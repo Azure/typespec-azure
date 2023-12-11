@@ -1,0 +1,101 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/mediatypes/analyze": {
+      "post": {
+        "operationId": "AnalyzeBody",
+        "description": "Analyze body, that could be different media types.",
+        "consumes": [
+          "application/pdf",
+          "application/json",
+          "image/jpeg",
+          "image/png",
+          "image/tiff"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/Input"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/mediatypes/contentTypeWithEncoding": {
+      "post": {
+        "operationId": "contentTypeWithEncoding",
+        "description": "Pass in contentType 'text/plain; encoding=UTF-8' to pass test. Value for input does not matter",
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/Input"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "SourcePath": {
+      "type": "object",
+      "description": "Uri or local path to source data.",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "File source path.",
+          "minLength": 0,
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "source"
+      ]
+    }
+  },
+  "parameters": {
+    "Input": {
+      "name": "input",
+      "in": "body",
+      "description": "Input parameter.",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/SourcePath"
+      },
+      "x-ms-parameter-location": "method"
+    }
+  }
+}

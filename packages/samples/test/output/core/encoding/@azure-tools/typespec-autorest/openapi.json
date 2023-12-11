@@ -1,0 +1,149 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "(title)",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "Read",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Encodings"
+            },
+            "headers": {
+              "in-header": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Encodings": {
+      "type": "object",
+      "properties": {
+        "datetime": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "rfc3339": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "rfc7231": {
+              "type": "string",
+              "format": "date-time-rfc7231"
+            },
+            "rfc7231ViaScalar": {
+              "$ref": "#/definitions/myRfc7231DateTime"
+            },
+            "unixtime": {
+              "type": "integer",
+              "format": "unixtime"
+            },
+            "unixtimeViaScalar": {
+              "$ref": "#/definitions/myUnixTimestamp"
+            }
+          },
+          "required": [
+            "default",
+            "rfc3339",
+            "rfc7231",
+            "rfc7231ViaScalar",
+            "unixtime",
+            "unixtimeViaScalar"
+          ]
+        },
+        "duration": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "string",
+              "format": "duration"
+            },
+            "durationISO": {
+              "type": "string",
+              "format": "duration"
+            },
+            "durationSecondsInt32": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "durationSecondsFloat32": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "required": [
+            "default",
+            "durationISO",
+            "durationSecondsInt32",
+            "durationSecondsFloat32"
+          ]
+        },
+        "bytes": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "string",
+              "format": "byte"
+            },
+            "base64": {
+              "type": "string",
+              "format": "base64"
+            },
+            "base64url": {
+              "type": "string",
+              "format": "base64url"
+            }
+          },
+          "required": [
+            "default",
+            "base64",
+            "base64url"
+          ]
+        }
+      },
+      "required": [
+        "datetime",
+        "duration",
+        "bytes"
+      ]
+    },
+    "myRfc7231DateTime": {
+      "type": "string",
+      "format": "date-time-rfc7231"
+    },
+    "myUnixTimestamp": {
+      "type": "integer",
+      "format": "unixtime"
+    }
+  },
+  "parameters": {}
+}

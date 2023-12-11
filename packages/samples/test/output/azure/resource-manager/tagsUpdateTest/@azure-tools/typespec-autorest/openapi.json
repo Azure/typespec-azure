@@ -1,0 +1,1409 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Microsoft.UpdateTests",
+    "version": "2023-03-01-preview",
+    "description": "Testing resource update using a Management API",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "TestUpdate"
+    },
+    {
+      "name": "TestChildUpdate"
+    },
+    {
+      "name": "TestCustomUpdate"
+    }
+  ],
+  "paths": {
+    "/providers/Microsoft.UpdateTests/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.UpdateTests/accessPointGateways": {
+      "get": {
+        "operationId": "TestUpdate_ListBySubscription",
+        "tags": [
+          "TestUpdate"
+        ],
+        "description": "List TestUpdateResource resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}/sites": {
+      "get": {
+        "operationId": "TestChildUpdate_ListBySubscription",
+        "tags": [
+          "TestChildUpdate"
+        ],
+        "description": "List TestUpdateChildResource resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}/sites/{siteName}/subnets": {
+      "get": {
+        "operationId": "TestCustomUpdate_ListBySubscription",
+        "tags": [
+          "TestCustomUpdate"
+        ],
+        "description": "List TestCustomUpdateResource resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.UpdateTests/accessPointGateways": {
+      "get": {
+        "operationId": "TestUpdate_ListByResourceGroup",
+        "tags": [
+          "TestUpdate"
+        ],
+        "description": "List TestUpdateResource resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}": {
+      "get": {
+        "operationId": "TestUpdate_Get",
+        "tags": [
+          "TestUpdate"
+        ],
+        "description": "Get a TestUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TestUpdate_Create",
+        "tags": [
+          "TestUpdate"
+        ],
+        "description": "Create a TestUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestUpdateResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestUpdateResource' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResource"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "TestUpdate_Update",
+        "tags": [
+          "TestUpdate"
+        ],
+        "description": "Update a TestUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResourceTagsUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TestUpdate_Delete",
+        "tags": [
+          "TestUpdate"
+        ],
+        "description": "Delete a TestUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}/sites": {
+      "get": {
+        "operationId": "TestChildUpdate_ListByTestUpdateResource",
+        "tags": [
+          "TestChildUpdate"
+        ],
+        "description": "List TestUpdateChildResource resources by TestUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}/sites/{siteName}": {
+      "get": {
+        "operationId": "TestChildUpdate_Get",
+        "tags": [
+          "TestChildUpdate"
+        ],
+        "description": "Get a TestUpdateChildResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TestChildUpdate_Create",
+        "tags": [
+          "TestChildUpdate"
+        ],
+        "description": "Create a TestUpdateChildResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestUpdateChildResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestUpdateChildResource' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResource"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "TestChildUpdate_Update",
+        "tags": [
+          "TestChildUpdate"
+        ],
+        "description": "Update a TestUpdateChildResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResourceTagsUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestUpdateChildResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TestChildUpdate_Delete",
+        "tags": [
+          "TestChildUpdate"
+        ],
+        "description": "Delete a TestUpdateChildResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}/sites/{siteName}/subnets": {
+      "get": {
+        "operationId": "TestCustomUpdate_ListByTestUpdateChildResource",
+        "tags": [
+          "TestCustomUpdate"
+        ],
+        "description": "List TestCustomUpdateResource resources by TestUpdateChildResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.UpdateTests/accessPointGateways/{accessPointGatewayName}/sites/{siteName}/subnets/{subnetName}": {
+      "get": {
+        "operationId": "TestCustomUpdate_Get",
+        "tags": [
+          "TestCustomUpdate"
+        ],
+        "description": "Get a TestCustomUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subnetName",
+            "in": "path",
+            "description": "The name of the Gateway Subnet",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TestCustomUpdate_Create",
+        "tags": [
+          "TestCustomUpdate"
+        ],
+        "description": "Create a TestCustomUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subnetName",
+            "in": "path",
+            "description": "The name of the Gateway Subnet",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestCustomUpdateResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestCustomUpdateResource' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResource"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "TestCustomUpdate_Update",
+        "tags": [
+          "TestCustomUpdate"
+        ],
+        "description": "Update a TestCustomUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subnetName",
+            "in": "path",
+            "description": "The name of the Gateway Subnet",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CustomUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestCustomUpdateResource"
+            }
+          },
+          "202": {
+            "description": "Resource update request accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "TestCustomUpdate_Delete",
+        "tags": [
+          "TestCustomUpdate"
+        ],
+        "description": "Delete a TestCustomUpdateResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "accessPointGatewayName",
+            "in": "path",
+            "description": "The name of the Gateway",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "siteName",
+            "in": "path",
+            "description": "The name of the Gateway Site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subnetName",
+            "in": "path",
+            "description": "The name of the Gateway Subnet",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    }
+  },
+  "definitions": {
+    "ClassificationLevel": {
+      "type": "string",
+      "description": "Cluster Classification Levels",
+      "enum": [
+        "Collateral",
+        "Sar",
+        "Sci",
+        "SciSar"
+      ],
+      "x-ms-enum": {
+        "name": "ClassificationLevel",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Collateral",
+            "value": "Collateral",
+            "description": "Collateral"
+          },
+          {
+            "name": "Sar",
+            "value": "Sar",
+            "description": "SAR"
+          },
+          {
+            "name": "Sci",
+            "value": "Sci",
+            "description": "SCI"
+          },
+          {
+            "name": "SciSar",
+            "value": "SciSar",
+            "description": "SCI/SAR"
+          }
+        ]
+      }
+    },
+    "CustomUpdateProperties": {
+      "type": "object",
+      "description": "Custom update request properties",
+      "properties": {
+        "addressPrefix": {
+          "type": "string",
+          "description": "The IP Range of the subnet"
+        },
+        "subnetMask": {
+          "type": "string",
+          "description": "The size of the subnet you wish to create"
+        }
+      }
+    },
+    "CustomUpdateRequest": {
+      "type": "object",
+      "description": "The update request body for custom update",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/CustomUpdateProperties",
+          "description": "The first update property"
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ProvisioningState": {
+      "type": "string",
+      "description": "Provisioning state",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled",
+        "Provisioning",
+        "Updating",
+        "Deleting",
+        "Accepted"
+      ],
+      "x-ms-enum": {
+        "name": "ProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          },
+          {
+            "name": "Provisioning",
+            "value": "Provisioning",
+            "description": "Provisioning"
+          },
+          {
+            "name": "Updating",
+            "value": "Updating",
+            "description": "Updating"
+          },
+          {
+            "name": "Deleting",
+            "value": "Deleting",
+            "description": "Deleting"
+          },
+          {
+            "name": "Accepted",
+            "value": "Accepted",
+            "description": "Accepted"
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "TestCustomUpdateProperties": {
+      "type": "object",
+      "description": "Gateway Subnet Properties.",
+      "properties": {
+        "addressPrefix": {
+          "type": "string",
+          "description": "The IP Range of the subnet",
+          "x-ms-mutability": [
+            "read",
+            "update"
+          ]
+        },
+        "subnetMask": {
+          "type": "string",
+          "description": "The size of the subnet you wish to create",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/ProvisioningState",
+          "description": "The status of the last operation.",
+          "readOnly": true
+        }
+      }
+    },
+    "TestCustomUpdateResource": {
+      "type": "object",
+      "description": "Access Point Gateway Subnet",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestCustomUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "TestCustomUpdateResourceListResult": {
+      "type": "object",
+      "description": "The response of a TestCustomUpdateResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestCustomUpdateResource items on this page",
+          "items": {
+            "$ref": "#/definitions/TestCustomUpdateResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestUpdateChildProperties": {
+      "type": "object",
+      "description": "Gateway Site Properties.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/ProvisioningState",
+          "description": "The status of the last operation.",
+          "readOnly": true
+        }
+      }
+    },
+    "TestUpdateChildResource": {
+      "type": "object",
+      "description": "Access Point Gateway Site",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestUpdateChildProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "TestUpdateChildResourceListResult": {
+      "type": "object",
+      "description": "The response of a TestUpdateChildResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestUpdateChildResource items on this page",
+          "items": {
+            "$ref": "#/definitions/TestUpdateChildResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestUpdateChildResourceTagsUpdate": {
+      "type": "object",
+      "description": "The type used for updating tags in TestUpdateChildResource resources.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "TestUpdateResource": {
+      "type": "object",
+      "description": "Access Point Gateway",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestUpdateResourceProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "TestUpdateResourceListResult": {
+      "type": "object",
+      "description": "The response of a TestUpdateResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestUpdateResource items on this page",
+          "items": {
+            "$ref": "#/definitions/TestUpdateResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestUpdateResourceProperties": {
+      "type": "object",
+      "description": "Access Point Gateway Properties.",
+      "properties": {
+        "classificationLevel": {
+          "$ref": "#/definitions/ClassificationLevel",
+          "description": "The Classification Level of the Access Point infrastructure.",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/ProvisioningState",
+          "description": "The status of the last operation.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "classificationLevel"
+      ]
+    },
+    "TestUpdateResourceTagsUpdate": {
+      "type": "object",
+      "description": "The type used for updating tags in TestUpdateResource resources.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "parameters": {}
+}

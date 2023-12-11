@@ -1,0 +1,204 @@
+---
+title: Overview
+sidebar_position: 0
+toc_min_heading_level: 2
+toc_max_heading_level: 3
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Overview
+
+TypeSpec Azure Resource Manager library
+
+## Install
+
+<Tabs>
+<TabItem value="spec" label="In a spec" default>
+
+```bash
+npm install @azure-tools/typespec-azure-resource-manager
+```
+
+</TabItem>
+<TabItem value="library" label="In a library" default>
+
+```bash
+npm install --save-peer @azure-tools/typespec-azure-resource-manager
+```
+
+</TabItem>
+</Tabs>
+
+## Azure
+
+## Azure.ResourceManager
+
+### Decorators
+
+- [`@armCommonTypesVersion`](./decorators.md#@Azure.ResourceManager.armCommonTypesVersion)
+- [`@armLibraryNamespace`](./decorators.md#@Azure.ResourceManager.armLibraryNamespace)
+- [`@armProviderNamespace`](./decorators.md#@Azure.ResourceManager.armProviderNamespace)
+- [`@armProviderNameValue`](./decorators.md#@Azure.ResourceManager.armProviderNameValue)
+- [`@armRenameListByOperation`](./decorators.md#@Azure.ResourceManager.armRenameListByOperation)
+- [`@armResourceAction`](./decorators.md#@Azure.ResourceManager.armResourceAction)
+- [`@armResourceCollectionAction`](./decorators.md#@Azure.ResourceManager.armResourceCollectionAction)
+- [`@armResourceCreateOrUpdate`](./decorators.md#@Azure.ResourceManager.armResourceCreateOrUpdate)
+- [`@armResourceDelete`](./decorators.md#@Azure.ResourceManager.armResourceDelete)
+- [`@armResourceList`](./decorators.md#@Azure.ResourceManager.armResourceList)
+- [`@armResourceOperations`](./decorators.md#@Azure.ResourceManager.armResourceOperations)
+- [`@armResourceRead`](./decorators.md#@Azure.ResourceManager.armResourceRead)
+- [`@armResourceUpdate`](./decorators.md#@Azure.ResourceManager.armResourceUpdate)
+- [`@extensionResource`](./decorators.md#@Azure.ResourceManager.extensionResource)
+- [`@locationResource`](./decorators.md#@Azure.ResourceManager.locationResource)
+- [`@resourceGroupResource`](./decorators.md#@Azure.ResourceManager.resourceGroupResource)
+- [`@singleton`](./decorators.md#@Azure.ResourceManager.singleton)
+- [`@subscriptionResource`](./decorators.md#@Azure.ResourceManager.subscriptionResource)
+- [`@tenantResource`](./decorators.md#@Azure.ResourceManager.tenantResource)
+- [`@useLibraryNamespace`](./decorators.md#@Azure.ResourceManager.useLibraryNamespace)
+
+### Interfaces
+
+- [`ExtensionResourceCollectionOperations`](./interfaces.md#Azure.ResourceManager.ExtensionResourceCollectionOperations)
+- [`ExtensionResourceInstanceOperations`](./interfaces.md#Azure.ResourceManager.ExtensionResourceInstanceOperations)
+- [`ExtensionResourceOperations`](./interfaces.md#Azure.ResourceManager.ExtensionResourceOperations)
+- [`Operations`](./interfaces.md#Azure.ResourceManager.Operations)
+- [`ProxyResourceOperations`](./interfaces.md#Azure.ResourceManager.ProxyResourceOperations)
+- [`ResourceCollectionOperations`](./interfaces.md#Azure.ResourceManager.ResourceCollectionOperations)
+- [`ResourceCreateAsync`](./interfaces.md#Azure.ResourceManager.ResourceCreateAsync)
+- [`ResourceCreateSync`](./interfaces.md#Azure.ResourceManager.ResourceCreateSync)
+- [`ResourceDeleteAsync`](./interfaces.md#Azure.ResourceManager.ResourceDeleteAsync)
+- [`ResourceDeleteSync`](./interfaces.md#Azure.ResourceManager.ResourceDeleteSync)
+- [`ResourceDeleteWithoutOkAsync`](./interfaces.md#Azure.ResourceManager.ResourceDeleteWithoutOkAsync)
+- [`ResourceInstanceOperations`](./interfaces.md#Azure.ResourceManager.ResourceInstanceOperations)
+- [`ResourceListByParent`](./interfaces.md#Azure.ResourceManager.ResourceListByParent)
+- [`ResourceListBySubscription`](./interfaces.md#Azure.ResourceManager.ResourceListBySubscription)
+- [`ResourceOperations`](./interfaces.md#Azure.ResourceManager.ResourceOperations)
+- [`ResourceRead`](./interfaces.md#Azure.ResourceManager.ResourceRead)
+- [`ResourceUpdateAsync`](./interfaces.md#Azure.ResourceManager.ResourceUpdateAsync)
+- [`ResourceUpdateSync`](./interfaces.md#Azure.ResourceManager.ResourceUpdateSync)
+- [`TenantResourceOperations`](./interfaces.md#Azure.ResourceManager.TenantResourceOperations)
+- [`TrackedResourceOperations`](./interfaces.md#Azure.ResourceManager.TrackedResourceOperations)
+
+### Operations
+
+- [`ArmCustomPatchAsync`](./interfaces.md#Azure.ResourceManager.ArmCustomPatchAsync)
+- [`ArmCustomPatchSync`](./interfaces.md#Azure.ResourceManager.ArmCustomPatchSync)
+- [`ArmListBySubscription`](./interfaces.md#Azure.ResourceManager.ArmListBySubscription)
+- [`ArmResourceActionAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionAsync)
+- [`ArmResourceActionAsyncBase`](./interfaces.md#Azure.ResourceManager.ArmResourceActionAsyncBase)
+- [`ArmResourceActionNoContentAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionNoContentAsync)
+- [`ArmResourceActionNoContentSync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionNoContentSync)
+- [`ArmResourceActionNoResponseContentAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync)
+- [`ArmResourceActionSync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionSync)
+- [`ArmResourceCreateOrReplaceSync`](./interfaces.md#Azure.ResourceManager.ArmResourceCreateOrReplaceSync)
+- [`ArmResourceCreateOrUpdateAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceCreateOrUpdateAsync)
+- [`ArmResourceCreateOrUpdateSync`](./interfaces.md#Azure.ResourceManager.ArmResourceCreateOrUpdateSync)
+- [`ArmResourceDeleteAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceDeleteAsync)
+- [`ArmResourceDeleteAsyncBase`](./interfaces.md#Azure.ResourceManager.ArmResourceDeleteAsyncBase)
+- [`ArmResourceDeleteSync`](./interfaces.md#Azure.ResourceManager.ArmResourceDeleteSync)
+- [`ArmResourceDeleteWithoutOkAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync)
+- [`ArmResourceListAtScope`](./interfaces.md#Azure.ResourceManager.ArmResourceListAtScope)
+- [`ArmResourceListByParent`](./interfaces.md#Azure.ResourceManager.ArmResourceListByParent)
+- [`ArmResourceRead`](./interfaces.md#Azure.ResourceManager.ArmResourceRead)
+- [`checkGlobalNameAvailability`](./interfaces.md#Azure.ResourceManager.checkGlobalNameAvailability)
+- [`checkLocalNameAvailability`](./interfaces.md#Azure.ResourceManager.checkLocalNameAvailability)
+
+### Models
+
+- [`ApiVersionParameter`](./data-types.md#Azure.ResourceManager.ApiVersionParameter)
+- [`ArmAcceptedLroResponse`](./data-types.md#Azure.ResourceManager.ArmAcceptedLroResponse)
+- [`ArmAcceptedResponse`](./data-types.md#Azure.ResourceManager.ArmAcceptedResponse)
+- [`ArmCreatedResponse`](./data-types.md#Azure.ResourceManager.ArmCreatedResponse)
+- [`ArmDeleteAcceptedLroResponse`](./data-types.md#Azure.ResourceManager.ArmDeleteAcceptedLroResponse)
+- [`ArmDeleteAcceptedResponse`](./data-types.md#Azure.ResourceManager.ArmDeleteAcceptedResponse)
+- [`ArmDeletedNoContentResponse`](./data-types.md#Azure.ResourceManager.ArmDeletedNoContentResponse)
+- [`ArmDeletedResponse`](./data-types.md#Azure.ResourceManager.ArmDeletedResponse)
+- [`ArmNoContentResponse`](./data-types.md#Azure.ResourceManager.ArmNoContentResponse)
+- [`ArmResourceCreatedResponse`](./data-types.md#Azure.ResourceManager.ArmResourceCreatedResponse)
+- [`ArmResourceCreatedSyncResponse`](./data-types.md#Azure.ResourceManager.ArmResourceCreatedSyncResponse)
+- [`ArmResourceUpdatedResponse`](./data-types.md#Azure.ResourceManager.ArmResourceUpdatedResponse)
+- [`ArmResponse`](./data-types.md#Azure.ResourceManager.ArmResponse)
+- [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CustomerManagedKeyEncryption)
+- [`DefaultProvisioningStateProperty`](./data-types.md#Azure.ResourceManager.DefaultProvisioningStateProperty)
+- [`Encryption`](./data-types.md#Azure.ResourceManager.Encryption)
+- [`EncryptionConfiguration`](./data-types.md#Azure.ResourceManager.EncryptionConfiguration)
+- [`EntityTag`](./data-types.md#Azure.ResourceManager.EntityTag)
+- [`ErrorResponse`](./data-types.md#Azure.ResourceManager.ErrorResponse)
+- [`ExtensionResource`](./data-types.md#Azure.ResourceManager.ExtensionResource)
+- [`KeysOf`](./data-types.md#Azure.ResourceManager.KeysOf)
+- [`LocationParameter`](./data-types.md#Azure.ResourceManager.LocationParameter)
+- [`ManagedBy`](./data-types.md#Azure.ResourceManager.ManagedBy)
+- [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.ManagedServiceIdentity)
+- [`ManagedSystemAssignedIdentity`](./data-types.md#Azure.ResourceManager.ManagedSystemAssignedIdentity)
+- [`ParentKeysOf`](./data-types.md#Azure.ResourceManager.ParentKeysOf)
+- [`PrivateEndpoint`](./data-types.md#Azure.ResourceManager.PrivateEndpoint)
+- [`PrivateEndpointConnection`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnection)
+- [`PrivateEndpointConnectionParameter`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionParameter)
+- [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProperties)
+- [`PrivateEndpointConnectionResourceListResult`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionResourceListResult)
+- [`PrivateLinkResource`](./data-types.md#Azure.ResourceManager.PrivateLinkResource)
+- [`PrivateLinkResourceListResult`](./data-types.md#Azure.ResourceManager.PrivateLinkResourceListResult)
+- [`PrivateLinkResourceParameter`](./data-types.md#Azure.ResourceManager.PrivateLinkResourceParameter)
+- [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.PrivateLinkResourceProperties)
+- [`PrivateLinkServiceConnectionState`](./data-types.md#Azure.ResourceManager.PrivateLinkServiceConnectionState)
+- [`ProviderNamespace`](./data-types.md#Azure.ResourceManager.ProviderNamespace)
+- [`ProxyResource`](./data-types.md#Azure.ResourceManager.ProxyResource)
+- [`ResourceGroupParameter`](./data-types.md#Azure.ResourceManager.ResourceGroupParameter)
+- [`ResourceIdentifierAllowedResource`](./data-types.md#Azure.ResourceManager.ResourceIdentifierAllowedResource)
+- [`ResourceInstanceParameters`](./data-types.md#Azure.ResourceManager.ResourceInstanceParameters)
+- [`ResourceKind`](./data-types.md#Azure.ResourceManager.ResourceKind)
+- [`ResourceListResult`](./data-types.md#Azure.ResourceManager.ResourceListResult)
+- [`ResourceParentParameters`](./data-types.md#Azure.ResourceManager.ResourceParentParameters)
+- [`ResourcePlan`](./data-types.md#Azure.ResourceManager.ResourcePlan)
+- [`ResourceSku`](./data-types.md#Azure.ResourceManager.ResourceSku)
+- [`ResourceUriParameter`](./data-types.md#Azure.ResourceManager.ResourceUriParameter)
+- [`SubscriptionIdParameter`](./data-types.md#Azure.ResourceManager.SubscriptionIdParameter)
+- [`TrackedResource`](./data-types.md#Azure.ResourceManager.TrackedResource)
+
+## Azure.ResourceManager.CommonTypes
+
+## Azure.ResourceManager.Foundations
+
+### Operations
+
+- [`checkNameAvailability`](./interfaces.md#Azure.ResourceManager.Foundations.checkNameAvailability)
+
+### Models
+
+- [`ArmResource`](./data-types.md#Azure.ResourceManager.Foundations.ArmResource)
+- [`ArmTagsProperty`](./data-types.md#Azure.ResourceManager.Foundations.ArmTagsProperty)
+- [`BaseParameters`](./data-types.md#Azure.ResourceManager.Foundations.BaseParameters)
+- [`CheckNameAvailabilityRequest`](./data-types.md#Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest)
+- [`CheckNameAvailabilityResponse`](./data-types.md#Azure.ResourceManager.Foundations.CheckNameAvailabilityResponse)
+- [`ErrorAdditionalInfo`](./data-types.md#Azure.ResourceManager.Foundations.ErrorAdditionalInfo)
+- [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail)
+- [`ExtensionBaseParameters`](./data-types.md#Azure.ResourceManager.Foundations.ExtensionBaseParameters)
+- [`ExtensionResourceBase`](./data-types.md#Azure.ResourceManager.Foundations.ExtensionResourceBase)
+- [`ExtensionScope`](./data-types.md#Azure.ResourceManager.Foundations.ExtensionScope)
+- [`LocationBaseParameters`](./data-types.md#Azure.ResourceManager.Foundations.LocationBaseParameters)
+- [`LocationScope`](./data-types.md#Azure.ResourceManager.Foundations.LocationScope)
+- [`ManagedIdentityProperties`](./data-types.md#Azure.ResourceManager.Foundations.ManagedIdentityProperties)
+- [`ManagedSystemIdentityProperties`](./data-types.md#Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties)
+- [`Operation`](./data-types.md#Azure.ResourceManager.Foundations.Operation)
+- [`OperationDisplay`](./data-types.md#Azure.ResourceManager.Foundations.OperationDisplay)
+- [`OperationIdParameter`](./data-types.md#Azure.ResourceManager.Foundations.OperationIdParameter)
+- [`OperationListResult`](./data-types.md#Azure.ResourceManager.Foundations.OperationListResult)
+- [`OperationStatusResult`](./data-types.md#Azure.ResourceManager.Foundations.OperationStatusResult)
+- [`ProxyResourceBase`](./data-types.md#Azure.ResourceManager.Foundations.ProxyResourceBase)
+- [`ProxyResourceUpdateModel`](./data-types.md#Azure.ResourceManager.Foundations.ProxyResourceUpdateModel)
+- [`ResourceGroupBaseParameters`](./data-types.md#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters)
+- [`ResourceGroupScope`](./data-types.md#Azure.ResourceManager.Foundations.ResourceGroupScope)
+- [`ResourcePlanType`](./data-types.md#Azure.ResourceManager.Foundations.ResourcePlanType)
+- [`ResourceSkuType`](./data-types.md#Azure.ResourceManager.Foundations.ResourceSkuType)
+- [`ResourceUpdateModel`](./data-types.md#Azure.ResourceManager.Foundations.ResourceUpdateModel)
+- [`ResourceUpdateModelProperties`](./data-types.md#Azure.ResourceManager.Foundations.ResourceUpdateModelProperties)
+- [`SubscriptionBaseParameters`](./data-types.md#Azure.ResourceManager.Foundations.SubscriptionBaseParameters)
+- [`SubscriptionScope`](./data-types.md#Azure.ResourceManager.Foundations.SubscriptionScope)
+- [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData)
+- [`TagsUpdateModel`](./data-types.md#Azure.ResourceManager.Foundations.TagsUpdateModel)
+- [`TenantBaseParameters`](./data-types.md#Azure.ResourceManager.Foundations.TenantBaseParameters)
+- [`TenantScope`](./data-types.md#Azure.ResourceManager.Foundations.TenantScope)
+- [`TrackedResourceBase`](./data-types.md#Azure.ResourceManager.Foundations.TrackedResourceBase)
+- [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentity)

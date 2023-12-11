@@ -1,0 +1,39 @@
+import "../dist/src/index.js";
+import "@typespec/openapi";
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-autorest";
+import "@azure-tools/typespec-azure-core";
+
+import "./arm.foundations.tsp";
+import "./common-types.tsp";
+import "./private.decorators.tsp";
+import "./models.tsp";
+import "./operations.tsp";
+import "./decorators.tsp";
+import "./interfaces.tsp";
+import "./responses.tsp";
+import "./parameters.tsp";
+import "./private-links.tsp";
+import "./customer-managed-keys.tsp";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using TypeSpec.OpenAPI;
+using Autorest;
+using Azure.ResourceManager.Foundations;
+
+@versioned(Azure.ResourceManager.Versions)
+namespace Azure.ResourceManager;
+
+/**
+ * Supported versions of Azure.ResourceManager building blocks.
+ */
+@doc("Supported versions of Azure.ResourceManager building blocks.")
+enum Versions {
+  @doc("Version 1.0-preview.1")
+  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+  v1_0_Preview_1: "1.0-preview.1",
+}

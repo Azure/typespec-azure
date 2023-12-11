@@ -1,0 +1,83 @@
+{
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "search.exclude": {
+    "**/dist/**": true,
+    "**/dist-dev/**": true,
+    "**/CHANGELOG.json": true,
+    "docs/spec.html": true,
+    "**/bin/**": true,
+    "**/node_modules/**": true,
+    "packages/website/versioned_docs/**": true,
+    "core/packages/website/versioned_docs/**": true
+  },
+  "files.exclude": {
+    "**/common/temp/**": true,
+    "**/obj/**": true,
+    "**/.git": true,
+    "**/.DS_Store": true
+  },
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false, // work around https://github.com/simonhaenisch/prettier-plugin-organize-imports/issues/53
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json][[jsonc][yaml][typespec][markdown][css]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[csharp]": {
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4
+  },
+  "[xml]": {
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2
+  },
+  "files.associations": {
+    "rush.json": "jsonc",
+    "common-versions.json": "jsonc",
+    "command-line.json": "jsonc",
+    "pnpm-config.json": "jsonc",
+    "version-policies.json": "jsonc"
+  },
+  "typescript.tsdk": "./core/packages/compiler/node_modules/typescript/lib",
+  "git.ignoreLimitWarning": true,
+  "testExplorer.useNativeTesting": true,
+  "mochaExplorer.parallel": false,
+  "mochaExplorer.files": [
+    "./core/packages/*/dist/test/**/*.test.js",
+    "./core/packages/*/test/**/*.test.js",
+    "./packages/*/dist/test/**/*.test.js",
+    "./packages/*/test/**/*.test.js"
+  ],
+  "mochaExplorer.ignore": [
+    "./core/packages/*/dist/test/manual/**/*.js",
+    "./packages/*/dist/test/manual/**/*.js"
+  ],
+  "mochaExplorer.mochaPath": "./core/packages/compiler/node_modules/mocha",
+  "mochaExplorer.timeout": 500000,
+  "mochaExplorer.require": "source-map-support/register",
+  "mochaExplorer.debuggerConfig": "Tests",
+  "mochaExplorer.env": {
+    "TYPESPEC_VERBOSE_TEST_OUTPUT": "true",
+    "NODE_OPTIONS": "--stack-trace-limit=50"
+  },
+  "prettier.configPath": ".prettierrc.json",
+  "prettier.ignorePath": ".prettierignore",
+  "prettier.prettierPath": "./core/packages/compiler/node_modules/prettier/index.cjs",
+  "prettier.documentSelectors": ["**/*.tsp"],
+  "testExplorer.errorDecoration": false,
+  "typespec.tsp-server.path": "${workspaceRoot}/core/packages/compiler",
+  "cSpell.words": ["autorest", "typespec"],
+  "dotnet.defaultSolution": "disable"
+}

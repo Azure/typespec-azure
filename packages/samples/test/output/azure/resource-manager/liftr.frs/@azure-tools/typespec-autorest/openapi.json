@@ -1,0 +1,661 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Azure Fluid Relay",
+    "version": "2021-03-12-preview",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "FluidRelayServers"
+    }
+  ],
+  "paths": {
+    "/providers/Microsoft.FluidRelay/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.FluidRelay/fluidRelayServers": {
+      "get": {
+        "operationId": "FluidRelayServers_ListBySubscription",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "List FluidRelayServer resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServerListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.FluidRelay/fluidRelayServers": {
+      "get": {
+        "operationId": "FluidRelayServers_ListByResourceGroup",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "List FluidRelayServer resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServerListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.FluidRelay/fluidRelayServers/{name}": {
+      "get": {
+        "operationId": "FluidRelayServers_Get",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "Get a FluidRelayServer",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The resource name.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "FluidRelayServers_CreateOrUpdate",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "Create a FluidRelayServer",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The resource name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'FluidRelayServer' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServer"
+            }
+          },
+          "201": {
+            "description": "Resource 'FluidRelayServer' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServer"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "FluidRelayServers_Update",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "Update a FluidRelayServer",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The resource name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServerUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "FluidRelayServers_Delete",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "Delete a FluidRelayServer",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The resource name.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.FluidRelay/fluidRelayServers/{name}/getKeys": {
+      "post": {
+        "operationId": "FluidRelayServers_GetKeys",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "Retrieve the keys for this server.",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The resource name.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServerKeys"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.FluidRelay/fluidRelayServers/{name}/regenerateKey": {
+      "post": {
+        "operationId": "FluidRelayServers_RegenerateKey",
+        "tags": [
+          "FluidRelayServers"
+        ],
+        "description": "Regenerate the primary or secondary key for this server.",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The resource name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "parameters",
+            "in": "body",
+            "description": "The details of the key generation request.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegenerateKeyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FluidRelayServerKeys"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "FluidRelayEndpoints": {
+      "type": "object",
+      "description": "The Fluid Relay Service endpoints for this server.",
+      "properties": {
+        "ordererEndpoints": {
+          "type": "array",
+          "description": "The Fluid Relay Orderer Endpoints.",
+          "items": {
+            "$ref": "#/definitions/Uri"
+          },
+          "readOnly": true
+        },
+        "storageEndpoints": {
+          "type": "array",
+          "description": "The Fluid Relay storage endpoints.",
+          "items": {
+            "$ref": "#/definitions/Uri"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "FluidRelayServer": {
+      "type": "object",
+      "description": "Details of the FluidRelay server.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/FluidRelayServerProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "FluidRelayServerKeys": {
+      "type": "object",
+      "description": "The set of available keys for this server.",
+      "properties": {
+        "key1": {
+          "$ref": "#/definitions/SecretKey",
+          "description": "The primary key for this server.",
+          "readOnly": true
+        },
+        "key2": {
+          "$ref": "#/definitions/SecretKey",
+          "description": "The secondary key for this server.",
+          "readOnly": true
+        }
+      }
+    },
+    "FluidRelayServerListResult": {
+      "type": "object",
+      "description": "The response of a FluidRelayServer list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The FluidRelayServer items on this page",
+          "items": {
+            "$ref": "#/definitions/FluidRelayServer"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "FluidRelayServerProperties": {
+      "type": "object",
+      "description": "The properties of a Fluid Relay Service resource.",
+      "properties": {
+        "frsTenantId": {
+          "type": "string",
+          "description": "The Fluid tenantId for this server",
+          "readOnly": true
+        },
+        "fluidRelayEndpoints": {
+          "$ref": "#/definitions/FluidRelayEndpoints",
+          "description": "The Fluid service endpoints for this server.",
+          "readOnly": true
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/ProvisioningState",
+          "description": "Provisioning states for FluidRelay RP"
+        }
+      }
+    },
+    "FluidRelayServerUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the FluidRelayServer.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/FluidRelayServerUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "FluidRelayServerUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the FluidRelayServer.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/ProvisioningState",
+          "description": "Provisioning states for FluidRelay RP"
+        }
+      }
+    },
+    "KeyName": {
+      "type": "string",
+      "description": "The keys that are defined fro a FluidRelay Service.",
+      "enum": [
+        "key1",
+        "key2"
+      ],
+      "x-ms-enum": {
+        "name": "KeyName",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "key1",
+            "value": "key1",
+            "description": "Key 1"
+          },
+          {
+            "name": "key2",
+            "value": "key2",
+            "description": "Key 2"
+          }
+        ]
+      }
+    },
+    "ProvisioningState": {
+      "type": "string",
+      "description": "Provisioning states for FluidRelay RP",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled"
+      ],
+      "x-ms-enum": {
+        "name": "ProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "RegenerateKeyRequest": {
+      "type": "object",
+      "description": "Specifies which key should be generated.",
+      "properties": {
+        "keyName": {
+          "$ref": "#/definitions/KeyName",
+          "description": "The key to regenerate."
+        }
+      },
+      "required": [
+        "keyName"
+      ]
+    },
+    "SecretKey": {
+      "type": "string",
+      "format": "password",
+      "description": "The representation of a secret value, represented as a string on the wire",
+      "x-ms-secret": true
+    },
+    "Uri": {
+      "type": "string",
+      "description": "A string that represents a URI."
+    }
+  },
+  "parameters": {}
+}

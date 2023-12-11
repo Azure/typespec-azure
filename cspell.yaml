@@ -1,0 +1,48 @@
+version: "0.2"
+language: en
+allowCompoundWords: true
+import:
+  - core/cspell.yaml
+dictionaries:
+  - node
+  - typescript
+ignorePaths:
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/dist-dev/**"
+  - "**/CHANGELOG.md"
+  - common/scripts/*
+  - packages/website/build/*
+enableFiletypes:
+  - cadl
+words:
+  - allof
+  - apim
+  - apos
+  - azsdk
+  - Bazs
+  - byos
+  - clsx
+  - DMSS
+  - Donezo
+  - dynatrace
+  - foos
+  - horiz
+  - Howtos
+  - liftr
+  - logz
+  - LRO
+  - msazure
+  - msdata
+  - odata
+  - Onco
+  - oncophenotype
+  - prismjs
+  - regionality
+  - rpaasoneboxacr
+  - rpass
+  - SERVICERP
+  - userrp
+  - lropaging
+  - armId
+  - tcgc

@@ -1,0 +1,32 @@
+{
+  "name": "@azure-tools/e2e-tests",
+  "private": true,
+  "author": "Microsoft Corporation",
+  "version": "0.1.0",
+  "description": "TypeSpec E2E Tests",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": ""
+  },
+  "devDependencies": {
+    "@typespec/compiler": "workspace:~0.51.0",
+    "typescript": "~5.2.2",
+    "dotenv": "~16.3.1"
+  }
+}

@@ -1,0 +1,4790 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Microsoft.OperationsTest",
+    "version": "2022-11-01-preview",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "TrackedOperations"
+    },
+    {
+      "name": "TrackedChildOperations"
+    },
+    {
+      "name": "TenantOperations"
+    },
+    {
+      "name": "TenantChildOperations"
+    },
+    {
+      "name": "ExtensionOperations"
+    },
+    {
+      "name": "ExtensionChildOperations"
+    },
+    {
+      "name": "Tracked2Operations"
+    },
+    {
+      "name": "TrackedChildOperations2"
+    },
+    {
+      "name": "TenantOperations2"
+    },
+    {
+      "name": "TenantChildOperations2"
+    },
+    {
+      "name": "ExtensionOperations2"
+    },
+    {
+      "name": "ExtensionChildOperations2"
+    },
+    {
+      "name": "LocationResourceOperations"
+    },
+    {
+      "name": "LocationChildResourceOperations"
+    }
+  ],
+  "paths": {
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResource2s": {
+      "get": {
+        "operationId": "ExtensionOperations2_List",
+        "tags": [
+          "ExtensionOperations2"
+        ],
+        "description": "List TestExtensionResource2 resources by parent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResource2s/{extensionResourceName}": {
+      "get": {
+        "operationId": "ExtensionOperations2_Get",
+        "tags": [
+          "ExtensionOperations2"
+        ],
+        "description": "Get a TestExtensionResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ExtensionOperations2_Create",
+        "tags": [
+          "ExtensionOperations2"
+        ],
+        "description": "Create a TestExtensionResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "ExtensionOperations2_Update",
+        "tags": [
+          "ExtensionOperations2"
+        ],
+        "description": "Update a TestExtensionResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2Update"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ExtensionOperations2_Delete",
+        "tags": [
+          "ExtensionOperations2"
+        ],
+        "description": "Delete a TestExtensionResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResource2s/{extensionResourceName}/children": {
+      "get": {
+        "operationId": "ExtensionChildOperations2_ListByTestExtensionResource2",
+        "tags": [
+          "ExtensionChildOperations2"
+        ],
+        "description": "List TestExtensionChild2 resources by TestExtensionResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResource2s/{extensionResourceName}/children/{childName}": {
+      "get": {
+        "operationId": "ExtensionChildOperations2_Get",
+        "tags": [
+          "ExtensionChildOperations2"
+        ],
+        "description": "Get a TestExtensionChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ExtensionChildOperations2_Create",
+        "tags": [
+          "ExtensionChildOperations2"
+        ],
+        "description": "Create a TestExtensionChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "ExtensionChildOperations2_Update",
+        "tags": [
+          "ExtensionChildOperations2"
+        ],
+        "description": "Update a TestExtensionChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2Update"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ExtensionChildOperations2_Delete",
+        "tags": [
+          "ExtensionChildOperations2"
+        ],
+        "description": "Delete a TestExtensionChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResources": {
+      "get": {
+        "operationId": "ExtensionOperations_List",
+        "tags": [
+          "ExtensionOperations"
+        ],
+        "description": "List TestExtensionResource resources by parent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResources/{extensionResourceName}": {
+      "get": {
+        "operationId": "ExtensionOperations_Get",
+        "tags": [
+          "ExtensionOperations"
+        ],
+        "description": "Get a TestExtensionResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ExtensionOperations_CreateOrUpdate",
+        "tags": [
+          "ExtensionOperations"
+        ],
+        "description": "Create a TestExtensionResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestExtensionResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestExtensionResource' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "ExtensionOperations_Update",
+        "tags": [
+          "ExtensionOperations"
+        ],
+        "description": "Update a TestExtensionResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResourceUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ExtensionOperations_Delete",
+        "tags": [
+          "ExtensionOperations"
+        ],
+        "description": "Delete a TestExtensionResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResources/{extensionResourceName}/children": {
+      "get": {
+        "operationId": "ExtensionChildOperations_ListByTestExtensionResource",
+        "tags": [
+          "ExtensionChildOperations"
+        ],
+        "description": "List TestExtensionChild resources by TestExtensionResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChildListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationsTest/extensionResources/{extensionResourceName}/children/{childName}": {
+      "get": {
+        "operationId": "ExtensionChildOperations_Get",
+        "tags": [
+          "ExtensionChildOperations"
+        ],
+        "description": "Get a TestExtensionChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ExtensionChildOperations_CreateOrUpdate",
+        "tags": [
+          "ExtensionChildOperations"
+        ],
+        "description": "Create a TestExtensionChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestExtensionChild' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestExtensionChild' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "ExtensionChildOperations_Delete",
+        "tags": [
+          "ExtensionChildOperations"
+        ],
+        "description": "Delete a TestExtensionChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "extensionResourceName",
+            "in": "path",
+            "description": "The name of the extension resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the extension child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.OperationsTest/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResource2s": {
+      "get": {
+        "operationId": "TenantOperations2_ListByTenant",
+        "tags": [
+          "TenantOperations2"
+        ],
+        "description": "List TestTenantResource2 resources by tenant",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResource2s/{tenantResourceName}": {
+      "get": {
+        "operationId": "TenantOperations2_Get",
+        "tags": [
+          "TenantOperations2"
+        ],
+        "description": "Get a TestTenantResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TenantOperations2_Create",
+        "tags": [
+          "TenantOperations2"
+        ],
+        "description": "Create a TestTenantResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "TenantOperations2_Update",
+        "tags": [
+          "TenantOperations2"
+        ],
+        "description": "Update a TestTenantResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2Update"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TenantOperations2_Delete",
+        "tags": [
+          "TenantOperations2"
+        ],
+        "description": "Delete a TestTenantResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResource2s/{tenantResourceName}/children": {
+      "get": {
+        "operationId": "TenantChildOperations2_ListByTestTenantResource2",
+        "tags": [
+          "TenantChildOperations2"
+        ],
+        "description": "List TestTenantChile2 resources by TestTenantResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResource2s/{tenantResourceName}/children/{childName}": {
+      "get": {
+        "operationId": "TenantChildOperations2_Get",
+        "tags": [
+          "TenantChildOperations2"
+        ],
+        "description": "Get a TestTenantChile2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TenantChildOperations2_Create",
+        "tags": [
+          "TenantChildOperations2"
+        ],
+        "description": "Create a TestTenantChile2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "TenantChildOperations2_Update",
+        "tags": [
+          "TenantChildOperations2"
+        ],
+        "description": "Update a TestTenantChile2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2Update"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TenantChildOperations2_Delete",
+        "tags": [
+          "TenantChildOperations2"
+        ],
+        "description": "Delete a TestTenantChile2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResources": {
+      "get": {
+        "operationId": "TenantOperations_ListByTenant",
+        "tags": [
+          "TenantOperations"
+        ],
+        "description": "List TestTenantResource resources by tenant",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResources/{tenantResourceName}": {
+      "get": {
+        "operationId": "TenantOperations_Get",
+        "tags": [
+          "TenantOperations"
+        ],
+        "description": "Get a TestTenantResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TenantOperations_CreateOrUpdate",
+        "tags": [
+          "TenantOperations"
+        ],
+        "description": "Create a TestTenantResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestTenantResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTenantResource' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "TenantOperations_Update",
+        "tags": [
+          "TenantOperations"
+        ],
+        "description": "Update a TestTenantResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantResourceUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TenantOperations_Delete",
+        "tags": [
+          "TenantOperations"
+        ],
+        "description": "Delete a TestTenantResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResources/{tenantResourceName}/children": {
+      "get": {
+        "operationId": "TenantChildOperations_ListByTestTenantResource",
+        "tags": [
+          "TenantChildOperations"
+        ],
+        "description": "List TestTenantChile resources by TestTenantResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChileListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.OperationsTest/tenantResources/{tenantResourceName}/children/{childName}": {
+      "get": {
+        "operationId": "TenantChildOperations_Get",
+        "tags": [
+          "TenantChildOperations"
+        ],
+        "description": "Get a TestTenantChile",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TenantChildOperations_CreateOrUpdate",
+        "tags": [
+          "TenantChildOperations"
+        ],
+        "description": "Create a TestTenantChile",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestTenantChile' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTenantChile' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "TenantChildOperations_Delete",
+        "tags": [
+          "TenantChildOperations"
+        ],
+        "description": "Delete a TestTenantChile",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "tenantResourceName",
+            "in": "path",
+            "description": "The name of the tenant resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the tenant child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources": {
+      "get": {
+        "operationId": "LocationResourceOperations_ListByLocation",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "List LocationResource resources by location",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}": {
+      "get": {
+        "operationId": "LocationResourceOperations_Get",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "Get a LocationResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "LocationResourceOperations_Create",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "Create a LocationResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "LocationResourceOperations_Update",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "Update a LocationResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationResourceUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "LocationResourceOperations_Delete",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "Delete a LocationResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}/children": {
+      "get": {
+        "operationId": "LocationChildResourceOperations_ListByLocationResource",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "List LocationChild resources by LocationResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationChildListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}/children/{childname}": {
+      "get": {
+        "operationId": "LocationChildResourceOperations_Get",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "Get a LocationChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childname",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationChild"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "LocationChildResourceOperations_Create",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "Create a LocationChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childname",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationChild"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationChild"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "LocationChildResourceOperations_Update",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "Update a LocationChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childname",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationChildUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationChild"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "LocationChildResourceOperations_Delete",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "Delete a LocationChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childname",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}/children/{childname}/enable": {
+      "post": {
+        "operationId": "LocationChildResourceOperations_Enable",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "Enable a location for the given period",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childname",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The content of the action request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EnableLocationChildProperties"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Action completed successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}/children/{childname}/munge": {
+      "post": {
+        "operationId": "LocationChildResourceOperations_Munge",
+        "tags": [
+          "LocationChildResourceOperations"
+        ],
+        "description": "Make an unspecified change at the given location",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childname",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The content of the action request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationMungeChildRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationMungeChildResult"
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}/disable": {
+      "post": {
+        "operationId": "LocationResourceOperations_Disable",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "Disable a location for the given period",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The content of the action request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DisableLocationProperties"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Action completed successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.OperationsTest/locationResources/{locationResourceName}/munge": {
+      "post": {
+        "operationId": "LocationResourceOperations_Munge",
+        "tags": [
+          "LocationResourceOperations"
+        ],
+        "description": "Make an unspecified change at the given location",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "locationResourceName",
+            "in": "path",
+            "description": "The name of the location resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The content of the action request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationMungeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationMungeResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationsTest/trackedResource2s": {
+      "get": {
+        "operationId": "Tracked2Operations_ListBySubscription",
+        "tags": [
+          "Tracked2Operations"
+        ],
+        "description": "List TestTrackedResource2 resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationsTest/trackedResources": {
+      "get": {
+        "operationId": "TrackedOperations_ListBySubscription",
+        "tags": [
+          "TrackedOperations"
+        ],
+        "description": "List TestTrackedResource resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResource2s": {
+      "get": {
+        "operationId": "Tracked2Operations_ListByResourceGroup",
+        "tags": [
+          "Tracked2Operations"
+        ],
+        "description": "List TestTrackedResource2 resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResource2s/{trackedResourceName}": {
+      "get": {
+        "operationId": "Tracked2Operations_Get",
+        "tags": [
+          "Tracked2Operations"
+        ],
+        "description": "Get a TestTrackedResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Tracked2Operations_Create",
+        "tags": [
+          "Tracked2Operations"
+        ],
+        "description": "Create a TestTrackedResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "Tracked2Operations_Update",
+        "tags": [
+          "Tracked2Operations"
+        ],
+        "description": "Update a TestTrackedResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2Update"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Tracked2Operations_Delete",
+        "tags": [
+          "Tracked2Operations"
+        ],
+        "description": "Delete a TestTrackedResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResource2s/{trackedResourceName}/children": {
+      "get": {
+        "operationId": "TrackedChildOperations2_ListByTestTrackedResource2",
+        "tags": [
+          "TrackedChildOperations2"
+        ],
+        "description": "List TestTrackedChild2 resources by TestTrackedResource2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2ListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResource2s/{trackedResourceName}/children/{childName}": {
+      "get": {
+        "operationId": "TrackedChildOperations2_Get",
+        "tags": [
+          "TrackedChildOperations2"
+        ],
+        "description": "Get a TestTrackedChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TrackedChildOperations2_Create",
+        "tags": [
+          "TrackedChildOperations2"
+        ],
+        "description": "Create a TestTrackedChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "TrackedChildOperations2_Update",
+        "tags": [
+          "TrackedChildOperations2"
+        ],
+        "description": "Update a TestTrackedChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2Update"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TrackedChildOperations2_Delete",
+        "tags": [
+          "TrackedChildOperations2"
+        ],
+        "description": "Delete a TestTrackedChild2",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResources": {
+      "get": {
+        "operationId": "TrackedOperations_ListByResourceGroup",
+        "tags": [
+          "TrackedOperations"
+        ],
+        "description": "List TestTrackedResource resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResourceListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResources/{trackedResourceName}": {
+      "get": {
+        "operationId": "TrackedOperations_Get",
+        "tags": [
+          "TrackedOperations"
+        ],
+        "description": "Get a TestTrackedResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TrackedOperations_CreateOrUpdate",
+        "tags": [
+          "TrackedOperations"
+        ],
+        "description": "Create a TestTrackedResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestTrackedResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTrackedResource' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "TrackedOperations_Update",
+        "tags": [
+          "TrackedOperations"
+        ],
+        "description": "Update a TestTrackedResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResourceUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "TrackedOperations_Delete",
+        "tags": [
+          "TrackedOperations"
+        ],
+        "description": "Delete a TestTrackedResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResources/{trackedResourceName}/children": {
+      "get": {
+        "operationId": "TrackedChildOperations_ListByTestTrackedResource",
+        "tags": [
+          "TrackedChildOperations"
+        ],
+        "description": "List TestTrackedChild resources by TestTrackedResource",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChildListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationsTest/trackedResources/{trackedResourceName}/children/{childName}": {
+      "get": {
+        "operationId": "TrackedChildOperations_Get",
+        "tags": [
+          "TrackedChildOperations"
+        ],
+        "description": "Get a TestTrackedChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "TrackedChildOperations_CreateOrUpdate",
+        "tags": [
+          "TrackedChildOperations"
+        ],
+        "description": "Create a TestTrackedChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'TestTrackedChild' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTrackedChild' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "TrackedChildOperations_Delete",
+        "tags": [
+          "TrackedChildOperations"
+        ],
+        "description": "Delete a TestTrackedChild",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "trackedResourceName",
+            "in": "path",
+            "description": "The name of the Tracked resource.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "childName",
+            "in": "path",
+            "description": "The name of the Tracked child.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    }
+  },
+  "definitions": {
+    "Azure.ResourceManager.ResourceProvisioningState": {
+      "type": "string",
+      "description": "The provisioning state of a resource type.",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled"
+      ],
+      "x-ms-enum": {
+        "name": "ResourceProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "DisableLocationProperties": {
+      "type": "object",
+      "description": "The length of time a location resource is disabled",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start of the disabling"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end time of disabling"
+        }
+      },
+      "required": [
+        "startTime",
+        "endTime"
+      ]
+    },
+    "EnableLocationChildProperties": {
+      "type": "object",
+      "description": "The length of time a location resource child is enabled",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start of the disabling"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end time of disabling"
+        }
+      },
+      "required": [
+        "startTime",
+        "endTime"
+      ]
+    },
+    "EnvelopeProvisioningState": {
+      "type": "string",
+      "description": "The set of provisioning state values",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled",
+        "Working"
+      ],
+      "x-ms-enum": {
+        "name": "EnvelopeProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          },
+          {
+            "name": "Working",
+            "value": "Working",
+            "description": "Working"
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "ExtensionChildProperties": {
+      "type": "object",
+      "description": "A child of a tenant resource",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the extension child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "flavor",
+        "provisioningState"
+      ]
+    },
+    "ExtensionChildProperties2": {
+      "type": "object",
+      "description": "A child of a tenant resource",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the extension child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "flavor",
+        "provisioningState"
+      ]
+    },
+    "LocationChild": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/LocationProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "LocationChildListResult": {
+      "type": "object",
+      "description": "The response of a LocationChild list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The LocationChild items on this page",
+          "items": {
+            "$ref": "#/definitions/LocationChild"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "LocationChildProperties": {
+      "type": "object",
+      "description": "The rp-specific properties of a LocationResource child",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the location"
+        }
+      },
+      "required": [
+        "provisioningState",
+        "color"
+      ]
+    },
+    "LocationChildUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the LocationChild.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/LocationChildUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "LocationChildUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the LocationChild.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the location"
+        }
+      }
+    },
+    "LocationMungeChildRequest": {
+      "type": "object",
+      "description": "A request to change a location resource child in some unspecified manner",
+      "properties": {
+        "mungeData": {
+          "type": "string",
+          "description": "Data on the unspecified change"
+        }
+      },
+      "required": [
+        "mungeData"
+      ]
+    },
+    "LocationMungeChildResult": {
+      "type": "object",
+      "description": "The result of an unspecified change",
+      "properties": {
+        "mungeResult": {
+          "type": "string",
+          "description": "Description fo the unspecified change"
+        }
+      },
+      "required": [
+        "mungeResult"
+      ]
+    },
+    "LocationMungeRequest": {
+      "type": "object",
+      "description": "A request to change a location resource in some unspecified manner",
+      "properties": {
+        "mungeData": {
+          "type": "string",
+          "description": "Data on the unspecified change"
+        }
+      },
+      "required": [
+        "mungeData"
+      ]
+    },
+    "LocationMungeResult": {
+      "type": "object",
+      "description": "The result of an unspecified change",
+      "properties": {
+        "mungeResult": {
+          "type": "string",
+          "description": "Description fo the unspecified change"
+        }
+      },
+      "required": [
+        "mungeResult"
+      ]
+    },
+    "LocationProperties": {
+      "type": "object",
+      "description": "The rp-specific properties of a LocationResource",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the location"
+        }
+      },
+      "required": [
+        "provisioningState",
+        "color"
+      ]
+    },
+    "LocationResource": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/LocationProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "LocationResourceListResult": {
+      "type": "object",
+      "description": "The response of a LocationResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The LocationResource items on this page",
+          "items": {
+            "$ref": "#/definitions/LocationResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "LocationResourceUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the LocationResource.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/LocationResourceUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "LocationResourceUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the LocationResource.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the location"
+        }
+      }
+    },
+    "TenantChildProperties": {
+      "type": "object",
+      "description": "A child of a tenant resource",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the tenant child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "flavor",
+        "provisioningState"
+      ]
+    },
+    "TenantChildProperties2": {
+      "type": "object",
+      "description": "A child of a tenant resource",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the tenant child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "flavor",
+        "provisioningState"
+      ]
+    },
+    "TestExtensionChild": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ExtensionChildProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestExtensionChild2": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ExtensionChildProperties2",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestExtensionChild2ListResult": {
+      "type": "object",
+      "description": "The response of a TestExtensionChild2 list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestExtensionChild2 items on this page",
+          "items": {
+            "$ref": "#/definitions/TestExtensionChild2"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestExtensionChild2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestExtensionChild2.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestExtensionChild2UpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestExtensionChild2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestExtensionChild2.",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the extension child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      }
+    },
+    "TestExtensionChildListResult": {
+      "type": "object",
+      "description": "The response of a TestExtensionChild list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestExtensionChild items on this page",
+          "items": {
+            "$ref": "#/definitions/TestExtensionChild"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestExtensionProperties": {
+      "type": "object",
+      "description": "rp-specific proeprties for the resource",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      },
+      "required": [
+        "provisioningState"
+      ]
+    },
+    "TestExtensionProperties2": {
+      "type": "object",
+      "description": "rp-specific properties for the resource",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      },
+      "required": [
+        "provisioningState"
+      ]
+    },
+    "TestExtensionResource": {
+      "type": "object",
+      "description": "Concrete extension resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestExtensionProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestExtensionResource2": {
+      "type": "object",
+      "description": "Concrete extension resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestExtensionProperties2",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestExtensionResource2ListResult": {
+      "type": "object",
+      "description": "The response of a TestExtensionResource2 list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestExtensionResource2 items on this page",
+          "items": {
+            "$ref": "#/definitions/TestExtensionResource2"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestExtensionResource2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestExtensionResource2.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestExtensionResource2UpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestExtensionResource2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestExtensionResource2.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestExtensionResourceListResult": {
+      "type": "object",
+      "description": "The response of a TestExtensionResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestExtensionResource items on this page",
+          "items": {
+            "$ref": "#/definitions/TestExtensionResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestExtensionResourceUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the TestExtensionResource.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestExtensionResourceUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestExtensionResourceUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestExtensionResource.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestTenantChile": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TenantChildProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestTenantChile2": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TenantChildProperties2",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestTenantChile2ListResult": {
+      "type": "object",
+      "description": "The response of a TestTenantChile2 list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTenantChile2 items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTenantChile2"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTenantChile2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTenantChile2.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTenantChile2UpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestTenantChile2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestTenantChile2.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestTenantChileListResult": {
+      "type": "object",
+      "description": "The response of a TestTenantChile list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTenantChile items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTenantChile"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTenantProperties": {
+      "type": "object",
+      "description": "rp-specific proeprties for the resource",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      },
+      "required": [
+        "provisioningState"
+      ]
+    },
+    "TestTenantProperties2": {
+      "type": "object",
+      "description": "rp-specific proeprties for the resource",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource.",
+          "readOnly": true
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestTenantResource": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTenantProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestTenantResource2": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTenantProperties2",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestTenantResource2ListResult": {
+      "type": "object",
+      "description": "The response of a TestTenantResource2 list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTenantResource2 items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTenantResource2"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTenantResource2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTenantResource2.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTenantResource2UpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestTenantResource2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestTenantResource2.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestTenantResourceListResult": {
+      "type": "object",
+      "description": "The response of a TestTenantResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTenantResource items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTenantResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTenantResourceUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTenantResource.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTenantResourceUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestTenantResourceUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestTenantResource.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestTrackedChild": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TrackedChildProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestTrackedChild2": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TrackedChildProperties2",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "TestTrackedChild2ListResult": {
+      "type": "object",
+      "description": "The response of a TestTrackedChild2 list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTrackedChild2 items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTrackedChild2"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTrackedChild2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTrackedChild2.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTrackedChild2UpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestTrackedChild2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestTrackedChild2.",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the tracked child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      }
+    },
+    "TestTrackedChildListResult": {
+      "type": "object",
+      "description": "The response of a TestTrackedChild list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTrackedChild items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTrackedChild"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTrackedProperties": {
+      "type": "object",
+      "description": "rp-specific properties for the resource with all envelope properties",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource.",
+          "readOnly": true
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      }
+    },
+    "TestTrackedProperties2": {
+      "type": "object",
+      "description": "rp-specific proeprties for the resource with all envelope properties",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      },
+      "required": [
+        "provisioningState"
+      ]
+    },
+    "TestTrackedResource": {
+      "type": "object",
+      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTrackedProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "TestTrackedResource2": {
+      "type": "object",
+      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTrackedProperties2",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "TestTrackedResource2ListResult": {
+      "type": "object",
+      "description": "The response of a TestTrackedResource2 list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTrackedResource2 items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTrackedResource2"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTrackedResource2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTrackedResource2.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/TestTrackedResource2UpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestTrackedResource2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestTrackedResource2.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/EnvelopeProvisioningState",
+          "description": "The status of the last operation performed on this resource."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
+    },
+    "TestTrackedResourceListResult": {
+      "type": "object",
+      "description": "The response of a TestTrackedResource list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The TestTrackedResource items on this page",
+          "items": {
+            "$ref": "#/definitions/TestTrackedResource"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "TestTrackedResourceUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTrackedResource.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "TrackedChildProperties": {
+      "type": "object",
+      "description": "A child of a tracked resource",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the tracked child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "flavor",
+        "provisioningState"
+      ]
+    },
+    "TrackedChildProperties2": {
+      "type": "object",
+      "description": "A child of a tracked resource",
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "description": "The flavor of the tracked child"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "flavor",
+        "provisioningState"
+      ]
+    }
+  },
+  "parameters": {
+    "Azure.ResourceManager.ResourceUriParameter": {
+      "name": "resourceUri",
+      "in": "path",
+      "description": "The fully qualified Azure Resource manager identifier of the resource.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-skip-url-encoding": true
+    }
+  }
+}

@@ -1,0 +1,840 @@
+{
+  "name": "@azure-tools/typespec-azure-resource-manager",
+  "entries": [
+    {
+      "version": "0.37.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.37.0",
+      "date": "Wed, 06 Dec 2023 19:47:28 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Added support for the SubscriptionLifeCycleNotification endpoint"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.1",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.36.1",
+      "date": "Tue, 14 Nov 2023 20:35:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Adding allowing void on ARM action templates to specify no request body."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-autorest\" from `~0.36.0` to `~0.36.1`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-autorest\" from `~0.36.0` to `~0.36.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.36.0",
+      "date": "Wed, 08 Nov 2023 00:11:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "ARM `common-types` versions can now be selected for each service specification version using the `Azure.ResourceManager.CommonTypes.Versions` enum with the new `@armCommonTypesVersion` decorator"
+          },
+          {
+            "comment": "Add support for Private Links v5 common types"
+          },
+          {
+            "comment": "Add ARM v5 common-types for Customer Managed Keys"
+          },
+          {
+            "comment": "`TypeScript` use `types` entry under `exports` of `package.json` instead of legacy `typesVersions` to provide the definition files"
+          },
+          {
+            "comment": "**BREAKING CHANGE** Minimum node version increased to 18"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.35.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.35.0",
+      "date": "Wed, 11 Oct 2023 23:51:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Update dependencies"
+          },
+          {
+            "comment": "Uptake changes to http libraries with status code ranges"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.34.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.34.0",
+      "date": "Tue, 12 Sep 2023 21:49:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Soft deprecation of ArmResourceActionNoCOntentAsync in favor of ArmResourceActionNoResponseCOntentAsync"
+          },
+          {
+            "comment": "Migrating linter rules to new system. Linter rules will NOT be automatically enabled anymore.\nAdd the following to your `tspconfig.yaml` to get the same behavior:\n```yaml\nlinter:\n extends: ['@azure-tools/typespec-azure-resource-manager/all'] \n```"
+          },
+          {
+            "comment": "Add Private links common types to Azure.ResourceManager"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.33.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.33.0",
+      "date": "Tue, 08 Aug 2023 22:32:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Allow shared ARM type libraries and override of arm provider namespace"
+          },
+          {
+            "comment": "Fix #3243 issues with ArmTagsPatch template parameters"
+          },
+          {
+            "comment": "Fix #3316, #3325, arm template issues"
+          },
+          {
+            "comment": "Add fix and tests for ArmTagsPatchAsync"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.32.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.32.0",
+      "date": "Tue, 11 Jul 2023 22:06:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add ArmResourceDeleteWithoutOkAsync operation signature to comply with updated ARM guidelines"
+          },
+          {
+            "comment": "Add ArmResourceActionNoResponseContentAsync operation signature"
+          },
+          {
+            "comment": "Add `@dev` on doc comment to prevent it overriding template doc"
+          },
+          {
+            "comment": "Fix generated route for localCheckNameAvailability."
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Updated LocationParameter to reference Common Types"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.31.0",
+      "date": "Tue, 06 Jun 2023 22:44:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "**Potential breaking change** Add missing decorators signature"
+          },
+          {
+            "comment": "**Potential breaking change** Moved many decorators in the private namespace. Those are decorators that were not documented and should NOT have been used directly. See `lib/private.decorators.tsp` for list."
+          },
+          {
+            "comment": "Remove reference to `object` in decorators and templates"
+          },
+          {
+            "comment": "Updated decorators to use `valueof`"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.30.0",
+      "date": "Wed, 10 May 2023 21:24:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Added templates for checkNameAVailability"
+          },
+          {
+            "comment": "Fix issue where a decorator renames operations in a way that is contrary to guidelines."
+          },
+          {
+            "comment": "**Added** Support for the new autorest `arm-types-dir` option"
+          },
+          {
+            "comment": "Fix issue with overriding interface lifecycle operations"
+          },
+          {
+            "comment": "Cleanup deprecated items"
+          },
+          {
+            "comment": "Uptake change in template operations"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.29.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.29.0",
+      "date": "Tue, 11 Apr 2023 18:49:21 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Fix invalid default for ResourceIdentifier Allowed resources"
+          },
+          {
+            "comment": "Uptake changes to datetime types"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.28.0",
+      "date": "Mon, 13 Mar 2023 21:30:57 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Correct lro templates for correct generation"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.27.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.27.0",
+      "date": "Fri, 03 Mar 2023 19:59:30 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Fix arm-resource-invalid-version-format lint rule"
+          },
+          {
+            "comment": "Update package homepage link to github.io page"
+          },
+          {
+            "comment": "Revert back changelog"
+          },
+          {
+            "comment": "Adopted the new `@typespec/http` library"
+          },
+          {
+            "comment": "update entrypoint to tspMain"
+          },
+          {
+            "comment": "Rename to TypeSpec"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.26.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.26.0",
+      "date": "Tue, 07 Feb 2023 21:56:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Deprecating ResourceOperations to avoid name clash #2476"
+          },
+          {
+            "comment": "Removed `@armNamespace` decorator. Removed `TenantResourceList`, `ResourceCommonParameters`, `ExtensionResourceCommonParameters` and `CommonTenantScope` Cadl models."
+          },
+          {
+            "comment": "Fix issues when multiple copies of library are loaded."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.25.0",
+      "date": "Fri, 13 Jan 2023 00:05:37 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Internal: Update TS module resolution to node16"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.24.0",
+      "date": "Wed, 07 Dec 2022 17:21:54 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add lego bricks and linting rules, refactor for operation templates"
+          },
+          {
+            "comment": "Uptake new `getNamespaceFullName`"
+          },
+          {
+            "comment": "Add linter rule to discourage use of `@segment` with `@armResourceAction`."
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Add validation to prevent multiple `@armProviderNamespace`"
+          },
+          {
+            "comment": "Uptake change to compiler for new `scalar` type"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Refactor non-direct used ARM library artifacts into Foundations namespace"
+          },
+          {
+            "comment": "Fix api-version query parameter casing style"
+          },
+          {
+            "comment": "add arm lint rule to check armResource<Op> decorator"
+          },
+          {
+            "comment": "add arm lint rule to check response schema consistency"
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "major": [
+          {
+            "comment": "Update linter rule to account for new pattern of extensible enums."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.12.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.12.0",
+      "date": "Sat, 12 Nov 2022 00:14:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Consolidate ExtensionResourceOperation to Instance and Collection sub-interface."
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Adding ResourceIdentifier model definition"
+          },
+          {
+            "comment": "Moved `casing` linter rule to `cadl-azure-core`"
+          },
+          {
+            "comment": "Added lint rule to check empty updateable properties"
+          },
+          {
+            "comment": "Opt out of inapplicable metadata to payload on resource types"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Update templates TResource to constraint to object"
+          },
+          {
+            "comment": "Uptake changes to linter engine"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.8.0` to `~0.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.21.0` to `~0.22.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.8.0` to `~0.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.21.0` to `~0.22.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.11.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.11.0",
+      "date": "Wed, 12 Oct 2022 21:12:48 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update linter rules to use new linter system"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "**Breaking** `Azure.ResourceManager.Operations` must now be explicitly included."
+          },
+          {
+            "comment": "Apply changes to rest library"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.7.0` to `~0.8.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.20.0` to `~0.21.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.7.0` to `~0.8.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.20.0` to `~0.21.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.10.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.10.0",
+      "date": "Thu, 08 Sep 2022 01:05:13 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix: service authentication contains correct description for `user_impersonation` scope"
+          },
+          {
+            "comment": "Temporarily disable the use-standard-operations linting rule for ARM specs"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Rename @armNamespace to @armProviderNamespace, subscriptionId->subscriptionIdParameter, resourceGroup->ResourceGroupParameter, all operations to camelCase, Moving @armCommonDefinition, @armCommonParameter, @assignProviderNamespace, @armUpdateProviderNamespace to internal private namespace "
+          },
+          {
+            "comment": "Internals: Uptake change to `@autoRoute` decorator"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "React to Type suffix removal"
+          },
+          {
+            "comment": "Added RPC linting rules and made properties bag optional"
+          },
+          {
+            "comment": "Uptake change to enum members map type"
+          },
+          {
+            "comment": "Uptake changes to compiler with current projection"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.6.0` to `~0.7.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.19.0` to `~0.20.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.6.0` to `~0.7.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.19.0` to `~0.20.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.9.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.9.0",
+      "date": "Thu, 11 Aug 2022 19:05:47 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "React to changes in Azure.Core namespace organization"
+          },
+          {
+            "comment": "Remove deprecation suppressions and @pageable annotations."
+          },
+          {
+            "comment": "Suppress deprecation warnings."
+          },
+          {
+            "comment": "Fix ordering of templated types in ResourceUpdateModel to resolve duplicate model property issues"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Add initial versioning support for Azure.Core library and use versioned Azure.Core library"
+          },
+          {
+            "comment": "Support set of unannotated parameters as request body"
+          },
+          {
+            "comment": "Add additional unsupported types to linter."
+          },
+          {
+            "comment": "Reach to OkResponse becomeing non-generic"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Add versioning support for Azure.ResourceManager library and use versioned Azure.Core library"
+          },
+          {
+            "comment": "Uptake changes to type relations"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.5.0` to `~0.6.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.18.0` to `~0.19.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.5.0` to `~0.6.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.18.0` to `~0.19.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.8.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.8.0",
+      "date": "Fri, 08 Jul 2022 23:23:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Add tenant resource support and tests"
+          },
+          {
+            "comment": "Use new emitter options syntax"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.4.0` to `~0.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.17.0` to `~0.18.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.4.0` to `~0.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.17.0` to `~0.18.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.7.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.7.0",
+      "date": "Mon, 13 Jun 2022 23:42:46 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix common type error and update to v3 and v4 common types"
+          },
+          {
+            "comment": "add lint rules to apply ARM guideline"
+          },
+          {
+            "comment": "resource name should be marked with @path and visibility(\"read\")"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Uptake changes to accessor diagnostics"
+          },
+          {
+            "comment": "Update `ListBy<Parent>` operation name to use parent model name instead of collection name."
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Use @server decorator to set host instead of @serviceHost"
+          },
+          {
+            "comment": "Uptake changes to decorator context"
+          }
+        ],
+        "none": [
+          {
+            "comment": "Upgrade to TS4.7"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.3.0` to `~0.4.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.16.0` to `~0.17.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.3.0` to `~0.4.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.16.0` to `~0.17.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.6.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.6.0",
+      "date": "Fri, 06 May 2022 17:20:15 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add new `@singleton` decorator to mark an ARM resource type as a singleton resource"
+          },
+          {
+            "comment": "Uptake `mixes` -> `extends` rename"
+          },
+          {
+            "comment": "Add validation to prevent usage of `int8`"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Remove node 14 support"
+          },
+          {
+            "comment": "Rename ResourceListByResourceGroup<T> to ResourceListByParent<T> and automatically rename the contained operation to include the parent type name, if any"
+          },
+          {
+            "comment": "Include updateable resource envelope properties in ResourceUpdateModel"
+          }
+        ],
+        "none": [
+          {
+            "comment": "Adding test cases"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Add a corrected diagnostic for when @armResourceInternal is used on a non-resource type"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.2.0` to `~0.3.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.15.0` to `~0.16.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.2.0` to `~0.3.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.15.0` to `~0.16.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.5.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.5.0",
+      "date": "Thu, 31 Mar 2022 17:11:06 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Add APIs for requesting all ARM resource types and operations, new decorators for marking ARM operations"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.1.0` to `~0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.14.0` to `~0.15.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.1.0` to `~0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.14.0` to `~0.15.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.4.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.4.0",
+      "date": "Wed, 09 Mar 2022 17:42:26 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add interface-based ARM resource modelling pattern"
+          },
+          {
+            "comment": "Use new Azure.Core library and adapt to Page<T> moving over to it"
+          },
+          {
+            "comment": "React to @key decorator move to core"
+          },
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Remove redundant `@visibility` decorators in arm.cadl"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.0.1` to `~0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.13.0` to `~0.14.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.0.1` to `~0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.13.0` to `~0.14.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.3.0",
+      "date": "Tue, 15 Feb 2022 22:35:13 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Use `@error` instead of no-longer-supported \"default\" `@statusCode`"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.12.0` to `~0.13.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.12.0` to `~0.13.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.0",
+      "tag": "@azure-tools/cadl-azure-resource-manager_v0.2.0",
+      "date": "Fri, 11 Feb 2022 06:13:30 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update decorators with new interface"
+          },
+          {
+            "comment": "Create @azure-tools/cadl-azure-resource-manager library for new interface-based resource modelling design"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.11.0` to `~0.12.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-autorest\" from `~0.11.0` to `~0.12.0`"
+          }
+        ]
+      }
+    }
+  ]
+}
