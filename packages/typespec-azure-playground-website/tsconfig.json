@@ -1,0 +1,30 @@
+{
+  "extends": "../../core/packages/tsconfig.json",
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.json" },
+    { "path": "../../core/packages/openapi/tsconfig.json" },
+    { "path": "../../core/packages/rest/tsconfig.json" },
+    { "path": "../typespec-azure-resource-manager/tsconfig.json" }
+  ],
+  "compilerOptions": {
+    "outDir": "dist-dev",
+    "rootDir": ".",
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
+    "types": ["node"],
+    "checkJs": true,
+    "allowJs": true,
+    "jsxImportSource": "@emotion/react",
+    "lib": ["DOM", "ES2022"],
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "test/**/*.ts",
+    "e2e/**/*.ts",
+    "vite.config.ts",
+    "samples/**/*.js",
+    "samples/**/*.d.ts"
+  ]
+}

@@ -1,0 +1,22 @@
+jobs:
+  - job: e2e
+    pool:
+      name: azsdk-pool-mms-ubuntu-2004-general
+      vmImage: ubuntu-20.04
+
+    variables:
+      TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
+      TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: ./templates/install.yml
+
+      - template: ./templates/build.yml
+        parameters:
+          nodeVersion: "20.x"
+
+      - script: node packages/e2e-tests/e2e-tests.mjs
+        displayName: Run E2E tests

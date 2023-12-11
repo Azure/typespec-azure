@@ -1,0 +1,833 @@
+openapi: 3.0.0
+info:
+  title: App Config Service
+  version: 0000-00-00
+tags: []
+paths:
+  /keys:
+    get:
+      operationId: GetKeys
+      description: Gets a list of keys.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: after
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.keyset+json:
+              schema:
+                $ref: '#/components/schemas/PagedKey'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedKey'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    head:
+      operationId: CheckKeys
+      description: Requests the headers and status of the given resource.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: after
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /kv:
+    get:
+      operationId: GetKeyValues
+      description: Gets a list of key-values.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - $ref: '#/components/parameters/KeyFilters.key'
+        - $ref: '#/components/parameters/KeyFilters.label'
+        - name: After
+          in: query
+          required: true
+          description: Instructs the server to return elements that appear after the element referred to by the specified token.
+          schema:
+            type: string
+            format: date
+        - name: $Select
+          in: query
+          required: false
+          description: Used to select what fields are present in the returned resource(s).
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/KeyField'
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.keyset+json:
+              schema:
+                $ref: '#/components/schemas/PagedKeyValue'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedKeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    head:
+      operationId: CheckKeyValues
+      description: Gets a list of key-values.
+      parameters:
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - $ref: '#/components/parameters/KeyFilters.key'
+        - $ref: '#/components/parameters/KeyFilters.label'
+        - name: After
+          in: query
+          required: true
+          description: Instructs the server to return elements that appear after the element referred to by the specified token.
+          schema:
+            type: string
+            format: date
+        - name: $Select
+          in: query
+          required: false
+          description: Used to select what fields are present in the returned resource(s).
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/KeyField'
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /kv/{key}:
+    get:
+      operationId: GetKeyValue
+      description: Gets a single key-value.
+      parameters:
+        - $ref: '#/components/parameters/ETagHeaders.ifMatch'
+        - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - $ref: '#/components/parameters/KeyWithFilters.key'
+        - $ref: '#/components/parameters/KeyWithFilters.label'
+        - name: $Select
+          in: query
+          required: false
+          description: Used to select what fields are present in the returned resource(s).
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/KeyField'
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+            last-modified:
+              required: true
+              schema:
+                type: string
+                format: date
+            e-tag:
+              required: true
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.kv+json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    head:
+      operationId: CheckKeyValue
+      description: Requests the headers and status of the given resource.
+      parameters:
+        - $ref: '#/components/parameters/ETagHeaders.ifMatch'
+        - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - $ref: '#/components/parameters/KeyWithFilters.key'
+        - $ref: '#/components/parameters/KeyWithFilters.label'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+            last-modified:
+              required: true
+              schema:
+                type: string
+                format: date
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      operationId: PutKeyValue
+      description: Creates a key-value.
+      parameters:
+        - $ref: '#/components/parameters/ETagHeaders.ifMatch'
+        - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
+        - $ref: '#/components/parameters/KeyWithFilters.key'
+        - $ref: '#/components/parameters/KeyWithFilters.label'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+            last-modified:
+              required: true
+              schema:
+                type: string
+                format: date
+            e-tag:
+              required: true
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.kv+json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/vnd.microsoft.appconfig.kv+json:
+            schema:
+              $ref: '#/components/schemas/KeyValue'
+          application/vnd.microsoft.appconfig.kvset+json:
+            schema:
+              $ref: '#/components/schemas/KeyValue'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyValue'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/KeyValue'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/KeyValue'
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/KeyValue'
+    post:
+      operationId: UpdateKeyValue
+      description: Updates a key-value pair
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/ETagHeaders.ifMatch'
+        - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
+        - $ref: '#/components/parameters/KeyWithFilters.key'
+        - $ref: '#/components/parameters/KeyWithFilters.label'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+            last-modified:
+              required: true
+              schema:
+                type: string
+                format: date
+            e-tag:
+              required: true
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.kv+json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                type: string
+    delete:
+      operationId: DeleteKeyValue
+      description: Deletes a key-value.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/KeyWithFilters.key'
+        - $ref: '#/components/parameters/KeyWithFilters.label'
+        - name: if-match
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+            e-tag:
+              required: true
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.kv+json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /labels:
+    get:
+      operationId: GetLabels
+      description: Gets a list of labels.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: after
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.labelset+json:
+              schema:
+                $ref: '#/components/schemas/PagedLabel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedLabel'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    head:
+      operationId: CheckLabels
+      description: Requests the headers and status of the given resource.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: after
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: $Select
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/LabelField'
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /locks/{key}:
+    get:
+      operationId: GetLock
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: label
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ETagHeaders.ifMatch'
+        - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: DeleteLock
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: label
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ETagHeaders.ifMatch'
+        - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /revisions:
+    get:
+      operationId: GetRevisions
+      description: Gets a list of revisions.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - name: $Select
+          in: query
+          required: false
+          description: Used to select what fields are present in the returned resource(s).
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/KeyField'
+          style: form
+          explode: true
+        - name: label
+          in: query
+          required: true
+          description: A filter used to match labels
+          schema:
+            type: string
+        - name: key
+          in: query
+          required: true
+          description: A filter used to match keys.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+          content:
+            application/vnd.microsoft.appconfig.kvset+json:
+              schema:
+                $ref: '#/components/schemas/PagedKeyValue'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedKeyValue'
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    head:
+      operationId: CheckRevisions
+      description: Requests the headers and status of the given resource.
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/SyncTokenHeader'
+        - $ref: '#/components/parameters/AcceptDatetimeHeader'
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: after
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    AcceptDatetimeHeader:
+      name: accept-datetime
+      in: header
+      required: true
+      schema:
+        type: string
+        format: date
+    ApiVersion:
+      name: apiVersion
+      in: query
+      required: true
+      schema:
+        type: string
+    ETagHeaders.ifMatch:
+      name: if-match
+      in: header
+      required: true
+      schema:
+        type: string
+    ETagHeaders.ifNoneMatch:
+      name: if-none-match
+      in: header
+      required: true
+      schema:
+        type: string
+    KeyFilters.key:
+      name: key
+      in: query
+      required: false
+      description: A filter for the name of the returned keys.
+      schema:
+        type: string
+    KeyFilters.label:
+      name: label
+      in: query
+      required: false
+      description: A filter used to match labels
+      schema:
+        type: string
+    KeyWithFilters.key:
+      name: key
+      in: path
+      required: true
+      description: A filter for the name of the returned keys.
+      schema:
+        type: string
+    KeyWithFilters.label:
+      name: label
+      in: query
+      required: false
+      description: A filter used to match labels
+      schema:
+        type: string
+    SyncTokenHeader:
+      name: sync-token
+      in: header
+      required: false
+      description: Used to guarantee real-time consistency between requests.
+      schema:
+        type: string
+  schemas:
+    ETagHeader:
+      type: object
+    Error:
+      type: object
+      required:
+        - type
+        - title
+        - name
+        - detail
+        - statusCode
+      properties:
+        type:
+          type: string
+          description: The type of the error
+        title:
+          type: string
+          description: A brief summary of the error.
+        name:
+          type: string
+          description: The name of the parameter that resulted in the error.
+        detail:
+          type: string
+          description: A detailed description of the error.
+        statusCode:
+          type: integer
+          format: int32
+          description: The HTTP status code that the error maps to.
+      description: Azure App Configuration error object.
+    Key:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+    KeyField:
+      type: string
+      enum:
+        - key
+        - label
+        - content_type
+        - value
+        - last_modified
+        - tags
+    KeyValue:
+      type: object
+      required:
+        - key
+        - tags
+        - locked
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+        locked:
+          type: boolean
+    Label:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    LabelField:
+      type: string
+      enum:
+        - name
+    LastModifiedHeader:
+      type: object
+    PagedKey:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Key'
+          description: The Key items on this page
+        nextLink:
+          type: string
+          description: The link to the next page of items
+      description: Paged collection of Key items
+    PagedKeyValue:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          description: The KeyValue items on this page
+        nextLink:
+          type: string
+          description: The link to the next page of items
+      description: Paged collection of KeyValue items
+    PagedLabel:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+          description: The Label items on this page
+        nextLink:
+          type: string
+          description: The link to the next page of items
+      description: Paged collection of Label items
+    Value:
+      type: object
+      required:
+        - tags
+        - locked
+      properties:
+        label:
+          type: string
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+        locked:
+          type: boolean

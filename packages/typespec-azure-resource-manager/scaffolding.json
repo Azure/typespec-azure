@@ -1,0 +1,13 @@
+{
+  "azure-resource-manager": {
+    "title": "Azure Resource Manager Service",
+    "description": "Create a project representing an Azure Resource Management API",
+    "libraries": [
+      "@typespec/rest",
+      "@typespec/openapi",
+      "@azure-tools/typespec-autorest",
+      "@azure-tools/typespec-azure-core",
+      "@azure-tools/typespec-azure-resource-manager"
+    ]
+  }
+}

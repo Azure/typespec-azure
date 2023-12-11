@@ -1,0 +1,177 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Tags sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "foo"
+    },
+    {
+      "name": "tag1"
+    },
+    {
+      "name": "tag2"
+    },
+    {
+      "name": "tag3"
+    },
+    {
+      "name": "outer"
+    },
+    {
+      "name": "inner"
+    },
+    {
+      "name": "moreInner"
+    },
+    {
+      "name": "innerOp"
+    }
+  ],
+  "paths": {
+    "/bar": {
+      "get": {
+        "operationId": "Bar_List",
+        "description": "no tags",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Resp"
+              },
+              "x-ms-identifiers": []
+            }
+          }
+        }
+      }
+    },
+    "/bar/{id}": {
+      "post": {
+        "operationId": "Bar_Create",
+        "tags": [
+          "tag3"
+        ],
+        "description": "one operation tag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    },
+    "/foo/{id}": {
+      "get": {
+        "operationId": "Foo_Read",
+        "tags": [
+          "foo",
+          "tag1"
+        ],
+        "description": "includes namespace tag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      },
+      "post": {
+        "operationId": "Foo_Create",
+        "tags": [
+          "foo",
+          "tag1",
+          "tag2"
+        ],
+        "description": "includes namespace tag and two operations tags",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    },
+    "/nested/{id}": {
+      "post": {
+        "operationId": "NestedMoreInner_CreateOther",
+        "tags": [
+          "outer",
+          "inner",
+          "moreInner",
+          "innerOp"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Resp": {
+      "type": "object",
+      "properties": {
+        "out": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "out"
+      ]
+    }
+  },
+  "parameters": {}
+}

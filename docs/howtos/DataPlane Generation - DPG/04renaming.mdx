@@ -1,0 +1,209 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Client renaming
+
+This page documents how to customize names for client generations in DPG. For an overview of the setup, please visit the setup page.
+
+## Default behaviors
+
+By default, any language code generator will assume the TYPESPEC name is the client. For clarity, generators do not attempt to do any auto-magic rename.
+
+> **NOTE:** While names are not transformed, they will be adapted to what is idiomatic of the language (Python snake_case, etc.).
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+namespace PetStoreNamespace;
+
+@doc("This is the input I need")
+@resource("input")
+model InputModel {
+  @key
+  @doc("Id of this object")
+  @visibility("read")
+  name: string;
+}
+
+@doc("Read my resource")
+op GetModel is ResourceRead<InputModel>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+class OutputModel:
+  name: str = rest_field(readonly=True)
+
+response: OutputModel = client.get(name="name")
+FIXME
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+interface InputModel {
+  name: string;
+}
+
+const model: InputModel = await client.path("/petStore/model/{name}").get();
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+## Customizations
+
+### Model names
+
+Renames in the context of models can be done on the model name and the attribute name. [Renames have a target](https://microsoft.github.io/typespec/standard-library/projected-names#known-targets):
+
+- `client` means that all client will use that name
+- `csharp`, `javascript`, `python`, `java` means you target this specific language
+
+Language target takes priority over `client` target.
+
+> **NOTE:** As model name do not get serialized as JSON, sometimes the best choice is to rename the main TYPESPEC for clarity. Talk to your DPG contact is you're unsure
+> if you should rename the model in the main TYPESPEC or customize it.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@projectedName(InputModel, "client", "InputOptions"); // Use InputOptions as a base name in clients
+@@projectedName(InputModel, "csharp", "ParameterOptions"); // Prefer a different name for C# only
+
+@@projectedName(InputModel.name, "python", "input_name"); // Python may need a different to be idiomatic
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+class OutputOptions:
+  output_name: str = rest_field(rest_name="name", readonly=True)
+FIXME
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```c#
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Typescript do not change behavior based on protocolAPI or convenientAPI
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+### Rename operations and parameters
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@projectedName(GetModel, "client", "ReadModel"); // Use InputOptions as a base name in clients
+@@projectedName(GetModel, "python", "GetComputedModel"); // Note that Python will still snake_case it
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+client.get_computed_model()
+# FIXME
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Typescript do not change behavior based on protocolAPI or convenientAPI
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+## Implementation
+
+### Order of Operations
+
+For consistency when generating code, the order in which projections are applied is important. Code emitters should apply projections in the following order.
+
+#### Over-the-Wire JSON Names
+
+For determining the final name of a TypeSpec entity when sent over-the-wire in JSON:
+
+1. Run the `#target("json")` projection
+2. Run the `#customTarget("json")` projection, if it exists
+3. Apply the `@projectedName` decorator using the `getProjectedName` helper method.
+
+#### Client SDK Names
+
+For determining the final name of a TypeSpec entity when used in a client SDK (e.g. Python):
+
+1. Determine the name based on the client target:
+   1. Run the `#target("client")` projection
+   1. Run the `#customTarget("client")` projection, if it exists
+   1. Apply the `@projectedName` decorator using the `getProjectedName` helper method.
+1. Determine the name based on the language target:
+   1. Run the `#target("python")` projection
+   1. Run the `#customTarget("python")` projection, if it exists
+   1. Apply the `@projectedName` decorator using the `getProjectedName` helper method.
+1. If the language target name is different from the client target name, use the language target name. Otherwise, use the client name.
+1. For names based on language target projections, do not alter the casing. For names based on the client target projections, apply casing heuristics appropriate for the language (for example, snake case, Pascal case, etc.).

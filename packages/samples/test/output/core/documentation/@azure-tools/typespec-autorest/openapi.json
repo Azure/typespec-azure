@@ -1,0 +1,192 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Documentaion sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/foo/DefaultDescriptions": {
+      "get": {
+        "operationId": "Foo_WithDefaultDescriptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Resp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/foo/ModelDocDescriptions": {
+      "get": {
+        "operationId": "Foo_WithModelDocDescriptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/RespWithDocs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/ErrorWithDocs"
+            }
+          }
+        }
+      }
+    },
+    "/foo/NotFoundDefaultDocs": {
+      "get": {
+        "operationId": "Foo_WithDefaultDescNotFound",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/RespWithDocs"
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "schema": {
+              "$ref": "#/definitions/NotFoundResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/foo/NotFoundWithDocs": {
+      "get": {
+        "operationId": "Foo_WithStatusCodeDocs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Resp"
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "schema": {
+              "$ref": "#/definitions/NotFoundWithDocsResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "code"
+      ]
+    },
+    "ErrorWithDocs": {
+      "type": "object",
+      "description": "Error from @doc",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "code"
+      ]
+    },
+    "NotFoundResp": {
+      "type": "object",
+      "properties": {
+        "details": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    "NotFoundWithDocsResp": {
+      "type": "object",
+      "description": "Not found",
+      "properties": {
+        "details": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "details"
+      ]
+    },
+    "Resp": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "RespWithDocs": {
+      "type": "object",
+      "description": "Response from @doc",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    }
+  },
+  "parameters": {}
+}

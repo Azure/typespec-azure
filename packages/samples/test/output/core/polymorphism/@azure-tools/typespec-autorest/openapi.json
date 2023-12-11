@@ -1,0 +1,97 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Polymorphism sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/Pets": {
+      "get": {
+        "operationId": "Root_Read",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Cat": {
+      "type": "object",
+      "properties": {
+        "meow": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "meow"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Pet"
+        }
+      ],
+      "x-ms-discriminator-value": "cat"
+    },
+    "Dog": {
+      "type": "object",
+      "properties": {
+        "bark": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bark"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Pet"
+        }
+      ],
+      "x-ms-discriminator-value": "dog"
+    },
+    "Pet": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Discriminator property for Pet."
+        },
+        "name": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "discriminator": "kind",
+      "required": [
+        "kind",
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

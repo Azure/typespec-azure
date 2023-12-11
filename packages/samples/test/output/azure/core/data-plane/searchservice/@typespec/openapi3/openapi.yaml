@@ -1,0 +1,4395 @@
+openapi: 3.0.0
+info:
+  title: Search Service
+  version: 2021-04-30-Preview
+  description: Client that can be used to manage and query indexes and documents, as well as manage other resources, on a search service.
+tags:
+  - name: DataSources
+  - name: Service
+  - name: Indexers
+  - name: Indexes
+  - name: Skillsets
+paths:
+  /datasources:
+    get:
+      tags:
+        - DataSources
+      operationId: DatasourcesApis_list
+      description: Lists all indexe data sources available for a search service.
+      parameters:
+        - $ref: '#/components/parameters/SelectParameter'
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - value
+                properties:
+                  value:
+                    allOf:
+                      - $ref: '#/components/schemas/SearchIndexerDataSource'
+                    x-ms-client-name: DataSources
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    post:
+      tags:
+        - DataSources
+      operationId: DatasourcesApis_create
+      description: Creates a new datasource.
+      parameters:
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerDataSource'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The definition of the data source to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndexerDataSource'
+  /datasources('{dataSourceName}'):
+    get:
+      tags:
+        - DataSources
+      operationId: DatasourcesApis_get
+      description: Retrieves an index definition.
+      parameters:
+        - name: dataSourceName
+          in: path
+          required: true
+          description: The name of the data source to retrieve.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerDataSource'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    put:
+      tags:
+        - DataSources
+      operationId: DatasourcesApis_createOrUpdate
+      description: Creates a new search data source or updates an data source if it already exists.
+      parameters:
+        - name: dataSourceName
+          in: path
+          required: true
+          description: The name of the data source to create or update.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IgnoreResetRequirementsParameter'
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/PreferHeaderParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerDataSource'
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerDataSource'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The definition of the data source to create or update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndexerDataSource'
+    delete:
+      tags:
+        - DataSources
+      operationId: DatasourcesApis_delete
+      description: Deletes a datasource.
+      parameters:
+        - name: dataSourceName
+          in: path
+          required: true
+          description: The name of the data source to delete.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '404':
+          description: The server cannot find the requested resource.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /indexers:
+    get:
+      tags:
+        - Indexers
+      operationId: IndexersApis_list
+      description: Lists all indexers available for a search service.
+      parameters:
+        - $ref: '#/components/parameters/SelectParameter'
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - value
+                properties:
+                  value:
+                    allOf:
+                      - $ref: '#/components/schemas/SearchIndexer'
+                    x-ms-client-name: Indexers
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    post:
+      tags:
+        - Indexers
+      operationId: IndexersApis_create
+      description: Creates a new search indexer.
+      parameters:
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexer'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The definition of the data source to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndexer'
+  /indexers('{indexerName}'):
+    get:
+      tags:
+        - Indexers
+      operationId: IndexersApis_get
+      description: Retrieves an indexer definition.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the data source to retrieve.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexer'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    put:
+      tags:
+        - Indexers
+      operationId: IndexersApis_createOrUpdate
+      description: Creates a new indexer or updates an indexer if it already exists.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the indexer to create or update.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IgnoreResetRequirementsParameter'
+        - $ref: '#/components/parameters/DisableCacheReprocessingChangeDetectionParameter'
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/PreferHeaderParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexer'
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexer'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The definition of the data source to create or update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndexer'
+    delete:
+      tags:
+        - Indexers
+      operationId: IndexersApis_delete
+      description: Deletes a indexer.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the indexer to delete.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '404':
+          description: The server cannot find the requested resource.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /indexers('{indexerName}')/search.reset:
+    post:
+      tags:
+        - Indexers
+      operationId: IndexersApis_reset
+      description: Resets the change tracking state associated with an indexer.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the indexer to reset.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /indexers('{indexerName}')/search.resetdocs:
+    post:
+      tags:
+        - Indexers
+      operationId: IndexersApis_resetDocs
+      description: Resets specific documents in the datasource to be selectively re-ingested by the indexer.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the indexer to reset.
+          schema:
+            type: string
+        - name: overwrite
+          in: query
+          required: false
+          description: If false, keys or ids will be appended to existing ones. If true, only the keys or ids in this payload will be queued to be re-ingested.
+          schema:
+            type: boolean
+            default: false
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: datasource document identifiers to be reset
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+  /indexers('{indexerName}')/search.run:
+    post:
+      tags:
+        - Indexers
+      operationId: IndexersApis_run
+      description: Runs an indexer on-demand.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the indexer to reset.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing has not yet completed.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /indexers('{indexerName}')/search.status:
+    get:
+      tags:
+        - Indexers
+      operationId: IndexersApis_getStatus
+      description: Returns the current status and execution history of an indexer.
+      parameters:
+        - name: indexerName
+          in: path
+          required: true
+          description: The name of the indexer for which to retrieve status.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerStatus'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /indexes:
+    get:
+      tags:
+        - Indexes
+      operationId: Indexes_list
+      description: Lists all indexes available for a search service.
+      parameters:
+        - $ref: '#/components/parameters/SelectParameter'
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - value
+                properties:
+                  value:
+                    allOf:
+                      - $ref: '#/components/schemas/SearchIndex'
+                    x-ms-client-name: Indexes
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    post:
+      tags:
+        - Indexes
+      operationId: Indexes_create
+      description: Creates a new search index.
+      parameters:
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndex'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The definition of the index to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndex'
+  /indexes('{indexName}'):
+    get:
+      tags:
+        - Indexes
+      operationId: Indexes_get
+      description: Retrieves an index definition.
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          description: The name of the index to retrieve.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndex'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    put:
+      tags:
+        - Indexes
+      operationId: Indexes_createOrUpdate
+      description: Creates a new search index or updates an index if it already exists.
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          description: The name of the index to create or update.
+          schema:
+            type: string
+        - name: allowIndexDowntime
+          in: query
+          required: false
+          description: Allows new analyzers, tokenizers, token filters, or char filters to be added to an index by taking the index offline for at least a few seconds. This temporarily causes indexing and query requests to fail. Performance and write availability of the index can be impaired for several minutes after the index is updated, or longer for very large indexes.
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/PreferHeaderParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndex'
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndex'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The definition of the index to create or update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndex'
+    delete:
+      tags:
+        - Indexes
+      operationId: Indexes_delete
+      description: Deletes a search index and all the documents it contains. This operation is permanent, with no recovery option. Make sure you have a master copy of your index definition, data ingestion code, and a backup of the primary data source in case you need to re-build the index.
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          description: The name of the index to delete.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /indexes('{indexName}')/search.analyze:
+    post:
+      tags:
+        - Indexes
+      operationId: Indexes_analyze
+      description: Shows how an analyzer breaks text into tokens.
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          description: The name of the index for which to test an analyzer.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResult'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The text and analyzer or analysis components to test.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+  /indexes('{indexName}')/search.stats:
+    get:
+      tags:
+        - Indexes
+      operationId: Indexes_getStatistics
+      description: Returns statistics for the given index, including a document count and storage usage.
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          description: The name of the index for which to retrieve statistics.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIndexStatisticsResult'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /servicestats:
+    get:
+      tags:
+        - Service
+      operationId: ServiceApis_GetServiceStatistics
+      parameters:
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStatistics'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+  /skillsets:
+    get:
+      tags:
+        - Skillsets
+      operationId: Skillsets_list
+      description: List all skillsets in a search service.
+      parameters:
+        - $ref: '#/components/parameters/SelectParameter'
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - value
+                properties:
+                  value:
+                    allOf:
+                      - $ref: '#/components/schemas/SearchIndexerSkillset'
+                    x-ms-client-name: Skillsets
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    post:
+      tags:
+        - Skillsets
+      operationId: Skillsets_create
+      description: Creates a new skillset in a search service.
+      parameters:
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerSkillset'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The skillset containing one or more skills to create in a search service.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndexerSkillset'
+  /skillsets('{skillsetName}'):
+    get:
+      tags:
+        - Skillsets
+      operationId: Skillsets_get
+      description: Retrieves a skillset in a search service.
+      parameters:
+        - name: skillsetName
+          in: path
+          required: true
+          description: The name of the skillset to retrieve.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerSkillset'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    put:
+      tags:
+        - Skillsets
+      operationId: Skillsets_createOrUpdate
+      description: Creates a new skillset in a search service or updates the skillset if it already exists.
+      parameters:
+        - name: skillsetName
+          in: path
+          required: true
+          description: The name of the skillset to create or update.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchIndexerSkillset'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        description: The skillset containing one or more skills to create or update in a search service.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIndexerSkillset'
+    delete:
+      tags:
+        - Skillsets
+      operationId: Skillsets_delete
+      description: Deletes a skillset in a search service.
+      parameters:
+        - name: skillsetName
+          in: path
+          required: true
+          description: The name of the skillset to delete.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/IfMatchParameter'
+        - $ref: '#/components/parameters/IfNoneMatchParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+    post:
+      tags:
+        - Skillsets
+      operationId: Skillsets_resetSkills
+      description: Reset an existing skillset in a search service
+      parameters:
+        - name: skillsetName
+          in: path
+          required: true
+          description: The name of the skillset to reset.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ClientRequestIdParameter'
+        - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillNames'
+security:
+  - ApiKeyAuth: []
+  - OAuth2Auth:
+      - https://cognitiveservices.azure.com/.default
+components:
+  parameters:
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: Client API version
+      schema:
+        type: string
+    ClientRequestIdParameter:
+      name: x-ms-client-request-id
+      in: header
+      required: true
+      description: The tracking ID sent with the request to help with debugging.
+      schema:
+        type: string
+    DisableCacheReprocessingChangeDetectionParameter:
+      name: disableCacheReprocessingChangeDetection
+      in: query
+      required: false
+      description: Disables cache reprocessing change detection.
+      schema:
+        type: boolean
+    IfMatchParameter:
+      name: If-Match
+      in: header
+      required: false
+      description: The tracking ID sent with the request to help with debugging.
+      schema:
+        type: string
+    IfNoneMatchParameter:
+      name: If-None-Match
+      in: header
+      required: false
+      description: Defines the If-None-Match condition. The operation will be performed only if the ETag on the server does not match this value.
+      schema:
+        type: string
+    IgnoreResetRequirementsParameter:
+      name: ignoreResetRequirements
+      in: query
+      required: false
+      description: Ignores cache reset requirements.
+      schema:
+        type: boolean
+    PreferHeaderParameter:
+      name: Prefer
+      in: header
+      required: true
+      description: The tracking ID sent with the request to help with debugging.
+      schema:
+        type: string
+        enum:
+          - return=representation
+    SelectParameter:
+      name: $select
+      in: query
+      required: false
+      description: Selects which top-level properties of the resource to retrieve. Specified as a comma-separated list of JSON property names, or '*' for all properties. The default is all properties.
+      schema:
+        type: string
+  schemas:
+    AmlSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Custom.AmlSkill'
+        uri:
+          type: string
+          description: (Required for no authentication or key authentication) The scoring URI of the AML service to which the JSON payload will be sent. Only the https URI scheme is allowed.
+        key:
+          type: string
+          description: (Required for key authentication) The key for the AML service.
+        resourceId:
+          type: string
+          description: (Required for token authentication). The Azure Resource Manager resource ID of the AML service. It should be in the format subscriptions/{guid}/resourceGroups/{resource-group-name}/Microsoft.MachineLearningServices/workspaces/{workspace-name}/services/{service_name}.
+        timeout:
+          type: string
+          format: duration
+          description: (Optional) When specified, indicates the timeout for the http client making the API call.
+        region:
+          type: string
+          description: (Optional for token authentication). The region the AML service is deployed in.
+        degreeOfParallelism:
+          type: integer
+          format: int32
+          description: (Optional) When specified, indicates the number of calls the indexer will make in parallel to the endpoint you have provided. You can decrease this value if your endpoint is failing under too high of a request load, or raise it if your endpoint is able to accept more requests and you would like an increase in the performance of the indexer. If not set, a default value of 5 is used. The degreeOfParallelism can be set to a maximum of 10 and a minimum of 1.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: The AML skill allows you to extend AI enrichment with a custom Azure Machine Learning (AML) model. Once an AML model is trained and deployed, an AML skill integrates it into AI enrichment.
+    AnalyzeRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: The text to break into tokens.
+        analyzer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalAnalyzerName'
+          description: The name of the analyzer to use to break the given text.
+        tokenizer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalTokenizerName'
+          description: The name of the tokenizer to use to break the given text.
+        normalizer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalNormalizerName'
+          description: The name of the normalizer to use to normalize the given text.
+        tokenFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenFilterName'
+          description: An optional list of token filters to use when breaking the given text.
+        charFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharFilterName'
+          description: An optional list of character filters to use when breaking the given text.
+      description: Specifies some text and analysis components used to break that text into tokens.
+    AnalyzeResult:
+      type: object
+      required:
+        - tokens
+      properties:
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyzedTokenInfo'
+          description: The list of tokens returned by the analyzer specified in the request.
+      description: The result of testing an analyzer on text.
+    AnalyzedTokenInfo:
+      type: object
+      required:
+        - token
+        - startOffset
+        - endOffset
+        - position
+      properties:
+        token:
+          type: string
+          description: The token returned by the analyzer.
+        startOffset:
+          type: integer
+          format: int32
+          description: The index of the first character of the token in the input text.
+        endOffset:
+          type: integer
+          format: int32
+          description: The index of the last character of the token in the input text.
+        position:
+          type: integer
+          format: int32
+          description: The position of the token in the input text relative to other tokens. The first token in the input text has position 0, the next has position 1, and so on. Depending on the analyzer used, some tokens might have the same position, for example if they are synonyms of each other.
+      description: Information about a token returned by an analyzer.
+    AsciiFoldingTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.AsciiFoldingTokenFilter'
+        preserveOriginal:
+          type: boolean
+          description: A value indicating whether the original token will be kept. Default is false.
+          default: false
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Converts alphabetic, numeric, and symbolic Unicode characters which are not in the first 127 ASCII characters (the "Basic Latin" Unicode block) into their ASCII equivalents, if such equivalents exist. This token filter is implemented using Apache Lucene.
+    AzureActiveDirectoryApplicationCredentials:
+      type: object
+      properties:
+        applicationId:
+          type: string
+          description: An AAD Application ID that was granted the required access permissions to the Azure Key Vault that is to be used when encrypting your data at rest. The Application ID should not be confused with the Object ID for your AAD Application.
+        applicationSecret:
+          type: string
+          description: The authentication key of the specified AAD application.
+    BM25Similarity:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.BM25Similarity'
+        k1:
+          type: number
+          format: double
+          description: This property controls the scaling function between the term frequency of each matching terms and the final relevance score of a document-query pair. By default, a value of 1.2 is used. A value of 0.0 means the score does not scale with an increase in term frequency.
+        b:
+          type: number
+          format: double
+          description: This property controls how the length of a document affects the relevance score. By default, a value of 0.75 is used. A value of 0.0 means no length normalization is applied, while a value of 1.0 means the score is fully normalized by the length of the document.
+      allOf:
+        - $ref: '#/components/schemas/Similarity'
+      description: Ranking function based on the Okapi BM25 similarity algorithm. BM25 is a TF-IDF-like algorithm that includes length normalization (controlled by the 'b' parameter) as well as term frequency saturation (controlled by the 'k1' parameter).
+    BlobIndexerDataToExtract:
+      type: string
+      enum:
+        - storageMetadata
+        - allMetadata
+        - contentAndMetadata
+      description: Specifies the data to extract from Azure blob storage and tells the indexer which data to extract from image content when "imageAction" is set to a value other than "none".  This applies to embedded image content in a .PDF or other application, or image files such as .jpg and .png, in Azure blobs.
+    BlobIndexerImageAction:
+      type: string
+      enum:
+        - none
+        - generateNormalizedImages
+        - generateNormalizedImagePerPage
+      description: Determines how to process embedded images and image files in Azure blob storage.  Setting the "imageAction" configuration to any value other than "none" requires that a skillset also be attached to that indexer.
+    BlobIndexerPDFTextRotationAlgorithm:
+      type: string
+      enum:
+        - none
+        - detectAngles
+      description: Determines algorithm for text extraction from PDF files in Azure blob storage.
+    BlobIndexerParsingMode:
+      type: string
+      enum:
+        - default
+        - text
+        - delimitedText
+        - json
+        - jsonArray
+        - jsonLines
+      description: Represents the parsing mode for indexing from an Azure blob data source.
+    CharFilter:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the char filter. It must only contain letters, digits, spaces, dashes or underscores, can only start and end with alphanumeric characters, and is limited to 128 characters.
+        '@odata.type':
+          type: string
+          description: Discriminator property for CharFilter.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Azure.Search.MappingCharFilter': '#/components/schemas/MappingCharFilter'
+          '#Microsoft.Azure.Search.PatternReplaceCharFilter': '#/components/schemas/PatternReplaceCharFilter'
+      description: Base type for character filters.
+    CharFilterName:
+      type: string
+      enum:
+        - html_strip
+      description: Defines the names of all character filters supported by Azure Cognitive Search.
+    CjkBigramTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.CjkBigramTokenFilter'
+        ignoreScripts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CjkBigramTokenFilterScripts'
+          description: The scripts to ignore.
+        outputUnigrams:
+          type: boolean
+          description: Forms bigrams of CJK terms that are generated from the standard tokenizer. This token filter is implemented using Apache Lucene.
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Forms bigrams of CJK terms that are generated from the standard tokenizer. This token filter is implemented using Apache Lucene.
+    CjkBigramTokenFilterScripts:
+      type: string
+      enum:
+        - han
+        - hiragana
+        - katakana
+        - hangul
+      description: Scripts that can be ignored by CjkBigramTokenFilter.
+    ClassicSimilarity:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.ClassicSimilarity'
+      allOf:
+        - $ref: '#/components/schemas/Similarity'
+      description: Legacy similarity algorithm which uses the Lucene TFIDFSimilarity implementation of TF-IDF. This variation of TF-IDF introduces static document length normalization as well as coordinating factors that penalize documents that only partially match the searched queries.
+    ClassicTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.ClassicTokenizer'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Grammar-based tokenizer that is suitable for processing most European-language documents. This tokenizer is implemented using Apache Lucene.
+    CognitiveServicesAccount:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          description: Description of the cognitive service resource attached to a skillset.
+      description: Base type for describing any cognitive service resource attached to a skillset.
+    CognitiveServicesAccountKey:
+      type: object
+      required:
+        - '@odata.type'
+        - key
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.CognitiveServicesByKey'
+        key:
+          type: string
+          description: The key used to provision the cognitive service resource attached to a skillset.
+      allOf:
+        - $ref: '#/components/schemas/CognitiveServicesAccount'
+      description: A cognitive service resource provisioned with a key that is attached to a skillset.
+    CommonGramTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - commonWords
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.CommonGramTokenFilter'
+        commonWords:
+          type: array
+          items:
+            type: string
+          description: The set of common words.
+        ignoreCase:
+          type: boolean
+          description: A value indicating whether common words matching will be case insensitive. Default is false.
+          default: false
+        queryMode:
+          type: boolean
+          description: A value that indicates whether the token filter is in query mode. When in query mode, the token filter generates bigrams and then removes common words and single terms followed by a common word. Default is false.
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Construct bigrams for frequently occurring terms while indexing. Single terms are still indexed too, with bigrams overlaid. This token filter is implemented using Apache Lucene.
+    ConditionalSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Util.ConditionalSkill'
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that enables scenarios that require a Boolean operation to determine the data to assign to an output.
+    CorsOptions:
+      type: object
+      required:
+        - allowedOrigins
+      properties:
+        allowedOrigins:
+          type: array
+          items:
+            type: string
+          description: The list of origins from which JavaScript code will be granted access to your index. Can contain a list of hosts of the form {protocol}://{fully-qualified-domain-name}[:{port#}], or a single '*' to allow all origins (not recommended).
+        maxAgeInSeconds:
+          type: integer
+          format: int64
+          description: The duration for which browsers should cache CORS preflight responses. Defaults to 5 minutes.
+      description: Defines options to control Cross-Origin Resource Sharing (CORS) for an index.
+    CustomAnalyzer:
+      type: object
+      required:
+        - '@odata.type'
+        - tokenizer
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.CustomAnalyzer'
+        tokenizer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalTokenizerName'
+          description: The name of the tokenizer to use to divide continuous text into a sequence of tokens, such as breaking a sentence into words.
+        tokenFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenFilterName'
+          description: A list of token filters used to filter out or modify the tokens generated by a tokenizer. For example, you can specify a lowercase filter that converts all characters to lowercase. The filters are run in the order in which they are listed.
+        charFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharFilterName'
+          description: A list of character filters used to prepare input text before it is processed by the tokenizer. For instance, they can replace certain characters or symbols. The filters are run in the order in which they are listed.
+      allOf:
+        - $ref: '#/components/schemas/LexicalAnalyzer'
+      description: Allows you to take control over the process of converting text into indexable/searchable tokens. It's a user-defined configuration consisting of a single predefined tokenizer and one or more filters. The tokenizer is responsible for breaking text into tokens, and the filters for modifying tokens emitted by the tokenizer.
+    CustomEntity:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The top-level entity descriptor. Matches in the skill output will be grouped by this name, and it should represent the "normalized" form of the text being found.
+        description:
+          type: string
+          description: This field can be used as a passthrough for custom metadata about the matched text(s). The value of this field will appear with every match of its entity in the skill output.
+        type:
+          type: string
+          description: This field can be used as a passthrough for custom metadata about the matched text(s). The value of this field will appear with every match of its entity in the skill output.
+        subtype:
+          type: string
+          description: This field can be used as a passthrough for custom metadata about the matched text(s). The value of this field will appear with every match of its entity in the skill output.
+        id:
+          type: string
+          description: This field can be used as a passthrough for custom metadata about the matched text(s). The value of this field will appear with every match of its entity in the skill output.
+        caseSensitive:
+          type: boolean
+          description: 'Defaults to false. Boolean value denoting whether comparisons with the entity name should be sensitive to character casing. Sample case insensitive matches of "Microsoft" could be: microsoft, microSoft, MICROSOFT.'
+          default: false
+        accentSensitive:
+          type: boolean
+          description: Defaults to false. Boolean value denoting whether comparisons with the entity name should be sensitive to accent.
+          default: false
+        fuzzyEditDistance:
+          type: integer
+          format: int32
+          description: Defaults to 0. Maximum value of 5. Denotes the acceptable number of divergent characters that would still constitute a match with the entity name. The smallest possible fuzziness for any given match is returned. For instance, if the edit distance is set to 3, "Windows10" would still match "Windows", "Windows10" and "Windows 7". When case sensitivity is set to false, case differences do NOT count towards fuzziness tolerance, but otherwise do.
+          default: 0
+        defaultCaseSensitive:
+          type: boolean
+          description: Changes the default case sensitivity value for this entity. It be used to change the default value of all aliases caseSensitive values.
+        defaultAccentSensitive:
+          type: boolean
+          description: Changes the default case sensitivity value for this entity. It be used to change the default value of all aliases caseSensitive values.
+        defaultFuzzyEditDistance:
+          type: integer
+          format: int32
+          description: Changes the default fuzzy edit distance value for this entity. It can be used to change the default value of all aliases fuzzyEditDistance values.
+        aliases:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomEntityAlias'
+          description: An array of complex objects that can be used to specify alternative spellings or synonyms to the root entity name.
+      description: An object that contains information about the matches that were found, and related metadata.
+    CustomEntityAlias:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: The text of the alias.
+        caseSensitive:
+          type: boolean
+          description: Determine if the alias is case sensitive.
+        accentSensitive:
+          type: boolean
+          description: Determine if the alias is accent sensitive.
+        fuzzyEditDistance:
+          type: integer
+          format: int32
+          description: Determine the fuzzy edit distance of the alias.
+      description: A complex object that can be used to specify alternative spellings or synonyms to the root entity name.
+    CustomEntityLookupSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.CustomEntityLookupSkill'
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/CustomEntityLookupSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+        entitiesDefinitionUri:
+          type: string
+          description: Path to a JSON or CSV file containing all the target text to match against. This entity definition is read at the beginning of an indexer run. Any updates to this file during an indexer run will not take effect until subsequent runs. This config must be accessible over HTTPS.
+        inlineEntitiesDefinition:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomEntity'
+          description: The inline CustomEntity definition.
+        globalDefaultCaseSensitive:
+          type: boolean
+          description: A global flag for CaseSensitive. If CaseSensitive is not set in CustomEntity, this value will be the default value.
+        globalDefaultAccentSensitive:
+          type: boolean
+          description: A global flag for AccentSensitive. If AccentSensitive is not set in CustomEntity, this value will be the default value.
+        globalDefaultFuzzyEditDistance:
+          type: integer
+          format: int32
+          description: A global flag for FuzzyEditDistance. If FuzzyEditDistance is not set in CustomEntity, this value will be the default value.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill looks for text from a custom, user-defined list of words and phrases.
+    CustomEntityLookupSkillLanguage:
+      type: string
+      enum:
+        - da
+        - de
+        - en
+        - es
+        - fi
+        - fr
+        - it
+        - ko
+        - pt
+      description: The language codes supported for input text by CustomEntityLookupSkill.
+    CustomNormalizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.CustomNormalizer'
+        tokenFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenFilterName'
+          description: A list of token filters used to filter out or modify the input token. For example, you can specify a lowercase filter that converts all characters to lowercase. The filters are run in the order in which they are listed.
+        charFilters:
+          allOf:
+            - $ref: '#/components/schemas/CharFilterName'
+          description: A list of character filters used to prepare input text before it is processed. For instance, they can replace certain characters or symbols. The filters are run in the order in which they are listed.
+      allOf:
+        - $ref: '#/components/schemas/LexicalNormalizer'
+      description: Allows you to configure normalization for filterable, sortable, and facetable fields, which by default operate with strict matching. This is a user-defined configuration consisting of at least one or more filters, which modify the token that is stored.
+    DataChangeDetectionPolicy:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          description: Identifies the concrete type of the data change detection policy.
+      description: Base type for data change detection policies.
+    DataDeletionDetectionPolicy:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          description: Identifies the concrete type of the data deletion detection policy.
+      description: Base type for data deletion detection policies.
+    DataSourceCredentials:
+      type: object
+      properties:
+        connectionString:
+          type: string
+          description: The connection string for the datasource. Set to '<unchanged>' if you do not want the connection string updated.
+      description: Represents credentials that can be used to connect to a datasource.
+    DefaultCognitiveServicesAccount:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.DefaultCognitiveServices'
+      allOf:
+        - $ref: '#/components/schemas/CognitiveServicesAccount'
+      description: An empty object that represents the default cognitive service resource for a skillset.
+    DictionaryDecompounderTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - wordList
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.DictionaryDecompounderTokenFilter'
+        wordList:
+          type: array
+          items:
+            type: string
+          description: The list of words to match against.
+        minWordSize:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The minimum word size. Only words longer than this get processed. Default is 5. Maximum is 300.
+          default: 5
+        minSubwordSize:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The minimum subword size. Only words longer than this get processed. Default is 5. Maximum is 300.
+          default: 2
+        maxSubwordSize:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum subword size. Only words longer than this get processed. Default is 5. Maximum is 300.
+          default: 15
+        onlyLongestMatch:
+          type: boolean
+          description: A value indicating whether to add only the longest matching subword to the output. Default is false.
+          default: false
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Decomposes compound words found in many Germanic languages. This token filter is implemented using Apache Lucene.
+    DistanceScoringFunction:
+      type: object
+      required:
+        - type
+        - distance
+      properties:
+        type:
+          type: string
+          enum:
+            - distance
+        distance:
+          allOf:
+            - $ref: '#/components/schemas/DistanceScoringParameters'
+          description: Parameter values for the distance scoring function.
+      allOf:
+        - $ref: '#/components/schemas/ScoringFunction'
+      description: Defines a function that boosts scores based on distance from a geographic location.
+    DistanceScoringParameters:
+      type: object
+      required:
+        - referencePointParameter
+        - boostingDistance
+      properties:
+        referencePointParameter:
+          type: string
+          description: The name of the parameter passed in search queries to specify the reference location.
+        boostingDistance:
+          type: number
+          format: double
+          description: The distance in kilometers from the reference location where the boosting range ends.
+      description: Provides parameter values to a distance scoring function.
+    DocumentExtractionSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Util.DocumentExtractionSkill'
+        parsingMode:
+          type: string
+          description: The parsingMode for the skill. Will be set to 'default' if not defined.
+        dataToExtract:
+          type: string
+          description: The type of data to be extracted for the skill. Will be set to 'contentAndMetadata' if not defined.
+        configuration:
+          type: object
+          additionalProperties:
+            type: object
+          description: A dictionary of configurations for the skill.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that extracts content from a file within the enrichment pipeline.
+    ETag:
+      type: object
+      required:
+        - '@odata.etag'
+      properties:
+        '@odata.etag':
+          type: string
+          description: The ETag of the resource.
+    EdgeNGramTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.EdgeNGramTokenFilter'
+        minGram:
+          type: integer
+          format: int32
+          description: The minimum n-gram length. Default is 1. Must be less than the value of maxGram.
+          default: 1
+        maxGram:
+          type: integer
+          format: int32
+          description: The maximum n-gram length. Default is 2.
+          default: 2
+        side:
+          allOf:
+            - $ref: '#/components/schemas/EdgeNGramTokenFilterSide'
+          description: Specifies which side of the input the n-gram should be generated from. Default is "front".
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Generates n-grams of the given size(s) starting from the front or the back of an input token. This token filter is implemented using Apache Lucene.
+    EdgeNGramTokenFilterSide:
+      type: string
+      enum:
+        - front
+        - back
+      description: Specifies which side of the input an n-gram should be generated from.
+    EdgeNGramTokenFilterV2:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.EdgeNGramTokenFilterV2'
+        minGram:
+          type: integer
+          format: int32
+          description: The minimum n-gram length. Default is 1. Must be less than the value of maxGram.
+          default: 1
+        maxGram:
+          type: integer
+          format: int32
+          description: The maximum n-gram length. Default is 2.
+          default: 2
+        side:
+          allOf:
+            - $ref: '#/components/schemas/EdgeNGramTokenFilterSide'
+          description: Specifies which side of the input the n-gram should be generated from. Default is "front".
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Generates n-grams of the given size(s) starting from the front or the back of an input token. This token filter is implemented using Apache Lucene.
+    EdgeNGramTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.EdgeNGramTokenizer'
+        minGram:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The minimum n-gram length. Default is 1. Maximum is 300. Must be less than the value of maxGram.
+          default: 1
+        maxGram:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum n-gram length. Default is 2. Maximum is 300.
+          default: 2
+        tokenChars:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenCharacterKind'
+          description: Character classes to keep in the tokens.
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Tokenizes the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.
+    ElisionTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.ElisionTokenFilter'
+        articles:
+          type: array
+          items:
+            type: string
+          description: The set of articles to remove.
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Removes elisions. For example, "l'avion" (the plane) will be converted to "avion" (plane). This token filter is implemented using Apache Lucene.
+    EntityCategory:
+      type: string
+      enum:
+        - location
+        - organization
+        - person
+        - quantity
+        - datetime
+        - url
+        - email
+      description: A string indicating what entity categories to return.
+    EntityLinkingSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.V3.EntityLinkingSkill'
+        defaultLanguageCode:
+          type: string
+          description: A value indicating which language code to use. Default is en.
+        minimumPrecision:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: A value between 0 and 1 that be used to only include entities whose confidence score is greater than the value specified. If not set (default), or if explicitly set to null, all entities will be included.
+        modelVersion:
+          type: string
+          description: The version of the model to use when calling the Text Analytics service. It will default to the latest available when not specified. We recommend you do not specify this value unless absolutely necessary.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: Using the Text Analytics API, extracts linked entities from text.
+    EntityRecognitionSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.EntityRecognitionSkill'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityCategory'
+          description: A list of entity categories that should be extracted.
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/EntityRecognitionSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+        includeTypelessEntities:
+          type: boolean
+          description: Determines whether or not to include entities which are well known but don't conform to a pre-defined type. If this configuration is not set (default), set to null or set to false, entities which don't conform to one of the pre-defined types will not be surfaced.
+        minimumPrecision:
+          type: number
+          format: double
+          description: A value between 0 and 1 that be used to only include entities whose confidence score is greater than the value specified. If not set (default), or if explicitly set to null, all entities will be included.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: Text analytics entity recognition.
+    EntityRecognitionSkillLanguage:
+      type: string
+      enum:
+        - ar
+        - cs
+        - zh-Hans
+        - zh-Hant
+        - da
+        - nl
+        - en
+        - fi
+        - fr
+        - de
+        - el
+        - hu
+        - it
+        - ja
+        - ko
+        - no
+        - pl
+        - pt-PT
+        - pt-BR
+        - ru
+        - es
+        - sv
+        - tr
+      description: The language codes supported for input text by EntityRecognitionSkill.
+    EntityRecognitionSkillV3:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.V3.EntityRecognitionSkill'
+        categories:
+          type: array
+          items:
+            type: string
+          description: A list of entity categories that should be extracted.
+        defaultLanguageCode:
+          type: string
+          description: A value indicating which language code to use. Default is en.
+        minimumPrecision:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: A value between 0 and 1 that be used to only include entities whose confidence score is greater than the value specified. If not set (default), or if explicitly set to null, all entities will be included.
+        modelVersion:
+          type: string
+          description: The version of the model to use when calling the Text Analytics service. It will default to the latest available when not specified. We recommend you do not specify this value unless absolutely necessary.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: Using the Text Analytics API, extracts entities of different types from text.
+    FieldMapping:
+      type: object
+      required:
+        - sourceFieldName
+      properties:
+        sourceFieldName:
+          type: string
+          description: The name of the field in the data source.
+        targetFieldName:
+          type: string
+          description: The name of the target field in the index. Same as the source field name by default.
+        mappingFunction:
+          allOf:
+            - $ref: '#/components/schemas/FieldMappingFunction'
+          description: A function to apply to each source field value before indexing.
+      description: Defines a mapping between a field in a data source and a target field in an index.
+    FieldMappingFunction:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the field mapping function.
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+          description: A dictionary of parameter name/value pairs to pass to the function. Each value must be of a primitive type.
+      description: Represents a function that transforms a value from a data source before indexing.
+    FreshnessScoringFunction:
+      type: object
+      required:
+        - type
+        - freshness
+      properties:
+        type:
+          type: string
+          enum:
+            - freshness
+        freshness:
+          allOf:
+            - $ref: '#/components/schemas/FreshnessScoringParameters'
+          description: Parameter values for the freshness scoring function.
+      allOf:
+        - $ref: '#/components/schemas/ScoringFunction'
+      description: Defines a function that boosts scores based on the value of a date-time field.
+    FreshnessScoringParameters:
+      type: object
+      required:
+        - boostingDuration
+      properties:
+        boostingDuration:
+          type: string
+          format: duration
+          description: The expiration period after which boosting will stop for a particular document.
+      description: Provides parameter values to a freshness scoring function.
+    GetIndexStatisticsResult:
+      type: object
+      required:
+        - documentCount
+        - storageSize
+      properties:
+        documentCount:
+          type: integer
+          format: int64
+          description: The number of documents in the index.
+        storageSize:
+          type: integer
+          format: int64
+          description: The amount of storage in bytes consumed by the index.
+      description: Statistics for a given index. Statistics are collected periodically and are not guaranteed to always be up-to-date.
+    ImageAnalysisSkill:
+      type: object
+      required:
+        - '@odata.type'
+        - visualFeatures
+        - details
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Vision.ImageAnalysisSkill'
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/ImageAnalysisSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+        visualFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/VisualFeature'
+          description: A list of visual features.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageDetail'
+          description: A string indicating which domain-specific details to return.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that analyzes image files. It extracts a rich set of visual features based on the image content.
+    ImageAnalysisSkillLanguage:
+      type: string
+      enum:
+        - en
+        - es
+        - ja
+        - pt
+        - zh
+      description: The language codes supported for input by ImageAnalysisSkill.
+    ImageDetail:
+      type: string
+      enum:
+        - celebrities
+        - landmarks
+      description: A string indicating which domain-specific details to return.
+    IndexerCurrentState:
+      type: object
+      properties:
+        mode:
+          allOf:
+            - $ref: '#/components/schemas/IndexingMode'
+          description: The mode the indexer is running in.
+        allDocsInitialChangeTrackingState:
+          type: string
+          description: Change tracking state used when indexing starts on all documents in the datasource.
+        allDocsFinalChangeTrackingState:
+          type: string
+          description: Change tracking state value when indexing finishes on all documents in the datasource.
+        resetDocsInitialChangeTrackingState:
+          type: string
+          description: Change tracking state used when indexing starts on select, reset documents in the datasource.
+        resetDocsFinalChangeTrackingState:
+          type: string
+          description: Change tracking state value when indexing finishes on select, reset documents in the datasource.
+        resetDocumentKeys:
+          type: array
+          items:
+            type: string
+          description: The list of document keys that have been reset. The document key is the document's unique identifier for the data in the search index. The indexer will prioritize selectively re-ingesting these keys.
+        resetDatasourceDocumentIds:
+          type: array
+          items:
+            type: string
+          description: The list of datasource document ids that have been reset. The datasource document id is the unique identifier for the data in the datasource. The indexer will prioritize selectively re-ingesting these ids.
+      description: Represents all of the state that defines and dictates the indexer's current execution.
+    IndexerExecutionEnvironment:
+      type: string
+      enum:
+        - standard
+        - private
+      description: Specifies the environment in which the indexer should execute.
+    IndexerExecutionResult:
+      type: object
+      required:
+        - status
+        - errors
+        - warnings
+        - itemsProcessed
+        - itemsFailed
+      properties:
+        status:
+          allOf:
+            - $ref: '#/components/schemas/IndexerExecutionStatus'
+          description: The outcome of this indexer execution.
+        statusDetail:
+          allOf:
+            - $ref: '#/components/schemas/IndexerExecutionStatusDetail'
+          description: The outcome of this indexer execution.
+        currentState:
+          allOf:
+            - $ref: '#/components/schemas/IndexerCurrentState'
+          description: All of the state that defines and dictates the indexer's current execution.
+        errorMessage:
+          type: string
+          description: The error message indicating the top-level error, if any.
+        startTime:
+          type: string
+          format: date-time
+          description: The start time of this indexer execution.
+        endTime:
+          type: string
+          format: date-time
+          description: The end time of this indexer execution, if the execution has already completed.
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchIndexerError'
+          description: The item-level indexing errors.
+          readOnly: true
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchIndexerWarning'
+          description: The item-level indexing warnings.
+          readOnly: true
+        itemsProcessed:
+          type: integer
+          format: int32
+          description: The number of items that were processed during this indexer execution. This includes both successfully processed items and items where indexing was attempted but failed.
+          readOnly: true
+        itemsFailed:
+          type: integer
+          format: int32
+          description: The number of items that failed to be indexed during this indexer execution.
+          readOnly: true
+        initialTrackingState:
+          type: string
+          description: Change tracking state with which an indexer execution started.
+          readOnly: true
+        finalTrackingState:
+          type: string
+          description: Change tracking state with which an indexer execution finished.
+          readOnly: true
+      description: Represents the result of an individual indexer execution.
+    IndexerExecutionStatus:
+      type: string
+      enum:
+        - transientFailure
+        - success
+        - inProgress
+        - reset
+      description: Represents the status of an individual indexer execution.
+    IndexerExecutionStatusDetail:
+      type: string
+      enum:
+        - resetDocs
+      description: Details the status of an individual indexer execution.
+    IndexerStatus:
+      type: string
+      enum:
+        - unknown
+        - error
+        - running
+      description: Represents the overall indexer status.
+    IndexingMode:
+      type: string
+      enum:
+        - indexingAllDocs
+        - indexingResetDocs
+      description: Represents the mode the indexer is executing in.
+    IndexingParameters:
+      type: object
+      properties:
+        batchSize:
+          type: integer
+          format: int32
+          description: The number of items that are read from the data source and indexed as a single batch in order to improve performance. The default depends on the data source type.
+        maxFailedItems:
+          type: integer
+          format: int32
+          description: The maximum number of items that can fail indexing for indexer execution to still be considered successful. -1 means no limit. Default is 0.
+        maxFailedItemsPerBatch:
+          type: integer
+          format: int32
+          description: The maximum number of items in a single batch that can fail indexing for the batch to still be considered successful. -1 means no limit. Default is 0.
+        configuration:
+          $ref: '#/components/schemas/IndexingParametersConfiguration'
+      description: Represents parameters for indexer execution.
+    IndexingParametersConfiguration:
+      type: object
+      properties:
+        parsingMode:
+          $ref: '#/components/schemas/BlobIndexerParsingMode'
+        excludedFileNameExtensions:
+          type: string
+          description: Comma-delimited list of filename extensions to ignore when processing from Azure blob storage.  For example, you could exclude '.png, .mp4' to skip over those files during indexing.
+        indexedFileNameExtensions:
+          type: string
+          description: Comma-delimited list of filename extensions to select when processing from Azure blob storage.  For example, you could focus indexing on specific application files '.docx, .pptx, .msg' to specifically include those file types.
+        failOnUnsupportedContentType:
+          type: boolean
+          description: For Azure blobs, set to false if you want to continue indexing when an unsupported content type is encountered, and you don't know all the content types (file extensions) in advance.
+          default: false
+        failOnUnprocessableDocument:
+          type: boolean
+          description: For Azure blobs, set to false if you want to continue indexing if a document fails indexing.
+          default: false
+        indexStorageMetadataOnlyForOversizedDocuments:
+          type: boolean
+          description: For Azure blobs, set this property to true to still index storage metadata for blob content that is too large to process. Oversized blobs are treated as errors by default. For limits on blob size, see https://docs.microsoft.com/azure/search/search-limits-quotas-capacity.
+          default: false
+        delimitedTextHeaders:
+          type: string
+          description: For CSV blobs, specifies a comma-delimited list of column headers, useful for mapping source fields to destination fields in an index.
+        delimitedTextDelimiter:
+          type: string
+          description: For CSV blobs, specifies the end-of-line single-character delimiter for CSV files where each line starts a new document (for example, " | ").
+        firstLineContainsHeaders:
+          type: boolean
+          description: For CSV blobs, indicates that the first (non-blank) line of each blob contains headers.
+          default: true
+        documentRoot:
+          type: string
+          description: For JSON arrays, given a structured or semi-structured document, you can specify a path to the array using this property.
+        dataToExtract:
+          $ref: '#/components/schemas/BlobIndexerDataToExtract'
+        imageAction:
+          $ref: '#/components/schemas/BlobIndexerImageAction'
+        allowSkillsetToReadFileData:
+          type: boolean
+          description: If true, will create a path //document//file_data that is an object representing the original file data downloaded from your blob data source.  This allows you to pass the original file data to a custom skill for processing within the enrichment pipeline, or to the Document Extraction skill.
+          default: false
+        pdfTextRotationAlgorithm:
+          $ref: '#/components/schemas/BlobIndexerPDFTextRotationAlgorithm'
+        executionEnvironment:
+          $ref: '#/components/schemas/IndexerExecutionEnvironment'
+        queryTimeout:
+          type: string
+          description: Increases the timeout beyond the 5-minute default for Azure SQL database data sources, specified in the format 'hh:mm:ss'.
+          default: 00:05:00
+      description: A dictionary of indexer-specific configuration properties. Each name is the name of a specific property. Each value must be of a primitive type.
+    IndexingSchedule:
+      type: object
+      required:
+        - interval
+      properties:
+        interval:
+          type: string
+          description: The interval of time between indexer executions.
+        startTime:
+          type: string
+          format: date-time
+          description: The time when an indexer should start running.
+      description: Represents a schedule for indexer execution.
+    InputFieldMappingEntry:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the input.
+        source:
+          type: string
+          description: The source of the input.
+        sourceContext:
+          type: string
+          description: The source context used for selecting recursive inputs.
+        inputs:
+          allOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/InputFieldMappingEntry'
+          description: The recursive inputs used when creating a complex type.
+      description: Input field mapping for a skill.
+    KeepTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - keepWords
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.KeepTokenFilter'
+        keepWords:
+          type: array
+          items:
+            type: string
+          description: The list of words to keep.
+        keepWordsCase:
+          type: boolean
+          description: A value indicating whether to lower case all words first. Default is false.
+          default: false
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: A token filter that only keeps tokens with text contained in a specified list of words. This token filter is implemented using Apache Lucene.
+    KeyPhraseExtractionSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.KeyPhraseExtractionSkill'
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/KeyPhraseExtractionSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+        maxKeyPhraseCount:
+          type: integer
+          format: int32
+          description: A number indicating how many key phrases to return. If absent, all identified key phrases will be returned.
+        modelVersion:
+          type: string
+          description: The version of the model to use when calling the Text Analytics service. It will default to the latest available when not specified. We recommend you do not specify this value unless absolutely necessary.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that uses text analytics for key phrase extraction.
+    KeyPhraseExtractionSkillLanguage:
+      type: string
+      enum:
+        - da
+        - nl
+        - en
+        - fi
+        - fr
+        - de
+        - it
+        - ja
+        - ko
+        - no
+        - pl
+        - pt-PT
+        - pt-BR
+        - ru
+        - es
+        - sv
+      description: The language codes supported for input text by KeyPhraseExtractionSkill.
+    KeywordMarkerTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - keepWords
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.KeywordMarkerTokenFilter'
+        keepWords:
+          type: array
+          items:
+            type: string
+          description: A list of words to mark as keywords.
+        ignoreCase:
+          type: boolean
+          description: A value indicating whether to ignore case. If true, all words are converted to lower case first. Default is false.
+          default: false
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Marks terms as keywords. This token filter is implemented using Apache Lucene.
+    KeywordTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.KeywordTokenizer'
+        bufferSize:
+          type: integer
+          format: int32
+          description: The read buffer size in bytes. Default is 256.
+          default: 256
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Emits the entire input as a single token. This tokenizer is implemented using Apache Lucene.
+    KeywordTokenizerV2:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.KeywordTokenizerV2'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 256. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Emits the entire input as a single token. This tokenizer is implemented using Apache Lucene.
+    LanguageDetectionSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.LanguageDetectionSkill'
+        defaultCountryHint:
+          type: string
+          description: A country code to use as a hint to the language detection model if it cannot disambiguate the language.
+        modelVersion:
+          type: string
+          description: The version of the model to use when calling the Text Analytics service. It will default to the latest available when not specified. We recommend you do not specify this value unless absolutely necessary.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that detects the language of input text and reports a single language code for every document submitted on the request. The language code is paired with a score indicating the confidence of the analysis.
+    LengthTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.LengthTokenFilter'
+        min:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The minimum length in characters. Default is 0. Maximum is 300. Must be less than the value of max.
+          default: 0
+        max:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum  length in characters. Default is 0. Maximum is 300. Must be less than the value of max.
+          default: 300
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Removes words that are too long or too short. This token filter is implemented using Apache Lucene.
+    LexicalAnalyzer:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the analyzer. It must only contain letters, digits, spaces, dashes or underscores, can only start and end with alphanumeric characters, and is limited to 128 characters.
+        '@odata.type':
+          type: string
+          description: Discriminator property for LexicalAnalyzer.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Azure.Search.CustomAnalyzer': '#/components/schemas/CustomAnalyzer'
+          '#Microsoft.Azure.Search.PatternAnalyzer': '#/components/schemas/PatternAnalyzer'
+          '#Microsoft.Azure.Search.StandardAnalyzer': '#/components/schemas/LuceneStandardAnalyzer'
+          '#Microsoft.Azure.Search.StopAnalyzer': '#/components/schemas/StopAnalyzer'
+      description: Base type for analyzers.
+    LexicalAnalyzerName:
+      type: string
+      enum:
+        - ar.microsoft
+        - ar.lucene
+        - hy.lucene
+        - bn.microsoft
+        - eu.lucene
+        - bg.microsoft
+        - bg.lucene
+        - ca.microsoft
+        - ca.lucene
+        - zh-Hans.microsoft
+        - zh-Hans.lucene
+        - zh-Hant.microsoft
+        - zh-Hant.lucene
+        - hr.microsoft
+        - cs.microsoft
+        - cs.lucene
+        - da.microsoft
+        - da.lucene
+        - nl.microsoft
+        - nl.lucene
+        - en.microsoft
+        - en.lucene
+        - et.microsoft
+        - fi.microsoft
+        - fi.lucene
+        - fr.microsoft
+        - fr.lucene
+        - gl.lucene
+        - de.microsoft
+        - de.lucene
+        - el.microsoft
+        - el.lucene
+        - gu.microsoft
+        - he.microsoft
+        - hi.microsoft
+        - hi.lucene
+        - hu.microsoft
+        - hu.lucene
+        - is.microsoft
+        - id.microsoft
+        - id.lucene
+        - ga.lucene
+        - it.microsoft
+        - it.lucene
+        - ja.microsoft
+        - ja.lucene
+        - kn.microsoft
+        - ko.microsoft
+        - ko.lucene
+        - lv.microsoft
+        - lv.lucene
+        - lt.microsoft
+        - ml.microsoft
+        - ms.microsoft
+        - mr.microsoft
+        - nb.microsoft
+        - no.lucene
+        - fa.lucene
+        - pl.microsoft
+        - pl.lucene
+        - pt-BR.microsoft
+        - pt-BR.lucene
+        - pt-PT.microsoft
+        - pt-PT.lucene
+        - pa.microsoft
+        - ro.microsoft
+        - ro.lucene
+        - ru.microsoft
+        - ru.lucene
+        - sr-cyrillic.microsoft
+        - sr-latin.microsoft
+        - sk.microsoft
+        - sl.microsoft
+        - es.microsoft
+        - es.lucene
+        - sv.microsoft
+        - sv.lucene
+        - ta.microsoft
+        - te.microsoft
+        - th.microsoft
+        - th.lucene
+        - tr.microsoft
+        - tr.lucene
+        - uk.microsoft
+        - ur.microsoft
+        - vi.microsoft
+        - standard.lucene
+        - standardasciifolding.lucene
+        - keyword
+        - pattern
+        - simple
+        - stop
+        - whitespace
+      description: Defines the names of all text analyzers supported by Azure Cognitive Search.
+    LexicalNormalizer:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the normalizer. It must only contain letters, digits, spaces, dashes or underscores, can only start and end with alphanumeric characters, and is limited to 128 characters. It cannot end in '.microsoft' nor '.lucene', nor be named 'asciifolding', 'standard', 'lowercase', 'uppercase', or 'elision'.
+        '@odata.type':
+          type: string
+          description: Discriminator property for LexicalNormalizer.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Azure.Search.CustomNormalizer': '#/components/schemas/CustomNormalizer'
+      description: Base type for normalizers.
+    LexicalNormalizerName:
+      type: string
+      enum:
+        - asciifolding
+        - elision
+        - lowercase
+        - standard
+        - uppercase
+      description: Defines the names of all text normalizers supported by Azure Cognitive Search.
+    LexicalTokenizer:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the tokenizer. It must only contain letters, digits, spaces, dashes or underscores, can only start and end with alphanumeric characters, and is limited to 128 characters.
+        '@odata.type':
+          type: string
+          description: Discriminator property for LexicalTokenizer.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Azure.Search.ClassicTokenizer': '#/components/schemas/ClassicTokenizer'
+          '#Microsoft.Azure.Search.EdgeNGramTokenizer': '#/components/schemas/EdgeNGramTokenizer'
+          '#Microsoft.Azure.Search.KeywordTokenizer': '#/components/schemas/KeywordTokenizer'
+          '#Microsoft.Azure.Search.KeywordTokenizerV2': '#/components/schemas/KeywordTokenizerV2'
+          '#Microsoft.Azure.Search.MicrosoftLanguageTokenizer': '#/components/schemas/MicrosoftLanguageTokenizer'
+          '#Microsoft.Azure.Search.MicrosoftLanguageStemmingTokenizer': '#/components/schemas/MicrosoftLanguageStemmingTokenizer'
+          '#Microsoft.Azure.Search.NGramTokenizer': '#/components/schemas/NGramTokenizer'
+          '#Microsoft.Azure.Search.PathHierarchyTokenizerV2': '#/components/schemas/PathHierarchyTokenizerV2'
+          '#Microsoft.Azure.Search.PatternTokenizer': '#/components/schemas/PatternTokenizer'
+          '#Microsoft.Azure.Search.StandardTokenizer': '#/components/schemas/LuceneStandardTokenizer'
+          '#Microsoft.Azure.Search.StandardTokenizerV2': '#/components/schemas/LuceneStandardTokenizerV2'
+          '#Microsoft.Azure.Search.UaxUrlEmailTokenizer': '#/components/schemas/UaxUrlEmailTokenizer'
+      description: Base type for tokenizers.
+    LexicalTokenizerName:
+      type: string
+      enum:
+        - classic
+        - edgeNGram
+        - keyword_v2
+        - letter
+        - lowercase
+        - microsoft_language_tokenizer
+        - microsoft_language_stemming_tokenizer
+        - nGram
+        - path_hierarchy_v2
+        - pattern
+        - standard_v2
+        - uax_url_email
+        - whitespace
+      description: Defines the names of all tokenizers supported by Azure Cognitive Search.
+    LimitTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.LimitTokenFilter'
+        maxTokenCount:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum number of tokens to produce. Default is 1.
+          default: 1
+        consumeAllTokens:
+          type: boolean
+          description: A value indicating whether all tokens from the input must be consumed even if maxTokenCount is reached. Default is false.
+          default: false
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Limits the number of tokens while indexing. This token filter is implemented using Apache Lucene.
+    LineEnding:
+      type: string
+      enum:
+        - space
+        - carriageReturn
+        - lineFeed
+        - carriageReturnLineFeed
+    LuceneStandardAnalyzer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.StandardAnalyzer'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+        stopwords:
+          type: array
+          items:
+            type: string
+          description: A list of stopwords.
+      allOf:
+        - $ref: '#/components/schemas/LexicalAnalyzer'
+      description: Standard Apache Lucene analyzer; Composed of the standard tokenizer, lowercase filter and stop filter.
+    LuceneStandardTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.StandardTokenizer'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Breaks text following the Unicode Text Segmentation rules. This tokenizer is implemented using Apache Lucene.
+    LuceneStandardTokenizerV2:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.StandardTokenizerV2'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Breaks text following the Unicode Text Segmentation rules. This tokenizer is implemented using Apache Lucene.
+    MagnitudeScoringFunction:
+      type: object
+      required:
+        - type
+        - magnitude
+      properties:
+        type:
+          type: string
+          enum:
+            - magnitude
+        magnitude:
+          allOf:
+            - $ref: '#/components/schemas/MagnitudeScoringParameters'
+          description: Parameter values for the magnitude scoring function.
+      allOf:
+        - $ref: '#/components/schemas/ScoringFunction'
+      description: Defines a function that boosts scores based on the magnitude of a numeric field.
+    MagnitudeScoringParameters:
+      type: object
+      required:
+        - boostingRangeStart
+        - boostingRangeEnd
+      properties:
+        boostingRangeStart:
+          type: number
+          format: double
+          description: The field value at which boosting stgarts.
+        boostingRangeEnd:
+          type: number
+          format: double
+          description: The field value at which boosting ends.
+        constantBoostBeyondRange:
+          type: boolean
+          description: A value indicating whether to apply a constant boost for field values beyond the range end value; default is false.
+      description: Provides parameter values to a magnitude scoring function.
+    MappingCharFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - mappings
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.MappingCharFilter'
+        mappings:
+          type: array
+          items:
+            type: string
+          description: 'A list of mappings of the following format: "a=>b" (all occurrences of the character "a" will be replaced with character "b").'
+      allOf:
+        - $ref: '#/components/schemas/CharFilter'
+      description: A character filter that applies mappings defined with the mappings option. Matching is greedy (longest pattern matching at a given point wins). Replacement is allowed to be the empty string. This character filter is implemented using Apache Lucene.
+    MergeSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.MergeSkill'
+        insertPreTag:
+          type: string
+          description: The tag indicates the start of the merged text. By default, the tag is an empty space.
+          default: ' '
+        insertPostTag:
+          type: string
+          description: The tag indicates the end of the merged text. By default, the tag is an empty space.
+          default: ' '
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill for merging two or more strings into a single unified string, with an optional user-defined delimiter separating each component part.
+    MicrosoftLanguageStemmingTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.MicrosoftLanguageStemmingTokenizer'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+        isSearchTokenizer:
+          type: boolean
+          description: A value indicating how the tokenizer is used. Set to true if used as the search tokenizer, set to false if used as the indexing tokenizer. Default is false.
+          default: false
+        language:
+          allOf:
+            - $ref: '#/components/schemas/MicrosoftStemmingTokenizerLanguage'
+          description: The language to use. The default is English.
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Divides text using language-specific rules and reduces words to their base forms.
+    MicrosoftLanguageTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.MicrosoftLanguageTokenizer'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+        isSearchTokenizer:
+          type: boolean
+          description: A value indicating how the tokenizer is used. Set to true if used as the search tokenizer, set to false if used as the indexing tokenizer. Default is false.
+          default: false
+        language:
+          allOf:
+            - $ref: '#/components/schemas/MicrosoftTokenizerLanguage'
+          description: The language to use. The default is English.
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Grammar-based tokenizer that is suitable for processing most European-language documents. This tokenizer is implemented using Apache Lucene.
+    MicrosoftStemmingTokenizerLanguage:
+      type: string
+      enum:
+        - bangla
+        - bulgarian
+        - catalan
+        - chineseSimplified
+        - chineseTraditional
+        - croatian
+        - czech
+        - danish
+        - dutch
+        - english
+        - french
+        - german
+        - greek
+        - gujarati
+        - hindi
+        - icelandic
+        - indonesian
+        - italian
+        - japanese
+        - kannada
+        - korean
+        - malay
+        - malayalam
+        - marathi
+        - norwegianBokmaal
+        - polish
+        - portuguese
+        - portugueseBrazilian
+        - punjabi
+        - romanian
+        - russian
+        - serbianCyrillic
+        - serbianLatin
+        - slovenian
+        - spanish
+        - swedish
+        - tamil
+        - telugu
+        - thai
+        - ukrainian
+        - urdu
+        - vietnamese
+      description: Lists the languages supported by the Microsoft language stemming  tokenizer.
+    MicrosoftTokenizerLanguage:
+      type: string
+      enum:
+        - arabic
+        - bangla
+        - bulgarian
+        - catalan
+        - croatian
+        - czech
+        - danish
+        - dutch
+        - english
+        - finnish
+        - french
+        - german
+        - greek
+        - gujarati
+        - hebrew
+        - hindi
+        - hungarian
+        - icelandic
+        - indonesian
+        - italian
+        - kannada
+        - latvian
+        - lithuanian
+        - malay
+        - malayalam
+        - marathi
+        - norwegianBokmaal
+        - polish
+        - portuguese
+        - portugueseBrazilian
+        - punjabi
+        - romanian
+        - russian
+        - serbianCyrillic
+        - serbianLatin
+        - slovak
+        - slovenian
+        - spanish
+        - swedish
+        - tamil
+        - telugu
+        - turkish
+        - ukrainian
+        - urdu
+      description: Lists the languages supported by the Microsoft language tokenizer.
+    NGramTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.NGramTokenFilter'
+        minGram:
+          type: integer
+          format: int32
+          description: The minimum n-gram length. Default is 1. Must be less than the value of maxGram.
+          default: 1
+        maxGram:
+          type: integer
+          format: int32
+          description: The maximum n-gram length. Default is 2.
+          default: 2
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Generates n-grams of the given size(s). This token filter is implemented using Apache Lucene.
+    NGramTokenFilterV2:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.NGramTokenFilterV2'
+        minGram:
+          type: integer
+          format: int32
+          description: The minimum n-gram length. Default is 1. Must be less than the value of maxGram.
+          default: 1
+        maxGram:
+          type: integer
+          format: int32
+          description: The maximum n-gram length. Default is 2.
+          default: 2
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Generates n-grams of the given size(s). This token filter is implemented using Apache Lucene.
+    NGramTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.NGramTokenizer'
+        minGram:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The minimum n-gram length. Default is 1. Maximum is 300. Must be less than the value of maxGram.
+          default: 1
+        maxGram:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum n-gram length. Default is 2. Maximum is 300.
+          default: 2
+        tokenChars:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenCharacterKind'
+          description: Character classes to keep in the tokens.
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Tokenizes the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.
+    OcrSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Vision.OcrSkill'
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/OcrSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+        detectOrientation:
+          type: boolean
+          description: A value indicating to turn orientation detection on or not. Default is false.
+          default: false
+        lineEnding:
+          allOf:
+            - $ref: '#/components/schemas/LineEnding'
+          description: Defines the sequence of characters to use between the lines of text recognized by the OCR skill. The default value is "space".
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that uses text analytics for key phrase extraction.
+    OcrSkillLanguage:
+      type: string
+      enum:
+        - zh-Hans
+        - zh-Hant
+        - cs
+        - da
+        - nl
+        - en
+        - fi
+        - fr
+        - de
+        - el
+        - hu
+        - it
+        - ja
+        - ko
+        - nb
+        - pl
+        - pt
+        - ru
+        - es
+        - sv
+        - tr
+        - ar
+        - ro
+        - sr-Cyrl
+        - sr-Latn
+        - sk
+        - unk
+      description: The language codes supported for input by OcrSkill.
+    OutputFieldMappingEntry:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the output defined by the skill.
+        targetName:
+          type: string
+          description: The target name of the output. It is optional and default to name.
+      description: Output field mapping for a skill.
+    PIIDetectionSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.PIIDetectionSkill'
+        defaultLanguageCode:
+          type: string
+          description: A value indicating which language code to use. Default is en.
+        minimumPrecision:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: A value between 0 and 1 that be used to only include entities whose confidence score is greater than the value specified. If not set (default), or if explicitly set to null, all entities will be included.
+        maskingMode:
+          allOf:
+            - $ref: '#/components/schemas/PIIDetectionSkillMaskingMode'
+          description: A parameter that provides various ways to mask the personal information detected in the input text. Default is 'none'.
+        maskingCharacter:
+          type: string
+          maxLength: 1
+          description: The character used to mask the text if the maskingMode parameter is set to replace. Default is '*'.
+        modelVersion:
+          type: string
+          description: The version of the model to use when calling the Text Analytics service. It will default to the latest available when not specified. We recommend you do not specify this value unless absolutely necessary.
+        piiCategories:
+          type: array
+          items:
+            type: string
+          description: A list of PII entity categories that should be extracted and masked.
+        domain:
+          type: string
+          description: "If specified, will set the PII domain to include only a subset of the entity categories. Possible values include: 'phi', 'none'. Default is 'none'."
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: Using the Text Analytics API, extracts personal information from an input text and gives you the option of masking it.
+    PIIDetectionSkillMaskingMode:
+      type: string
+      enum:
+        - none
+        - replace
+    PathHierarchyTokenizerV2:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.PathHierarchyTokenizerV2'
+        delimiter:
+          type: string
+          maxLength: 1
+          description: The delimiter character to use. Default is "/".
+          default: /
+        replacement:
+          type: string
+          maxLength: 1
+          description: A value that, if set, replaces the delimiter character. Default is "/".
+          default: /
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default and maximum is 300.
+          default: 300
+        reverse:
+          type: boolean
+          description: A value indicating whether to generate tokens in reverse order. Default is false.
+        skip:
+          type: integer
+          format: int32
+          description: The number of initial tokens to skip. Default is 0.
+          default: 0
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Tokenizer for path-like hierarchies. This tokenizer is implemented using Apache Lucene.
+    PatternAnalyzer:
+      type: object
+      required:
+        - '@odata.type'
+        - stopwords
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.PatternAnalyzer'
+        lowercase:
+          type: boolean
+          description: A value indicating whether terms should be lower-cased. Default is true.
+          default: true
+        pattern:
+          type: string
+          description: A regular expression pattern to match token separators. Default is an expression that matches one or more non-word characters.
+          default: \W+
+        flags:
+          allOf:
+            - $ref: '#/components/schemas/RegexFlags'
+          description: Regular expression flags.
+        stopwords:
+          type: array
+          items:
+            type: string
+          description: A list of stopwords.
+      allOf:
+        - $ref: '#/components/schemas/LexicalAnalyzer'
+      description: Flexibly separates text into terms via a regular expression pattern. This analyzer is implemented using Apache Lucene.
+    PatternCaptureTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - patterns
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.PatternCaptureTokenFilter'
+        patterns:
+          type: array
+          items:
+            type: string
+          description: A list of patterns to match against each token.
+        preserveOriginal:
+          type: boolean
+          description: A value indicating whether to return the original token even if one of the patterns matches. Default is true.
+          default: true
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: Generates n-grams of the given size(s). This token filter is implemented using Apache Lucene.
+    PatternReplaceCharFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - pattern
+        - replacement
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.PatternReplaceCharFilter'
+        pattern:
+          type: string
+          description: A regular expression pattern.
+        replacement:
+          type: string
+          description: The replacement text.
+      allOf:
+        - $ref: '#/components/schemas/CharFilter'
+      description: A character filter that replaces characters in the input string. It uses a regular expression to identify character sequences to preserve and a replacement pattern to identify characters to replace. For example, given the input text "aa bb aa bb", pattern "(aa)\s+(bb)", and replacement "$1#$2", the result would be "aa#bb aa#bb". This character filter is implemented using Apache Lucene.
+    PatternReplaceTokenFilter:
+      type: object
+      required:
+        - '@odata.type'
+        - pattern
+        - replacement
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.PatternReplaceTokenFilter'
+        pattern:
+          type: string
+          description: A regular expression pattern.
+        replacement:
+          type: string
+          description: The replacement text.
+      allOf:
+        - $ref: '#/components/schemas/TokenFilter'
+      description: A character filter that replaces characters in the input string. It uses a regular expression to identify character sequences to preserve and a replacement pattern to identify characters to replace. For example, given the input text "aa bb aa bb", pattern "(aa)\s+(bb)", and replacement "$1#$2", the result would be "aa#bb aa#bb". This token filter is implemented using Apache Lucene.
+    PatternTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.PatternTokenizer'
+        pattern:
+          type: string
+          description: A regular expression pattern to match token separators. Default is an expression that matches one or more non-word characters.
+          default: \W+
+        flags:
+          allOf:
+            - $ref: '#/components/schemas/RegexFlags'
+          description: Regular expression flags.
+        group:
+          type: integer
+          format: int32
+          description: The zero-based ordinal of the matching group in the regular expression pattern to extract into tokens. Use -1 if you want to use the entire pattern to split the input into tokens, irrespective of matching groups. Default is -1.
+          default: -1
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Tokenizer that uses regex pattern matching to construct distinct tokens. This tokenizer is implemented using Apache Lucene.
+    PrioritizedFields:
+      type: object
+      properties:
+        titleField:
+          type: array
+          items:
+            $ref: '#/components/schemas/SemanticField'
+          description: Defines the title field to be used for semantic ranking, captions, highlights, and answers. If you don't have a title field in your index, leave this blank.
+        prioritizedContentFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/SemanticField'
+          description: Defines the content fields to be used for semantic ranking, captions, highlights, and answers. For the best result, the selected fields should contain text in natural language form. The order of the fields in the array represents their priority. Fields with lower priority may get truncated if the content is long.
+        prioritizedKeywordsFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/SemanticField'
+          description: Defines the keyword fields to be used for semantic ranking, captions, highlights, and answers. For the best result, the selected fields should contain a list of keywords. The order of the fields in the array represents their priority. Fields with lower priority may get truncated if the content is long.
+      description: Describes the title, content, and keywords fields to be used for semantic ranking, captions, highlights, and answers.
+    RegexFlags:
+      type: string
+      enum:
+        - CANON_EQ
+        - CASE_INSENSITIVE
+        - COMMENTS
+        - DOTALL
+        - LITERAL
+        - MULTILINE
+        - UNICODE_CASE
+        - UNIX_LINES
+      description: Defines flags that can be combined to control how regular expressions are used in the pattern analyzer and pattern tokenizer.
+    ResourceCounter:
+      type: object
+      required:
+        - usage
+      properties:
+        usage:
+          type: integer
+          format: int64
+          description: The resource usage amount.
+        quota:
+          type: integer
+          format: int64
+          description: The resource amount quota.
+    ScoringFunction:
+      type: object
+      required:
+        - fieldName
+        - boost
+      properties:
+        fieldName:
+          type: string
+          description: The name of the field used as input to the scoring function.
+        boost:
+          type: number
+          format: double
+          description: A multiplier for the raw score. Must be a positive number not equal to 1.0.
+        interpolation:
+          allOf:
+            - $ref: '#/components/schemas/ScoringFunctionInterpolation'
+          description: A value indicating how boosting will be interpolated across document scores; defaults to "Linear".
+        type:
+          type: string
+          description: Discriminator property for ScoringFunction.
+      discriminator:
+        propertyName: type
+        mapping:
+          distance: '#/components/schemas/DistanceScoringFunction'
+          freshness: '#/components/schemas/FreshnessScoringFunction'
+          magnitude: '#/components/schemas/MagnitudeScoringFunction'
+          tag: '#/components/schemas/TagScoringFunction'
+      description: Base type for functions that can modify document scores during ranking.
+    ScoringFunctionAggregation:
+      type: string
+      enum:
+        - sum
+        - average
+        - minimum
+        - maximum
+        - firstMatching
+      description: Defines the aggregation function used to combine the results of all the scoring functions in a scoring profile.
+    ScoringFunctionInterpolation:
+      type: string
+      enum:
+        - linear
+        - constant
+        - quadratic
+        - logarithmic
+      description: Defines the function used to interpolate score boosting across a range of documents.
+    ScoringProfile:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the scoring profile.
+        text:
+          allOf:
+            - $ref: '#/components/schemas/TextWeights'
+          description: Parameters that boost scoring based on text matches in certain index fields.
+        functions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoringFunction'
+          description: The collection of functions that influence the scoring of documents.
+        functionAggregation:
+          allOf:
+            - $ref: '#/components/schemas/ScoringFunctionAggregation'
+          description: A value indicating how the results of individual scoring functions should be combined. Defaults to "Sum". Ignored if there are no scoring functions.
+      description: Defines parameters for a search index that influence scoring in search queries.
+    SearchError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes
+          readOnly: true
+        message:
+          type: string
+          description: A human-readable representation of the error
+          readOnly: true
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchError'
+          description: An array of details about specific errors that led to this reported error.
+          readOnly: true
+      description: The error object
+    SearchField:
+      type: object
+      required:
+        - name
+        - type
+        - synonymMaps
+      properties:
+        name:
+          type: string
+          description: The name of the field, which must be unique within the fields collection of the index or parent field.
+        type:
+          allOf:
+            - $ref: '#/components/schemas/SearchFieldDataType'
+          description: The data type of the field.
+        key:
+          type: boolean
+          description: A value indicating whether the field uniquely identifies documents in the index. Exactly one top-level field in each index must be chosen as the key field and it must be of type Edm.String. Key fields can be used to look up documents directly and update or delete specific documents. Default is false for simple fields and null for complex fields.
+        retrievable:
+          type: boolean
+          description: A value indicating whether the field can be returned in a search result. You can disable this option if you want to use a field (for example, margin) as a filter, sorting, or scoring mechanism but do not want the field to be visible to the end user. This property must be true for key fields, and it must be null for complex fields. This property can be changed on existing fields. Enabling this property does not cause any increase in index storage requirements. Default is true for simple fields and null for complex fields.
+        searchable:
+          type: boolean
+          description: 'A value indicating whether the field is full-text searchable. This means it will undergo analysis such as word-breaking during indexing. If you set a searchable field to a value like "sunny day", internally it will be split into the individual tokens "sunny" and "day". This enables full-text searches for these terms. Fields of type Edm.String or Collection(Edm.String) are searchable by default. This property must be false for simple fields of other non-string data types, and it must be null for complex fields. Note: searchable fields consume extra space in your index since Azure Cognitive Search will store an additional tokenized version of the field value for full-text searches. If you want to save space in your index and you don''t need a field to be included in searches, set searchable to false.'
+        filterable:
+          type: boolean
+          description: A value indicating whether to enable the field to be referenced in $filter queries. filterable differs from searchable in how strings are handled. Fields of type Edm.String or Collection(Edm.String) that are filterable do not undergo word-breaking, so comparisons are for exact matches only. For example, if you set such a field f to "sunny day", $filter=f eq 'sunny' will find no matches, but $filter=f eq 'sunny day' will. This property must be null for complex fields. Default is true for simple fields and null for complex fields.
+        sortable:
+          type: boolean
+          description: A value indicating whether to enable the field to be referenced in $orderby expressions. By default Azure Cognitive Search sorts results by score, but in many experiences users will want to sort by fields in the documents. A simple field can be sortable only if it is single-valued (it has a single value in the scope of the parent document). Simple collection fields cannot be sortable, since they are multi-valued. Simple sub-fields of complex collections are also multi-valued, and therefore cannot be sortable. This is true whether it's an immediate parent field, or an ancestor field, that's the complex collection. Complex fields cannot be sortable and the sortable property must be null for such fields. The default for sortable is true for single-valued simple fields, false for multi-valued simple fields, and null for complex fields.
+        facetable:
+          type: boolean
+          description: A value indicating whether to enable the field to be referenced in facet queries. Typically used in a presentation of search results that includes hit count by category (for example, search for digital cameras and see hits by brand, by megapixels, by price, and so on). This property must be null for complex fields. Fields of type Edm.GeographyPoint or Collection(Edm.GeographyPoint) cannot be facetable. Default is true for all other simple fields.
+        analyzer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalAnalyzerName'
+          description: The name of the analyzer to use for the field. This option can be used only with searchable fields and it can't be set together with either searchAnalyzer or indexAnalyzer. Once the analyzer is chosen, it cannot be changed for the field. Must be null for complex fields.
+        searchAnalyzer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalAnalyzerName'
+          description: The name of the analyzer used at search time for the field. This option can be used only with searchable fields. It must be set together with indexAnalyzer and it cannot be set together with the analyzer option. This property cannot be set to the name of a language analyzer; use the analyzer property instead if you need a language analyzer. This analyzer can be updated on an existing field. Must be null for complex fields.
+        indexAnalyzer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalAnalyzerName'
+          description: The name of the analyzer used at indexing time for the field. This option can be used only with searchable fields. It must be set together with searchAnalyzer and it cannot be set together with the analyzer option.  This property cannot be set to the name of a language analyzer; use the analyzer property instead if you need a language analyzer. Once the analyzer is chosen, it cannot be changed for the field. Must be null for complex fields.
+        normalizer:
+          allOf:
+            - $ref: '#/components/schemas/LexicalNormalizerName'
+          description: The name of the normalizer to use for the field. This option can be used only with fields with filterable, sortable, or facetable enabled. Once the normalizer is chosen, it cannot be changed for the field. Must be null for complex fields.
+        synonymMaps:
+          type: array
+          items:
+            type: string
+          description: A list of the names of synonym maps to associate with this field. This option can be used only with searchable fields. Currently only one synonym map per field is supported. Assigning a synonym map to a field ensures that query terms targeting that field are expanded at query-time using the rules in the synonym map. This attribute can be changed on existing fields. Must be null or an empty collection for complex fields.
+        fields:
+          allOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/SearchField'
+          description: A list of sub-fields if this is a field of type Edm.ComplexType or Collection(Edm.ComplexType). Must be null or empty for simple fields.
+      description: Represents a field in an index definition, which describes the name, data type, and search behavior of a field.
+    SearchFieldDataType:
+      type: string
+      enum:
+        - Edm.String
+        - Edm.Int32
+        - Edm.Int64
+        - Edm.Double
+        - Edm.Boolean
+        - Edm.DateTimeOffset
+        - Edm.GeographyPoint
+        - Edm.ComplexType
+      description: Defines the data type of a field in a search index.
+    SearchIndex:
+      type: object
+      required:
+        - '@odata.etag'
+        - name
+        - fields
+      properties:
+        '@odata.etag':
+          type: string
+          description: The ETag of the resource.
+        name:
+          type: string
+          description: The name of the index.
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchField'
+          description: The fields of the index.
+        scoringProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoringProfile'
+          description: The scoring profiles for the index.
+        defaultScoringProfile:
+          type: string
+          description: The name of the scoring profile to use if none is specified in the query. If this property is not set and no scoring profile is specified in the query, then default scoring (tf-idf) will be used.
+        corsOptions:
+          allOf:
+            - $ref: '#/components/schemas/CorsOptions'
+          description: Options to control Cross-Origin Resource Sharing (CORS) for the index.
+        suggesters:
+          allOf:
+            - $ref: '#/components/schemas/Suggester'
+          description: The suggesters for the index.
+        analyzers:
+          allOf:
+            - $ref: '#/components/schemas/LexicalAnalyzer'
+          description: The analyzers for the index.
+        tokenizers:
+          allOf:
+            - $ref: '#/components/schemas/LexicalTokenizer'
+          description: The tokenizers for the index.
+        tokenFilter:
+          allOf:
+            - $ref: '#/components/schemas/TokenFilter'
+          description: The token filters for the index.
+        charFilters:
+          allOf:
+            - $ref: '#/components/schemas/CharFilter'
+          description: The character filters for the index.
+        normalizers:
+          allOf:
+            - $ref: '#/components/schemas/LexicalNormalizer'
+          description: The normalizers for the index.
+        encryptionKey:
+          allOf:
+            - $ref: '#/components/schemas/SearchResourceEncryptionKey'
+          description: A description of an encryption key that you create in Azure Key Vault. This key is used to provide an additional level of encryption-at-rest for your data when you want full assurance that no one, not even Microsoft, can decrypt your data in Azure Cognitive Search. Once you have encrypted your data, it will always remain encrypted. Azure Cognitive Search will ignore attempts to set this property to null. You can change this property as needed if you want to rotate your encryption key; Your data will be unaffected. Encryption with customer-managed keys is not available for free search services, and is only available for paid services created on or after January 1, 2019.
+        similarity:
+          allOf:
+            - $ref: '#/components/schemas/Similarity'
+          description: The type of similarity algorithm to be used when scoring and ranking the documents matching a search query. The similarity algorithm can only be defined at index creation time and cannot be modified on existing indexes. If null, the ClassicSimilarity algorithm is used.
+        semantic:
+          allOf:
+            - $ref: '#/components/schemas/SemanticSettings'
+          description: Defines parameters for a search index that influence semantic capabilities.
+      description: Represents a search index definition, which describes the fields and search behavior of an index.
+    SearchIndexer:
+      type: object
+      required:
+        - name
+        - dataSourceName
+        - targetIndexName
+        - '@odata.etag'
+      properties:
+        name:
+          type: string
+          description: The name of the indexer.
+        description:
+          type: string
+          description: The description of the indexer.
+        dataSourceName:
+          type: string
+          description: The name of the datasource from which this indexer reads data.
+        skillsetName:
+          type: string
+          description: The name of the skillset executing with this indexer.
+        targetIndexName:
+          type: string
+          description: The name of the index to which this indexer writes data.
+        schedule:
+          allOf:
+            - $ref: '#/components/schemas/IndexingSchedule'
+          description: The schedule for this indexer.
+        parameters:
+          allOf:
+            - $ref: '#/components/schemas/IndexingParameters'
+          description: Parameters for indexer execution.
+        fieldMappings:
+          allOf:
+            - $ref: '#/components/schemas/FieldMapping'
+          description: Defines mappings between fields in the data source and corresponding target fields in the index.
+        outputFieldMappings:
+          allOf:
+            - $ref: '#/components/schemas/FieldMapping'
+          description: Output field mappings are applied after enrichment and immediately before indexing.
+        disabled:
+          type: boolean
+          description: A value indicating whether the indexer is disabled. Default is false.
+          default: false
+        '@odata.etag':
+          type: string
+          description: The ETag of the resource.
+        encryptionKey:
+          allOf:
+            - $ref: '#/components/schemas/SearchResourceEncryptionKey'
+          description: A description of an encryption key that you create in Azure Key Vault. This key is used to provide an additional level of encryption-at-rest for your indexer definition (as well as indexer execution status) when you want full assurance that no one, not even Microsoft, can decrypt them in Azure Cognitive Search. Once you have encrypted your indexer definition, it will always remain encrypted. Azure Cognitive Search will ignore attempts to set this property to null. You can change this property as needed if you want to rotate your encryption key; Your indexer definition (and indexer execution status) will be unaffected. Encryption with customer-managed keys is not available for free search services, and is only available for paid services created on or after January 1, 2019.
+        cache:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerCache'
+          description: Adds caching to an enrichment pipeline to allow for incremental modification steps without having to rebuild the index every time.
+    SearchIndexerCache:
+      type: object
+      properties:
+        storageConnectionString:
+          type: string
+          description: The connection string to the storage account where the cache data will be persisted.
+        enableReprocessing:
+          type: boolean
+          description: Specifies whether incremental reprocessing is enabled.
+    SearchIndexerDataContainer:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the table or view (for Azure SQL data source) or collection (for CosmosDB data source) that will be indexed.
+        query:
+          type: string
+          description: A query that is applied to this data container. The syntax and meaning of this parameter is datasource-specific. Not supported by Azure SQL datasources.
+      description: Represents information about the entity (such as Azure SQL table or CosmosDB collection) that will be indexed.
+    SearchIndexerDataIdentity:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          description: Identifies the concrete type of the identity.
+    SearchIndexerDataNoneIdentity:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerDataIdentity'
+    SearchIndexerDataSource:
+      type: object
+      required:
+        - name
+        - type
+        - credentials
+        - container
+        - '@odata.etag'
+      properties:
+        name:
+          type: string
+          description: The name of the datasource.
+          readOnly: true
+        description:
+          type: string
+          description: The description of the datasource.
+        type:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerDataSourceType'
+          description: The type of the datasource.
+        credentials:
+          allOf:
+            - $ref: '#/components/schemas/DataSourceCredentials'
+          description: Credentials for the datasource.
+        container:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerDataContainer'
+          description: The data container for the datasource.
+        identity:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerDataIdentity'
+          description: An explicit managed identity to use for this datasource. If not specified and the connection string is a managed identity, the system-assigned managed identity is used. If not specified, the value remains unchanged. If ',none,' is specified, the value of this property is cleared.
+        dataChangeDetectionPolicy:
+          allOf:
+            - $ref: '#/components/schemas/DataChangeDetectionPolicy'
+          description: The data change detection policy for the datasource.
+        dataDeletionDetectionPolicy:
+          allOf:
+            - $ref: '#/components/schemas/DataDeletionDetectionPolicy'
+          description: The data deletion detection policy for the datasource.
+        '@odata.etag':
+          type: string
+          description: The ETag of the resource.
+        encryptionKey:
+          allOf:
+            - $ref: '#/components/schemas/SearchResourceEncryptionKey'
+          description: A description of an encryption key that you create in Azure Key Vault. This key is used to provide an additional level of encryption-at-rest for your datasource definition when you want full assurance that no one, not even Microsoft, can decrypt your data source definition in Azure Cognitive Search. Once you have encrypted your data source definition, it will always remain encrypted. Azure Cognitive Search will ignore attempts to set this property to null. You can change this property as needed if you want to rotate your encryption key; Your datasource definition will be unaffected. Encryption with customer-managed keys is not available for free search services, and is only available for paid services created on or after January 1, 2019.
+    SearchIndexerDataSourceType:
+      type: string
+      enum:
+        - azuresql
+        - cosmosdb
+        - azureblob
+        - azuretable
+        - mysql
+        - adlsgen2
+    SearchIndexerError:
+      type: object
+      required:
+        - errorMessage
+        - statusCode
+      properties:
+        key:
+          type: string
+          description: The key of the item for which indexing failed.
+        errorMessage:
+          type: string
+          description: The message describing the error that occurred while processing the item.
+        statusCode:
+          type: integer
+          format: int32
+          description: 'The status code indicating why the indexing operation failed. Possible values include: 400 for a malformed input document, 404 for document not found, 409 for a version conflict, 422 when the index is temporarily unavailable, or 503 for when the service is too busy.'
+        name:
+          type: string
+          description: The name of the source at which the error originated. For example, this could refer to a particular skill in the attached skillset. This may not be always available.
+        details:
+          type: string
+          description: Additional, verbose details about the error to assist in debugging the indexer. This may not be always available.
+        documentationLink:
+          type: string
+          description: A link to a troubleshooting guide for these classes of errors. This may not be always available.
+      description: Represents an item- or document-level indexing error.
+    SearchIndexerKnowledgeStore:
+      type: object
+      required:
+        - storageConnectionString
+        - projections
+      properties:
+        storageConnectionString:
+          type: string
+          description: The connection string to the storage account projections will be stored in.
+        projections:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchIndexerKnowledgeStoreProjection'
+          description: A list of additional projections to perform during indexing.
+      description: Definition of additional projections to azure blob, table, or files, of enriched data.
+    SearchIndexerKnowledgeStoreBlobProjectionSelector:
+      type: object
+      required:
+        - storageContainer
+      properties:
+        storageContainer:
+          type: string
+          description: Blob container to store projections in.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreProjectionSelector'
+      description: Abstract class to share properties between concrete selectors.
+    SearchIndexerKnowledgeStoreFileProjectionSelector:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreBlobProjectionSelector'
+      description: Projection definition for what data to store in Azure Files.
+    SearchIndexerKnowledgeStoreObjectProjectionSelector:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreBlobProjectionSelector'
+      description: Projection definition for what data to store in Azure Blob.
+    SearchIndexerKnowledgeStoreProjection:
+      type: object
+      properties:
+        tables:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreTableProjectionSelector'
+          description: Projections to Azure Table storage.
+        objects:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreObjectProjectionSelector'
+          description: Projections to Azure Blob storage.
+        files:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreFileProjectionSelector'
+          description: Projections to Azure File storage.
+      description: Container object for various projection selectors.
+    SearchIndexerKnowledgeStoreProjectionSelector:
+      type: object
+      properties:
+        referenceKeyName:
+          type: string
+          description: Name of reference key to different projection.
+        generatedKeyName:
+          type: string
+          description: Name of generated  key to  store projection under.
+        source:
+          type: string
+          description: Source data to project.
+        sourceContext:
+          type: string
+          description: Source context for complex projections.
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputFieldMappingEntry'
+          description: Nested inputs for complex projections.
+      description: Abstract class to share properties between concrete selectors.
+    SearchIndexerKnowledgeStoreTableProjectionSelector:
+      type: object
+      required:
+        - tableName
+      properties:
+        tableName:
+          type: string
+          description: Name of the Azure table to store projected data in.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerKnowledgeStoreProjectionSelector'
+      description: Description for what data to store in Azure Tables.
+    SearchIndexerLimits:
+      type: object
+      properties:
+        maxRunTime:
+          type: string
+          description: The maximum duration that the indexer is permitted to run for one execution.
+        maxDocumentExtractionSize:
+          type: integer
+          format: int64
+          description: The maximum size of a document, in bytes, which will be considered valid for indexing.
+        maxDocumentContentCharactersToExtract:
+          type: integer
+          format: int64
+          description: The maximum number of characters that will be extracted from a document picked up for indexing.
+    SearchIndexerSkill:
+      type: object
+      required:
+        - name
+        - inputs
+        - outputs
+      properties:
+        name:
+          type: string
+          description: The name of the skill which uniquely identifies it within the skillset. A skill with no name defined will be given a default name of its 1-based index in the skills array, prefixed with the character '#'.
+        description:
+          type: string
+          description: The description of the skill which describes the inputs, outputs, and usage of the skill.
+        context:
+          type: string
+          description: Represents the level at which operations take place, such as the document root or document content (for example, /document or /document/content). The default is /document.
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputFieldMappingEntry'
+          description: Inputs of the skills could be a column in the source data set, or the output of an upstream skill.
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutputFieldMappingEntry'
+          description: The output of a skill is either a field in a search index, or a value that can be consumed as an input by another skill.
+        '@odata.type':
+          type: string
+          description: Discriminator property for SearchIndexerSkill.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Skills.Util.ConditionalSkill': '#/components/schemas/ConditionalSkill'
+          '#Microsoft.Skills.Text.KeyPhraseExtractionSkill': '#/components/schemas/KeyPhraseExtractionSkill'
+          '#Microsoft.Skills.Vision.OcrSkill': '#/components/schemas/OcrSkill'
+          '#Microsoft.Skills.Vision.ImageAnalysisSkill': '#/components/schemas/ImageAnalysisSkill'
+          '#Microsoft.Skills.Text.LanguageDetectionSkill': '#/components/schemas/LanguageDetectionSkill'
+          '#Microsoft.Skills.Util.ShaperSkill': '#/components/schemas/ShaperSkill'
+          '#Microsoft.Skills.Text.MergeSkill': '#/components/schemas/MergeSkill'
+          '#Microsoft.Skills.Text.EntityRecognitionSkill': '#/components/schemas/EntityRecognitionSkill'
+          '#Microsoft.Skills.Text.SentimentSkill': '#/components/schemas/SentimentSkill'
+          '#Microsoft.Skills.Text.V3.SentimentSkill': '#/components/schemas/SentimentSkillV3'
+          '#Microsoft.Skills.Text.V3.EntityLinkingSkill': '#/components/schemas/EntityLinkingSkill'
+          '#Microsoft.Skills.Text.V3.EntityRecognitionSkill': '#/components/schemas/EntityRecognitionSkillV3'
+          '#Microsoft.Skills.Text.PIIDetectionSkill': '#/components/schemas/PIIDetectionSkill'
+          '#Microsoft.Skills.Text.SplitSkill': '#/components/schemas/SplitSkill'
+          '#Microsoft.Skills.Text.CustomEntityLookupSkill': '#/components/schemas/CustomEntityLookupSkill'
+          '#Microsoft.Skills.Text.TranslationSkill': '#/components/schemas/TextTranslationSkill'
+          '#Microsoft.Skills.Util.DocumentExtractionSkill': '#/components/schemas/DocumentExtractionSkill'
+          '#Microsoft.Skills.Custom.WebApiSkill': '#/components/schemas/WebApiSkill'
+          '#Microsoft.Skills.Custom.AmlSkill': '#/components/schemas/AmlSkill'
+      description: Base type for skills.
+    SearchIndexerSkillset:
+      type: object
+      required:
+        - '@odata.etag'
+        - name
+        - skills
+      properties:
+        '@odata.etag':
+          type: string
+          description: The ETag of the resource.
+        name:
+          type: string
+          description: The name of the skillset.
+        description:
+          type: string
+          description: The description of the skillset.
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchIndexerSkill'
+          description: A list of skills in the skillset.
+        cognitiveServices:
+          allOf:
+            - $ref: '#/components/schemas/CognitiveServicesAccount'
+          description: Details about cognitive services to be used when running skills.
+        knowledgeStore:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerKnowledgeStore'
+          description: Definition of additional projections to azure blob, table, or files, of enriched data.
+        encryptionKey:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/SearchResourceEncryptionKey'
+          nullable: true
+          description: A description of an encryption key that you create in Azure Key Vault. This key is used to provide an additional level of encryption-at-rest for your skillset definition when you want full assurance that no one, not even Microsoft, can decrypt your skillset definition in Azure Cognitive Search. Once you have encrypted your skillset definition, it will always remain encrypted. Azure Cognitive Search will ignore attempts to set this property to null. You can change this property as needed if you want to rotate your encryption key; Your skillset definition will be unaffected. Encryption with customer-managed keys is not available for free search services, and is only available for paid services created on or after January 1, 2019.
+      description: A list of skills.
+    SearchIndexerStatus:
+      type: object
+      required:
+        - status
+        - executionHistory
+        - limits
+      properties:
+        status:
+          allOf:
+            - $ref: '#/components/schemas/IndexerStatus'
+          description: Overall indexer status.
+        lastResult:
+          allOf:
+            - $ref: '#/components/schemas/IndexerExecutionResult'
+          description: The result of the most recent or an in-progress indexer execution.
+        executionHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexerExecutionResult'
+          description: History of the recent indexer executions, sorted in reverse chronological order.
+        limits:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerLimits'
+          description: The execution limits for the indexer.
+      description: Represents the current status and execution history of an indexer.
+    SearchIndexerWarning:
+      type: object
+      required:
+        - message
+      properties:
+        key:
+          type: string
+          description: The key of the item which generated a warning.
+        message:
+          type: string
+          description: The message describing the warning that occurred while processing the item.
+        name:
+          type: string
+          description: The name of the source at which the warning originated. For example, this could refer to a particular skill in the attached skillset. This may not be always available.
+        details:
+          type: string
+          description: Additional, verbose details about the warning to assist in debugging the indexer. This may not be always available.
+        documentationLink:
+          type: string
+          description: A link to a troubleshooting guide for these classes of warnings. This may not be always available.
+      description: Represents an item-level warning.
+    SearchResourceEncryptionKey:
+      type: object
+      required:
+        - keyVaultKeyName
+        - keyVaultKeyVersion
+        - keyVaultUri
+      properties:
+        keyVaultKeyName:
+          type: string
+          description: The name of your Azure Key Vault key to be used to encrypt your data at rest.
+        keyVaultKeyVersion:
+          type: string
+          description: The version of your Azure Key Vault key to be used to encrypt your data at rest.
+        keyVaultUri:
+          type: string
+          description: The URI of your Azure Key Vault, also referred to as DNS name, that contains the key to be used to encrypt your data at rest. An example URI might be https://my-keyvault-name.vault.azure.net.
+        accessCredentials:
+          allOf:
+            - $ref: '#/components/schemas/AzureActiveDirectoryApplicationCredentials'
+          description: Optional Azure Active Directory credentials used for accessing your Azure Key Vault. Not required if using managed identity instead.
+        identity:
+          allOf:
+            - $ref: '#/components/schemas/SearchIndexerDataIdentity'
+          description: An explicit managed identity to use for this encryption key. If not specified and the access credentials property is null, the system-assigned managed identity is used. On update to the resource, if the explicit identity is unspecified, it remains unchanged. If none is specified, the value of this property is cleared.
+    SemanticConfiguration:
+      type: object
+      required:
+        - name
+        - prioritizedFields
+      properties:
+        name:
+          type: string
+          description: The name of the semantic configuration.
+        prioritizedFields:
+          allOf:
+            - $ref: '#/components/schemas/PrioritizedFields'
+          description: Describes the title, content, and keyword fields to be used for semantic ranking, captions, highlights, and answers. At least one of the three sub properties (titleField, prioritizedKeywordsFields and prioritizedContentFields) need to be set.
+      description: Defines a specific configuration to be used in the context of semantic capabilities.
+    SemanticField:
+      type: object
+      required:
+        - fieldName
+      properties:
+        fieldName:
+          type: string
+          description: Field name.
+      description: A field that is used as part of the semantic configuration.
+    SemanticSettings:
+      type: object
+      required:
+        - configurations
+      properties:
+        configurations:
+          type: array
+          items:
+            $ref: '#/components/schemas/SemanticConfiguration'
+          description: The semantic configurations for the index.
+      description: Defines parameters for a search index that influence semantic capabilities.
+    SentimentSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.SentimentSkill'
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/SentimentSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: Text analytics positive-negative sentiment analysis, scored as a floating point value in a range of zero to 1.
+    SentimentSkillLanguage:
+      type: string
+      enum:
+        - da
+        - nl
+        - en
+        - fi
+        - fr
+        - de
+        - el
+        - it
+        - ja
+        - ko
+        - no
+        - pl
+        - pt-PT
+        - ru
+        - es
+        - sv
+        - tr
+      description: The language codes supported for input text by SentimentSkill.
+    SentimentSkillV3:
+      type: object
+      required:
+        - '@odata.type'
+        - modelVersion
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.V3.SentimentSkill'
+        defaultLanguageCode:
+          type: string
+          description: A value indicating which language code to use. Default is en.
+        includeOpinionMining:
+          type: boolean
+          description: If set to true, the skill output will include information from Text Analytics for opinion mining, namely targets (nouns or verbs) and their associated assessment (adjective) in the text. Default is false.
+          default: false
+        modelVersion:
+          type: string
+          description: The version of the model to use when calling the Text Analytics service. It will default to the latest available when not specified. We recommend you do not specify this value unless absolutely necessary.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: Using the Text Analytics API, evaluates unstructured text and for each record, provides sentiment labels (such as "negative", "neutral" and "positive") based on the highest confidence score found by the service at a sentence and document-level.
+    ServiceCounters:
+      type: object
+      properties:
+        documentCount:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total number of documents across all indexes in the service.
+        indexesCount:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total number of indexes.
+        indexersCount:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total number of indexers.
+        dataSourcesCount:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total number of data sources.
+        storageSize:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total size of used storage in bytes.
+        synonymMaps:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total number of synonym maps.
+        skillsetCount:
+          allOf:
+            - $ref: '#/components/schemas/ResourceCounter'
+          description: Total number of skillsets.
+    ServiceLimits:
+      type: object
+      properties:
+        maxFieldsPerIndex:
+          type: integer
+          format: int32
+          description: The maximum allowed fields per index.
+        maxFieldNestingDepthPerIndex:
+          type: integer
+          format: int32
+          description: The maximum depth which you can nest sub-fields in an index, including the top-level complex field. For example, a/b/c has a nesting depth of 3.
+        maxComplexCollectionFieldsPerIndex:
+          type: integer
+          format: int32
+          description: The maximum number of fields of type Collection(Edm.ComplexType) allowed in an index.
+        maxComplexObjectsInCollectionsPerDocument:
+          type: integer
+          format: int32
+          description: The maximum number of objects in complex collections allowed per document.
+    ServiceStatistics:
+      type: object
+      properties:
+        counters:
+          allOf:
+            - $ref: '#/components/schemas/ServiceCounters'
+          description: Service level resource counters.
+        limits:
+          allOf:
+            - $ref: '#/components/schemas/ServiceLimits'
+          description: Service level general limits.
+      description: Response from a get service statistics request. If successful, it includes service level counters and limits.
+    ShaperSkill:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Util.ShaperSkill'
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill for reshaping the outputs. It creates a complex type to support composite fields (also known as multipart fields).
+    Similarity:
+      type: object
+      properties:
+        '@odata.type':
+          type: string
+          description: Discriminator property for Similarity.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Azure.Search.ClassicSimilarity': '#/components/schemas/ClassicSimilarity'
+          '#Microsoft.Azure.Search.BM25Similarity': '#/components/schemas/BM25Similarity'
+      description: Base type for similarity algorithms. Similarity algorithms are used to calculate scores that tie queries to documents. The higher the score, the more relevant the document is to that specific query. Those scores are used to rank the search results.
+    SkillNames:
+      type: object
+      required:
+        - skillNames
+      properties:
+        skillNames:
+          type: array
+          items:
+            type: string
+          description: the names of skills to be reset.
+      description: The names of skills to reset.
+    SplitSkill:
+      type: object
+      required:
+        - '@odata.type'
+        - textSplitMode
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.SplitSkill'
+        defaultLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/SplitSkillLanguage'
+          description: A value indicating which language code to use. Default is en.
+        textSplitMode:
+          allOf:
+            - $ref: '#/components/schemas/TextSplitMode'
+          description: A value indicating which split mode to perform.
+        maximumPageLength:
+          type: integer
+          format: int32
+          description: The desired maximum page length. Default is 10000.
+          default: 10000
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill to split a string into chunks of text.
+    SplitSkillLanguage:
+      type: string
+      enum:
+        - da
+        - de
+        - en
+        - es
+        - fi
+        - fr
+        - it
+        - ko
+        - pt
+      description: The language codes supported for input text by SplitSkill.
+    StopAnalyzer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.StopAnalyzer'
+        stopwords:
+          type: array
+          items:
+            type: string
+          description: A list of stopwords.
+      allOf:
+        - $ref: '#/components/schemas/LexicalAnalyzer'
+      description: Divides text at non-letters; Applies the lowercase and stopword token filters. This analyzer is implemented using Apache Lucene.
+    Suggester:
+      type: object
+      required:
+        - name
+        - searchMode
+        - sourceFields
+      properties:
+        name:
+          type: string
+          description: The name of the suggester.
+        searchMode:
+          allOf:
+            - $ref: '#/components/schemas/SuggesterSearchMode'
+          description: A value indicating the capabilities of the suggester.
+        sourceFields:
+          type: array
+          items:
+            type: string
+          description: The list of field names to which the suggester applies. Each field must be searchable.
+      description: Defines how the Suggest API should apply to a group of fields in the index.
+    SuggesterSearchMode:
+      type: string
+      enum:
+        - analyzingInfixMatching
+      description: A value indicating the capabilities of the suggester.
+    TagScoringFunction:
+      type: object
+      required:
+        - type
+        - tag
+      properties:
+        type:
+          type: string
+          enum:
+            - tag
+        tag:
+          allOf:
+            - $ref: '#/components/schemas/TagScoringParameters'
+          description: Parameter values for the tag scoring function.
+      allOf:
+        - $ref: '#/components/schemas/ScoringFunction'
+      description: Defines a function that boosts scores of documents with string values matching a given list of tags.
+    TagScoringParameters:
+      type: object
+      required:
+        - tagsParameter
+      properties:
+        tagsParameter:
+          type: string
+          description: The name of the parameter passed in search queries to specify the list of tags to compare against the target field.
+      description: Provides parameter values to a tag scoring function.
+    TextSplitMode:
+      type: object
+      required:
+        - Pages
+        - Sentences
+      properties:
+        Pages:
+          type: string
+          enum:
+            - pages
+          description: Split the text into individual pages.
+        Sentences:
+          type: string
+          enum:
+            - sentences
+          description: Split the text into individual sentences.
+      description: A value indicating which split mode to perform.
+    TextTranslationSkill:
+      type: object
+      required:
+        - '@odata.type'
+        - defaultToLanguageCode
+        - defaultFromLanguageCode
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Text.TranslationSkill'
+        defaultToLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/TextTranslationSkillLanguage'
+          description: "The language code to translate documents into for documents that don't specify the to language explicitly. "
+        defaultFromLanguageCode:
+          allOf:
+            - $ref: '#/components/schemas/TextTranslationSkillLanguage'
+          description: The language code to translate documents from for documents that don't specify the from language explicitly.
+        suggestedFrom:
+          allOf:
+            - $ref: '#/components/schemas/TextTranslationSkillLanguage'
+          description: The language code to translate documents from when neither the fromLanguageCode input nor the defaultFromLanguageCode parameter are provided, and the automatic language detection is unsuccessful. Default is en.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill to translate text from one language to another.
+    TextTranslationSkillLanguage:
+      type: string
+      enum:
+        - af
+        - ar
+        - bn
+        - bs
+        - bg
+        - yue
+        - ca
+        - zh-Hans
+        - zh-Hant
+        - hr
+        - cs
+        - da
+        - nl
+        - en
+        - et
+        - fj
+        - fil
+        - fi
+        - fr
+        - de
+        - el
+        - ht
+        - he
+        - hi
+        - mww
+        - hu
+        - is
+        - id
+        - it
+        - ja
+        - sw
+        - tlh
+        - tlh-Latn
+        - tlh-Piqd
+        - ko
+        - lv
+        - lt
+        - mg
+        - ms
+        - mt
+        - nb
+        - fa
+        - pl
+        - pt
+        - pt-br
+        - pt-PT
+        - otq
+        - ro
+        - ru
+        - sm
+        - sr-Cyrl
+        - sr-Latn
+        - sk
+        - sl
+        - es
+        - sv
+        - ty
+        - ta
+        - te
+        - th
+        - to
+        - tr
+        - uk
+        - ur
+        - vi
+        - cy
+        - yua
+        - ga
+        - kn
+        - mi
+        - ml
+        - pa
+      description: The language codes supported for input text by TextTranslationSkill.
+    TextWeights:
+      type: object
+      required:
+        - weights
+      properties:
+        weights:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: The dictionary of per-field weights to boost document scoring. The keys are field names and the values are the weights for each field.
+      description: Defines weights on index fields for which matches should boost scoring in search queries.
+    TokenCharacterKind:
+      type: string
+      enum:
+        - letter
+        - digit
+        - whitespace
+        - punctuation
+        - symbol
+      description: Represents classes of characters on which a token filter can operate.
+    TokenFilter:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the token filter. It must only contain letters, digits, spaces, dashes or underscores, can only start and end with alphanumeric characters, and is limited to 128 characters.
+        '@odata.type':
+          type: string
+          description: Discriminator property for TokenFilter.
+      discriminator:
+        propertyName: '@odata.type'
+        mapping:
+          '#Microsoft.Azure.Search.AsciiFoldingTokenFilter': '#/components/schemas/AsciiFoldingTokenFilter'
+          '#Microsoft.Azure.Search.CjkBigramTokenFilter': '#/components/schemas/CjkBigramTokenFilter'
+          '#Microsoft.Azure.Search.CommonGramTokenFilter': '#/components/schemas/CommonGramTokenFilter'
+          '#Microsoft.Azure.Search.DictionaryDecompounderTokenFilter': '#/components/schemas/DictionaryDecompounderTokenFilter'
+          '#Microsoft.Azure.Search.EdgeNGramTokenFilter': '#/components/schemas/EdgeNGramTokenFilter'
+          '#Microsoft.Azure.Search.EdgeNGramTokenFilterV2': '#/components/schemas/EdgeNGramTokenFilterV2'
+          '#Microsoft.Azure.Search.ElisionTokenFilter': '#/components/schemas/ElisionTokenFilter'
+          '#Microsoft.Azure.Search.KeepTokenFilter': '#/components/schemas/KeepTokenFilter'
+          '#Microsoft.Azure.Search.KeywordMarkerTokenFilter': '#/components/schemas/KeywordMarkerTokenFilter'
+          '#Microsoft.Azure.Search.LengthTokenFilter': '#/components/schemas/LengthTokenFilter'
+          '#Microsoft.Azure.Search.LimitTokenFilter': '#/components/schemas/LimitTokenFilter'
+          '#Microsoft.Azure.Search.NGramTokenFilter': '#/components/schemas/NGramTokenFilter'
+          '#Microsoft.Azure.Search.NGramTokenFilterV2': '#/components/schemas/NGramTokenFilterV2'
+          '#Microsoft.Azure.Search.PatternCaptureTokenFilter': '#/components/schemas/PatternCaptureTokenFilter'
+          '#Microsoft.Azure.Search.PatternReplaceTokenFilter': '#/components/schemas/PatternReplaceTokenFilter'
+      description: Base type for token filters.
+    TokenFilterName:
+      type: string
+      enum:
+        - arabic_normalization
+        - apostrophe
+        - asciifolding
+        - cjk_bigram
+        - cjk_width
+        - classic
+        - common_grams
+        - edgeNGram_v2
+        - elision
+        - german_normalization
+        - hindi_normalization
+        - indic_normalization
+        - keyword_repeat
+        - kstem
+        - length
+        - limit
+        - lowercase
+        - nGram_v2
+        - persian_normalization
+        - phonetic
+        - porter_stem
+        - reverse
+        - scandinavian_normalization
+        - scandinavian_folding
+        - shingle
+        - snowball
+        - sorani_normalization
+        - stemmer
+        - stopwords
+        - trim
+        - truncate
+        - unique
+        - uppercase
+        - word_delimiter
+      description: Defines the names of all token filters supported by Azure Cognitive Search.
+    UaxUrlEmailTokenizer:
+      type: object
+      required:
+        - '@odata.type'
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Azure.Search.UaxUrlEmailTokenizer'
+        maxTokenLength:
+          type: integer
+          format: int32
+          maximum: 300
+          description: The maximum token length. Default is 255. Tokens longer than the maximum length are split. The maximum token length that can be used is 300 characters.
+          default: 255
+      allOf:
+        - $ref: '#/components/schemas/LexicalTokenizer'
+      description: Tokenizes urls and emails as one token. This tokenizer is implemented using Apache Lucene.
+    VisualFeature:
+      type: string
+      enum:
+        - adult
+        - brands
+        - categories
+        - description
+        - faces
+        - objects
+        - tags
+      description: The strings indicating what visual feature types to return.
+    WebApiSkill:
+      type: object
+      required:
+        - '@odata.type'
+        - uri
+        - httpMethod
+      properties:
+        '@odata.type':
+          type: string
+          enum:
+            - '#Microsoft.Skills.Custom.WebApiSkill'
+        uri:
+          type: string
+          description: The url for the Web API.
+        httpMethod:
+          type: string
+          description: The method for the http request.
+        timeout:
+          type: string
+          format: duration
+          description: The desired timeout for the request. Default is 30 seconds.
+        batchSize:
+          type: integer
+          format: int32
+          description: The desired batch size which indicates number of documents.
+        degreeOfParallelism:
+          type: integer
+          format: int32
+          description: If set, the number of parallel calls that can be made to the Web API.
+      allOf:
+        - $ref: '#/components/schemas/SearchIndexerSkill'
+      description: A skill that can call a Web API endpoint, allowing you to extend a skillset by having it call your custom code.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api-key
+    OAuth2Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.contoso.com/common/oauth2/v2.0/authorize
+          scopes:
+            https://cognitiveservices.azure.com/.default: ''

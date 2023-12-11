@@ -1,0 +1,16 @@
+steps:
+  - checkout: self
+    submodules: true
+
+  - template: ../templates/install.yml
+
+  - script: node eng/scripts/validate-core-submodule.js
+    displayName: Check that core submodule is merged to core repo
+
+  - script: node common/scripts/install-run-rush.js change -v --target-branch "origin/$SYSTEM_PULLREQUEST_TARGETBRANCHNAME"
+    condition: and(succeeded(), not(or(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), startsWith(variables['System.PullRequest.SourceBranch'], 'backmerge/'))))
+    displayName: Check that changelog has been provided
+
+  - script: node common/scripts/install-run-rush.js publish --apply && node eng/scripts/check-for-changed-files.js publish
+    condition: and(succeeded(), eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), true), eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/dpg/'), false))
+    displayName: Check that publish PR isn't missing changes

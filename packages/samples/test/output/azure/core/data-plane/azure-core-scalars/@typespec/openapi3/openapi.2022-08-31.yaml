@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: (title)
+  version: 2022-08-31
+tags: []
+paths:
+  /widgets/{widgetName}:
+    get:
+      operationId: getWidget
+      description: Get a Widget
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: widgetName
+          in: path
+          required: true
+          description: The widget name.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.ConditionalRequestHeaders.ifMatch'
+        - $ref: '#/components/parameters/Azure.Core.ConditionalRequestHeaders.ifNoneMatch'
+        - $ref: '#/components/parameters/Azure.Core.ConditionalRequestHeaders.ifUnmodifiedSince'
+        - $ref: '#/components/parameters/Azure.Core.ConditionalRequestHeaders.ifModifiedSince'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            ETag:
+              required: false
+              description: The entity tag for the response.
+              schema:
+                type: string
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WidgetServiceErrorResponse'
+components:
+  parameters:
+    Azure.Core.ClientRequestIdHeader:
+      name: x-ms-client-request-id
+      in: header
+      required: false
+      description: An opaque, globally-unique, client-generated string identifier for the request.
+      schema:
+        $ref: '#/components/schemas/Azure.Core.uuid'
+    Azure.Core.ConditionalRequestHeaders.ifMatch:
+      name: If-Match
+      in: header
+      required: false
+      description: The request should only proceed if an entity matches this string.
+      schema:
+        type: string
+    Azure.Core.ConditionalRequestHeaders.ifModifiedSince:
+      name: If-Modified-Since
+      in: header
+      required: false
+      description: The request should only proceed if the entity was modified after this time.
+      schema:
+        type: string
+        format: date-time
+    Azure.Core.ConditionalRequestHeaders.ifNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      description: The request should only proceed if no entity matches this string.
+      schema:
+        type: string
+    Azure.Core.ConditionalRequestHeaders.ifUnmodifiedSince:
+      name: If-Unmodified-Since
+      in: header
+      required: false
+      description: The request should only proceed if the entity was not modified after this time.
+      schema:
+        type: string
+        format: date-time
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+  schemas:
+    Azure.Core.eTag:
+      type: string
+      format: eTag
+      description: |-
+        The ETag (or entity tag) HTTP response header is an identifier for a specific version of a resource.
+        It lets caches be more efficient and save bandwidth, as a web server does not need to resend a full response if the content was not changed.
+
+        It is a string of ASCII characters placed between double quotes, like "675af34563dc-tr34".
+    Azure.Core.ipV4Address:
+      type: string
+      format: ipV4Address
+      description: |-
+        Represent an IP V4 address serialized as a string.
+
+        It is formatted as four 8-bit fields separated by periods.
+    Azure.Core.ipV6Address:
+      type: string
+      format: ipV6Address
+      description: |-
+        Represent an IP V6 address serialized as a string.
+
+        It is formatted as eight hex decimal values(16-bit) between 0 and FFFF separated by colon. (i.e. `y:y:y:y:y:y:y:y`)
+    Azure.Core.uuid:
+      type: string
+      format: uuid
+      description: Universally Unique Identifier
+    Versions:
+      type: string
+      enum:
+        - 2022-08-31
+      description: The Contoso Widget Manager service version.
+    Widget:
+      type: object
+      required:
+        - name
+        - siteId
+        - ipV4
+        - ipV6
+        - etag
+      properties:
+        name:
+          type: string
+          description: The widget name.
+          readOnly: true
+        siteId:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.uuid'
+          description: Side id as a uuid
+        ipV4:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.ipV4Address'
+          description: IpV6 of widget
+        ipV6:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.ipV6Address'
+          description: IpV6 of widget
+        etag:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.eTag'
+          description: The entity tag for this resource.
+          readOnly: true
+      description: A widget.
+    WidgetServiceErrorResponse:
+      type: object
+      required:
+        - code
+        - errorMessage
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: The numeric error code.
+        errorMessage:
+          type: string
+          description: The error message.
+      description: A custom error type for the Widget Manager service.

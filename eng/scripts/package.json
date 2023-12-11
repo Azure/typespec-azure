@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "autorest": "^3.4.2",
+    "js-yaml": "^4.1.0"
+  }
+}

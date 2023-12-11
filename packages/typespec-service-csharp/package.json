@@ -1,0 +1,77 @@
+{
+  "name": "@azure-tools/typespec-service-csharp",
+  "version": "0.32.0",
+  "description": "Azure TypeSpec service code generator for c-sharp",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-service-csharp/README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec",
+    "service",
+    "rejuvenate",
+    "r9",
+    "c-sharp"
+  ],
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "tspMain": "dist/src/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./temp",
+    "build": "npm run compile",
+    "compile": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "test": "mocha",
+    "test-official": "c8 mocha --forbid-only --reporter mocha-multi-reporters",
+    "lint": "eslint . --ext .ts --max-warnings=0",
+    "lint:fix": "eslint . --fix --ext .ts",
+    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-service-csharp/reference"
+  },
+  "files": [
+    "lib/*.tsp",
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "peerDependencies": {
+    "@typespec/compiler": "workspace:~0.51.0",
+    "@typespec/rest": "workspace:~0.51.0",
+    "@typespec/http": "workspace:~0.51.0",
+    "@typespec/versioning": "workspace:~0.51.0",
+    "@azure-tools/typespec-autorest": "~0.37.1",
+    "@azure-tools/typespec-azure-core": "~0.37.1"
+  },
+  "dependencies": {
+    "change-case": "~4.1.2"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "workspace:~0.51.0",
+    "@azure-tools/typespec-autorest": "workspace:~0.37.1",
+    "@typespec/openapi": "workspace:~0.51.0",
+    "@typespec/rest": "workspace:~0.51.0",
+    "@typespec/http": "workspace:~0.51.0",
+    "@azure-tools/typespec-azure-core": "workspace:~0.37.1",
+    "@types/mocha": "~10.0.1",
+    "@types/node": "~18.11.9",
+    "@typespec/eslint-config-typespec": "workspace:~0.51.0",
+    "@typespec/library-linter": "workspace:~0.51.0",
+    "@typespec/eslint-plugin": "workspace:~0.51.0",
+    "@typespec/tspd": "workspace:~0.46.0",
+    "eslint": "^8.49.0",
+    "c8": "~8.0.1",
+    "rimraf": "~5.0.1",
+    "typescript": "~5.2.2",
+    "mocha": "~10.2.0",
+    "mocha-junit-reporter": "~2.2.1",
+    "mocha-multi-reporters": "~1.5.1"
+  }
+}

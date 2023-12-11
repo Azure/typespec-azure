@@ -1,0 +1,1421 @@
+{
+  "name": "@azure-tools/typespec-autorest",
+  "entries": [
+    {
+      "version": "0.37.1",
+      "tag": "@azure-tools/typespec-autorest_v0.37.1",
+      "date": "Mon, 11 Dec 2023 18:44:34 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix: enums created from named unions will keep have the union name carry over to `x-ms-enum.name`"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-azure-core\" from `~0.37.0` to `~0.37.1`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-azure-core\" from `~0.37.0` to `~0.37.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.37.0",
+      "tag": "@azure-tools/typespec-autorest_v0.37.0",
+      "date": "Wed, 06 Dec 2023 19:47:28 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Adds validation of '@format' decorator."
+          },
+          {
+            "comment": "Support EmbeddingVector types from Azure.Core."
+          },
+          {
+            "comment": "Added support for more complex unions of literals which could be represented with `enum: []`"
+          },
+          {
+            "comment": "Minor change on docs"
+          },
+          {
+            "comment": "Added support for string templates"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.1",
+      "tag": "@azure-tools/typespec-autorest_v0.36.1",
+      "date": "Tue, 14 Nov 2023 20:35:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix: `discriminator` property will always be marked as required to produce a valid Swagger 2.0 spec."
+          },
+          {
+            "comment": "Fix: Multipart with `bytes` part will now produce `type: file` instead of `type: string, format: binary`"
+          },
+          {
+            "comment": "Fix: Multipart with json part will now produce `type: string` and report a warning as json parts are not supported in swagger 2.0."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.0",
+      "tag": "@azure-tools/typespec-autorest_v0.36.0",
+      "date": "Wed, 08 Nov 2023 00:11:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Fix: Stops emitting an error when using `@body _: void` in operation parameters and treat it as no body."
+          },
+          {
+            "comment": "Allow automatic disambiguation of x-ms-paths when signatures don't differ by query params."
+          },
+          {
+            "comment": "`TypeScript` use `types` entry under `exports` of `package.json` instead of legacy `typesVersions` to provide the definition files"
+          },
+          {
+            "comment": "**BREAKING CHANGE** Minimum node version increased to 18"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.35.2",
+      "tag": "@azure-tools/typespec-autorest_v0.35.2",
+      "date": "Tue, 31 Oct 2023 19:47:30 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix #3794 Allow casing override for OperationId"
+          },
+          {
+            "comment": "Fix: Query or header parameters with a type of array of enum would produce an invalid OpenAPI2.0 spec where the enum would be referenced with a `$ref` which is not allowed inside a parameter definition."
+          },
+          {
+            "comment": "Fix `x-ms-discriminator-value` was not set when a child discriminated model was referenced directly"
+          },
+          {
+            "comment": "Fix: `x-ms-paths` implicit disambiguation would create invalid parameter. Instead `_overload` dummy parameter is always added."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.35.1",
+      "tag": "@azure-tools/typespec-autorest_v0.35.1",
+      "date": "Sat, 28 Oct 2023 15:59:07 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Allow automatic disambiguation of x-ms-paths when signatures don't differ by query params."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-azure-core\" from `~0.35.0` to `~0.35.1`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-azure-core\" from `~0.35.0` to `~0.35.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.35.0",
+      "tag": "@azure-tools/typespec-autorest_v0.35.0",
+      "date": "Wed, 11 Oct 2023 23:51:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "A diagnostic will now be emitted for any HTTP authentication scheme not supported by OpenAPI 2"
+          },
+          {
+            "comment": "Fix: Use `null` as a default"
+          },
+          {
+            "comment": "Update dependencies"
+          },
+          {
+            "comment": "Add support for status code ranges"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.34.0",
+      "tag": "@azure-tools/typespec-autorest_v0.34.0",
+      "date": "Tue, 12 Sep 2023 21:49:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Handle general encodings for utcDateTime"
+          },
+          {
+            "comment": "Fix: handling of `model extends Record<T>` and `model is Record<T>`"
+          },
+          {
+            "comment": "Fix: Resolve the correct `nextLinkName` if property name has `.`."
+          },
+          {
+            "comment": "Fix header with encode rfc7231"
+          },
+          {
+            "comment": "Fix: Autorest output wasn't sorting the properties in known extensions"
+          },
+          {
+            "comment": "Fix issue where properties with \"create\" visibility did not appear when using the CreateOrUpdate PATCH-based template."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.33.0",
+      "tag": "@azure-tools/typespec-autorest_v0.33.0",
+      "date": "Tue, 08 Aug 2023 22:32:22 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Annotate long-running operations with \"x-ms-long-running-operation\"."
+          },
+          {
+            "comment": "Fix: Apply `@minItems` and `@maxItems` decorators on model array."
+          },
+          {
+            "comment": "Add interpolation support for the `arm-types-dir` for the `emitter-output-dir` variable"
+          },
+          {
+            "comment": "Add support for `@info` decorator providing the ability to specify the additional fields from openapi info object."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.32.0",
+      "tag": "@azure-tools/typespec-autorest_v0.32.0",
+      "date": "Tue, 11 Jul 2023 22:06:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Allow discriminator to be an enum"
+          },
+          {
+            "comment": "Add warning for unsupported empty enums."
+          },
+          {
+            "comment": "Show error details when failing to load an example file"
+          },
+          {
+            "comment": "**Change** Added a determinstic ordering to the generated openapi document. This might result in some different ordering as previously."
+          },
+          {
+            "comment": "Add support for nullable enums properties"
+          },
+          {
+            "comment": "Omitting `x-typespec-name` extension by default from autorest output. A new flag `include-x-typespec-name: \"inline-only\" | \"never\"` has been added to get previous behavior."
+          },
+          {
+            "comment": "Create readOnly schema for provisioningState"
+          },
+          {
+            "comment": "AutoRest emitter now reports on non-specific scalar types like `numeric`, `integer`, and `float`."
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.0",
+      "tag": "@azure-tools/typespec-autorest_v0.31.0",
+      "date": "Tue, 06 Jun 2023 22:44:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "(Breaking) It is now an error to have multiple example files with the same operation ID and title. Previously, this would silently overwrite x-ms-examples entries in the output. To fix, choose a unique title for each example of any given operation."
+          },
+          {
+            "comment": "Fix: Documentation on `model is x[]` was not included in schema description"
+          },
+          {
+            "comment": "Implicit body is marked as `required`"
+          },
+          {
+            "comment": "Fix: derived scalar doc ignored"
+          },
+          {
+            "comment": "Fix: `@encode` encoding doesn't override target type format"
+          },
+          {
+            "comment": "Fix: Encoding resolution for model properties and add back `unixtime`"
+          },
+          {
+            "comment": "Fix: operation parameter doc should was ignored if the parameter type had a doc"
+          },
+          {
+            "comment": "add support for decimal and decimal128"
+          },
+          {
+            "comment": "Uptake doc comment changes"
+          },
+          {
+            "comment": "Add emitter options description"
+          },
+          {
+            "comment": "Remove reference to `object` in decorators"
+          },
+          {
+            "comment": "Updated decorators to use `valueof`"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.1",
+      "tag": "@azure-tools/typespec-autorest_v0.30.1",
+      "date": "Sat, 20 May 2023 01:52:45 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix: `arm-types-dir` using absolute reference(e.g. using `{project-root}` would resolve path with extra `../`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.0",
+      "tag": "@azure-tools/typespec-autorest_v0.30.0",
+      "date": "Wed, 10 May 2023 21:24:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "**Added** new option `arm-types-dir` used to specify the directory for the common arm common types"
+          },
+          {
+            "comment": " Respect `client` projection target to resolve `operationId` and `x-ms-client-name`"
+          },
+          {
+            "comment": "Add support for `@encode` decorator"
+          },
+          {
+            "comment": "Cleanup deprecated items"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.29.0",
+      "tag": "@azure-tools/typespec-autorest_v0.29.0",
+      "date": "Tue, 11 Apr 2023 18:49:21 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "**Breaking** `output-file` now use config path interpolation. Existing value must be change to include the values to interpolate. e.g. `custom.json` -> `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/custom.json`"
+          },
+          {
+            "comment": "Support share route scenarios with x-ms-paths."
+          },
+          {
+            "comment": "Add regression tests for versioning and projected names"
+          },
+          {
+            "comment": "Remove deprecated autorest option from README.md"
+          },
+          {
+            "comment": "**Breaking Change** Removed deprecated `@collectionFormat` decorator. Use `@header({format: })` or `@query({format:})` instead."
+          },
+          {
+            "comment": "Uptake changes to dateTime types"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.0",
+      "tag": "@azure-tools/typespec-autorest_v0.28.0",
+      "date": "Mon, 13 Mar 2023 21:30:57 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Avoid Read suffix in schemas split by visibility."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.27.0",
+      "tag": "@azure-tools/typespec-autorest_v0.27.0",
+      "date": "Fri, 03 Mar 2023 19:59:30 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Support additionalProperties."
+          },
+          {
+            "comment": "Stop treating models spread into parameters as unreferenced."
+          },
+          {
+            "comment": "Update package homepage link to github.io page"
+          },
+          {
+            "comment": "Revert back changelog"
+          },
+          {
+            "comment": "Adopted the new `@typespec/http` library"
+          },
+          {
+            "comment": "update entrypoint to tspMain"
+          },
+          {
+            "comment": "Rename to TypeSpec"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.26.0",
+      "tag": "@azure-tools/cadl-autorest_v0.26.0",
+      "date": "Tue, 07 Feb 2023 21:56:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Adding extern dec decorator in cadl file"
+          },
+          {
+            "comment": "Fix issue where operation parameters could not target model properties."
+          },
+          {
+            "comment": "Removed `@pageable` and `@asyncOperationOptions` decorators."
+          },
+          {
+            "comment": "Don't emit extra \"canonical\" model when always impacted by visibility"
+          },
+          {
+            "comment": "Fix issues when multiple copies of library are loaded."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.0",
+      "tag": "@azure-tools/cadl-autorest_v0.25.0",
+      "date": "Fri, 13 Jan 2023 00:05:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Emit collectionFormat from encoding options"
+          },
+          {
+            "comment": "Generate recursive update schemas with optional properties for resource update operation"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.0",
+      "tag": "@azure-tools/cadl-autorest_v0.24.0",
+      "date": "Wed, 07 Dec 2022 17:21:53 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Honor @header/@query/@path in parameter name"
+          },
+          {
+            "comment": "Emit 'deprecated' operation property in cadl-autorest"
+          },
+          {
+            "comment": "Remove undocumented use of atVersion projection"
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Uptake new `getNamespaceFullName`"
+          },
+          {
+            "comment": "Uptake deprecation of `uri` type in favor of `url` scalar"
+          },
+          {
+            "comment": "Uptake changes to rest library api"
+          },
+          {
+            "comment": "Omit metadata properties of type `never`"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Update `invalid-union` diagnostic to be a warning instead of an error."
+          },
+          {
+            "comment": "Uptake change to emitter api with new `emitter-output-dir` option"
+          },
+          {
+            "comment": "Uptake changes to allow multiple services"
+          },
+          {
+            "comment": "Uptake change to compiler for new `scalar` type"
+          }
+        ],
+        "major": [
+          {
+            "comment": "Change behavior to generate enums with \"modelAsString: true\" unless the enum is decorated with `@fixed`."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.22.0",
+      "tag": "@azure-tools/cadl-autorest_v0.22.0",
+      "date": "Sat, 12 Nov 2022 00:14:23 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Support multipart form data."
+          },
+          {
+            "comment": "Fix handling of examples when using multiple API versions"
+          },
+          {
+            "comment": "Fix: @extension on a model is intrinsic types are being applied"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Feature: Add support for `unknown`"
+          },
+          {
+            "comment": "Add automatic visibility and metadata handling"
+          },
+          {
+            "comment": "Apply x-ms-mutability when \"read\" visibility is not present but \"create\" or \"update\" is."
+          },
+          {
+            "comment": "Add `output-dir` emitter options to override compiler default `output-dir`"
+          },
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.8.0` to `~0.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.8.0` to `~0.9.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.21.0",
+      "tag": "@azure-tools/cadl-autorest_v0.21.0",
+      "date": "Wed, 12 Oct 2022 21:12:48 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add support for model property references."
+          },
+          {
+            "comment": "Uptake changes to core discriminator"
+          },
+          {
+            "comment": "Empty object as a response will not produce a 204 response anymore"
+          },
+          {
+            "comment": "Include `x-ms-skip-url-encoding: true` for `uri` server params"
+          },
+          {
+            "comment": "Emitted swagger document include all types under the service namespace unless `omit-unreachable-types` option is set."
+          },
+          {
+            "comment": "Add support for `@minItems` and `@maxItems` decorators"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Uptake move of  `@discriminator` into compiler"
+          },
+          {
+            "comment": "Apply changes to rest library"
+          },
+          {
+            "comment": "Update info logging to use new tracing engine"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Fix: `Content-Type` request header lookup is case insensitive"
+          },
+          {
+            "comment": "Exclude properties of type `never` when emitting model schemas"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.7.0` to `~0.8.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.7.0` to `~0.8.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.20.0",
+      "tag": "@azure-tools/cadl-autorest_v0.20.0",
+      "date": "Thu, 08 Sep 2022 01:05:13 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Uptake changes to http service authentication oauth2 scopes."
+          },
+          {
+            "comment": "Add support for projected names. Using json projection to differentiate x-ms-client-name."
+          },
+          {
+            "comment": "string literal as constant enum "
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "React to Type suffix removal"
+          },
+          {
+            "comment": "Uptake change to enum members map type"
+          },
+          {
+            "comment": "Uptake changes to compiler with current projection"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Moving comparePath to private"
+          },
+          {
+            "comment": "emit x-ms-error-response when @error applies"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.6.0` to `~0.7.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.6.0` to `~0.7.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.19.0",
+      "tag": "@azure-tools/cadl-autorest_v0.19.0",
+      "date": "Thu, 11 Aug 2022 19:05:47 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "update readme.md with decorator information"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "support collection format"
+          },
+          {
+            "comment": "Update openapi emitter to work with Azure.Core.Page<T>. Deprecate @pageable."
+          },
+          {
+            "comment": "Internal: Uptake new compiler helpers to work with template types"
+          },
+          {
+            "comment": "Added support for default value for properties with enum type."
+          },
+          {
+            "comment": "Added `new-line` endings emitter option to configure the line endings."
+          },
+          {
+            "comment": "Support set of unannotated parameters as request body"
+          },
+          {
+            "comment": "Inline template instantiations without `@friendlyName`"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Emit service authentication metadata that was applied to a service with `@useAuth`"
+          },
+          {
+            "comment": "Uptake new `resolveOperationId` helper from openapi library improving the logic"
+          },
+          {
+            "comment": "Add warning if there is no exposed routes"
+          },
+          {
+            "comment": "Uptake changes to type relations"
+          },
+          {
+            "comment": "Allow overriding `x-ms-parameter-location` for shared parameters using `@extension` decorator"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Fix: Description being ignored on non-string primitive models"
+          },
+          {
+            "comment": "Fix output-file setting not used when multi version and azure-resource-provider-folder"
+          },
+          {
+            "comment": "fix infinite recurision"
+          },
+          {
+            "comment": "Fix bug with zero enum values"
+          },
+          {
+            "comment": "Remove `summary` property set on schemas and `parameters`"
+          },
+          {
+            "comment": "Make response descriptions more consistent"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.5.0` to `~0.6.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.5.0` to `~0.6.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.18.0",
+      "tag": "@azure-tools/cadl-autorest_v0.18.0",
+      "date": "Fri, 08 Jul 2022 23:23:14 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Detect effective schema type for spread models"
+          },
+          {
+            "comment": "force operation id to upper case"
+          },
+          {
+            "comment": "Inline parameters spread from anonymous model"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Rename emitter options to be `kebab-case`"
+          },
+          {
+            "comment": "Use new emitter options syntax"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.4.0` to `~0.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.4.0` to `~0.5.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.17.0",
+      "tag": "@azure-tools/cadl-autorest_v0.17.0",
+      "date": "Mon, 13 Jun 2022 23:42:46 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Remove use of \"path\" library"
+          },
+          {
+            "comment": "Added marker to indicate cadl generation"
+          },
+          {
+            "comment": "Add dependency to Azure.Core."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Uptake changes to accessor diagnostics"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Add support for new @server decorator used to specify api endpoints."
+          },
+          {
+            "comment": "Uptake changes to decorator context"
+          },
+          {
+            "comment": "Uptake change to versioning library using enum instead of string for versions"
+          }
+        ],
+        "none": [
+          {
+            "comment": "Upgrade to TS4.7"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.3.0` to `~0.4.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-azure-core\" from `~0.3.0` to `~0.4.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.0",
+      "tag": "@azure-tools/cadl-autorest_v0.16.0",
+      "date": "Fri, 06 May 2022 17:20:15 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Rearrange some aspects of operation output in the OpenAPI/Swagger 2 emitter"
+          },
+          {
+            "comment": "Fix template errors when example directory does not exist"
+          },
+          {
+            "comment": "add support for versioning"
+          },
+          {
+            "comment": "Do not include discriminator property in child types"
+          },
+          {
+            "comment": "Missing `@cadl-lang/versioning` as a peerDependency"
+          },
+          {
+            "comment": "Fix: Rename `x-ms-identifier` -> `x-ms-identifiers`"
+          },
+          {
+            "comment": "URI-encode refs"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Add description to discriminated model discriminator property"
+          },
+          {
+            "comment": "Uptake change in compiler with children references"
+          },
+          {
+            "comment": "Move decorators into `Autorest` namespace"
+          },
+          {
+            "comment": "Support examplesDirectory emitter option"
+          },
+          {
+            "comment": "Added validation to @asyncOperationOptions decorator"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Remove node 14 support"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.15.0",
+      "tag": "@azure-tools/cadl-autorest_v0.15.0",
+      "date": "Thu, 31 Mar 2022 17:11:06 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "add support for x-ms-identifier"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Add support for `@knownValues` to emit modelAsString=true enums"
+          },
+          {
+            "comment": "Add support for `void` body to return 204"
+          },
+          {
+            "comment": "Moved http response interpretation to @cadl-lang/rest library."
+          },
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.14.0",
+      "tag": "@azure-tools/cadl-autorest_v0.14.0",
+      "date": "Wed, 09 Mar 2022 17:42:26 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix issue where parameter definitions were being duplicated unnecessarily"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "@doc and @summary will set the description and summary on extended primitive types"
+          },
+          {
+            "comment": "Emit child models to OpenAPI when parent is emitted"
+          },
+          {
+            "comment": "**Added** support for `@externalDocs` decorator"
+          },
+          {
+            "comment": "@doc on service namespace set openapi description"
+          },
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Uptake change to intrinsic types"
+          },
+          {
+            "comment": "Fix issue where a model name the same as Cadl Intrinsic type would be treated the same."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.13.0",
+      "tag": "@azure-tools/cadl-autorest_v0.13.0",
+      "date": "Tue, 15 Feb 2022 22:35:13 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Support union values for status-code and content-type in responses"
+          },
+          {
+            "comment": "Add @example decorator"
+          },
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Add support for separate `@summary` from `@doc`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.12.0",
+      "tag": "@azure-tools/cadl-autorest_v0.12.0",
+      "date": "Fri, 11 Feb 2022 06:13:30 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update decorators with new interface"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Bump dependency versions"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.11.0",
+      "tag": "@azure-tools/cadl-autorest_v0.11.0",
+      "date": "Fri, 04 Feb 2022 18:01:35 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Absorb projections change"
+          },
+          {
+            "comment": "cadl-autorest support for discriminated unions"
+          },
+          {
+            "comment": "Add support for extensions on parameters"
+          },
+          {
+            "comment": "Uptake changes in @cadl-lang/rest library improving operation parameter handling"
+          },
+          {
+            "comment": "Update cadl dependencies to peerDependencies"
+          },
+          {
+            "comment": "Internals: switch to internal path manipulation"
+          },
+          {
+            "comment": "**Added** values to `x-ms-enum` containing `@doc` for members and custom name/values if applicable"
+          },
+          {
+            "comment": "Adopt statusCode decorator for http status code"
+          },
+          {
+            "comment": "Update for new emitter syntax"
+          },
+          {
+            "comment": "Use common decorator from @cadl-lang/openapi library"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Adding @format decorator support for autorest to emit \"format\" for string types"
+          },
+          {
+            "comment": "**Fix** Added support for nullable array `xzy[] | null`"
+          },
+          {
+            "comment": "**Fix** issue with @body body: bytes producing `type: string, format: bytes` instead of `type: string, format: binary` for requests and response"
+          },
+          {
+            "comment": "Add `friendlyName` decorator support to cadl-autorest emitter"
+          },
+          {
+            "comment": "Renaming @format decorator to @pattern."
+          },
+          {
+            "comment": "Add cadl-autorest support for safeint"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.10.0",
+      "tag": "@azure-tools/cadl-autorest_v0.10.0",
+      "date": "Thu, 16 Dec 2021 08:03:03 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "generate resource provider subfolder"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Update emitter to use simplified getAllTags arguments"
+          },
+          {
+            "comment": "Adjust emitter to support new @route model"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.9.2",
+      "tag": "@azure-tools/cadl-autorest_v0.9.2",
+      "date": "Wed, 01 Dec 2021 22:56:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix mapping of update method name to HTTP verb"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.9.1",
+      "tag": "@azure-tools/cadl-autorest_v0.9.1",
+      "date": "Thu, 18 Nov 2021 13:58:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Respond to new API changes in @cadl-lang/rest"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.9.0",
+      "tag": "@azure-tools/cadl-autorest_v0.9.0",
+      "date": "Thu, 11 Nov 2021 21:46:47 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "**Added** Support for duration type"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Define response body for primitive response type"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.8.1",
+      "tag": "@azure-tools/cadl-autorest_v0.8.1",
+      "date": "Thu, 28 Oct 2021 21:20:34 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Use strict diagnostics"
+          },
+          {
+            "comment": "Fix logic for maxValue decorator"
+          },
+          {
+            "comment": "Sort paths and definitions in cadl-autorest OpenAPI output files"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.8.0",
+      "tag": "@azure-tools/cadl-autorest_v0.8.0",
+      "date": "Fri, 15 Oct 2021 21:33:37 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "**Added** Support for server default"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@cadl-lang/compiler\" from `0.20.0` to `0.21.0`"
+          },
+          {
+            "comment": "Updating dependency \"@cadl-lang/rest\" from `0.6.1` to `0.6.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.7.0",
+      "tag": "@azure-tools/cadl-autorest_v0.7.0",
+      "date": "Fri, 17 Sep 2021 00:49:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Updates for cadl namespace addition"
+          },
+          {
+            "comment": "Support for emitting `bytes` and new number types"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Remove support for multiple inheritance"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@cadl-lang/compiler\" from `0.19.0` to `0.20.0`"
+          },
+          {
+            "comment": "Updating dependency \"@cadl-lang/rest\" from `0.6.0` to `0.6.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.6.0",
+      "tag": "@azure-tools/cadl-autorest_v0.6.0",
+      "date": "Sat, 21 Aug 2021 00:04:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Introduce naming convention `$name` for JavaScript-defined Cadl functions and decorators"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Allow x-ms-pageable in non-list operations (POST)"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@cadl-lang/compiler\" from `0.18.0` to `0.19.0`"
+          },
+          {
+            "comment": "Updating dependency \"@cadl-lang/rest\" from `0.5.1` to `0.6.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.5.1",
+      "tag": "@azure-tools/cadl-autorest_v0.5.1",
+      "date": "Fri, 13 Aug 2021 19:10:21 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fixes for retaining state over multiple compilations, allowing lro extensions, minimizing produces/consumes usage, removing empty response schema, fixes for dictionaries with complex value types"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@cadl-lang/compiler\" from `0.17.0` to `0.18.0`"
+          },
+          {
+            "comment": "Updating dependency \"@cadl-lang/rest\" from `0.5.0` to `0.5.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.5.0",
+      "tag": "@azure-tools/cadl-autorest_v0.5.0",
+      "date": "Tue, 10 Aug 2021 20:23:04 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Rename package to @azure-tools/cadl-autorest"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@cadl-lang/compiler\" from `0.16.0` to `0.17.0`"
+          },
+          {
+            "comment": "Updating dependency \"@cadl-lang/rest\" from `0.4.1` to `0.5.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.4.1",
+      "tag": "@azure-tools/cadl-openapi_v0.4.1",
+      "date": "Mon, 09 Aug 2021 21:14:12 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl\" from `0.15.0` to `0.16.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-rest\" from `0.4.0` to `0.4.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.4.0",
+      "tag": "@azure-tools/cadl-openapi_v0.4.0",
+      "date": "Mon, 02 Aug 2021 18:17:00 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Rename ADL to Cadl"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl\" from `0.14.0` to `0.15.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/cadl-rest\" from `0.3.2` to `0.4.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.2",
+      "tag": "@azure-tools/adl-openapi_v0.3.2",
+      "date": "Wed, 28 Jul 2021 19:40:06 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix swagger generation bugs for empty schema and support host property"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/adl\" from `0.13.0` to `0.14.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/adl-rest\" from `0.3.1` to `0.3.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.1",
+      "tag": "@azure-tools/adl-openapi_v0.3.1",
+      "date": "Fri, 09 Jul 2021 20:21:06 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Catch ErrorType instances while walking ADL types so that it's easier to diagnose syntax issues in source files"
+          },
+          {
+            "comment": "Absorb base templated model instance into derived type's schema definition when it's the only base type"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/adl\" from `0.12.0` to `0.13.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/adl-rest\" from `0.3.0` to `0.3.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.0",
+      "tag": "@azure-tools/adl-openapi_v0.3.0",
+      "date": "Thu, 24 Jun 2021 03:57:43 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix decorator application to OpenAPI output when the target is a model property or operation parameter"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Add semantic error recovery"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/adl\" from `0.11.0` to `0.12.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/adl-rest\" from `0.2.1` to `0.3.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.1",
+      "tag": "@azure-tools/adl-openapi_v0.2.1",
+      "date": "Tue, 18 May 2021 23:43:31 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/adl\" from `0.10.0` to `0.11.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/adl-rest\" from `0.2.0` to `0.2.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.0",
+      "tag": "@azure-tools/adl-openapi_v0.2.0",
+      "date": "Thu, 06 May 2021 14:56:01 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Implement alias and enum, remove model ="
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Replace several internal compiler errors with diagnostics"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/adl\" from `0.9.0` to `0.10.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/adl-rest\" from `0.1.2` to `0.2.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.2",
+      "tag": "@azure-tools/adl-openapi_v0.1.2",
+      "date": "Tue, 20 Apr 2021 15:23:29 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Trim base service namespace from parameter definition names"
+          },
+          {
+            "comment": "Use new virtual file to emit output"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/adl\" from `0.8.0` to `0.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/adl-rest\" from `0.1.1` to `0.1.2`"
+          }
+        ]
+      }
+    }
+  ]
+}

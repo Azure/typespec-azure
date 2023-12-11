@@ -1,0 +1,174 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Pet Store Service",
+    "version": "v2",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "MyService_GetPet",
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersionParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PetBase"
+            }
+          }
+        }
+      }
+    },
+    "/walkDog": {
+      "post": {
+        "operationId": "MyService_WalkDog",
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersionParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Cat": {
+      "type": "object",
+      "properties": {
+        "catnipDose": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "catnipDose"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/PetBase"
+        }
+      ],
+      "x-ms-discriminator-value": "cat"
+    },
+    "Dog": {
+      "type": "object",
+      "properties": {
+        "nextWalkTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "walkerName": {
+          "type": "string"
+        },
+        "commandList": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "nextWalkTime",
+        "commandList"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/PetBase"
+        }
+      ],
+      "x-ms-discriminator-value": "dog"
+    },
+    "Library.PetToy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "material": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "material"
+      ]
+    },
+    "PetBase": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Discriminator property for PetBase."
+        },
+        "name": {
+          "type": "string"
+        },
+        "favoriteToys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Library.PetToy"
+          },
+          "x-ms-identifiers": []
+        }
+      },
+      "discriminator": "type",
+      "required": [
+        "type",
+        "name",
+        "favoriteToys"
+      ]
+    },
+    "Versions": {
+      "type": "string",
+      "enum": [
+        "v1",
+        "v2"
+      ],
+      "x-ms-enum": {
+        "name": "Versions",
+        "modelAsString": true
+      }
+    }
+  },
+  "parameters": {
+    "ApiVersionParam": {
+      "name": "api-version",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "enum": [
+        "v1",
+        "v2"
+      ],
+      "x-ms-enum": {
+        "name": "Versions",
+        "modelAsString": true
+      },
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "apiVersion"
+    }
+  }
+}

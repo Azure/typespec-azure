@@ -1,0 +1,765 @@
+---
+title: "Interfaces and Operations"
+toc_min_heading_level: 2
+toc_max_heading_level: 3
+---
+
+# Interfaces and Operations
+
+## Azure.Core
+
+### `ResourceOperations` {#Azure.Core.ResourceOperations}
+
+Interface containing common resource operations.
+
+```typespec
+interface Azure.Core.ResourceOperations<InterfaceTraits, TErrorResponse>
+```
+
+#### Template Parameters
+
+| Name            | Description                                                                             |
+| --------------- | --------------------------------------------------------------------------------------- |
+| InterfaceTraits | Traits applicable to the operations.                                                    |
+| TErrorResponse  | Error response of the operations. If not specified, the default error response is used. |
+
+#### `ResourceOperations.ResourceCreateOrReplace` {#Azure.Core.ResourceOperations.ResourceCreateOrReplace}
+
+Create or replace operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceCreateOrReplace(apiVersion: string, resource: TResource): (anonymous model) | (anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.LongRunningResourceCreateOrReplace` {#Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace}
+
+Long-running resource create or replace operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: string, resource: TResource): (anonymous model) | (anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceCreateOrUpdate` {#Azure.Core.ResourceOperations.ResourceCreateOrUpdate}
+
+Create or update operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | (anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.LongRunningResourceCreateOrUpdate` {#Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate}
+
+Long-running resource create or update operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | (anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceUpdate` {#Azure.Core.ResourceOperations.ResourceUpdate}
+
+Resource update operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName}
+
+Resource create with service-provided name operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: TResource): Azure.Core.(anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.LongRunningResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedName}
+
+Long-running resource create with service-provided name operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: TResource): Azure.Core.(anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceRead` {#Azure.Core.ResourceOperations.ResourceRead}
+
+Resource read operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceRead(apiVersion: string): {} | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceDelete` {#Azure.Core.ResourceOperations.ResourceDelete}
+
+Resource delete operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceDelete(apiVersion: string): Azure.Core.(anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.LongRunningResourceDelete` {#Azure.Core.ResourceOperations.LongRunningResourceDelete}
+
+Long-running resource delete operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.LongRunningResourceDelete(apiVersion: string): (anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceList` {#Azure.Core.ResourceOperations.ResourceList}
+
+Resource list operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceList(apiVersion: string): Azure.Core.Foundations.CustomPage<TResource, Traits> | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                    |
+| --------- | ---------------------------------------------- |
+| TResource | Resource type.                                 |
+| Traits    | Object describing the traits of the operation. |
+
+#### `ResourceOperations.ResourceAction` {#Azure.Core.ResourceOperations.ResourceAction}
+
+Resource action operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceAction(apiVersion: string): {} | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                        |
+| --------- | -------------------------------------------------- |
+| TResource | Resource type.                                     |
+| TParams   | Object describing the parameters of the operation. |
+| TResponse | Object describing the response of the operation.   |
+| Traits    | Object describing the traits of the operation.     |
+
+#### `ResourceOperations.ResourceCollectionAction` {#Azure.Core.ResourceOperations.ResourceCollectionAction}
+
+Resource collection action operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.ResourceCollectionAction(apiVersion: string): {} | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name      | Description                                        |
+| --------- | -------------------------------------------------- |
+| TResource | Resource type.                                     |
+| TParams   | Object describing the parameters of the operation. |
+| TResponse | Object describing the response of the operation.   |
+| Traits    | Object describing the traits of the operation.     |
+
+#### `ResourceOperations.LongRunningResourceAction` {#Azure.Core.ResourceOperations.LongRunningResourceAction}
+
+Long-running resource action operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.LongRunningResourceAction(apiVersion: string): Azure.Core.(anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name          | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| TResource     | Resource type.                                        |
+| TParams       | Object describing the parameters of the operation.    |
+| TStatusResult | Object describing the status result of the operation. |
+| TStatusError  | Object describing the status error of the operation.  |
+| Traits        | Object describing the traits of the operation.        |
+
+#### `ResourceOperations.LongRunningResourceCollectionAction` {#Azure.Core.ResourceOperations.LongRunningResourceCollectionAction}
+
+Long-running resource collection action operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.(anonymous model) | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name          | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| TResource     | Resource type.                                        |
+| TParams       | Object describing the parameters of the operation.    |
+| TStatusResult | Object describing the status result of the operation. |
+| TStatusError  | Object describing the status error of the operation.  |
+| Traits        | Object describing the traits of the operation.        |
+
+#### `ResourceOperations.GetResourceOperationStatus` {#Azure.Core.ResourceOperations.GetResourceOperationStatus}
+
+Resource operation status operation template.
+
+```typespec
+op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string, operationId: string): Azure.Core.ResourceOperationStatus<TResource, TStatusResult, TStatusError> | TErrorResponse
+```
+
+##### Template Parameters
+
+| Name          | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| TResource     | Resource type.                                        |
+| TStatusResult | Object describing the status result of the operation. |
+| TStatusError  | Object describing the status error of the operation.  |
+| Traits        | Object describing the traits of the operation.        |
+
+### `GetResourceOperationStatus` {#Azure.Core.GetResourceOperationStatus}
+
+Operation signature to retrieve a resource operation status.
+
+```typespec
+op Azure.Core.GetResourceOperationStatus(apiVersion: string, operationId: string): Azure.Core.ResourceOperationStatus<TResource, TStatusResult, TStatusError> | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| TResource     | The type of the resource.                                                                             |
+| TStatusResult | Object describing the result of the status operation.                                                 |
+| TStatusError  | Object describing the error of the status operation. If not provided, the default error type is used. |
+| Traits        | Traits to apply to the operation.                                                                     |
+
+### `LongRunningResourceAction` {#Azure.Core.LongRunningResourceAction}
+
+DEPRECATED: Use `LongRunningResourceAction` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Long-running operation signature for a resource action.
+
+```typespec
+op Azure.Core.LongRunningResourceAction(apiVersion: string): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| TResource     | The type of the resource.                                                                             |
+| TParams       | Object describing the request parameters.                                                             |
+| TStatusResult | Object describing the result of the status operation.                                                 |
+| TStatusError  | Object describing the error of the status operation. If not provided, the default error type is used. |
+| Traits        | Traits to apply to the operation.                                                                     |
+
+### `LongRunningResourceCollectionAction` {#Azure.Core.LongRunningResourceCollectionAction}
+
+DEPRECATED: Use `LongRunningResourceCollectionAction` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Long-running operation signature for an action that applies to a collection of resources.
+
+```typespec
+op Azure.Core.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| TResource     | The type of the resource.                                                                             |
+| TParams       | Object describing the request parameters.                                                             |
+| TStatusResult | Object describing the result of the status operation.                                                 |
+| TStatusError  | Object describing the error of the status operation. If not provided, the default error type is used. |
+| Traits        | Traits to apply to the operation.                                                                     |
+
+### `LongRunningResourceCreateOrReplace` {#Azure.Core.LongRunningResourceCreateOrReplace}
+
+DEPRECATED: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Long-running operation signature to create or replace a resource.
+
+```typespec
+op Azure.Core.LongRunningResourceCreateOrReplace(apiVersion: string, resource: TResource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `LongRunningResourceCreateOrUpdate` {#Azure.Core.LongRunningResourceCreateOrUpdate}
+
+DEPRECATED: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Long-running operation signature to create or update a resource.
+
+```typespec
+op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `LongRunningResourceCreateWithServiceProvidedName` {#Azure.Core.LongRunningResourceCreateWithServiceProvidedName}
+
+DEPRECATED: Use `LongRunningResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Long-running operation signature to create a resource with a service-provided name.
+
+```typespec
+op Azure.Core.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: TResource): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `LongRunningResourceDelete` {#Azure.Core.LongRunningResourceDelete}
+
+DEPRECATED: Use `LongRunningResourceDelete` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Long-running operation signature to delete a resource.
+
+```typespec
+op Azure.Core.LongRunningResourceDelete(apiVersion: string): (anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `LongRunningRpcOperation` {#Azure.Core.LongRunningRpcOperation}
+
+A long-running remote procedure call (RPC) operation.
+
+```typespec
+op Azure.Core.LongRunningRpcOperation(apiVersion: string): Azure.Core.(anonymous model) | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TParams        | Object describing the parameters of the operation.                                                                                                                                       |
+| TResponse      | Object describing the response of the operation.                                                                                                                                         |
+| TStatusResult  | Object describing the status result of the operation.                                                                                                                                    |
+| TStatusError   | Error response of the status operation. If not specified, the default error response is used.                                                                                            |
+| Traits         | Object describing the traits of the operation.                                                                                                                                           |
+| TErrorResponse | Error response of the operation. If not specified, the default error response is used.                                                                                                   |
+| TraitContexts  | Trait contexts applicable to the operation. Defaults to `TraitContext.Undefined` which means that only traits that always apply will appear. Can specify multiple using the \| operator. |
+
+### `ResourceAction` {#Azure.Core.ResourceAction}
+
+DEPRECATED: Use `ResourceAction` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature for a resource action.
+
+```typespec
+op Azure.Core.ResourceAction(apiVersion: string): {} | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                                |
+| --------- | ------------------------------------------ |
+| TResource | The type of the resource.                  |
+| TParams   | Object describing the request parameters.  |
+| TResponse | Object describing the response parameters. |
+| Traits    | Traits to apply to the operation.          |
+
+### `ResourceCollectionAction` {#Azure.Core.ResourceCollectionAction}
+
+DEPRECATED: Use `ResourceCollectionAction` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature for an action that applies to a collection of resources.
+
+```typespec
+op Azure.Core.ResourceCollectionAction(apiVersion: string): {} | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                                |
+| --------- | ------------------------------------------ |
+| TResource | The type of the resource.                  |
+| TParams   | Object describing the request parameters.  |
+| TResponse | Object describing the response parameters. |
+| Traits    | Traits to apply to the operation.          |
+
+### `ResourceCreateOrReplace` {#Azure.Core.ResourceCreateOrReplace}
+
+DEPRECATED: Use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature to create or replace a resource.
+
+```typespec
+op Azure.Core.ResourceCreateOrReplace(apiVersion: string, resource: TResource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `ResourceCreateOrUpdate` {#Azure.Core.ResourceCreateOrUpdate}
+
+DEPRECATED: Use `ResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature to create or update a resource.
+
+```typespec
+op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `ResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceCreateWithServiceProvidedName}
+
+DEPRECATED: Use `ResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature to synchronously create a resource with a service-provided name.
+
+```typespec
+op Azure.Core.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: TResource): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `ResourceDelete` {#Azure.Core.ResourceDelete}
+
+DEPRECATED: Use `ResourceDelete` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature to delete a resource.
+
+```typespec
+op Azure.Core.ResourceDelete(apiVersion: string): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `ResourceList` {#Azure.Core.ResourceList}
+
+DEPRECATED: Use `ResourceList` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature to list resources in a paginated way.
+
+```typespec
+op Azure.Core.ResourceList(apiVersion: string): Azure.Core.Foundations.CustomPage<TResource, Traits> | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `ResourceRead` {#Azure.Core.ResourceRead}
+
+DEPRECATED: Use `ResourceRead` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+
+Operation signature to retrieve a resource.
+
+```typespec
+op Azure.Core.ResourceRead(apiVersion: string): {} | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `ResourceUpdate` {#Azure.Core.ResourceUpdate}
+
+DEPRECATED: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
+This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+Operation signature to update a resource.
+
+```typespec
+op Azure.Core.ResourceUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | Azure.Core.Foundations.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name      | Description                       |
+| --------- | --------------------------------- |
+| TResource | The type of the resource.         |
+| Traits    | Traits to apply to the operation. |
+
+### `RpcOperation` {#Azure.Core.RpcOperation}
+
+A remote procedure call (RPC) operation.
+
+```typespec
+op Azure.Core.RpcOperation(apiVersion: string): {} | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TParams        | Object describing the parameters of the operation.                                                                                                                                       |
+| TResponse      | Object describing the response of the operation.                                                                                                                                         |
+| Traits         | Object describing the traits of the operation.                                                                                                                                           |
+| TErrorResponse | Error response of the operation. If not specified, the default error response is used.                                                                                                   |
+| TraitContexts  | Trait contexts applicable to the operation. Defaults to `TraitContext.Undefined` which means that only traits that always apply will appear. Can specify multiple using the \| operator. |
+
+## Azure.Core.Foundations
+
+### `GetOperationStatus` {#Azure.Core.Foundations.GetOperationStatus}
+
+Operation that returns the status of another operation.
+
+```typespec
+op Azure.Core.Foundations.GetOperationStatus(apiVersion: string, operationId: string): Azure.Core.Foundations.OperationStatus<TStatusResult, TStatusError> | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TParams        | Object describing the request parameters of the operation.                                     |
+| TStatusResult  | The type of the operation status result.                                                       |
+| TStatusError   | The type of the operation status error.                                                        |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |
+
+### `LongRunningOperation` {#Azure.Core.Foundations.LongRunningOperation}
+
+Long-running operation.
+
+```typespec
+op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.Foundations.(anonymous model) | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- |
+| TParams        | Object describing the request parameters of the operation.                                                           |
+| TResponse      | Object describing the response properties of the operation. If not provided, the AcceptedResponse type will be used. |
+| Traits         | Traits which apply to the operation.                                                                                 |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used.                       |
+
+### `LongRunningResourceUpdate` {#Azure.Core.Foundations.LongRunningResourceUpdate}
+
+Long-running operation that updates a resource.
+
+```typespec
+op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: TResource): (anonymous model) | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TResource      | The type of the resource.                                                                      |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |
+
+### `NonPagedResourceList` {#Azure.Core.Foundations.NonPagedResourceList}
+
+Operation that lists resources in a non-paginated way.
+
+```typespec
+op Azure.Core.Foundations.NonPagedResourceList(apiVersion: string): Azure.Core.Foundations.(anonymous model) | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TResource      | The type of the resource.                                                                      |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |
+
+### `Operation` {#Azure.Core.Foundations.Operation}
+
+The most basic operation.
+
+```typespec
+op Azure.Core.Foundations.Operation(apiVersion: string): TResponse | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TParams        | Object describing the request parameters of the operation.                                     |
+| TResponse      | Object describing the response properties of the operation.                                    |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |
+
+### `ResourceCollectionOperation` {#Azure.Core.Foundations.ResourceCollectionOperation}
+
+Operation that applies to a collection of resources.
+
+```typespec
+op Azure.Core.Foundations.ResourceCollectionOperation(apiVersion: string): TResponse | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TResource      | The type of the resource.                                                                      |
+| TParams        | Object describing the request parameters of the operation.                                     |
+| TResponse      | Object describing the response properties of the operation.                                    |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |
+
+### `ResourceList` {#Azure.Core.Foundations.ResourceList}
+
+Operation that lists resources in a paginated way.
+
+```typespec
+op Azure.Core.Foundations.ResourceList(apiVersion: string): TResponse | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TResource      | The type of the resource.                                                                      |
+| TParams        | Object describing the request parameters of the operation.                                     |
+| TResponse      | Object describing the response properties of the operation.                                    |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |
+
+### `ResourceOperation` {#Azure.Core.Foundations.ResourceOperation}
+
+The most basic operation that applies to a resource.
+
+```typespec
+op Azure.Core.Foundations.ResourceOperation(apiVersion: string): TResponse | TErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| TResource      | The type of the resource.                                                                      |
+| TParams        | Object describing the request parameters of the operation.                                     |
+| TResponse      | Object describing the response properties of the operation.                                    |
+| Traits         | Traits which apply to the operation.                                                           |
+| TErrorResponse | The type of the error response. If not provided, the default error response type will be used. |

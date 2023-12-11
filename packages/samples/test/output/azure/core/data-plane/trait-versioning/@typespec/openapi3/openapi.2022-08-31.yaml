@@ -1,0 +1,809 @@
+openapi: 3.0.0
+info:
+  title: Contoso Widget Manager
+  version: 2022-08-31
+tags: []
+paths:
+  /manufacturers:
+    get:
+      operationId: Manufacturers_listManufacturers
+      description: List Manufacturer resources
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedManufacturer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /manufacturers/{manufacturerId}:
+    put:
+      operationId: Manufacturers_createOrReplaceManufacturer
+      description: Creates or replaces a Manufacturer
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: manufacturerId
+          in: path
+          required: true
+          description: The manufacturer's unique ID.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId'
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manufacturer'
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          headers:
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manufacturer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      requestBody:
+        description: The resource instance.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Manufacturer'
+    get:
+      operationId: Manufacturers_getManufacturer
+      description: Get a Manufacturer
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: manufacturerId
+          in: path
+          required: true
+          description: The manufacturer's unique ID.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manufacturer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: Manufacturers_deleteManufacturer
+      description: Delete a Manufacturer asynchronously.
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: manufacturerId
+          in: path
+          required: true
+          description: The manufacturer's unique ID.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId'
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing has not yet completed.
+          headers:
+            Operation-Location:
+              required: true
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - status
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                    description: The status of the operation
+                  error:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                    description: Error object that describes the error when status is "Failed".
+                description: Provides status details for long running operations.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /manufacturers/{manufacturerId}/operations/{operationId}:
+    get:
+      operationId: Manufacturers_getManufacturerOperationStatus
+      description: Gets status of a Manufacturer operation.
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: manufacturerId
+          in: path
+          required: true
+          description: The manufacturer's unique ID.
+          schema:
+            type: string
+        - name: operationId
+          in: path
+          required: true
+          description: The unique ID of the operation.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - status
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                    description: The status of the operation
+                  error:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                    description: Error object that describes the error when status is "Failed".
+                  result:
+                    allOf:
+                      - $ref: '#/components/schemas/Manufacturer'
+                    description: The result of the operation.
+                description: Provides status details for long running operations.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /service-status:
+    get:
+      operationId: getServiceStatus
+      description: Responds with status information about the overall service.
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusString:
+                    type: string
+                required:
+                  - statusString
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /widgets:
+    get:
+      operationId: Widgets_listWidgets
+      description: List Widget resources
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - $ref: '#/components/parameters/Azure.Core.TopQueryParameter'
+        - $ref: '#/components/parameters/Azure.Core.SkipQueryParameter'
+        - $ref: '#/components/parameters/Azure.Core.MaxPageSizeQueryParameter'
+        - $ref: '#/components/parameters/Azure.Core.SelectQueryParameter'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedWidget'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /widgets/{widgetName}:
+    patch:
+      operationId: Widgets_createOrUpdateWidget
+      description: Creates or updates a Widget asynchronously
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: widgetName
+          in: path
+          required: true
+          description: The widget name.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId'
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+            Operation-Location:
+              required: true
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          headers:
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+            Operation-Location:
+              required: true
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      requestBody:
+        description: The resource instance.
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/WidgetCreateOrUpdate'
+    get:
+      operationId: Widgets_getWidget
+      description: Get a Widget
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: widgetName
+          in: path
+          required: true
+          description: The widget name.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: Widgets_deleteWidget
+      description: Delete a Widget asynchronously.
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: widgetName
+          in: path
+          required: true
+          description: The widget name.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId'
+        - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing has not yet completed.
+          headers:
+            Operation-Location:
+              required: true
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - status
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                    description: The status of the operation
+                  error:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                    description: Error object that describes the error when status is "Failed".
+                description: Provides status details for long running operations.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /widgets/{widgetName}/operations/{operationId}:
+    get:
+      operationId: Widgets_getWidgetOperationStatus
+      description: Gets status of a Widget operation.
+      parameters:
+        - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - name: widgetName
+          in: path
+          required: true
+          description: The widget name.
+          schema:
+            type: string
+        - name: operationId
+          in: path
+          required: true
+          description: The unique ID of the operation.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - status
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                    description: The status of the operation
+                  error:
+                    allOf:
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                    description: Error object that describes the error when status is "Failed".
+                  result:
+                    allOf:
+                      - $ref: '#/components/schemas/Widget'
+                    description: The result of the operation.
+                description: Provides status details for long running operations.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              required: false
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+components:
+  parameters:
+    Azure.Core.ClientRequestIdHeader:
+      name: x-ms-client-request-id
+      in: header
+      required: false
+      description: An opaque, globally-unique, client-generated string identifier for the request.
+      schema:
+        $ref: '#/components/schemas/Azure.Core.uuid'
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    Azure.Core.MaxPageSizeQueryParameter:
+      name: maxpagesize
+      in: query
+      required: false
+      description: The maximum number of result items per page.
+      schema:
+        type: integer
+        format: int32
+    Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent:
+      name: Repeatability-First-Sent
+      in: header
+      required: false
+      description: Specifies the date and time at which the request was first created.
+      schema:
+        type: string
+        format: date-time
+    Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId:
+      name: Repeatability-Request-ID
+      in: header
+      required: false
+      description: An opaque, globally-unique, client-generated string identifier for the request.
+      schema:
+        type: string
+    Azure.Core.SelectQueryParameter:
+      name: select
+      in: query
+      required: false
+      description: Select the specified fields to be included in the response.
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true
+    Azure.Core.SkipQueryParameter:
+      name: skip
+      in: query
+      required: false
+      description: The number of result items to skip.
+      schema:
+        type: integer
+        format: int32
+        default: 0
+    Azure.Core.TopQueryParameter:
+      name: top
+      in: query
+      required: false
+      description: The number of result items to return.
+      schema:
+        type: integer
+        format: int32
+  schemas:
+    Azure.Core.Foundations.Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        message:
+          type: string
+          description: A human-readable representation of the error.
+        target:
+          type: string
+          description: The target of the error.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+          description: An array of details about specific errors that led to this reported error.
+        innererror:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+          description: An object containing more specific information than the current object about the error.
+      description: The error object.
+    Azure.Core.Foundations.ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+          description: The error object.
+      description: A response containing error details.
+    Azure.Core.Foundations.InnerError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        innererror:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+          description: Inner error.
+      description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
+    Azure.Core.Foundations.OperationState:
+      type: string
+      enum:
+        - NotStarted
+        - Running
+        - Succeeded
+        - Failed
+        - Canceled
+      description: Enum describing allowed operation states.
+    Azure.Core.eTag:
+      type: string
+      format: eTag
+      description: |-
+        The ETag (or entity tag) HTTP response header is an identifier for a specific version of a resource.
+        It lets caches be more efficient and save bandwidth, as a web server does not need to resend a full response if the content was not changed.
+
+        It is a string of ASCII characters placed between double quotes, like "675af34563dc-tr34".
+    Azure.Core.uuid:
+      type: string
+      format: uuid
+      description: Universally Unique Identifier
+    Manufacturer:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - etag
+      properties:
+        id:
+          type: string
+          description: The manufacturer's unique ID.
+          readOnly: true
+        name:
+          type: string
+          description: The manufacturer's name.
+        address:
+          type: string
+          description: The manufacturer's full address.
+        etag:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.eTag'
+          description: The entity tag for this resource.
+          readOnly: true
+      description: A manufacturer of widgets.
+    PagedManufacturer:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Manufacturer'
+          description: The Manufacturer items on this page
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      description: Paged collection of Manufacturer items
+    PagedWidget:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Widget'
+          description: The Widget items on this page
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      description: Paged collection of Widget items
+    RepeatabilityResult:
+      type: string
+      enum:
+        - accepted
+        - rejected
+    Versions:
+      type: string
+      enum:
+        - 2022-08-31
+        - 2023-02-07
+      description: The Contoso Widget Manager service version.
+    Widget:
+      type: object
+      required:
+        - name
+        - manufacturerId
+        - etag
+      properties:
+        name:
+          type: string
+          description: The widget name.
+          readOnly: true
+        manufacturerId:
+          type: string
+          description: The ID of the widget's manufacturer.
+        etag:
+          allOf:
+            - $ref: '#/components/schemas/Azure.Core.eTag'
+          description: The entity tag for this resource.
+          readOnly: true
+      description: A widget.
+    WidgetCreateOrUpdate:
+      type: object
+      properties:
+        manufacturerId:
+          type: string
+          description: The ID of the widget's manufacturer.
+      description: A widget.
