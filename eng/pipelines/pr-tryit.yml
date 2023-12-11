@@ -1,0 +1,54 @@
+trigger: none
+pr:
+  - main
+
+variables:
+  - template: templates/variables/globals.yml
+
+jobs:
+  - job: publish_playground
+    displayName: Publish playground & website
+    variables:
+      TYPESPEC_WEBSITE_BASE_PATH: "cadl-azure/prs/$(System.PullRequest.PullRequestNumber)/"
+    pool:
+      name: azsdk-pool-mms-ubuntu-2004-general
+      vmImage: ubuntu-20.04
+
+    steps:
+      - checkout: self
+        submodules: true
+        persistCredentials: true
+
+      - template: ./templates/install.yml
+
+      - script: node common/scripts/install-run-rush.js rebuild --parallelism max --verbose
+        displayName: Build
+
+      - task: AzureCLI@1
+        displayName: "Publish playground to PR endpoint"
+        inputs:
+          azureSubscription: "Azure SDK Engineering System"
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch \
+              --destination \$web \
+              --account-name "cadlplayground" \
+              --destination-path $(TYPESPEC_WEBSITE_BASE_PATH) \
+              --source "./packages/typespec-azure-playground-website/dist/" \
+              --overwrite
+
+      - task: AzureCLI@1
+        displayName: "Publish website to PR endpoint"
+        inputs:
+          azureSubscription: "Azure SDK Engineering System"
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch \
+              --destination \$web \
+              --account-name "tspwebsitepr" \
+              --destination-path $(TYPESPEC_WEBSITE_BASE_PATH) \
+              --source "./packages/website/build/" \
+              --overwrite
+
+      - script: node core/eng/scripts/create-tryit-comment.js "cadl-azure"
+        displayName: Check already commented

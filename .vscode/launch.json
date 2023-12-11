@@ -1,0 +1,246 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "args": [],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Default Port",
+      "port": 9229,
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "presentation": {
+        "order": 999
+      }
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Tests",
+      "port": 9229,
+      "smartStep": true,
+      "sourceMaps": true,
+      "continueOnAttach": true,
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "**/.vscode/extensions/hbenl.vscode-mocha-test-adapter-*/**.js"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "name": "Attach to Language Server",
+      "type": "node",
+      "request": "attach",
+      "port": 4242,
+      "restart": {
+        "delay": 100,
+        "maxAttempts": 10
+      },
+      "continueOnAttach": true,
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "timeout": 60000,
+      "presentation": {
+        "order": 999
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Compile Scratch (core)",
+      "program": "${workspaceRoot}/core/packages/compiler/entrypoints/cli.js",
+      "args": [
+        "compile",
+        "../samples/scratch",
+        "--output-dir=../samples/scratch/tsp-output",
+        "--emit=@typespec/openapi3"
+      ],
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}/core/packages/compiler",
+      "presentation": {
+        "order": 2
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test TypeSpec init Azure (core)",
+      "program": "${workspaceRoot}/core/packages/compiler/entrypoints/cli.js",
+      "args": ["init", "${input:initTemplate}"],
+      "smartStep": true,
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}/eng/feeds/scratch",
+      "console": "integratedTerminal",
+      "presentation": {
+        "order": 2
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Compile Scratch (core - nostdlib)",
+      "program": "${workspaceRoot}/core/packages/compiler/entrypoints/cli.js",
+      "args": ["compile", "../samples/scratch", "--output-dir=temp/scratch-output", "--nostdlib"],
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}/core/packages/compiler",
+      "presentation": {
+        "order": 2
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Compile Scratch",
+      "program": "${workspaceRoot}/core/packages/compiler/entrypoints/cli.js",
+      "args": ["compile", ".", "--emit=@azure-tools/typespec-autorest"],
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}/packages/samples/scratch",
+      "presentation": {
+        "order": 2
+      }
+    },
+    {
+      "name": "Regenerate .tmlanguage",
+      "type": "node",
+      "program": "${workspaceRoot}/core/packages/typespec-vscode/scripts/generate-tmlanguage.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}/packages/typespec-vscode",
+      "presentation": {
+        "order": 999
+      }
+    },
+    {
+      "name": "e2e Tests",
+      "type": "node",
+      "program": "${workspaceRoot}/packages/e2e-tests/e2e-tests.mjs",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}",
+      "presentation": {
+        "order": 999
+      }
+    },
+    {
+      "name": "VS Code Extension (Client)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceRoot}/core/packages/typespec-vscode"],
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "env": {
+        "TYPESPEC_DEVELOPMENT_MODE": "true",
+        "TYPESPEC_SERVER_NODE_OPTIONS": "--nolazy --inspect-brk=4242"
+      },
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Docs Generation",
+      "program": "${workspaceRoot}/core/packages/tspd/cmd/tspd.js",
+      "args": [
+        "doc",
+        "${workspaceFolder}/packages/typespec-azure-resource-manager",
+        "--enable-experimental",
+        "--output-dir=../../docs/libraries/azure-resource-manager/reference"
+      ],
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "VS Code Extension",
+      "configurations": ["VS Code Extension (Client)", "Attach to Language Server"],
+      "presentation": {
+        "order": 1
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "initTemplate",
+      "type": "promptString",
+      "default": "${workspaceRoot}/eng/feeds/azure-scaffolding.json",
+      "description": "The init template to use"
+    }
+  ]
+}

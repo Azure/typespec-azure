@@ -1,0 +1,153 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Binary sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/test/base64": {
+      "post": {
+        "operationId": "BytesMethod_JsonWithBase64",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/HasBytes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/HasBytes"
+            }
+          }
+        }
+      }
+    },
+    "/test/binaryFile": {
+      "post": {
+        "operationId": "BytesMethod_GenericBinaryFile",
+        "produces": [
+          "application/octect-stream"
+        ],
+        "consumes": [
+          "application/octect-stream"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/test/imagePng": {
+      "post": {
+        "operationId": "BytesMethod_Image",
+        "produces": [
+          "image/png"
+        ],
+        "consumes": [
+          "image/png"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/test/textPlain": {
+      "post": {
+        "operationId": "BytesMethod_TextPlain",
+        "produces": [
+          "text/plain"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "HasBytes": {
+      "type": "object",
+      "properties": {
+        "bytes": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "bytes"
+      ]
+    }
+  },
+  "parameters": {}
+}

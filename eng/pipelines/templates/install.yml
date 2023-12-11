@@ -1,0 +1,31 @@
+# Template installing all dependencies.
+parameters:
+  - name: nodeVersion
+    type: string
+    default: 20.x
+
+steps:
+  - task: UseDotNet@2
+    inputs:
+      version: 6.0.x
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: ${{ parameters.nodeVersion }}
+    displayName: Install Node.js
+    retryCountOnTaskFailure: 3
+
+  - script: |
+      echo "Node:"
+      node -v
+      echo "Npm:"
+      npm -v
+    displayName: "Log tool versions used"
+
+  # purge before install to ensure a clean state between retries
+  - script: node common/scripts/install-run-rush.js install --purge
+    displayName: Install JavaScript Dependencies
+    retryCountOnTaskFailure: 3
+
+  - script: dotnet restore core/packages/typespec-vs
+    displayName: Restore .NET Dependencies

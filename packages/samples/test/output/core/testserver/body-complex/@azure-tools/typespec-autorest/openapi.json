@@ -1,0 +1,897 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/complex/array/valid": {
+      "get": {
+        "operationId": "Complex_GetArray",
+        "description": "Get complex types with array properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ArrayWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutArray",
+        "description": "Put complex types with array properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ArrayWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/basic/valid": {
+      "get": {
+        "operationId": "Complex_GetValid",
+        "description": "Get complex type {id: 2, name: 'abc', color: 'YELLOW'}",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Basic"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutValid",
+        "description": "Please put {id: 2, name: 'abc', color: 'Magenta'}",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Basic"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/dictionary/typed/valid": {
+      "get": {
+        "operationId": "Dictionary_GetDictionary",
+        "description": "Get complex types with dictionary property",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/DictionaryWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Dictionary_PutArray",
+        "description": "Put complex types with dictionary property",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DictionaryWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/bool": {
+      "get": {
+        "operationId": "Complex_GetBool",
+        "description": "Get complex types with bool properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/BooleanWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutBool",
+        "description": "Put complex types with bool properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BooleanWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/bytes": {
+      "get": {
+        "operationId": "Complex_GetBytes",
+        "description": "Get complex types with bytes properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/BytesWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutBytes",
+        "description": "Put complex types with bytes properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BytesWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/date": {
+      "get": {
+        "operationId": "Complex_GetPlainDate",
+        "description": "Get complex types with date properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PlainDateWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutPlainDate",
+        "description": "Put complex types with date properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlainDateWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/datetime": {
+      "get": {
+        "operationId": "Complex_GetZonedDateTime",
+        "description": "Get complex types with DateTime properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/DateTimeWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutZonedDateTime",
+        "description": "Put complex types with DateTime properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DateTimeWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/double": {
+      "get": {
+        "operationId": "Complex_GetDouble",
+        "description": "Get complex types with double properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/DoubleWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutDouble",
+        "description": "Put complex types with double properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DoubleWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/duration": {
+      "get": {
+        "operationId": "Complex_GetZonedDuration",
+        "description": "Get complex types with Duration properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/DurationWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutZonedDuration",
+        "description": "Put complex types with Duration properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DurationWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/float": {
+      "get": {
+        "operationId": "Complex_GetFloat",
+        "description": "Get complex types with float properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/FloatWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutFloat",
+        "description": "Put complex types with float properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FloatWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/integer": {
+      "get": {
+        "operationId": "Complex_GetInt",
+        "description": "Get complex types with integer properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/IntWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutInt",
+        "description": "Put complex types with integer properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IntWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/long": {
+      "get": {
+        "operationId": "Complex_GetLong",
+        "description": "Get complex types with long properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/LongWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutLong",
+        "description": "Put complex types with long properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LongWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/complex/primitive/string": {
+      "get": {
+        "operationId": "Complex_GetString",
+        "description": "Get complex types with string properties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/StringWrapper"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Complex_PutString",
+        "description": "Put complex types with string properties",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StringWrapper"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ArrayWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "field"
+      ]
+    },
+    "Basic": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Basic Id",
+          "x-nullable": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name property with a very long description that does not fit on a single line and a line break."
+        },
+        "color": {
+          "$ref": "#/definitions/CMYKColors"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "color"
+      ]
+    },
+    "BooleanWrapper": {
+      "type": "object",
+      "properties": {
+        "field_true": {
+          "type": "boolean"
+        },
+        "field_false": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "field_true",
+        "field_false"
+      ]
+    },
+    "BytesWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "field"
+      ]
+    },
+    "CMYKColors": {
+      "type": "string",
+      "enum": [
+        "cyan",
+        "Magenta",
+        "YELLOW",
+        "blacK"
+      ],
+      "x-ms-enum": {
+        "name": "CMYKColors",
+        "modelAsString": true
+      }
+    },
+    "DateTimeWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "now": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "field",
+        "now"
+      ]
+    },
+    "DictionaryWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "field"
+      ]
+    },
+    "DoubleWrapper": {
+      "type": "object",
+      "properties": {
+        "field1": {
+          "type": "number",
+          "format": "double"
+        },
+        "field_56_zeros_after_the_dot_and_negative_zero_before_dot_and_this_is_a_long_field_name_on_purpose": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "field1",
+        "field_56_zeros_after_the_dot_and_negative_zero_before_dot_and_this_is_a_long_field_name_on_purpose"
+      ]
+    },
+    "DurationWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "format": "duration"
+        }
+      },
+      "required": [
+        "field"
+      ]
+    },
+    "Error": {
+      "type": "object",
+      "description": "Error",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ]
+    },
+    "FloatWrapper": {
+      "type": "object",
+      "properties": {
+        "field1": {
+          "type": "number",
+          "format": "float"
+        },
+        "field2": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "field1",
+        "field2"
+      ]
+    },
+    "IntWrapper": {
+      "type": "object",
+      "properties": {
+        "field1": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "field2": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "field1",
+        "field2"
+      ]
+    },
+    "LongWrapper": {
+      "type": "object",
+      "properties": {
+        "field1": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "field2": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "field1",
+        "field2"
+      ]
+    },
+    "Pet": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "PlainDateWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "format": "date"
+        },
+        "leap": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "required": [
+        "field",
+        "leap"
+      ]
+    },
+    "ReadonlyObj": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "id",
+        "size"
+      ]
+    },
+    "StringWrapper": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "empty": {
+          "type": "string"
+        },
+        "null": {
+          "type": "string",
+          "x-nullable": true
+        }
+      },
+      "required": [
+        "field",
+        "empty",
+        "null"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -1,0 +1,136 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "TypeSpec Overloads Sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/typespec/things": {
+      "post": {
+        "operationId": "Things_PostThing",
+        "parameters": [
+          {
+            "name": "thing",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Thing"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Thing"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-ms-paths": {
+    "/typespec/things/?overload=returnString": {
+      "post": {
+        "operationId": "Things_PostThingReturnString",
+        "produces": [
+          "text/plain; charset=utf=8"
+        ],
+        "parameters": [
+          {
+            "name": "thing",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Thing"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/typespec/things/?overload=withParam": {
+      "post": {
+        "operationId": "Things_PostThingWithParam",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "thing": {
+                  "$ref": "#/definitions/Thing"
+                },
+                "param": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "thing",
+                "param"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Thing"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Thing": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "ThingStringResponse": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "The body type of the operation request or response."
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -1,0 +1,244 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Convenient method generation
+
+This page documents how to customize method generations in DPG. For an overview of the setup, please visit the setup page.
+
+## Default behaviors
+
+By default, any language code generator will generate both protocol methods and convenient methods.
+
+> **NOTE:** Python and Typescript don't have a separation of convenient/protocol methods.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+namespace PetStoreNamespace;
+
+@doc("This is the input I need")
+@resource("output")
+model OutputModel {
+  @key
+  @doc("Id of this object")
+  @visibility("read")
+  name: string;
+}
+
+@doc("Read my resource")
+op GetModel is ResourceRead<OutputModel>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+class OutputModel:
+  name: str = rest_field(readonly=True)
+response: OutputModel = client.get(name="name")
+FIXME
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+interface OutputModel {
+  name: string;
+}
+
+const model: OutputModel = await client.path("/petStore/model/{name}").get();
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+## Customizations
+
+The detailed generation configuration of protocol and/or convenient methods that can be done:
+
+As emitters global parameters:
+
+- `generate-protocol-methods`: boolean flag to shift the entire generation for the process (`true` by default)
+- `generate-convenience-methods`: boolean flag to shift the entire generation for the process (`true` by default)
+
+To set global emitters parameters, read the documentation of [emitters configuration](https://microsoft.github.io/typespec/introduction/configuration#configuration-file).
+
+For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take a required boolean as parameter.
+
+### Shifting the generation of protocol and convenience on and off
+
+This can be achieved with the augment operator and the DPG package
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@convenientAPI(PetStoreNamespace.GetModel, false);
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+# Python do not change behavior based on protocolAPI or convenientAPI
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```c#
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Typescript do not change behavior based on protocolAPI or convenientAPI
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+### Make methods private/internal
+
+Sometimes it may be useful to still generate the method, but to make it private, so it can be re-used by a manual code wrapper.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@access(PetStoreNamespace.GetModel, Access.internal);
+```
+
+The two possible value for the `Access` enum are `internal` and `public`.
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+class _GetModel:
+  ...
+# FIXME
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Typescript do not change behavior based on protocolAPI or convenientAPI
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+
+### Decide the usage of a model
+
+Models can be used for input, output, or both at the same time. In some languages, this
+changes the way the API is exposed for those models.
+
+By default, the code generator will infer the usage based on the TypeSpec. If this inference doesn't
+correspond to expectation, this can be customized with the `usage` decorator. Possible values are
+`input` and `ouput`, and can be combined with `Usage.input | Usage.output`.
+
+> **NOTE:** If a model is never used, it will not be generated. Assigning a usage will force generation.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// This model is input only
+@@usage(Azure.OpenAI.AzureCognitiveSearchIndexFieldMappingOptions, Usage.input);
+// This models is input/output
+@@usage(Azure.OpenAI.ImageGenerations, Usage.input | Usage.output);
+
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+# Python doesn't generate different code based on usage
+# However, the model may not be generated if it's never used
+# In that case, set a usage for the model
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// JS doesn't generate different code based on usage
+// However, the model may not be generated if it's never used
+// In that case, set a usage for the model
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>

@@ -1,0 +1,143 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Nullable sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/test": {
+      "get": {
+        "operationId": "NullableMethods_Read",
+        "parameters": [
+          {
+            "name": "someParam",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-nullable": true
+          },
+          {
+            "name": "modelOrNull",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "x-nullable": true,
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AnotherModel"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/HasNullables"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AnotherModel": {
+      "type": "object",
+      "properties": {
+        "num": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "num"
+      ]
+    },
+    "HasNullables": {
+      "type": "object",
+      "properties": {
+        "str": {
+          "type": "string"
+        },
+        "when": {
+          "type": "string",
+          "format": "time"
+        },
+        "strOrNull": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "modelOrNull": {
+          "type": "object",
+          "x-nullable": true,
+          "allOf": [
+            {
+              "$ref": "#/definitions/AnotherModel"
+            }
+          ]
+        },
+        "literalsOrNull": {
+          "type": "string",
+          "enum": [
+            "one",
+            "two"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          },
+          "x-nullable": true
+        },
+        "manyNullsOneString": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "manyNullsSomeValues": {
+          "type": "number",
+          "enum": [
+            42,
+            100
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          },
+          "x-nullable": true
+        },
+        "arr": {
+          "type": "array",
+          "x-nullable": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "str",
+        "when",
+        "strOrNull",
+        "modelOrNull",
+        "literalsOrNull",
+        "manyNullsOneString",
+        "manyNullsSomeValues",
+        "arr"
+      ]
+    }
+  },
+  "parameters": {}
+}

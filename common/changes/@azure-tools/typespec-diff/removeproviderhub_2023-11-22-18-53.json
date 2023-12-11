@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-diff",
+      "comment": "Remove unused dependency on providerhub",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-diff"
+}

@@ -1,0 +1,223 @@
+import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
+import {
+  DecoratorContext,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+  Program,
+  addService,
+  getNamespaceFullName,
+} from "@typespec/compiler";
+import * as http from "@typespec/http";
+import { getAuthentication, setAuthentication, setRouteOptionsForNamespace } from "@typespec/http";
+import { getResourceTypeForKeyParam } from "@typespec/rest";
+import { reportDiagnostic } from "./lib.js";
+import { getSingletonResourceKey } from "./resource.js";
+import { ArmStateKeys } from "./state.js";
+
+/**
+ * Mark the target namespace as containign only ARM library types.  This is used to create libraries to share among RPs
+ * @param context The doecorator context, automatically supplied by the compiler
+ * @param entity The decorated namespace
+ */
+export function $armLibraryNamespace(context: DecoratorContext, entity: Namespace) {
+  const { program } = context;
+
+  // HACK HACK HACK: Disable the linter rule that raises `use-standard-operations`
+  // until Azure.Core-compatible operations are implemented for Azure.ResourceManager
+  __unsupported_enable_checkStandardOperations(false);
+
+  program.stateMap(ArmStateKeys.armLibraryNamespaces).set(entity, true);
+}
+
+/**
+ * Check if the given namespace contains ARM library types
+ * @param program The program to process
+ * @param namespace The namespace to check
+ * @returns true if the given namespace contains ARM library types only, false otherwise
+ */
+export function isArmLibraryNamespace(program: Program, namespace: Namespace): boolean {
+  return program.stateMap(ArmStateKeys.armLibraryNamespaces).get(namespace) === true;
+}
+
+function isArmNamespaceOverride(program: Program, entity: Namespace): boolean {
+  return (
+    program.stateMap(ArmStateKeys.armProviderNamespaces).size === 1 &&
+    program.stateMap(ArmStateKeys.armProviderNamespaces).has(entity)
+  );
+}
+
+/**
+ * Specify which ARM library namespaces this arm provider uses
+ * @param {DecoratorContext} context Standard DecoratorContext object
+ * @param {Namespace} entity The namespace the decorator is applied to
+ * @param {Namespace[]} namespaces The library namespaces that will be used in this namespace
+ */
+export function $useLibraryNamespace(
+  context: DecoratorContext,
+  entity: Namespace,
+  ...namespaces: Namespace[]
+) {
+  const { program } = context;
+  const provider = program.stateMap(ArmStateKeys.armProviderNamespaces).get(entity);
+
+  if (provider) {
+    setLibraryNamespaceProvider(program, provider, namespaces);
+  }
+
+  program.stateMap(ArmStateKeys.usesArmLibraryNamespaces).set(entity, namespaces);
+}
+
+/**
+ * Determine which library namespaces are used in this provider
+ * @param {Program} program The program to check
+ * @param {Namespace} namespace The provider namespace
+ */
+export function getUsedLibraryNamespaces(
+  program: Program,
+  namespace: Namespace
+): Namespace[] | undefined {
+  return program.stateMap(ArmStateKeys.usesArmLibraryNamespaces).get(namespace) as Namespace[];
+}
+
+function setLibraryNamespaceProvider(program: Program, provider: string, namespaces: Namespace[]) {
+  for (const namespace of namespaces) {
+    program.stateMap(ArmStateKeys.armProviderNamespaces).set(namespace, provider);
+  }
+}
+
+/**
+ * `@armProviderNamespace` sets the ARM provider namespace.
+ * @param {DecoratorContext} context DecoratorContext object
+ * @param {type} entity Target of the decorator. Must be `namespace` type
+ * @param {string} armProviderNamespace Provider namespace
+ */
+export function $armProviderNamespace(
+  context: DecoratorContext,
+  entity: Namespace,
+  armProviderNamespace?: string
+) {
+  const { program } = context;
+
+  const override = isArmNamespaceOverride(program, entity);
+  const namespaceCount = program.stateMap(ArmStateKeys.armProviderNamespaces).size;
+  if (namespaceCount > 0 && !override) {
+    reportDiagnostic(program, {
+      code: "single-arm-provider",
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // HACK HACK HACK: Disable the linter rule that raises `use-standard-operations`
+  // until Azure.Core-compatible operations are implemented for Azure.ResourceManager
+  __unsupported_enable_checkStandardOperations(false);
+
+  // armProviderNamespace will set the service namespace if it's not done already
+  if (!override) {
+    addService(program, entity);
+
+    if (!http.getServers(program, entity)) {
+      context.call(
+        http.$server,
+        entity,
+        "https://management.azure.com",
+        "Azure Resource Manager url."
+      );
+    }
+  }
+
+  // 'namespace' is optional, use the actual namespace string if omitted
+  const typespecNamespace = getNamespaceFullName(entity);
+  if (!armProviderNamespace) {
+    armProviderNamespace = typespecNamespace;
+  }
+
+  program.stateMap(ArmStateKeys.armProviderNamespaces).set(entity, armProviderNamespace);
+
+  const libraryNamespace = getUsedLibraryNamespaces(program, entity);
+
+  if (libraryNamespace) {
+    setLibraryNamespaceProvider(program, armProviderNamespace, libraryNamespace);
+  }
+
+  // Set default security definitions
+  if (!override) {
+    if (getAuthentication(program, entity) === undefined) {
+      setAuthentication(program, entity, {
+        options: [
+          {
+            schemes: [
+              {
+                id: "azure_auth",
+                description: "Azure Active Directory OAuth2 Flow.",
+                type: "oauth2",
+                flows: [
+                  {
+                    type: "implicit",
+                    authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize",
+                    scopes: [
+                      { value: "user_impersonation", description: "impersonate your user account" },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    }
+
+    // Set route options for the whole namespace
+    setRouteOptionsForNamespace(program, entity, {
+      autoRouteOptions: {
+        // Filter key parameters for singleton resource types to insert the
+        // singleton key value
+        routeParamFilter: (operation: Operation, param: ModelProperty) => {
+          const paramResourceType = getResourceTypeForKeyParam(program, param);
+          if (paramResourceType) {
+            const singletonKey = getSingletonResourceKey(program, paramResourceType);
+            if (singletonKey) {
+              return {
+                routeParamString: singletonKey,
+                excludeFromOperationParams: true,
+              };
+            }
+          }
+
+          // Returning undefined leaves the parameter unaffected
+          return undefined;
+        },
+      },
+    });
+  }
+}
+
+/**
+ * Get the ARM provider namespace for a given entity
+ * @param {Program} program
+ * @param {Namespace | Model} entity
+ * @returns {string | undefined} ARM provider namespace
+ */
+export function getArmProviderNamespace(
+  program: Program,
+  entity: Namespace | Model
+): string | undefined {
+  let currentNamespace: Namespace | undefined =
+    entity.kind === "Namespace" ? entity : entity.namespace;
+
+  let armProviderNamespace: string | undefined;
+  while (currentNamespace) {
+    armProviderNamespace = program
+      .stateMap(ArmStateKeys.armProviderNamespaces)
+      .get(currentNamespace);
+    if (armProviderNamespace) {
+      return armProviderNamespace;
+    }
+
+    currentNamespace = currentNamespace.namespace;
+  }
+
+  return undefined;
+}

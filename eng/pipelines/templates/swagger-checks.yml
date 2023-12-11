@@ -1,0 +1,23 @@
+parameters:
+  - name: nodeVersion
+    type: string
+
+steps:
+  - bash: |
+      NodeVer=$(node -v)
+      echo "##vso[task.setvariable variable=nodeBase]${NodeVer}"
+    displayName: Swagger - Set execution variable
+  - script: |
+      npm install -g autorest && cd eng/scripts && npm install
+      echo "nodeBase:" $NODEBASE
+    displayName: Swagger - Install Dependencies
+    condition: and(succeeded(), contains(variables.nodeBase, 'v18'), ne(variables['Agent.OS'], 'Windows_NT'))
+  - script: node eng/scripts/lint-resourcemanager.js "packages/samples/test/output/azure/resource-manager"
+    displayName: Swagger - Resource Manager Linting
+    condition: and(succeeded(), contains(variables.nodeBase, 'v18'), ne(variables['Agent.OS'], 'Windows_NT'))
+  - script: node eng/scripts/gen-sdk.js python "packages/samples/test/output/azure/resource-manager"
+    displayName: Swagger - Generate Python SDK
+    condition: and(succeeded(), contains(variables.nodeBase, 'v18'), ne(variables['Agent.OS'], 'Windows_NT'))
+  - script: node eng/scripts/gen-sdk.js javascript "packages/samples/test/output/azure/resource-manager"
+    displayName: Swagger - Generate JavaScript SDK
+    condition: and(succeeded(), contains(variables.nodeBase, 'v18'), ne(variables['Agent.OS'], 'Windows_NT'))

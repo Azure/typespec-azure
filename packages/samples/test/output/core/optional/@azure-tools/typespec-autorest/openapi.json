@@ -1,0 +1,116 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Optional sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/test": {
+      "get": {
+        "operationId": "OptionalMethods_Read",
+        "parameters": [
+          {
+            "name": "queryString",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "defaultQueryString"
+          },
+          {
+            "name": "queryNumber",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "default": 123
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/HasOptional"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "HasOptional": {
+      "type": "object",
+      "properties": {
+        "optionalNoDefault": {
+          "type": "string"
+        },
+        "optionalString": {
+          "type": "string",
+          "default": "default string"
+        },
+        "optionalNumber": {
+          "type": "integer",
+          "format": "int32",
+          "default": 123
+        },
+        "optionalBoolean": {
+          "type": "boolean",
+          "default": true
+        },
+        "optionalArray": {
+          "type": "array",
+          "default": [
+            "foo",
+            "bar"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "optionalUnion": {
+          "type": "string",
+          "default": "foo",
+          "enum": [
+            "foo",
+            "bar"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        },
+        "optionalEnum": {
+          "$ref": "#/definitions/MyEnum",
+          "default": "a"
+        }
+      }
+    },
+    "MyEnum": {
+      "type": "string",
+      "enum": [
+        "a",
+        "b"
+      ],
+      "x-ms-enum": {
+        "name": "MyEnum",
+        "modelAsString": true
+      }
+    }
+  },
+  "parameters": {}
+}

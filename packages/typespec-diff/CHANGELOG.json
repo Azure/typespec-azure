@@ -1,0 +1,164 @@
+{
+  "name": "@azure-tools/typespec-diff",
+  "entries": [
+    {
+      "version": "0.37.0",
+      "tag": "@azure-tools/typespec-diff_v0.37.0",
+      "date": "Wed, 06 Dec 2023 19:47:28 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.0",
+      "tag": "@azure-tools/typespec-diff_v0.36.0",
+      "date": "Wed, 08 Nov 2023 00:11:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "`TypeScript` use `types` entry under `exports` of `package.json` instead of legacy `typesVersions` to provide the definition files"
+          },
+          {
+            "comment": "**BREAKING CHANGE** Minimum node version increased to 18"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.35.0",
+      "tag": "@azure-tools/typespec-diff_v0.35.0",
+      "date": "Wed, 11 Oct 2023 23:51:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Update dependencies"
+          },
+          {
+            "comment": "Uptake changes to http libraries with status code ranges"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.34.0",
+      "tag": "@azure-tools/typespec-diff_v0.34.0",
+      "date": "Tue, 12 Sep 2023 21:49:08 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.33.0",
+      "tag": "@azure-tools/typespec-diff_v0.33.0",
+      "date": "Tue, 08 Aug 2023 22:32:23 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.32.0",
+      "tag": "@azure-tools/typespec-diff_v0.32.0",
+      "date": "Tue, 11 Jul 2023 22:06:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "none": [
+          {
+            "comment": "Update dependencies"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.0",
+      "tag": "@azure-tools/typespec-diff_v0.31.0",
+      "date": "Tue, 06 Jun 2023 22:44:32 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.0",
+      "tag": "@azure-tools/typespec-diff_v0.30.0",
+      "date": "Wed, 10 May 2023 21:24:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.29.0",
+      "tag": "@azure-tools/typespec-diff_v0.29.0",
+      "date": "Tue, 11 Apr 2023 18:49:21 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.0",
+      "tag": "@azure-tools/typespec-diff_v0.28.0",
+      "date": "Mon, 13 Mar 2023 21:30:57 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.27.0",
+      "tag": "@azure-tools/typespec-diff_v0.27.0",
+      "date": "Fri, 03 Mar 2023 19:59:30 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Update package homepage link to github.io page"
+          },
+          {
+            "comment": "Adopted the new `@typespec/http` library"
+          },
+          {
+            "comment": "Add typespec diff 0.1.0."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    }
+  ]
+}
