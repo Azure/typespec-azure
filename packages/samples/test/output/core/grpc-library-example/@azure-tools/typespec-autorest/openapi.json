@@ -1,0 +1,569 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Grpc Library sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "LibraryService"
+    }
+  ],
+  "paths": {
+    "/v1/shelves": {
+      "get": {
+        "operationId": "LibraryService_ListShelves",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Lists shelves. The order is unspecified but deterministic. Newly created\nshelves will not necessarily be added to the end of this list.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/ListRequestBase.page_size"
+          },
+          {
+            "$ref": "#/parameters/ListRequestBase.page_token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ListShelvesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "LibraryService_CreateShelf",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Creates a shelf, and returns the new Shelf.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CreateShelfRequest"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Shelf"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/v1/shelves/{name}": {
+      "get": {
+        "operationId": "LibraryService_GetShelf",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Gets a shelf. Returns NOT_FOUND if the shelf does not exist.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/GetShelfRequest"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Shelf"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "LibraryService_DeleteShelf",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Deletes a shelf. Returns NOT_FOUND if the shelf does not exist.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/DeleteShelfRequest"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/v1/shelves/{name}:merge": {
+      "post": {
+        "operationId": "LibraryService_MergeShelves",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Merges two shelves by adding all books from the shelf named\n`other_shelf_name` to shelf `name`, and deletes\n`other_shelf_name`. Returns the updated shelf.\nThe book ids of the moved books may not be the same as the original books.\nReturns NOT_FOUND if either shelf does not exist.\nThis call is a no-op if the specified shelves are the same.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/MergeShelvesRequest.name"
+          },
+          {
+            "$ref": "#/parameters/MergeShelvesRequest.other_shelf_name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Shelf"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/v1/shelves/{name}/books": {
+      "get": {
+        "operationId": "LibraryService_ListBooks",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Lists books in a shelf. The order is unspecified but deterministic. Newly\ncreated books will not necessarily be added to the end of this list.\nReturns NOT_FOUND if the shelf does not exist.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/ListBooksRequest.name"
+          },
+          {
+            "$ref": "#/parameters/ListRequestBase.page_size"
+          },
+          {
+            "$ref": "#/parameters/ListRequestBase.page_token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ListBooksResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "LibraryService_CreateBook",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Creates a book, and returns the new Book.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CreateBookRequest.name"
+          },
+          {
+            "$ref": "#/parameters/CreateBookRequest.book"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      }
+    },
+    "/v1/shelves/shelf_name/books/{name}": {
+      "get": {
+        "operationId": "LibraryService_GetBook",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Gets a book. Returns NOT_FOUND if the book does not exist.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/GetBookRequest"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "LibraryService_DeleteBook",
+        "tags": [
+          "LibraryService"
+        ],
+        "description": "Deletes a book. Returns NOT_FOUND if the book does not exist.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/DeleteBookRequest"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/RpcStatus"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Book": {
+      "type": "object",
+      "description": "A single book in the library.",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/book_name",
+          "description": "The resource name of the book.\nBook names have the form `shelves/{shelf_id}/books/{book_id}`.\nThe name is ignored when creating a book."
+        },
+        "author": {
+          "type": "string",
+          "description": "The name of the book author."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the book."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Value indicating whether the book has been read."
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Empty": {
+      "type": "object",
+      "description": "No body returned"
+    },
+    "ListBooksResponse": {
+      "type": "object",
+      "description": "Response message for LibraryService.ListBooks.",
+      "properties": {
+        "books": {
+          "type": "array",
+          "description": "The list of books.",
+          "items": {
+            "$ref": "#/definitions/Book"
+          },
+          "x-ms-identifiers": []
+        },
+        "next_page_token": {
+          "type": "string",
+          "description": "A token to retrieve next page of results.\nPass this value in the\n[ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token]\nfield in the subsequent call to `ListShelves` method to retrieve the next\npage of results."
+        }
+      },
+      "required": [
+        "books"
+      ]
+    },
+    "ListResponseBase": {
+      "type": "object",
+      "properties": {
+        "next_page_token": {
+          "type": "string",
+          "description": "A token to retrieve next page of results.\nPass this value in the\n[ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token]\nfield in the subsequent call to `ListShelves` method to retrieve the next\npage of results."
+        }
+      }
+    },
+    "ListShelvesResponse": {
+      "type": "object",
+      "description": "Response message for LibraryService.ListShelves.",
+      "properties": {
+        "shelves": {
+          "type": "array",
+          "description": "The list of shelves.",
+          "items": {
+            "$ref": "#/definitions/Shelf"
+          },
+          "x-ms-identifiers": []
+        },
+        "next_page_token": {
+          "type": "string",
+          "description": "A token to retrieve next page of results.\nPass this value in the\n[ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token]\nfield in the subsequent call to `ListShelves` method to retrieve the next\npage of results."
+        }
+      },
+      "required": [
+        "shelves"
+      ]
+    },
+    "MoveBookRequest": {
+      "type": "object",
+      "description": "Describes what book to move (name) and what shelf we're moving it\nto (other_shelf_name).",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/book_name",
+          "description": "The name of the book to move."
+        },
+        "other_shelf_name": {
+          "$ref": "#/definitions/shelf_name",
+          "description": "The name of the destination shelf."
+        }
+      },
+      "required": [
+        "name",
+        "other_shelf_name"
+      ]
+    },
+    "ProtobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "RpcStatus": {
+      "type": "object",
+      "description": "An unexpected error response.",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProtobufAny"
+          },
+          "x-ms-identifiers": []
+        }
+      }
+    },
+    "Shelf": {
+      "type": "object",
+      "description": "A Shelf contains a collection of books with a theme.",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/shelf_name",
+          "description": "The resource name of the shelf.\nShelf names have the form `shelves/{shelf_id}`.\nThe name is ignored when creating a shelf."
+        },
+        "theme": {
+          "type": "string",
+          "description": "The theme of the shelf"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "UpdateBookRequest": {
+      "type": "object",
+      "description": "Request message for LibraryService.UpdateBook.",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/book_name",
+          "description": "The name of the book to update."
+        },
+        "book": {
+          "$ref": "#/definitions/Book",
+          "description": "The book to update with. The name must match or be empty."
+        }
+      },
+      "required": [
+        "name",
+        "book"
+      ]
+    },
+    "book_name": {
+      "type": "string",
+      "description": "The name of a book.\nBook names have the form `shelves/{shelf_id}/books/{book_id}`",
+      "pattern": "shelves/\\w+/books/\\w+"
+    },
+    "shelf_name": {
+      "type": "string",
+      "description": "The name of a shelf.\nShelf names have the form `shelves/{shelf_id}`.",
+      "pattern": "shelves/\\w+"
+    }
+  },
+  "parameters": {
+    "CreateBookRequest.book": {
+      "name": "book",
+      "in": "body",
+      "description": "The book to create.",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/Book"
+      },
+      "x-ms-parameter-location": "method"
+    },
+    "CreateBookRequest.name": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the shelf in which the book is created.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "CreateShelfRequest": {
+      "name": "body",
+      "in": "body",
+      "description": "The shelf to create.",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/Shelf"
+      },
+      "x-ms-parameter-location": "method"
+    },
+    "DeleteBookRequest": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the book to delete.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+/books/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "DeleteShelfRequest": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the shelf to delete.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "GetBookRequest": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the book to retrieve.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+/books/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "GetShelfRequest": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the shelf to retrieve.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "ListBooksRequest.name": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the shelf whose books we'd like to list.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "ListRequestBase.page_size": {
+      "name": "page_size",
+      "in": "query",
+      "description": "Requested page size. Server may return fewer shelves than requested.\nIf unspecified, server will pick an appropriate default.",
+      "required": false,
+      "type": "integer",
+      "format": "int32",
+      "x-ms-parameter-location": "method"
+    },
+    "ListRequestBase.page_token": {
+      "name": "page_token",
+      "in": "query",
+      "description": "A token identifying a page of results the server should return.\nTypically, this is the value of\n[ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token]\nreturned from the previous call to `ListShelves` method.",
+      "required": false,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "MergeShelvesRequest.name": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the shelf we're adding books to.",
+      "required": true,
+      "type": "string",
+      "pattern": "shelves/\\w+",
+      "x-ms-parameter-location": "method"
+    },
+    "MergeShelvesRequest.other_shelf_name": {
+      "name": "other_shelf_name",
+      "in": "body",
+      "description": "The name of the shelf we're removing books from and deleting.",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/shelf_name"
+      },
+      "x-ms-parameter-location": "method"
+    }
+  }
+}

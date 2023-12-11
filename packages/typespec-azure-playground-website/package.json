@@ -1,0 +1,83 @@
+{
+  "name": "@azure-tools/typespec-azure-playground-website",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Microsoft Corporation",
+  "description": "An app to play with TYPESPEC in the browser with Azure Libraries",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist-dev/src/index.d.ts",
+      "default": "./dist-dev/src/index.js"
+    },
+    "./samples": {
+      "types": "./samples/dist/samples.d.ts",
+      "default": "./samples/dist/samples.js"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./dist-dev ./temp ./samples/dist",
+    "build-samples": "node ./samples/build.js",
+    "build": "npm run build-samples && tsc -p . && vite build 2>&1",
+    "start": "npm run -s watch",
+    "watch": "vite --port 5174",
+    "e2e": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e",
+    "e2e:headed": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e --headed",
+    "test": "npm run e2e 2>&1",
+    "test-official": "npm run e2e 2>&1",
+    "lint": "eslint . --ext .ts --max-warnings=0",
+    "lint:fix": "eslint . --fix --ext .ts"
+  },
+  "files": [
+    "lib/*.tsp",
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "dependencies": {
+    "@typespec/versioning": "workspace:~0.51.0",
+    "@typespec/compiler": "workspace:~0.51.0",
+    "@typespec/rest": "workspace:~0.51.0",
+    "@typespec/http": "workspace:~0.51.0",
+    "@typespec/openapi": "workspace:~0.51.0",
+    "@typespec/openapi3": "workspace:~0.51.0",
+    "@azure-tools/typespec-autorest": "workspace:~0.37.1",
+    "@azure-tools/typespec-azure-core": "workspace:~0.37.1",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.37.0",
+    "@azure-tools/typespec-client-generator-core": "workspace:~0.37.0",
+    "@vitejs/plugin-react": "~4.1.0",
+    "@emotion/react": "^11.11.1",
+    "es-module-shims": "~1.8.0",
+    "monaco-editor": "~0.43.0",
+    "react-dom": "~18.2.0",
+    "react": "~18.2.0",
+    "vite": "^4.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "~18.11.9",
+    "@types/react-dom": "~18.2.7",
+    "@typespec/eslint-config-typespec": "workspace:~0.51.0",
+    "@typespec/bundler": "workspace:~0.1.0-alpha.4",
+    "@typespec/playground": "workspace:~0.1.0-alpha.4",
+    "@playwright/test": "^1.39.0",
+    "eslint": "^8.49.0",
+    "rimraf": "~5.0.1",
+    "cross-env": "~7.0.3",
+    "typescript": "~5.2.2"
+  }
+}

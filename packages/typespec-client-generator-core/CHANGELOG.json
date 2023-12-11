@@ -1,0 +1,513 @@
+{
+  "name": "@azure-tools/typespec-client-generator-core",
+  "entries": [
+    {
+      "version": "0.37.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.37.0",
+      "date": "Wed, 06 Dec 2023 19:47:28 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Generate naming for anonymous model or union"
+          },
+          {
+            "comment": "Support unbranded client and operation group detection"
+          },
+          {
+            "comment": "Support scope for @client and @operationGroup"
+          },
+          {
+            "comment": "Support decimal build-in kind"
+          },
+          {
+            "comment": "Fix corner case for anonymous model"
+          },
+          {
+            "comment": "Support scope for protocolAPI and convenientAPI"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.1",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.36.1",
+      "date": "Tue, 28 Nov 2023 23:33:07 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "~add scope to protocolApi, convenient"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.36.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.36.0",
+      "date": "Wed, 08 Nov 2023 00:11:02 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "add parent enum as type on SdkEnumValueType"
+          },
+          {
+            "comment": "Deprecate @include, @exclude, @internal, @clientFormat"
+          },
+          {
+            "comment": "Add emitterName and emitterContext to SdkContext"
+          },
+          {
+            "comment": "Fix access propagation regression"
+          },
+          {
+            "comment": "Fix usage override for orphan enum"
+          },
+          {
+            "comment": "`TypeScript` use `types` entry under `exports` of `package.json` instead of legacy `typesVersions` to provide the definition files"
+          },
+          {
+            "comment": "**BREAKING CHANGE** Minimum node version increased to 18"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.35.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.35.0",
+      "date": "Wed, 11 Oct 2023 23:51:36 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "add support for cross language definition id"
+          },
+          {
+            "comment": "add arm to sdk context"
+          },
+          {
+            "comment": "Migrate 'friendly-name' rule from typespec-code-generator-core to typespec-azure-core."
+          },
+          {
+            "comment": "refactor utils.test.ts"
+          },
+          {
+            "comment": "return tsp Union type for string literal union"
+          },
+          {
+            "comment": "Remove dependency to `@typespec/lint`"
+          },
+          {
+            "comment": "Fix wrong type for the values of SdkTupleType"
+          },
+          {
+            "comment": "Refine logic and test for @access"
+          },
+          {
+            "comment": "Refine getAllModels implementation including: add deprecation info, add known values, change discriminator type in base model, etc."
+          },
+          {
+            "comment": "Fix the problem of models with duplicate name"
+          },
+          {
+            "comment": "Change union type handling logic in common interface"
+          },
+          {
+            "comment": "Update dependencies"
+          },
+          {
+            "comment": "Uptake changes to http libraries with status code ranges"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.34.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.34.0",
+      "date": "Tue, 12 Sep 2023 21:49:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "determine whether service is arm or not"
+          },
+          {
+            "comment": "add docs for SdkTypes"
+          },
+          {
+            "comment": "handle both @friendlyName and @projectedName in function getLibraryName()"
+          },
+          {
+            "comment": "deduplicate models in map"
+          },
+          {
+            "comment": "fix enum discriminator type for base class"
+          },
+          {
+            "comment": "add getAllModels"
+          },
+          {
+            "comment": "make __raw optional"
+          },
+          {
+            "comment": "Add tuple type support"
+          },
+          {
+            "comment": "Add @usage and @access decorators."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.33.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.33.0",
+      "date": "Tue, 08 Aug 2023 22:32:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "add transitivity support for @include"
+          },
+          {
+            "comment": "Fix the `getEmitterTargetName` function to use the real name of the emitter"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.32.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.32.0",
+      "date": "Tue, 11 Jul 2023 22:06:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ],
+        "none": [
+          {
+            "comment": "adding scope to include and exclude decorator"
+          },
+          {
+            "comment": "fix for decorator about \"Scalar extends string/numeric\""
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.31.0",
+      "date": "Tue, 06 Jun 2023 22:44:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add @typespec/versioning peer dependency."
+          },
+          {
+            "comment": "Use original type if scalar has encode decorator."
+          },
+          {
+            "comment": "Add temporary workaround to deal with `uri` scalar without format"
+          },
+          {
+            "comment": "adding scope to internal decorator"
+          },
+          {
+            "comment": "Remove reference to `object` in decorators and templates"
+          },
+          {
+            "comment": "Updated decorators to use `valueof`"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.30.0",
+      "date": "Wed, 10 May 2023 21:24:14 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "expose getSdkModelPropertyType"
+          },
+          {
+            "comment": "expose enum converter"
+          },
+          {
+            "comment": "add duration to client format"
+          },
+          {
+            "comment": "Add lint rule for @friendlyName."
+          },
+          {
+            "comment": "export getSdkConstant"
+          },
+          {
+            "comment": "Compete transitive closure of @internal methods and models"
+          },
+          {
+            "comment": "generate nullable enums"
+          },
+          {
+            "comment": "refine types in union and enum"
+          },
+          {
+            "comment": "remove support for zonedDateTime"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.29.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.29.0",
+      "date": "Tue, 11 Apr 2023 18:49:21 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "temporarily add back zonedDateTime support"
+          },
+          {
+            "comment": "fix intrinsic type checking in getSdkSimpleType"
+          },
+          {
+            "comment": "expose list and dict converter"
+          },
+          {
+            "comment": "Update Client and Dpg prefixes to be Sdk for consistency"
+          },
+          {
+            "comment": "Add DPG shared interfaces and initial logic to create a method response"
+          },
+          {
+            "comment": "add support for unions"
+          },
+          {
+            "comment": "expose converter functions, fix simple sdk types"
+          },
+          {
+            "comment": "Uptake changes to datetime types"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.28.0",
+      "date": "Mon, 13 Mar 2023 21:30:57 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "correct regex for language emitters"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.27.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.27.0",
+      "date": "Fri, 03 Mar 2023 19:59:30 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Export embedded models in Array/List/Model for `getAllModels`."
+          },
+          {
+            "comment": "fix getAllModels when there are no models"
+          },
+          {
+            "comment": "Update package homepage link to github.io page"
+          },
+          {
+            "comment": "Renaming DPG package name to typespec-client-generator-core. Namespace is changed to Azure.ClientGenerator.Core"
+          },
+          {
+            "comment": "Adopted the new `@typespec/http` library"
+          },
+          {
+            "comment": "update entrypoint to tspMain"
+          },
+          {
+            "comment": "Rename to TypeSpec"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.26.0",
+      "tag": "@azure-tools/cadl-dpg_v0.26.0",
+      "date": "Tue, 07 Feb 2023 21:56:32 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add getPropertyNames"
+          },
+          {
+            "comment": "add extern dec docs"
+          },
+          {
+            "comment": "cadl-dpg, isApiVersion, support identify api version defined as host parameter in @server "
+          },
+          {
+            "comment": "add clientFormat decorator"
+          },
+          {
+            "comment": "Add decorators @include and @exclude"
+          },
+          {
+            "comment": "add @internal decorator"
+          },
+          {
+            "comment": "Suppress PascalCase naming rule on DPG namespace"
+          },
+          {
+            "comment": "Removed `@convenienceAPI` decorator. Removed `getConvenienceAPIName` function."
+          },
+          {
+            "comment": "switch all exposed cadl-dpg functions to input context"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "add getAllSchemas"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.0",
+      "tag": "@azure-tools/cadl-dpg_v0.25.0",
+      "date": "Fri, 13 Jan 2023 00:05:37 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add protocolAPI/convenientAPI"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "add getClientNamespace helper method"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.0",
+      "tag": "@azure-tools/cadl-dpg_v0.24.0",
+      "date": "Wed, 07 Dec 2022 17:21:54 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          },
+          {
+            "comment": "Uptake changes to allow multiple services"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Update dependencies"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.0",
+      "tag": "@azure-tools/cadl-dpg_v0.3.0",
+      "date": "Sat, 12 Nov 2022 00:14:23 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "add utils file, fix tests"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "add getDefaultApiVersion"
+          },
+          {
+            "comment": "Update repository information"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "add isApiVersion helper"
+          },
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.0",
+      "tag": "@azure-tools/cadl-dpg_v0.2.0",
+      "date": "Mon, 24 Oct 2022 21:57:17 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add `@client` and `@operationGroup` decorators"
+          },
+          {
+            "comment": "@client defined under a service namespace will resolve the service automatically"
+          },
+          {
+            "comment": "listOperationsInOperationGroup will not resolve operations nested under another @client"
+          }
+        ]
+      }
+    }
+  ]
+}

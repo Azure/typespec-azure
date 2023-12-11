@@ -1,0 +1,199 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# One path for multiple input/output
+
+This page documents DPG behavior and customization when you use union operator `|` or `@sharedRoute` to express multiple input/output for a given path.
+
+## Default behaviors
+
+The simplest way to express a combination of input in TypeSpec is to use the union operator `|`.
+At a glance, JS and Python supports natively union, while Java and C# will use overloads.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@route("/analyze")
+@post
+op analyze(@query mode: "strict" | "lenient", @body image: bytes): AnalyzeResult;
+
+model CompletionInput {
+  input: string | string[];
+}
+
+@route("/completions")
+@post
+op completions(@body input: CompletionInput): CompletionResult;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def analyze(*, mode: Literal["strict", "lenient"], image: bytes) -> AnalyzeResult:
+  ...
+
+class CompletionInput:
+  input: str | List[str] = rest_field(readonly=True)
+
+def completions(input: CompletionInput) -> CompletionResult:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+FIXME
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+FIXME
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
+you must use `@sharedRoute`. By default, codegen will generate one method per operation name.
+
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@sharedRoute("/foo")
+op a(x: int) : float
+
+@sharedRoute("/foo")
+op b(x: string) : int64
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def a(x: int) -> float:
+  # code
+
+def b(x: string) -> int:
+  # code
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+//protocol
+public Response A(RequestContent content, RequestContext context);
+public Response B(RequestContent content, RequestContext context);
+
+//convenience
+public Response<float> A(int x, CancellationToken token);
+public Response<long> B(string x, Cancellation token);
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+FIXME
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+
+
+## Customizations
+
+### Merge `@sharedRoute` operations into one.
+
+If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by projecting
+the same name on both operations.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typescript
+// main.tsp
+@sharedRoute("/foo")
+op a(x: int) : float
+
+@sharedRoute("/foo")
+op b(x: string) : int64
+
+// client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@projectedName(a, "client", "Foo");
+@@projectedName(b, "client", "Foo");
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+@overload
+def foo(x: int) -> float:
+   ...
+
+@overload
+def foo(x: string) -> int:
+   ...
+
+def foo(x: string | int) -> float | int:
+   # Code here
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+//protocol
+public Response Foo(RequestContent content, RequestContext context);
+
+//convenience
+public Response<float> Foo(int x, CancellationToken token);
+public Response<long> Foo(string x, Cancellation token);
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+FIXME
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+FIXME
+```
+
+</TabItem>
+</Tabs>
+

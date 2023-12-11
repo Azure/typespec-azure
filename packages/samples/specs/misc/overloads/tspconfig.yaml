@@ -1,0 +1,5 @@
+emit:
+  - "@azure-tools/typespec-autorest"
+
+  #  An example for `x-ms-paths`, not supported by openapi3
+  # - "@typespec/openapi3"

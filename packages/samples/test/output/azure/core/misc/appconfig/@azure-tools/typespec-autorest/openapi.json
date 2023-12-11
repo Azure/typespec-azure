@@ -1,0 +1,1216 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "App Config Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/keys": {
+      "get": {
+        "operationId": "GetKeys",
+        "description": "Gets a list of keys.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.keyset+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "after",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PagedKey"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "CheckKeys",
+        "description": "Requests the headers and status of the given resource.",
+        "produces": [
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "after",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/kv": {
+      "get": {
+        "operationId": "GetKeyValues",
+        "description": "Gets a list of key-values.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.keyset+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "$ref": "#/parameters/KeyFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyFilters.label"
+          },
+          {
+            "name": "After",
+            "in": "query",
+            "description": "Instructs the server to return elements that appear after the element referred to by the specified token.",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "$Select",
+            "in": "query",
+            "description": "Used to select what fields are present in the returned resource(s).",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "key",
+                "label",
+                "content_type",
+                "value",
+                "last_modified",
+                "tags"
+              ],
+              "x-ms-enum": {
+                "name": "KeyField",
+                "modelAsString": true
+              }
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PagedKeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "CheckKeyValues",
+        "description": "Gets a list of key-values.",
+        "produces": [
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "$ref": "#/parameters/KeyFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyFilters.label"
+          },
+          {
+            "name": "After",
+            "in": "query",
+            "description": "Instructs the server to return elements that appear after the element referred to by the specified token.",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "$Select",
+            "in": "query",
+            "description": "Used to select what fields are present in the returned resource(s).",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "key",
+                "label",
+                "content_type",
+                "value",
+                "last_modified",
+                "tags"
+              ],
+              "x-ms-enum": {
+                "name": "KeyField",
+                "modelAsString": true
+              }
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/kv/{key}": {
+      "get": {
+        "operationId": "GetKeyValue",
+        "description": "Gets a single key-value.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.kv+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ETagHeaders.ifMatch"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifNoneMatch"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.label"
+          },
+          {
+            "name": "$Select",
+            "in": "query",
+            "description": "Used to select what fields are present in the returned resource(s).",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "key",
+                "label",
+                "content_type",
+                "value",
+                "last_modified",
+                "tags"
+              ],
+              "x-ms-enum": {
+                "name": "KeyField",
+                "modelAsString": true
+              }
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              },
+              "last-modified": {
+                "type": "string",
+                "format": "date"
+              },
+              "e-tag": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "PutKeyValue",
+        "description": "Creates a key-value.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.kv+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "consumes": [
+          "application/vnd.microsoft.appconfig.kv+json",
+          "application/vnd.microsoft.appconfig.kvset+json",
+          "application/json",
+          "text/json",
+          "application/*+json",
+          "application/json-patch+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ETagHeaders.ifMatch"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifNoneMatch"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.label"
+          },
+          {
+            "name": "entity",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              },
+              "last-modified": {
+                "type": "string",
+                "format": "date"
+              },
+              "e-tag": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "UpdateKeyValue",
+        "description": "Updates a key-value pair",
+        "produces": [
+          "application/vnd.microsoft.appconfig.kv+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "consumes": [
+          "application/json-patch+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifMatch"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifNoneMatch"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.label"
+          },
+          {
+            "name": "jsonPatch",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              },
+              "last-modified": {
+                "type": "string",
+                "format": "date"
+              },
+              "e-tag": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteKeyValue",
+        "description": "Deletes a key-value.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.kv+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.label"
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "ifMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              },
+              "e-tag": {
+                "type": "string"
+              }
+            }
+          },
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. ",
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "CheckKeyValue",
+        "description": "Requests the headers and status of the given resource.",
+        "produces": [
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ETagHeaders.ifMatch"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifNoneMatch"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.key"
+          },
+          {
+            "$ref": "#/parameters/KeyWithFilters.label"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              },
+              "last-modified": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/labels": {
+      "get": {
+        "operationId": "GetLabels",
+        "description": "Gets a list of labels.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.labelset+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PagedLabel"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "CheckLabels",
+        "description": "Requests the headers and status of the given resource.",
+        "produces": [
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "$Select",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "name"
+              ],
+              "x-ms-enum": {
+                "name": "LabelField",
+                "modelAsString": true
+              }
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/locks/{key}": {
+      "get": {
+        "operationId": "GetLock",
+        "produces": [
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "label",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifMatch"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteLock",
+        "produces": [
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "label",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifMatch"
+          },
+          {
+            "$ref": "#/parameters/ETagHeaders.ifNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/KeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/revisions": {
+      "get": {
+        "operationId": "GetRevisions",
+        "description": "Gets a list of revisions.",
+        "produces": [
+          "application/vnd.microsoft.appconfig.kvset+json",
+          "application/json",
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "name": "$Select",
+            "in": "query",
+            "description": "Used to select what fields are present in the returned resource(s).",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "key",
+                "label",
+                "content_type",
+                "value",
+                "last_modified",
+                "tags"
+              ],
+              "x-ms-enum": {
+                "name": "KeyField",
+                "modelAsString": true
+              }
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "label",
+            "in": "query",
+            "description": "A filter used to match labels",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "description": "A filter used to match keys.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PagedKeyValue"
+            },
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "CheckRevisions",
+        "description": "Requests the headers and status of the given resource.",
+        "produces": [
+          "application/problem+json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/ApiVersion"
+          },
+          {
+            "$ref": "#/parameters/SyncTokenHeader"
+          },
+          {
+            "$ref": "#/parameters/AcceptDatetimeHeader"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ETagHeader": {
+      "type": "object"
+    },
+    "Error": {
+      "type": "object",
+      "description": "Azure App Configuration error object.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The type of the error"
+        },
+        "title": {
+          "type": "string",
+          "description": "A brief summary of the error."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the parameter that resulted in the error."
+        },
+        "detail": {
+          "type": "string",
+          "description": "A detailed description of the error."
+        },
+        "statusCode": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The HTTP status code that the error maps to."
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "name",
+        "detail",
+        "statusCode"
+      ]
+    },
+    "Key": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "KeyField": {
+      "type": "string",
+      "enum": [
+        "key",
+        "label",
+        "content_type",
+        "value",
+        "last_modified",
+        "tags"
+      ],
+      "x-ms-enum": {
+        "name": "KeyField",
+        "modelAsString": true
+      }
+    },
+    "KeyValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "locked": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "key",
+        "tags",
+        "locked"
+      ]
+    },
+    "Label": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "LabelField": {
+      "type": "string",
+      "enum": [
+        "name"
+      ],
+      "x-ms-enum": {
+        "name": "LabelField",
+        "modelAsString": true
+      }
+    },
+    "LastModifiedHeader": {
+      "type": "object"
+    },
+    "PagedKey": {
+      "type": "object",
+      "description": "Paged collection of Key items",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "The Key items on this page",
+          "items": {
+            "$ref": "#/definitions/Key"
+          },
+          "x-ms-identifiers": []
+        },
+        "nextLink": {
+          "type": "string",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "PagedKeyValue": {
+      "type": "object",
+      "description": "Paged collection of KeyValue items",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "The KeyValue items on this page",
+          "items": {
+            "$ref": "#/definitions/KeyValue"
+          },
+          "x-ms-identifiers": []
+        },
+        "nextLink": {
+          "type": "string",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "PagedLabel": {
+      "type": "object",
+      "description": "Paged collection of Label items",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "The Label items on this page",
+          "items": {
+            "$ref": "#/definitions/Label"
+          },
+          "x-ms-identifiers": []
+        },
+        "nextLink": {
+          "type": "string",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "Value": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "locked": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "tags",
+        "locked"
+      ]
+    }
+  },
+  "parameters": {
+    "AcceptDatetimeHeader": {
+      "name": "accept-datetime",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "format": "date",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "acceptDatetime"
+    },
+    "ApiVersion": {
+      "name": "apiVersion",
+      "in": "query",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "ETagHeaders.ifMatch": {
+      "name": "if-match",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "ifMatch"
+    },
+    "ETagHeaders.ifNoneMatch": {
+      "name": "if-none-match",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "ifNoneMatch"
+    },
+    "KeyFilters.key": {
+      "name": "key",
+      "in": "query",
+      "description": "A filter for the name of the returned keys.",
+      "required": false,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "KeyFilters.label": {
+      "name": "label",
+      "in": "query",
+      "description": "A filter used to match labels",
+      "required": false,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "KeyWithFilters.key": {
+      "name": "key",
+      "in": "path",
+      "description": "A filter for the name of the returned keys.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "KeyWithFilters.label": {
+      "name": "label",
+      "in": "query",
+      "description": "A filter used to match labels",
+      "required": false,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "SyncTokenHeader": {
+      "name": "sync-token",
+      "in": "header",
+      "description": "Used to guarantee real-time consistency between requests.",
+      "required": false,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "syncToken"
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Nested sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "SubC_AnotherOp",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "thing": {
+                  "$ref": "#/definitions/SubA.Thing"
+                },
+                "thing2": {
+                  "$ref": "#/definitions/SubA.Thing"
+                }
+              },
+              "required": [
+                "thing",
+                "thing2"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/sub/a/subsub": {
+      "post": {
+        "operationId": "SubSubA_DoSomething",
+        "parameters": [
+          {
+            "name": "thing",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SubA.SubSubA.Thing"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/sub/b": {
+      "post": {
+        "operationId": "SubB_DoSomething",
+        "parameters": [
+          {
+            "name": "thing",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SubB.Thing"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "SubA.SubSubA.Thing": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "SubA.Thing": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "SubB.Thing": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -1,0 +1,80 @@
+parameters:
+  - name: nodeVersion
+    type: string
+  - name: dotnetVersion
+    type: string
+  - name: poolName
+    type: string
+
+steps:
+  - checkout: self
+    submodules: true
+
+  - template: ../templates/install.yml
+    parameters:
+      nodeVersion: ${{ parameters.nodeVersion }}
+
+  # Only running UI test on linux
+  - ${{ if ne(variables['Agent.OS'], 'Windows_NT') }}:
+      - template: ../templates/install-browsers.yml
+
+  - template: ../templates/build.yml
+
+  - script: node common/scripts/install-run-rush.js test-official --parallelism max --verbose
+    displayName: Test
+
+  - template: ../templates/upload-coverage.yml
+
+  - script: node common/scripts/install-run-rush.js check-format
+    displayName: Check Formatting
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: node common/scripts/install-run-rush.js lint --parallelism max --verbose
+    displayName: Lint
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: node eng/scripts/download-common-types.js v3
+    displayName: Swagger - Fetch common-types v3
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: node eng/scripts/check-for-changed-files.js
+    displayName: Check Git Status For Changed Files
+
+  - script: node common/scripts/install-run-rush.js cspell
+    displayName: Spell check
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  # Unlink node_modules folders to significantly improve performance of subsequent tasks
+  # which need to walk the directory tree (and are hardcoded to follow symlinks).
+  - script: node common/scripts/install-run-rush.js purge
+    displayName: "Purge dependencies"
+    condition: always()
+
+  # It's important for performance to pass "packages" as "searchFolder" to avoid looking under root "node_modules".
+  # PublishTestResults.searchFolder only supports absolute paths, not relative.
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: "JUnit"
+      searchFolder: "$(System.DefaultWorkingDirectory)/core/packages"
+      testResultsFiles: "*/test-results.xml"
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: "[CORE] Test os: ${{ parameters.poolName }}, node: ${{ parameters.nodeVersion }}"
+    displayName: Publish core test results
+    condition: always()
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: "JUnit"
+      searchFolder: "$(System.DefaultWorkingDirectory)/packages"
+      testResultsFiles: "*/test-results.xml"
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: "[NON-CORE] Test os: ${{ parameters.poolName }}, node: ${{ parameters.nodeVersion }}"
+    displayName: Publish non-core test results
+    condition: always()
+
+  - publish: ./core/packages/playground-website/test-results
+    artifact: "uitestresults-${{ parameters.poolName }}-node-${{ parameters.nodeVersion }}"
+    displayName: Publish UI tests artifacts
+    condition: ne(variables['Agent.OS'], 'Windows_NT')

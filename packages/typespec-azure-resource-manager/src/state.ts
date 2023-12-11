@@ -1,0 +1,27 @@
+// FIXME - This is a workaround for the circular dependency issue when loading
+// createStateSymbol.
+// Issue: https://github.com/microsoft/typespec/issues/2301
+function azureResourceManagerCreateStateSymbol(name: string): symbol {
+  return Symbol.for(`@azure-tools/typespec-azure-resource-manager.${name}`);
+}
+
+export const ArmStateKeys = {
+  armProviderNamespaces: azureResourceManagerCreateStateSymbol("armProviderNamespaces"),
+  armResourceOperations: azureResourceManagerCreateStateSymbol("armResourceOperations"),
+  armResourceCollectionAction: azureResourceManagerCreateStateSymbol("armResourceCollectionAction"),
+  armResourceCollection: azureResourceManagerCreateStateSymbol("parameterBaseTypes"),
+  armResources: azureResourceManagerCreateStateSymbol("armResources"),
+  armLibraryNamespaces: azureResourceManagerCreateStateSymbol("armLibraryNamespaces"),
+  usesArmLibraryNamespaces: azureResourceManagerCreateStateSymbol("usesArmLibraryNamespaces"),
+  armCommonTypesVersion: azureResourceManagerCreateStateSymbol("armCommonTypesVersion"),
+
+  // resource.ts
+  armResourcesCached: azureResourceManagerCreateStateSymbol("armResourcesCached"),
+  armSingletonResources: azureResourceManagerCreateStateSymbol("armSingletonResources"),
+  resourceBaseType: azureResourceManagerCreateStateSymbol("resourceBaseTypeKey"),
+
+  // private.decorator.ts
+  armCommonDefinitions: azureResourceManagerCreateStateSymbol("armCommonDefinitions"),
+  armCommonParameters: azureResourceManagerCreateStateSymbol("armCommonParameters"),
+  armCommonTypesVersions: azureResourceManagerCreateStateSymbol("armCommonTypesVersions"),
+};

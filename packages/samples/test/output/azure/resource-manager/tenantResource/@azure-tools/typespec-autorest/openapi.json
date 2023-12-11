@@ -1,0 +1,1928 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Microsoft.Contoso",
+    "version": "2022-05-22-preview",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "Buildings"
+    },
+    {
+      "name": "Rooms"
+    },
+    {
+      "name": "Permissions"
+    },
+    {
+      "name": "Widgets"
+    },
+    {
+      "name": "Flanges"
+    }
+  ],
+  "paths": {
+    "/{resourceUri}/providers/Microsoft.Contoso/permissions": {
+      "get": {
+        "operationId": "Permissions_List",
+        "tags": [
+          "Permissions"
+        ],
+        "description": "List Permission resources by parent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PermissionListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.Contoso/permissions/{permissionName}": {
+      "get": {
+        "operationId": "Permissions_Get",
+        "tags": [
+          "Permissions"
+        ],
+        "description": "Get a Permission",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "permissionName",
+            "in": "path",
+            "description": "The name of the permission resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Permission"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Permissions_CreateOrUpdate",
+        "tags": [
+          "Permissions"
+        ],
+        "description": "Create a Permission",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "permissionName",
+            "in": "path",
+            "description": "The name of the permission resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Permission"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'Permission' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Permission"
+            }
+          },
+          "201": {
+            "description": "Resource 'Permission' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Permission"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "Permissions_Update",
+        "tags": [
+          "Permissions"
+        ],
+        "description": "Update a Permission",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "permissionName",
+            "in": "path",
+            "description": "The name of the permission resource",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PermissionUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Permission"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Permissions_Delete",
+        "tags": [
+          "Permissions"
+        ],
+        "description": "Delete a Permission",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "permissionName",
+            "in": "path",
+            "description": "The name of the permission resource",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.Contoso/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.Contoso/widgets": {
+      "get": {
+        "operationId": "Widgets_ListByTenant",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "List Widget resources by tenant",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/WidgetListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.Contoso/widgets/{widgetName}": {
+      "get": {
+        "operationId": "Widgets_Get",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Get a Widget",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Widgets_CreateOrUpdate",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Create a Widget",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'Widget' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "201": {
+            "description": "Resource 'Widget' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "Widgets_Update",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Update a Widget",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WidgetUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Widgets_Delete",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Delete a Widget",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.Contoso/widgets/{widgetName}/flanges": {
+      "get": {
+        "operationId": "Flanges_ListByWidget",
+        "tags": [
+          "Flanges"
+        ],
+        "description": "List Flange resources by Widget",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/FlangeListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}": {
+      "get": {
+        "operationId": "Flanges_Get",
+        "tags": [
+          "Flanges"
+        ],
+        "description": "Get a Flange",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "flangeName",
+            "in": "path",
+            "description": "The name of the flange",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Flange"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Flanges_CreateOrUpdate",
+        "tags": [
+          "Flanges"
+        ],
+        "description": "Create a Flange",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "flangeName",
+            "in": "path",
+            "description": "The name of the flange",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Flange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'Flange' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Flange"
+            }
+          },
+          "201": {
+            "description": "Resource 'Flange' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Flange"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "Flanges_Delete",
+        "tags": [
+          "Flanges"
+        ],
+        "description": "Delete a Flange",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "flangeName",
+            "in": "path",
+            "description": "The name of the flange",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}/increaseWeight": {
+      "post": {
+        "operationId": "Flanges_IncreaseWeight",
+        "tags": [
+          "Flanges"
+        ],
+        "description": "Add a certain amount to the weight",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "flangeName",
+            "in": "path",
+            "description": "The name of the flange",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "increment",
+            "in": "body",
+            "description": "The request body.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Weight added successfully"
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/providers/Microsoft.Contoso/widgets/{widgetName}/flipSpin": {
+      "post": {
+        "operationId": "Widgets_FlipSpin",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Flip to the opposite of the current spin",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/buildings": {
+      "get": {
+        "operationId": "Buildings_ListBySubscription",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "List Building resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BuildingListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/buildings": {
+      "get": {
+        "operationId": "Buildings_ListByResourceGroup",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "List Building resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BuildingListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/buildings/{buildingName}": {
+      "get": {
+        "operationId": "Buildings_Get",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Get a Building",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Building"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Buildings_CreateOrUpdate",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Create a Building",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Building"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'Building' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Building"
+            }
+          },
+          "201": {
+            "description": "Resource 'Building' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Building"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "Buildings_Update",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Update a Building",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BuildingUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Building"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Buildings_Delete",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Delete a Building",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/buildings/{buildingName}/evacuate": {
+      "post": {
+        "operationId": "Buildings_Evacuate",
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Get out!",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Building"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/buildings/{buildingName}/rooms": {
+      "get": {
+        "operationId": "Rooms_ListByBuilding",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "List Room resources by Building",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/RoomListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/buildings/{buildingName}/rooms/{roomName}": {
+      "get": {
+        "operationId": "Rooms_Get",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Get a Room",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "roomName",
+            "in": "path",
+            "description": "The room name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Rooms_CreateOrUpdate",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Create a Room",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "roomName",
+            "in": "path",
+            "description": "The room name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Room"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'Room' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            }
+          },
+          "201": {
+            "description": "Resource 'Room' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            },
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "Rooms_Delete",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Delete a Room",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "buildingName",
+            "in": "path",
+            "description": "The name of the building",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "roomName",
+            "in": "path",
+            "description": "The room name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource deleted successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    }
+  },
+  "definitions": {
+    "Azure.ResourceManager.ResourceProvisioningState": {
+      "type": "string",
+      "description": "The provisioning state of a resource type.",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled"
+      ],
+      "x-ms-enum": {
+        "name": "ResourceProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "Building": {
+      "type": "object",
+      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/BuildingProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "identity": {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v4/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "sku": {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/Sku",
+          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
+        },
+        "managedBy": {
+          "type": "string",
+          "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "BuildingListResult": {
+      "type": "object",
+      "description": "The response of a Building list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The Building items on this page",
+          "items": {
+            "$ref": "#/definitions/Building"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "BuildingProperties": {
+      "type": "object",
+      "description": "The rp-specific building properties",
+      "properties": {
+        "streetAddress": {
+          "type": "string",
+          "description": "The street address",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "streetAddress",
+        "provisioningState"
+      ]
+    },
+    "BuildingUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the Building.",
+      "properties": {
+        "identity": {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v4/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "sku": {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/Sku",
+          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
+        },
+        "managedBy": {
+          "type": "string",
+          "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/BuildingUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "BuildingUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the Building.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      }
+    },
+    "Flange": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/FlangeProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "FlangeListResult": {
+      "type": "object",
+      "description": "The response of a Flange list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The Flange items on this page",
+          "items": {
+            "$ref": "#/definitions/Flange"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "FlangeProperties": {
+      "type": "object",
+      "description": "The properties of a Flange",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The description of the flange"
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The weight in ounces of the flange"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "description",
+        "weight",
+        "provisioningState"
+      ]
+    },
+    "Permission": {
+      "type": "object",
+      "description": "A Permission Resource",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/PermissionProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "PermissionListResult": {
+      "type": "object",
+      "description": "The response of a Permission list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The Permission items on this page",
+          "items": {
+            "$ref": "#/definitions/Permission"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "PermissionProperties": {
+      "type": "object",
+      "description": "The resource-specific properties of a Permissions resource",
+      "properties": {
+        "read": {
+          "type": "boolean",
+          "description": "includes permission to read the target resource"
+        },
+        "write": {
+          "type": "boolean",
+          "description": "includes permission to write to the target resource"
+        },
+        "execute": {
+          "type": "boolean",
+          "description": "includes permission to execute the target resource"
+        },
+        "delete": {
+          "type": "boolean",
+          "description": "includes permission to delete the target resource"
+        },
+        "principalName": {
+          "type": "array",
+          "description": "The principals given this permission",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "read",
+        "write",
+        "execute",
+        "delete",
+        "principalName",
+        "provisioningState"
+      ]
+    },
+    "PermissionUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the Permission.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/PermissionUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "PermissionUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the Permission.",
+      "properties": {
+        "read": {
+          "type": "boolean",
+          "description": "includes permission to read the target resource"
+        },
+        "write": {
+          "type": "boolean",
+          "description": "includes permission to write to the target resource"
+        },
+        "execute": {
+          "type": "boolean",
+          "description": "includes permission to execute the target resource"
+        },
+        "delete": {
+          "type": "boolean",
+          "description": "includes permission to delete the target resource"
+        },
+        "principalName": {
+          "type": "array",
+          "description": "The principals given this permission",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      }
+    },
+    "Room": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/RoomProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "RoomListResult": {
+      "type": "object",
+      "description": "The response of a Room list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The Room items on this page",
+          "items": {
+            "$ref": "#/definitions/Room"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "RoomProperties": {
+      "type": "object",
+      "description": "rp-specific room properties",
+      "properties": {
+        "desks": {
+          "$ref": "#/definitions/UnsignedInt",
+          "description": "The number of desks"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "desks",
+        "provisioningState"
+      ]
+    },
+    "Spin": {
+      "type": "string",
+      "description": "Spin.",
+      "enum": [
+        "up",
+        "down"
+      ],
+      "x-ms-enum": {
+        "name": "Spin",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "up",
+            "value": "up",
+            "description": "Up"
+          },
+          {
+            "name": "down",
+            "value": "down",
+            "description": "Down"
+          }
+        ]
+      }
+    },
+    "UnsignedInt": {
+      "type": "integer",
+      "format": "int32",
+      "minimum": 0
+    },
+    "Widget": {
+      "type": "object",
+      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/WidgetProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true,
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "WidgetListResult": {
+      "type": "object",
+      "description": "The response of a Widget list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The Widget items on this page",
+          "items": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "WidgetProperties": {
+      "type": "object",
+      "description": "The properties of a widget",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "The color of the widget"
+        },
+        "weightInPounds": {
+          "$ref": "#/definitions/UnsignedInt",
+          "description": "The weight of the widget in (integral) pounds"
+        },
+        "weightInKilograms": {
+          "type": "number",
+          "format": "float",
+          "description": "The weight in kilograms"
+        },
+        "spin": {
+          "$ref": "#/definitions/Spin",
+          "description": "The spin of the widget"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      },
+      "required": [
+        "color",
+        "provisioningState"
+      ]
+    },
+    "WidgetUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the Widget.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/WidgetUpdateProperties",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "WidgetUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the Widget.",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "The color of the widget"
+        },
+        "weightInPounds": {
+          "$ref": "#/definitions/UnsignedInt",
+          "description": "The weight of the widget in (integral) pounds"
+        },
+        "weightInKilograms": {
+          "type": "number",
+          "format": "float",
+          "description": "The weight in kilograms"
+        },
+        "spin": {
+          "$ref": "#/definitions/Spin",
+          "description": "The spin of the widget"
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource."
+        }
+      }
+    }
+  },
+  "parameters": {
+    "Azure.ResourceManager.ResourceUriParameter": {
+      "name": "resourceUri",
+      "in": "path",
+      "description": "The fully qualified Azure Resource manager identifier of the resource.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-skip-url-encoding": true
+    }
+  }
+}

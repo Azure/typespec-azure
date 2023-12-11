@@ -1,0 +1,455 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Visibility sample",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/hello": {
+      "get": {
+        "operationId": "Hello_List",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Person"
+                  }
+                }
+              },
+              "required": [
+                "items"
+              ]
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Hello_Update",
+        "parameters": [
+          {
+            "name": "person",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WriteableOptionalPerson"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ReadablePerson"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "Hello_Create",
+        "parameters": [
+          {
+            "name": "person",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WritablePerson"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ReadablePerson"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "Hello_UpdateRest",
+        "parameters": [
+          {
+            "name": "person",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PersonUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ReadablePerson"
+            }
+          }
+        }
+      }
+    },
+    "/hello/{id}": {
+      "get": {
+        "operationId": "Hello_Read",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fieldMask",
+            "in": "query",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ReadablePerson"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "OptionalPerson": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "secret": {
+          "type": "string",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "other": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "update"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelative"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      }
+    },
+    "Person": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "secret": {
+          "type": "string",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "other": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "update"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelative"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "secret",
+        "name",
+        "test",
+        "other",
+        "relatives"
+      ]
+    },
+    "PersonCreateItem": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelativeCreateItem"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "secret",
+        "name",
+        "test",
+        "relatives"
+      ]
+    },
+    "PersonRelative": {
+      "type": "object",
+      "properties": {
+        "person": {
+          "$ref": "#/definitions/Person"
+        },
+        "relationship": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "person",
+        "relationship"
+      ]
+    },
+    "PersonRelativeCreateItem": {
+      "type": "object",
+      "properties": {
+        "person": {
+          "$ref": "#/definitions/PersonCreateItem"
+        },
+        "relationship": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "person",
+        "relationship"
+      ]
+    },
+    "PersonUpdate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "other": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "update"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelative"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      }
+    },
+    "ReadablePerson": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "other": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "update"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelative"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "test",
+        "other",
+        "relatives"
+      ]
+    },
+    "WritablePerson": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelativeCreateItem"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "secret",
+        "name",
+        "test",
+        "relatives"
+      ]
+    },
+    "WriteableOptionalPerson": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelative"
+          },
+          "x-ms-identifiers": [],
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        }
+      }
+    }
+  },
+  "parameters": {}
+}

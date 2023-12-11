@@ -1,0 +1,75 @@
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-azure-resource-manager";
+import "./ref-library/int-templates.tsp";
+import "./ref-library/op-templates.tsp";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using Azure.ResourceManager;
+
+@service({
+  title: "Microsoft.EnvelopeTest",
+  version: "2021-09-21-preview",
+})
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
+@armProviderNamespace
+namespace Microsoft.LibraryTest;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
+  @doc("The name of the all properties resource.")
+  @key("allPropertiesName")
+  @segment("allProperties")
+  @path
+  name: string;
+
+  ...EntityTag;
+  ...ManagedBy;
+  ...ResourceKind;
+  ...ResourcePlan;
+  ...ResourceSku;
+  ...ManagedServiceIdentity;
+}
+
+@armResourceOperations
+interface AllProperties
+  extends TrackedResourceOperations<AllPropertiesResource, AllPropertiesProperties> {}
+
+@doc("rp-specific properties for the resource with all envelope properties")
+model AllPropertiesProperties {
+  @doc("The status of the last operation performed on this resource.")
+  provisioningState: SystemEnvelopeProvisioningState;
+
+  @doc("Name of the resource")
+  displayName?: string = "default";
+}
+
+@Azure.Core.lroStatus
+@doc("Envelope provisioning state")
+enum SystemEnvelopeProvisioningState {
+  ...ResourceProvisioningState,
+
+  @doc("Working")
+  Working,
+}
+
+@armResourceOperations
+interface TrackedOperations extends Microsoft.InterfacesTest.TrackedOperations {}
+
+@armResourceOperations
+interface TrackedChildOperations extends Microsoft.InterfacesTest.TrackedChildOperations {}
+
+@armResourceOperations
+interface TenantOperations extends Microsoft.InterfacesTest.TenantOperations {}
+
+@armResourceOperations
+interface ExtensionOperations extends Microsoft.InterfacesTest.ExtensionOperations {}
+
+@armResourceOperations
+interface Tracked2Operations extends Microsoft.OperationsTest.Tracked2Operations {}

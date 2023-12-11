@@ -1,0 +1,270 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Pet Store Service",
+    "version": "2021-03-25",
+    "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/pets": {
+      "get": {
+        "operationId": "Pets_List",
+        "description": "<blink>List pets.</blink>",
+        "parameters": [
+          {
+            "name": "nextLink",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/PetListResults"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "Pets_Create",
+        "parameters": [
+          {
+            "name": "pet",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/pets/{petId}": {
+      "get": {
+        "operationId": "Pets_Read",
+        "description": "Returns a pet. Supports eTags.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/PetId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          },
+          "304": {
+            "description": "The client has made a conditional request and the resource has not been modified.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Pets_Delete",
+        "description": "Delete a pet.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/PetId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/pets/{petId}/toys": {
+      "get": {
+        "operationId": "ListPetToysResponse_List",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "nameFilter",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/ToyListResults"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "description": "Error",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
+    },
+    "Pet": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0,
+          "maximum": 20
+        }
+      },
+      "required": [
+        "name",
+        "age"
+      ]
+    },
+    "PetListResults": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Pet"
+          },
+          "x-ms-identifiers": []
+        },
+        "nextLink": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "Toy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "petId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "petId",
+        "name"
+      ]
+    },
+    "ToyListResults": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Toy"
+          }
+        },
+        "nextLink": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    }
+  },
+  "parameters": {
+    "PetId": {
+      "name": "petId",
+      "in": "path",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "x-ms-parameter-location": "method"
+    }
+  }
+}
