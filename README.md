@@ -1,5 +1,4 @@
-testing
-# TypeSpec Azure Libraries
+# TypeSpec Azure Libraries Test
 
 [TypeSpec](https://github.com/microsoft/typespec) is a language for describing cloud
 service APIs and generating other API description languages, client and
