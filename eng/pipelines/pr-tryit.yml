@@ -52,3 +52,5 @@ jobs:
 
       - script: node core/eng/scripts/create-tryit-comment.js "cadl-azure"
         displayName: Check already commented
+        env:
+          GH_TOKEN: $(azuresdk-github-pat)
