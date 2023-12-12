@@ -9,7 +9,7 @@ jobs:
   - job: publish_playground
     displayName: Publish playground & website
     variables:
-      TYPESPEC_WEBSITE_BASE_PATH: "cadl-azure/prs/$(System.PullRequest.PullRequestNumber)/"
+      TYPESPEC_WEBSITE_BASE_PATH: "typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
     pool:
       name: azsdk-pool-mms-ubuntu-2004-general
       vmImage: ubuntu-20.04
@@ -50,5 +50,7 @@ jobs:
               --source "./packages/website/build/" \
               --overwrite
 
-      - script: node core/eng/scripts/create-tryit-comment.js "cadl-azure"
+      - script: node core/eng/scripts/create-tryit-comment.js "typespec-azure"
         displayName: Check already commented
+        env:
+          GH_TOKEN: $(azuresdk-github-pat)
