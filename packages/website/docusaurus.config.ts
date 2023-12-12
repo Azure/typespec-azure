@@ -204,6 +204,12 @@ const config: Config = {
       darkTheme: themes.oneDark,
       additionalLanguages: ["csharp", "java", "python"],
     },
+    algolia: {
+      // cspell:disable-next-line
+      appId: "45W9UOZTFJ",
+      apiKey: "d25c05ea079a06182a55e784a53c1e3c",
+      indexName: "typespec-azure",
+    },
   } satisfies ThemeConfig,
   plugins: [
     (context, options): Plugin => {
