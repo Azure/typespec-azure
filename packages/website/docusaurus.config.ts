@@ -207,7 +207,7 @@ const config: Config = {
     algolia: {
       // cspell:disable-next-line
       appId: "45W9UOZTFJ",
-      apiKey: "d25c05ea079a06182a55e784a53c1e3c",
+      apiKey: "a9d52fdde02ebb7bab1d19b4443dcde1",
       indexName: "typespec-azure",
     },
   } satisfies ThemeConfig,
