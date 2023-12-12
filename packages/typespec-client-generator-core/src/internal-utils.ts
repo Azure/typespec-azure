@@ -59,11 +59,6 @@ export function getClientNamespaceStringHelper(
   return undefined;
 }
 
-interface TypeWithApiVersionInformation {
-  isApiVersionParam: boolean;
-  clientDefaultValue?: unknown;
-}
-
 /**
  *
  * @param context
@@ -73,13 +68,18 @@ interface TypeWithApiVersionInformation {
 export function updateWithApiVersionInformation(
   context: SdkContext,
   type: ModelProperty
-): TypeWithApiVersionInformation {
+): {
+  isApiVersionParam: boolean;
+  clientDefaultValue?: unknown;
+  onClient: boolean;
+} {
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
     clientDefaultValue: isApiVersionParam
       ? getDefaultApiVersion(context, listServices(context.program)[0].type)?.value || undefined
       : undefined,
+    onClient: isApiVersionParam,
   };
 }
 

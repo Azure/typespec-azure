@@ -534,9 +534,9 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       ...sdkParam,
       kind: "endpoint",
       urlEncode: false,
-      onClient: true,
       optional: false,
       ...updateWithApiVersionInformation(context, param),
+      onClient: true,
     });
   }
   return [servers[0].url, endpointParameters];

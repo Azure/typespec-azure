@@ -1526,7 +1526,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.isApiVersionParam, true);
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.serializedName, "api-version");
-      strictEqual(apiVersionParam.onClient, false);
+      strictEqual(apiVersionParam.onClient, true);
       strictEqual(method.getParameterMapping(apiVersionParam).length, 1);
       strictEqual(
         method.getParameterMapping(apiVersionParam)[0],
@@ -1619,7 +1619,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.isApiVersionParam, true);
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.serializedName, "api-version");
-      strictEqual(apiVersionParam.onClient, false);
+      strictEqual(apiVersionParam.onClient, true);
       strictEqual(getStatus.getParameterMapping(apiVersionParam).length, 1);
       strictEqual(
         getStatus.getParameterMapping(apiVersionParam)[0],
