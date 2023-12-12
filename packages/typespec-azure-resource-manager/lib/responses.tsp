@@ -55,16 +55,22 @@ model ArmAcceptedResponse<TMessage extends valueof string = "Resource operation 
   ...Azure.Core.Foundations.RetryAfterHeader;
 }
 
+/** Legacy representation for resource location using string instead of url */
+@TypeSpec.Rest.Private.resourceLocation(TResponse)
+scalar StringResourceLink<TResponse extends TypeSpec.Reflection.Model = {}> extends string;
+
 /**
  * The standard ARM response for asynchronous PATCH, POST, and DELETE operations
  * @template TMessage The description of the response status (defaults to `Resource operation accepted`)
  */
 @doc(TMessage)
-model ArmAcceptedLroResponse<TMessage extends valueof string = "Resource operation accepted.">
-  is ArmAcceptedResponse<TMessage> {
+model ArmAcceptedLroResponse<
+  TMessage extends valueof string = "Resource operation accepted.",
+  TLroResponse extends TypeSpec.Reflection.Model = {}
+> is ArmAcceptedResponse<TMessage> {
   @doc("The Location header contains the URL where the status of the long running operation can be checked.")
   @header("Location")
-  location?: string;
+  location?: StringResourceLink<TLroResponse>;
 }
 
 /**

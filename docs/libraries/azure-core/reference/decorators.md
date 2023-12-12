@@ -13,7 +13,7 @@ toc_max_heading_level: 3
 Identifies a ModelProperty as containing the final location for the operation result.
 
 ```typespec
-@Azure.Core.finalLocation
+@Azure.Core.finalLocation(finalResult?: Model | void)
 ```
 
 #### Target
@@ -22,7 +22,9 @@ Identifies a ModelProperty as containing the final location for the operation re
 
 #### Parameters
 
-None
+| Name        | Type                  | Description                                                                                                                                                 |
+| ----------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| finalResult | `union Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<T>. |
 
 ### `@finalOperation` {#@Azure.Core.finalOperation}
 
@@ -257,7 +259,7 @@ None
 Identifies a model property as containing the location to poll for operation state.
 
 ```typespec
-@Azure.Core.pollingLocation
+@Azure.Core.pollingLocation(options?: Azure.Core.PollingOptions)
 ```
 
 #### Target
@@ -266,7 +268,9 @@ Identifies a model property as containing the location to poll for operation sta
 
 #### Parameters
 
-None
+| Name    | Type                              | Description                                                                                                                                                                            |
+| ------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | `model Azure.Core.PollingOptions` | PollingOptions for the poller poiinted to by this link. Overrides<br />settings derived from property value it is decorating, if the value of the<br />property is ResourceLocation<T> |
 
 ### `@pollingOperation` {#@Azure.Core.pollingOperation}
 

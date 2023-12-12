@@ -21,14 +21,15 @@ model Azure.ResourceManager.ApiVersionParameter
 The standard ARM response for asynchronous PATCH, POST, and DELETE operations
 
 ```typespec
-model Azure.ResourceManager.ArmAcceptedLroResponse<TMessage>
+model Azure.ResourceManager.ArmAcceptedLroResponse<TMessage, TLroResponse>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                                                        |
-| -------- | ---------------------------------------------------------------------------------- |
-| TMessage | The description of the response status (defaults to `Resource operation accepted`) |
+| Name         | Description                                                                        |
+| ------------ | ---------------------------------------------------------------------------------- |
+| TMessage     | The description of the response status (defaults to `Resource operation accepted`) |
+| TLroResponse |                                                                                    |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
 
@@ -679,6 +680,62 @@ vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
 
 ```typespec
 scalar Azure.ResourceManager.ResourceIdentifier
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
+```
+
+### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
+
+Legacy representation for resource location using string instead of url
+
+```typespec
+scalar Azure.ResourceManager.StringResourceLink
 ```
 
 ## Azure.ResourceManager.CommonTypes

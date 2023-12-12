@@ -111,6 +111,31 @@ Provides the standard 'filter' query parameter for list operations.
 model Azure.Core.FilterQueryParameter
 ```
 
+### `HttpResponseStatusOptions` {#Azure.Core.HttpResponseStatusOptions}
+
+Metadata to control polling by HttpResponseStatus
+
+```typespec
+model Azure.Core.HttpResponseStatusOptions
+```
+
+### `HttpResponseStatusPollingOptions` {#Azure.Core.HttpResponseStatusPollingOptions}
+
+Options for describing a polling endpoint that uses status codes to control polling
+
+```typespec
+model Azure.Core.HttpResponseStatusPollingOptions<TContinuationStatus, TTerminalStatus, TPollingModel, TFinalResult>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                       |
+| ------------------- | --------------------------------------------------------------------------------- |
+| TContinuationStatus | The status code(s) or status code range indictaing polling should continue.       |
+| TTerminalStatus     | The status code(s) or status code range indicating successful polling completion. |
+| TPollingModel       | The model that is returned when polling should continue.                          |
+| TFinalResult        |                                                                                   |
+
 ### `MaxPageSizeQueryParameter` {#Azure.Core.MaxPageSizeQueryParameter}
 
 Provides the standard 'maxpagesize' query parameter for list operations.
@@ -140,6 +165,14 @@ model Azure.Core.Page<TResource>
 | Name      | Description        |
 | --------- | ------------------ |
 | TResource | The resource type. |
+
+### `PollingOptions` {#Azure.Core.PollingOptions}
+
+Generic polling options for Lros.
+
+```typespec
+model Azure.Core.PollingOptions
+```
 
 ### `RepeatabilityRequestHeaders` {#Azure.Core.RepeatabilityRequestHeaders}
 
@@ -231,6 +264,30 @@ Provides the most common query parameters for list operations.
 model Azure.Core.StandardListQueryParameters
 ```
 
+### `StatusMonitorOptions` {#Azure.Core.StatusMonitorOptions}
+
+Options for Lro status monitors.
+
+```typespec
+model Azure.Core.StatusMonitorOptions
+```
+
+### `StatusMonitorPollingOptions` {#Azure.Core.StatusMonitorPollingOptions}
+
+Options for overriding a polling endpoint that uses a StatusMonitor
+
+```typespec
+model Azure.Core.StatusMonitorPollingOptions<TPollingModel, TFinalResult, TFinalProperty>
+```
+
+#### Template Parameters
+
+| Name           | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| TPollingModel  | The model that is returned when polling should continue. |
+| TFinalResult   |                                                          |
+| TFinalProperty |                                                          |
+
 ### `TopQueryParameter` {#Azure.Core.TopQueryParameter}
 
 Provides the standard 'top' query parameter for list operations.
@@ -245,6 +302,12 @@ Supported versions of Azure.Core TypeSpec building blocks.
 
 ```typespec
 enum Azure.Core.Versions
+```
+
+### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
+
+```typespec
+union Azure.Core.PollingOptionKind
 ```
 
 ### `RepeatabilityResult` {#Azure.Core.RepeatabilityResult}

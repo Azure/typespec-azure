@@ -226,6 +226,76 @@ model RequestIdResponseHeader {
 @Foundations.Private.embeddingVector(TType)
 model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
 
+/** Options for describing a polling endpoint that uses status codes to control polling
+ * @template TContinuationStatus The status code(s) or status code range indictaing polling should continue.
+ * @template TTerminalStatus The status code(s) or status code range indicating successful polling completion.
+ * @template TPollingModel The model that is returned when polling should continue.
+ * @template TFinalModel he model that is returned when polling terminates successfully.
+ */
+model HttpResponseStatusPollingOptions<
+  TContinuationStatus extends int32[] = [202],
+  TTerminalStatus extends int32[] = [200, 204],
+  TPollingModel extends TypeSpec.Reflection.Model | void = never,
+  TFinalResult extends TypeSpec.Reflection.Model | void = never
+> extends HttpResponseStatusOptions {
+  kind: PollingOptionKind.httpResonseStatus;
+  continuationStatusCodes?: TContinuationStatus;
+  terminationStatusCodes?: TTerminalStatus;
+  pollingModel?: TPollingModel;
+  finalResult?: TFinalResult;
+}
+
+/** Options for overriding a polling endpoint that uses a StatusMonitor
+ * @template TPollingModel The model that is returned when polling should continue.
+ * @template TFinalModel The model that is returned when polling terminates successfully.
+ */
+model StatusMonitorPollingOptions<
+  TPollingModel extends TypeSpec.Reflection.Model | void = never,
+  TFinalResult extends TypeSpec.Reflection.Model | void = never,
+  TFinalProperty extends TypeSpec.Reflection.ModelProperty | (valueof string) = never
+> extends StatusMonitorOptions {
+  kind: PollingOptionKind.statusMonitor;
+  pollingModel: TPollingModel;
+  finalResult: TFinalResult;
+  finalProperty: TFinalProperty;
+}
+
+/** Metadata to control polling by HttpResponseStatus */
+model HttpResponseStatusOptions extends PollingOptions {
+  kind: PollingOptionKind.httpResonseStatus;
+
+  /** he status code(s) or status code range indictaing polling should continue. */
+  continuationStatusCodes?: Array<int32>;
+
+  /** The status code(s) or status code range indicating successful polling completion. */
+  terminationStatusCodes?: Array<int32>;
+}
+
+/** Options for Lro status monitors. */
+model StatusMonitorOptions extends PollingOptions {
+  kind: PollingOptionKind.statusMonitor;
+
+  /** A reference to or name of the property of the status monitor that contains the response */
+  finalProperty?: TypeSpec.Reflection.ModelProperty | (valueof string);
+}
+
+/** Generic polling options for Lros. */
+model PollingOptions {
+  kind: PollingOptionKind;
+
+  /** The model that is returned when polling should continue. */
+  pollingModel?: TypeSpec.Reflection.Model | void;
+
+  /** The type that is returned when polling terminates successfully. */
+  finalResult?: TypeSpec.Reflection.Model | void;
+}
+
+union PollingOptionKind {
+  statusMonitor: "statusMonitor",
+  httpResonseStatus: "httpResponseStatus",
+  string,
+}
+
 /**
  * Universally Unique Identifier
  *

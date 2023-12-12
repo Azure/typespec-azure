@@ -476,7 +476,7 @@ interface Azure.ResourceManager.ResourceUpdateAsync<TResource, TProperties, TBas
 #### `ResourceUpdateAsync.update` {#Azure.ResourceManager.ResourceUpdateAsync.update}
 
 ```typespec
-op Azure.ResourceManager.ResourceUpdateAsync.update(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted.> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceUpdateAsync.update(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., {}> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceUpdateSync` {#Azure.ResourceManager.ResourceUpdateSync}
@@ -612,7 +612,7 @@ op Azure.ResourceManager.TrackedResourceOperations.listBySubscription(apiVersion
 A long-running resource update using a custom PATCH payload (Asynchronous)
 
 ```typespec
-op Azure.ResourceManager.ArmCustomPatchAsync(provider: Microsoft.ThisWillBeReplaced, properties: TPatchModel): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted.> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmCustomPatchAsync(provider: Microsoft.ThisWillBeReplaced, properties: TPatchModel): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., {}> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
@@ -658,7 +658,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted.> | TResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceActionAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., {}> | TResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
@@ -692,7 +692,7 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: Microsoft.ThisWill
 A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted.> | Azure.ResourceManager.ArmNoContentResponse<Action completed successfully.> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., {}> | Azure.ResourceManager.ArmNoContentResponse<Action completed successfully.> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
@@ -724,7 +724,7 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: Microsoft.This
 A long-running resource action that returns no content.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted.> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., {}> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
