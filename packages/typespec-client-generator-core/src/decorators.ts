@@ -29,15 +29,22 @@ import {
   SdkClient,
   SdkContext,
   SdkEmitterOptions,
+  SdkHttpOperation,
   SdkOperationGroup,
+  SdkServiceOperation,
 } from "./interfaces.js";
 import { parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { getSdkPackage } from "./package.js";
 import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
-function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type): any {
+function getScopedDecoratorData<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  key: symbol,
+  target: Type
+): any {
   const retval = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
   if (!retval.scopes) return retval.value; // this means it applies to all languages
@@ -45,7 +52,7 @@ function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type):
   return undefined;
 }
 
-function listScopedDecoratorData(context: SdkContext, key: symbol): any[] {
+function listScopedDecoratorData<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, key: symbol): any[] {
   const retval = [...context.program.stateMap(key).values()];
   return retval.filter((value) => {
     if (!value.scopes) return true;
@@ -160,7 +167,7 @@ function findClientService(
  * @param type Type to check
  * @returns Client or undefined
  */
-export function getClient(context: SdkContext, type: Namespace | Interface): SdkClient | undefined {
+export function getClient<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, type: Namespace | Interface): SdkClient | undefined {
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, clientKey, type);
   }
@@ -178,7 +185,7 @@ export function getClient(context: SdkContext, type: Namespace | Interface): Sdk
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: SdkContext): boolean {
+function hasExplicitClientOrOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>): boolean {
   return (
     listScopedDecoratorData(context, clientKey).length > 0 ||
     listScopedDecoratorData(context, operationGroupKey).length > 0
@@ -191,7 +198,7 @@ function hasExplicitClientOrOperationGroup(context: SdkContext): boolean {
  * @param context SdkContext
  * @returns Array of clients
  */
-export function listClients(context: SdkContext): SdkClient[] {
+export function listClients<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>): SdkClient[] {
   const explicitClients = [...listScopedDecoratorData(context, clientKey)].map(
     (value) => value.value
   );
@@ -251,7 +258,7 @@ export function $operationGroup(
  * @param type Type to check
  * @returns boolean
  */
-export function isOperationGroup(context: SdkContext, type: Namespace | Interface): boolean {
+export function isOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, type: Namespace | Interface): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
   }
@@ -270,17 +277,16 @@ export function isOperationGroup(context: SdkContext, type: Namespace | Interfac
  * @param type Type to check
  * @returns boolean
  */
-export function isInOperationGroup(
-  context: SdkContext,
-  type: Namespace | Interface | Operation
-): boolean {
+export function isInOperationGroup<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: SdkContext<TServiceOperation>, type: Namespace | Interface | Operation): boolean {
   switch (type.kind) {
     case "Operation":
       return type.interface
         ? isInOperationGroup(context, type.interface)
         : type.namespace
-          ? isInOperationGroup(context, type.namespace)
-          : false;
+        ? isInOperationGroup(context, type.namespace)
+        : false;
     case "Interface":
     case "Namespace":
       return (
@@ -290,7 +296,7 @@ export function isInOperationGroup(
   }
 }
 
-function buildOperationGroupPath(context: SdkContext, type: Namespace | Interface): string {
+function buildOperationGroupPath<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, type: Namespace | Interface): string {
   const path = [];
   while (true) {
     const client = getClient(context, type);
@@ -315,8 +321,8 @@ function buildOperationGroupPath(context: SdkContext, type: Namespace | Interfac
  * @param type Type to check
  * @returns Operation group or undefined.
  */
-export function getOperationGroup(
-  context: SdkContext,
+export function getOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Namespace | Interface
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
@@ -378,8 +384,8 @@ export function getOperationGroup(
  * @param ignoreHierarchy Whether to get all nested operation groups
  * @returns
  */
-export function listOperationGroups(
-  context: SdkContext,
+export function listOperationGroups<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   group: SdkClient | SdkOperationGroup,
   ignoreHierarchy = false
 ): SdkOperationGroup[] {
@@ -418,8 +424,8 @@ export function listOperationGroups(
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
-export function listOperationsInOperationGroup(
-  context: SdkContext,
+export function listOperationsInOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   group: SdkOperationGroup | SdkClient,
   ignoreHierarchy = false
 ): Operation[] {
@@ -459,24 +465,27 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
-export function createSdkContext<TOptions extends Record<string, any> = SdkEmitterOptions>(
-  context: EmitContext<TOptions>,
-  emitterName?: string
-): SdkContext<TOptions> {
+export function createSdkContext<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+>(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TServiceOperation, TOptions> {
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  return {
+  const sdkContext: SdkContext<TServiceOperation, TOptions> = {
     program: context.program,
     emitContext: context,
+    sdkPackage: undefined!,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
   };
+  sdkContext.sdkPackage = getSdkPackage(sdkContext);
+  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
@@ -501,12 +510,16 @@ export function $convenientAPI(
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 }
 
-export function shouldGenerateProtocol(context: SdkContext, entity: Operation): boolean {
+export function shouldGenerateProtocol<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: SdkContext<TServiceOperation>, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
   return value ?? context.generateProtocolMethods;
 }
 
-export function shouldGenerateConvenient(context: SdkContext, entity: Operation): boolean {
+export function shouldGenerateConvenient<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: SdkContext<TServiceOperation>, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, convenientAPIKey, entity);
   return value ?? context.generateConvenienceMethods;
 }
@@ -532,14 +545,20 @@ export function $include(context: DecoratorContext, entity: Model, scope?: strin
 /**
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function isExclude(context: SdkContext, entity: Model): boolean {
+export function isExclude<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  entity: Model
+): boolean {
   return getScopedDecoratorData(context, excludeKey, entity) ?? false;
 }
 
 /**
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function isInclude(context: SdkContext, entity: Model): boolean {
+export function isInclude<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  entity: Model
+): boolean {
   return getScopedDecoratorData(context, includeKey, entity) ?? false;
 }
 
@@ -610,8 +629,8 @@ export function $clientFormat(
  * @returns the format in which to serialize the typespec type or undefined
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function getClientFormat(
-  context: SdkContext,
+export function getClientFormat<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   entity: ModelProperty
 ): ClientFormat | undefined {
   let retval: ClientFormat | undefined = getScopedDecoratorData(context, clientFormatKey, entity);
@@ -651,7 +670,10 @@ export function $internal(context: DecoratorContext, target: Operation, scope?: 
  * @returns whether the entity is internal
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function isInternal(context: SdkContext, entity: Model | Operation | Enum | Union): boolean {
+export function isInternal<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  entity: Model | Operation | Enum | Union
+): boolean {
   const found = getScopedDecoratorData(context, internalKey, entity) ?? false;
   if (entity.kind === "Operation" || found) {
     return found;
@@ -713,14 +735,17 @@ export function $usage(
   });
 }
 
-export function getUsageOverride(
-  context: SdkContext,
+export function getUsageOverride<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   entity: Model | Enum
 ): UsageFlags | undefined {
   return getScopedDecoratorData(context, usageKey, entity);
 }
 
-export function getUsage(context: SdkContext, entity: Model | Enum): UsageFlags {
+export function getUsage<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  entity: Model | Enum
+): UsageFlags {
   if (!context.modelsMap) {
     getAllModels(context); // this will populate modelsMap
   }
@@ -747,15 +772,15 @@ export function $access(
   setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
 }
 
-export function getAccessOverride(
-  context: SdkContext,
+export function getAccessOverride<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   entity: Model | Enum | Operation
 ): AccessFlags | undefined {
   return getScopedDecoratorData(context, accessKey, entity);
 }
 
-export function getAccess(
-  context: SdkContext,
+export function getAccess<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   entity: Model | Enum | Operation
 ): AccessFlags | undefined {
   const override = getScopedDecoratorData(context, accessKey, entity);

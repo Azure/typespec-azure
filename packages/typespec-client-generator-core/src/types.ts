@@ -27,15 +27,23 @@ import {
   isNullType,
 } from "@typespec/compiler";
 import {
+  ServiceAuthentication,
   Visibility,
+  getAuthentication,
+  getContentTypes,
+  getHeaderFieldName,
+  getHeaderFieldOptions,
   getHttpOperation,
+  getPathParamName,
+  getQueryParamName,
+  getQueryParamOptions,
   getServers,
+  isBody,
   isHeader,
   isPathParam,
   isQueryParam,
   isStatusCode,
 } from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   getAccessOverride,
   getUsageOverride,
@@ -48,36 +56,51 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
+  CollectionFormat,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
   SdkBuiltInType,
+  SdkClient,
   SdkConstantType,
   SdkContext,
+  SdkCredentialParameter,
+  SdkCredentialType,
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
-  SdkModelPropertyTypeBase,
+  SdkHttpOperation,
+  SdkModelPropertyType,
   SdkModelType,
+  SdkServiceOperation,
   SdkTupleType,
   SdkType,
+  SdkUnionType,
 } from "./interfaces.js";
+import {
+  getAvailableApiVersions,
+  getDocHelper,
+  getSdkTypeBaseHelper,
+  intOrFloat,
+  isAzureCoreModel,
+  updateWithApiVersionInformation,
+} from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
-  getDocHelper,
   getEffectivePayloadType,
   getGeneratedName,
   getLibraryName,
   getPropertyNames,
-  getSdkTypeBaseHelper,
-  intOrFloat,
-  isAzureCoreModel,
 } from "./public-utils.js";
 
-function getEncodeHelper(context: SdkContext, type: Type, kind: string): string {
+function getEncodeHelper<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Type,
+  kind: string
+): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
     return getEncode(context.program, type)?.encoding || kind;
   }
@@ -92,8 +115,8 @@ function getEncodeHelper(context: SdkContext, type: Type, kind: string): string 
  * @param type the original typespec type. Used to grab the format decorator off of
  * @param propertyType the type of the property, i.e. the internal type that we add the format info onto
  */
-function addFormatInfo(
-  context: SdkContext,
+function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
@@ -133,8 +156,8 @@ function addFormatInfo(
  * @param type the original typespec type. Used to grab the encoding decorator off of
  * @param propertyType the type of the property, i.e. the internal type that we add the encoding info onto
  */
-function addEncodeInfo(
-  context: SdkContext,
+function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
@@ -208,8 +231,8 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
  * @param type the typespec type
  * @returns the corresponding sdk type
  */
-export function getSdkBuiltInType(
-  context: SdkContext,
+export function getSdkBuiltInType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
 ): SdkBuiltInType {
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
@@ -239,7 +262,10 @@ export function getSdkBuiltInType(
   throw Error(`Unknown kind ${type.kind}`);
 }
 
-export function getSdkDatetimeType(context: SdkContext, type: Scalar): SdkDatetimeType {
+export function getSdkDatetimeType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Scalar
+): SdkDatetimeType {
   // we don't get encode info until we get to the property / parameter level
   // so we insert the default. Later in properties, we will check
   // for encoding info and override accordingly
@@ -250,7 +276,10 @@ export function getSdkDatetimeType(context: SdkContext, type: Scalar): SdkDateti
   };
 }
 
-export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurationType {
+export function getSdkDurationType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Scalar
+): SdkDurationType {
   // we don't get encode info until we get to the property / parameter level
   // so we insert the default. Later in properties, we will check
   // for encoding info and override accordingly
@@ -261,8 +290,8 @@ export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurati
   };
 }
 
-export function getSdkArrayOrDict(
-  context: SdkContext,
+export function getSdkArrayOrDict<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Model,
   operation?: Operation
 ): (SdkDictionaryType | SdkArrayType) | undefined {
@@ -291,7 +320,11 @@ export function getSdkArrayOrDict(
   return undefined;
 }
 
-export function getSdkTuple(context: SdkContext, type: Tuple, operation?: Operation): SdkTupleType {
+export function getSdkTuple<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Tuple,
+  operation?: Operation
+): SdkTupleType {
   return {
     ...getSdkTypeBaseHelper(context, type, "tuple"),
     values: type.values.map((x) => getClientType(context, x, operation)),
@@ -316,16 +349,16 @@ export function getSdkTuple(context: SdkContext, type: Tuple, operation?: Operat
 //   return enumVal;
 // }
 
-function getNonNullOptions(context: SdkContext, type: Union): Type[] {
+function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-export function getSdkUnion(
-  context: SdkContext,
+export function getSdkUnion<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Union,
   operation?: Operation
 ): SdkType | undefined {
-  const nonNullOptions = getNonNullOptions(context, type);
+  const nonNullOptions = getNonNullOptions(type);
   if (nonNullOptions.length === 0) {
     reportDiagnostic(context.program, { code: "union-null", target: type });
     return;
@@ -382,8 +415,8 @@ export function getSdkUnion(
   };
 }
 
-export function getSdkConstant(
-  context: SdkContext,
+export function getSdkConstant<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: StringLiteral | NumericLiteral | BooleanLiteral
 ): SdkConstantType {
   switch (type.kind) {
@@ -399,8 +432,8 @@ export function getSdkConstant(
   }
 }
 
-function addDiscriminatorToModelType(
-  context: SdkContext,
+function addDiscriminatorToModelType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Model,
   model: SdkModelType,
   operation?: Operation
@@ -474,12 +507,18 @@ function addDiscriminatorToModelType(
       serializedName: discriminator.propertyName,
       type: discriminatorType!,
       nameInClient: discriminator.propertyName,
-      apiVersions: getAvailableApiVersions(context, model.__raw!),
+      onClient: false,
+      apiVersions: getAvailableApiVersions(context, type),
+      isApiVersionParam: false,
     });
   }
 }
 
-export function getSdkModel(context: SdkContext, type: Model, operation?: Operation): SdkModelType {
+export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Model,
+  operation?: Operation
+): SdkModelType {
   type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
   if (sdkType) {
@@ -497,9 +536,10 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      isAnonymous: false,
     };
-
     updateModelsMap(context, type, sdkType, operation);
+
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
       sdkType.additionalProperties = true;
@@ -525,8 +565,8 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
   return sdkType;
 }
 
-function getSdkEnumValueType(
-  context: SdkContext,
+function getSdkEnumValueType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: EnumMember | StringLiteral | NumericLiteral
 ): SdkBuiltInType {
   let kind: "string" | "int32" | "float32" = "string";
@@ -539,8 +579,8 @@ function getSdkEnumValueType(
   };
 }
 
-export function getSdkEnumValue(
-  context: SdkContext,
+export function getSdkEnumValue<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   enumType: SdkEnumType,
   type: EnumMember
 ): SdkEnumValueType {
@@ -556,7 +596,11 @@ export function getSdkEnumValue(
   };
 }
 
-export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operation): SdkEnumType {
+export function getSdkEnum<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Enum,
+  operation?: Operation
+): SdkEnumType {
   let sdkType = context.modelsMap?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
     const docWrapper = getDocHelper(context, type);
@@ -581,8 +625,8 @@ export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operatio
   return sdkType;
 }
 
-function getKnownValuesEnum(
-  context: SdkContext,
+function getKnownValuesEnum<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Scalar | ModelProperty,
   operation?: Operation
 ): SdkEnumType | undefined {
@@ -619,7 +663,11 @@ function getKnownValuesEnum(
   }
 }
 
-export function getClientType(context: SdkContext, type: Type, operation?: Operation): SdkType {
+export function getClientType<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Type,
+  operation?: Operation
+): SdkType {
   switch (type.kind) {
     case "String":
     case "Number":
@@ -637,7 +685,7 @@ export function getClientType(context: SdkContext, type: Type, operation?: Opera
       return getSdkBuiltInType(context, type);
     case "Scalar":
       if (!context.program.checker.isStdType(type) && type.kind === "Scalar" && type.baseScalar) {
-        const baseType = getClientType(context, type.baseScalar, operation);
+        const baseType = getClientType<TServiceOperation>(context, type.baseScalar, operation);
         addEncodeInfo(context, type, baseType);
         addFormatInfo(context, type, baseType);
         return getKnownValuesEnum(context, type, operation) ?? baseType;
@@ -662,7 +710,7 @@ export function getClientType(context: SdkContext, type: Type, operation?: Opera
       }
       return union;
     case "ModelProperty":
-      const innerType = getClientType(context, type.type, operation);
+      const innerType = getClientType<TServiceOperation>(context, type.type, operation);
       addEncodeInfo(context, type, innerType);
       addFormatInfo(context, type, innerType);
       return getKnownValuesEnum(context, type, operation) ?? innerType;
@@ -690,7 +738,10 @@ export function isReadOnly(property: SdkBodyModelPropertyType) {
   return false;
 }
 
-function getSdkVisibility(context: SdkContext, type: ModelProperty): Visibility[] | undefined {
+function getSdkVisibility<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: ModelProperty
+): Visibility[] | undefined {
   const visibility = getVisibility(context.program, type);
   if (visibility) {
     const result = [];
@@ -714,72 +765,164 @@ function getSdkVisibility(context: SdkContext, type: ModelProperty): Visibility[
   return undefined;
 }
 
-function getAvailableApiVersions(context: SdkContext, type: Type): string[] {
-  const allVersions = getVersions(context.program, type)[1]?.getVersions() ?? [];
-  const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
-  const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
-  let added: boolean = addedOnVersions.length ? false : true;
-  let addedCounter = 0;
-  let removeCounter = 0;
-  const retval: string[] = [];
-  for (const version of allVersions) {
-    if (addedCounter < addedOnVersions.length && version.value === addedOnVersions[addedCounter]) {
-      added = true;
-      addedCounter++;
-    }
-    if (
-      removeCounter < removedOnVersions.length &&
-      version.value === removedOnVersions[removeCounter]
-    ) {
-      added = false;
-      removeCounter++;
-    }
-    if (added) retval.push(version.value);
+function getCollectionFormat<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: ModelProperty
+): CollectionFormat | undefined {
+  const program = context.program;
+  const tspCollectionFormat = (
+    isQueryParam(program, type)
+      ? getQueryParamOptions(program, type)
+      : isHeader(program, type)
+        ? getHeaderFieldOptions(program, type)
+        : undefined
+  )?.format;
+  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
+    return undefined;
   }
-  return retval;
+  return tspCollectionFormat;
 }
 
-function getSdkModelPropertyType(
-  context: SdkContext,
+function getSdkCredentialType(
+  client: SdkClient,
+  authentication: ServiceAuthentication
+): SdkCredentialType | SdkUnionType {
+  const credentialTypes: SdkCredentialType[] = [];
+  for (const option of authentication.options) {
+    for (const scheme of option.schemes) {
+      credentialTypes.push({
+        __raw: client.service,
+        kind: "credential",
+        scheme: scheme,
+        nullable: false,
+      });
+    }
+  }
+  if (credentialTypes.length > 1) {
+    return {
+      __raw: client.service,
+      kind: "union",
+      values: credentialTypes,
+      nullable: false,
+    };
+  }
+  return credentialTypes[0];
+}
+
+export function getSdkCredentialParameter<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  client: SdkClient
+): SdkCredentialParameter | undefined {
+  const auth = getAuthentication(context.program, client.service);
+  if (!auth) return undefined;
+  return {
+    type: getSdkCredentialType(client, auth),
+    kind: "credential",
+    nameInClient: "credential",
+    description: "Credential used to authenticate requests to the service.",
+    apiVersions: getAvailableApiVersions<TServiceOperation>(context, client.service),
+    onClient: true,
+    optional: false,
+    isApiVersionParam: false,
+  };
+}
+
+interface GetSdkModelPropertyTypeOptions {
+  isEndpointParam?: boolean;
+  operation?: Operation;
+  isMethodParameter?: boolean;
+}
+
+export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: ModelProperty,
-  operation?: Operation
-): SdkModelPropertyTypeBase {
-  let propertyType = getClientType(context, type.type, operation);
+  options: GetSdkModelPropertyTypeOptions = {}
+): SdkModelPropertyType {
+  let propertyType = getClientType<TServiceOperation>(context, type.type, options.operation);
   addEncodeInfo(context, type, propertyType);
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
-    propertyType = getSdkEnum(context, knownValues, operation);
+    propertyType = getSdkEnum(context, knownValues, options.operation);
   }
   const docWrapper = getDocHelper(context, type);
-  return {
+  const base = {
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
     apiVersions: getAvailableApiVersions(context, type),
     type: propertyType,
     nameInClient: getPropertyNames(context, type)[0],
+    onClient: false,
     optional: type.optional,
   };
-}
-
-function getSdkBodyModelPropertyType(
-  context: SdkContext,
-  type: ModelProperty,
-  operation?: Operation
-): SdkBodyModelPropertyType {
-  return {
-    ...getSdkModelPropertyType(context, type, operation),
-    kind: "property",
+  const program = context.program;
+  const headerQueryOptions = {
+    ...base,
     optional: type.optional,
-    visibility: getSdkVisibility(context, type),
-    discriminator: false,
-    serializedName: getPropertyNames(context, type)[1],
+    collectionFormat: getCollectionFormat(context, type),
   };
+  if (options.isMethodParameter) {
+    return {
+      ...base,
+      kind: "method",
+      ...updateWithApiVersionInformation(context, type),
+      optional: type.optional,
+    };
+  } else if (isPathParam(program, type) || options.isEndpointParam) {
+    return {
+      ...base,
+      kind: "path",
+      urlEncode: true,
+      serializedName: getPathParamName(program, type),
+      ...updateWithApiVersionInformation(context, type),
+      optional: false,
+    };
+  } else if (isHeader(program, type)) {
+    return {
+      ...headerQueryOptions,
+      kind: "header",
+      serializedName: getHeaderFieldName(program, type),
+      ...updateWithApiVersionInformation(context, type),
+    };
+  } else if (isQueryParam(program, type)) {
+    return {
+      ...headerQueryOptions,
+      kind: "query",
+      serializedName: getQueryParamName(program, type),
+      ...updateWithApiVersionInformation(context, type),
+    };
+  } else if (isBody(program, type)) {
+    let contentTypes = ignoreDiagnostics(getContentTypes(type));
+    if (contentTypes.length === 0) {
+      contentTypes = ["application/json"];
+    }
+    return {
+      ...base,
+      kind: "body",
+      contentTypes,
+      defaultContentType: contentTypes.includes("application/json")
+        ? "application/json"
+        : contentTypes[0],
+      ...updateWithApiVersionInformation(context, type),
+      optional: false,
+    };
+  } else {
+    // I'm a body model property
+    return {
+      ...base,
+      kind: "property",
+      optional: type.optional,
+      visibility: getSdkVisibility(context, type),
+      discriminator: false,
+      serializedName: getPropertyNames(context, type)[1],
+      ...updateWithApiVersionInformation(context, type),
+    };
+  }
 }
 
-function addPropertiesToModelType(
-  context: SdkContext,
+function addPropertiesToModelType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Model,
   sdkType: SdkType,
   operation?: Operation
@@ -788,14 +931,11 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverType(property.type) ||
-      isHeader(context.program, property) ||
-      isQueryParam(context.program, property) ||
-      isPathParam(context.program, property) ||
       sdkType.kind !== "model"
     ) {
       continue;
     }
-    const clientProperty = getSdkBodyModelPropertyType(context, property, operation);
+    const clientProperty = getSdkModelPropertyType(context, property, { operation: operation });
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
@@ -804,7 +944,12 @@ function addPropertiesToModelType(
   }
 }
 
-function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, operation?: Operation) {
+function updateModelsMap<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Type,
+  sdkType: SdkType,
+  operation?: Operation
+) {
   if (sdkType.kind !== "model" && sdkType.kind !== "enum") {
     return;
   }
@@ -861,8 +1006,8 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
   }
 }
 
-function checkAndGetClientType(
-  context: SdkContext,
+function checkAndGetClientType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   type: Type,
   operation?: Operation
 ): SdkType | undefined {
@@ -874,22 +1019,23 @@ function checkAndGetClientType(
   return getClientType(context, type, operation); // this will update the models map / simple types map
 }
 
-function updateUsageOfModel(
-  context: SdkContext,
-  type: SdkType,
+function updateUsageOfModel<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
   usage: UsageFlags,
+  type?: SdkType,
   seenModelNames?: Set<SdkType>
 ): void {
+  if (!type || !["model", "enum", "array", "dict", "union"].includes(type.kind)) return undefined;
   if (seenModelNames === undefined) {
     seenModelNames = new Set<SdkType>();
   }
   if (type.kind === "model" && seenModelNames.has(type)) return; // avoid circular references
   if (type.kind === "array" || type.kind === "dict") {
-    return updateUsageOfModel(context, type.valueType, usage, seenModelNames);
+    return updateUsageOfModel(context, usage, type.valueType, seenModelNames);
   }
   if (type.kind === "union") {
     for (const unionType of type.values) {
-      updateUsageOfModel(context, unionType, usage, seenModelNames);
+      updateUsageOfModel(context, usage, unionType, seenModelNames);
     }
     return;
   }
@@ -909,45 +1055,57 @@ function updateUsageOfModel(
     type.baseModel.usage |= usage;
   }
   if (type.baseModel) {
-    updateUsageOfModel(context, type.baseModel, usage, seenModelNames);
+    updateUsageOfModel(context, usage, type.baseModel, seenModelNames);
   }
   if (type.discriminatedSubtypes) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
-      updateUsageOfModel(context, discriminatedSubtype, usage, seenModelNames);
+      updateUsageOfModel(context, usage, discriminatedSubtype, seenModelNames);
     }
   }
   for (const property of type.properties) {
-    updateUsageOfModel(context, property.type, usage, seenModelNames);
+    updateUsageOfModel(context, usage, property.type, seenModelNames);
   }
 }
 
-function updateTypesFromOperation(context: SdkContext, operation: Operation): void {
+function updateTypesFromOperation<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  operation: Operation
+): void {
   const program = context.program;
   const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
-  for (const param of httpOperation.parameters.parameters) {
-    checkAndGetClientType(context, param.param.type, operation);
-  }
   const generateConvenient = shouldGenerateConvenient(context, operation);
+  for (const param of operation.parameters.properties.values()) {
+    const paramType = checkAndGetClientType(context, param.type, operation)
+    if (generateConvenient) {
+      updateUsageOfModel(
+        context,
+        UsageFlags.Input,
+        paramType
+      );
+    }
+  }
+  for (const param of httpOperation.parameters.parameters) {
+    const paramType = checkAndGetClientType(context, param.param.type, operation)
+    if (generateConvenient) {
+      updateUsageOfModel(
+        context,
+        UsageFlags.Input,
+        paramType
+      );
+    }
+  }
   if (httpOperation.parameters.body) {
     const body = checkAndGetClientType(context, httpOperation.parameters.body.type, operation);
-    if (
-      body &&
-      ["model", "enum", "array", "dict", "union"].includes(body.kind) &&
-      generateConvenient
-    ) {
-      updateUsageOfModel(context, body, UsageFlags.Input);
+    if (generateConvenient) {
+      updateUsageOfModel(context, UsageFlags.Input, body);
     }
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type) {
         const responseBody = checkAndGetClientType(context, innerResponse.body.type, operation);
-        if (
-          responseBody &&
-          ["model", "enum", "array", "dict", "union"].includes(responseBody.kind) &&
-          generateConvenient
-        ) {
-          updateUsageOfModel(context, responseBody, UsageFlags.Output);
+        if (generateConvenient) {
+          updateUsageOfModel(context, UsageFlags.Output, responseBody);
         }
       }
     }
@@ -955,17 +1113,15 @@ function updateTypesFromOperation(context: SdkContext, operation: Operation): vo
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData) {
     const logicalResult = checkAndGetClientType(context, lroMetaData.logicalResult, operation);
-    if (
-      logicalResult &&
-      ["model", "enum", "array", "dict", "union"].includes(logicalResult.kind) &&
-      generateConvenient
-    ) {
-      updateUsageOfModel(context, logicalResult, UsageFlags.Output);
+    if (generateConvenient) {
+      updateUsageOfModel(context, UsageFlags.Output, logicalResult);
     }
   }
 }
 
-function updateAccessOfModel(context: SdkContext): void {
+function updateAccessOfModel<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>
+): void {
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
     const internal = isInternal(context, type as any); // eslint-disable-line deprecation/deprecation
     if (internal) {
@@ -1006,24 +1162,25 @@ interface GetAllModelsOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(context: SdkContext, type: Model | Enum) {
+function handleServiceOrphanType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Model | Enum
+) {
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
     const sdkModel = checkAndGetClientType(context, type);
-    if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-      updateUsageOfModel(context, sdkModel, UsageFlags.Input | UsageFlags.Output);
-    }
+    updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkModel);
   }
   if (getAccessOverride(context, type) !== undefined) {
     const sdkModel = checkAndGetClientType(context, type);
     if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-      updateUsageOfModel(context, sdkModel, UsageFlags.None);
+      updateUsageOfModel(context, UsageFlags.None, sdkModel);
     }
   }
 }
 
-export function getAllModels(
-  context: SdkContext,
+export function getAllModels<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
   options: GetAllModelsOptions = {}
 ): (SdkModelType | SdkEnumType)[] {
   const defaultOptions = {
@@ -1061,9 +1218,7 @@ export function getAllModels(
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
         const sdkModel = checkAndGetClientType(context, param);
-        if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-          updateUsageOfModel(context, sdkModel, UsageFlags.Input);
-        }
+        updateUsageOfModel(context, UsageFlags.Input, sdkModel);
       }
     }
   }

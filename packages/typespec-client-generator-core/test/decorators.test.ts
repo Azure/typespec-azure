@@ -1475,6 +1475,7 @@ describe("typespec-client-generator-core: decorators", () => {
   describe("@access", () => {
     it("mark an operation as internal", async () => {
       const { test } = (await runner.compile(`
+        @service({title: "Test Service"}) namespace TestService;
         @test
         @access(Access.internal)
         op test(): void;

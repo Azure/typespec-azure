@@ -1,5 +1,4 @@
 import "@typespec/http";
-
 using TypeSpec.Reflection;
 using TypeSpec.Http;
 
@@ -163,6 +162,7 @@ model SdkEnumType extends SdkType {
   access: AccessFlags;
   usage: UsageFlags;
   summary: string;
+  nameSpace: string;
 }
 
 /**
@@ -237,6 +237,7 @@ model SdkModelType extends SdkType {
   dicriminatorValue?: string;
   discriminatedSubtypes?: Record<SdkModelType>;
   baseModel?: SdkModelType;
+  nameSpace: string;
 }
 
 /**
@@ -249,6 +250,7 @@ model SdkModelType extends SdkType {
  * @property description: Description for the property
  * @property details: Optional details of the property
  * @property apiVersions: Api versions the property is available for
+ * @property onClient: Whether the property is on the client
  * @property optional: Whether its an optional property
  */
 @doc("Base class for our property types")
@@ -260,7 +262,82 @@ model SdkModelPropertyType {
   description?: string;
   details?: string;
   apiVersions: string[];
+  onClient: boolean;
   optional: boolean;
+}
+
+/**
+ * If one to one between method parameter and sdk service parameter:
+ * MethodParameter: {
+ *   name: "pathParam",
+ *   type: "string",
+ *   kind: "method"
+ * }
+ * SdkServiceParameter: {
+ *   name: "pathParam",
+ *   type: "string",
+ *   kind: "path"
+ * }
+ * mapping: {
+ *   "": SdkServiceParameter
+ * }
+ *
+ * If one to many between method parameter and sdk service parameter
+ * MethodParameter: {
+ *   name: "input",
+ *   type: {
+ *     kind: "model",
+ *     properties: [
+ *       {
+ *         nameInClient: "path_param",
+ *         serializedName: "pathParam"
+ *         type: "string",
+ *         kind: "path"
+ *       },
+ *       {
+ *         nameInClient: "query_param",
+ *         name: "queryParam",
+ *         type: "string",
+ *         kind: "query"
+ *       }
+ *     ]
+ *   },
+ *   kind: "method"
+ * }
+ * PathServiceParameter: {
+ *   nameInClient: "pathParam",
+ *   serializedName: "pathParam",
+ *   type: "string",
+ *   kind: "path",
+ *   mapping : {
+ *     logicalPath: "path_param",
+ *     type: "string",
+ *   }
+ * }
+ * QueryServiceParameter: {
+ *   nameInClient: "queryParam",
+ *   serializedName: "queryParam",
+ *   type: "string",
+ *   kind: "query",
+ *   mapping: {
+ *     logicalPath: "query_param",
+ *     type: "string"
+ *   }
+ * }
+ */
+/**
+ * Represents a mapping from the method to the service or from the service to the method
+ */
+model SdkMethodServiceMapping {
+  logicalPath: string;
+  property: SdkModelPropertyType;
+}
+
+/**
+ * Represents a method parameter
+ */
+model SdkMethodParameter extends SdkModelPropertyType {
+  kind: "method";
 }
 
 /**
@@ -283,10 +360,11 @@ model SdkBodyModelPropertyType extends SdkModelPropertyType {
  * @property serializedName: The name of the property we send over the wire to the services
  * @property collectionFormat: The format for a collection of headers
  */
-model SdkHeaderParameter extends SdkModelPropertyType {
+model SdkHeaderServiceParameter extends SdkModelPropertyType {
   kind: "header";
   serializedName: string;
   collectionFormat?: "multi" | "csv" | "ssv" | "tsv" | "pipes";
+  mapping: SdkMethodServiceMapping;
 }
 
 /**
@@ -295,10 +373,11 @@ model SdkHeaderParameter extends SdkModelPropertyType {
  * @property serializedName: The name of the property we send over the wire to the services
  * @property collectionFormat: The format for a collection of queries
  */
-model SdkQueryParameter extends SdkModelPropertyType {
+model SdkQueryServiceParameter extends SdkModelPropertyType {
   kind: "query";
   serializedName: string;
   collectionFormat?: "multi" | "csv" | "ssv" | "tsv" | "pipes";
+  mapping: SdkMethodServiceMapping;
 }
 
 /**
@@ -307,27 +386,74 @@ model SdkQueryParameter extends SdkModelPropertyType {
  * @property serializedName: The name of the property we send over the wire to the services
  * @property urlEncode: Whether to url encode the path parameter
  * @property validation: Any validation for the path parameter. Right now only including validation on path paramters because we only know about path params needing validation.
+ * @property location: Whether the parameter is a client-level or operation-level parameter
  */
-model SdkPathParameter extends SdkModelPropertyType {
+model SdkPathServiceParameter extends SdkModelPropertyType {
   kind: "path";
   serializedName: string;
   urlEncode: boolean;
-  validation: SdkValidation;
+  validation?: SdkValidation;
+  mapping: SdkMethodServiceMapping;
   optional: false;
 }
 
 /**
- * Represents a body parameter.
+ * Represents an Oauth2Auth flow. Copied from typespec/http because it doesn't export
+ *
+ * @property id: id of the authentication scheme
+ * @property description: Optional description
+ * @property flows: Flows for the authentication
+ */
+model Oauth2Auth<TFlows extends OAuth2Flow[]> {
+  type: "oauth2";
+  id: string;
+  description?: string;
+  flows: TFlows;
+}
+
+/**
+ * Credential type for a client
+ *
+ * @property scheme: Potential schemes for the credential
+ */
+model SdkCredentialType extends SdkType {
+  kind: "credential";
+  scheme: BasicAuth | BearerAuth | ApiKeyAuth<ApiKeyLocation, string> | Oauth2Auth<OAuth2Flow[]>;
+}
+
+/**
+ * Represents a credential parameter
+ *
+ * @property type: The type of the credential. Can be either a single SdkCredentialType or a union of SdkCredentialTypes
+ */
+model SdkCredentialParameter extends SdkModelPropertyType {
+  kind: "credential";
+  type: SdkCredentialType | SdkUnionType;
+  urlEncode: boolean;
+}
+
+/**
+ * Represents the client endpoint parameter
+ */
+model SdkEndpointParameter extends SdkModelPropertyType {
+  kind: "endpoint";
+  type: SdkType; // should be string
+  urlEncode: boolean;
+  serializedName?: string;
+}
+
+/**
+ * Represents a body parameter to the service.
  *
  * @property contentTypes: The content types the body parameter is valid for
  * @property defaultContentType: What content type to send by default if none are specified
- * @property optional: Whether its an optional parameter
+ * @property mapping: Mapping from the body parameter to the method parameter
  */
-model SdkBodyParameter extends SdkModelPropertyType {
+model SdkBodyServiceParameter extends SdkModelPropertyType {
   kind: "body";
   contentTypes: string[];
   defaultContentType: string;
-  optional: boolean;
+  mapping: SdkMethodServiceMapping;
 }
 
 /**
@@ -360,51 +486,104 @@ model SdkResponseHeader {
  * Representing a possible response of an operation
  *
  * @property __raw: The original TSP response
- * @property statusCodes: Status codes that map to this response
  * @property type: The type of the response
- * @property description: Description for the response
- * @property details: Optional details of the response
+ */
+@discriminator("kind")
+model SdkResponse {
+  __raw: unknown;
+  type: SdkType;
+}
+
+/**
+ * Represents a response from a service operation
+ *
  * @property headers: Headers returned as part of the response
  */
-model SdkResponse {
-  __raw?: unknown;
-  statusCodes: (string | int32)[];
-  type: SdkType;
-  description?: string;
-  details?: string;
+model SdkServiceOperationResponse extends SdkResponse {
+  kind: "operation";
   headers: SdkResponseHeader[];
 }
 
 /**
- * Base class for representation of an operation.
+ * Response from a method that calls a service operation
  *
- * @property __raw: The original TSP operation
- * @property path: Path of the operation
- * @property access: The access level of the operation
- * @property verb: Http verb of the operation
- * @property parameters: Parameters object for an operation
- * @property responses: Non-error responses of the operation
- * @property exceptions: Exceptions of the operation
+ * @property mapping: Mapping from the responses of the service operation to the response the method returns
+ */
+model SdkServiceMethodResponse extends SdkResponse {
+  kind: "method";
+  mapping: SdkMethodServiceMapping;
+}
+
+/**
+ * Service parameter
+ */
+alias SdkServiceParameter = SdkQueryServiceParameter | SdkHeaderServiceParameter | SdkPathServiceParameter;
+
+/**
+ * Base class for representation of a client method.
+ *
+ * @property name: The name of the method
+ * @property access: The access level of the method
+ * @property parameters: Parameters object for the method
  * @property description: Description of the operation
  * @property details: Optional details of the operation
- * @property summary: Summary of the operation
- * @property overloads: List of overloads of this operation if there are any
- * @property overloading: The operation this operation is overloading, if it is
+ * @property overloads: Any overloads of this method
+ * @property overloading: The method that this method overloads
  */
 @discriminator("kind")
-model SdkOperation {
-  __raw?: unknown;
-  path: string;
+model SdkMethod {
+  name: string; // return myFunc for Python and Java, but include projectedNames
   access: AccessFlags;
-  verb: string;
-  parameters: SdkOperationParameters;
-  responses: SdkResponse[];
-  exceptions: SdkResponse[];
+  parameters: SdkMethodParameter[];
   description?: string;
   details?: string;
-  summary: string;
-  overloads?: SdkOperation[];
-  overloading?: SdkOperation;
+  overloads?: SdkMethod[];
+  overloading?: SdkMethod;
+}
+
+/**
+ * Returns an sdk client from a top level client
+ *
+ * @property response: which client the operation returns
+ */
+model SdkClientAccessor extends SdkMethod {
+  kind: "client";
+  response: SdkClientType;
+}
+
+/**
+ * Represents a method that includes a service call
+ *
+ * @property operation: The operation that calls the service
+ * @property response: The model the method returns
+ * @property exceptions: Exceptions of the method
+ */
+model SdkServiceMethod extends SdkMethod {
+  kind: "methodforserviceoperation";
+  operation: SdkServiceOperation;
+  response: SdkServiceMethodResponse;
+  exceptions: SdkServiceMethodResponse[];
+}
+
+/**
+ * Represents an operation to the service. Is HTTP specific.
+ *
+ * @property __raw: The original TSP HTTP operation
+ * @property path: Path of the operation
+ * @property verb: Http verb
+ * @property parameters: HTTP parameters for the service operation. These parameters will contain a mapping from the method to themselves
+ * @property responses: Non-error responses of the operation
+ * @property exceptions: Exceptions of the operation
+ */
+@discriminator("kind")
+model SdkServiceOperation {
+  __raw: unknown;
+  path: string;
+  verb: string;
+  parameters: SdkServiceParameter[];
+  bodyParameter?: SdkBodyServiceParameter;
+  responses: Record<SdkServiceOperationResponse>; // int status code -> SdkServiceOperationResponse
+  exception: SdkServiceOperationResponse;
 }
 
 /**
@@ -412,53 +591,57 @@ model SdkOperation {
  *
  * @property kind: Discriminator for the type of operation
  */
-model SdkBasicOperation extends SdkOperation {
+model SdkBasicServiceOperation extends SdkServiceOperation {
   kind: "basic";
 }
 
 /**
  * Sdk paging operation options
  *
- * @property itemsPath: Where to find the items list on a paging response
- * @property itemType: The type of each item in the items list
- * @property nextLinkPath: Where to get the next link
+ * @property __raw_paged_metadata: The original TSP paging metadata
+ * @property itemsMapping: Mapping of the items to return in the iterable
+ * @property nextLinkLogicalPath: Where to get the next link. Off if we know there won't be a second page
+ * @property nextLinkOperation: The operation to call to get the next page, if there is one
  */
-alias SdkPagingOperationOptions = {
-  itemsPath: string;
-  itemType: SdkType;
-  nextLinkPath: string;
+alias SdkPagingServiceOperationOptions = {
+  __raw_paged_metadata: unknown;
+  itemsMapping: SdkMethodServiceMapping;
+  nextLinkLogicalPath?: string;
+  nextLinkOperation?: SdkServiceOperation;
 };
 
 /**
  * Representation of a paging operation
  */
-model SdkPagingOperation extends SdkOperation {
+model SdkPagingServiceOperation extends SdkServiceOperation {
   kind: "paging";
-  ...SdkPagingOperationOptions;
+  ...SdkPagingServiceOperationOptions;
 }
 
 /**
  * Sdk LRO operation options
  *
- * @property initialOperation: Operation to make the initial call
+ * @property __raw_lro_metadata: The original TSP LRO metadata
  */
-alias SdkLroOperationOptions = {
-  initialOperation: SdkBasicOperation;
+alias SdkLroServiceOperationOptions = {
+  __raw_lro_metadata: unknown;
 };
 
 /**
  * Representation of a lro operation
  */
-model SdkLroOperation extends SdkOperation {
+model SdkLroServiceOperation extends SdkServiceOperation {
   kind: "lro";
-  ...SdkLroOperationOptions;
+  ...SdkLroServiceOperationOptions;
 }
 
-@doc("Representation of a lro + paging operation")
-model SdkLroPagingOperation extends SdkOperation {
+/**
+ * Representation of a lro paging operation
+ */
+model SdkLroPagingServiceOperation extends SdkServiceOperation {
   kind: "lropaging";
-  ...SdkPagingOperationOptions;
-  ...SdkLroOperationOptions;
+  ...SdkPagingServiceOperationOptions;
+  ...SdkLroServiceOperationOptions;
 }
 
 /**
@@ -518,6 +701,51 @@ model SdkFloat32Validation is SdkNumericValidationTemplate<"float32", float32>;
 model SdkFloat64Validation is SdkNumericValidationTemplate<"float64", float64>;
 
 /**
+ * Representiation of an SdkClient
+ *
+ * @property name: name of the client
+ * @property description: documentation of the client
+ * @property details: details of the client
+ * @property initialization: initialization options for the client. Will include endpoint and credential options. Name defaults to {SdkClient.name}Options
+ * @property methods: list of methods on the client. Can also be methods that return other clients.
+ * @property apiVersions: List of api versions the client is available for
+ * @property nameSpace: fully qualified namespace of the client
+ * @property arm: is the client an arm client
+ */
+model SdkClientType {
+  kind: "client";
+  name: string;
+  description?: string;
+  details?: string;
+  initialization?: SdkModelType;
+  methods: SdkMethod[];
+
+  // TODO: we have groups of clients (for example, network client is a grouping of resource clients).
+  // these do not have api versions. Should we do separate models for these? Or keep api versions as optional?
+  apiVersions: string[]; // look into the sorting of this, if versioning package already does order it
+
+  nameSpace: string;
+  arm: boolean;
+}
+
+/**
+ * Represents and entire SDK package
+ *
+ * @property name: Name of the package
+ * @property rootNamespace: Root namespace of the package
+ * @property clients: List of clients in the package
+ * @property models: List of models in the package
+ * @property enums: List of enums in the package
+ */
+model SdkPackage {
+  name: string;
+  rootNamespace: string; // TODO: how do we want to define this for languages in client.tsp. few samples for each language to fill in
+  clients: SdkClientType[];
+  models: SdkModelType[]; // 2 options: Have it as a function that takes in filter, or add filter as a context parameter
+  enums: SdkEnumType[];
+}
+
+/**
  * Context that is passed around for an emitter's instance in TCGC.
  *
  * @property program: The TypeSpec program, a Program type.
@@ -546,6 +774,7 @@ model SdkContext {
   jsonProjectedProgram?: unknown;
   modelsMap?: Record<Model>;
   operationModelsMap?: Record<Model>;
+  returnEntireLroResult: boolean;
 }
 
 /**

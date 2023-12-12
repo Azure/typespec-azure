@@ -1,3 +1,4 @@
+import { LroMetadata, PagedResultMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
   DurationKnownEncoding,
@@ -12,25 +13,19 @@ import {
   UsageFlags,
 } from "@typespec/compiler";
 import {
+  HttpAuth,
   HttpOperation,
-  HttpOperationParameters,
   HttpOperationResponse,
-  HttpStatusCodes,
   HttpVerb,
   Visibility,
 } from "@typespec/http";
 
-export type SdkParameterLocation =
-  | "endpointPath"
-  | "header"
-  | "query"
-  | "path"
-  | "body"
-  | "unknown";
-export type SdkParameterImplementation = "Client" | "Method";
-
-export interface SdkContext<TOptions extends object = Record<string, any>> {
+export interface SdkContext<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+  TOptions extends object = Record<string, any>,
+> {
   program: Program;
+  sdkPackage: SdkPackage<TServiceOperation>;
   emitContext: EmitContext<TOptions>;
   emitterName: string;
   generateProtocolMethods: boolean;
@@ -42,6 +37,9 @@ export interface SdkContext<TOptions extends object = Record<string, any>> {
   jsonProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  __api_version_parameter?: SdkParameter;
+  __api_versions?: string[];
+  __clients?: Map<SdkClient | SdkOperationGroup, SdkClientType<TServiceOperation>>;
   generatedNames?: Set<string>;
   arm?: boolean;
 }
@@ -60,6 +58,23 @@ export interface SdkClient {
   type: Namespace | Interface;
   arm: boolean;
   crossLanguageDefinitionId: string;
+}
+
+export interface SdkInitializationType extends SdkModelType {
+  properties: SdkParameter[];
+}
+
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+  kind: "client";
+  name: string;
+  description?: string;
+  details?: string;
+  initialization?: SdkInitializationType;
+  methods: SdkMethod<TServiceOperation>[];
+  apiVersions: string[];
+  nameSpace: string; // fully qualified
+  endpoint: string;
+  arm: boolean;
 }
 
 export interface SdkOperationGroup {
@@ -87,7 +102,8 @@ export type SdkType =
   | SdkEnumValueType
   | SdkConstantType
   | SdkUnionType
-  | SdkModelType;
+  | SdkModelType
+  | SdkCredentialType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -114,7 +130,7 @@ export type SdkBuiltInKinds =
   | "armId"
   | "ipAddress"
   | "azureLocation"
-  | "etag";
+  | "etag"; // If you add you'll need to update isSdkBuiltInKind in utils as well
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
@@ -201,7 +217,13 @@ export interface SdkModelType extends SdkTypeBase {
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   baseModel?: SdkModelType;
+  isAnonymous: boolean;
   crossLanguageDefinitionId: string;
+}
+
+export interface SdkCredentialType extends SdkTypeBase {
+  kind: "credential";
+  scheme: HttpAuth;
 }
 
 export interface SdkModelPropertyTypeBase {
@@ -211,15 +233,34 @@ export interface SdkModelPropertyTypeBase {
   description?: string;
   details?: string;
   apiVersions: string[];
+  onClient: boolean;
+  clientDefaultValue?: any;
+  isApiVersionParam: boolean;
   optional: boolean;
+}
+
+export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
+  kind: "endpoint";
+  urlEncode: boolean;
+  onClient: true;
+  serializedName?: string;
+}
+
+export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
+  kind: "credential";
+  type: SdkCredentialType | SdkUnionType; // union of credentials
+  onClient: true;
 }
 
 export type SdkModelPropertyType =
   | SdkBodyModelPropertyType
-  | SdkHeaderParameter
+  | SdkParameter
+  | SdkEndpointParameter
+  | SdkCredentialParameter
   | SdkQueryParameter
   | SdkPathParameter
-  | SdkBodyParameter;
+  | SdkBodyParameter
+  | SdkHeaderParameter;
 
 export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
@@ -228,135 +269,255 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   visibility?: Visibility[];
 }
 
-type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
 
-interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
+export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
 }
 
-interface SdkQueryParameter extends SdkModelPropertyTypeBase {
+export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
 }
 
-interface SdkPathParameter extends SdkModelPropertyTypeBase {
+export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
   urlEncode: boolean;
-  validation: SdkValidation;
   serializedName: string;
   optional: false;
 }
 
-interface SdkBodyParameter extends SdkModelPropertyTypeBase {
+export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
 }
 
-interface SdkOperationParameters {
-  __raw?: HttpOperationParameters;
-  parameters: (SdkQueryParameter | SdkHeaderParameter | SdkPathParameter)[];
-  body?: SdkBodyParameter;
+export type SdkHttpParameter =
+  | SdkQueryParameter
+  | SdkPathParameter
+  | SdkBodyParameter
+  | SdkHeaderParameter;
+
+export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
+  kind: "method";
 }
 
-interface SdkResponseHeader {
-  __raw?: ModelProperty;
+export interface SdkServiceResponseHeader {
+  __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
+  description?: string;
+  details?: string;
 }
 
-interface SdkResponse {
-  __raw?: HttpOperationResponse;
-  statusCodes: HttpStatusCodes[];
-  type: SdkType;
-  doc: string;
-  headers: SdkResponseHeader[];
+export interface SdkMethodResponse {
+  kind: "method";
+  type?: SdkType;
+  responsePath?: string; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
 }
 
-interface SdkOperationBase<TOperation> {
-  __raw?: HttpOperation;
+export interface SdkServiceResponse {
+  type?: SdkType;
+  headers: SdkServiceResponseHeader[];
+}
+
+export interface SdkHttpResponse extends SdkServiceResponse {
+  __raw: HttpOperationResponse;
+  kind: "http";
+  contentTypes?: string[];
+  defaultContentType?: string;
+}
+
+interface SdkServiceOperationBase {}
+
+export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
+
+export interface SdkHttpOperation extends SdkServiceOperationBase {
+  __raw: HttpOperation;
+  kind: "http";
   path: string;
-  access: AccessFlags;
   verb: HttpVerb;
-  parameters: SdkOperationParameters;
-  responses: SdkResponse[];
-  exceptions: SdkResponse[];
-  overloads?: TOperation[];
-  overloading?: TOperation;
+  pathParams: SdkPathParameter[];
+  queryParams: SdkQueryParameter[];
+  headerParams: SdkHeaderParameter[];
+  bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
+  responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
+  exception?: SdkHttpResponse;
 }
 
-interface SdkBasicOperation extends SdkOperationBase<SdkBasicOperation> {
+/**
+ * We eventually will include other kinds of service operations, i.e. grpc. For now, it's just Http.
+ */
+
+export type SdkServiceOperation = SdkHttpOperation;
+export type SdkServiceParameter = SdkHttpParameter;
+
+/**
+ * Flattened model body
+ * def foo(bar: string, baz: string) -> string which sends body {"bar": string, "baz": string}
+ *
+ * Method
+ * params: ["bar", "baz"]
+ * getParameterMapping(body) === [bar, baz]
+ * response: string
+ * getResponseMapping(ServiceMethodResponse<string>) ===
+ * // No response mapping if the same
+ *
+ * Service Operation
+ * bodyParams: ["body"]
+ * response: string
+ *
+ * Grouped model body
+ * def foo(options: {"path": string, "query": string})
+ *
+ * Method
+ * params: ["options"]
+ * getParameterMapping(path) === [options.path]
+ * getParameterMapping(query) === [options.query]
+ *
+ * Service Operation
+ * params: ["path", "query"]
+ *
+ * Paging
+ * def foo() -> ItemPaged[Item]
+ *
+ * Method
+ * response: ItemPaged[Item]
+ * getResponseMapping(response) === [response.nextLink]
+ * responseMapping: {"$": "result.values"}
+ *
+ * Service Operation
+ * response: {"nextValue": string, "values": Item[]}
+ *
+ * Grouping of header and body
+ * def foo() -> {"header": string, "body": string}
+ * response: {"header": string, "body": string}
+ * responseMapping: {"result.header": "header", "result.body": "body"}
+ *
+ * Service Operation
+ * response: {"body": string}
+ * responseHeaders: ["header"]
+ */
+
+interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+  __raw?: Operation;
+  name: string;
+  access: AccessFlags;
+  parameters: SdkParameter[];
+  apiVersions: string[];
+  description?: string;
+  details?: string;
+  overloads?: SdkMethod<TServiceOperation>[];
+  overloading?: SdkMethod<TServiceOperation>;
+}
+
+/**
+ * ResponseMapping
+ *
+ * Normal operation
+ *
+ * def foo() -> string
+ * ServiceResponse: {type: string, headers: [{"x-ms-client-request-id": string}]}
+ * MethodResponse: {type: string}
+ * getResponseMapping: {resultPath: "", resultType: string}
+ * return serviceResponse.body
+ *
+ * Paging operation
+ * def list_foo() -> ItemPaged[Item]
+ * ServiceResponse: {type: {"nextLink": string, "values": Item[]}]}
+ * MethodResponse: Item[]
+ * getResponseMapping: {resultPath: ".values", resultType: Item[]}
+ * return serviceResponse.body.values
+ *
+ * LRO operation
+ * def create_foo() -> Foo
+ * ServiceResponse: {type: OperationStatus<Foo>, headers: [{"location": string}]}
+ * MethodResponse:
+ * getResponseMapping: {"$": ".result"}
+ * return serviceResponse.body.result
+ *
+ * Return object of headers and body
+ * def headers_and_body() -> HeaderAndBodyModel
+ * ServiceResponse: {type: string, headers: [{"x-ms-client-request-id": string}]}
+ * MethodResponse: {type: HeaderAndBodyModel}
+ * return HeaderAndBodyModel(body=serviceResponse.body, client_request_id=serviceResponse.headers["x-ms-client-request-id"])
+ * getResponseMapping: {"$.body": ".body", "$.client_request_id": ".headers["x-ms-client-request-id"]}
+ */
+
+interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase<TServiceOperation> {
+  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
+  operation: TServiceOperation;
+  parameters: SdkMethodParameter[];
+  response: SdkMethodResponse;
+  exceptions: SdkMethodResponse[];
+}
+
+export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation> {
   kind: "basic";
 }
 
-interface SdkPagingOperationOptions {
-  itemsPath: string;
-  itemType: SdkType;
-  nextLinkPath: string;
+interface SdkPagingServiceMethodOptions {
+  __raw_paged_metadata: PagedResultMetadata;
+  nextLinkLogicalPath?: string[]; // off means fake paging
+  nextLinkOperation?: SdkServiceOperation;
 }
 
-interface SdkPagingOperation
-  extends SdkOperationBase<SdkPagingOperation>,
-    SdkPagingOperationOptions {
+export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
-interface SdkLroOperationOptions {
-  initialOperation: SdkBasicOperation;
+interface SdkLroServiceMethodOptions {
+  __raw_lro_metadata: LroMetadata;
 }
 
-interface SdkLroOperation extends SdkOperationBase<SdkLroOperation>, SdkLroOperationOptions {
+export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
-interface SdkLroPagingOperation
-  extends SdkOperationBase<SdkLroPagingOperation>,
-    SdkPagingOperationOptions,
-    SdkLroOperationOptions {
+export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkLroServiceMethodOptions,
+    SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
-export type SdkOperation =
-  | SdkBasicOperation
-  | SdkPagingOperation
-  | SdkLroOperation
-  | SdkLroPagingOperation;
+export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
+  | SdkBasicServiceMethod<TServiceOperation>
+  | SdkPagingServiceMethod<TServiceOperation>
+  | SdkLroServiceMethod<TServiceOperation>
+  | SdkLroPagingServiceMethod<TServiceOperation>
+  | SdkLroPagingServiceMethod<TServiceOperation>;
 
-export type SdkValidation =
-  | SdkStringValidation
-  | SdkInt32Validation
-  | SdkInt64Validation
-  | SdkFloat32Validation
-  | SdkFloat64Validation;
-
-interface SdkStringValidation {
-  kind: "string";
-  pattern?: string;
-  minLength?: number;
-  maxLength?: number;
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase<TServiceOperation> {
+  kind: "clientaccessor";
+  response: SdkClientType<TServiceOperation>;
 }
 
-interface SdkNumericValidationBase {
-  minValue?: number;
-  maxValue?: number;
+export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
+  | SdkServiceMethod<TServiceOperation>
+  | SdkPagingServiceMethod<TServiceOperation>
+  | SdkLroServiceMethod<TServiceOperation>
+  | SdkLroPagingServiceMethod<TServiceOperation>
+  | SdkClientAccessor<TServiceOperation>;
+
+export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  rootNamespace: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
 }
 
-interface SdkInt32Validation extends SdkNumericValidationBase {
-  kind: "int32";
-}
-
-interface SdkInt64Validation extends SdkNumericValidationBase {
-  kind: "int64";
-}
-
-interface SdkFloat32Validation extends SdkNumericValidationBase {
-  kind: "float32";
-}
-
-interface SdkFloat64Validation extends SdkNumericValidationBase {
-  kind: "float64";
-}
+export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;

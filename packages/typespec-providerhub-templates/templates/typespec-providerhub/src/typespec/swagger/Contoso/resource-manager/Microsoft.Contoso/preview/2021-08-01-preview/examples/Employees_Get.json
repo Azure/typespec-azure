@@ -1,0 +1,22 @@
+{
+  "operationId": "Employees_Get",
+  "title": "GetEmployee",
+  "parameters": {
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
+    "resourceGroupName": "testrg",
+    "api-version": "2021-08-01-preview",
+    "EmployeeName": "Jack"
+  },
+  "responses": {
+    "200": {
+      "body": {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Contoso/employees/Jack",
+        "name": "Jack",
+        "type": "Microsoft.Employee/employees",
+        "properties": {
+          "ProvisioningState": "Succeeded"
+        }
+      }
+    }
+  }
+}

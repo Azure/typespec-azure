@@ -1,15 +1,5 @@
 import {
-  createProjectedNameProgram,
   Enum,
-  getDeprecationDetails,
-  getDoc,
-  getEffectiveModelType,
-  getFriendlyName,
-  getNamespaceFullName,
-  getProjectedName,
-  getSummary,
-  ignoreDiagnostics,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -17,22 +7,27 @@ import {
   Scalar,
   Type,
   Union,
+  getEffectiveModelType,
+  getFriendlyName,
+  getNamespaceFullName,
+  getProjectedName,
+  ignoreDiagnostics,
+  listServices,
 } from "@typespec/compiler";
 import {
+  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
   getQueryParamName,
-  HttpOperationParameter,
   isStatusCode,
 } from "@typespec/http";
-import { getVersions, Version } from "@typespec/versioning";
+import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import { listClients, listOperationGroups, listOperationsInOperationGroup } from "./decorators.js";
 import { SdkContext } from "./interfaces.js";
-import { parseEmitterName } from "./internal-utils.js";
-import { reportDiagnostic } from "./lib.js";
+import { getClientNamespaceStringHelper, parseEmitterName } from "./internal-utils.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -75,18 +70,7 @@ export function isApiVersion(
  * @returns
  */
 export function getClientNamespaceString(context: SdkContext): string | undefined {
-  let packageName = context.packageName;
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  const services = listServices(context.program);
-  if (services.length === 0) {
-    return undefined;
-  }
-  return getNamespaceFullName(services[0].type);
+  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
 }
 
 /**
@@ -128,19 +112,6 @@ export function getEffectivePayloadType(context: SdkContext, type: Model): Model
 }
 
 /**
- * Whether a model is an Azure.Core model or not
- * @param t
- * @returns
- */
-export function isAzureCoreModel(t: Type): boolean {
-  return (
-    t.kind === "Model" &&
-    t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
-  );
-}
-
-/**
  *
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
@@ -160,12 +131,9 @@ export function getEmitterTargetName(context: SdkContext): string {
  * @returns a tuple of the library and wire name for a model property
  */
 export function getPropertyNames(context: SdkContext, property: ModelProperty): [string, string] {
-  if (!context.jsonProjectedProgram) {
-    context.jsonProjectedProgram = createProjectedNameProgram(context.program, "json");
-  }
   return [
     getLibraryName(context, property),
-    context.jsonProjectedProgram.getProjectedName(property),
+    getProjectedName(context.program, property, "json") ?? property.name,
   ];
 }
 
@@ -186,82 +154,17 @@ export function getLibraryName(
   context: SdkContext,
   type: Model | ModelProperty | Operation
 ): string {
-  if (!context.languageProjectedProgram) {
-    context.languageProjectedProgram = createProjectedNameProgram(
-      context.program,
-      context.emitterName
-    );
+  if (!context.emitterName) {
+    context.emitterName = getEmitterTargetName(context);
   }
-  // 1. check if there's a specific name for our language
-  const emitterSpecificName = context.languageProjectedProgram.getProjectedName(type);
-  if (emitterSpecificName !== type.name) return emitterSpecificName;
+  const emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
+  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
-  // 2. check if there's a client name
-  if (!context.clientProjectedProgram) {
-    context.clientProjectedProgram = createProjectedNameProgram(context.program, "client");
-  }
-  const clientSpecificName = context.clientProjectedProgram.getProjectedName(type);
-  if (clientSpecificName !== type.name) return clientSpecificName;
+  const clientSpecificName = getProjectedName(context.program, type, "client");
+  if (clientSpecificName && clientSpecificName !== type.name) return clientSpecificName;
 
-  // 3. check if there's a friendly name, if so return friendly name, otherwise return undefined
+  // 3. check if there's a friendly name, if so return friendly name, otherwise return typespec name
   return getFriendlyName(context.program, type) ?? type.name;
-}
-
-export function capitalize(name: string): string {
-  return name[0].toUpperCase() + name.slice(1);
-}
-
-export function reportUnionUnsupported(context: SdkContext, type: Union): void {
-  reportDiagnostic(context.program, { code: "union-unsupported", target: type });
-}
-
-export function intOrFloat(value: number): "int32" | "float32" {
-  return value.toString().indexOf(".") === -1 ? "int32" : "float32";
-}
-
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-export function getDocHelper(context: SdkContext, type: Type): DocWrapper {
-  if (getSummary(context.program, type)) {
-    return {
-      description: getSummary(context.program, type),
-      details: getDoc(context.program, type),
-    };
-  }
-  return {
-    description: getDoc(context.program, type),
-  };
-}
-
-export function getWireName(context: SdkContext, type: Type & { name: string }) {
-  return getProjectedName(context.program, type, "json") ?? type.name;
-}
-
-interface DefaultSdkTypeBase<TKind> {
-  __raw: Type;
-  nullable: boolean;
-  deprecation?: string;
-  kind: TKind;
-}
-
-/**
- * Helper function to return default values for nullable, encode etc
- * @param type
- */
-export function getSdkTypeBaseHelper<TKind>(
-  context: SdkContext,
-  type: Type,
-  kind: TKind
-): DefaultSdkTypeBase<TKind> {
-  return {
-    __raw: type,
-    nullable: false,
-    deprecation: getDeprecationDetails(context.program, type)?.message,
-    kind,
-  };
 }
 
 /**

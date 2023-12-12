@@ -1617,6 +1617,39 @@ describe("typespec-client-generator-core: types", () => {
       );
     });
 
+    it("usage propagation", async () => {
+      await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+          friends?: Fish[];
+          hate?: Record<Fish>;
+          partner?: Fish;
+        }
+
+        model SawShark extends Shark {
+          sharktype: "saw";
+        }
+
+        model GoblinShark extends Shark {
+          sharktype: "goblin";
+        }
+        op operation(@body input: Shark): Shark;
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 4);
+      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
     it("unnamed model", async () => {
       await runner.compileWithBuiltInService(`
         model Test {
