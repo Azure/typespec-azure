@@ -502,7 +502,11 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
     updateModelsMap(context, type, sdkType, operation);
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
-      sdkType.additionalProperties = getClientType(context, type.sourceModel!.indexer!.value!, operation);
+      sdkType.additionalProperties = getClientType(
+        context,
+        type.sourceModel!.indexer!.value!,
+        operation
+      );
     }
     if (type.baseModel) {
       sdkType.baseModel = context.modelsMap?.get(type.baseModel) as SdkModelType | undefined;
