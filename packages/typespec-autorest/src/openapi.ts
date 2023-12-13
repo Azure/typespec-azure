@@ -1133,7 +1133,11 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     }
 
     if (type.kind === "Model" && isArrayModelType(program, type)) {
-      const schema = getSchemaForPrimitiveItems(type.indexer.value, visibility, paramName, true);
+      const elementType = type.indexer.value;
+      if (isBytes(elementType)) {
+        return { type: "array", items: { type: "file" } };
+      }
+      const schema = getSchemaForPrimitiveItems(elementType, visibility, paramName, true);
       if (schema === undefined) {
         return undefined;
       }

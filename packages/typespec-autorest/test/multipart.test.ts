@@ -19,6 +19,26 @@ describe("typespec-autorest: multipart", () => {
     ]);
   });
 
+  it("part of type `bytes[]` produce `type: array, items: { type: file }`", async () => {
+    const res = await openApiFor(
+      `
+      op upload(@header contentType: "multipart/form-data", profileImage: bytes): void;
+      `
+    );
+    const op = res.paths["/"].post;
+    deepStrictEqual(op.parameters, [
+      {
+        in: "formData",
+        name: "profileImage",
+        required: true,
+        type: "array",
+        items: {
+          type: "file",
+        },
+      },
+    ]);
+  });
+
   it("part of type `string` produce `type: string`", async () => {
     const res = await openApiFor(
       `
