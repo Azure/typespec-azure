@@ -46,11 +46,11 @@
     "@typespec/eslint-config-typespec": "workspace:~0.51.0",
     "@typespec/tspd": "workspace:~0.46.0",
     "dotenv": "~16.3.1",
-    "eslint": "^8.49.0",
+    "eslint": "^8.55.0",
     "file-loader": "~6.2.0",
     "monaco-editor-webpack-plugin": "~7.1.0",
     "rimraf": "~5.0.1",
-    "typescript": "~5.2.2"
+    "typescript": "~5.3.3"
   },
   "browserslist": {
     "production": [

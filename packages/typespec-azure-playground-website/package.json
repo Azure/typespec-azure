@@ -75,9 +75,9 @@
     "@typespec/bundler": "workspace:~0.1.0-alpha.4",
     "@typespec/playground": "workspace:~0.1.0-alpha.4",
     "@playwright/test": "^1.39.0",
-    "eslint": "^8.49.0",
+    "eslint": "^8.55.0",
     "rimraf": "~5.0.1",
     "cross-env": "~7.0.3",
-    "typescript": "~5.2.2"
+    "typescript": "~5.3.3"
   }
 }
