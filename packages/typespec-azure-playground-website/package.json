@@ -60,13 +60,13 @@
     "@azure-tools/typespec-azure-core": "workspace:~0.37.1",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~0.37.0",
     "@azure-tools/typespec-client-generator-core": "workspace:~0.37.0",
-    "@vitejs/plugin-react": "~4.1.0",
+    "@vitejs/plugin-react": "~4.2.1",
     "@emotion/react": "^11.11.1",
     "es-module-shims": "~1.8.0",
-    "monaco-editor": "~0.43.0",
+    "monaco-editor": "~0.45.0",
     "react-dom": "~18.2.0",
     "react": "~18.2.0",
-    "vite": "^4.4.9"
+    "vite": "^5.0.8"
   },
   "devDependencies": {
     "@types/node": "~18.11.9",
