@@ -1109,7 +1109,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(contentTypeMethodParam.clientDefaultValue, "application/json");
       strictEqual(contentTypeMethodParam.onClient, false);
       strictEqual(contentTypeMethodParam.optional, false);
-      
+
       strictEqual(method.getParameterMapping(contentTypeOperationParam)[0], contentTypeMethodParam);
 
       const acceptOperationParam = method.operation.headerParams.find(x => x.serializedName === "Accept")!;
@@ -1204,7 +1204,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodAcceptParam = method.parameters.find(x => x.nameInClient === "accept")!;
       strictEqual(methodAcceptParam.clientDefaultValue, "application/json");
       strictEqual(methodAcceptParam.optional, false);
-      
+
       const serviceOperation = method.operation;
 
       const pathParam = serviceOperation.pathParams[0];
@@ -1722,7 +1722,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(methodResponse.responsePath, "result");
     });
-    it("paging", async () => {});
+    it("paging", async () => { });
   });
 });
 

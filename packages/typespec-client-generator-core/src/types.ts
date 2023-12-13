@@ -893,17 +893,11 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
       ...updateWithApiVersionInformation(context, type),
     };
   } else if (isBody(program, type)) {
-    let contentTypes = ignoreDiagnostics(getContentTypes(type));
-    if (contentTypes.length === 0) {
-      contentTypes = ["application/json"];
-    }
     return {
       ...base,
       kind: "body",
-      contentTypes,
-      defaultContentType: contentTypes.includes("application/json")
-        ? "application/json"
-        : contentTypes[0],
+      contentTypes: ["application/json"], // will update when we get to the operation level
+      defaultContentType: "application/json", // will update when we get to the operation level
       ...updateWithApiVersionInformation(context, type),
       optional: false,
     };
