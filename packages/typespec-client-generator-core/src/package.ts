@@ -72,6 +72,11 @@ function getSdkHttpBodyParameters(
 ): SdkBodyParameter[] | undefined {
   const tspBody = httpOperation.parameters.body;
   if (tspBody === undefined) return undefined;
+  let contentTypes = tspBody.contentTypes;
+  if (contentTypes.length === 0) {
+    contentTypes = ["application/json"];
+  }
+  const defaultContentType = contentTypes.includes("application/json") ? "application/json" : contentTypes[0];
   if (!tspBody.parameter) {
     const bodyType = getClientType(context, tspBody.type, httpOperation.operation);
     return [
@@ -81,8 +86,8 @@ function getSdkHttpBodyParameters(
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
         onClient: false,
-        contentTypes: ["application/json"],
-        defaultContentType: "application/json",
+        contentTypes: contentTypes,
+        defaultContentType: defaultContentType,
         isApiVersionParam: false,
         apiVersions: getAvailableApiVersions<SdkHttpOperation>(context, tspBody.type),
         type: bodyType,
@@ -92,20 +97,29 @@ function getSdkHttpBodyParameters(
   }
   const body = getSdkModelPropertyType(context, tspBody.parameter!, {
     operation: httpOperation.operation,
+    defaultContentType: defaultContentType,
   });
   const methodBodyParameter = methodParameters.find(
     (x) => x.nameInClient === tspBody.parameter!.name
   );
   if (body.kind !== "body") throw new Error("blah");
   if (methodBodyParameter) {
-    return [body];
+    return [{
+      ...body,
+      contentTypes,
+      defaultContentType,
+    }];
   } else {
     // this means that the body parameter is a property on one of the method parameters
     for (const methodParameter of methodParameters) {
       if (methodParameter.type.kind === "model") {
         const bodyProperty = methodParameter.type.properties.find((x) => x.kind === "body");
         if (bodyProperty) {
-          return [body];
+          return [{
+            ...body,
+            contentTypes,
+            defaultContentType,
+          }];
         }
       }
     }
@@ -254,10 +268,10 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     nextLinkLogicalPath: pagedMetadata?.nextLinkSegments || [],
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? getSdkServiceOperation<TServiceOperation>(
-          context,
-          pagedMetadata.nextLinkOperation,
-          basic.parameters
-        )
+        context,
+        pagedMetadata.nextLinkOperation,
+        basic.parameters
+      )
       : undefined,
   };
 }
@@ -271,7 +285,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   basicServiceMethod.response.responsePath =
     metadata.logicalPath ??
     (metadata.envelopeResult !== metadata.logicalResult &&
-    basicServiceMethod.operation.verb === "post"
+      basicServiceMethod.operation.verb === "post"
       ? ".result"
       : ".");
   return {
