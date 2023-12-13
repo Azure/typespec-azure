@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-autorest",
+      "comment": "Fix: Multipart proprerty of type `bytes[]` is now treated as multiple file parts",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-autorest"
+}
