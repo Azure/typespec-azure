@@ -51,7 +51,7 @@
     "@azure-tools/typespec-azure-core": "~0.37.1"
   },
   "dependencies": {
-    "change-case": "~4.1.2"
+    "change-case": "~5.3.0"
   },
   "devDependencies": {
     "@typespec/compiler": "workspace:~0.51.0",

@@ -65,7 +65,7 @@
     "picocolors": "~1.0.0"
   },
   "devDependencies": {
-    "@types/yargs": "~17.0.24",
+    "@types/yargs": "~17.0.32",
     "@types/mocha": "~10.0.6",
     "@types/lodash": "4.14.191",
     "@types/js-yaml": "~4.0.1",

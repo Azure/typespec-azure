@@ -52,7 +52,7 @@
   ],
   "dependencies": {
     "pluralize": "^8.0.0",
-    "change-case": "~4.1.2"
+    "change-case": "~5.3.0"
   },
   "peerDependencies": {
     "@typespec/compiler": "workspace:~0.51.0",
