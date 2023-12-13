@@ -96,6 +96,7 @@ function getSdkHttpBodyParameters(
   }
   const body = getSdkModelPropertyType(context, tspBody.parameter!, {
     operation: httpOperation.operation,
+    defaultContentType: defaultContentType,
   });
   const methodBodyParameter = methodParameters.find(
     (x) => x.nameInClient === tspBody.parameter!.name

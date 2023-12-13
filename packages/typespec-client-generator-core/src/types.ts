@@ -159,7 +159,8 @@ function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
 function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
-  propertyType: SdkType
+  propertyType: SdkType,
+  defaultContentType?: string,
 ): void {
   const encodeData = getEncode(context.program, type);
   if (propertyType.kind === "duration") {
@@ -178,8 +179,10 @@ function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
   if (propertyType.kind === "bytes") {
     if (encodeData) {
       propertyType.encode = encodeData.encoding as BytesKnownEncoding;
-    } else {
+    } else if (!defaultContentType || defaultContentType === "application/json") {
       propertyType.encode = "base64";
+    } else {
+      propertyType.encode = "bytes";
     }
   }
 }
@@ -666,7 +669,7 @@ function getKnownValuesEnum<TServiceOperation extends SdkServiceOperation>(
 export function getClientType<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: SdkContext<TServiceOperation>,
   type: Type,
-  operation?: Operation
+  operation?: Operation,
 ): SdkType {
   switch (type.kind) {
     case "String":
@@ -831,6 +834,7 @@ interface GetSdkModelPropertyTypeOptions {
   isEndpointParam?: boolean;
   operation?: Operation;
   isMethodParameter?: boolean;
+  defaultContentType?: string;
 }
 
 export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOperation>(
@@ -839,7 +843,7 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
   options: GetSdkModelPropertyTypeOptions = {}
 ): SdkModelPropertyType {
   let propertyType = getClientType<TServiceOperation>(context, type.type, options.operation);
-  addEncodeInfo(context, type, propertyType);
+  addEncodeInfo(context, type, propertyType, options.defaultContentType);
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
