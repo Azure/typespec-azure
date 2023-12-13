@@ -347,7 +347,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   headerParams: SdkHeaderParameter[];
   bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
   responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
-  exception?: SdkHttpResponse;
+  exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
 }
 
 /**
@@ -455,7 +455,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
   response: SdkMethodResponse;
-  exceptions: SdkMethodResponse[];
+  exception?: SdkMethodResponse;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>

@@ -5,6 +5,7 @@ import {
   UsageFlags,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isErrorModel,
 } from "@typespec/compiler";
 import { HttpOperation, getHeaderFieldName, getHttpOperation, getServers, isContentTypeHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
@@ -127,7 +128,7 @@ function getSdkHttpOperation(
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[]
 ): SdkHttpOperation {
-  const [responses, exception] = getSdkServiceResponseAndExceptions<SdkHttpOperation>(
+  const [responses, exceptions] = getSdkServiceResponseAndExceptions<SdkHttpOperation>(
     context,
     httpOperation
   );
@@ -176,16 +177,10 @@ function getSdkHttpOperation(
       })
     }
   }
-  const responsesWithBodies = Object.values(responses).filter(r => r.type)
-  if ((responsesWithBodies.length > 0 || exception?.type) && !headerParams.some(h => isAcceptHeader(h))) {
+  const responsesWithBodies = Object.values(responses).concat(Object.values(exceptions)).filter(r => r.type)
+  if (responsesWithBodies.length > 0 && !headerParams.some(h => isAcceptHeader(h))) {
     // Always have an accept header if we're returning any response with a body
-    let clientDefaultValue: string = "";
-    if (responsesWithBodies.length > 0) {
-      clientDefaultValue = responsesWithBodies[0].defaultContentType!;
-    } else {
-      // we know that exception will have a body then
-      clientDefaultValue = exception!.defaultContentType!;
-    }
+    const clientDefaultValue = responsesWithBodies[0].defaultContentType!;
     const acceptBase = {
       nameInClient: "accept",
       type: stringType,
@@ -218,7 +213,7 @@ function getSdkHttpOperation(
     headerParams,
     bodyParams: bodyParams || [],
     responses,
-    exception,
+    exceptions,
   };
 }
 
@@ -325,9 +320,9 @@ function getSdkMethodResponse(
 function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   httpOperation: HttpOperation
-): [Record<number | string, SdkHttpResponse>, SdkHttpResponse | undefined] {
+): [Record<number | string, SdkHttpResponse>, Record<number | string, SdkHttpResponse>] {
   const responses: Record<number | string, SdkHttpResponse> = {};
-  let exception: SdkHttpResponse | undefined;
+  const exceptions: Record<number | string | "*", SdkHttpResponse> = {};
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -364,16 +359,17 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
         ? "application/json"
         : contentTypes[0],
     };
-    if (response.statusCodes === "*") {
-      exception = sdkResponse;
-    } else if (typeof response.statusCodes === "number") {
-      responses[response.statusCodes] = sdkResponse;
+    let statusCode: number | string = "";
+    if (typeof response.statusCodes === "number" || response.statusCodes === "*") {
+      statusCode = response.statusCodes;
     } else {
-      responses[`${String(response.statusCodes.start)}-${String(response.statusCodes.end)}`] =
-        sdkResponse;
+      statusCode = `${response.statusCodes.start}-${response.statusCodes.end}`;
+    }
+    if (statusCode === "*" || (body && isErrorModel(context.program, body))) {
+      exceptions[statusCode] = sdkResponse;
     }
   }
-  return [responses, exception];
+  return [responses, exceptions];
 }
 
 function getParameterMappingHelper<TServiceOperation extends SdkServiceOperation>(
@@ -457,7 +453,6 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     overloads: [],
     operation: serviceOperation,
     response,
-    exceptions: [],
     apiVersions: getAvailableApiVersions<SdkServiceOperation>(context, operation),
     getParameterMapping: function getParameterMapping(
       serviceParam: SdkServiceParameter
@@ -534,8 +529,7 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       ...sdkParam,
       kind: "endpoint",
       urlEncode: false,
-      optional: false,
-      ...updateWithApiVersionInformation(context, param),
+      optional: false,      ...updateWithApiVersionInformation(context, param),
       onClient: true,
     });
   }
