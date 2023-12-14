@@ -73,36 +73,40 @@
         "destination": "main.tsp"
       },
       {
+        "path": "./arm/employee.tsp",
+        "destination": "employee.tsp"
+      },      
+      {
         "path": "./arm/tspconfig.yaml",
         "destination": "tspconfig.yaml"
       },
       {
-        "path": "./arm/examples/Employees_CreateOrUpdate.json",
-        "destination": "examples/Employees_CreateOrUpdate.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_CreateOrUpdate.json",
+        "destination": "examples/2021-10-01-preview/Employees_CreateOrUpdate.json"
       },
       {
-        "path": "./arm/examples/Employees_Delete.json",
-        "destination": "examples/Employees_Delete.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_Delete.json",
+        "destination": "examples/2021-10-01-preview/Employees_Delete.json"
       },
       {
-        "path": "./arm/examples/Employees_ListByResourceGroup.json",
-        "destination": "examples/Employees_ListByResourceGroup.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_ListByResourceGroup.json",
+        "destination": "examples/2021-10-01-preview/Employees_ListByResourceGroup.json"
       },
       {
-        "path": "./arm/examples/Employees_ListBySubscription.json",
-        "destination": "examples/Employees_ListBySubscription.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_ListBySubscription.json",
+        "destination": "examples/2021-10-01-preview/Employees_ListBySubscription.json"
       },
       {
-        "path": "./arm/examples/Employees_Update.json",
-        "destination": "examples/Employees_Update.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_Update.json",
+        "destination": "examples/2021-10-01-preview/Employees_Update.json"
       },
       {
-        "path": "./arm/examples/Employees_Get.json",
-        "destination": "examples/Employees_Get.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_Get.json",
+        "destination": "examples/2021-10-01-preview/Employees_Get.json"
       },
       {
-        "path": "./arm/examples/Operations_List.json",
-        "destination": "examples/Operations_List.json"
+        "path": "./arm/examples/2021-10-01-preview/Operations_List.json",
+        "destination": "examples/2021-10-01-preview/Operations_List.json"
       }
     ],
     "inputs": {
@@ -122,7 +126,6 @@
       "@azure-tools/typespec-azure-core",
       "@azure-tools/typespec-azure-resource-manager",
       "@azure-tools/typespec-client-generator-core",
-      "@azure-tools/typespec-providerhub",
       "@typespec/http",
       "@typespec/openapi",
       "@typespec/rest",
@@ -193,37 +196,41 @@
         "path": "./arm/main.tsp",
         "destination": "main.tsp"
       },
+            {
+        "path": "./arm/employee.tsp",
+        "destination": "employee.tsp"
+      }, 
       {
         "path": "./arm/tspconfig_stand_alone.yaml",
         "destination": "tspconfig.yaml"
       },
       {
-        "path": "./arm/examples/Employees_CreateOrUpdate.json",
-        "destination": "examples/Employees_CreateOrUpdate.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_CreateOrUpdate.json",
+        "destination": "examples/2021-10-01-preview/Employees_CreateOrUpdate.json"
       },
       {
-        "path": "./arm/examples/Employees_Delete.json",
-        "destination": "examples/Employees_Delete.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_Delete.json",
+        "destination": "examples/2021-10-01-preview/Employees_Delete.json"
       },
       {
-        "path": "./arm/examples/Employees_ListByResourceGroup.json",
-        "destination": "examples/Employees_ListByResourceGroup.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_ListByResourceGroup.json",
+        "destination": "examples/2021-10-01-preview/Employees_ListByResourceGroup.json"
       },
       {
-        "path": "./arm/examples/Employees_ListBySubscription.json",
-        "destination": "examples/Employees_ListBySubscription.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_ListBySubscription.json",
+        "destination": "examples/2021-10-01-preview/Employees_ListBySubscription.json"
       },
       {
-        "path": "./arm/examples/Employees_Update.json",
-        "destination": "examples/Employees_Update.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_Update.json",
+        "destination": "examples/2021-10-01-preview/Employees_Update.json"
       },
       {
-        "path": "./arm/examples/Employees_Get.json",
-        "destination": "examples/Employees_Get.json"
+        "path": "./arm/examples/2021-10-01-preview/Employees_Get.json",
+        "destination": "examples/2021-10-01-preview/Employees_Get.json"
       },
       {
-        "path": "./arm/examples/Operations_List.json",
-        "destination": "examples/Operations_List.json"
+        "path": "./arm/examples/2021-10-01-preview/Operations_List.json",
+        "destination": "examples/2021-10-01-preview/Operations_List.json"
       }
     ],
     "inputs": {
