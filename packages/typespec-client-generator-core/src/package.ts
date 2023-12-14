@@ -381,6 +381,8 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
     }
     if (statusCode === "*" || (body && isErrorModel(context.program, body))) {
       exceptions[statusCode] = sdkResponse;
+    } else {
+      responses[statusCode] = sdkResponse;
     }
   }
   return [responses, exceptions];

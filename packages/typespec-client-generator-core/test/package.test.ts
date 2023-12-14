@@ -1053,6 +1053,32 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponseType.properties.length, 2);
       strictEqual(methodResponseType.properties.filter((x) => x.kind === "header").length, 1);
     });
+    it("NoContentResponse", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @delete op delete(@path id: string): NoContentResponse;
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfSingleClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "delete");
+      const serviceResponses = method.operation.responses;
+      strictEqual(Object.keys(serviceResponses).length, 1);
+
+      const voidResponse = serviceResponses[204];
+      strictEqual(voidResponse.kind, "http");
+      strictEqual(voidResponse.type, undefined);
+      strictEqual(voidResponse.headers.length, 0);
+
+      const errorResponse = method.operation.exceptions["*"];
+      strictEqual(errorResponse.kind, "http");
+      strictEqual(errorResponse.type!.kind, "model");
+      strictEqual(errorResponse.type!, sdkPackage.models[0]);
+
+      strictEqual(method.response.type, undefined);
+      strictEqual(method.response.responsePath, undefined);
+    });
   });
   describe("Vanilla Widget Service", () => {
     async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) {
