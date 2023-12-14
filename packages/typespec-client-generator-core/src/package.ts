@@ -503,7 +503,7 @@ function getDefaultSdkEndpointParameter<TServiceOperation extends SdkServiceOper
     {
       kind: "endpoint",
       nameInClient: "endpoint",
-      description: getDocHelper(context, client.service).description,
+      description: "Service host",
       onClient: true,
       urlEncode: false,
       apiVersions: getAvailableApiVersions<TServiceOperation>(context, client.type),
