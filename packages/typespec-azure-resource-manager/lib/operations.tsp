@@ -79,6 +79,7 @@ op ArmResourceRead<TResource extends ArmResource, TBaseParameters = BaseParamete
  * A long-running resource CreateOrUpdate (PUT)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeadersOptional.  Allows overriding the lro headers returned on resource create
  */
 @autoRoute
 @doc("Create a {name}", TResource)
@@ -93,14 +94,23 @@ op ArmResourceRead<TResource extends ArmResource, TBaseParameters = BaseParamete
 @put
 op ArmResourceCreateOrUpdateAsync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    TResource,
+    string,
+    string
+  >
 >(
   ...ResourceInstanceParameters<TResource, TBaseParameters>,
 
   @doc("Resource create parameters.")
   @body
   resource: TResource,
-): ArmResourceUpdatedResponse<TResource> | ArmResourceCreatedResponse<TResource> | ErrorResponse;
+): ArmResourceUpdatedResponse<TResource> | ArmResourceCreatedResponse<
+  TResource,
+  LroHeaders
+> | ErrorResponse;
 
 /**
  * DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
@@ -144,37 +154,63 @@ op ArmResourceCreateOrReplaceSync<
 
 alias ArmResourceCreateOrReplaceAsync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
-> = ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters>;
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    TResource,
+    string,
+    string
+  >
+> = ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders>;
 
 /**
  * A long-running resource update that only allows updating resource tags (the minimum)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted repsonse
  */
 alias ArmTagsPatchAsync<
   TResource extends ArmResource,
   TProperties extends {} = TagsUpdateModel<TResource>,
-  TBaseParameters = BaseParameters<TResource>
-> = ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters>;
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    TResource,
+    string,
+    string
+  >
+> = ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters, LroHeaders>;
 
 /**
  * A long-running resource update using the items from the resource marked with visibility "update"
  * @template TResource the resource being patched
  * @template TProperties The model type of the resource properties
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  */
 alias ArmResourcePatchAsync<
   TResource extends ArmResource,
   TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
-> = ArmCustomPatchAsync<TResource, ResourceUpdateModel<TResource, TProperties>, TBaseParameters>;
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    TResource,
+    string,
+    string
+  >
+> = ArmCustomPatchAsync<
+  TResource,
+  ResourceUpdateModel<TResource, TProperties>,
+  TBaseParameters,
+  LroHeaders
+>;
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
  * @template TResource the resource being patched
  * @template TPatchModel The input model for the PATCH request
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  */
 @autoRoute
 @doc("Update a {name}", TResource)
@@ -190,14 +226,23 @@ alias ArmResourcePatchAsync<
 op ArmCustomPatchAsync<
   TResource extends ArmResource,
   TPatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<TResource>,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    TResource,
+    string,
+    string
+  >
 >(
   ...ResourceInstanceParameters<TResource, TBaseParameters>,
 
   @doc("The resource properties to be updated.")
   @body
   properties: TPatchModel,
-): ArmResponse<TResource> | ArmAcceptedLroResponse<"Resource update request accepted."> | ErrorResponse;
+): ArmResponse<TResource> | ArmAcceptedLroResponse<
+  "Resource update request accepted.",
+  LroHeaders
+> | ErrorResponse;
 
 /**
  * A resource update that only allows updating resource tags (the minimum)
@@ -270,13 +315,15 @@ op ArmResourceDeleteAsyncBase<
  * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
  * @template TResource The resource being deleted
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template LroHeaders Optional. Allows overriding the headers in the Accepted response
  */
 op ArmResourceDeleteAsync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
 > is ArmResourceDeleteAsyncBase<
   TResource,
-  ArmDeletedResponse | ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse,
+  ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   TBaseParameters
 >;
 
@@ -284,13 +331,15 @@ op ArmResourceDeleteAsync<
  * @dev Delete a resource asynchronously
  * @template TResource The resource being deleted
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted respsonse
  */
 op ArmResourceDeleteWithoutOkAsync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
 > is ArmResourceDeleteAsyncBase<
   TResource,
-  ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse,
+  ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   TBaseParameters
 >;
 
@@ -346,17 +395,24 @@ op ArmResourceActionAsyncBase<
  * @template TRequest The request model for the action
  * @template TResponse The response model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted respsonse
  */
 @returnsDoc("ARM operation completed successfully.")
 op ArmResourceActionAsync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
   TResponse extends TypeSpec.Reflection.Model | void,
-  TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>
+  TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    TResponse,
+    string,
+    string
+  >
 > is ArmResourceActionAsyncBase<
   TResource,
   TRequest,
-  ArmAcceptedLroResponse | TResponse,
+  ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | TResponse,
   TBaseParameters
 >;
 
@@ -389,11 +445,19 @@ op ArmResourceActionSync<
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted respsonse
+ *
  */
 op ArmResourceActionNoContentAsync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
-  TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>
+  TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    void,
+    string,
+    string
+  >
 > is ArmResourceActionAsyncBase<
   TResource,
   TRequest,
@@ -406,12 +470,24 @@ op ArmResourceActionNoContentAsync<
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template Headers Optional. Allows overriding the headers returned in the Accepted respsonse
  */
 op ArmResourceActionNoResponseContentAsync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
-  TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>
-> is ArmResourceActionAsyncBase<TResource, TRequest, ArmAcceptedLroResponse, TBaseParameters>;
+  TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
+    ArmOperationStatus,
+    void,
+    string,
+    string
+  >
+> is ArmResourceActionAsyncBase<
+  TResource,
+  TRequest,
+  ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
+  TBaseParameters
+>;
 
 /**
  * A synchronous resource action that returns no content.
