@@ -539,7 +539,6 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
-      isAnonymous: false,
     };
     updateModelsMap(context, type, sdkType, operation);
 

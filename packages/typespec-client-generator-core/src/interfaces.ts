@@ -217,7 +217,6 @@ export interface SdkModelType extends SdkTypeBase {
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   baseModel?: SdkModelType;
-  isAnonymous: boolean;
   crossLanguageDefinitionId: string;
 }
 
