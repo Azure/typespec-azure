@@ -535,7 +535,7 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
       description: docWrapper.description,
       details: docWrapper.details,
       properties: [],
-      additionalProperties: false, // going to set additional properties in the next few lines when we look at base model
+      additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
@@ -544,7 +544,11 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
-      sdkType.additionalProperties = true;
+      sdkType.additionalProperties = getClientType(
+        context,
+        type.sourceModel!.indexer!.value!,
+        operation
+      );
     }
     if (type.baseModel) {
       sdkType.baseModel = context.modelsMap?.get(type.baseModel) as SdkModelType | undefined;
@@ -554,7 +558,7 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
           | SdkModelType;
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
-          sdkType.additionalProperties = true;
+          sdkType.additionalProperties = baseModel.valueType;
         } else {
           sdkType.baseModel = baseModel;
           updateModelsMap(context, type.baseModel, sdkType.baseModel, operation);

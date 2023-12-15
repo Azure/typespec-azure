@@ -1760,7 +1760,7 @@ describe("typespec-client-generator-core: types", () => {
       const Test6 = models.find((x) => x.name === "Test6")!;
       strictEqual(Test6.access, undefined);
     });
-    it("additionalProperties true", async () => {
+    it("additionalProperties string", async () => {
       await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
         @access(Access.public)
@@ -1769,7 +1769,7 @@ describe("typespec-client-generator-core: types", () => {
         }
         @usage(Usage.input | Usage.output)
         @access(Access.public)
-        model AdditionalPropertiesModel2 is Record<string> {
+        model AdditionalPropertiesModel2 is Record<unknown> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
@@ -1789,11 +1789,11 @@ describe("typespec-client-generator-core: types", () => {
       const NonAdditionalPropertiesModel = models.find(
         (x) => x.name === "NoAdditionalPropertiesModel"
       )! as SdkModelType;
-      strictEqual(AdditionalPropertiesModel.additionalProperties, true);
+      strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
       strictEqual(AdditionalPropertiesModel.baseModel, undefined);
-      strictEqual(AdditionalPropertiesModel2.additionalProperties, true);
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "any");
       strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
-      strictEqual(NonAdditionalPropertiesModel.additionalProperties, false);
+      strictEqual(NonAdditionalPropertiesModel.additionalProperties, undefined);
     });
     it("crossLanguageDefinitionId", async () => {
       await runner.compile(`
