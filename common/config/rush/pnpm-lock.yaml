@@ -1966,6 +1966,9 @@ importers:
       '@typespec/versioning':
         specifier: workspace:~0.51.0
         version: link:../../core/packages/versioning
+      c8:
+        specifier: ~8.0.1
+        version: 8.0.1
       mocha:
         specifier: ~10.2.0
         version: 10.2.0
