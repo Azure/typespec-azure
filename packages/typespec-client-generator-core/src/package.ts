@@ -580,7 +580,7 @@ function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>
     name,
     access: "public",
     usage: UsageFlags.Input,
-    additionalProperties: false,
+    additionalProperties: undefined,
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
   };
