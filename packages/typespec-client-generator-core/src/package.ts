@@ -290,6 +290,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
       basicServiceMethod.operation.verb === "post"
       ? "result"
       : undefined);
+  basicServiceMethod.response.type = getClientType(context, metadata.logicalResult);
   return {
     ...basicServiceMethod,
     kind: "lro",
