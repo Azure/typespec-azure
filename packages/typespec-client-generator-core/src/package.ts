@@ -466,7 +466,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     __raw: operation,
     kind: "basic",
     name: getLibraryName(context, operation),
-    access: getAccess(context, operation) ? "internal" : "public",
+    access: getAccess(context, operation),
     parameters: methodParameters.filter((x) => !x.isApiVersionParam),
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,

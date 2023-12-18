@@ -406,7 +406,7 @@ export type SdkServiceParameter = SdkHttpParameter;
 interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   __raw?: Operation;
   name: string;
-  access: AccessFlags;
+  access: AccessFlags | undefined;
   parameters: SdkParameter[];
   apiVersions: string[];
   description?: string;
