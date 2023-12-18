@@ -219,7 +219,7 @@ model SdkUnionType extends SdkType {
  * @property properties: List of properties on the model
  * @property access: Access level of the model
  * @property usage: Usage cases for the model. Used to filter when people only want input or output models.
- * @property additionalProperties: Whether the model has additional properties
+ * @property additionalProperties: Model's additional properties type, if no additional properties, then undefined
  * @property discriminatorValue: Value of the discriminator if this is a discriminated subtype. Will be undefined if not.
  * @property discriminatedSubtypes: Mapping of discriminator value to this models discriminated subtypes if there are any.
  * @property baseModel: The base model class of this model type if one exists.
@@ -233,7 +233,7 @@ model SdkModelType extends SdkType {
   properties: SdkModelPropertyType[];
   access: AccessFlags;
   usage: UsageFlags;
-  additionalProperties: boolean;
+  additionalProperties?: SdkType;
   dicriminatorValue?: string;
   discriminatedSubtypes?: Record<SdkModelType>;
   baseModel?: SdkModelType;

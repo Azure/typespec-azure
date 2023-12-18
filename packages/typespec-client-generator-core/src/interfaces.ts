@@ -213,7 +213,7 @@ export interface SdkModelType extends SdkTypeBase {
   details?: string;
   access: AccessFlags | undefined;
   usage: UsageFlags;
-  additionalProperties: boolean;
+  additionalProperties: SdkType | undefined;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   baseModel?: SdkModelType;
