@@ -59,6 +59,8 @@ import {
 } from "./internal-utils.js";
 import { getClientNamespaceString, getLibraryName } from "./public-utils.js";
 import {
+  addEncodeInfo,
+  addFormatInfo,
   getAllModels,
   getClientType,
   getSdkCredentialParameter,
@@ -340,29 +342,31 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
-    for (const data of response.responses) {
-      for (const header of Object.values(data.headers || [])) {
+    let contentTypes: string[] = [];
+
+    for (const innerResponse of response.responses) {
+      for (const header of Object.values(innerResponse.headers || [])) {
+        const clientType = getClientType(context, header.type);
+        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json") ? "application/json" : innerResponse.body?.contentTypes[0];
+        addEncodeInfo(context, header, clientType, defaultContentType);
+        addFormatInfo(context, header, clientType);
         headers.push({
           __raw: header,
           description: getDocHelper(context, header).description,
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
-          type: getClientType(context, header.type),
+          type: clientType,
         });
       }
-      if (data.body) {
-        if (body && body !== data.body.type) {
+      if (innerResponse.body) {
+        if (body && body !== innerResponse.body.type) {
           throw new Error("blah");
         }
-        body = data.body.type;
-      }
-    }
-    let contentTypes: string[] = [];
-    for (const innerResponse of response.responses) {
-      if (innerResponse.body) {
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes)
+        body = innerResponse.body.type;
       }
     }
+    
     const sdkResponse: SdkHttpResponse = {
       __raw: response,
       kind: "http",
@@ -545,7 +549,7 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       ...sdkParam,
       kind: "endpoint",
       urlEncode: false,
-      optional: false,      ...updateWithApiVersionInformation(context, param),
+      optional: false, ...updateWithApiVersionInformation(context, param),
       onClient: true,
     });
   }
