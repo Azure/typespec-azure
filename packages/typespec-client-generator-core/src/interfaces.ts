@@ -176,7 +176,7 @@ export interface SdkEnumType extends SdkTypeBase {
   details?: string;
   isFlags: boolean;
   usage: UsageFlags;
-  access: AccessFlags | undefined;
+  access?: AccessFlags;
   crossLanguageDefinitionId: string;
 }
 
@@ -211,9 +211,9 @@ export interface SdkModelType extends SdkTypeBase {
   generatedName?: string;
   description?: string;
   details?: string;
-  access: AccessFlags | undefined;
+  access?: AccessFlags;
   usage: UsageFlags;
-  additionalProperties: SdkType | undefined;
+  additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   baseModel?: SdkModelType;
@@ -406,7 +406,7 @@ export type SdkServiceParameter = SdkHttpParameter;
 interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   __raw?: Operation;
   name: string;
-  access: AccessFlags;
+  access: AccessFlags | undefined;
   parameters: SdkParameter[];
   apiVersions: string[];
   description?: string;

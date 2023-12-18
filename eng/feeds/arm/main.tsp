@@ -3,6 +3,7 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "./employee.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -13,57 +14,16 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "{{parameters.ServiceNamespace}} management service",
-  version: "2021-10-01-preview",
 })
-@doc("{{parameters.ServiceNamespace}} Resource Provider management API.")
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+/** {{parameters.ServiceNamespace}} Resource Provider management API. */
+@versioned(Microsoft.Contoso.Versions)
 namespace {{parameters.ServiceNamespace}};
 
-@doc("Employee resource")
-model Employee is TrackedResource<EmployeeProperties> {
-  @doc("Name of employee")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @path
-  @segment("employees")
-  name: string;
-}
-
-@doc("Employee properties")
-model EmployeeProperties {
-  @doc("Age of employee")
-  age?: int32;
-
-  @doc("City of employee")
-  city?: string;
-
-  @doc("Profile of employee")
-  @encode("base64url")
-  profile?: bytes;
-
-  @visibility("read")
-  @doc("The status of the last operation.")
-  provisioningState?: ProvisioningState;
-}
-
-@lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
-  Provisioning,
-  Updating,
-  Deleting,
-  Accepted,
-}
-
-interface Operations extends Azure.ResourceManager.Operations {}
-
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrUpdateAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-  delete is ArmResourceDeleteSync<Employee>;
-  listByResourceGroup is ArmResourceListByParent<Employee>;
-  listBySubscription is ArmListBySubscription<Employee>;
+/** The available API versions. */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_10_01_preview: "2021-10-01-preview",
 }

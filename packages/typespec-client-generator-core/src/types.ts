@@ -115,7 +115,7 @@ function getEncodeHelper<TServiceOperation extends SdkServiceOperation>(
  * @param type the original typespec type. Used to grab the format decorator off of
  * @param propertyType the type of the property, i.e. the internal type that we add the format info onto
  */
-function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
+export function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
   propertyType: SdkType
@@ -156,7 +156,7 @@ function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
  * @param type the original typespec type. Used to grab the encoding decorator off of
  * @param propertyType the type of the property, i.e. the internal type that we add the encoding info onto
  */
-function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
+export function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
   propertyType: SdkType,
