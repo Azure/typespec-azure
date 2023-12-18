@@ -29,24 +29,6 @@ export const $lib = createTypeSpecLibrary({
         marketPlaceOffer: `@marketPlaceOffer decorator can be only applied to trackedResource and proxyResource`,
       },
     },
-    "invalid-type-for-about-displayName": {
-      severity: "error",
-      messages: {
-        default: `invalidType for $about.displayName.`,
-      },
-    },
-    "invalid-type-for-about-keywords": {
-      severity: "error",
-      messages: {
-        default: `invalidType for $about.keywords.`,
-      },
-    },
-    "invalid-type-for-about-keywords-item": {
-      severity: "error",
-      messages: {
-        default: `invalidType for $about.keywords : only accept string item.`,
-      },
-    },
     "essentials-maximum-usage": {
       severity: "error",
       messages: {
