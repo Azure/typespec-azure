@@ -24,17 +24,8 @@ import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js
  */
 export function $browse(context: DecoratorContext, target: Model, options: BrowseOptions) {
   const { program } = context;
-  if (
-    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-  ) {
-    reportDiagnostic(program, {
-      code: "invalidUsageDecorator",
-      messageId: "browse",
-      target,
-    });
-  }
   validateDecoratorUniqueOnNode(context, target, $browse);
+  isARMResource(program, target, "browse");
   if (options && (options as Model).properties) {
     const query = (options as Model).properties.get("argQuery");
     if (query && query.type.kind === "Model") {
@@ -70,30 +61,29 @@ export function getBrowseArgQuery(program: Program, target: Type) {
   return browse.properties.get("argQuery");
 }
 
-/**
- * This is a About decorator that will be used to define icon, keywords and learnMoreDocs.
- * @param target The model that is being decorated.
- * @param options AboutOptions of the property.
- */
-// making to Model and document AboutOptions
-export function $about(context: DecoratorContext, target: Model, options: AboutOptions) {
-  const { program } = context;
-  validateDecoratorUniqueOnNode(context, target, $about);
+export function isARMResource(program: Program, target: Model, decoratorName: "browse" | "about" | "marketplaceOffer") {
   if (
     getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
     getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
   ) {
     reportDiagnostic(program, {
       code: "invalidUsageDecorator",
-      messageId: "browse",
+      messageId: decoratorName,
       target,
     });
   }
+}
+/**
+ * This is a About decorator that will be used to define icon, keywords and learnMoreDocs.
+ * @param target The model that is being decorated.
+ * @param options AboutOptions of the property.
+ */
+export function $about(context: DecoratorContext, target: Model, options: AboutOptions) {
+  const { program } = context;
+  validateDecoratorUniqueOnNode(context, target, $about);
+  isARMResource(program, target, "about");
   if (options && (options as Model).properties) {
     const icon = (options as Model).properties.get("icon");
-    const displayName = (options as Model).properties.get("displayName");
-    const keywords = (options as Model).properties.get("keywords");
-    const learnMoreDocs = (options as Model).properties.get("learnMoreDocs");
     if (icon) {
       if (icon.type.kind === "Model") {
         const sourceLocation = getSourceLocation(target);
@@ -115,55 +105,6 @@ export function $about(context: DecoratorContext, target: Model, options: AboutO
         }
       }
     }
-    if (displayName) {
-      if (displayName.type.kind !== "String") {
-        reportDiagnostic(program, {
-          code: "invalidType",
-          messageId: "aboutDisplayName",
-          target,
-        });
-      }
-    }
-    if (keywords) {
-      if (keywords.type.kind !== "Tuple") {
-        reportDiagnostic(program, {
-          code: "invalidType",
-          messageId: "aboutKeywords",
-          target,
-        });
-      } else {
-        const invalidTypes =
-          keywords.type.values &&
-          keywords.type.values.filter((keyword) => keyword.kind !== "String");
-        if (invalidTypes && invalidTypes.length > 0) {
-          reportDiagnostic(program, {
-            code: "invalidType",
-            messageId: "aboutKeywordsItem",
-            target,
-          });
-        }
-      }
-    }
-    if (learnMoreDocs) {
-      if (learnMoreDocs.type.kind !== "Tuple") {
-        reportDiagnostic(program, {
-          code: "invalidType",
-          messageId: "aboutLearnMoreDocs",
-          target,
-        });
-      } else {
-        const invalidTypes =
-          learnMoreDocs.type.values &&
-          learnMoreDocs.type.values.filter((doc) => doc.kind !== "String");
-        if (invalidTypes && invalidTypes.length > 0) {
-          reportDiagnostic(program, {
-            code: "invalidType",
-            messageId: "aboutLearnMoreDocsItem",
-            target,
-          });
-        }
-      }
-    }
   }
   program.stateMap(PortalCoreKeys.about).set(target, options);
 }
@@ -182,9 +123,23 @@ export function getAboutKeywords(program: Program, target: Type) {
   return about.properties.get("keywords");
 }
 
+export function getAboutKeywordsItemsArray(program: Program, target: Type) {
+  const keywords = getAboutKeywords(program, target);
+  return keywords.type.values
+      .filter((value: Type) => value.kind === "String")
+      .map((value: Type) => (<StringLiteral>value).value);
+}
+
 export function getAboutLearnMoreDocs(program: Program, target: Type) {
   const about = getAbout(program, target);
   return about.properties.get("learnMoreDocs");
+}
+
+export function getAboutLearnMoreDocsItemsArray(program: Program, target: Type) {
+  const learnMoreDocs = getAboutLearnMoreDocs(program, target);
+  return learnMoreDocs.type.values
+      .filter((value: Type) => value.kind === "String")
+      .map((value: Type) => (<StringLiteral>value).value);
 }
 
 export function $marketplaceOffer(
@@ -194,29 +149,13 @@ export function $marketplaceOffer(
 ) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
-  if (
-    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-  ) {
-    reportDiagnostic(program, {
-      code: "invalidUsageDecorator",
-      messageId: "marketPlaceOffer",
-      target,
-    });
-  }
-  if (options && (options as Model).properties) {
-    const id = (options as Model).properties.get("id");
-    if (id) {
-      if (id.type.kind !== "String") {
-        reportDiagnostic(program, {
-          code: "invalidType",
-          messageId: "marketplaceOfferId",
-          target,
-        });
-      }
-    }
-  }
+  isARMResource(program, target, "marketplaceOffer");
   program.stateMap(PortalCoreKeys.marketplaceOffer).set(target, options);
+}
+
+export function getMarketplaceOfferId(program: Program, target: Type) {
+  const marketplaceOffer = program.stateMap(PortalCoreKeys.marketplaceOffer).get(target);
+  return marketplaceOffer.properties.get("id");
 }
 
 // export function $patternValidationMessage(context:DecoratorContext, target: Scalar | ModelProperty, message: string) {
@@ -278,12 +217,6 @@ export function getDisplayNameValue(program: Program, target: Type): string | un
 //   return program.stateSet(PortalCoreKeys.essentials).has(target);
 // }
 
-export function findAboutDisplayName(program: Program, target: Model) {
-  return (
-    program.stateSet(PortalCoreKeys.about).has(target) &&
-    program.stateSet(PortalCoreKeys.about).keys()
-  );
-}
 
 // function validateTargetingAString(
 //   context: DecoratorContext,

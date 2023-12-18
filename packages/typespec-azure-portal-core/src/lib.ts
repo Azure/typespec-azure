@@ -3,22 +3,11 @@ import { createTypeSpecLibrary } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-portal-core",
   diagnostics: {
-    invalidType: {
-      severity: "error",
-      messages: {
-        aboutDisplayName: `invalidType for $about.displayName.`,
-        aboutKeywords: `invalidType for $about.keywords.`,
-        aboutKeywordsItem: `invalidType for $about.keywords : only accept string item.`,
-        aboutLearnMoreDocs: `invalidType for $about.LearnMoreDocs.`,
-        aboutLearnMoreDocsItem: `invalidType for $about.keywords : only accept string item.`,
-        marketplaceOfferId: `invalidType for $marketplaceOffer.id.`,
-      },
-    },
     fileNotFound: {
       severity: "error",
       messages: {
-        browseargQuery: `cannot find file argQuery`,
-        aboutIcon: `cannot find file icon`,
+        browseargQuery: `cannot find @browse file argQuery`,
+        aboutIcon: `cannot find @about file icon`,
       },
     },
     invalidUsageDecorator: {
@@ -26,7 +15,7 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         browse: `@browse decorator can be only applied to trackedResource and proxyResource`,
         about: `@about decorator can be only applied to trackedResource and proxyResource`,
-        marketPlaceOffer: `@marketPlaceOffer decorator can be only applied to trackedResource and proxyResource`,
+        marketplaceOffer: `@marketPlaceOffer decorator can be only applied to trackedResource and proxyResource`,
       },
     },
     "essentials-maximum-usage": {
