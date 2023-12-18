@@ -223,6 +223,12 @@
       "versionPolicyName": "typespec-azure"
     },
     {
+      "packageName": "@azure-tools/typespec-azure-portal-core",
+      "projectFolder": "packages/typespec-azure-portal-core",
+      "reviewCategory": "production",
+      "versionPolicyName": "typespec-azure"
+    },
+    {
       "packageName": "@azure-tools/typespec-client-generator-core",
       "projectFolder": "packages/typespec-client-generator-core",
       "reviewCategory": "production",
