@@ -15,7 +15,6 @@ import { createPortalCoreTestRunner } from "./test-host.js";
 describe("my library", () => {
   let runner: BasicTestRunner;
 
-  const browseFile = createbrowseTestDecorator(`{filePath:"./testfiles/query.kql"}`);
   const browseString = createbrowseTestDecorator(`"helloThisISArgQuery"`);
   //const testSpecWithbrowseFile = createTestSpec(browseFile);
   //const testSpecWithBrowseString = createTestSpec(browseString);
@@ -74,7 +73,6 @@ describe("my library", () => {
   it("test @browse with string", async () => {
     const { Foo } = await runner.compile(createTestSpec(browseString));
     const result = getBrowseArgQuery(runner.program, Foo);
-    //const actual = getDisplayName(runner.program, name as ModelProperty);
     strictEqual(Foo.kind, "Model");
     strictEqual(result.kind, "ModelProperty");
     strictEqual(result.type.kind, "String");
