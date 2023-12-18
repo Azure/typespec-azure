@@ -925,6 +925,86 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(correspondingQueryParams.length, 1);
       strictEqual(correspondingQueryParams[0].nameInClient, queryParamProp.nameInClient);
     });
+
+    it("content type", async () => {
+      await runner.compileWithBuiltInService(`
+      @patch op patchNull(@body body: string): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfSingleClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 1);
+
+      const methodParam = method.parameters[0];
+      strictEqual(methodParam.kind, "method");
+      strictEqual(methodParam.nameInClient, "options");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "model");
+
+      const requestOptionsModel = methodParam.type;
+      strictEqual(requestOptionsModel.name, "RequestOptions");
+      strictEqual(requestOptionsModel.properties.length, 3);
+
+      const headerParamProp = requestOptionsModel.properties.find(
+        (x): x is SdkHeaderParameter => x.nameInClient === "header"
+      )!;
+      strictEqual(headerParamProp.kind, "header");
+      strictEqual(headerParamProp.nameInClient, "header");
+      strictEqual(headerParamProp.optional, false);
+      strictEqual(headerParamProp.onClient, false);
+      strictEqual(headerParamProp.type.kind, "string");
+
+      const queryParamProp = requestOptionsModel.properties.find(
+        (x): x is SdkQueryParameter => x.nameInClient === "query"
+      )!;
+      strictEqual(queryParamProp.kind, "query");
+      strictEqual(queryParamProp.nameInClient, "query");
+      strictEqual(queryParamProp.optional, false);
+      strictEqual(queryParamProp.onClient, false);
+      strictEqual(queryParamProp.type.kind, "string");
+
+      const bodyParamProp = requestOptionsModel.properties.find(
+        (x): x is SdkBodyParameter => x.nameInClient === "body"
+      )!;
+      strictEqual(bodyParamProp.kind, "body");
+      strictEqual(bodyParamProp.nameInClient, "body");
+      strictEqual(bodyParamProp.optional, false);
+      strictEqual(bodyParamProp.onClient, false);
+      strictEqual(bodyParamProp.type.kind, "string");
+      deepStrictEqual(bodyParamProp.contentTypes, ["application/json"]);
+      strictEqual(bodyParamProp.defaultContentType, "application/json");
+
+      const serviceOperation = method.operation;
+      strictEqual(getAllServiceOperationParameters(serviceOperation).length, 3);
+
+      strictEqual(serviceOperation.bodyParams.length, 1);
+      const correspondingBodyParams = method.getParameterMapping(serviceOperation.bodyParams[0]);
+      strictEqual(correspondingBodyParams.length, 1);
+      strictEqual(correspondingBodyParams[0].nameInClient, bodyParamProp.nameInClient);
+      // Ideally check they're strict equal, but running into heap issues when separating out the raw
+      // property
+
+      // strictEqual(
+      //   removeRawFromType(method.getParameterMapping(serviceOperation.bodyParams[0])[0]),
+      //   removeRawFromType(bodyParamProp)
+      // );
+
+      strictEqual(serviceOperation.headerParams.length, 1);
+      const correspondingHeaderParams = method.getParameterMapping(
+        serviceOperation.headerParams[0]
+      );
+      strictEqual(correspondingHeaderParams.length, 1);
+      strictEqual(correspondingHeaderParams[0].nameInClient, headerParamProp.nameInClient);
+
+      strictEqual(serviceOperation.queryParams.length, 1);
+      const correspondingQueryParams = method.getParameterMapping(serviceOperation.queryParams[0]);
+      strictEqual(correspondingQueryParams.length, 1);
+      strictEqual(correspondingQueryParams[0].nameInClient, queryParamProp.nameInClient);
+    });
   });
 
   describe("Responses", () => {

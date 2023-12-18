@@ -288,8 +288,8 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
     metadata.logicalPath ??
     (metadata.envelopeResult !== metadata.logicalResult &&
       basicServiceMethod.operation.verb === "post"
-      ? ".result"
-      : ".");
+      ? "result"
+      : undefined);
   return {
     ...basicServiceMethod,
     kind: "lro",
@@ -549,7 +549,8 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       ...sdkParam,
       kind: "endpoint",
       urlEncode: false,
-      optional: false, ...updateWithApiVersionInformation(context, param),
+      optional: false,
+      ...updateWithApiVersionInformation(context, param),
       onClient: true,
     });
   }
