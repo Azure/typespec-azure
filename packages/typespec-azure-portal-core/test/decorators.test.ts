@@ -1,4 +1,4 @@
-import { ModelProperty, StringLiteral, Type } from "@typespec/compiler";
+import { ModelProperty } from "@typespec/compiler";
 import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, strictEqual } from "assert";
 import {
@@ -12,7 +12,6 @@ import {
   getMarketplaceOfferId,
 } from "../src/decorators.js";
 import { createPortalCoreTestRunner } from "./test-host.js";
-
 
 describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   let runner: BasicTestRunner;
@@ -76,7 +75,10 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
         ${browseString}
         model Bar {}
       `);
-    expectDiagnostics(diagnostics, { code: "@azure-tools/typespec-azure-portal-core/invalidUsageDecorator", message: "@browse decorator can be only applied to trackedResource and proxyResource" });
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalidUsageDecorator",
+      message: "@browse decorator can be only applied to trackedResource and proxyResource",
+    });
   });
 
   it("test @about", async () => {
@@ -117,16 +119,28 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
         ${aboutTest}
         model Bar {}
       `);
-    expectDiagnostics(diagnostics, { code: "@azure-tools/typespec-azure-portal-core/invalidUsageDecorator", message: "@about decorator can be only applied to trackedResource and proxyResource" });
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalidUsageDecorator",
+      message: "@about decorator can be only applied to trackedResource and proxyResource",
+    });
   });
 
   it("test @marketplaceOffer.id", async () => {
-    const marketplaceOffer = `@test @marketplaceOffer({id: "marketplaceofferid"})`;
+    const marketplaceOffer = `@test @marketplaceOffer({id: "id"})`;
     const { Foo } = await runner.compile(createTestSpec(undefined, marketplaceOffer));
     const marketplaceOfferId = getMarketplaceOfferId(runner.program, Foo);
     strictEqual(marketplaceOfferId.kind, "ModelProperty");
     strictEqual(marketplaceOfferId.type.kind, "String");
-    strictEqual(marketplaceOfferId.type.value, "marketplaceofferid");
+    strictEqual(marketplaceOfferId.type.value, "id");
+  });
+
+  it("test @marketplaceOffer.id with space", async () => {
+    const marketplaceOffer = `@test @marketplaceOffer({id: "id space"})`;
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, marketplaceOffer));
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalidType",
+      message: "@marketplaceOffer id cannot have a blank space.",
+    });
   });
 });
 

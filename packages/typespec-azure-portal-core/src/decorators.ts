@@ -61,7 +61,11 @@ export function getBrowseArgQuery(program: Program, target: Type) {
   return browse.properties.get("argQuery");
 }
 
-export function isARMResource(program: Program, target: Model, decoratorName: "browse" | "about" | "marketplaceOffer") {
+export function isARMResource(
+  program: Program,
+  target: Model,
+  decoratorName: "browse" | "about" | "marketplaceOffer"
+) {
   if (
     getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
     getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
@@ -126,8 +130,8 @@ export function getAboutKeywords(program: Program, target: Type) {
 export function getAboutKeywordsItemsArray(program: Program, target: Type) {
   const keywords = getAboutKeywords(program, target);
   return keywords.type.values
-      .filter((value: Type) => value.kind === "String")
-      .map((value: Type) => (<StringLiteral>value).value);
+    .filter((value: Type) => value.kind === "String")
+    .map((value: Type) => (<StringLiteral>value).value);
 }
 
 export function getAboutLearnMoreDocs(program: Program, target: Type) {
@@ -138,8 +142,8 @@ export function getAboutLearnMoreDocs(program: Program, target: Type) {
 export function getAboutLearnMoreDocsItemsArray(program: Program, target: Type) {
   const learnMoreDocs = getAboutLearnMoreDocs(program, target);
   return learnMoreDocs.type.values
-      .filter((value: Type) => value.kind === "String")
-      .map((value: Type) => (<StringLiteral>value).value);
+    .filter((value: Type) => value.kind === "String")
+    .map((value: Type) => (<StringLiteral>value).value);
 }
 
 export function $marketplaceOffer(
@@ -150,6 +154,18 @@ export function $marketplaceOffer(
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
   isARMResource(program, target, "marketplaceOffer");
+  if (options && (options as Model).properties) {
+    const id = (options as Model).properties.get("id");
+    if (id?.type.kind === "String") {
+      if (id.type.value.match(/\s/)) {
+        reportDiagnostic(program, {
+          code: "invalidType",
+          messageId: "marketplaceOfferId",
+          target,
+        });
+      }
+    }
+  }
   program.stateMap(PortalCoreKeys.marketplaceOffer).set(target, options);
 }
 
@@ -216,7 +232,6 @@ export function getDisplayNameValue(program: Program, target: Type): string | un
 // export function isEssential(program: Program, target: ModelProperty) {
 //   return program.stateSet(PortalCoreKeys.essentials).has(target);
 // }
-
 
 // function validateTargetingAString(
 //   context: DecoratorContext,

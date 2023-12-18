@@ -18,6 +18,12 @@ export const $lib = createTypeSpecLibrary({
         marketplaceOffer: `@marketPlaceOffer decorator can be only applied to trackedResource and proxyResource`,
       },
     },
+    invalidType: {
+      severity: "error",
+      messages: {
+        marketplaceOfferId: `@marketplaceOffer id cannot have a blank space.`,
+      },
+    },
     "essentials-maximum-usage": {
       severity: "error",
       messages: {
