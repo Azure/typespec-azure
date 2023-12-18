@@ -476,6 +476,7 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 
 interface SdkLroServiceMethodOptions {
   __raw_lro_metadata: LroMetadata;
+  initialOperation: SdkServiceOperation;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>

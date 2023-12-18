@@ -295,6 +295,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
     ...basicServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata,
+    initialOperation: getSdkServiceOperation<TServiceOperation>(context, metadata.operation, basicServiceMethod.parameters),
   };
 }
 
