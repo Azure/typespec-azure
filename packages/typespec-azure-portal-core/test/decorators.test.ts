@@ -1,38 +1,28 @@
 import { ModelProperty, StringLiteral, Type } from "@typespec/compiler";
-import { BasicTestRunner } from "@typespec/compiler/testing";
+import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, strictEqual } from "assert";
 import {
   getAboutDisplayName,
   getAboutKeywords,
+  getAboutKeywordsItemsArray,
   getAboutLearnMoreDocs,
+  getAboutLearnMoreDocsItemsArray,
   getBrowseArgQuery,
   getDisplayName,
+  getMarketplaceOfferId,
 } from "../src/decorators.js";
 import { createPortalCoreTestRunner } from "./test-host.js";
 
-//const browse = `@test @browse({argQuery:${browseArg}})`;
 
-describe("my library", () => {
+describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   let runner: BasicTestRunner;
-
-  const browseString = createbrowseTestDecorator(`"helloThisISArgQuery"`);
-  //const testSpecWithbrowseFile = createTestSpec(browseFile);
-  //const testSpecWithBrowseString = createTestSpec(browseString);
 
   beforeEach(async () => {
     runner = await createPortalCoreTestRunner();
   });
 
-  // Check everything works fine
-  it("does this", async () => {
-    const { Foo } = await runner.compile(`
-        @test model Foo {}
-      `);
-    strictEqual(Foo.kind, "Model");
-  });
-
   it("test @displayName", async () => {
-    const { Foo, name } = await runner.compile(`
+    const { name } = await runner.compile(`
         model Foo {
             @test @displayName("nickName")
             name: string;
@@ -71,12 +61,22 @@ describe("my library", () => {
   // });
 
   it("test @browse with string", async () => {
+    const browseString = createbrowseTestDecorator(`"helloThisISArgQuery"`);
     const { Foo } = await runner.compile(createTestSpec(browseString));
     const result = getBrowseArgQuery(runner.program, Foo);
     strictEqual(Foo.kind, "Model");
     strictEqual(result.kind, "ModelProperty");
     strictEqual(result.type.kind, "String");
     strictEqual(result.type.value, "helloThisISArgQuery");
+  });
+
+  it("test @browse on non-ARM resource", async () => {
+    const browseString = createbrowseTestDecorator(`"helloThisISArgQuery"`);
+    const diagnostics = await runner.diagnose(`
+        ${browseString}
+        model Bar {}
+      `);
+    expectDiagnostics(diagnostics, { code: "@azure-tools/typespec-azure-portal-core/invalidUsageDecorator", message: "@browse decorator can be only applied to trackedResource and proxyResource" });
   });
 
   it("test @about", async () => {
@@ -90,7 +90,6 @@ describe("my library", () => {
     const displayName = getAboutDisplayName(runner.program, Foo);
     const keywords = getAboutKeywords(runner.program, Foo);
     const learnMoreDocs = getAboutLearnMoreDocs(runner.program, Foo);
-    //const actual = getDisplayName(runner.program, name as ModelProperty);
     strictEqual(Foo.kind, "Model");
     strictEqual(displayName.kind, "ModelProperty");
     strictEqual(displayName.type.kind, "String");
@@ -98,35 +97,47 @@ describe("my library", () => {
 
     strictEqual(keywords.kind, "ModelProperty");
     strictEqual(keywords.type.kind, "Tuple");
-    const keywordValues = keywords.type.values
-      .filter((value: Type) => value.kind === "String")
-      .map((value: Type) => (<StringLiteral>value).value);
+    const keywordValues = getAboutKeywordsItemsArray(runner.program, Foo);
     deepEqual(keywordValues, ["a", "c", "b"]);
 
     strictEqual(learnMoreDocs.kind, "ModelProperty");
     strictEqual(learnMoreDocs.type.kind, "Tuple");
-    const learnMoreDocsValues = learnMoreDocs.type.values
-      .filter((value: Type) => value.kind === "String")
-      .map((value: Type) => (<StringLiteral>value).value);
+    const learnMoreDocsValues = getAboutLearnMoreDocsItemsArray(runner.program, Foo);
     deepEqual(learnMoreDocsValues, ["www.azure.com", "www.portal.azure.com"]);
   });
 
-  // Check diagnostics are emitted
-  it("errors", async () => {
+  it("test @about on non-ARM resource", async () => {
+    const aboutTest = `
+        @test @about({
+        displayName: "hello",
+        keywords: ["a", "c", "b"],
+        learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
+      })`;
     const diagnostics = await runner.diagnose(`
-         model Bar {}
+        ${aboutTest}
+        model Bar {}
       `);
-    //expectDiagnostics(diagnostics, { code: "...", message: "..." });
+    expectDiagnostics(diagnostics, { code: "@azure-tools/typespec-azure-portal-core/invalidUsageDecorator", message: "@about decorator can be only applied to trackedResource and proxyResource" });
+  });
+
+  it("test @marketplaceOffer.id", async () => {
+    const marketplaceOffer = `@test @marketplaceOffer({id: "marketplaceofferid"})`;
+    const { Foo } = await runner.compile(createTestSpec(undefined, marketplaceOffer));
+    const marketplaceOfferId = getMarketplaceOfferId(runner.program, Foo);
+    strictEqual(marketplaceOfferId.kind, "ModelProperty");
+    strictEqual(marketplaceOfferId.type.kind, "String");
+    strictEqual(marketplaceOfferId.type.value, "marketplaceofferid");
   });
 });
 
-export function createTestSpec(browseDec?: string, aboutDec?: string) {
+export function createTestSpec(browseDec?: string, aboutDec?: string, marketplaceOffer?: string) {
   return `
     @service({title: "Microsoft.Foo"})
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     @armProviderNamespace
     namespace Microsoft.Foo;
 
+    ${marketplaceOffer ? marketplaceOffer : ""}
     ${aboutDec ? aboutDec : ""}
     ${browseDec ? browseDec : ""}
     model Foo is TrackedResource<{}> {
@@ -144,21 +155,4 @@ export function createTestSpec(browseDec?: string, aboutDec?: string) {
 
 export function createbrowseTestDecorator(browseArg: string) {
   return `@test @browse({argQuery:${browseArg}})`;
-}
-
-export function createAboutTestDecorator(
-  displayName?: string,
-  keywords?: string,
-  learnMoreDocs?: string
-) {
-  const example = `    @test @about({
-      displayName: "hello",
-      keywords: ["a", "c", "b"],
-      learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
-    })`;
-  return `@test @about({
-      ${displayName ? displayName + "," : ""}
-      ${keywords ? keywords + "," : ""}
-      ${learnMoreDocs ? learnMoreDocs + "," : ""}
-    })`;
 }
