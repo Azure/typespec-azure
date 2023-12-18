@@ -3,7 +3,7 @@ import { createTypeSpecLibrary } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-portal-core",
   diagnostics: {
-    "invalidType": {
+    invalidType: {
       severity: "error",
       messages: {
         aboutDisplayName: `invalidType for $about.displayName.`,
@@ -14,19 +14,19 @@ export const $lib = createTypeSpecLibrary({
         marketplaceOfferId: `invalidType for $marketplaceOffer.id.`,
       },
     },
-    "fileNotFound": {
+    fileNotFound: {
       severity: "error",
       messages: {
         browseargQuery: `cannot find file argQuery`,
         aboutIcon: `cannot find file icon`,
       },
     },
-    "invalidUsageDecorator": {
+    invalidUsageDecorator: {
       severity: "error",
       messages: {
         browse: `@browse decorator can be only applied to trackedResource and proxyResource`,
         about: `@about decorator can be only applied to trackedResource and proxyResource`,
-        marketPlaceOffer: `@marketPlaceOffer decorator can be only applied to trackedResource and proxyResource`
+        marketPlaceOffer: `@marketPlaceOffer decorator can be only applied to trackedResource and proxyResource`,
       },
     },
     "invalid-type-for-about-displayName": {
@@ -52,7 +52,7 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default: `essentials can be only used 5 times in ModelProperty.`,
       },
-    }
+    },
   },
 } as const);
 

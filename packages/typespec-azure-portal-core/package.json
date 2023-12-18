@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "build": "tsc -p .",
-    "test": "mocha"
+    "test": "mocha",
+    "test-official": "c8 mocha --forbid-only --reporter mocha-multi-reporters"
   },
   "keywords": [
     "Azure",

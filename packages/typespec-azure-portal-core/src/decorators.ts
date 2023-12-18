@@ -1,9 +1,21 @@
-import { validateDecoratorUniqueOnNode, type DecoratorContext, type Model, type ModelProperty, type Program, type Type, StringLiteral, getDirectoryPath, getSourceLocation, resolvePath, normalizePath } from "@typespec/compiler";
+import { ArmResourceKind, getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
+import {
+  StringLiteral,
+  getDirectoryPath,
+  getSourceLocation,
+  normalizePath,
+  resolvePath,
+  validateDecoratorUniqueOnNode,
+  type DecoratorContext,
+  type Model,
+  type ModelProperty,
+  type Program,
+  type Type,
+} from "@typespec/compiler";
+import fs from "fs";
 import { PortalCoreKeys } from "./keys.js";
 import { reportDiagnostic } from "./lib.js";
 import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js";
-import fs from 'fs';
-import { getArmResourceKind, ArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 
 /**
  * This is a Browse decorator which will be use to put more info on the browse view.
@@ -12,11 +24,14 @@ import { getArmResourceKind, ArmResourceKind } from "@azure-tools/typespec-azure
  */
 export function $browse(context: DecoratorContext, target: Model, options: BrowseOptions) {
   const { program } = context;
-  if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) && getArmResourceKind(target) !== ("Proxy" as ArmResourceKind) ) {
+  if (
+    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
+    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
+  ) {
     reportDiagnostic(program, {
       code: "invalidUsageDecorator",
       messageId: "browse",
-      target
+      target,
     });
   }
   validateDecoratorUniqueOnNode(context, target, $browse);
@@ -24,21 +39,23 @@ export function $browse(context: DecoratorContext, target: Model, options: Brows
     const query = (options as Model).properties.get("argQuery");
     if (query && query.type.kind === "Model") {
       const sourceLocation = getSourceLocation(target);
-      const dirPath = sourceLocation && sourceLocation.file.path && getDirectoryPath(sourceLocation.file.path);
+      const dirPath =
+        sourceLocation && sourceLocation.file.path && getDirectoryPath(sourceLocation.file.path);
       let argQueryPath = query.type && (query.type as Model).properties.get("filePath");
-      const argQueryPathValue = argQueryPath && argQueryPath.type && (argQueryPath.type as StringLiteral).value;
+      const argQueryPathValue =
+        argQueryPath && argQueryPath.type && (argQueryPath.type as StringLiteral).value;
       let filePath = resolvePath(dirPath, argQueryPathValue); //if given path is fullpath, it will return the fullPath
       if (filePath && argQueryPath && argQueryPathValue) {
         filePath = normalizePath(filePath);
-          if(!fs.existsSync(filePath)) {
-            reportDiagnostic(program, {
-              code: "fileNotFound",
-              messageId: "browseargQuery",
-              target
-            });
-          }
+        if (!fs.existsSync(filePath)) {
+          reportDiagnostic(program, {
+            code: "fileNotFound",
+            messageId: "browseargQuery",
+            target,
+          });
+        }
         (argQueryPath.type as StringLiteral).value = filePath;
-      }    
+      }
     }
   }
   program.stateMap(PortalCoreKeys.browse).set(target, options);
@@ -62,11 +79,14 @@ export function getBrowseArgQuery(program: Program, target: Type) {
 export function $about(context: DecoratorContext, target: Model, options: AboutOptions) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $about);
-  if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) && getArmResourceKind(target) !== ("Proxy" as ArmResourceKind) ) {
+  if (
+    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
+    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
+  ) {
     reportDiagnostic(program, {
       code: "invalidUsageDecorator",
       messageId: "browse",
-      target
+      target,
     });
   }
   if (options && (options as Model).properties) {
@@ -77,64 +97,69 @@ export function $about(context: DecoratorContext, target: Model, options: AboutO
     if (icon) {
       if (icon.type.kind === "Model") {
         const sourceLocation = getSourceLocation(target);
-        const dirPath = sourceLocation && sourceLocation.file.path && getDirectoryPath(sourceLocation.file.path);
+        const dirPath =
+          sourceLocation && sourceLocation.file.path && getDirectoryPath(sourceLocation.file.path);
         let iconPath = icon.type && (icon.type as Model).properties.get("filePath");
         const iconPathValue = iconPath && iconPath.type && (iconPath.type as StringLiteral).value;
         let filePath = resolvePath(dirPath, iconPathValue); //if given path is fullpath, it will return the fullPath
         if (filePath && iconPath && iconPathValue) {
           filePath = normalizePath(filePath);
-            if (!fs.existsSync(filePath)) {
-              reportDiagnostic(program, {
-                code: "fileNotFound",
-                messageId: "aboutIcon",
-                target
-              });
-            }
+          if (!fs.existsSync(filePath)) {
+            reportDiagnostic(program, {
+              code: "fileNotFound",
+              messageId: "aboutIcon",
+              target,
+            });
+          }
           (iconPath.type as StringLiteral).value = filePath;
         }
       }
     }
     if (displayName) {
-      if(displayName.type.kind !== "String") {
+      if (displayName.type.kind !== "String") {
         reportDiagnostic(program, {
-            code: "invalidType",
-            messageId: "aboutDisplayName",
-            target
+          code: "invalidType",
+          messageId: "aboutDisplayName",
+          target,
         });
       }
-    } 
+    }
     if (keywords) {
       if (keywords.type.kind !== "Tuple") {
-          reportDiagnostic(program, {
-              code: "invalidType",
-              messageId: "aboutKeywords",
-              target
-          });
+        reportDiagnostic(program, {
+          code: "invalidType",
+          messageId: "aboutKeywords",
+          target,
+        });
       } else {
-        const invalidTypes = keywords.type.values && keywords.type.values.filter(keyword => keyword.kind !== "String");
+        const invalidTypes =
+          keywords.type.values &&
+          keywords.type.values.filter((keyword) => keyword.kind !== "String");
         if (invalidTypes && invalidTypes.length > 0) {
           reportDiagnostic(program, {
-              code: "invalidType",
-              messageId: "aboutKeywordsItem",
-              target
+            code: "invalidType",
+            messageId: "aboutKeywordsItem",
+            target,
           });
         }
       }
     }
     if (learnMoreDocs) {
       if (learnMoreDocs.type.kind !== "Tuple") {
-          reportDiagnostic(program, {
-              code: "invalidType",
-              messageId: "aboutLearnMoreDocs",
-              target
-          });
+        reportDiagnostic(program, {
+          code: "invalidType",
+          messageId: "aboutLearnMoreDocs",
+          target,
+        });
       } else {
-        const invalidTypes = learnMoreDocs.type.values && learnMoreDocs.type.values.filter(doc => doc.kind !== "String");
+        const invalidTypes =
+          learnMoreDocs.type.values &&
+          learnMoreDocs.type.values.filter((doc) => doc.kind !== "String");
         if (invalidTypes && invalidTypes.length > 0) {
           reportDiagnostic(program, {
-              code: "invalidType",
-              messageId: "aboutLearnMoreDocsItem",
-              target
+            code: "invalidType",
+            messageId: "aboutLearnMoreDocsItem",
+            target,
           });
         }
       }
@@ -162,30 +187,36 @@ export function getAboutLearnMoreDocs(program: Program, target: Type) {
   return about.properties.get("learnMoreDocs");
 }
 
-export function $marketplaceOffer(context: DecoratorContext, target: Model, options: marketplaceOfferOptions) {
+export function $marketplaceOffer(
+  context: DecoratorContext,
+  target: Model,
+  options: marketplaceOfferOptions
+) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
-  if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) && getArmResourceKind(target) !== ("Proxy" as ArmResourceKind) ) {
+  if (
+    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
+    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
+  ) {
     reportDiagnostic(program, {
       code: "invalidUsageDecorator",
       messageId: "marketPlaceOffer",
-      target
+      target,
     });
   }
   if (options && (options as Model).properties) {
     const id = (options as Model).properties.get("id");
     if (id) {
-      if(id.type.kind !== "String") {
+      if (id.type.kind !== "String") {
         reportDiagnostic(program, {
-            code: "invalidType",
-            messageId: "marketplaceOfferId",
-            target
+          code: "invalidType",
+          messageId: "marketplaceOfferId",
+          target,
         });
       }
-    } 
+    }
   }
   program.stateMap(PortalCoreKeys.marketplaceOffer).set(target, options);
-
 }
 
 // export function $patternValidationMessage(context:DecoratorContext, target: Scalar | ModelProperty, message: string) {
@@ -240,7 +271,7 @@ export function getDisplayNameValue(program: Program, target: Type): string | un
 //     essentialsArray.push(target.name);
 //     program.stateSet(PortalCoreKeys.essentials).add({kind: "String", value: target.name} as StringLiteral);
 //   }
-  
+
 // }
 
 // export function isEssential(program: Program, target: ModelProperty) {
@@ -248,7 +279,10 @@ export function getDisplayNameValue(program: Program, target: Type): string | un
 // }
 
 export function findAboutDisplayName(program: Program, target: Model) {
-  return program.stateSet(PortalCoreKeys.about).has(target) && program.stateSet(PortalCoreKeys.about).keys()
+  return (
+    program.stateSet(PortalCoreKeys.about).has(target) &&
+    program.stateSet(PortalCoreKeys.about).keys()
+  );
 }
 
 // function validateTargetingAString(
