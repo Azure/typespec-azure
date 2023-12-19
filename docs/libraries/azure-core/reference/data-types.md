@@ -252,16 +252,16 @@ model Azure.Core.StatusMonitorOptions
 Options for overriding a polling endpoint that uses a StatusMonitor
 
 ```typespec
-model Azure.Core.StatusMonitorPollingOptions<TPollingModel, TFinalResult, TFinalProperty>
+model Azure.Core.StatusMonitorPollingOptions<PollingModel, FinalResult, FinalProperty>
 ```
 
 #### Template Parameters
 
-| Name           | Description                                              |
-| -------------- | -------------------------------------------------------- |
-| TPollingModel  | The model that is returned when polling should continue. |
-| TFinalResult   |                                                          |
-| TFinalProperty |                                                          |
+| Name          | Description                                               |
+| ------------- | --------------------------------------------------------- |
+| PollingModel  | The model that is returned when polling should continue.  |
+| FinalResult   |                                                           |
+| FinalProperty | The property of the status monitor that contains results. |
 
 ### `TopQueryParameter` {#Azure.Core.TopQueryParameter}
 
@@ -280,6 +280,8 @@ enum Azure.Core.Versions
 ```
 
 ### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
+
+The available kinds of polling options
 
 ```typespec
 union Azure.Core.PollingOptionKind

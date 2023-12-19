@@ -666,7 +666,7 @@ export function $pollingLocation(
 }
 
 /**
- * Gets pollign information stored with a field that contains a link to an Lro polling endpoint
+ * Gets polling information stored with a field that contains a link to an Lro polling endpoint
  * @param program The program to check
  * @param target The ModelProperty to check for polling info
  */

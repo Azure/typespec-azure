@@ -52,7 +52,7 @@ op Azure.ResourceManager.ExtensionResourceInstanceOperations.get(apiVersion: str
 #### `ExtensionResourceInstanceOperations.createOrUpdate` {#Azure.ResourceManager.ExtensionResourceInstanceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceInstanceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceInstanceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ExtensionResourceInstanceOperations.update` {#Azure.ResourceManager.ExtensionResourceInstanceOperations.update}
@@ -91,7 +91,7 @@ op Azure.ResourceManager.ExtensionResourceOperations.get(apiVersion: string, res
 #### `ExtensionResourceOperations.createOrUpdate` {#Azure.ResourceManager.ExtensionResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.update` {#Azure.ResourceManager.ExtensionResourceOperations.update}
@@ -161,7 +161,7 @@ op Azure.ResourceManager.ProxyResourceOperations.get(provider: Microsoft.ThisWil
 #### `ProxyResourceOperations.createOrUpdate` {#Azure.ResourceManager.ProxyResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ProxyResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ProxyResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ProxyResourceOperations.delete` {#Azure.ResourceManager.ProxyResourceOperations.delete}
@@ -221,7 +221,7 @@ interface Azure.ResourceManager.ResourceCreateAsync<TResource, TBaseParameters>
 #### `ResourceCreateAsync.createOrUpdate` {#Azure.ResourceManager.ResourceCreateAsync.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ResourceCreateAsync.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceCreateAsync.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceCreateSync` {#Azure.ResourceManager.ResourceCreateSync}
@@ -330,7 +330,7 @@ op Azure.ResourceManager.ResourceInstanceOperations.get(provider: Microsoft.This
 #### `ResourceInstanceOperations.createOrUpdate` {#Azure.ResourceManager.ResourceInstanceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ResourceInstanceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceInstanceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ResourceInstanceOperations.update` {#Azure.ResourceManager.ResourceInstanceOperations.update}
@@ -411,7 +411,7 @@ op Azure.ResourceManager.ResourceOperations.get(provider: Microsoft.ThisWillBeRe
 #### `ResourceOperations.createOrUpdate` {#Azure.ResourceManager.ResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ResourceOperations.update` {#Azure.ResourceManager.ResourceOperations.update}
@@ -531,7 +531,7 @@ op Azure.ResourceManager.TenantResourceOperations.get(apiVersion: string, provid
 #### `TenantResourceOperations.createOrUpdate` {#Azure.ResourceManager.TenantResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.TenantResourceOperations.createOrUpdate(apiVersion: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TenantResourceOperations.createOrUpdate(apiVersion: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TenantResourceOperations.update` {#Azure.ResourceManager.TenantResourceOperations.update}
@@ -580,7 +580,7 @@ op Azure.ResourceManager.TrackedResourceOperations.get(provider: Microsoft.ThisW
 #### `TrackedResourceOperations.createOrUpdate` {#Azure.ResourceManager.TrackedResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.TrackedResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TrackedResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.update` {#Azure.ResourceManager.TrackedResourceOperations.update}
@@ -753,7 +753,7 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: Microsoft.ThisWillBeRep
 ### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
@@ -784,7 +784,7 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(provider: Microsoft.This
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters

@@ -86,7 +86,6 @@ model ArmOperationStatus<
   properties?: Properties;
 
   /** The operation status */
-  @visibility("read")
   @Azure.Core.lroStatus
   status: StatusValues;
 
@@ -94,7 +93,6 @@ model ArmOperationStatus<
   @key
   @path
   @segment("operationStatuses")
-  @visibility("read")
   id: Azure.Core.uuid;
 
   /** The name of the  operationStatus resource */
@@ -189,26 +187,29 @@ model ArmNoContentResponse<TMessage extends valueof string = "Operation complete
   ...NoContentResponse;
 }
 
-/** Resource update operation succeeded
+/**
+ * @dev Resource update operation succeeded
  * @template TResource The resource being updated
  */
 @doc("Resource '{name}' update operation succeeded", TResource)
 model ArmResourceUpdatedResponse<TResource extends Azure.ResourceManager.Foundations.ArmResource>
   is ArmResponse<TResource>;
 
-/** Resource create operation succeeded
- * @template TResource The resource being updated
+/**
+ * @dev Resource create operation succeeded
+ * @template Resource The resource being updated
  * @template LroHeaders Optional. The lro headers returned with a Created response
  */
-@doc("Resource '{name}' create operation succeeded", TResource)
+@doc("Resource '{name}' create operation succeeded", Resource)
 model ArmResourceCreatedResponse<
-  TResource extends Azure.ResourceManager.Foundations.ArmResource,
+  Resource extends Azure.ResourceManager.Foundations.ArmResource,
   LroHeaders extends TypeSpec.Reflection.Model = {}
-> is ArmCreatedResponse<TResource> {
+> is ArmCreatedResponse<Resource> {
   ...LroHeaders;
 }
 
-/** Resource synchronous create operation succeeded
+/**
+ * @dev Resource synchronous create operation succeeded
  * @template TResource The resource being updated
  */
 @doc("Resource '{name}' create operation succeeded", TResource)

@@ -166,22 +166,18 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
-Resource create operation succeeded
-
 ```typespec
-model Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders>
+model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 ```
 
 #### Template Parameters
 
 | Name       | Description                                                |
 | ---------- | ---------------------------------------------------------- |
-| TResource  | The resource being updated                                 |
+| Resource   | The resource being updated                                 |
 | LroHeaders | Optional. The lro headers returned with a Created response |
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
-
-Resource synchronous create operation succeeded
 
 ```typespec
 model Azure.ResourceManager.ArmResourceCreatedSyncResponse<TResource>
@@ -194,8 +190,6 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<TResource>
 | TResource | The resource being updated |
 
 ### `ArmResourceUpdatedResponse` {#Azure.ResourceManager.ArmResourceUpdatedResponse}
-
-Resource update operation succeeded
 
 ```typespec
 model Azure.ResourceManager.ArmResourceUpdatedResponse<TResource>

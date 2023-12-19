@@ -227,22 +227,31 @@ model RequestIdResponseHeader {
 model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
 
 /** Options for overriding a polling endpoint that uses a StatusMonitor
- * @template TPollingModel The model that is returned when polling should continue.
- * @template TFinalModel The model that is returned when polling terminates successfully.
+ * @template PollingModel The model that is returned when polling should continue.
+ * @template FinalModel The model that is returned when polling terminates successfully.
+ * @template FinalProperty The property of the status monitor that contains results.
  */
 model StatusMonitorPollingOptions<
-  TPollingModel extends TypeSpec.Reflection.Model | void = never,
-  TFinalResult extends TypeSpec.Reflection.Model | void = never,
-  TFinalProperty extends TypeSpec.Reflection.ModelProperty | (valueof string) = never
+  PollingModel extends TypeSpec.Reflection.Model | void = never,
+  FinalResult extends TypeSpec.Reflection.Model | void = never,
+  FinalProperty extends TypeSpec.Reflection.ModelProperty | (valueof string) = never
 > extends StatusMonitorOptions {
+  /** The kind of polling options */
   kind: PollingOptionKind.statusMonitor;
-  pollingModel: TPollingModel;
-  finalResult: TFinalResult;
-  finalProperty: TFinalProperty;
+
+  /** The model that is returned when polling should continue */
+  pollingModel: PollingModel;
+
+  /** The model that is returned when polling terminates successfully */
+  finalResult: FinalResult;
+
+  /** The property of the status monitor that contains results */
+  finalProperty: FinalProperty;
 }
 
 /** Options for Lro status monitors. */
 model StatusMonitorOptions extends PollingOptions {
+  /** The kind of polling options */
   kind: PollingOptionKind.statusMonitor;
 
   /** A reference to or name of the property of the status monitor that contains the response */
@@ -251,6 +260,7 @@ model StatusMonitorOptions extends PollingOptions {
 
 /** Generic polling options for LRO operations. */
 model PollingOptions {
+  /** The kind of polling options */
   kind: PollingOptionKind;
 
   /** The model that is returned when polling should continue. */
@@ -260,8 +270,11 @@ model PollingOptions {
   finalResult?: TypeSpec.Reflection.Model | void;
 }
 
+/** The available kinds of polling options */
 union PollingOptionKind {
+  /** Polling options for a status monitor */
   statusMonitor: "statusMonitor",
+
   string,
 }
 

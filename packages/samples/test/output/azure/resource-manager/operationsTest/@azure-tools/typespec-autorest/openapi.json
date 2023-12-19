@@ -4031,13 +4031,11 @@
       "properties": {
         "status": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The operation status",
-          "readOnly": true
+          "description": "The operation status"
         },
         "id": {
           "$ref": "#/definitions/Azure.Core.uuid",
-          "description": "The unique identifier for the operationStatus resource",
-          "readOnly": true
+          "description": "The unique identifier for the operationStatus resource"
         },
         "name": {
           "type": "string",
@@ -4079,13 +4077,11 @@
       "properties": {
         "status": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The operation status",
-          "readOnly": true
+          "description": "The operation status"
         },
         "id": {
           "$ref": "#/definitions/Azure.Core.uuid",
-          "description": "The unique identifier for the operationStatus resource",
-          "readOnly": true
+          "description": "The unique identifier for the operationStatus resource"
         },
         "name": {
           "type": "string",
