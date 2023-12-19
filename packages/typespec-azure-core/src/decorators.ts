@@ -406,6 +406,22 @@ export function getLongRunningStates(
  * @param target The model to check for lro status
  */
 export function getLroStatusProperty(program: Program, target: Model): ModelProperty | undefined {
+  function getProvisioningState(props: Map<string, ModelProperty>): ModelProperty | undefined {
+    let innerProps: Map<string, ModelProperty> | undefined = undefined;
+    let result: ModelProperty | undefined = undefined;
+    const innerProperty = props.get("properties");
+    result = props.get("provisioningState");
+    if (
+      result === undefined &&
+      innerProperty !== undefined &&
+      innerProperty.type?.kind === "Model"
+    ) {
+      innerProps = getAllProperties(innerProperty.type);
+      result = innerProps.get("provisioningState");
+    }
+
+    return result;
+  }
   const props = getAllProperties(target);
   for (const [_, prop] of props.entries()) {
     let values = program.stateMap(lroStatusKey).get(prop);
@@ -416,7 +432,7 @@ export function getLroStatusProperty(program: Program, target: Model): ModelProp
     }
   }
 
-  const statusProp = props.get("status") ?? props.get("provisioningState");
+  const statusProp = props.get("status") ?? getProvisioningState(props);
   if (statusProp) {
     const [states, _] = extractLroStates(program, statusProp);
     if (states !== undefined) return statusProp;
