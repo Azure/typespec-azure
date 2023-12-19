@@ -159,10 +159,10 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 
 #### Template Parameters
 
-| Name         | Description                                   |
-| ------------ | --------------------------------------------- |
-| Properties   | Optional resource-specific properties         |
-| StatusValues | The set of allowd values for operation status |
+| Name         | Description                                    |
+| ------------ | ---------------------------------------------- |
+| Properties   | Optional resource-specific properties          |
+| StatusValues | The set of allowed values for operation status |
 
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
@@ -328,10 +328,19 @@ model Azure.ResourceManager.KeysOf<TResource>
 
 ### `LocationParameter` {#Azure.ResourceManager.LocationParameter}
 
+DEPRECATED - DO NOT USE
 The default location parameter type.
 
 ```typespec
 model Azure.ResourceManager.LocationParameter
+```
+
+### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.LocationResourceParameter
 ```
 
 ### `ManagedBy` {#Azure.ResourceManager.ManagedBy}
@@ -632,6 +641,18 @@ The default subscriptionId parameter type.
 model Azure.ResourceManager.SubscriptionIdParameter
 ```
 
+### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
+
+```typespec
+model Azure.ResourceManager.SubscriptionLocationResource
+```
+
+### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
+
+```typespec
+model Azure.ResourceManager.TenantLocationResource
+```
+
 ### `TrackedResource` {#Azure.ResourceManager.TrackedResource}
 
 Concrete tracked resource types can be created by aliasing this type using a specific property type.
@@ -766,6 +787,14 @@ Base model that defines common properties for all ARM resources.
 
 ```typespec
 model Azure.ResourceManager.Foundations.ArmResource
+```
+
+### `ArmResourceBase` {#Azure.ResourceManager.Foundations.ArmResourceBase}
+
+Base class used for type definitions
+
+```typespec
+model Azure.ResourceManager.Foundations.ArmResourceBase
 ```
 
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}

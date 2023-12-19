@@ -75,7 +75,7 @@ model ArmAcceptedLroResponse<
 /**
  * Standard ARM operation status response
  * @template Properties Optional resource-specific properties
- * @template StatusValues The set of allowd values for operation status
+ * @template StatusValues The set of allowed values for operation status
  */
 model ArmOperationStatus<
   Properties extends {} = never,

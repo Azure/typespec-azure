@@ -227,7 +227,7 @@ model RequestIdResponseHeader {
 model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
 
 /** Options for describing a polling endpoint that uses status codes to control polling
- * @template TContinuationStatus The status code(s) or status code range indictaing polling should continue.
+ * @template TContinuationStatus The status code(s) or status code range indicating polling should continue.
  * @template TTerminalStatus The status code(s) or status code range indicating successful polling completion.
  * @template TPollingModel The model that is returned when polling should continue.
  * @template TFinalModel he model that is returned when polling terminates successfully.
@@ -264,7 +264,7 @@ model StatusMonitorPollingOptions<
 model HttpResponseStatusOptions extends PollingOptions {
   kind: PollingOptionKind.httpResonseStatus;
 
-  /** he status code(s) or status code range indictaing polling should continue. */
+  /** he status code(s) or status code range indicating polling should continue. */
   continuationStatusCodes?: Array<int32>;
 
   /** The status code(s) or status code range indicating successful polling completion. */
@@ -279,7 +279,7 @@ model StatusMonitorOptions extends PollingOptions {
   finalProperty?: TypeSpec.Reflection.ModelProperty | (valueof string);
 }
 
-/** Generic polling options for Lros. */
+/** Generic polling options for LRO operations. */
 model PollingOptions {
   kind: PollingOptionKind;
 

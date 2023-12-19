@@ -268,9 +268,9 @@ Identifies a model property as containing the location to poll for operation sta
 
 #### Parameters
 
-| Name    | Type                              | Description                                                                                                                                                                            |
-| ------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| options | `model Azure.Core.PollingOptions` | PollingOptions for the poller poiinted to by this link. Overrides<br />settings derived from property value it is decorating, if the value of the<br />property is ResourceLocation<T> |
+| Name    | Type                              | Description                                                                                                                                                                           |
+| ------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | `model Azure.Core.PollingOptions` | PollingOptions for the poller pointed to by this link. Overrides<br />settings derived from property value it is decorating, if the value of the<br />property is ResourceLocation<T> |
 
 ### `@pollingOperation` {#@Azure.Core.pollingOperation}
 

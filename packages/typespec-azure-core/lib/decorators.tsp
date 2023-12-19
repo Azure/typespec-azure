@@ -64,7 +64,7 @@ namespace Azure {
 
     /**
      * Identifies a model property as containing the location to poll for operation state.
-     * @param options PollingOptions for the poller poiinted to by this link.  Overrides
+     * @param options PollingOptions for the poller pointed to by this link.  Overrides
      * settings derived from property value it is decorating, if the value of the
      * property is ResourceLocation<T>
      */

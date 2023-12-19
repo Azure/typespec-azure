@@ -331,7 +331,7 @@ op ArmResourceDeleteAsync<
  * @dev Delete a resource asynchronously
  * @template TResource The resource being deleted
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
- * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted respsonse
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  */
 op ArmResourceDeleteWithoutOkAsync<
   TResource extends ArmResource,
@@ -395,7 +395,7 @@ op ArmResourceActionAsyncBase<
  * @template TRequest The request model for the action
  * @template TResponse The response model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
- * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted respsonse
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  */
 @returnsDoc("ARM operation completed successfully.")
 op ArmResourceActionAsync<
@@ -445,7 +445,7 @@ op ArmResourceActionSync<
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
- * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted respsonse
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  *
  */
 op ArmResourceActionNoContentAsync<
@@ -470,7 +470,7 @@ op ArmResourceActionNoContentAsync<
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
- * @template Headers Optional. Allows overriding the headers returned in the Accepted respsonse
+ * @template Headers Optional. Allows overriding the headers returned in the Accepted response
  */
 op ArmResourceActionNoResponseContentAsync<
   TResource extends ArmResource,

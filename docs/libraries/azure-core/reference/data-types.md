@@ -131,7 +131,7 @@ model Azure.Core.HttpResponseStatusPollingOptions<TContinuationStatus, TTerminal
 
 | Name                | Description                                                                       |
 | ------------------- | --------------------------------------------------------------------------------- |
-| TContinuationStatus | The status code(s) or status code range indictaing polling should continue.       |
+| TContinuationStatus | The status code(s) or status code range indicating polling should continue.       |
 | TTerminalStatus     | The status code(s) or status code range indicating successful polling completion. |
 | TPollingModel       | The model that is returned when polling should continue.                          |
 | TFinalResult        |                                                                                   |
@@ -168,7 +168,7 @@ model Azure.Core.Page<TResource>
 
 ### `PollingOptions` {#Azure.Core.PollingOptions}
 
-Generic polling options for Lros.
+Generic polling options for LRO operations.
 
 ```typespec
 model Azure.Core.PollingOptions
