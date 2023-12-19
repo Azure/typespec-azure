@@ -226,9 +226,10 @@ model RequestIdResponseHeader {
 @Foundations.Private.embeddingVector(TType)
 model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
 
-/** Options for overriding a polling endpoint that uses a StatusMonitor
+/**
+ * Options for overriding a polling endpoint that uses a StatusMonitor
  * @template PollingModel The model that is returned when polling should continue.
- * @template FinalModel The model that is returned when polling terminates successfully.
+ * @template FinalResult The model that is returned when polling terminates successfully.
  * @template FinalProperty The property of the status monitor that contains results.
  */
 model StatusMonitorPollingOptions<

@@ -257,11 +257,11 @@ model Azure.Core.StatusMonitorPollingOptions<PollingModel, FinalResult, FinalPro
 
 #### Template Parameters
 
-| Name          | Description                                               |
-| ------------- | --------------------------------------------------------- |
-| PollingModel  | The model that is returned when polling should continue.  |
-| FinalResult   |                                                           |
-| FinalProperty | The property of the status monitor that contains results. |
+| Name          | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| PollingModel  | The model that is returned when polling should continue.         |
+| FinalResult   | The model that is returned when polling terminates successfully. |
+| FinalProperty | The property of the status monitor that contains results.        |
 
 ### `TopQueryParameter` {#Azure.Core.TopQueryParameter}
 

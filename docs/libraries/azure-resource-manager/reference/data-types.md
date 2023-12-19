@@ -95,9 +95,9 @@ model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 
 #### Template Parameters
 
-| Name       | Description |
-| ---------- | ----------- |
-| LroHeaders |             |
+| Name       | Description                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| LroHeaders | Optional. Allows overriding the Lro headers returned in the response. |
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 

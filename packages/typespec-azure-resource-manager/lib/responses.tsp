@@ -37,7 +37,7 @@ model ArmDeletedResponse {
 
 /**
  * @dev The response for asynchronous ARM delete ACCEPTED
- * @template Headers Optional.  Allows overriding the Lro headers returned in the response.
+ * @template LroHeaders Optional.  Allows overriding the Lro headers returned in the response.
  */
 model ArmDeleteAcceptedLroResponse<LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader>
   is ArmAcceptedLroResponse<"Resource deletion accepted.", LroHeaders>;
