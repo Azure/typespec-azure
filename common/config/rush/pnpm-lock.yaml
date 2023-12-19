@@ -1934,7 +1934,7 @@ importers:
   ../../packages/typespec-azure-portal-core:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.37.1
