@@ -2,6 +2,18 @@
   "name": "@azure-tools/typespec-autorest",
   "entries": [
     {
+      "version": "0.37.2",
+      "tag": "@azure-tools/typespec-autorest_v0.37.2",
+      "date": "Thu, 14 Dec 2023 01:19:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix: Multipart property of type `bytes[]` is now treated as multiple file parts"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.1",
       "tag": "@azure-tools/typespec-autorest_v0.37.1",
       "date": "Mon, 11 Dec 2023 18:44:34 GMT",
