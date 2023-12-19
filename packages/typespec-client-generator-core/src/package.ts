@@ -527,27 +527,40 @@ function getDefaultSdkEndpointParameter<TServiceOperation extends SdkServiceOper
 function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   client: SdkClient
-): [string, SdkEndpointParameter[]] {
+): {
+  endpoint: string;
+  properties: SdkEndpointParameter[];
+  hasParameterizedEndpoint: boolean
+} {
   const servers = getServers(context.program, client.service);
   if (servers === undefined) {
-    return ["", getDefaultSdkEndpointParameter<TServiceOperation>(context, client)];
+    return {
+      endpoint: "",
+      properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client),
+      hasParameterizedEndpoint: false
+    }
   }
   if (servers.length > 1) {
-    return ["{endpoint}", getDefaultSdkEndpointParameter<TServiceOperation>(context, client)];
+    return {
+      endpoint: "{endpoint}",
+      properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client),
+      hasParameterizedEndpoint: true
+    };
   }
   if (servers[0].parameters.size === 0) {
-    return [
-      servers[0].url,
-      getDefaultSdkEndpointParameter<TServiceOperation>(context, client, servers[0].url),
-    ];
+    return {
+      endpoint: servers[0].url,
+      properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client, servers[0].url),
+      hasParameterizedEndpoint: false
+    };
   }
-  const endpointParameters: SdkEndpointParameter[] = [];
+  const properties: SdkEndpointParameter[] = [];
   for (const param of servers[0].parameters.values()) {
     const sdkParam = getSdkModelPropertyType(context, param, { isEndpointParam: true });
     if (sdkParam.kind !== "path") {
       throw new Error("blah");
     }
-    endpointParameters.push({
+    properties.push({
       ...sdkParam,
       kind: "endpoint",
       urlEncode: false,
@@ -556,7 +569,11 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       onClient: true,
     });
   }
-  return [servers[0].url, endpointParameters];
+  return {
+    endpoint: servers[0].url,
+    properties,
+    hasParameterizedEndpoint: true
+  };
 }
 
 function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>(
@@ -564,10 +581,8 @@ function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>
   client: SdkClient
 ): SdkInitializationType {
   const credentialParam = getSdkCredentialParameter<TServiceOperation>(context, client);
-  const properties: SdkParameter[] = getEndpointAndEndpointParameters<TServiceOperation>(
-    context,
-    client
-  )[1];
+  const endpointInfo = getEndpointAndEndpointParameters<TServiceOperation>(context, client);
+  const properties: SdkParameter[] = endpointInfo.properties;
   if (credentialParam) {
     properties.push(credentialParam);
   }
@@ -629,6 +644,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     .filter((x) => x.rootVersion)
     .map((x) => x.rootVersion!.value);
   const isClient = baseClientType.kind === "SdkClient";
+  const endpointInfo = getEndpointAndEndpointParameters<TServiceOperation>(context, client)
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
     name: isClient ? baseClientType.name : baseClientType.type.name,
@@ -640,7 +656,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     initialization: isClient
       ? getSdkInitializationType<TServiceOperation>(context, client)
       : undefined,
-    endpoint: getEndpointAndEndpointParameters<TServiceOperation>(context, client)[0],
+    endpoint: endpointInfo.endpoint,
+    hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
     arm: client.arm,
   };
   context.__clients.set(baseClientType, sdkClientType);

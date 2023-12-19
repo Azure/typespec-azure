@@ -74,6 +74,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   apiVersions: string[];
   nameSpace: string; // fully qualified
   endpoint: string;
+  hasParameterizedEndpoint: boolean;
   arm: boolean;
 }
 
