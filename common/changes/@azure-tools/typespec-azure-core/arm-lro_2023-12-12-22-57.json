@@ -3,7 +3,7 @@
     {
       "packageName": "@azure-tools/typespec-azure-core",
       "comment": "Add LRO support for ARM patterns",
-      "type": "none"
+      "type": "patch"
     }
   ],
   "packageName": "@azure-tools/typespec-azure-core"

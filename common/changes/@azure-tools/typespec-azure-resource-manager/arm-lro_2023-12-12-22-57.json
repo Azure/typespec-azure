@@ -3,7 +3,7 @@
     {
       "packageName": "@azure-tools/typespec-azure-resource-manager",
       "comment": "Add types to support lro scenarios",
-      "type": "none"
+      "type": "patch"
     }
   ],
   "packageName": "@azure-tools/typespec-azure-resource-manager"
