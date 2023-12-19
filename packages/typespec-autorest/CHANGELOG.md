@@ -1,6 +1,13 @@
 # Change Log - @azure-tools/typespec-autorest
 
-This log was last generated on Mon, 11 Dec 2023 18:44:34 GMT and should not be manually modified.
+This log was last generated on Thu, 14 Dec 2023 01:19:27 GMT and should not be manually modified.
+
+## 0.37.2
+Thu, 14 Dec 2023 01:19:27 GMT
+
+### Patches
+
+- Fix: Multipart property of type `bytes[]` is now treated as multiple file parts
 
 ## 0.37.1
 Mon, 11 Dec 2023 18:44:34 GMT
