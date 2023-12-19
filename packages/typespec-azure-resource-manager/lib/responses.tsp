@@ -87,7 +87,7 @@ model ArmOperationStatus<
 
   /** The operation status */
   @visibility("read")
-  //@Azure.Core.lroStatus
+  @Azure.Core.lroStatus
   status: StatusValues;
 
   /** The unique identifier for the operationStatus resource */
