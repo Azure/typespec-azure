@@ -80,18 +80,26 @@ model ArmAcceptedLroResponse<
 model ArmOperationStatus<
   Properties extends {} = never,
   StatusValues extends TypeSpec.Reflection.Enum | TypeSpec.Reflection.Union = ResourceProvisioningState
-> {
+> is ArmResourceBase {
+  /** RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status */
+  @visibility("read")
+  properties?: Properties;
+
+  /** The operation status */
+  @visibility("read")
+  //@Azure.Core.lroStatus
+  status: StatusValues;
+
   /** The unique identifier for the operationStatus resource */
+  @key
+  @path
+  @segment("operationStatuses")
   @visibility("read")
   id: Azure.Core.uuid;
 
   /** The name of the  operationStatus resource */
   @visibility("read")
   name?: string;
-
-  /** RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status */
-  @visibility("read")
-  properties?: Properties;
 
   /** Operation start time */
   @visibility("read")
@@ -104,11 +112,6 @@ model ArmOperationStatus<
   /** The progress made toward completing the operation */
   @visibility("read")
   percentComplete?: float64;
-
-  /** The operation status */
-  @visibility("read")
-  @Azure.Core.lroStatus
-  status: StatusValues;
 
   /** Errors that occurred if the operation ended with Canceled or Failed status */
   @visibility("read")
@@ -125,6 +128,7 @@ model ArmAsyncOperationHeader<
   UrlValue extends string = string
 > {
   /** A link to the status monitor */
+  @header("Azure-AsyncOperation")
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
   azureAsyncOperation: UrlValue;
 }
@@ -140,7 +144,8 @@ model ArmLroLocationHeader<
   FinalResult extends {} | void = void,
   UrlValue extends string = string
 > {
-  /** A link to the intermediate and final result */
+  /** The Location header contains the URL where the status of the long running operation can be checked. */
+  @header("Location")
   @Azure.Core.pollingLocation(LroPollingOptions)
   @Azure.Core.finalLocation(FinalResult)
   location: UrlValue;
@@ -161,9 +166,11 @@ model ArmCombinedLroHeaders<
 > {
   /** A link to the status monitor */
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
+  @header("Azure-AsyncOperation")
   azureAsyncOperation: PollingUrlValue;
 
-  /** A link to the final result */
+  /** The Location header contains the URL where the status of the long running operation can be checked. */
+  @header("Location")
   @Azure.Core.finalLocation(FinalResult)
   location: FinalUrlValue;
 }

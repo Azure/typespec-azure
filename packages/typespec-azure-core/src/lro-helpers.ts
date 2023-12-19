@@ -8,6 +8,7 @@ import {
 } from "./utils.js";
 
 import {
+  getEffectiveModelType,
   ignoreDiagnostics,
   IntrinsicType,
   isNeverType,
@@ -23,6 +24,7 @@ import {
   getHttpOperation,
   getOperationVerb,
   HttpOperation,
+  isBody,
   isHeader,
 } from "@typespec/http";
 import {
@@ -540,6 +542,12 @@ function ensureContext(
   };
 }
 
+function getBodyType(program: Program, model: Model): Model | undefined {
+  const bodyProps = filterModelProperties(model, (p) => isBody(program, p));
+  if (bodyProps.length === 1 && bodyProps[0].type.kind === "Model") return bodyProps[0].type;
+  return undefined;
+}
+
 function getLogicalResourceOperation(
   program: Program,
   operation: Operation,
@@ -548,14 +556,17 @@ function getLogicalResourceOperation(
   const resOp = getResourceOperation(program, operation);
   if (resOp !== undefined) return resOp;
   if (model === undefined) return undefined;
+  const bodyModel = getBodyType(program, model);
+  if (bodyModel !== undefined) model = bodyModel;
+  model = getEffectiveModelType(program, model);
   let resultOp: string;
   const verb = getOperationVerb(program, operation);
   switch (verb) {
     case "delete":
-      resultOp = "deletesResource";
+      resultOp = "delete";
       break;
     case "put":
-      resultOp = "createsOrReplacesResource";
+      resultOp = "createOrReplace";
       break;
     default:
       return undefined;
@@ -574,10 +585,7 @@ function getFinalStateVia(
     context.originalModel?.name !== undefined ? context.originalModel : undefined;
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   const resOp = getLogicalResourceOperation(program, operation, model);
-  if (
-    operationAction !== undefined ||
-    (resOp !== undefined && resOp.operation.startsWith("delete"))
-  ) {
+  if (operationAction !== undefined || resOp?.operation === "delete") {
     finalState = FinalStateValue.operationLocation;
     model = context.pollingStep?.responseModel ?? context.originalModel;
   }
@@ -585,7 +593,9 @@ function getFinalStateVia(
   if (
     context.finalStep &&
     context.finalStep.kind !== "noPollingResult" &&
-    (context.finalStep.kind !== "pollingSuccessProperty" || resOp?.operation !== "createOrReplace")
+    (context.finalStep.kind !== "pollingSuccessProperty" ||
+      resOp?.operation === undefined ||
+      resOp.operation !== "createOrReplace")
   ) {
     model = context.finalStep.responseModel;
     if (
@@ -610,6 +620,7 @@ function getFinalStateVia(
 
   if (
     resOp !== undefined &&
+    resOp.operation !== undefined &&
     resOp.operation === "createOrReplace" &&
     resOp.resourceType !== undefined
   ) {
@@ -622,8 +633,7 @@ function getFinalStateVia(
     (operationAction !== undefined &&
       operationAction !== null &&
       context.statusMonitorStep !== undefined) ||
-    (resOp?.operation !== undefined &&
-      resOp.operation.startsWith("delete") &&
+    (resOp?.operation === "delete" &&
       context.pollingStep !== undefined &&
       context.statusMonitorStep !== undefined) ||
     (operationAction === undefined &&

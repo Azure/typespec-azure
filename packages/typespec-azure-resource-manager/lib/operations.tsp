@@ -71,7 +71,7 @@ op ArmResourceListAtScope<
 @doc("Get a {name}", TResource)
 @get
 @armResourceRead(TResource)
-op ArmResourceRead<TResource extends ArmResource, TBaseParameters = BaseParameters<TResource>>(
+op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BaseParameters<TResource>>(
   ...ResourceInstanceParameters<TResource, TBaseParameters>,
 ): ArmResponse<TResource> | ErrorResponse;
 
@@ -152,24 +152,24 @@ op ArmResourceCreateOrReplaceSync<
   resource: TResource,
 ): ArmResourceUpdatedResponse<TResource> | ArmResourceCreatedSyncResponse<TResource> | ErrorResponse;
 
-alias ArmResourceCreateOrReplaceAsync<
+op ArmResourceCreateOrReplaceAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
     ArmOperationStatus,
-    TResource,
+    never,
     string,
     string
   >
-> = ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders>;
+> is ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders>;
 
 /**
- * A long-running resource update that only allows updating resource tags (the minimum)
+ * @dev A long-running resource update that only allows updating resource tags (the minimum)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted repsonse
  */
-alias ArmTagsPatchAsync<
+op ArmTagsPatchAsync<
   TResource extends ArmResource,
   TProperties extends {} = TagsUpdateModel<TResource>,
   TBaseParameters = BaseParameters<TResource>,
@@ -179,16 +179,16 @@ alias ArmTagsPatchAsync<
     string,
     string
   >
-> = ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters, LroHeaders>;
+> is ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters, LroHeaders>;
 
 /**
- * A long-running resource update using the items from the resource marked with visibility "update"
+ * @dev A long-running resource update using the items from the resource marked with visibility "update"
  * @template TResource the resource being patched
  * @template TProperties The model type of the resource properties
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  */
-alias ArmResourcePatchAsync<
+op ArmResourcePatchAsync<
   TResource extends ArmResource,
   TProperties extends TypeSpec.Reflection.Model,
   TBaseParameters = BaseParameters<TResource>,
@@ -198,7 +198,7 @@ alias ArmResourcePatchAsync<
     string,
     string
   >
-> = ArmCustomPatchAsync<
+> is ArmCustomPatchAsync<
   TResource,
   ResourceUpdateModel<TResource, TProperties>,
   TBaseParameters,
@@ -245,26 +245,26 @@ op ArmCustomPatchAsync<
 > | ErrorResponse;
 
 /**
- * A resource update that only allows updating resource tags (the minimum)
+ * @dev A resource update that only allows updating resource tags (the minimum)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  */
-alias ArmTagsPatchSync<
+op ArmTagsPatchSync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>
-> = ArmCustomPatchSync<TResource, TagsUpdateModel<TResource>, TBaseParameters>;
+> is ArmCustomPatchSync<TResource, TagsUpdateModel<TResource>, TBaseParameters>;
 
 /**
- * A resource update using the items from the resource marked with visibility "update"
+ * @dev A resource update using the items from the resource marked with visibility "update"
  * @template TResource the resource being patched
  * @template TProperties The model type of the resource properties
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  */
-alias ArmResourcePatchSync<
+op ArmResourcePatchSync<
   TResource extends ArmResource,
   TProperties extends TypeSpec.Reflection.Model,
   TBaseParameters = BaseParameters<TResource>
-> = ArmCustomPatchSync<TResource, ResourceUpdateModel<TResource, TProperties>, TBaseParameters>;
+> is ArmCustomPatchSync<TResource, ResourceUpdateModel<TResource, TProperties>, TBaseParameters>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
@@ -390,7 +390,7 @@ op ArmResourceActionAsyncBase<
 ): TResponse | ErrorResponse;
 
 /**
- * A long-running resource action.
+ * @dev A long-running resource action.
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TResponse The response model for the action
@@ -441,7 +441,7 @@ op ArmResourceActionSync<
 ): TResponse | ErrorResponse;
 
 /**
- * A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
+ * @dev A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
@@ -466,7 +466,7 @@ op ArmResourceActionNoContentAsync<
 >;
 
 /**
- * A long-running resource action that returns no content.
+ * @dev A long-running resource action that returns no content.
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
@@ -511,7 +511,7 @@ op ArmResourceActionNoContentSync<
 ): ArmNoContentResponse<"Action completed successfully."> | ErrorResponse;
 
 /**
- * Adds check global name availability operation, normally used if
+ * @dev Adds check global name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
  * exposes and endpoint that uses the resource name in the url)
  * @template TRequest the availability request, defaults to the standard request, containing name and resource type
@@ -531,7 +531,7 @@ op checkGlobalNameAvailability<
 >;
 
 /**
- * Adds check location-specific name availability operation, normally used if
+ * @dev Adds check location-specific name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
  * exposes and endpoint that uses the resource name in the url)
  * @template TRequest the availability request, defaults to the standard request, containing name and resource type

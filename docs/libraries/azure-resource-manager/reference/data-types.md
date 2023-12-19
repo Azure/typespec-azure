@@ -18,22 +18,18 @@ model Azure.ResourceManager.ApiVersionParameter
 
 ### `ArmAcceptedLroResponse` {#Azure.ResourceManager.ArmAcceptedLroResponse}
 
-The standard ARM response for asynchronous PATCH, POST, and DELETE operations
-
 ```typespec
-model Azure.ResourceManager.ArmAcceptedLroResponse<TMessage, TLroResponse>
+model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 ```
 
 #### Template Parameters
 
-| Name         | Description                                                                        |
-| ------------ | ---------------------------------------------------------------------------------- |
-| TMessage     | The description of the response status (defaults to `Resource operation accepted`) |
-| TLroResponse |                                                                                    |
+| Name        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Description | The description of the response status (defaults to `Resource operation accepted`) |
+| LroHeaders  | Optional. The lro headers that appear in the Accepted response                     |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
-
-The standard ACCEPTED response
 
 ```typespec
 model Azure.ResourceManager.ArmAcceptedResponse<TMessage>
@@ -44,6 +40,38 @@ model Azure.ResourceManager.ArmAcceptedResponse<TMessage>
 | Name     | Description                                                                        |
 | -------- | ---------------------------------------------------------------------------------- |
 | TMessage | The description of the response status (defaults to `Resource operation accepted`) |
+
+### `ArmAsyncOperationHeader` {#Azure.ResourceManager.ArmAsyncOperationHeader}
+
+The standard header for asynchronous operation polling
+
+```typespec
+model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
+```
+
+#### Template Parameters
+
+| Name          | Description                                       |
+| ------------- | ------------------------------------------------- |
+| StatusMonitor | The status monitor type for lro polling           |
+| UrlValue      | The value type of the Azure-AsyncOperation header |
+
+### `ArmCombinedLroHeaders` {#Azure.ResourceManager.ArmCombinedLroHeaders}
+
+Provide Both Azure-AsyncOperation and Location headers
+
+```typespec
+model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, PollingUrlValue, FinalUrlValue>
+```
+
+#### Template Parameters
+
+| Name            | Description                                                                       |
+| --------------- | --------------------------------------------------------------------------------- |
+| StatusMonitor   | The type of the polling StatusMonitor when following the Azure-AsyncOperation url |
+| FinalResult     | The type of the logical result when following the location header                 |
+| PollingUrlValue | The value type of the link to the status monitor                                  |
+| FinalUrlValue   | The value type fo the link to the final result                                    |
 
 ### `ArmCreatedResponse` {#Azure.ResourceManager.ArmCreatedResponse}
 
@@ -62,8 +90,14 @@ model Azure.ResourceManager.ArmCreatedResponse<T>
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 
 ```typespec
-model Azure.ResourceManager.ArmDeleteAcceptedLroResponse
+model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 ```
+
+#### Template Parameters
+
+| Name       | Description |
+| ---------- | ----------- |
+| LroHeaders |             |
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 
@@ -85,6 +119,22 @@ The response for synchronous delete of a resource
 model Azure.ResourceManager.ArmDeletedResponse
 ```
 
+### `ArmLroLocationHeader` {#Azure.ResourceManager.ArmLroLocationHeader}
+
+The default header for lro PUT and DELETE polling
+
+```typespec
+model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue>
+```
+
+#### Template Parameters
+
+| Name              | Description                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| LroPollingOptions | The polling options when polling the url in the location header |
+| FinalResult       | The ultimate final result of the logical operation              |
+| UrlValue          | The value type for the location header                          |
+
 ### `ArmNoContentResponse` {#Azure.ResourceManager.ArmNoContentResponse}
 
 Standard ARM NoContent (204) response
@@ -99,19 +149,35 @@ model Azure.ResourceManager.ArmNoContentResponse<TMessage>
 | -------- | --------------------------------------------------------------------------------------- |
 | TMessage | The description of the response status (defaults to `Operation completed successfully`) |
 
+### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
+
+Standard ARM operation status response
+
+```typespec
+model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
+```
+
+#### Template Parameters
+
+| Name         | Description                                   |
+| ------------ | --------------------------------------------- |
+| Properties   | Optional resource-specific properties         |
+| StatusValues | The set of allowd values for operation status |
+
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
 Resource create operation succeeded
 
 ```typespec
-model Azure.ResourceManager.ArmResourceCreatedResponse<TResource>
+model Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders>
 ```
 
 #### Template Parameters
 
-| Name      | Description                |
-| --------- | -------------------------- |
-| TResource | The resource being updated |
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| TResource  | The resource being updated                                 |
+| LroHeaders | Optional. The lro headers returned with a Created response |
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
 
@@ -680,62 +746,6 @@ vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
 
 ```typespec
 scalar Azure.ResourceManager.ResourceIdentifier
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
-```
-
-### `StringResourceLink` {#Azure.ResourceManager.StringResourceLink}
-
-Legacy representation for resource location using string instead of url
-
-```typespec
-scalar Azure.ResourceManager.StringResourceLink
 ```
 
 ## Azure.ResourceManager.CommonTypes

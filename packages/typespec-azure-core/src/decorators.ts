@@ -655,6 +655,7 @@ export function $pollingLocation(
 ) {
   const { program } = context;
   if (options) {
+    if (isNeverType(options)) return;
     const info = extractPollingLocationInfo(program, entity, options);
     if (info) {
       program.stateMap(pollingLocationInfoKey).set(entity, info);
@@ -812,6 +813,7 @@ export function $finalLocation(
   finalResult?: Model | IntrinsicType
 ) {
   const { program } = context;
+  if (finalResult !== undefined && isNeverType(finalResult)) return;
   program.stateSet(finalLocationsKey).add(entity);
   switch (finalResult?.kind) {
     case "Model":

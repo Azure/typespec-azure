@@ -634,6 +634,14 @@
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -888,6 +896,14 @@
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -963,6 +979,42 @@
           "final-state-via": "location"
         },
         "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.OperationsTest/locations/{location}/operationStatuses/{id}": {
+      "get": {
+        "operationId": "OperationStatuses_GetStatus",
+        "description": "Get a MyOpStatus",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier for the operationStatus resource",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/MyOpStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
       }
     },
     "/providers/Microsoft.OperationsTest/operations": {
@@ -1506,6 +1558,14 @@
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -1745,6 +1805,14 @@
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -2408,6 +2476,10 @@
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
               },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
               "Location": {
                 "type": "string",
                 "description": "The Location header contains the URL where the status of the long running operation can be checked."
@@ -2513,6 +2585,45 @@
             "description": "ARM operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationMungeResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationsTest/locations/{location}/operationStatuses/{id}": {
+      "get": {
+        "operationId": "OperationStatuses_GetSubscriptionStatus",
+        "description": "Get a MySubOpStatus",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/parameters/LocationParameter"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier for the operationStatus resource",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ARM operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/MySubOpStatus"
             }
           },
           "default": {
@@ -3180,6 +3291,14 @@
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -3449,6 +3568,14 @@
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              },
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -3531,6 +3658,11 @@
     }
   },
   "definitions": {
+    "Azure.Core.uuid": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Universally Unique Identifier"
+    },
     "Azure.ResourceManager.ResourceProvisioningState": {
       "type": "string",
       "description": "The provisioning state of a resource type.",
@@ -3892,6 +4024,102 @@
           "description": "The color of the location"
         }
       }
+    },
+    "MyOpStatus": {
+      "type": "object",
+      "description": "Standard ARM operation status response",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The operation status",
+          "readOnly": true
+        },
+        "id": {
+          "$ref": "#/definitions/Azure.Core.uuid",
+          "description": "The unique identifier for the operationStatus resource",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the  operationStatus resource",
+          "readOnly": true
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Operation start time",
+          "readOnly": true
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Operation complete time",
+          "readOnly": true
+        },
+        "percentComplete": {
+          "type": "number",
+          "format": "double",
+          "description": "The progress made toward completing the operation",
+          "readOnly": true
+        },
+        "error": {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorDetail",
+          "description": "Errors that occurred if the operation ended with Canceled or Failed status",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "status",
+        "id"
+      ]
+    },
+    "MySubOpStatus": {
+      "type": "object",
+      "description": "Standard ARM operation status response",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The operation status",
+          "readOnly": true
+        },
+        "id": {
+          "$ref": "#/definitions/Azure.Core.uuid",
+          "description": "The unique identifier for the operationStatus resource",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the  operationStatus resource",
+          "readOnly": true
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Operation start time",
+          "readOnly": true
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Operation complete time",
+          "readOnly": true
+        },
+        "percentComplete": {
+          "type": "number",
+          "format": "double",
+          "description": "The progress made toward completing the operation",
+          "readOnly": true
+        },
+        "error": {
+          "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/ErrorDetail",
+          "description": "Errors that occurred if the operation ended with Canceled or Failed status",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "status",
+        "id"
+      ]
     },
     "TenantChildProperties": {
       "type": "object",

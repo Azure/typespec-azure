@@ -52,7 +52,7 @@ op Azure.ResourceManager.ExtensionResourceInstanceOperations.get(apiVersion: str
 #### `ExtensionResourceInstanceOperations.createOrUpdate` {#Azure.ResourceManager.ExtensionResourceInstanceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceInstanceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceInstanceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ExtensionResourceInstanceOperations.update` {#Azure.ResourceManager.ExtensionResourceInstanceOperations.update}
@@ -64,7 +64,7 @@ op Azure.ResourceManager.ExtensionResourceInstanceOperations.update(apiVersion: 
 #### `ExtensionResourceInstanceOperations.delete` {#Azure.ResourceManager.ExtensionResourceInstanceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceInstanceOperations.delete(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceInstanceOperations.delete(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ExtensionResourceOperations` {#Azure.ResourceManager.ExtensionResourceOperations}
@@ -91,7 +91,7 @@ op Azure.ResourceManager.ExtensionResourceOperations.get(apiVersion: string, res
 #### `ExtensionResourceOperations.createOrUpdate` {#Azure.ResourceManager.ExtensionResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceOperations.createOrUpdate(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.update` {#Azure.ResourceManager.ExtensionResourceOperations.update}
@@ -103,7 +103,7 @@ op Azure.ResourceManager.ExtensionResourceOperations.update(apiVersion: string, 
 #### `ExtensionResourceOperations.delete` {#Azure.ResourceManager.ExtensionResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceOperations.delete(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceOperations.delete(apiVersion: string, resourceUri: string, provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.list` {#Azure.ResourceManager.ExtensionResourceOperations.list}
@@ -161,13 +161,13 @@ op Azure.ResourceManager.ProxyResourceOperations.get(provider: Microsoft.ThisWil
 #### `ProxyResourceOperations.createOrUpdate` {#Azure.ResourceManager.ProxyResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ProxyResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ProxyResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ProxyResourceOperations.delete` {#Azure.ResourceManager.ProxyResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ProxyResourceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ProxyResourceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ProxyResourceOperations.listByResourceGroup` {#Azure.ResourceManager.ProxyResourceOperations.listByResourceGroup}
@@ -221,7 +221,7 @@ interface Azure.ResourceManager.ResourceCreateAsync<TResource, TBaseParameters>
 #### `ResourceCreateAsync.createOrUpdate` {#Azure.ResourceManager.ResourceCreateAsync.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ResourceCreateAsync.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceCreateAsync.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceCreateSync` {#Azure.ResourceManager.ResourceCreateSync}
@@ -261,7 +261,7 @@ interface Azure.ResourceManager.ResourceDeleteAsync<TResource, TBaseParameters>
 #### `ResourceDeleteAsync.delete` {#Azure.ResourceManager.ResourceDeleteAsync.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceDeleteAsync.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceDeleteAsync.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceDeleteSync` {#Azure.ResourceManager.ResourceDeleteSync}
@@ -301,7 +301,7 @@ interface Azure.ResourceManager.ResourceDeleteWithoutOkAsync<TResource, TBasePar
 #### `ResourceDeleteWithoutOkAsync.delete` {#Azure.ResourceManager.ResourceDeleteWithoutOkAsync.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceDeleteWithoutOkAsync.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceDeleteWithoutOkAsync.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceInstanceOperations` {#Azure.ResourceManager.ResourceInstanceOperations}
@@ -330,7 +330,7 @@ op Azure.ResourceManager.ResourceInstanceOperations.get(provider: Microsoft.This
 #### `ResourceInstanceOperations.createOrUpdate` {#Azure.ResourceManager.ResourceInstanceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ResourceInstanceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceInstanceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ResourceInstanceOperations.update` {#Azure.ResourceManager.ResourceInstanceOperations.update}
@@ -342,7 +342,7 @@ op Azure.ResourceManager.ResourceInstanceOperations.update(provider: Microsoft.T
 #### `ResourceInstanceOperations.delete` {#Azure.ResourceManager.ResourceInstanceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceInstanceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceInstanceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceListByParent` {#Azure.ResourceManager.ResourceListByParent}
@@ -411,7 +411,7 @@ op Azure.ResourceManager.ResourceOperations.get(provider: Microsoft.ThisWillBeRe
 #### `ResourceOperations.createOrUpdate` {#Azure.ResourceManager.ResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.ResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ResourceOperations.update` {#Azure.ResourceManager.ResourceOperations.update}
@@ -423,7 +423,7 @@ op Azure.ResourceManager.ResourceOperations.update(provider: Microsoft.ThisWillB
 #### `ResourceOperations.delete` {#Azure.ResourceManager.ResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ResourceOperations.listByResourceGroup` {#Azure.ResourceManager.ResourceOperations.listByResourceGroup}
@@ -476,7 +476,7 @@ interface Azure.ResourceManager.ResourceUpdateAsync<TResource, TProperties, TBas
 #### `ResourceUpdateAsync.update` {#Azure.ResourceManager.ResourceUpdateAsync.update}
 
 ```typespec
-op Azure.ResourceManager.ResourceUpdateAsync.update(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., {}> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceUpdateAsync.update(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, PollingUrlValue, FinalUrlValue>> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceUpdateSync` {#Azure.ResourceManager.ResourceUpdateSync}
@@ -531,7 +531,7 @@ op Azure.ResourceManager.TenantResourceOperations.get(apiVersion: string, provid
 #### `TenantResourceOperations.createOrUpdate` {#Azure.ResourceManager.TenantResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.TenantResourceOperations.createOrUpdate(apiVersion: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TenantResourceOperations.createOrUpdate(apiVersion: string, provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TenantResourceOperations.update` {#Azure.ResourceManager.TenantResourceOperations.update}
@@ -543,7 +543,7 @@ op Azure.ResourceManager.TenantResourceOperations.update(apiVersion: string, pro
 #### `TenantResourceOperations.delete` {#Azure.ResourceManager.TenantResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.TenantResourceOperations.delete(apiVersion: string, provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TenantResourceOperations.delete(apiVersion: string, provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TenantResourceOperations.listByTenant` {#Azure.ResourceManager.TenantResourceOperations.listByTenant}
@@ -580,7 +580,7 @@ op Azure.ResourceManager.TrackedResourceOperations.get(provider: Microsoft.ThisW
 #### `TrackedResourceOperations.createOrUpdate` {#Azure.ResourceManager.TrackedResourceOperations.createOrUpdate}
 
 ```typespec
-op Azure.ResourceManager.TrackedResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TrackedResourceOperations.createOrUpdate(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.update` {#Azure.ResourceManager.TrackedResourceOperations.update}
@@ -592,7 +592,7 @@ op Azure.ResourceManager.TrackedResourceOperations.update(provider: Microsoft.Th
 #### `TrackedResourceOperations.delete` {#Azure.ResourceManager.TrackedResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.TrackedResourceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TrackedResourceOperations.delete(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.listByResourceGroup` {#Azure.ResourceManager.TrackedResourceOperations.listByResourceGroup}
@@ -612,16 +612,17 @@ op Azure.ResourceManager.TrackedResourceOperations.listBySubscription(apiVersion
 A long-running resource update using a custom PATCH payload (Asynchronous)
 
 ```typespec
-op Azure.ResourceManager.ArmCustomPatchAsync(provider: Microsoft.ThisWillBeReplaced, properties: TPatchModel): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., {}> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmCustomPatchAsync(provider: Microsoft.ThisWillBeReplaced, properties: TPatchModel): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
 
-| Name            | Description                                          |
-| --------------- | ---------------------------------------------------- |
-| TResource       | the resource being patched                           |
-| TPatchModel     | The input model for the PATCH request                |
-| TBaseParameters | Optional. Allows overriding the operation parameters |
+| Name            | Description                                                                   |
+| --------------- | ----------------------------------------------------------------------------- |
+| TResource       | the resource being patched                                                    |
+| TPatchModel     | The input model for the PATCH request                                         |
+| TBaseParameters | Optional. Allows overriding the operation parameters                          |
+| LroHeaders      | Optional. Allows overriding the lro headers returned in the Accepted response |
 
 ### `ArmCustomPatchSync` {#Azure.ResourceManager.ArmCustomPatchSync}
 
@@ -658,17 +659,18 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., {}> | TResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceActionAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | TResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
 
-| Name            | Description                                                  |
-| --------------- | ------------------------------------------------------------ |
-| TResource       | The resource being acted upon                                |
-| TRequest        | The request model for the action                             |
-| TResponse       | The response model for the action                            |
-| TBaseParameters | Optional. Allows overriding the parameters for the operation |
+| Name            | Description                                                                |
+| --------------- | -------------------------------------------------------------------------- |
+| TResource       | The resource being acted upon                                              |
+| TRequest        | The request model for the action                                           |
+| TResponse       | The response model for the action                                          |
+| TBaseParameters | Optional. Allows overriding the parameters for the operation               |
+| LroHeaders      | Optional. Allows overriding the headers returned in the Accepted respsonse |
 
 ### `ArmResourceActionAsyncBase` {#Azure.ResourceManager.ArmResourceActionAsyncBase}
 
@@ -692,16 +694,17 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: Microsoft.ThisWill
 A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., {}> | Azure.ResourceManager.ArmNoContentResponse<Action completed successfully.> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., Azure.ResourceManager.ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, never, never>, void, string>> | Azure.ResourceManager.ArmNoContentResponse<Action completed successfully.> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
 
-| Name            | Description                                                  |
-| --------------- | ------------------------------------------------------------ |
-| TResource       | The resource being acted upon                                |
-| TRequest        | The request model for the action                             |
-| TBaseParameters | Optional. Allows overriding the parameters for the operation |
+| Name            | Description                                                                |
+| --------------- | -------------------------------------------------------------------------- |
+| TResource       | The resource being acted upon                                              |
+| TRequest        | The request model for the action                                           |
+| TBaseParameters | Optional. Allows overriding the parameters for the operation               |
+| LroHeaders      | Optional. Allows overriding the headers returned in the Accepted respsonse |
 
 ### `ArmResourceActionNoContentSync` {#Azure.ResourceManager.ArmResourceActionNoContentSync}
 
@@ -724,7 +727,7 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: Microsoft.This
 A long-running resource action that returns no content.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Resource operation accepted., {}> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: Microsoft.ThisWillBeReplaced, body: TRequest): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
@@ -734,6 +737,7 @@ op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: Micro
 | TResource       | The resource being acted upon                                |
 | TRequest        | The request model for the action                             |
 | TBaseParameters | Optional. Allows overriding the parameters for the operation |
+| LroHeaders      |                                                              |
 
 ### `ArmResourceActionSync` {#Azure.ResourceManager.ArmResourceActionSync}
 
@@ -751,6 +755,20 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: Microsoft.ThisWillBeRep
 | TRequest        | The request model for the action                             |
 | TResponse       | The response model for the action                            |
 | TBaseParameters | Optional. Allows overriding the parameters for the operation |
+
+### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
+
+```typespec
+op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name            | Description |
+| --------------- | ----------- |
+| TResource       |             |
+| TBaseParameters |             |
+| LroHeaders      |             |
 
 ### `ArmResourceCreateOrReplaceSync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceSync}
 
@@ -772,7 +790,7 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(provider: Microsoft.This
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: Microsoft.ThisWillBeReplaced, resource: TResource): Azure.ResourceManager.ArmResourceUpdatedResponse<TResource> | Azure.ResourceManager.ArmResourceCreatedResponse<TResource, LroHeaders> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
@@ -781,6 +799,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: Microsoft.This
 | --------------- | ---------------------------------------------------- |
 | TResource       | the resource being patched                           |
 | TBaseParameters | Optional. Allows overriding the operation parameters |
+| LroHeaders      |                                                      |
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
@@ -800,15 +819,16 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: Microsoft.ThisW
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceDeleteAsync(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceDeleteAsync(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
 
-| Name            | Description                                                  |
-| --------------- | ------------------------------------------------------------ |
-| TResource       | The resource being deleted                                   |
-| TBaseParameters | Optional. Allows overriding the parameters for the operation |
+| Name            | Description                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| TResource       | The resource being deleted                                       |
+| TBaseParameters | Optional. Allows overriding the parameters for the operation     |
+| LroHeaders      | Optional. Allows overriding the headers in the Accepted response |
 
 ### `ArmResourceDeleteAsyncBase` {#Azure.ResourceManager.ArmResourceDeleteAsyncBase}
 
@@ -842,15 +862,16 @@ op Azure.ResourceManager.ArmResourceDeleteSync(provider: Microsoft.ThisWillBeRep
 ### `ArmResourceDeleteWithoutOkAsync` {#Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeleteAcceptedLroResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
 
-| Name            | Description                                                  |
-| --------------- | ------------------------------------------------------------ |
-| TResource       | The resource being deleted                                   |
-| TBaseParameters | Optional. Allows overriding the parameters for the operation |
+| Name            | Description                                                                |
+| --------------- | -------------------------------------------------------------------------- |
+| TResource       | The resource being deleted                                                 |
+| TBaseParameters | Optional. Allows overriding the parameters for the operation               |
+| LroHeaders      | Optional. Allows overriding the headers returned in the Accepted respsonse |
 
 ### `ArmResourceListAtScope` {#Azure.ResourceManager.ArmResourceListAtScope}
 
@@ -884,12 +905,77 @@ op Azure.ResourceManager.ArmResourceListByParent(provider: Microsoft.ThisWillBeR
 | TParentName         | Optional. The name of the parent resource            |
 | TParentFriendlyName | Optional. The friendly name of the parent resource   |
 
+### `ArmResourcePatchAsync` {#Azure.ResourceManager.ArmResourcePatchAsync}
+
+A long-running resource update using the items from the resource marked with visibility "update"
+
+```typespec
+op Azure.ResourceManager.ArmResourcePatchAsync(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name            | Description                                                                   |
+| --------------- | ----------------------------------------------------------------------------- |
+| TResource       | the resource being patched                                                    |
+| TProperties     | The model type of the resource properties                                     |
+| TBaseParameters | Optional. Allows overriding the operation parameters                          |
+| LroHeaders      | Optional. Allows overriding the lro headers returned in the Accepted response |
+
+### `ArmResourcePatchSync` {#Azure.ResourceManager.ArmResourcePatchSync}
+
+A resource update using the items from the resource marked with visibility "update"
+
+```typespec
+op Azure.ResourceManager.ArmResourcePatchSync(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name            | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| TResource       | the resource being patched                           |
+| TProperties     | The model type of the resource properties            |
+| TBaseParameters | Optional. Allows overriding the operation parameters |
+
 ### `ArmResourceRead` {#Azure.ResourceManager.ArmResourceRead}
 
 A resource GET operation
 
 ```typespec
 op Azure.ResourceManager.ArmResourceRead(provider: Microsoft.ThisWillBeReplaced): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name            | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| TResource       | the resource being patched                           |
+| TBaseParameters | Optional. Allows overriding the operation parameters |
+
+### `ArmTagsPatchAsync` {#Azure.ResourceManager.ArmTagsPatchAsync}
+
+A long-running resource update that only allows updating resource tags (the minimum)
+
+```typespec
+op Azure.ResourceManager.ArmTagsPatchAsync(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.TagsUpdateModel<TResource>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name            | Description                                                                      |
+| --------------- | -------------------------------------------------------------------------------- |
+| TResource       | the resource being patched                                                       |
+| TProperties     |                                                                                  |
+| TBaseParameters | Optional. Allows overriding the operation parameters                             |
+| LroHeaders      | Optional. Allows overriding the lro headers that appear in the Accepted repsonse |
+
+### `ArmTagsPatchSync` {#Azure.ResourceManager.ArmTagsPatchSync}
+
+A resource update that only allows updating resource tags (the minimum)
+
+```typespec
+op Azure.ResourceManager.ArmTagsPatchSync(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.TagsUpdateModel<TResource>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ErrorResponse
 ```
 
 #### Template Parameters
