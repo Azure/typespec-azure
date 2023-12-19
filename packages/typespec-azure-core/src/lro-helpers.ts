@@ -71,28 +71,9 @@ export type TerminationStatus = HttpTerminationStatus | ModelPropertyTermination
 
 /**
  * Definition of a StatusMonitor that uses http status rather then status code.
- * By default, the operation continues on a 202 (Accepted) response
- * And is complete on a 201 (Created), 200 (OK) or 204 (NoContent) response
  */
 export interface HttpTerminationStatus {
   kind: "status-code";
-
-  /** The status code(s) that correspond to continuing to poll.  If not provided, the default is 202 (Accepted). */
-  continuationStatusCodes?: number[];
-
-  /** The status codes that correspond to operation completion.  By default, 201 (Created), 200 (OK) and 204 (NoContent)
-   * all indicate successful operation completion. Non-retryable error codes indicate failure.
-   */
-  terminationStatusCodes?: number[];
-
-  /** The returned model when polling is not completed */
-  continuationModel?: Model | "void";
-
-  /** The property that indicates continuation, and contains the url for the next poll. */
-  continuationProperty?: ModelProperty;
-
-  /** The model type that is returned when polling completes with success */
-  successModel?: Model | "void";
 }
 
 /**

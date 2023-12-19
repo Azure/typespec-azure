@@ -956,7 +956,7 @@ op Azure.ResourceManager.ArmTagsPatchAsync(provider: Microsoft.ThisWillBeReplace
 | TResource       | the resource being patched                                                       |
 | TProperties     |                                                                                  |
 | TBaseParameters | Optional. Allows overriding the operation parameters                             |
-| LroHeaders      | Optional. Allows overriding the lro headers that appear in the Accepted repsonse |
+| LroHeaders      | Optional. Allows overriding the lro headers that appear in the Accepted response |
 
 ### `ArmTagsPatchSync` {#Azure.ResourceManager.ArmTagsPatchSync}
 

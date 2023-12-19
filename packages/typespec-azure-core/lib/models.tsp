@@ -226,25 +226,6 @@ model RequestIdResponseHeader {
 @Foundations.Private.embeddingVector(TType)
 model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
 
-/** Options for describing a polling endpoint that uses status codes to control polling
- * @template TContinuationStatus The status code(s) or status code range indicating polling should continue.
- * @template TTerminalStatus The status code(s) or status code range indicating successful polling completion.
- * @template TPollingModel The model that is returned when polling should continue.
- * @template TFinalModel he model that is returned when polling terminates successfully.
- */
-model HttpResponseStatusPollingOptions<
-  TContinuationStatus extends int32[] = [202],
-  TTerminalStatus extends int32[] = [200, 204],
-  TPollingModel extends TypeSpec.Reflection.Model | void = never,
-  TFinalResult extends TypeSpec.Reflection.Model | void = never
-> extends HttpResponseStatusOptions {
-  kind: PollingOptionKind.httpResonseStatus;
-  continuationStatusCodes?: TContinuationStatus;
-  terminationStatusCodes?: TTerminalStatus;
-  pollingModel?: TPollingModel;
-  finalResult?: TFinalResult;
-}
-
 /** Options for overriding a polling endpoint that uses a StatusMonitor
  * @template TPollingModel The model that is returned when polling should continue.
  * @template TFinalModel The model that is returned when polling terminates successfully.
@@ -258,17 +239,6 @@ model StatusMonitorPollingOptions<
   pollingModel: TPollingModel;
   finalResult: TFinalResult;
   finalProperty: TFinalProperty;
-}
-
-/** Metadata to control polling by HttpResponseStatus */
-model HttpResponseStatusOptions extends PollingOptions {
-  kind: PollingOptionKind.httpResonseStatus;
-
-  /** he status code(s) or status code range indicating polling should continue. */
-  continuationStatusCodes?: Array<int32>;
-
-  /** The status code(s) or status code range indicating successful polling completion. */
-  terminationStatusCodes?: Array<int32>;
 }
 
 /** Options for Lro status monitors. */
@@ -292,7 +262,6 @@ model PollingOptions {
 
 union PollingOptionKind {
   statusMonitor: "statusMonitor",
-  httpResonseStatus: "httpResponseStatus",
   string,
 }
 

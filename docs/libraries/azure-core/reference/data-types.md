@@ -111,31 +111,6 @@ Provides the standard 'filter' query parameter for list operations.
 model Azure.Core.FilterQueryParameter
 ```
 
-### `HttpResponseStatusOptions` {#Azure.Core.HttpResponseStatusOptions}
-
-Metadata to control polling by HttpResponseStatus
-
-```typespec
-model Azure.Core.HttpResponseStatusOptions
-```
-
-### `HttpResponseStatusPollingOptions` {#Azure.Core.HttpResponseStatusPollingOptions}
-
-Options for describing a polling endpoint that uses status codes to control polling
-
-```typespec
-model Azure.Core.HttpResponseStatusPollingOptions<TContinuationStatus, TTerminalStatus, TPollingModel, TFinalResult>
-```
-
-#### Template Parameters
-
-| Name                | Description                                                                       |
-| ------------------- | --------------------------------------------------------------------------------- |
-| TContinuationStatus | The status code(s) or status code range indicating polling should continue.       |
-| TTerminalStatus     | The status code(s) or status code range indicating successful polling completion. |
-| TPollingModel       | The model that is returned when polling should continue.                          |
-| TFinalResult        |                                                                                   |
-
 ### `MaxPageSizeQueryParameter` {#Azure.Core.MaxPageSizeQueryParameter}
 
 Provides the standard 'maxpagesize' query parameter for list operations.

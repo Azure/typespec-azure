@@ -167,7 +167,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @dev A long-running resource update that only allows updating resource tags (the minimum)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
- * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted repsonse
+ * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  */
 op ArmTagsPatchAsync<
   TResource extends ArmResource,

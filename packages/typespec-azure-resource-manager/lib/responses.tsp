@@ -130,7 +130,7 @@ model ArmAsyncOperationHeader<
   /** A link to the status monitor */
   @header("Azure-AsyncOperation")
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
-  azureAsyncOperation: UrlValue;
+  azureAsyncOperation?: UrlValue;
 }
 
 /**
@@ -148,7 +148,7 @@ model ArmLroLocationHeader<
   @header("Location")
   @Azure.Core.pollingLocation(LroPollingOptions)
   @Azure.Core.finalLocation(FinalResult)
-  location: UrlValue;
+  location?: UrlValue;
 }
 
 /**
@@ -167,12 +167,12 @@ model ArmCombinedLroHeaders<
   /** A link to the status monitor */
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
   @header("Azure-AsyncOperation")
-  azureAsyncOperation: PollingUrlValue;
+  azureAsyncOperation?: PollingUrlValue;
 
   /** The Location header contains the URL where the status of the long running operation can be checked. */
   @header("Location")
   @Azure.Core.finalLocation(FinalResult)
-  location: FinalUrlValue;
+  location?: FinalUrlValue;
 }
 
 /**

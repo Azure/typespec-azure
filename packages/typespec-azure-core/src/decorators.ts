@@ -24,7 +24,6 @@ import {
   Scalar,
   setTypeSpecNamespace,
   StringLiteral,
-  Tuple,
   Type,
   walkPropertiesInherited,
 } from "@typespec/compiler";
@@ -617,35 +616,36 @@ export function isLroFailedState(program: Program, entity: EnumMember): boolean 
 const pollingLocationsKey = createStateSymbol("pollingLocations");
 const pollingLocationInfoKey = createStateSymbol("pollingLocationInfo");
 
-export type PollingLocationInfo = HttpStatusPollingLocationInfo | StatusMonitorPollingLocationInfo;
+/** Extra information about polling control stored with a polling link */
+export type PollingLocationInfo = StatusMonitorPollingLocationInfo;
+
+/** The abstract type for polling control information */
 export interface PollingLocationBase {
+  /** The kind of polling being done */
   kind: pollingOptionsKind;
+  /** The model property containing the polling link */
   target: ModelProperty;
+  /** The type of the poller */
   pollingModel?: Model | IntrinsicType;
+  /** The type of the final result after polling completes */
   finalResult?: Model | IntrinsicType;
 }
 
-export interface HttpStatusPollingLocationInfo extends PollingLocationBase {
-  kind: pollingOptionsKind.HttpResponseStatus;
-  continuationStatusCodes?: number[];
-  terminalStatusCodes?: number[];
-}
-
+/** Collected data for status monitor polling links */
 export interface StatusMonitorPollingLocationInfo extends PollingLocationBase {
+  /** The kind of status monitor */
   kind: pollingOptionsKind.StatusMonitor;
+  /** The status monitor detailed data for control of polling. */
   info: StatusMonitorMetadata;
 }
 
 // keys of the pollingOptions type
 const optionsKindKey = "kind";
-const continuationStatusCodeKey = "continuationStatusCodes";
-const terminationStatusCodesKey = "terminationStatusCodes";
 const finalPropertyKey = "finalProperty";
 const pollingModelKey = "pollingModel";
 const finalResultKey = "finalResult";
 
 export enum pollingOptionsKind {
-  HttpResponseStatus = "httpResponseStatus",
   StatusMonitor = "statusMonitor",
 }
 export function $pollingLocation(
@@ -703,8 +703,6 @@ function extractPollingLocationInfo(
   if (finalResult && finalResult.kind === "Model") pollingInfo.finalResult = finalResult;
   if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = program.checker.voidType;
   switch (kindValue) {
-    case pollingOptionsKind.HttpResponseStatus:
-      return extractHttpStatusLocationInfo(program, options, pollingInfo);
     case pollingOptionsKind.StatusMonitor:
       return extractStatusMonitorLocationInfo(program, options, pollingInfo);
     default:
@@ -752,47 +750,6 @@ function extractStatusMonitorLocationInfo(
     info: statusMonitor,
     ...baseInfo,
   };
-}
-
-function extractHttpStatusLocationInfo(
-  program: Program,
-  options: Model,
-  baseInfo: {
-    pollingModel?: Model | IntrinsicType;
-    finalResult?: Model | IntrinsicType;
-    target: ModelProperty;
-  }
-): HttpStatusPollingLocationInfo | undefined {
-  const kind = options.properties.get(optionsKindKey);
-  if (kind === undefined || extractUnionVariantValue(kind) !== "httpResponseStatus")
-    return undefined;
-  let continuationCodeValue: number[] | undefined = undefined;
-  let terminalCodeValue: number[] | undefined = undefined;
-  const continuationCode = options.properties.get(continuationStatusCodeKey)?.type;
-  if (continuationCode !== undefined && continuationCode.kind === "Tuple") {
-    continuationCodeValue = getNumericArray(continuationCode);
-  }
-  const terminalCode = options.properties.get(terminationStatusCodesKey)?.type;
-  if (terminalCode !== undefined && terminalCode.kind === "Tuple") {
-    terminalCodeValue = getNumericArray(terminalCode);
-  }
-
-  return {
-    kind: pollingOptionsKind.HttpResponseStatus,
-    continuationStatusCodes: continuationCodeValue,
-    terminalStatusCodes: terminalCodeValue,
-    ...baseInfo,
-  };
-}
-
-function getNumericArray(collection: Tuple): number[] | undefined {
-  const result: number[] = [];
-  for (const item of collection.values) {
-    if (item.kind !== "Number") return undefined;
-    result.push(item.value);
-  }
-
-  return result.length < 1 ? undefined : result;
 }
 
 /**
