@@ -95,10 +95,9 @@ op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BasePara
 op ArmResourceCreateOrUpdateAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
-    TResource,
-    string,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<TResource>,
+    never,
     string
   >
 >(
@@ -155,10 +154,9 @@ op ArmResourceCreateOrReplaceSync<
 op ArmResourceCreateOrReplaceAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<TResource>,
     never,
-    string,
     string
   >
 > is ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders>;
@@ -173,10 +171,9 @@ op ArmTagsPatchAsync<
   TResource extends ArmResource,
   TProperties extends {} = TagsUpdateModel<TResource>,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResource,
-    string,
     string
   >
 > is ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters, LroHeaders>;
@@ -192,10 +189,9 @@ op ArmResourcePatchAsync<
   TResource extends ArmResource,
   TProperties extends TypeSpec.Reflection.Model,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResource,
-    string,
     string
   >
 > is ArmCustomPatchAsync<
@@ -227,10 +223,9 @@ op ArmCustomPatchAsync<
   TResource extends ArmResource,
   TPatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<TResource>,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResource,
-    string,
     string
   >
 >(
@@ -403,10 +398,9 @@ op ArmResourceActionAsync<
   TRequest extends TypeSpec.Reflection.Model | void,
   TResponse extends TypeSpec.Reflection.Model | void,
   TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResponse,
-    string,
     string
   >
 > is ArmResourceActionAsyncBase<
@@ -452,10 +446,9 @@ op ArmResourceActionNoContentAsync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
   TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
-    string,
     string
   >
 > is ArmResourceActionAsyncBase<
@@ -476,10 +469,9 @@ op ArmResourceActionNoResponseContentAsync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
   TBaseParameters extends TypeSpec.Reflection.Model = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmCombinedLroHeaders<
-    ArmOperationStatus,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
-    string,
     string
   >
 > is ArmResourceActionAsyncBase<
