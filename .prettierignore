@@ -56,3 +56,6 @@ core/eng/feeds/
 
 # TypeSpec init template
 eng/feeds/
+
+# Auto generated templates
+core/packages/compiler/templates/scaffolding.json
