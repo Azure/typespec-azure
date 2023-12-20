@@ -227,6 +227,59 @@ model RequestIdResponseHeader {
 model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
 
 /**
+ * Options for overriding a polling endpoint that uses a StatusMonitor
+ * @template PollingModel The model that is returned when polling should continue.
+ * @template FinalResult The model that is returned when polling terminates successfully.
+ * @template FinalProperty The property of the status monitor that contains results.
+ */
+model StatusMonitorPollingOptions<
+  PollingModel extends TypeSpec.Reflection.Model | void = never,
+  FinalResult extends TypeSpec.Reflection.Model | void = never,
+  FinalProperty extends TypeSpec.Reflection.ModelProperty | (valueof string) = never
+> extends StatusMonitorOptions {
+  /** The kind of polling options */
+  kind: PollingOptionKind.statusMonitor;
+
+  /** The model that is returned when polling should continue */
+  pollingModel: PollingModel;
+
+  /** The model that is returned when polling terminates successfully */
+  finalResult: FinalResult;
+
+  /** The property of the status monitor that contains results */
+  finalProperty: FinalProperty;
+}
+
+/** Options for Lro status monitors. */
+model StatusMonitorOptions extends PollingOptions {
+  /** The kind of polling options */
+  kind: PollingOptionKind.statusMonitor;
+
+  /** A reference to or name of the property of the status monitor that contains the response */
+  finalProperty?: TypeSpec.Reflection.ModelProperty | (valueof string);
+}
+
+/** Generic polling options for LRO operations. */
+model PollingOptions {
+  /** The kind of polling options */
+  kind: PollingOptionKind;
+
+  /** The model that is returned when polling should continue. */
+  pollingModel?: TypeSpec.Reflection.Model | void;
+
+  /** The type that is returned when polling terminates successfully. */
+  finalResult?: TypeSpec.Reflection.Model | void;
+}
+
+/** The available kinds of polling options */
+union PollingOptionKind {
+  /** Polling options for a status monitor */
+  statusMonitor: "statusMonitor",
+
+  string,
+}
+
+/**
  * Universally Unique Identifier
  *
  * @example

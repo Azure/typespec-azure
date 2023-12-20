@@ -20,7 +20,7 @@ model OperationListResult is Azure.Core.Page<Operation>;
  * Base model that defines common properties for all ARM resources.
  */
 @doc("Common properties for all ARM resources.")
-model ArmResource {
+model ArmResource extends ArmResourceBase {
   @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
   @visibility("read")
   id: string;
@@ -35,6 +35,9 @@ model ArmResource {
   @visibility("read")
   systemData?: SystemData;
 }
+
+/** Base class used for type definitions */
+model ArmResourceBase {}
 
 /**
  * The base tracked resource.
@@ -216,13 +219,13 @@ model ErrorDetail {
  * @template TResource The type of the resource.
  */
 @resourceBaseParametersOf(TResource)
-model BaseParameters<TResource extends ArmResource> {
+model BaseParameters<TResource extends ArmResourceBase> {
   ...ApiVersionParameter;
 
   // unless tenant or extension
   ...SubscriptionIdParameter;
 
-  //unless tenant, subscription, resourceGroup, or extension
+  // deprecated, should not be used
   ...LocationParameter;
 
   // unless tenant, subscription, location, or extension
