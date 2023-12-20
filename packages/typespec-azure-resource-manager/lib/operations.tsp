@@ -79,7 +79,7 @@ op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BasePara
  * A long-running resource CreateOrUpdate (PUT)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
- * @template LroHeadersOptional.  Allows overriding the lro headers returned on resource create
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
  */
 @autoRoute
 @doc("Create a {name}", TResource)
@@ -95,11 +95,7 @@ op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BasePara
 op ArmResourceCreateOrUpdateAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<TResource>,
-    never,
-    string
-  >
+  LroHeaders extends TypeSpec.Reflection.Model = {}
 >(
   ...ResourceInstanceParameters<TResource, TBaseParameters>,
 
@@ -154,11 +150,7 @@ op ArmResourceCreateOrReplaceSync<
 op ArmResourceCreateOrReplaceAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<TResource>,
-    never,
-    string
-  >
+  LroHeaders extends TypeSpec.Reflection.Model = {}
 > is ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders>;
 
 /**

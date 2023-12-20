@@ -204,8 +204,15 @@ model ArmResourceUpdatedResponse<TResource extends Azure.ResourceManager.Foundat
 model ArmResourceCreatedResponse<
   Resource extends Azure.ResourceManager.Foundations.ArmResource,
   LroHeaders extends TypeSpec.Reflection.Model = {}
-> is ArmCreatedResponse<Resource> {
+> {
+  ...CreatedResponse;
+  ...Azure.Core.Foundations.RetryAfterHeader;
   ...LroHeaders;
+
+  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<Resource>)
+  @doc("The resource body")
+  @body
+  body: Resource;
 }
 
 /**

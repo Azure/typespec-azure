@@ -789,11 +789,11 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: Microsoft.This
 
 #### Template Parameters
 
-| Name            | Description                                          |
-| --------------- | ---------------------------------------------------- |
-| TResource       | the resource being patched                           |
-| TBaseParameters | Optional. Allows overriding the operation parameters |
-| LroHeaders      |                                                      |
+| Name            | Description                                                             |
+| --------------- | ----------------------------------------------------------------------- |
+| TResource       | the resource being patched                                              |
+| TBaseParameters | Optional. Allows overriding the operation parameters                    |
+| LroHeaders      | Optional. Allows overriding the lro headers returned on resource create |
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 

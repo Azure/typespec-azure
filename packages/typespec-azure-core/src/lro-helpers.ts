@@ -48,6 +48,7 @@ import {
   PollingLocationInfo,
   PollingOperationKey,
   pollingOptionsKind,
+  StatusMonitorPollingLocationInfo,
 } from "./decorators.js";
 import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 
@@ -58,7 +59,7 @@ import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 export interface OperationLink {
   kind: "link";
   /** Indicates whether the link is in the response header or response body */
-  location: "ResponseHeader" | "ResponseBody";
+  location: "ResponseHeader" | "ResponseBody" | "Self";
   /** The property that contains the link */
   property: ModelProperty;
 }
@@ -213,7 +214,7 @@ export interface PollingSuccessProperty extends LogicalOperationStep {
   /** The property containing the results of success */
   target: ModelProperty;
   /** The property in the response that contained a url to the status monitor */
-  sourceProperty: ModelProperty;
+  sourceProperty: ModelProperty | undefined;
 }
 
 export interface NoPollingSuccessProperty extends LogicalOperationStep {
@@ -451,9 +452,12 @@ function createLroMetadata(
 }
 
 function createOperationLink(program: Program, modelProperty: ModelProperty): OperationLink {
+  let location: "ResponseBody" | "ResponseHeader" | "Self" = "ResponseBody";
+  if (isHeader(program, modelProperty)) location = "ResponseHeader";
+  if (isBody(program, modelProperty)) location = "Self";
   return {
     kind: "link",
-    location: isHeader(program, modelProperty) ? "ResponseHeader" : "ResponseBody",
+    location: location,
     property: modelProperty,
   };
 }
@@ -641,10 +645,10 @@ function getFinalStateVia(
 
 function getLroStatusFromHeaderProperty(
   program: Program,
-  property: ModelProperty
+  property: ModelProperty | undefined
 ): FinalStateValue {
   let finalState: FinalStateValue;
-  if (!isHeader(program, property)) return FinalStateValue.customLink;
+  if (property === undefined || !isHeader(program, property)) return FinalStateValue.customLink;
   const name = getHeaderFieldName(program, property);
   if (name === undefined) return FinalStateValue.customLink;
 
@@ -768,6 +772,7 @@ function getStatusMonitorInfo(
     };
   }
   if (modelOrLink.kind === "link") {
+    if (modelOrLink.property === undefined) return undefined;
     const statusMonitorType = resolveOperationLocation(program, modelOrLink.property);
     if (statusMonitorType === undefined || statusMonitorType.kind === "Intrinsic") return undefined;
     modelOrLink = statusMonitorType;
@@ -823,12 +828,17 @@ function getStatusMonitorLinksFromModel(
   program: Program,
   model: Model
 ): StatusMonitorLinkData | undefined {
-  const pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
+  let pollingData: StatusMonitorPollingLocationInfo | undefined = undefined;
+  let pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
     isPollingLocation(program, prop)
   );
-  if (pollingLinks === undefined || pollingLinks.length !== 1) return undefined;
+  if (pollingLinks === undefined) return undefined;
+  // favor status monitor links over stepwise polling
+  if (pollingLinks.length > 1) {
+    pollingLinks = pollingLinks.filter((p) => !isBody(program, p));
+  }
   const pollingProperty = pollingLinks[0];
-  const pollingData = getPollingLocationInfo(program, pollingProperty);
+  pollingData = getPollingLocationInfo(program, pollingProperty);
   const pollingLink = createOperationLink(program, pollingProperty);
   const monitorInfo = getStatusMonitorInfo(program, pollingLink, pollingData);
   if (monitorInfo === undefined) return undefined;
@@ -845,7 +855,7 @@ function getStatusMonitorLinksFromModel(
       ? undefined
       : createOperationLink(program, finalLinks[0]);
   let finalTarget: Model | IntrinsicType | undefined;
-  if (finalLink !== undefined) {
+  if (finalLink !== undefined && finalLink.property !== undefined) {
     finalTarget = resolveOperationLocation(program, finalLink.property);
   }
   return {
@@ -869,6 +879,7 @@ function getTargetModelInformation(
 ): [Model | IntrinsicType, ModelProperty | undefined] | undefined {
   if (modelOrLink.kind === "Intrinsic") return undefined;
   if (modelOrLink.kind === "link") {
+    if (modelOrLink.property === undefined) return undefined;
     const linkModel = resolveOperationLocation(program, modelOrLink.property);
     if (linkModel === undefined || linkModel.kind === "Intrinsic") return undefined;
     modelOrLink = linkModel;
