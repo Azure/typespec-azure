@@ -476,7 +476,7 @@ interface Azure.ResourceManager.ResourceUpdateAsync<TResource, TProperties, TBas
 #### `ResourceUpdateAsync.update` {#Azure.ResourceManager.ResourceUpdateAsync.update}
 
 ```typespec
-op Azure.ResourceManager.ResourceUpdateAsync.update(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, PollingUrlValue, FinalUrlValue>> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceUpdateAsync.update(provider: Microsoft.ThisWillBeReplaced, properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>): Azure.ResourceManager.ArmResponse<T> | Azure.ResourceManager.ArmAcceptedLroResponse<Resource update request accepted., Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue>> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceUpdateSync` {#Azure.ResourceManager.ResourceUpdateSync}
