@@ -1,6 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
-This log was last generated on Wed, 06 Dec 2023 19:47:28 GMT and should not be manually modified.
+This log was last generated on Wed, 20 Dec 2023 05:29:22 GMT and should not be manually modified.
+
+## 0.37.1
+Wed, 20 Dec 2023 05:29:22 GMT
+
+### Patches
+
+- Add types to support lro scenarios
 
 ## 0.37.0
 Wed, 06 Dec 2023 19:47:28 GMT

@@ -1658,10 +1658,10 @@ importers:
         specifier: workspace:~0.37.2
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.37.1
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~0.37.0
@@ -1722,7 +1722,7 @@ importers:
   ../../packages/typespec-autorest:
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@types/mocha':
         specifier: ~10.0.1
@@ -1848,10 +1848,10 @@ importers:
         specifier: workspace:~0.37.2
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.37.1
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~0.37.0
@@ -1933,7 +1933,7 @@ importers:
         specifier: workspace:~0.37.2
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@types/mocha':
         specifier: ~10.0.1
@@ -2000,7 +2000,7 @@ importers:
         version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@types/mocha':
         specifier: ~10.0.1
@@ -2094,10 +2094,10 @@ importers:
         version: 17.7.2
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.37.1
         version: link:../typespec-azure-resource-manager
       '@types/js-yaml':
         specifier: ~4.0.1
@@ -2158,7 +2158,7 @@ importers:
         specifier: workspace:~0.37.2
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@types/mocha':
         specifier: ~10.0.1
@@ -2258,13 +2258,13 @@ importers:
         version: 18.2.0(react@18.2.0)
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.37.2
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-playground-website':
         specifier: workspace:~1.0.0
         version: link:../typespec-azure-playground-website
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.37.1
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~0.37.0
