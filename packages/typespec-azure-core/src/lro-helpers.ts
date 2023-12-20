@@ -1111,7 +1111,6 @@ function resolveOperationLocation(
   if (override) return override;
   const resolvedScalar: Scalar | undefined = resolveToScalarType(program, property.type);
   if (resolvedScalar === undefined) return undefined;
-  resolveOperationLocation;
   return getResourceLocationType(program, resolvedScalar);
 }
 
