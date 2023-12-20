@@ -141,6 +141,14 @@ model Azure.Core.Page<TResource>
 | --------- | ------------------ |
 | TResource | The resource type. |
 
+### `PollingOptions` {#Azure.Core.PollingOptions}
+
+Generic polling options for LRO operations.
+
+```typespec
+model Azure.Core.PollingOptions
+```
+
 ### `RepeatabilityRequestHeaders` {#Azure.Core.RepeatabilityRequestHeaders}
 
 Provides the 'Repeatability-\*' headers to enable repeatable requests.
@@ -231,6 +239,30 @@ Provides the most common query parameters for list operations.
 model Azure.Core.StandardListQueryParameters
 ```
 
+### `StatusMonitorOptions` {#Azure.Core.StatusMonitorOptions}
+
+Options for Lro status monitors.
+
+```typespec
+model Azure.Core.StatusMonitorOptions
+```
+
+### `StatusMonitorPollingOptions` {#Azure.Core.StatusMonitorPollingOptions}
+
+Options for overriding a polling endpoint that uses a StatusMonitor
+
+```typespec
+model Azure.Core.StatusMonitorPollingOptions<PollingModel, FinalResult, FinalProperty>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| PollingModel  | The model that is returned when polling should continue.         |
+| FinalResult   | The model that is returned when polling terminates successfully. |
+| FinalProperty | The property of the status monitor that contains results.        |
+
 ### `TopQueryParameter` {#Azure.Core.TopQueryParameter}
 
 Provides the standard 'top' query parameter for list operations.
@@ -245,6 +277,14 @@ Supported versions of Azure.Core TypeSpec building blocks.
 
 ```typespec
 enum Azure.Core.Versions
+```
+
+### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
+
+The available kinds of polling options
+
+```typespec
+union Azure.Core.PollingOptionKind
 ```
 
 ### `RepeatabilityResult` {#Azure.Core.RepeatabilityResult}

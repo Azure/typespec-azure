@@ -48,6 +48,7 @@ model SubscriptionIdParameter {
 }
 
 /**
+ * DEPRECATED - DO NOT USE
  * The default location parameter type.
  */
 @doc("The default location parameter type.")
@@ -61,6 +62,32 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor([ResourceHome.Location])
   location: string;
+}
+
+/**
+ * The default location parameter type.
+ */
+@doc("The default location parameter type.")
+model LocationResourceParameter {
+  @path
+  @minLength(1)
+  @segment("locations")
+  @doc("The location name.")
+  @key
+  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
+  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
+  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
+  location: string;
+}
+
+@tenantResource
+model TenantLocationResource {
+  ...LocationResourceParameter;
+}
+
+@subscriptionResource
+model SubscriptionLocationResource {
+  ...LocationResourceParameter;
 }
 
 /**
@@ -100,7 +127,7 @@ model ResourceUriParameter {
  * @template TBaseParameters The parameters representing the base Uri of the resource
  */
 model ResourceInstanceParameters<
-  TResource extends ArmResource,
+  TResource extends ArmResourceBase,
   TBaseParameters = BaseParameters<TResource>
 > {
   ...TBaseParameters;

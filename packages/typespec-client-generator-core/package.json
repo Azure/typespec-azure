@@ -68,7 +68,7 @@
     "@typespec/library-linter": "workspace:~0.51.0",
     "@typespec/eslint-plugin": "workspace:~0.51.0",
     "@typespec/versioning": "workspace:~0.51.0",
-    "@azure-tools/typespec-azure-core": "workspace:~0.37.1",
+    "@azure-tools/typespec-azure-core": "workspace:~0.37.2",
     "@typespec/prettier-plugin-typespec": "workspace:~0.51.0",
     "@typespec/tspd": "workspace:~0.46.0",
     "@types/mocha": "~10.0.6",
