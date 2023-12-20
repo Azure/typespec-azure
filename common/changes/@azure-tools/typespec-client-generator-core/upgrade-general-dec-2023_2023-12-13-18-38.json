@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-client-generator-core",
+      "comment": "Update dependencies",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-client-generator-core"
+}
