@@ -34,8 +34,6 @@ import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model
 import { useStandardNames } from "./rules/use-standard-names.js";
 import { useStandardOperations } from "./rules/use-standard-ops.js";
 
-export const namespace = "Azure.Core";
-
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
   diagnostics: {

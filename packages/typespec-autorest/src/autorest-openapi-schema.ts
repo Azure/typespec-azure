@@ -1,4 +1,4 @@
-let AutorestOpenAPISchema;
+let AutorestOpenAPISchema: any;
 try {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
