@@ -31,8 +31,9 @@
     "build": "npm run compile",
     "compile": "tsc -p .",
     "watch": "tsc -p . --watch",
-    "test": "mocha",
-    "test-official": "c8 mocha --forbid-only --reporter mocha-multi-reporters",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test-official": "vitest run --coverage",
     "lint": "eslint . --ext .ts --max-warnings=0",
     "lint:fix": "eslint . --fix --ext .ts",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-service-csharp/reference"
