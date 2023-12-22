@@ -1,10 +1,8 @@
-import { resolvePath } from "@typespec/compiler";
-import { TypeSpecTestLibrary } from "@typespec/compiler/testing";
-import { fileURLToPath } from "url";
+import { TypeSpecTestLibrary, findTestPackageRoot } from "@typespec/compiler/testing";
 
 export const CSharpServiceEmitterTestLibrary: TypeSpecTestLibrary = {
   name: "@azure-tools/typespec-service-csharp",
-  packageRoot: resolvePath(fileURLToPath(import.meta.url), "../../../../"),
+  packageRoot: await findTestPackageRoot(import.meta.url),
   files: [
     {
       realDir: "",

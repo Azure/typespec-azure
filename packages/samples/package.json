@@ -26,8 +26,8 @@
     "clean": "rimraf ./dist ./temp",
     "build": "tsc -p .",
     "watch": "tsc -p . --watch",
-    "test": "mocha",
-    "test-official": "mocha --forbid-only",
+    "test": "vitest run",
+    "test-official": "vitest run --coverage",
     "test:regen": "cross-env RECORD=true mocha",
     "regen-samples": "cross-env RECORD=true mocha"
   },
