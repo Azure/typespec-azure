@@ -4,5 +4,6 @@ export default defineConfig({
   test: {
     name: "azure-samples",
     environment: "node",
+    isolate: false,
   },
 });
