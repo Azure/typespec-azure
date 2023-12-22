@@ -6,7 +6,6 @@
     "rootDir": ".",
     "resolveJsonModule": true,
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
-    "types": ["node", "mocha"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext"
   },
