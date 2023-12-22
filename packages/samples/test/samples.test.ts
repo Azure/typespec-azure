@@ -1,6 +1,7 @@
 import { resolvePath } from "@typespec/compiler";
 import { defineSampleSnaphotTests } from "@typespec/samples";
 import { fileURLToPath } from "url";
+import { describe } from "vitest";
 
 const excludedSamples = [
   // fails compilation by design to demo language server

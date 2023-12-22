@@ -1,3 +1,4 @@
+import { describe, it } from "vitest";
 import { diffSameVersions, expectDiffCode } from "./test-host.js";
 
 describe("typespec-diff: rule test", () => {

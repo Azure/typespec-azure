@@ -4,6 +4,7 @@ import {
   expectDiagnostics,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { UnionEnumVariant } from "../../src/helpers/union-enums.js";
 import { getUnionAsEnum } from "../../src/index.js";
 

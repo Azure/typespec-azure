@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { responseSchemaMultiStatusCodeRule } from "../../src/rules/response-schema-multi-status-code.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

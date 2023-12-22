@@ -1,5 +1,6 @@
 import { HttpVerb } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { OpenAPI2Document } from "../src/types.js";
 import { openApiFor } from "./test-host.js";
 

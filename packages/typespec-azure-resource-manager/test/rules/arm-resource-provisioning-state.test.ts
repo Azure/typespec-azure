@@ -1,8 +1,9 @@
 import {
   BasicTestRunner,
-  createLinterRuleTester,
   LinterRuleTester,
+  createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 import { armResourceProvisioningStateRule } from "../../src/rules/arm-resource-provisioning-state-rule.js";

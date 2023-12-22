@@ -1,5 +1,6 @@
 import { BasicTestRunner } from "@typespec/compiler/testing";
 import assert from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { createCSharpServiceEmitterTestRunner, getStandardService } from "./test-host.js";
 
 function getGeneratedFile(runner: BasicTestRunner, fileName: string): [string, string] {

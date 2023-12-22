@@ -1,4 +1,5 @@
 import { ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { openApiFor } from "./test-host.js";
 
 describe("autorest: paging", () => {

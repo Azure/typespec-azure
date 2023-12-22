@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { authRequiredRule } from "../../src/rules/auth-required.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

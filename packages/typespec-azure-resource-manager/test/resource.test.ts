@@ -1,6 +1,7 @@
 import { Diagnostic, Model } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
 import { checkFor, getOpenApiAndDiagnostics, openApiFor } from "./test-host.js";

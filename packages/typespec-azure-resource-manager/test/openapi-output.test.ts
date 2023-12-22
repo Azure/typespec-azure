@@ -1,5 +1,6 @@
 import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok } from "assert";
+import { describe, it } from "vitest";
 import { getOpenApiAndDiagnostics, openApiFor } from "./test-host.js";
 
 describe("typespec-azure-resource-manager: autorest output", () => {

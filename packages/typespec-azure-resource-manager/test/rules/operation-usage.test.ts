@@ -6,6 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { invalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
 import { listBySubscriptionRule } from "../../src/rules/list-operation.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";

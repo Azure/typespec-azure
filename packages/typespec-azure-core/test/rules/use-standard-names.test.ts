@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { useStandardNames } from "../../src/rules/use-standard-names.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

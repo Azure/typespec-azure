@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { compositionOverInheritanceRule } from "../../src/rules/composition-over-inheritance.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

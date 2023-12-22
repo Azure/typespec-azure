@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { armResourceEnvelopeProperties } from "../../src/rules/arm-resource-invalid-envelope-property.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
