@@ -1952,91 +1952,6 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
 
-  ../../packages/typespec-diff:
-    dependencies:
-      '@typespec/compiler':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/compiler
-      '@typespec/http':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/http
-      '@typespec/openapi':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/openapi
-      '@typespec/rest':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/rest
-      '@typespec/versioning':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/versioning
-      ajv:
-        specifier: ~8.12.0
-        version: 8.12.0
-      js-yaml:
-        specifier: ~4.1.0
-        version: 4.1.0
-      lodash:
-        specifier: ~4.17.21
-        version: 4.17.21
-      picocolors:
-        specifier: ~1.0.0
-        version: 1.0.0
-      yargs:
-        specifier: ~17.7.2
-        version: 17.7.2
-    devDependencies:
-      '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
-        version: link:../typespec-azure-core
-      '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.1
-        version: link:../typespec-azure-resource-manager
-      '@types/js-yaml':
-        specifier: ~4.0.1
-        version: 4.0.8
-      '@types/lodash':
-        specifier: 4.14.191
-        version: 4.14.191
-      '@types/mocha':
-        specifier: ~10.0.6
-        version: 10.0.6
-      '@types/node':
-        specifier: ~18.11.9
-        version: 18.11.19
-      '@types/yargs':
-        specifier: ~17.0.32
-        version: 17.0.32
-      '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/eslint-config-typespec
-      '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/eslint-plugin-typespec
-      '@typespec/library-linter':
-        specifier: workspace:~0.51.0
-        version: link:../../core/packages/library-linter
-      c8:
-        specifier: ~8.0.1
-        version: 8.0.1
-      eslint:
-        specifier: ^8.55.0
-        version: 8.56.0
-      mocha:
-        specifier: ~10.2.0
-        version: 10.2.0
-      mocha-junit-reporter:
-        specifier: ~2.2.1
-        version: 2.2.1(mocha@10.2.0)
-      mocha-multi-reporters:
-        specifier: ~1.5.1
-        version: 1.5.1(mocha@10.2.0)
-      rimraf:
-        specifier: ~5.0.1
-        version: 5.0.5
-      typescript:
-        specifier: ~5.3.3
-        version: 5.3.3
-
   ../../packages/typespec-service-csharp:
     dependencies:
       '@typespec/versioning':
@@ -8903,16 +8818,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.2
     dev: false
 
-  /@types/js-yaml@4.0.8:
-    resolution: {integrity: sha512-m6jnPk1VhlYRiLFm3f8X9Uep761f+CK8mHyS65LutH2OhmBF0BeMEjHgg05usH8PLZMWWc/BUR9RPmkvpWnyRA==}
-    dev: true
-
   /@types/json-schema@7.0.14:
     resolution: {integrity: sha512-U3PUjAudAdJBeC2pgN8uTIKgxrb4nlDF3SF0++EldXQvQBGkpFZMSnwQiIoDU77tv45VgNkl/L4ouD+rEomujw==}
-
-  /@types/lodash@4.14.191:
-    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
-    dev: true
 
   /@types/mdast@3.0.14:
     resolution: {integrity: sha512-gVZ04PGgw1qLZKsnWnyFv4ORnaJ+DXLdHTVSFbU8yX6xZ34Bjg4Q32yPkmveUP1yItXReKfB0Aknlh/3zxTKAw==}
