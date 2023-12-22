@@ -5,7 +5,6 @@
     { "path": "../../core/packages/compiler/tsconfig.json" },
     { "path": "../../core/packages/rest/tsconfig.json" },
     { "path": "../../core/packages/openapi/tsconfig.json" },
-    { "path": "../../core/packages/lint/tsconfig.json" },
     { "path": "../typespec-azure-core/tsconfig.json" },
     { "path": "../typespec-autorest/tsconfig.json" }
   ],
