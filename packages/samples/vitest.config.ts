@@ -5,5 +5,8 @@ export default defineConfig({
     name: "azure-samples",
     environment: "node",
     isolate: false,
+    outputFile: {
+      junit: "./test-results.xml",
+    },
   },
 });

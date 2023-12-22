@@ -27,7 +27,7 @@
     "build": "tsc -p .",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
-    "test-official": "vitest run --coverage",
+    "test-official": "vitest run --coverage --reporter=junit --reporter=default",
     "test:regen": "cross-env RECORD=true mocha",
     "regen-samples": "cross-env RECORD=true mocha"
   },
