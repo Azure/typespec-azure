@@ -1,6 +1,7 @@
 export const namespace = "Azure.Core";
 
 export { $lib } from "./lib.js";
+export { $linter } from "./linter.js";
 
 export * from "./decorators.js";
 export { UnionEnum, getUnionAsEnum } from "./helpers/union-enums.js";
