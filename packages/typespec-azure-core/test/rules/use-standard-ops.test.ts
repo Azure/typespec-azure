@@ -59,7 +59,7 @@ describe("typespec-azure-core: use-standard-operations rule", () => {
       ]);
   });
 
-  it.only("emits a diagnostic for operations defined from a low-level Foundations signature", async () => {
+  it("emits a diagnostic for operations defined from a low-level Foundations signature", async () => {
     await tester
       .expect(
         `
