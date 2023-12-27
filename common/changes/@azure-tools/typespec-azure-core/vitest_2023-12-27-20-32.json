@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-azure-core",
+      "comment": "",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-azure-core"
+}
