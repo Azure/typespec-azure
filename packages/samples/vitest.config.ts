@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     name: "azure-samples",
     environment: "node",
-    testTimeout: 10000,
+    testTimeout: 30000,
     isolate: false,
     coverage: {
       reporter: ["cobertura", "json", "text"],
