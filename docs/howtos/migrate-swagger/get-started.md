@@ -12,10 +12,10 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 - Running the conversion tool.
 
 ```powershell
-./convert.ps1 [path to readme.md]
+./convert.ps1 [path to readme.md] [path to output folder]
 
 # OR specify parameter by name
-./convert.ps1 -swaggerConfigFile [path to readme.md]
+./convert.ps1 -swaggerConfigFile [path to readme.md] -outputFolder [path to output folder]
 ```
 
 - Review generated TypeSpec
