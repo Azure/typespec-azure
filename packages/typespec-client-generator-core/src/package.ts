@@ -7,7 +7,13 @@ import {
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
-import { HttpOperation, getHeaderFieldName, getHttpOperation, getServers, isContentTypeHeader } from "@typespec/http";
+import {
+  HttpOperation,
+  getHeaderFieldName,
+  getHttpOperation,
+  getServers,
+  isContentTypeHeader,
+} from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -16,7 +22,6 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
-  SdkBodyModelPropertyType,
   SdkBodyParameter,
   SdkBuiltInType,
   SdkClient,
@@ -34,7 +39,6 @@ import {
   SdkMethodParameter,
   SdkMethodResponse,
   SdkModelPropertyType,
-  SdkModelPropertyTypeBase,
   SdkModelType,
   SdkOperationGroup,
   SdkPackage,
@@ -78,7 +82,9 @@ function getSdkHttpBodyParameters(
   if (contentTypes.length === 0) {
     contentTypes = ["application/json"];
   }
-  const defaultContentType = contentTypes.includes("application/json") ? "application/json" : contentTypes[0];
+  const defaultContentType = contentTypes.includes("application/json")
+    ? "application/json"
+    : contentTypes[0];
   if (!tspBody.parameter) {
     const bodyType = getClientType(context, tspBody.type, httpOperation.operation);
     return [
@@ -106,22 +112,26 @@ function getSdkHttpBodyParameters(
   );
   if (body.kind !== "body") throw new Error("blah");
   if (methodBodyParameter) {
-    return [{
-      ...body,
-      contentTypes,
-      defaultContentType,
-    }];
+    return [
+      {
+        ...body,
+        contentTypes,
+        defaultContentType,
+      },
+    ];
   } else {
     // this means that the body parameter is a property on one of the method parameters
     for (const methodParameter of methodParameters) {
       if (methodParameter.type.kind === "model") {
         const bodyProperty = methodParameter.type.properties.find((x) => x.kind === "body");
         if (bodyProperty) {
-          return [{
-            ...body,
-            contentTypes,
-            defaultContentType,
-          }];
+          return [
+            {
+              ...body,
+              contentTypes,
+              defaultContentType,
+            },
+          ];
         }
       }
     }
@@ -168,8 +178,11 @@ function getSdkHttpOperation(
     kind: "string",
     encode: "string",
     nullable: false,
-  }
-  if (bodyParams && !headerParams.some(h => h.__raw && isContentTypeHeader(context.program, h.__raw))) {
+  };
+  if (
+    bodyParams &&
+    !headerParams.some((h) => h.__raw && isContentTypeHeader(context.program, h.__raw))
+  ) {
     // We will always add a content type parameter if a body is being inputted
     const contentTypeBase = {
       clientDefaultValue: bodyParams[0].defaultContentType,
@@ -180,21 +193,23 @@ function getSdkHttpOperation(
       onClient: false,
       optional: false,
       description: `Body parameter's content type. Known values are ${bodyParams[0].contentTypes}`,
-    }
+    };
     headerParams.push({
       ...contentTypeBase,
       kind: "header",
       serializedName: "Content-Type",
-    })
-    if (!methodParameters.some(m => m.__raw && isContentTypeHeader(context.program, m.__raw))) {
+    });
+    if (!methodParameters.some((m) => m.__raw && isContentTypeHeader(context.program, m.__raw))) {
       methodParameters.push({
         ...contentTypeBase,
         kind: "method",
-      })
+      });
     }
   }
-  const responsesWithBodies = Object.values(responses).concat(Object.values(exceptions)).filter(r => r.type)
-  if (responsesWithBodies.length > 0 && !headerParams.some(h => isAcceptHeader(h))) {
+  const responsesWithBodies = Object.values(responses)
+    .concat(Object.values(exceptions))
+    .filter((r) => r.type);
+  if (responsesWithBodies.length > 0 && !headerParams.some((h) => isAcceptHeader(h))) {
     // Always have an accept header if we're returning any response with a body
     const clientDefaultValue = responsesWithBodies[0].defaultContentType!;
     const acceptBase = {
@@ -204,19 +219,19 @@ function getSdkHttpOperation(
       isApiVersionParam: false,
       onClient: false,
       optional: false,
-    }
+    };
     headerParams.push({
       ...acceptBase,
       kind: "header",
       clientDefaultValue,
       serializedName: "Accept",
-    })
-    if (!methodParameters.some(m => isAcceptHeader(m))) {
+    });
+    if (!methodParameters.some((m) => m.nameInClient === "accept")) {
       methodParameters.push({
         ...acceptBase,
         clientDefaultValue,
         kind: "method",
-      })
+      });
     }
   }
   return {
@@ -259,7 +274,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 ): SdkPagingServiceMethod<TServiceOperation> {
   const pagedMetadata = getPagedResult(context.program, operation)!;
   const basic = getSdkBasicServiceMethod<TServiceOperation>(context, operation);
-  basic.response.responsePath = pagedMetadata.itemsSegments ? pagedMetadata.itemsSegments.join(".") : "";
+  basic.response.responsePath = pagedMetadata.itemsSegments
+    ? pagedMetadata.itemsSegments.join(".")
+    : "";
   if (pagedMetadata.itemsProperty) {
     basic.response.type = getClientType(context, pagedMetadata.itemsProperty.type);
   }
@@ -270,10 +287,10 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     nextLinkLogicalPath: pagedMetadata?.nextLinkSegments || [],
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? getSdkServiceOperation<TServiceOperation>(
-        context,
-        pagedMetadata.nextLinkOperation,
-        basic.parameters
-      )
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters
+        )
       : undefined,
   };
 }
@@ -287,7 +304,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   basicServiceMethod.response.responsePath =
     metadata.logicalPath ??
     (metadata.envelopeResult !== metadata.logicalResult &&
-      basicServiceMethod.operation.verb === "post"
+    basicServiceMethod.operation.verb === "post"
       ? "result"
       : undefined);
   basicServiceMethod.response.type = getClientType(context, metadata.logicalResult);
@@ -295,7 +312,11 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
     ...basicServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata,
-    initialOperation: getSdkServiceOperation<TServiceOperation>(context, metadata.operation, basicServiceMethod.parameters),
+    initialOperation: getSdkServiceOperation<TServiceOperation>(
+      context,
+      metadata.operation,
+      basicServiceMethod.parameters
+    ),
   };
 }
 
@@ -349,7 +370,9 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
     for (const innerResponse of response.responses) {
       for (const header of Object.values(innerResponse.headers || [])) {
         const clientType = getClientType(context, header.type);
-        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json") ? "application/json" : innerResponse.body?.contentTypes[0];
+        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
+          ? "application/json"
+          : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
         addFormatInfo(context, header, clientType);
         headers.push({
@@ -364,11 +387,11 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
         if (body && body !== innerResponse.body.type) {
           throw new Error("blah");
         }
-        contentTypes = contentTypes.concat(innerResponse.body.contentTypes)
+        contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body = innerResponse.body.type;
       }
     }
-    
+
     const sdkResponse: SdkHttpResponse = {
       __raw: response,
       kind: "http",
@@ -530,28 +553,32 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
 ): {
   endpoint: string;
   properties: SdkEndpointParameter[];
-  hasParameterizedEndpoint: boolean
+  hasParameterizedEndpoint: boolean;
 } {
   const servers = getServers(context.program, client.service);
   if (servers === undefined) {
     return {
       endpoint: "",
       properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client),
-      hasParameterizedEndpoint: false
-    }
+      hasParameterizedEndpoint: false,
+    };
   }
   if (servers.length > 1) {
     return {
       endpoint: "{endpoint}",
       properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client),
-      hasParameterizedEndpoint: true
+      hasParameterizedEndpoint: true,
     };
   }
   if (servers[0].parameters.size === 0) {
     return {
       endpoint: servers[0].url,
-      properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client, servers[0].url),
-      hasParameterizedEndpoint: false
+      properties: getDefaultSdkEndpointParameter<TServiceOperation>(
+        context,
+        client,
+        servers[0].url
+      ),
+      hasParameterizedEndpoint: false,
     };
   }
   const properties: SdkEndpointParameter[] = [];
@@ -572,7 +599,7 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
   return {
     endpoint: servers[0].url,
     properties,
-    hasParameterizedEndpoint: true
+    hasParameterizedEndpoint: true,
   };
 }
 
@@ -623,7 +650,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       details: getDocHelper(context, operationGroup.type).details,
       access: "internal",
       response: operationGroupClient,
-      apiVersions: getAvailableApiVersions<TServiceOperation>(context, operationGroup.type)
+      apiVersions: getAvailableApiVersions<TServiceOperation>(context, operationGroup.type),
     });
   }
   return retval;
@@ -644,7 +671,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     .filter((x) => x.rootVersion)
     .map((x) => x.rootVersion!.value);
   const isClient = baseClientType.kind === "SdkClient";
-  const endpointInfo = getEndpointAndEndpointParameters<TServiceOperation>(context, client)
+  const endpointInfo = getEndpointAndEndpointParameters<TServiceOperation>(context, client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
     name: isClient ? baseClientType.name : baseClientType.type.name,

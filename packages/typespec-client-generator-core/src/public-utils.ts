@@ -155,6 +155,7 @@ export function getLibraryName(
   type: Model | ModelProperty | Operation
 ): string {
   if (!context.emitterName) {
+    // eslint-disable-next-line deprecation/deprecation
     context.emitterName = getEmitterTargetName(context);
   }
   const emitterSpecificName = getProjectedName(context.program, type, context.emitterName);

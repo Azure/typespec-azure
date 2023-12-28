@@ -1,14 +1,7 @@
-import {
-  Operation,
-} from "@typespec/compiler";
-import { deepStrictEqual, ok, strictEqual } from "assert";
-import {
-  getDocHelper
-} from "../src/internal-utils.js";
-import {
-  createSdkTestRunner,
-  SdkTestRunner,
-} from "./test-host.js";
+import { Operation } from "@typespec/compiler";
+import { strictEqual } from "assert";
+import { getDocHelper } from "../src/internal-utils.js";
+import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: internal-utils", () => {
   let runner: SdkTestRunner;

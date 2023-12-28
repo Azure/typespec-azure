@@ -52,7 +52,10 @@ function getScopedDecoratorData<TServiceOperation extends SdkServiceOperation = 
   return undefined;
 }
 
-function listScopedDecoratorData<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, key: symbol): any[] {
+function listScopedDecoratorData<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  key: symbol
+): any[] {
   const retval = [...context.program.stateMap(key).values()];
   return retval.filter((value) => {
     if (!value.scopes) return true;
@@ -167,7 +170,10 @@ function findClientService(
  * @param type Type to check
  * @returns Client or undefined
  */
-export function getClient<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, type: Namespace | Interface): SdkClient | undefined {
+export function getClient<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Namespace | Interface
+): SdkClient | undefined {
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, clientKey, type);
   }
@@ -185,7 +191,9 @@ export function getClient<TServiceOperation extends SdkServiceOperation = SdkHtt
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>): boolean {
+function hasExplicitClientOrOperationGroup<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: SdkContext<TServiceOperation>): boolean {
   return (
     listScopedDecoratorData(context, clientKey).length > 0 ||
     listScopedDecoratorData(context, operationGroupKey).length > 0
@@ -198,7 +206,9 @@ function hasExplicitClientOrOperationGroup<TServiceOperation extends SdkServiceO
  * @param context SdkContext
  * @returns Array of clients
  */
-export function listClients<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>): SdkClient[] {
+export function listClients<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>
+): SdkClient[] {
   const explicitClients = [...listScopedDecoratorData(context, clientKey)].map(
     (value) => value.value
   );
@@ -258,7 +268,10 @@ export function $operationGroup(
  * @param type Type to check
  * @returns boolean
  */
-export function isOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, type: Namespace | Interface): boolean {
+export function isOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Namespace | Interface
+): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
   }
@@ -285,8 +298,8 @@ export function isInOperationGroup<
       return type.interface
         ? isInOperationGroup(context, type.interface)
         : type.namespace
-        ? isInOperationGroup(context, type.namespace)
-        : false;
+          ? isInOperationGroup(context, type.namespace)
+          : false;
     case "Interface":
     case "Namespace":
       return (
@@ -296,7 +309,10 @@ export function isInOperationGroup<
   }
 }
 
-function buildOperationGroupPath<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(context: SdkContext<TServiceOperation>, type: Namespace | Interface): string {
+function buildOperationGroupPath<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Namespace | Interface
+): string {
   const path = [];
   while (true) {
     const client = getClient(context, type);
@@ -384,7 +400,9 @@ export function getOperationGroup<TServiceOperation extends SdkServiceOperation 
  * @param ignoreHierarchy Whether to get all nested operation groups
  * @returns
  */
-export function listOperationGroups<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+export function listOperationGroups<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
   context: SdkContext<TServiceOperation>,
   group: SdkClient | SdkOperationGroup,
   ignoreHierarchy = false
@@ -424,7 +442,9 @@ export function listOperationGroups<TServiceOperation extends SdkServiceOperatio
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
-export function listOperationsInOperationGroup<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+export function listOperationsInOperationGroup<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
   context: SdkContext<TServiceOperation>,
   group: SdkOperationGroup | SdkClient,
   ignoreHierarchy = false

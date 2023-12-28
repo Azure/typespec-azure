@@ -10,6 +10,7 @@ import {
   Program,
   ProjectedNameView,
   Type,
+  Union,
   UsageFlags,
 } from "@typespec/compiler";
 import {
@@ -36,6 +37,7 @@ export interface SdkContext<
   clientProjectedProgram?: ProjectedNameView;
   jsonProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  unionsMap?: Map<Union, SdkUnionType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   __api_version_parameter?: SdkParameter;
   __api_versions?: string[];

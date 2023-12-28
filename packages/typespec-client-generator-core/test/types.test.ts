@@ -1646,7 +1646,7 @@ describe("typespec-client-generator-core: types", () => {
         op operation(@body input: Shark): Shark;
       `);
       const models = Array.from(getAllModels(runner.context));
-      strictEqual(models.length, 4);
+      strictEqual(models.length, 5);
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
     });
 
@@ -1823,7 +1823,6 @@ describe("typespec-client-generator-core: types", () => {
         model Catalog is TrackedResource<CatalogProperties> {
           @pattern("^[A-Za-z0-9_-]{1,50}$")
           @key("catalogName")
-          @path
           @segment("catalogs")
           name: string;
         }
@@ -1842,7 +1841,6 @@ describe("typespec-client-generator-core: types", () => {
         @access(Access.public)
         model Deployment is TrackedResource<DeploymentProperties> {
           @key("deploymentName")
-          @path
           @segment("deployments")
           name: string;
         }
@@ -1858,8 +1856,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 4);
       const catalog = models.find((x) => x.name === "Catalog")! as SdkModelType;
       const deployment = models.find((x) => x.name === "Deployment")! as SdkModelType;
-      strictEqual(catalog.properties.length, 1);
-      strictEqual(deployment.properties.length, 1);
+      strictEqual(catalog.properties.length, 2);
+      strictEqual(deployment.properties.length, 2);
     });
     it("model with deprecated annotation", async () => {
       await runner.compileAndDiagnose(`

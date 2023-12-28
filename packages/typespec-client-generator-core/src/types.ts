@@ -30,7 +30,6 @@ import {
   ServiceAuthentication,
   Visibility,
   getAuthentication,
-  getContentTypes,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getHttpOperation,
@@ -160,7 +159,7 @@ export function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
   propertyType: SdkType,
-  defaultContentType?: string,
+  defaultContentType?: string
 ): void {
   const encodeData = getEncode(context.program, type);
   if (propertyType.kind === "duration") {
@@ -409,13 +408,21 @@ export function getSdkUnion<TServiceOperation extends SdkServiceOperation>(
     clientType.nullable = true;
     return clientType;
   }
-  return {
-    ...getSdkTypeBaseHelper(context, type, "union"),
-    name: type.name,
-    generatedName: type.name ? undefined : getGeneratedName(context, type),
-    values: nonNullOptions.map((x) => getClientType(context, x, operation)),
-    nullable: nonNullOptions.length < type.variants.size,
-  };
+  let sdkType = context.unionsMap?.get(type) as SdkUnionType | undefined;
+  if (!sdkType) {
+    sdkType = {
+      ...getSdkTypeBaseHelper(context, type, "union"),
+      name: type.name,
+      generatedName: type.name ? undefined : getGeneratedName(context, type),
+      values: nonNullOptions.map((x) => getClientType(context, x, operation)),
+      nullable: nonNullOptions.length < type.variants.size,
+    };
+    if (context.unionsMap === undefined) {
+      context.unionsMap = new Map<Union, SdkUnionType>();
+    }
+    context.unionsMap.set(type, sdkType);
+  }
+  return sdkType;
 }
 
 export function getSdkConstant<TServiceOperation extends SdkServiceOperation>(
@@ -672,7 +679,7 @@ function getKnownValuesEnum<TServiceOperation extends SdkServiceOperation>(
 export function getClientType<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: SdkContext<TServiceOperation>,
   type: Type,
-  operation?: Operation,
+  operation?: Operation
 ): SdkType {
   switch (type.kind) {
     case "String":
@@ -1076,23 +1083,15 @@ function updateTypesFromOperation<TServiceOperation extends SdkServiceOperation>
   const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
-    const paramType = checkAndGetClientType(context, param.type, operation)
+    const paramType = checkAndGetClientType(context, param.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(
-        context,
-        UsageFlags.Input,
-        paramType
-      );
+      updateUsageOfModel(context, UsageFlags.Input, paramType);
     }
   }
   for (const param of httpOperation.parameters.parameters) {
-    const paramType = checkAndGetClientType(context, param.param.type, operation)
+    const paramType = checkAndGetClientType(context, param.param.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(
-        context,
-        UsageFlags.Input,
-        paramType
-      );
+      updateUsageOfModel(context, UsageFlags.Input, paramType);
     }
   }
   if (httpOperation.parameters.body) {
@@ -1191,6 +1190,9 @@ export function getAllModels<TServiceOperation extends SdkServiceOperation = Sdk
   options = { ...defaultOptions, ...options };
   if (context.modelsMap === undefined) {
     context.modelsMap = new Map<Type, SdkModelType | SdkEnumType>();
+  }
+  if (context.unionsMap === undefined) {
+    context.unionsMap = new Map<Union, SdkUnionType>();
   }
   if (context.operationModelsMap === undefined) {
     context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
