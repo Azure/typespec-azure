@@ -30,7 +30,6 @@ import {
   ServiceAuthentication,
   Visibility,
   getAuthentication,
-  getContentTypes,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getHttpOperation,
@@ -142,6 +141,12 @@ export function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
       case "azurelocation":
         propertyType.kind = "azureLocation";
         break;
+      case "date":
+        propertyType.kind = "date";
+        break;
+      case "date-time":
+        propertyType.kind = "utcDatetime";
+        break;
       default:
         throw Error(`Unknown format ${format}`);
     }
@@ -160,7 +165,7 @@ export function addEncodeInfo<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: ModelProperty | Scalar,
   propertyType: SdkType,
-  defaultContentType?: string,
+  defaultContentType?: string
 ): void {
   const encodeData = getEncode(context.program, type);
   if (propertyType.kind === "duration") {
@@ -211,6 +216,12 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
       return "date";
     case "plainTime":
       return "time";
+    // TODO: we need to handle how to process @format("date-time") and utcDateTime
+    // We have a separate SdkDateTimeType, but for @format("date-time") the SDKType is SDKBuiltInType
+    // I cannot use `datetime` here, because it will conflict with SdkDateTimeType
+    // We need to re-think how we want to `addFormatInfo`, maybe not carry the format info in `propertyType.kind`
+    case "utcDateTime":
+      return "utcDatetime";
     case "float":
       return "float32";
     case "decimal128":
@@ -672,7 +683,7 @@ function getKnownValuesEnum<TServiceOperation extends SdkServiceOperation>(
 export function getClientType<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: SdkContext<TServiceOperation>,
   type: Type,
-  operation?: Operation,
+  operation?: Operation
 ): SdkType {
   switch (type.kind) {
     case "String":
@@ -1076,23 +1087,15 @@ function updateTypesFromOperation<TServiceOperation extends SdkServiceOperation>
   const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
-    const paramType = checkAndGetClientType(context, param.type, operation)
+    const paramType = checkAndGetClientType(context, param.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(
-        context,
-        UsageFlags.Input,
-        paramType
-      );
+      updateUsageOfModel(context, UsageFlags.Input, paramType);
     }
   }
   for (const param of httpOperation.parameters.parameters) {
-    const paramType = checkAndGetClientType(context, param.param.type, operation)
+    const paramType = checkAndGetClientType(context, param.param.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(
-        context,
-        UsageFlags.Input,
-        paramType
-      );
+      updateUsageOfModel(context, UsageFlags.Input, paramType);
     }
   }
   if (httpOperation.parameters.body) {

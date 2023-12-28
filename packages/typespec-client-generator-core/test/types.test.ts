@@ -184,6 +184,8 @@ describe("typespec-client-generator-core: types", () => {
           azureLocationProperty: string;
           @format("etag")
           etagProperty: string;
+          @format("date")
+          dateProperty: string;
         }
       `
       );
@@ -340,6 +342,19 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "datetime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
+    });
+    it("used as parameter", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        op addTimeHeader(
+          @header("Repeatability-First-Sent") repeatabilityFirstSent?: utcDateTime 
+        ): void;
+      `
+      );
+      const m = runner.context.sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(m.type.kind, "datetime");
+      strictEqual(m.type.wireType.kind, "string");
+      strictEqual(m.type.encode, "rfc7231");
     });
     it("rfc3339", async function () {
       await runner.compileWithBuiltInService(

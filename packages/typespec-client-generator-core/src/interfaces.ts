@@ -116,6 +116,7 @@ export type SdkBuiltInKinds =
   | "boolean"
   | "date"
   | "time"
+  | "utcDatetime"
   | "any"
   | "int32"
   | "int64"
