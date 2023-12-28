@@ -64,13 +64,18 @@ namespace Azure {
 
     /**
      * Identifies a model property as containing the location to poll for operation state.
+     * @param options PollingOptions for the poller pointed to by this link.  Overrides
+     * settings derived from property value it is decorating, if the value of the
+     * property is ResourceLocation<T>
      */
-    extern dec pollingLocation(entity: ModelProperty);
+    extern dec pollingLocation(entity: ModelProperty, options?: PollingOptions);
 
     /**
      * Identifies a ModelProperty as containing the final location for the operation result.
+     * @param finalResult Sets the expected return value for the final result.  Overrides
+     * any value provided in the decorated property, if the property uses ResourceLocation<T>.
      */
-    extern dec finalLocation(entity: ModelProperty);
+    extern dec finalLocation(entity: ModelProperty, finalResult?: Model | void);
 
     /**
      * Identifies an operation that is linked to the target operation.

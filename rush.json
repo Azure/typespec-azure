@@ -169,12 +169,6 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@typespec/migrate",
-      "projectFolder": "core/packages/migrate",
-      "reviewCategory": "production",
-      "shouldPublish": false
-    },
-    {
       "packageName": "@typespec/protobuf",
       "projectFolder": "core/packages/protobuf",
       "reviewCategory": "production",
@@ -189,12 +183,6 @@
     {
       "packageName": "@typespec/html-program-viewer",
       "projectFolder": "core/packages/html-program-viewer",
-      "reviewCategory": "production",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@typespec/lint",
-      "projectFolder": "core/packages/lint",
       "reviewCategory": "production",
       "shouldPublish": false
     },
@@ -225,12 +213,6 @@
     {
       "packageName": "@azure-tools/typespec-client-generator-core",
       "projectFolder": "packages/typespec-client-generator-core",
-      "reviewCategory": "production",
-      "versionPolicyName": "typespec-azure"
-    },
-    {
-      "packageName": "@azure-tools/typespec-diff",
-      "projectFolder": "packages/typespec-diff",
       "reviewCategory": "production",
       "versionPolicyName": "typespec-azure"
     },

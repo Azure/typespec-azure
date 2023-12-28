@@ -2,6 +2,18 @@
   "name": "@azure-tools/typespec-azure-core",
   "entries": [
     {
+      "version": "0.37.2",
+      "tag": "@azure-tools/typespec-azure-core_v0.37.2",
+      "date": "Wed, 20 Dec 2023 05:29:22 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Add LRO support for ARM patterns"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.1",
       "tag": "@azure-tools/typespec-azure-core_v0.37.1",
       "date": "Mon, 11 Dec 2023 18:44:34 GMT",
