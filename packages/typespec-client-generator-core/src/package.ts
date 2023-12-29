@@ -4,6 +4,7 @@ import {
   Type,
   UsageFlags,
   getNamespaceFullName,
+  getService,
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
@@ -61,7 +62,12 @@ import {
   isAcceptHeader,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
-import { getClientNamespaceString, getLibraryName } from "./public-utils.js";
+import {
+  getClientNamespaceString,
+  getDefaultApiVersion,
+  getLibraryName,
+  getPropertyNames,
+} from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -108,7 +114,7 @@ function getSdkHttpBodyParameters(
     defaultContentType: defaultContentType,
   });
   const methodBodyParameter = methodParameters.find(
-    (x) => x.nameInClient === tspBody.parameter!.name
+    (x) => x.nameInClient === getPropertyNames(context, tspBody.parameter!)[0]
   );
   if (body.kind !== "body") throw new Error("blah");
   if (methodBodyParameter) {
@@ -477,9 +483,12 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   // we don't want it on the method level, but we will keep it on the service operation level
   const apiVersionParam = methodParameters.find((x) => x.isApiVersionParam);
   if (apiVersionParam && context.__api_version_parameter === undefined) {
-    context.__api_version_parameter = apiVersionParam;
-    context.__api_version_parameter.onClient = true;
-    context.__api_version_parameter.optional = false;
+    context.__api_version_parameter = {
+      ...apiVersionParam,
+      onClient: true,
+      optional: false,
+      clientDefaultValue: context.__api_version_client_default_value,
+    };
   }
   const serviceOperation = getSdkServiceOperation<TServiceOperation>(
     context,
@@ -603,6 +612,17 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
   };
 }
 
+function getClientDefaultApiVersion<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  client: SdkClient
+): string | undefined {
+  let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
+  if (!defaultVersion) {
+    defaultVersion = getService(context.program, client.service)?.version;
+  }
+  return defaultVersion;
+}
+
 function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   client: SdkClient
@@ -670,6 +690,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context.__api_versions = resolveVersions(context.program, client.service)
     .filter((x) => x.rootVersion)
     .map((x) => x.rootVersion!.value);
+  context.__api_version_client_default_value = getClientDefaultApiVersion(context, client);
   const isClient = baseClientType.kind === "SdkClient";
   const endpointInfo = getEndpointAndEndpointParameters<TServiceOperation>(context, client);
   const sdkClientType: SdkClientType<TServiceOperation> = {

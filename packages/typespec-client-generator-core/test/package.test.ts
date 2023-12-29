@@ -1824,7 +1824,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(methodResponse.responsePath, "result");
     });
-    it("paging", async () => { });
+    it("paging", async () => {});
   });
 });
 

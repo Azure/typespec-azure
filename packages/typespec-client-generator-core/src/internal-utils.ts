@@ -6,7 +6,6 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
-  listServices,
 } from "@typespec/compiler";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
@@ -17,7 +16,7 @@ import {
   SdkServiceParameter,
   SdkType,
 } from "./interfaces.js";
-import { getDefaultApiVersion, isApiVersion } from "./public-utils.js";
+import { isApiVersion } from "./public-utils.js";
 
 /**
  *
@@ -76,9 +75,7 @@ export function updateWithApiVersionInformation(
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
-    clientDefaultValue: isApiVersionParam
-      ? getDefaultApiVersion(context, listServices(context.program)[0].type)?.value || undefined
-      : undefined,
+    clientDefaultValue: isApiVersionParam ? context.__api_version_client_default_value : undefined,
     onClient: isApiVersionParam,
   };
 }

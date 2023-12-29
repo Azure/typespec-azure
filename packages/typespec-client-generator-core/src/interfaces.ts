@@ -40,6 +40,7 @@ export interface SdkContext<
   unionsMap?: Map<Union, SdkUnionType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   __api_version_parameter?: SdkParameter;
+  __api_version_client_default_value?: string;
   __api_versions?: string[];
   __clients?: Map<SdkClient | SdkOperationGroup, SdkClientType<TServiceOperation>>;
   generatedNames?: Set<string>;
