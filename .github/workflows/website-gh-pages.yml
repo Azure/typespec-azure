@@ -38,7 +38,7 @@ jobs:
         run: npm install -g pnpm@8.13.1
 
       - name: Install dependencies
-        run: pnpm update
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm run build --to @azure-tools/typespec-azure-website -v
