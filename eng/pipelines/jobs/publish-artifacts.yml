@@ -26,7 +26,7 @@ jobs:
         displayName: Regen manifest for compiler
         workingDirectory: ./core/packages/compiler
 
-      - script: pnpm -r pack --pack-destination $(Build.SourcesDirectory)/temp/artifacts
+      - script: pnpm run pack:all
         displayName: Pack packages
 
       - publish: $(Build.SourcesDirectory)/temp/artifacts
