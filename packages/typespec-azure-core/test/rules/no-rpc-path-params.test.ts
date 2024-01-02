@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { noRpcPathParamsRule } from "../../src/rules/no-rpc-path-params.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

@@ -1,4 +1,3 @@
-import "./index.js";
 import {
   filterModelProperties,
   filterResponseModels,

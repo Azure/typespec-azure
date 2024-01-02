@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { propertyNameRule } from "../../src/rules/property-naming.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

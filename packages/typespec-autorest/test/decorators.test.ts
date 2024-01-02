@@ -7,6 +7,7 @@ import {
   resolveVirtualPath,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { getRef } from "../src/decorators.js";
 import { AutorestTestLibrary } from "../src/testing/index.js";
 import {
