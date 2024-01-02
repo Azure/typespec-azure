@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-azure-portal-core",
+      "comment": "adding new package called typespec-azure-portal-core",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-azure-portal-core"
+}
