@@ -38,7 +38,7 @@ stages:
 
           - template: ./templates/install.yml
 
-          - script: pnpm run build --verbose
+          - script: pnpm run build
             displayName: Build
 
           - publish: $(Build.ArtifactStagingDirectory)

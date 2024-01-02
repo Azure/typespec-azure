@@ -21,7 +21,7 @@ jobs:
 
       - template: ./templates/install.yml
 
-      - script: pnpm run build --verbose
+      - script: pnpm run build
         displayName: Build
 
       - task: AzureCLI@1
