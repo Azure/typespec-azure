@@ -15,11 +15,14 @@ steps:
     displayName: Install Node.js
     retryCountOnTaskFailure: 3
 
+  - script: npm install -g pnpm@8.13.1
+    displayName: Install pnpm
+
   - script: |
       echo "Node:"
       node -v
-      echo "Npm:"
-      npm -v
+      echo "Pnpm:"
+      pnpm -v
     displayName: "Log tool versions used"
 
   # purge before install to ensure a clean state between retries
