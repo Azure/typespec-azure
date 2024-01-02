@@ -34,11 +34,14 @@ jobs:
         with:
           node-version: 18.x
 
+      - name: Install pnpm
+        run: npm install -g pnpm@8.13.1
+
       - name: Install dependencies
-        run: node common/scripts/install-run-rush.js update
+        run: pnpm update
 
       - name: Build
-        run: node common/scripts/install-run-rush.js build --to @azure-tools/typespec-azure-website -v
+        run: pnpm run build --to @azure-tools/typespec-azure-website -v
         env:
           TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/"
           NODE_OPTIONS: "--max_old_space_size=4096"
