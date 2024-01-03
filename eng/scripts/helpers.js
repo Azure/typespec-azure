@@ -37,21 +37,6 @@ export function forEachProject(onEach, filter) {
   }
 }
 
-export function npmForEachDependency(cmd, projectDir, options) {
-  const project = JSON.parse(readFileSync(`${projectDir}/package.json`, "utf-8"));
-  const deps = [
-    Object.keys(project.dependencies || {}),
-    Object.keys(project.devDependencies || {}),
-    Object.keys(project.peerDependencies || {}),
-  ].flat();
-
-  forEachProject((name, location, project) => {
-    if (project.scripts[cmd] || cmd === "pack") {
-      const args = cmd === "pack" ? [cmd] : ["run", cmd];
-      run("npm", args, { cwd: location, ...options });
-    }
-  }, deps);
-}
 
 export function getProjectVersion(projectName) {
   const projectFolder = resolve(
@@ -61,19 +46,6 @@ export function getProjectVersion(projectName) {
   return packageJson.version;
 }
 
-export function npmForEach(cmd, options) {
-  forEachProject((name, location, project) => {
-    if (cmd === "test-official" && !project.scripts[cmd] && project.scripts["test"]) {
-      const pj = join(location, "package.json");
-      throw new Error(`${pj} has a 'test' script, but no 'test-official' script for CI.`);
-    }
-
-    if (project.scripts[cmd] || cmd === "pack") {
-      const args = cmd === "pack" ? [cmd] : ["run", cmd];
-      run("npm", args, { cwd: location, ...options });
-    }
-  });
-}
 
 // We could use { shell: true } to let Windows find .cmd, but that causes other issues.
 // It breaks ENOENT checking for command-not-found and also handles command/args with spaces
@@ -130,110 +102,10 @@ export function run(command, args, options) {
   return proc;
 }
 
-export function runPrettier(...args) {
-  run(
-    prettier,
-    [
-      ...args,
-      "--config",
-      ".prettierrc.json",
-      "--ignore-path",
-      ".prettierignore",
-      "**/*.{ts,js,tsx,jsx,cjs,mjs,css,json,yml,yaml,tsp,cadl,md}",
-    ],
-    {
-      cwd: repoRoot,
-    }
-  );
-}
-
 export function clearScreen() {
   process.stdout.write("\x1bc");
 }
 
-export function runWatch(watch, dir, build, options) {
-  let lastBuildTime;
-  dir = resolve(dir);
-
-  // We need to wait for directory to be created before watching it. This deals
-  // with races between watchers where one watcher must create a directory
-  // before another can watch it.
-  //
-  // For example, we can't watch for tmlanguage.js changes if the source watcher
-  // hasn't even created the directory in which tmlanguage.js will be written.
-  try {
-    statSync(dir);
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      waitForDirectoryCreation();
-      return;
-    }
-    throw err;
-  }
-
-  // Directory already exists: we can start watching right away.
-  start();
-
-  function waitForDirectoryCreation() {
-    let dirCreated = false;
-    let parentDir = dirname(dir);
-    logWithTime(`Waiting for ${dir} to be created.`);
-
-    watch.createMonitor(parentDir, "created", (monitor) => {
-      monitor.on("created", (file) => {
-        if (!dirCreated && file === dir) {
-          dirCreated = true; // defend against duplicate events.
-          monitor.stop();
-          start();
-        }
-      });
-    });
-  }
-
-  function start() {
-    // build once up-front
-    runBuild();
-
-    // then build again on any change
-    watch.createMonitor(dir, { interval: 0.2, ...options }, (monitor) => {
-      monitor.on("created", (file) => runBuild(`${file} created`));
-      monitor.on("removed", (file) => runBuild(`${file} removed`));
-      monitor.on("changed", (file) => runBuild(`${file} changed`, monitor.files[file]?.mtime));
-    });
-  }
-
-  function runBuild(changeDescription, changeTime) {
-    runBuildAsync(changeDescription, changeTime).catch((err) => {
-      console.error(err.stack);
-      process.exit(1);
-    });
-  }
-
-  async function runBuildAsync(changeDescription, changeTime) {
-    if (changeTime && lastBuildTime && changeTime < lastBuildTime) {
-      // Don't rebuild if a change happened before the last build kicked off.
-      // Defends against duplicate events and building more than once when a
-      // bunch of files are changed at the same time.
-      return;
-    }
-
-    lastBuildTime = new Date();
-    if (changeDescription) {
-      clearScreen();
-      logWithTime(`File change detected: ${changeDescription}. Running build.`);
-    } else {
-      logWithTime("Starting build in watch mode.");
-    }
-
-    try {
-      await build();
-      logWithTime("Build succeeded. Waiting for file changes.");
-    } catch (err) {
-      console.error(err.stack);
-      logWithTime(`Build failed. Waiting for file changes.`);
-    }
-  }
-}
 
 export function logWithTime(msg) {
   const time = new Date().toLocaleTimeString();
