@@ -1,6 +1,7 @@
+import { findWorkspacePackagesNoCheck } from "@pnpm/find-workspace-packages";
 import { spawn, spawnSync } from "child_process";
-import { lstatSync, readFileSync, readdirSync, statSync } from "fs";
-import { dirname, join, resolve } from "path";
+import { lstatSync, readFileSync, readdirSync } from "fs";
+import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 function read(filename) {
@@ -19,24 +20,12 @@ export const prettier = resolve(repoRoot, "core/packages/compiler/node_modules/.
 export const tsc = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/tsc");
 export const autorest = resolve(repoRoot, "eng/scripts/node_modules/.bin/autorest");
 
-const minimumDotnetVersion = {
-  major: 5,
-  minor: 0,
-};
-
 const rush = read(`${repoRoot}/rush.json`);
 
-export function forEachProject(onEach, filter) {
-  // load all the projects
-  for (const each of rush.projects) {
-    const packageName = each.packageName;
-    if (filter !== undefined && !filter.includes(packageName)) continue;
-    const projectFolder = resolve(`${repoRoot}/${each.projectFolder}`);
-    const project = JSON.parse(readFileSync(`${projectFolder}/package.json`, "utf-8"));
-    onEach(packageName, projectFolder, project, each);
-  }
+/** @returns {Promise<import("@pnpm/find-workspace-packages").Project[]>*/
+export function listPackages() {
+  return findWorkspacePackagesNoCheck(repoRoot);
 }
-
 
 export function getProjectVersion(projectName) {
   const projectFolder = resolve(
@@ -45,7 +34,6 @@ export function getProjectVersion(projectName) {
   const packageJson = JSON.parse(readFileSync(`${projectFolder}/package.json`, "utf-8"));
   return packageJson.version;
 }
-
 
 // We could use { shell: true } to let Windows find .cmd, but that causes other issues.
 // It breaks ENOENT checking for command-not-found and also handles command/args with spaces
@@ -105,7 +93,6 @@ export function run(command, args, options) {
 export function clearScreen() {
   process.stdout.write("\x1bc");
 }
-
 
 export function logWithTime(msg) {
   const time = new Date().toLocaleTimeString();
