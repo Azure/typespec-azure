@@ -64,3 +64,4 @@ eng/feeds/
 
 # Auto generated templates
 core/packages/compiler/templates/scaffolding.json
+core/packages/compiler/templates/__snapshots__/
