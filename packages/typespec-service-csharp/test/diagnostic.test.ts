@@ -1,4 +1,5 @@
 import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { createCSharpServiceEmitterTestRunner, getStandardService } from "./test-host.js";
 
 describe("typespec-service-csharp: diagnostics", () => {

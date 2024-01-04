@@ -6,6 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { HttpOperation } from "@typespec/http";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { getPagedResult, isFinalLocation, isPollingLocation } from "../src/decorators.js";
 import { LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
 import { getNamespaceName } from "../src/rules/utils.js";

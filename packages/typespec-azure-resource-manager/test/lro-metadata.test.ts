@@ -3,6 +3,7 @@ import { Diagnostic, Model } from "@typespec/compiler";
 import { BasicTestRunner } from "@typespec/compiler/testing";
 import { HttpOperation, RouteResolutionOptions, getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok } from "assert";
+import { describe, it } from "vitest";
 import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
 async function getOperations(

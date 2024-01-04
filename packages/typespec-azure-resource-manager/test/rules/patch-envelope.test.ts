@@ -4,6 +4,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { patchEnvelopePropertiesRules } from "../../src/rules/patch-envelope-properties.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 

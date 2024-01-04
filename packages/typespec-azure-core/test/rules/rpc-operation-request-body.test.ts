@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { rpcOperationRequestBodyRule } from "../../src/rules/rpc-operation-request-body.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

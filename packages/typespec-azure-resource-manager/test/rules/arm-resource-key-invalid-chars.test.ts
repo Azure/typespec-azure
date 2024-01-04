@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { armResourceKeyInvalidCharsRule } from "../../src/rules/arm-resource-key-invalid-chars.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 

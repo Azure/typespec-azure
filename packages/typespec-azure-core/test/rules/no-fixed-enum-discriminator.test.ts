@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { noFixedEnumDiscriminatorRule } from "../../src/rules/no-fixed-enum-discriminator.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

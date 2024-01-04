@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { preventRestLibraryInterfaces } from "../../src/rules/prevent-rest-library.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

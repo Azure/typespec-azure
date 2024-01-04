@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { noErrorStatusCodesRule } from "../../src/rules/no-error-status-codes.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

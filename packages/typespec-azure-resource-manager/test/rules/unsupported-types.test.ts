@@ -4,6 +4,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { unsupportedTypeRule } from "../../src/rules/unsupported-type.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
