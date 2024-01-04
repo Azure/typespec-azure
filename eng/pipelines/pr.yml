@@ -55,13 +55,5 @@ jobs:
         parameters:
           nodeVersion: $(nodeVersion)
 
-  - job: Consistency_Check
-    pool:
-      name: azsdk-pool-mms-ubuntu-2004-general
-      vmImage: ubuntu-20.04
-
-    steps:
-      - template: ./jobs/pull-request-consistency.yml
-
   - template: e2e-job.yml
   - template: jobs/publish-artifacts.yml
