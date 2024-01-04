@@ -1,13 +1,13 @@
 // @ts-check
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
+import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
 import {
   CommandFailedError,
   checkForChangedFiles,
   coreRepoRoot,
   listPackages,
   repoRoot,
-  run,
 } from "./helpers.js";
 
 const NoChange = 0;
@@ -114,13 +114,13 @@ function doubleRun(command, ...args) {
 function typespecRun(command, ...args) {
   console.log();
   console.log("## typespec ##");
-  run(command, args, { cwd: coreRepoRoot });
+  runOrExit(command, args, { cwd: coreRepoRoot });
 }
 
 function typespecAzureRun(command, ...args) {
   console.log();
   console.log("## typespec-azure ##");
-  run(command, args, { cwd: repoRoot });
+  runOrExit(command, args, { cwd: repoRoot });
 }
 
 function typespecRunWithRetries(tries, command, ...args) {
@@ -128,7 +128,7 @@ function typespecRunWithRetries(tries, command, ...args) {
     console.log();
     console.log("## typespec ##");
     console.log(`remaining tries: ${tries}`);
-    run(command, args, { cwd: coreRepoRoot });
+    runOrExit(command, args, { cwd: coreRepoRoot });
   } catch (err) {
     if (tries-- > 0) {
       typespecRunWithRetries(tries, command, ...args);
@@ -141,7 +141,7 @@ function typespecAzureRunWithRetries(tries, command, ...args) {
     console.log();
     console.log("## typespec-azure ##");
     console.log(`remaining tries: ${tries}`);
-    run(command, args, { cwd: repoRoot });
+    runOrExit(command, args, { cwd: repoRoot });
   } catch (err) {
     if (tries-- > 0) {
       typespecAzureRunWithRetries(tries, command, ...args);
