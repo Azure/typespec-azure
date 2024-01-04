@@ -53,7 +53,7 @@ FIXME
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-FIXME
+FIXME;
 ```
 
 </TabItem>
@@ -69,16 +69,15 @@ FIXME
 Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
 you must use `@sharedRoute`. By default, codegen will generate one method per operation name.
 
-
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
 @sharedRoute("/foo")
-op a(x: int) : float
+op a(x: int): float;
 
 @sharedRoute("/foo")
-op b(x: string) : int64
+op b(x: string): int64;
 ```
 
 </TabItem>
@@ -110,7 +109,7 @@ public Response<long> B(string x, Cancellation token);
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-FIXME
+FIXME;
 ```
 
 </TabItem>
@@ -122,7 +121,6 @@ FIXME
 
 </TabItem>
 </Tabs>
-
 
 ## Customizations
 
@@ -184,7 +182,7 @@ public Response<long> Foo(string x, Cancellation token);
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-FIXME
+FIXME;
 ```
 
 </TabItem>
@@ -196,4 +194,3 @@ FIXME
 
 </TabItem>
 </Tabs>
-
