@@ -4,7 +4,7 @@
  */
 
 import { findWorkspacePackagesNoCheck } from "@pnpm/find-workspace-packages";
-import { runOrExit } from "../../packages/internal-build-utils/dist/src/common.js";
+import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
 import { repoRoot } from "./helpers.js";
 
 const projects = await findWorkspacePackagesNoCheck(repoRoot);
