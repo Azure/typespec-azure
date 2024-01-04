@@ -17,7 +17,7 @@
     "pack:all": "node ./eng/scripts/pack-all.js",
     "preinstall": "npx only-allow pnpm",
     "prepare-publish": "pnpm changeset version",
-    "prettier": "prettier .",
+    "prettier": "prettier . --config .prettierrc.json",
     "purge": "rimraf node_modules/ --glob \"packages/*/node_modules/\" --glob \"core/packages/*/node_modules/\"",
     "regen-docs": "pnpm -r  --parallel --aggregate-output run regen-docs",
     "regen-samples": "pnpm -r run regen-samples",

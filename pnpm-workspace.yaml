@@ -1,4 +1,3 @@
 packages:
   - packages/*
-  - core # Install core workspace packages too
   - core/packages/*
