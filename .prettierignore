@@ -4,13 +4,12 @@
 **/bin/
 **/obj/
 **/.vs/
-common/temp/
-common/scripts/
-common/changes/
+**/common/temp/
+**/common/scripts/
+**/common/changes/
 
 # Pnpm lock file
-pnpm-lock.yaml
-core/pnpm-lock.yaml
+**/pnpm-lock.yaml
 
 # Coverage report directory
 **/coverage/
