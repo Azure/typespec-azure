@@ -1,18 +1,8 @@
 import { findWorkspacePackagesNoCheck } from "@pnpm/find-workspace-packages";
 import { spawn, spawnSync } from "child_process";
-import { lstatSync, readFileSync, readdirSync } from "fs";
+import { lstatSync, readdirSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-
-function read(filename) {
-  const txt = readFileSync(filename, "utf-8")
-    .replace(/\r/gm, "")
-    .replace(/\n/gm, "«")
-    .replace(/\/\*.*?\*\//gm, "")
-    .replace(/«/gm, "\n")
-    .replace(/\s+\/\/.*/g, "");
-  return JSON.parse(txt);
-}
 
 export const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 export const coreRepoRoot = resolve(repoRoot, "core");
@@ -20,26 +10,21 @@ export const prettier = resolve(repoRoot, "core/packages/compiler/node_modules/.
 export const tsc = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/tsc");
 export const autorest = resolve(repoRoot, "eng/scripts/node_modules/.bin/autorest");
 
-const rush = read(`${repoRoot}/rush.json`);
-
 /** @returns {Promise<import("@pnpm/find-workspace-packages").Project[]>*/
 export function listPackages() {
   return findWorkspacePackagesNoCheck(repoRoot);
 }
 
-export function getProjectVersion(projectName) {
-  const projectFolder = resolve(
-    `${repoRoot}/${rush.projects.find((each) => each.packageName === projectName).projectFolder}`
-  );
-  const packageJson = JSON.parse(readFileSync(`${projectFolder}/package.json`, "utf-8"));
-  return packageJson.version;
+export async function getProjectVersion(projectName) {
+  const packages = await listPackages();
+  return packages.find((each) => each.manifest.name === projectName).version;
 }
 
 // We could use { shell: true } to let Windows find .cmd, but that causes other issues.
 // It breaks ENOENT checking for command-not-found and also handles command/args with spaces
 // poorly.
 const isCmdOnWindows = [
-  "rush",
+  "pnpm",
   "npm",
   "code",
   "code-insiders",
