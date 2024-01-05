@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { extensibleEnumRule } from "../../src/rules/extensible-enums.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

@@ -1,4 +1,5 @@
 import { deepStrictEqual, ok } from "assert";
+import { describe, it } from "vitest";
 import { openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: Property schema tests", () => {

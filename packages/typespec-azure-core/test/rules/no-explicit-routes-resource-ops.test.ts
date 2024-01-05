@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { noExplicitRoutesResourceOps } from "../../src/rules/no-explicit-routes-resource-ops.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

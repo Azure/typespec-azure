@@ -1,4 +1,5 @@
-import { checkForChangedFiles, coreRepoRoot, repoRoot, run } from "./helpers.js";
+import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
+import { checkForChangedFiles, coreRepoRoot, repoRoot } from "./helpers.js";
 
 if (
   checkForChangedFiles(coreRepoRoot, "## typespec ##") ||
@@ -16,7 +17,7 @@ In the future, remember to alert coworkers to avoid merging additional changes w
 Close this PR, run prepare-publish again.`
     );
   }
-  run("git", ["diff"], { cwd: coreRepoRoot });
-  run("git", ["diff"], { cwd: repoRoot });
+  await runOrExit("git", ["diff"], { cwd: coreRepoRoot });
+  await runOrExit("git", ["diff"], { cwd: repoRoot });
   process.exit(1);
 }

@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { knownEncodingRule } from "../../src/rules/known-encoding.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

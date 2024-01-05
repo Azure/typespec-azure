@@ -21,8 +21,6 @@ import {
 } from "@typespec/http";
 import {
   LongRunningStates,
-  ModelPropertyTerminationStatus,
-  OperationLink,
   extractLroStates,
   getLongRunningStates,
   getLroErrorResult,
@@ -30,8 +28,9 @@ import {
   getLroStatusProperty,
   getPollingOperationParameter,
   isPollingLocation,
-} from "./index.js";
+} from "./decorators.js";
 import { createDiagnostic } from "./lib.js";
+import { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";
 import { getAllProperties } from "./utils.js";
 
 export interface LroOperationInfo {

@@ -7,6 +7,7 @@ import {
   expectDiagnostics,
 } from "@typespec/compiler/testing";
 import assert, { deepStrictEqual, ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import {
   OperationLinkMetadata,
   getLongRunningStates,

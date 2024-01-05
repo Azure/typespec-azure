@@ -1,5 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { OpenAPI2HeaderParameter, OpenAPI2QueryParameter } from "../src/types.js";
 import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
 

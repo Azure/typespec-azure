@@ -1,6 +1,7 @@
 import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
   getClient,

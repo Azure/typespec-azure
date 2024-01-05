@@ -4,6 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import assert from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { casingRule } from "../../src/rules/casing.js";
 import { isCamelCaseNoAcronyms, isPascalCaseNoAcronyms } from "../../src/rules/utils.js";
 import { createAzureCoreTestRunner } from "../test-host.js";

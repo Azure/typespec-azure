@@ -1,6 +1,9 @@
-export * from "./decorators.js";
-export { $lib } from "./lib.js";
+export const namespace = "Azure.Core";
 
+export { $lib } from "./lib.js";
+export { $linter } from "./linter.js";
+
+export * from "./decorators.js";
 export { UnionEnum, getUnionAsEnum } from "./helpers/union-enums.js";
 export * from "./lro-helpers.js";
 export * from "./rules/prevent-rest-library.js";

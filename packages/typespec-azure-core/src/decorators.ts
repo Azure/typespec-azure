@@ -38,7 +38,6 @@ import {
   StatusMonitorMetadata,
 } from "./lro-info.js";
 
-export const namespace = "Azure.Core";
 /*
  * Constants for polling and final operation links
  */

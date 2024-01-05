@@ -1,6 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { UsageFlags } from "@typespec/compiler";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import {
   SdkArrayType,
   SdkBodyModelPropertyType,

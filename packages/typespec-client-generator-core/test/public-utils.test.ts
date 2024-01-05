@@ -1,13 +1,14 @@
 import {
-  ignoreDiagnostics,
-  listServices,
   Model,
   ModelProperty,
   Operation,
   Union,
+  ignoreDiagnostics,
+  listServices,
 } from "@typespec/compiler";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { SdkEmitterOptions, SdkModelType, SdkUnionType } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
@@ -18,10 +19,10 @@ import {
 } from "../src/public-utils.js";
 import { getAllModels, getSdkUnion } from "../src/types.js";
 import {
+  SdkTestRunner,
   createSdkContextTestHelper,
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
-  SdkTestRunner,
 } from "./test-host.js";
 
 describe("typespec-client-generator-core: public-utils", () => {

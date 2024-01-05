@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { preventMultipleDiscriminator } from "../../src/rules/prevent-multiple-discriminator.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
