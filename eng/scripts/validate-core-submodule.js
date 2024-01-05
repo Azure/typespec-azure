@@ -1,11 +1,12 @@
-import { coreRepoRoot, run } from "./helpers.js";
-
+// @ts-check
+import { execFileSync, spawnSync } from "child_process";
+import { coreRepoRoot } from "./helpers.js";
 const cwd = coreRepoRoot;
-run("git", ["fetch", "https://github.com/microsoft/typespec", "main"], { cwd });
 
-const proc = run("git", ["merge-base", "--is-ancestor", "HEAD", "FETCH_HEAD"], {
+execFileSync("git", ["fetch", "https://github.com/microsoft/typespec", "main"], { cwd });
+
+const proc = spawnSync("git", ["merge-base", "--is-ancestor", "HEAD", "FETCH_HEAD"], {
   cwd,
-  throwOnNonZeroExit: false,
 });
 
 if (proc.status !== 0) {

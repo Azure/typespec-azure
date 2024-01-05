@@ -1345,6 +1345,9 @@ importers:
       '@typespec/http':
         specifier: workspace:~0.51.0
         version: link:../http
+      '@typespec/internal-build-utils':
+        specifier: workspace:~0.51.0
+        version: link:../internal-build-utils
       '@typespec/json-schema':
         specifier: workspace:~0.51.0
         version: link:../json-schema
@@ -7923,6 +7926,7 @@ packages:
 
   /@swagger-api/apidom-ns-json-schema-draft-4@0.89.0:
     resolution: {integrity: sha512-7gXy3BPLkS7p7dmz9Hbf7ia4lH0NAaW2i7GcQdpX48pAUTR0/7Y+BPd38sgRxIOpebReWxnoAcKAfkak/KCQ3A==}
+    requiresBuild: true
     dependencies:
       '@babel/runtime-corejs3': 7.23.6
       '@swagger-api/apidom-ast': 0.89.0
