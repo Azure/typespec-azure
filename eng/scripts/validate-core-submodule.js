@@ -1,9 +1,10 @@
-import { coreRepoRoot, run } from "./helpers.js";
+import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
+import { coreRepoRoot } from "./helpers.js";
 
 const cwd = coreRepoRoot;
-run("git", ["fetch", "https://github.com/microsoft/typespec", "main"], { cwd });
+await runOrExit("git", ["fetch", "https://github.com/microsoft/typespec", "main"], { cwd });
 
-const proc = run("git", ["merge-base", "--is-ancestor", "HEAD", "FETCH_HEAD"], {
+const proc = await runOrExit("git", ["merge-base", "--is-ancestor", "HEAD", "FETCH_HEAD"], {
   cwd,
   throwOnNonZeroExit: false,
 });
