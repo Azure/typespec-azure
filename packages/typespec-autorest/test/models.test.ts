@@ -85,7 +85,8 @@ describe("typespec-autorest: model definitions", () => {
         xJson: { type: "integer", format: "int32" },
       },
     });
-    
+  });
+
   it("errors on duplicate model names", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
