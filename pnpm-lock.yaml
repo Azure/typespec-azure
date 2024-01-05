@@ -39,6 +39,39 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(@types/node@18.11.19)
 
+  core:
+    devDependencies:
+      '@changesets/cli':
+        specifier: ^2.26.2
+        version: 2.27.1
+      '@pnpm/find-workspace-packages':
+        specifier: ^6.0.9
+        version: 6.0.9(@pnpm/logger@5.0.0)
+      c8:
+        specifier: ^8.0.1
+        version: 8.0.1
+      cspell:
+        specifier: ^6.31.1
+        version: 6.31.3
+      prettier:
+        specifier: ~3.1.1
+        version: 3.1.1
+      prettier-plugin-organize-imports:
+        specifier: ~3.2.4
+        version: 3.2.4(prettier@3.1.1)(typescript@5.3.3)
+      rimraf:
+        specifier: ~5.0.1
+        version: 5.0.5
+      syncpack:
+        specifier: ^11.2.1
+        version: 11.2.1
+      typescript:
+        specifier: ~5.3.3
+        version: 5.3.3
+      vitest:
+        specifier: ^1.1.0
+        version: 1.1.0(@types/node@18.11.19)
+
   core/packages/best-practices:
     devDependencies:
       '@types/node':
