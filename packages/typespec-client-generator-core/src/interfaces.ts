@@ -345,9 +345,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   kind: "http";
   path: string;
   verb: HttpVerb;
-  pathParams: SdkPathParameter[];
-  queryParams: SdkQueryParameter[];
-  headerParams: SdkHeaderParameter[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
   responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
   exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range

@@ -145,16 +145,6 @@ function getSdkHttpBodyParameters(
   throw new Error("blah");
 }
 
-function getSdkHttpParameters<TType extends SdkModelPropertyType>(
-  context: SdkContext<SdkHttpOperation>,
-  httpOperation: HttpOperation,
-  filterFunction: (x: SdkModelPropertyType) => x is TType
-): TType[] {
-  return httpOperation.parameters.parameters
-    .map((x) => getSdkModelPropertyType(context, x.param, { operation: httpOperation.operation }))
-    .filter(filterFunction);
-}
-
 function getSdkHttpOperation(
   context: SdkContext<SdkHttpOperation>,
   httpOperation: HttpOperation,
@@ -164,21 +154,13 @@ function getSdkHttpOperation(
     context,
     httpOperation
   );
-  const pathParams = getSdkHttpParameters<SdkPathParameter>(
-    context,
-    httpOperation,
-    (x): x is SdkPathParameter => x.kind === "path"
-  );
-  const queryParams = getSdkHttpParameters<SdkQueryParameter>(
-    context,
-    httpOperation,
-    (x): x is SdkQueryParameter => x.kind === "query"
-  );
-  const headerParams = getSdkHttpParameters<SdkHeaderParameter>(
-    context,
-    httpOperation,
-    (x): x is SdkHeaderParameter => x.kind === "header"
-  );
+  const parameters = httpOperation.parameters.parameters
+    .map((x) => getSdkModelPropertyType(context, x.param, { operation: httpOperation.operation }))
+    .filter(
+      (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
+        x.kind === "header" || x.kind === "query" || x.kind === "path"
+    );
+  const headerParams = parameters.filter((x): x is SdkHeaderParameter => x.kind === "header");
   const bodyParams = getSdkHttpBodyParameters(context, httpOperation, methodParameters);
   const stringType: SdkBuiltInType = {
     kind: "string",
@@ -200,7 +182,7 @@ function getSdkHttpOperation(
       optional: false,
       description: `Body parameter's content type. Known values are ${bodyParams[0].contentTypes}`,
     };
-    headerParams.push({
+    parameters.push({
       ...contentTypeBase,
       kind: "header",
       serializedName: "Content-Type",
@@ -226,7 +208,7 @@ function getSdkHttpOperation(
       onClient: false,
       optional: false,
     };
-    headerParams.push({
+    parameters.push({
       ...acceptBase,
       kind: "header",
       clientDefaultValue,
@@ -245,9 +227,7 @@ function getSdkHttpOperation(
     kind: "http",
     path: httpOperation.path,
     verb: httpOperation.verb,
-    pathParams,
-    queryParams,
-    headerParams,
+    parameters,
     bodyParams: bodyParams || [],
     responses,
     exceptions,

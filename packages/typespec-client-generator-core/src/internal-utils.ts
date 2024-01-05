@@ -8,14 +8,7 @@ import {
   getSummary,
 } from "@typespec/compiler";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import {
-  SdkContext,
-  SdkHttpParameter,
-  SdkModelPropertyType,
-  SdkServiceOperation,
-  SdkServiceParameter,
-  SdkType,
-} from "./interfaces.js";
+import { SdkContext, SdkModelPropertyType, SdkServiceOperation, SdkType } from "./interfaces.js";
 import { isApiVersion } from "./public-utils.js";
 
 /**
@@ -195,17 +188,6 @@ export function isAzureCoreModel(t: Type): boolean {
     t.namespace !== undefined &&
     ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
   );
-}
-
-export function getAllServiceOperationParameters(
-  operation: SdkServiceOperation
-): SdkServiceParameter[] {
-  const parameters: SdkHttpParameter[] = [];
-  return parameters
-    .concat(operation.pathParams)
-    .concat(operation.queryParams)
-    .concat(operation.headerParams)
-    .concat(operation.bodyParams);
 }
 
 export function isAcceptHeader(param: SdkModelPropertyType): boolean {
