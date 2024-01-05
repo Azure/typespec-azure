@@ -2,6 +2,7 @@ import { Operation } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import { getDocHelper } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
+import { describe, it, beforeEach } from "vitest";
 
 describe("typespec-client-generator-core: internal-utils", () => {
   let runner: SdkTestRunner;

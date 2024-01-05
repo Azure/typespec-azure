@@ -14,6 +14,7 @@ import {
 } from "../src/interfaces.js";
 import { getAllServiceOperationParameters } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
+import { describe, it, beforeEach } from "vitest";
 
 describe("typespec-client-generator-core: package", () => {
   let runner: SdkTestRunner;
