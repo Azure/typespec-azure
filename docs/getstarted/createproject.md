@@ -7,7 +7,7 @@ First, open your command prompt (PowerShell, cmd.exe, bash, etc), create an empt
 Now create a new Azure service specification using the tsp init command:
 
 ```bash
-tsp init https://aka.ms/typespec/core-init
+tsp init https://aka.ms/typespec/azure-init
 
 ```
 
