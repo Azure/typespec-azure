@@ -1244,56 +1244,77 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
-  describe("@protocolAPI", () => {
-    for (const protocolValue of [true, false]) {
-      for (const globalValue of [true, false]) {
-        const testDescription = `mark an operation as protocol ${protocolValue}, pass in sdkContext with generateProtocolMethods ${globalValue}`;
-        const testCode = `
+  async function protocolAPITestHelper(
+    runner: SdkTestRunner,
+    protocolValue: boolean,
+    globalValue: boolean
+  ): Promise<void> {
+    const testCode = `
           @protocolAPI(${protocolValue})
           @test
           op test(): void;
         `;
+    const { test } = await runner.compile(testCode);
 
-        it(testDescription, async () => {
-          const { test } = await runner.compile(testCode);
-
-          const actual = shouldGenerateProtocol(
-            createSdkContextTestHelper(runner.context.program, {
-              generateProtocolMethods: globalValue,
-              generateConvenienceMethods: false,
-            }),
-            test as Operation
-          );
-          strictEqual(actual, protocolValue);
-        });
-      }
-    }
+    const actual = shouldGenerateProtocol(
+      createSdkContextTestHelper(runner.context.program, {
+        generateProtocolMethods: globalValue,
+        generateConvenienceMethods: false,
+      }),
+      test as Operation
+    );
+    strictEqual(actual, protocolValue);
+  }
+  describe("@protocolAPI", () => {
+    it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
+      await protocolAPITestHelper(runner, true, true);
+    });
+    it("generateProtocolMethodsTrue, operation marked protocolAPI false", async () => {
+      await protocolAPITestHelper(runner, false, true);
+    });
+    it("generateProtocolMethodsFalse, operation marked protocolAPI true", async () => {
+      await protocolAPITestHelper(runner, true, false);
+    });
+    it("generateProtocolMethodsFalse, operation marked protocolAPI false", async () => {
+      await protocolAPITestHelper(runner, false, false);
+    });
   });
 
-  describe("@convenientAPI", () => {
-    for (const convenientValue of [true, false]) {
-      for (const globalValue of [true, false]) {
-        const testDescription = `mark an operation as convenient ${convenientValue}, pass in sdkContext with generateConvenienceMethods ${globalValue}`;
-        const testCode = `
+  async function convenientAPITestHelper(
+    runner: SdkTestRunner,
+    convenientValue: boolean,
+    globalValue: boolean
+  ): Promise<void> {
+    const testCode = `
           @convenientAPI(${convenientValue})
           @test
           op test(): void;
         `;
+    const { test } = await runner.compile(testCode);
 
-        it(testDescription, async () => {
-          const { test } = await runner.compile(testCode);
+    const actual = shouldGenerateConvenient(
+      createSdkContextTestHelper(runner.program, {
+        generateProtocolMethods: false,
+        generateConvenienceMethods: globalValue,
+      }),
+      test as Operation
+    );
+    strictEqual(actual, convenientValue);
+  }
 
-          const actual = shouldGenerateConvenient(
-            createSdkContextTestHelper(runner.program, {
-              generateProtocolMethods: false,
-              generateConvenienceMethods: globalValue,
-            }),
-            test as Operation
-          );
-          strictEqual(actual, convenientValue);
-        });
-      }
-    }
+  describe("@convenientAPI", () => {
+    it("generateConvenienceMethodsTrue, operation marked convenientAPI true", async () => {
+      await convenientAPITestHelper(runner, true, true);
+    });
+    it("generateConvenienceMethodsTrue, operation marked convenientAPI false", async () => {
+      await convenientAPITestHelper(runner, false, true);
+    });
+    it("generateConvenienceMethodsFalse, operation marked convenientAPI true", async () => {
+      await convenientAPITestHelper(runner, true, false);
+    });
+    it("generateConvenienceMethodsFalse, operation marked convenientAPI false", async () => {
+      await convenientAPITestHelper(runner, false, false);
+    });
 
     it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
       const { test } = await runner.compile(`
