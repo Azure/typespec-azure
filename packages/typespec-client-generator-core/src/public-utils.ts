@@ -6,7 +6,6 @@ import {
   getEffectiveModelType,
   getFriendlyName,
   getNamespaceFullName,
-  getProjectedName,
   getSummary,
   ignoreDiagnostics,
   listServices,
@@ -14,6 +13,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  resolveEncodedName,
   Scalar,
   Type,
   Union,
@@ -160,13 +160,7 @@ export function getEmitterTargetName(context: SdkContext): string {
  * @returns a tuple of the library and wire name for a model property
  */
 export function getPropertyNames(context: SdkContext, property: ModelProperty): [string, string] {
-  if (!context.jsonProjectedProgram) {
-    context.jsonProjectedProgram = createProjectedNameProgram(context.program, "json");
-  }
-  return [
-    getLibraryName(context, property),
-    context.jsonProjectedProgram.getProjectedName(property),
-  ];
+  return [getLibraryName(context, property), getWireName(context, property)];
 }
 
 /**
@@ -237,7 +231,12 @@ export function getDocHelper(context: SdkContext, type: Type): DocWrapper {
 }
 
 export function getWireName(context: SdkContext, type: Type & { name: string }) {
-  return getProjectedName(context.program, type, "json") ?? type.name;
+  // 1. Check if there's an encoded name
+  const encodedName = resolveEncodedName(context.program, type, "application/json");
+  if (encodedName !== type.name) return encodedName;
+  // 2. Check if there's deprecated language projection
+  const jsonProjectedProgram = createProjectedNameProgram(context.program, "json");
+  return jsonProjectedProgram.getProjectedName(type);
 }
 
 interface DefaultSdkTypeBase<TKind> {

@@ -529,7 +529,6 @@ model SdkFloat64Validation is SdkNumericValidationTemplate<"float64", float64>;
  * @property emitterName: The name of the emitter. If not passed, we will find the value ourselves.
  * @property languageProjectedProgram: Helper to manage language projected names.
  * @property clientProjectedProgram: Helper to manage client projected names.
- * @property jsonProjectedProgram: Helper to manage json projected names.
  * @property modelsMap: Type map we create to keep track of all models
  * @property operationModelsMap: Type map we create to keep track of mapping between operations and the models they use. Used for transitive closure on access.
  */
@@ -543,7 +542,6 @@ model SdkContext {
   emitterName?: string;
   languageProjectedProgram?: unknown;
   clientProjectedProgram?: unknown;
-  jsonProjectedProgram?: unknown;
   modelsMap?: Record<Model>;
   operationModelsMap?: Record<Model>;
 }

@@ -39,7 +39,6 @@ export interface SdkContext<TOptions extends object = Record<string, any>> {
   packageName?: string;
   languageProjectedProgram?: ProjectedNameView;
   clientProjectedProgram?: ProjectedNameView;
-  jsonProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Set<string>;
