@@ -268,6 +268,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.kind, "endpoint");
+      strictEqual(endpointParam.description, "Testserver endpoint");
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
