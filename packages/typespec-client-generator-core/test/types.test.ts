@@ -1618,6 +1618,39 @@ describe("typespec-client-generator-core: types", () => {
       );
     });
 
+    it("usage propagation", async () => {
+      await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+          friends?: Fish[];
+          hate?: Record<Fish>;
+          partner?: Fish;
+        }
+
+        model SawShark extends Shark {
+          sharktype: "saw";
+        }
+
+        model GoblinShark extends Shark {
+          sharktype: "goblin";
+        }
+        op operation(@body input: Shark): Shark;
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 5);
+      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
     it("unnamed model", async () => {
       await runner.compileWithBuiltInService(`
         model Test {
@@ -1791,7 +1824,6 @@ describe("typespec-client-generator-core: types", () => {
         model Catalog is TrackedResource<CatalogProperties> {
           @pattern("^[A-Za-z0-9_-]{1,50}$")
           @key("catalogName")
-          @path
           @segment("catalogs")
           name: string;
         }
@@ -1810,7 +1842,6 @@ describe("typespec-client-generator-core: types", () => {
         @access(Access.public)
         model Deployment is TrackedResource<DeploymentProperties> {
           @key("deploymentName")
-          @path
           @segment("deployments")
           name: string;
         }
@@ -1826,8 +1857,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 4);
       const catalog = models.find((x) => x.name === "Catalog")! as SdkModelType;
       const deployment = models.find((x) => x.name === "Deployment")! as SdkModelType;
-      strictEqual(catalog.properties.length, 1);
-      strictEqual(deployment.properties.length, 1);
+      strictEqual(catalog.properties.length, 2);
+      strictEqual(deployment.properties.length, 2);
     });
     it("model with deprecated annotation", async () => {
       await runner.compileAndDiagnose(`
