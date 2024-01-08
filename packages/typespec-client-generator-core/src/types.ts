@@ -141,6 +141,16 @@ export function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
       case "azurelocation":
         propertyType.kind = "azureLocation";
         break;
+      // TODO: we need to handle how to process @format("date-time") and utcDateTime
+      // We have a separate SdkDateTimeType, but for @format("date-time") the SDKType is SDKBuiltInType
+      // I cannot use `datetime` here, because it will conflict with SdkDateTimeType
+      // We need to re-think how we want to `addFormatInfo`, maybe not carry the format info in `propertyType.kind`
+      case "date":
+        propertyType.kind = "date";
+        break;
+      case "date-time":
+        propertyType.kind = "utcDatetime";
+        break;
       default:
         throw Error(`Unknown format ${format}`);
     }
