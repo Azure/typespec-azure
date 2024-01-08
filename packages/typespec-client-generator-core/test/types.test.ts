@@ -934,8 +934,11 @@ describe("typespec-client-generator-core: types", () => {
           javaWireName: string;
           @projectedName("client", "clientName")
           clientProjectedName: string;
+          @projectedName("json", "projectedWireName")
+          @encodedName("application/json", "encodedWireName")
+          jsonEncodedAndProjectedName: string;
           @projectedName("json", "realWireName")
-          jsonProjectedName: string;
+          jsonProjectedName: string; // deprecated
           regular: string;
         }
       `);
@@ -956,7 +959,13 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(clientProjectedProp.kind, "property");
       strictEqual(clientProjectedProp.serializedName, "clientProjectedName");
 
-      // wire name test
+      // wire name test with encoded and projected
+      const jsonEncodedProp = sdkModel.properties.find(
+        (x) => x.kind === "property" && x.serializedName === "encodedWireName"
+      )!;
+      strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
+
+      // wire name test with deprecated projected
       const jsonProjectedProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "realWireName"
       )!;
