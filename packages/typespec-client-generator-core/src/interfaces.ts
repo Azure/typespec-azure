@@ -7,7 +7,6 @@ import {
   Namespace,
   Operation,
   Program,
-  ProjectedNameView,
   Type,
   UsageFlags,
 } from "@typespec/compiler";
@@ -37,8 +36,6 @@ export interface SdkContext<TOptions extends object = Record<string, any>> {
   generateConvenienceMethods: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
-  languageProjectedProgram?: ProjectedNameView;
-  clientProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Set<string>;
