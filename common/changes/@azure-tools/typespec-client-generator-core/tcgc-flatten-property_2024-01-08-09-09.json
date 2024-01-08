@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-client-generator-core",
+      "comment": "feat(decorator): add `@flattenProperty`",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-client-generator-core"
+}

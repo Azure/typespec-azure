@@ -771,3 +771,27 @@ export function getAccess(
     ? getSdkModel(context, entity).access
     : getSdkEnum(context, entity).access;
 }
+
+const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
+/**
+ * Whether a model property should be flattened.
+ *
+ * @param context DecoratorContext
+ * @param target ModelProperty to mark as flattened
+ * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
+ * @deprecated This decorator is not recommended to use.
+ */
+export function $flattenProperty(context: DecoratorContext, target: ModelProperty, scope?: string) {
+  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
+}
+
+/**
+ * Whether a model property should be flattened or not.
+ *
+ * @param context SdkContext
+ * @param target ModelProperty that we want to check whether it should be flattened or not
+ * @returns whether the model property should be flattened or not
+ */
+export function shouldFlattenProperty(context: SdkContext, target: ModelProperty): boolean {
+  return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
+}

@@ -172,6 +172,34 @@ model ModelToExclude {
 }
 ```
 
+### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
+
+Set whether a model property should be flattened or not.
+
+```typespec
+@Azure.ClientGenerator.Core.flattenProperty(scope?: valueof string)
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                    | Description                                                                                                   |
+| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+model Foo {
+  @flattenProperty
+  prop: Bar;
+}
+model Bar {}
+```
+
 ### `@include` {#@Azure.ClientGenerator.Core.include}
 
 Whether to include a model in generation for specific languages. By default we generate

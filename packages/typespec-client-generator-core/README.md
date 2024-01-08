@@ -17,6 +17,7 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@clientFormat`](#@clientformat)
 - [`@convenientAPI`](#@convenientapi)
 - [`@exclude`](#@exclude)
+- [`@flattenProperty`](#@flattenproperty)
 - [`@include`](#@include)
 - [`@internal`](#@internal)
 - [`@operationGroup`](#@operationgroup)
@@ -185,6 +186,34 @@ all models that are included in operations.
 model ModelToExclude {
   prop: valueof string;
 }
+```
+
+#### `@flattenProperty`
+
+Set whether a model property should be flattened or not.
+
+```typespec
+@Azure.ClientGenerator.Core.flattenProperty(scope?: valueof string)
+```
+
+##### Target
+
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                    | Description                                                                                                   |
+| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+##### Examples
+
+```typespec
+model Foo {
+  @flattenProperty
+  prop: Bar;
+}
+model Bar {}
 ```
 
 #### `@include`
