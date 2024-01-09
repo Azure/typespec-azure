@@ -74,7 +74,8 @@ steps:
     displayName: Publish non-core test results
     condition: always()
 
-  - publish: ./core/packages/playground-website/test-results
-    artifact: "uitestresults-${{ parameters.poolName }}-node-${{ parameters.nodeVersion }}"
-    displayName: Publish UI tests artifacts
-    condition: ne(variables['Agent.OS'], 'Windows_NT')
+  # Disable for now as e2e test are disabled - REMOVE BEFORE MERGING
+  # - publish: ./core/packages/playground-website/test-results
+  #   artifact: "uitestresults-${{ parameters.poolName }}-node-${{ parameters.nodeVersion }}"
+  #   displayName: Publish UI tests artifacts
+  #   condition: ne(variables['Agent.OS'], 'Windows_NT')
