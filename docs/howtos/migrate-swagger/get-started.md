@@ -23,3 +23,15 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 - Leverage standard `tspconfig.yaml` ([Template projects](https://github.com/microsoft/typespec/tree/main/eng/feeds)) and make appropriate output file name changes.
 - Ensure it compiles successfully locally and then submit a PR
 - Review CI checks such as breaking changes and other failures.
+
+## How to Get Help
+
+- Ask questions in the [TypeSpec Discussions Channel](https://teams.microsoft.com/l/channel/19%3a906c1efbbec54dc8949ac736633e6bdf%40thread.skype/TypeSpec%2520Discussion%2520%25F0%259F%2590%25AE?groupId=3e17dcb0-4257-4a30-b843-77f47f1d4121&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47)
+- Attend TypeSpec office hours. The office hours is listed on top tabs on the discussion channel.
+- File issues in the [typespec-azure github repo](https://github.com/azure/typespec-azure/issues)
+  - For bugs, please include:
+    - A high-level description of the bug
+    - Expected and Actual Results
+    - Repro steps, including any TypeSpec code that you used
+    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](#troubleshooting-vscode-tooling-and-filing-issues)
+- Schedule review meetings with TypeSpec team.
