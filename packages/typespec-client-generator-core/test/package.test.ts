@@ -1839,7 +1839,23 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(methodResponse.responsePath, "result");
     });
-    it("paging", async () => {});
+    it("paging", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await compileAzureWidgetService(
+        runnerWithCore,
+        `
+        @doc("List Manufacturer resources")
+        listManufacturers is Operations.ResourceList<Manufacturer>;
+      `
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 2);
+      strictEqual(sdkPackage.models.length, 1);
+    });
   });
 });
 

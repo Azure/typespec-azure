@@ -3,7 +3,6 @@ import {
   Operation,
   Type,
   UsageFlags,
-  getDoc,
   getNamespaceFullName,
   getService,
   ignoreDiagnostics,
@@ -560,7 +559,6 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       hasParameterizedEndpoint: true,
     };
   }
-  const description = getDocHelper(context, servers[0]).description;
   if (servers[0].parameters.size === 0) {
     return {
       endpoint: servers[0].url,

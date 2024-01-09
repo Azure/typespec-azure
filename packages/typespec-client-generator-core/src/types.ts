@@ -1018,13 +1018,26 @@ function checkAndGetClientType<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: Type,
   operation?: Operation
-): SdkType | undefined {
+): SdkType[] {
+  const retval: SdkType[] = [];
   if (type.kind === "Model") {
-    if (isExclude(context, type)) return; // eslint-disable-line deprecation/deprecation
+    if (isExclude(context, type)) return []; // eslint-disable-line deprecation/deprecation
     const effectivePayloadType = getEffectivePayloadType(context, type);
-    if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) return;
+    if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
+      if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
+        effectivePayloadType.templateMapper.args
+          .filter((arg) => arg.kind === "Model" && arg.name)
+          .forEach((arg) => {
+            retval.push(...checkAndGetClientType(context, arg, operation));
+          });
+        return retval;
+      } else {
+        return [];
+      }
+    }
   }
-  return getClientType(context, type, operation); // this will update the models map / simple types map
+  retval.push(getClientType(context, type, operation));
+  return retval; // this will update the models map / simple types map
 }
 
 function updateUsageOfModel<TServiceOperation extends SdkServiceOperation>(
@@ -1083,38 +1096,48 @@ function updateTypesFromOperation<TServiceOperation extends SdkServiceOperation>
   const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
-    const paramType = checkAndGetClientType(context, param.type, operation);
+    const paramTypes = checkAndGetClientType(context, param.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(context, UsageFlags.Input, paramType);
+      paramTypes.forEach((paramType) => {
+        updateUsageOfModel(context, UsageFlags.Input, paramType);
+      });
     }
   }
   for (const param of httpOperation.parameters.parameters) {
-    const paramType = checkAndGetClientType(context, param.param.type, operation);
+    const paramTypes = checkAndGetClientType(context, param.param.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(context, UsageFlags.Input, paramType);
+      paramTypes.forEach((paramType) => {
+        updateUsageOfModel(context, UsageFlags.Input, paramType);
+      });
     }
   }
   if (httpOperation.parameters.body) {
-    const body = checkAndGetClientType(context, httpOperation.parameters.body.type, operation);
+    const bodies = checkAndGetClientType(context, httpOperation.parameters.body.type, operation);
     if (generateConvenient) {
-      updateUsageOfModel(context, UsageFlags.Input, body);
+      bodies.forEach((body) => {
+        updateUsageOfModel(context, UsageFlags.Input, body);
+      });
     }
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type) {
-        const responseBody = checkAndGetClientType(context, innerResponse.body.type, operation);
+        const responseBodies = checkAndGetClientType(context, innerResponse.body.type, operation);
         if (generateConvenient) {
-          updateUsageOfModel(context, UsageFlags.Output, responseBody);
+          responseBodies.forEach((responseBody) => {
+            updateUsageOfModel(context, UsageFlags.Output, responseBody);
+          });
         }
       }
     }
   }
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData) {
-    const logicalResult = checkAndGetClientType(context, lroMetaData.logicalResult, operation);
+    const logicalResults = checkAndGetClientType(context, lroMetaData.logicalResult, operation);
     if (generateConvenient) {
-      updateUsageOfModel(context, UsageFlags.Output, logicalResult);
+      logicalResults.forEach((logicalResult) => {
+        updateUsageOfModel(context, UsageFlags.Output, logicalResult);
+      });
     }
   }
 }
@@ -1168,14 +1191,18 @@ function handleServiceOrphanType<TServiceOperation extends SdkServiceOperation>(
 ) {
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
-    const sdkModel = checkAndGetClientType(context, type);
-    updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkModel);
+    const sdkModels = checkAndGetClientType(context, type);
+    sdkModels.forEach((sdkModel) => {
+      updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkModel);
+    });
   }
   if (getAccessOverride(context, type) !== undefined) {
-    const sdkModel = checkAndGetClientType(context, type);
-    if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-      updateUsageOfModel(context, UsageFlags.None, sdkModel);
-    }
+    const sdkModels = checkAndGetClientType(context, type);
+    sdkModels
+      .filter((sdkModel) => ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind))
+      .forEach((sdkModel) => {
+        updateUsageOfModel(context, UsageFlags.None, sdkModel);
+      });
   }
 }
 
@@ -1220,8 +1247,10 @@ export function getAllModels<TServiceOperation extends SdkServiceOperation = Sdk
     const servers = getServers(context.program, client.service);
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
-        const sdkModel = checkAndGetClientType(context, param);
-        updateUsageOfModel(context, UsageFlags.Input, sdkModel);
+        const sdkModels = checkAndGetClientType(context, param);
+        sdkModels.forEach((sdkModel) => {
+          updateUsageOfModel(context, UsageFlags.Input, sdkModel);
+        });
       }
     }
   }
