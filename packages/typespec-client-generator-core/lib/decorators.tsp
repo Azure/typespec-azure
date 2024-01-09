@@ -194,3 +194,20 @@ enum Access {
  * ```
  */
 extern dec access(target: Model | Operation | Enum, value: EnumMember, scope?: valueof string);
+
+/**
+ * Set whether a model property should be flattened or not.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * model Foo {
+ *    @flattenProperty
+ *    prop: Bar;
+ * }
+ * model Bar {
+ * }
+ * ```
+ */
+#deprecated "@flattenProperty decorator is not recommended to use."
+extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
