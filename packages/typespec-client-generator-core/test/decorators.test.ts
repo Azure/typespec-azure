@@ -8,7 +8,7 @@ import {
   UsageFlags,
 } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, notEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
@@ -2229,7 +2229,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { Model1: Model };
 
       const childProperty = Model1.properties.get("child");
-      notEqual(childProperty, undefined);
+      notStrictEqual(childProperty, undefined);
       strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), true);
     });
 
@@ -2252,7 +2252,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { Model1: Model };
 
       const childProperty = Model1.properties.get("child");
-      notEqual(childProperty, undefined);
+      notStrictEqual(childProperty, undefined);
       strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), false);
     });
 
