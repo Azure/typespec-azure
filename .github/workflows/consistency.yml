@@ -31,5 +31,5 @@ jobs:
         name: Check changelog
         if: ${{ !startsWith(github.head_ref, 'publish/') && !startsWith(github.head_ref, 'dependabot/') && !startsWith(github.head_ref, 'backmerge/') }}
 
-      - script: node eng/scripts/validate-core-submodule.js
+      - run: node eng/scripts/validate-core-submodule.js
         displayName: Check that core submodule is merged to core repo
