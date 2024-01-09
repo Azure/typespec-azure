@@ -1855,6 +1855,74 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
       strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.models[0].name, "Manufacturer");
+      const widgetClient = sdkPackage.clients.find((c) => c.name === "Widgets")!;
+      strictEqual(widgetClient.initialization, undefined);
+      strictEqual(widgetClient.methods.length, 1);
+      const listManufacturers = widgetClient.methods[0];
+
+      strictEqual(listManufacturers.name, "listManufacturers");
+      strictEqual(listManufacturers.kind, "paging");
+      strictEqual(listManufacturers.parameters.length, 2);
+      deepStrictEqual(
+        listManufacturers.parameters.map((x) => x.nameInClient),
+        ["clientRequestId", "accept"]
+      );
+      const methodResponse = listManufacturers.response.type!;
+      strictEqual(methodResponse.kind, "array");
+      deepStrictEqual(methodResponse.valueType, sdkPackage.models[0]);
+
+      const operation = listManufacturers.operation;
+      strictEqual(operation.kind, "http");
+      strictEqual(operation.verb, "get");
+      strictEqual(operation.parameters.length, 3);
+
+      const apiVersion = operation.parameters.find((x) => x.isApiVersionParam)!;
+      strictEqual(apiVersion.kind, "query");
+      strictEqual(apiVersion.nameInClient, "apiVersion");
+      strictEqual(apiVersion.serializedName, "api-version");
+      strictEqual(apiVersion.onClient, true);
+
+      const clientRequestId = operation.parameters.find(
+        (x) => x.nameInClient === "clientRequestId"
+      )!;
+      strictEqual(clientRequestId.kind, "header");
+      deepStrictEqual(
+        listManufacturers.getParameterMapping(clientRequestId)[0],
+        listManufacturers.parameters[0]
+      );
+
+      const accept = operation.parameters.find((x) => x.nameInClient === "accept")!;
+      strictEqual(accept.kind, "header");
+      deepStrictEqual(
+        listManufacturers.getParameterMapping(accept)[0],
+        listManufacturers.parameters[1]
+      );
+
+      strictEqual(Object.keys(operation.responses).length, 1);
+      const response200 = operation.responses[200];
+      strictEqual(response200.kind, "http");
+      const pagingModel = response200.type!;
+      strictEqual(pagingModel.kind, "model");
+      strictEqual(pagingModel.name, "PagedManufacturer");
+      strictEqual(pagingModel.properties.length, 3);
+
+      const valueProperty = pagingModel.properties.find((x) => x.nameInClient === "value")!;
+      strictEqual(valueProperty.kind, "property");
+      strictEqual(valueProperty.type.kind, "array");
+      strictEqual(valueProperty.type.valueType, sdkPackage.models[0]);
+
+      const nextLinkProperty = pagingModel.properties.find((x) => x.nameInClient === "nextLink")!;
+      strictEqual(nextLinkProperty.kind, "property");
+      strictEqual(nextLinkProperty.type.kind, "url");
+      strictEqual(nextLinkProperty.serializedName, "nextLink");
+      strictEqual(listManufacturers.nextLinkLogicalPath?.length, 1);
+      strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkLogicalPath[0]);
+
+      const clientRequestIdProperty = pagingModel.properties.find(
+        (x) => x.nameInClient === "clientRequestId"
+      )!;
+      strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
 });
