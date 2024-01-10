@@ -1,6 +1,14 @@
-import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
+import {
+  Enum,
+  Interface,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+  UsageFlags,
+} from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
@@ -10,6 +18,7 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldFlattenProperty,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
@@ -2216,6 +2225,104 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { Dog: Model };
 
       strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
+    });
+  });
+
+  describe("@flattenProperty", () => {
+    it("marks a model property to be flattened with suppression of deprecation warning", async () => {
+      const { Model1 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Model1{
+            #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `)) as { Model1: Model };
+
+      const childProperty = Model1.properties.get("child");
+      notStrictEqual(childProperty, undefined);
+      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), true);
+    });
+
+    it("doesn't mark a un-flattened model property", async () => {
+      const { Model1 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Model1{
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `)) as { Model1: Model };
+
+      const childProperty = Model1.properties.get("child");
+      notStrictEqual(childProperty, undefined);
+      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), false);
+    });
+
+    it("throws deprecation warning if not suppressed", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "deprecated",
+      });
+    });
+
+    it("throws error when used on other targets", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @flattenProperty
+          model Model1{
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "decorator-wrong-target",
+      });
     });
   });
 });
