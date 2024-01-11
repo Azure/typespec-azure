@@ -520,6 +520,43 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationGroup.methods.length, 1);
       strictEqual(operationGroup.methods[0].name, "func");
     });
+
+    it("api version no default", async () => {
+      await runner.compile(`
+      @server(
+        "{endpoint}",
+        "Testserver endpoint",
+        {
+          /**
+           * Need to be set as 'http://localhost:3000' in client.
+           */
+          endpoint: url,
+        }
+      )
+      @service({})
+      namespace Server.Versions.NotVersioned {};
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 2);
+
+      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient")!;
+      const operationGroup = sdkPackage.clients.find((c) => c.name === "MyOperationGroup")!;
+
+      strictEqual(mainClient.methods.length, 1);
+      strictEqual(mainClient.initialization!.properties.length, 1);
+      strictEqual(mainClient.initialization!.properties[0].nameInClient, "endpoint");
+
+      const clientAccessor = mainClient.methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      strictEqual(clientAccessor.access, "internal");
+      strictEqual(clientAccessor.name, "getMyOperationGroup");
+      strictEqual(clientAccessor.parameters.length, 0);
+      strictEqual(clientAccessor.response, operationGroup);
+
+      strictEqual(operationGroup.initialization, undefined);
+      strictEqual(operationGroup.methods.length, 1);
+      strictEqual(operationGroup.methods[0].name, "func");
+    });
   });
   describe("Parameters", () => {
     it("path basic", async () => {
