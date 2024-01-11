@@ -546,6 +546,7 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      apiVersions: getAvailableApiVersions<TServiceOperation>(context, type),
     };
     updateModelsMap(context, type, sdkType, operation);
 
@@ -629,6 +630,7 @@ export function getSdkEnum<TServiceOperation extends SdkServiceOperation>(
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      apiVersions: getAvailableApiVersions<TServiceOperation>(context, type),
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -666,6 +668,7 @@ function getKnownValuesEnum<TServiceOperation extends SdkServiceOperation>(
         usage: UsageFlags.None, // We will add usage as we loop through the operations
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+        apiVersions: getAvailableApiVersions<TServiceOperation>(context, type),
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));

@@ -628,6 +628,7 @@ function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>
     usage: UsageFlags.Input,
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
+    apiVersions: getAvailableApiVersions<TServiceOperation>(context, client.service),
   };
 }
 

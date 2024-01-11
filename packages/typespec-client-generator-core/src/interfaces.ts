@@ -182,6 +182,7 @@ export interface SdkEnumType extends SdkTypeBase {
   usage: UsageFlags;
   access?: AccessFlags;
   crossLanguageDefinitionId: string;
+  apiVersions: string[];
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -222,6 +223,7 @@ export interface SdkModelType extends SdkTypeBase {
   discriminatedSubtypes?: Record<string, SdkModelType>;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
+  apiVersions: string[];
 }
 
 export interface SdkCredentialType extends SdkTypeBase {
