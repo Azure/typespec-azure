@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-azure-core",
+      "comment": "Relaxing camelCase linting rule to allow a single non-alphabetical char. Also added standard filterParameter",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-azure-core"
+}
