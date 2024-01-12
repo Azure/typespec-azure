@@ -1906,6 +1906,36 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models[0].name, "Model1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
     });
+
+    it("model with client hierarchy", async () => {
+      await runner.compile(`
+        @service({})
+        namespace Test1Client {
+          model T1 {
+            prop: string;
+          }
+          model T2 {
+            prop: string;
+          }
+          @route("/b")
+          namespace B {
+            op x(): void;
+
+            @route("/c")
+            interface C {
+              op y(): T1;
+            }
+
+            @route("/d")
+            namespace D {
+              op z(@body body: T2): void;
+            }
+          }
+        }
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 2);
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {

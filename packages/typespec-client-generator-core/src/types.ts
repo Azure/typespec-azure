@@ -1046,10 +1046,15 @@ export function getAllModels(
       // operations on a client
       updateTypesFromOperation(context, operation);
     }
-    for (const operationGroup of listOperationGroups(context, client)) {
-      for (const operation of listOperationsInOperationGroup(context, operationGroup)) {
+    const ogs = listOperationGroups(context, client);
+    while (ogs.length) {
+      const operationGroup = ogs.pop();
+      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         // operations on operation groups
         updateTypesFromOperation(context, operation);
+      }
+      if (operationGroup?.subOperationGroups) {
+        ogs.push(...operationGroup.subOperationGroups);
       }
     }
     // orphan models
