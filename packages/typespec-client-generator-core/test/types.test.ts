@@ -879,9 +879,9 @@ describe("typespec-client-generator-core: types", () => {
           @test
           @usage(Usage.input | Usage.output)
           @access(Access.public)
-          @projectedName("java", "JaveEnum1")
+          @projectedName("java", "JavaEnum1")
           enum Enum1{
-            @projectedName("java", "JaveOne")
+            @projectedName("java", "JavaOne")
             One: "one",
             two,
             three
@@ -897,9 +897,9 @@ describe("typespec-client-generator-core: types", () => {
           @test
           @usage(Usage.input | Usage.output)
           @access(Access.public)
-          @projectedName("java", "JaveEnum1")
+          @projectedName("java", "JavaEnum1")
           enum Enum1{
-            @projectedName("java", "JaveOne")
+            @projectedName("java", "JavaOne")
             One: "one",
             two,
             three
@@ -911,7 +911,7 @@ describe("typespec-client-generator-core: types", () => {
         strictEqual(enum1.values[0].name, enumValueName);
       }
       await helper("@azure-tools/typespec-csharp", "Enum1", "One");
-      await helper("@azure-tools/typespec-java", "JaveEnum1", "JaveOne");
+      await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
     });
   });
   describe("SdkBodyModelPropertyType", () => {
