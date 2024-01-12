@@ -80,6 +80,7 @@ import {
   listServices,
   navigateTypesInNamespace,
   projectProgram,
+  resolveEncodedName,
   resolvePath,
   stringTemplateToString,
 } from "@typespec/compiler";
@@ -1005,6 +1006,15 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     return placeholder;
   }
 
+  function getJsonName(type: Type & { name: string }) {
+    const viaProjection = jsonView.getProjectedName(type);
+
+    const encodedName = resolveEncodedName(program, type, "application/json");
+    // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
+    // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
+    return encodedName === type.name ? viaProjection : encodedName;
+  }
+
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
@@ -1043,7 +1053,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
         compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
         if (bodyModelType) {
           for (const param of bodyModelType.properties.values()) {
-            emitParameter(param, "formData", visibility, jsonView.getProjectedName(param));
+            emitParameter(param, "formData", visibility, getJsonName(param));
           }
         }
       } else if (methodParams.body.parameter) {
@@ -1051,7 +1061,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
           methodParams.body.parameter,
           "body",
           visibility,
-          jsonView.getProjectedName(methodParams.body.parameter),
+          getJsonName(methodParams.body.parameter),
           schema
         );
       } else {
@@ -1665,7 +1675,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
         continue;
       }
 
-      const jsonName = jsonView.getProjectedName(prop);
+      const jsonName = getJsonName(prop);
       const clientName = clientView.getProjectedName(prop);
 
       const description = getDoc(program, prop);
