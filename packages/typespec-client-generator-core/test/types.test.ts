@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, EnumMember, UsageFlags } from "@typespec/compiler";
+import { Enum, UsageFlags } from "@typespec/compiler";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -11,7 +11,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { getAllModels, getSdkEnum, getSdkEnumValue, isReadOnly } from "../src/types.js";
+import { getAllModels, getSdkEnum, isReadOnly } from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
