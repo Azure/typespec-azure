@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-client-generator-core",
+      "comment": "remove dynamic testing to support vitest plugin",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-client-generator-core"
+}
