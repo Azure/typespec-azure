@@ -534,7 +534,15 @@ describe("typespec-client-generator-core: package", () => {
         }
       )
       @service({})
-      namespace Server.Versions.NotVersioned {};
+      namespace Server.Versions.NotVersioned;
+
+      @route("/without-api-version")
+      @head
+      op withoutApiVersion(): OkResponse;
+
+      @route("/with-query-api-version")
+      @head
+      op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
       `);
       const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
