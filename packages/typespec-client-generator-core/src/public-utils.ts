@@ -29,7 +29,7 @@ import {
 import { getVersions, Version } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
-import { listClients, listOperationGroups, listOperationsInOperationGroup } from "./decorators.js";
+import { getClientNameOverride, listClients, listOperationGroups, listOperationsInOperationGroup } from "./decorators.js";
 import { SdkContext } from "./interfaces.js";
 import { parseEmitterName } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -186,24 +186,30 @@ export function getLibraryName(
   context: SdkContext,
   type: Model | ModelProperty | Operation
 ): string {
+  
+  // 1. check if there's a specific name with @clientName
+  let emitterSpecificName = getClientNameOverride(context, type);
+  if (emitterSpecificName) return emitterSpecificName;
+
   if (!context.languageProjectedProgram) {
     context.languageProjectedProgram = createProjectedNameProgram(
       context.program,
       context.emitterName
     );
   }
-  // 1. check if there's a specific name for our language
-  const emitterSpecificName = context.languageProjectedProgram.getProjectedName(type);
+
+  // 2. check if there's a specific name for our language with deprecated @projectedName
+  emitterSpecificName = context.languageProjectedProgram.getProjectedName(type);
   if (emitterSpecificName !== type.name) return emitterSpecificName;
 
-  // 2. check if there's a client name
+  // 3. check if there's a client name with deprecated @projectedName
   if (!context.clientProjectedProgram) {
     context.clientProjectedProgram = createProjectedNameProgram(context.program, "client");
   }
   const clientSpecificName = context.clientProjectedProgram.getProjectedName(type);
   if (clientSpecificName !== type.name) return clientSpecificName;
 
-  // 3. check if there's a friendly name, if so return friendly name, otherwise return undefined
+  // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
   return getFriendlyName(context.program, type) ?? type.name;
 }
 

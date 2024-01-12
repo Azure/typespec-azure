@@ -37,16 +37,24 @@ import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
+type ScopedDecoratorInfo = {
+  value: unknown;
+  scopes?: string[];
+}
+
 function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type): any {
-  const retval = context.program.stateMap(key).get(target);
+  const retval: ScopedDecoratorInfo[] = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
-  if (!retval.scopes) return retval.value; // this means it applies to all languages
-  if (retval.scopes.includes(context.emitterName)) return retval.value;
-  return undefined;
+  if (retval.length === 1 && !retval[0].scopes) return retval[0].value; // this means it applies to all languages
+  const existingValue = retval.find(x => x.scopes && x.scopes.includes(context.emitterName))
+  return existingValue?.value;
 }
 
 function listScopedDecoratorData(context: SdkContext, key: symbol): any[] {
-  const retval = [...context.program.stateMap(key).values()];
+  let retval: ScopedDecoratorInfo[] = [];
+  for (const values of context.program.stateMap(key).values()) {
+    retval = retval.concat(values);
+  }
   return retval.filter((value) => {
     if (!value.scopes) return true;
     return value.scopes.includes(context.emitterName);
@@ -62,23 +70,32 @@ function setScopedDecoratorData(
   scope?: string,
   transitivity: boolean = false
 ): boolean {
-  const existing = context.program.stateMap(key).get(target);
-  if (!existing) {
-    context.program.stateMap(key).set(target, { value, scopes: scope ? [scope] : undefined });
+  const existingEntries: ScopedDecoratorInfo[] = context.program.stateMap(key).get(target);
+  if (!existingEntries) {
+    // value is going to be a list of tuples, each tuple is a value and a list of scopes
+    const scopedDecoratorInfo: ScopedDecoratorInfo = { value, scopes: scope ? [scope] : undefined };
+    context.program.stateMap(key).set(target, [scopedDecoratorInfo]);
     return true;
   }
-  if (existing.scopes && scope && !existing.scopes.includes(scope)) {
+  const existingEntrySameValue = existingEntries.find((info) => info.value === value);
+  if (existingEntrySameValue) {
     // we only want to allow multiple decorators if they each specify a different scope
-    existing.scopes.push(scope);
+    if (existingEntrySameValue.scopes && scope && !existingEntrySameValue.scopes.includes(scope)) {
+      existingEntrySameValue.scopes.push(scope);
+    return true;
+    }
+  } else if (scope && !existingEntries.find((info) => info.scopes && info.scopes.includes(scope))) {
+    existingEntries.push({ value, scopes: [scope] })
     return true;
   }
   if (!transitivity) {
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
+  if (!existingEntrySameValue) return false;
   // for transitivity situation, we could allow scope extension
-  if (existing.scopes && !scope) {
-    existing.scopes = undefined;
+  if (existingEntrySameValue.scopes && !scope) {
+    existingEntrySameValue.scopes = undefined;
     return true;
   }
   return false;
@@ -203,8 +220,14 @@ export function listClients(context: SdkContext): SdkClient[] {
   const services = listServices(context.program);
 
   return services.map((service) => {
-    const originalName =
+    let originalName = service.type.name;
+    const clientNameOverride = getClientNameOverride(context, service.type);
+    if (clientNameOverride) {
+      originalName = clientNameOverride;
+    } else {
+      originalName =
       getProjectedName(context.program, service.type, "client") ?? service.type.name;
+    }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service.type);
     return {
@@ -794,4 +817,22 @@ export function $flattenProperty(context: DecoratorContext, target: ModelPropert
  */
 export function shouldFlattenProperty(context: SdkContext, target: ModelProperty): boolean {
   return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
+}
+
+const clientNameKey = createStateSymbol("clientName");
+
+export function $clientName(
+  context: DecoratorContext,
+  entity: Type,
+  value: string,
+  scope?: string
+) {
+  setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
+}
+
+export function getClientNameOverride(
+  context: SdkContext,
+  entity: Type
+): string | undefined {
+  return getScopedDecoratorData(context, clientNameKey, entity);
 }

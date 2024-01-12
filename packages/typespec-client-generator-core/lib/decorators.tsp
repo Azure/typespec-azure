@@ -3,6 +3,19 @@ using TypeSpec.Reflection;
 namespace Azure.ClientGenerator.Core;
 
 /**
+ * Changes the name of a method, parameter, property, or model generated in the client SDK
+ * @param rename The rename you want applied to the object
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * @clientName("nameInClient")
+ * op nameInService: void;
+ * ```
+ */
+extern dec clientName(target: unknown, rename: valueof string, scope?: valueof string);
+
+/**
  * Whether you want to generate an operation as a convenient operation.
  * @param value Whether to generate the operation as convenience method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters

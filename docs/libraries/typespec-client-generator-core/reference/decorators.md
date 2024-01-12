@@ -118,6 +118,32 @@ model MyModel {
 }
 ```
 
+### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
+
+Changes the name of a method, parameter, property, or model generated in the client SDK
+
+```typespec
+@Azure.ClientGenerator.Core.clientName(rename: valueof string, scope?: valueof string)
+```
+
+#### Target
+
+`(intrinsic) unknown`
+
+#### Parameters
+
+| Name   | Type                    | Description                                                                                                   |
+| ------ | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof scalar string` | The rename you want applied to the object                                                                     |
+| scope  | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+@clientName("nameInClient")
+op nameInService: void;
+```
+
 ### `@convenientAPI` {#@Azure.ClientGenerator.Core.convenientAPI}
 
 Whether you want to generate an operation as a convenient operation.
