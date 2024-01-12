@@ -100,7 +100,7 @@ describe("typespec-autorest: parameters", () => {
   it("@query/@header/@path names & @projectedName on body parameter are honored", async () => {
     const res = await openApiFor(
       `
-      @route("/{arg3}")
+      @route("/{x-ms-arg-3}")
       op test(
         @query("x-ms-arg-1") @doc("my-doc") arg1: string,
         @header("x-ms-arg-2") @doc("my-doc") arg2: string,
@@ -114,7 +114,7 @@ describe("typespec-autorest: parameters", () => {
     );
     strictEqual(res.paths["/{arg3}"].get.parameters[0].name, "x-ms-arg-1");
     strictEqual(res.paths["/{arg3}"].get.parameters[1].name, "x-ms-arg-2");
-    strictEqual(res.paths["/{arg3}"].get.parameters[2].name, "x-ms-arg-3");
+    strictEqual(res.paths["/{x-ms-arg-3}"].get.parameters[2].name, "x-ms-arg-3");
     strictEqual(res.paths["/"].put.parameters[0].name, "x-body");
   });
 

@@ -1195,13 +1195,12 @@
   },
   "parameters": {
     "ApiVersionPathParameter": {
-      "name": "api-version",
+      "name": "apiVersion",
       "in": "path",
       "description": "The API version to use for this operation.",
       "required": true,
       "type": "string",
-      "x-ms-parameter-location": "method",
-      "x-ms-client-name": "apiVersion"
+      "x-ms-parameter-location": "method"
     },
     "Azure.Core.ClientRequestIdHeader": {
       "name": "x-ms-client-request-id",

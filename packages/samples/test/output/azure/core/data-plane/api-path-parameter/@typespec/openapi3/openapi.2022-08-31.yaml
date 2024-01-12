@@ -636,7 +636,7 @@ paths:
 components:
   parameters:
     ApiVersionPathParameter:
-      name: api-version
+      name: apiVersion
       in: path
       required: true
       description: The API version to use for this operation.
