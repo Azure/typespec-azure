@@ -1,6 +1,7 @@
 import {
   createProjectedNameProgram,
   Enum,
+  EnumMember,
   getDeprecationDetails,
   getDoc,
   getEffectiveModelType,
@@ -184,7 +185,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  */
 export function getLibraryName(
   context: SdkContext,
-  type: Model | ModelProperty | Operation
+  type: Model | ModelProperty | Operation | Enum | EnumMember
 ): string {
   if (!context.languageProjectedProgram) {
     context.languageProjectedProgram = createProjectedNameProgram(
