@@ -29,10 +29,10 @@ describe("typespec-azure-core: casing rule", () => {
     });
 
     it("isCamelCaseNoAcronyms works as expected", () => {
-      ["", "a", "foo", "fooBar", "office365", "signalR", "aRp"].forEach((name) =>
+      ["", "a", "foo", "fooBar", "office365", "signalR", "aRp", "$aRp", "_aRp"].forEach((name) =>
         assert.ok(isCamelCaseNoAcronyms(name), `${name} should be camelCase`)
       );
-      ["Foo", "123", "foo.bar", "foo-bar", "foo_bar", "aRP"].forEach((name) =>
+      ["Foo", "123", "foo.bar", "foo-bar", "foo_bar", "aRP", "$aRP", "_ARp"].forEach((name) =>
         assert.ok(!isCamelCaseNoAcronyms(name), `${name} should not be camelCase`)
       );
     });
