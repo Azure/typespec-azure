@@ -65,7 +65,7 @@ describe("typespec-autorest: model definitions", () => {
 
     expect(res.defs.Foo).toMatchObject({
       properties: {
-        xJson: { type: "integer", format: "int32" },
+        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
       },
     });
   });
@@ -82,7 +82,7 @@ describe("typespec-autorest: model definitions", () => {
 
     expect(res.defs.Foo).toMatchObject({
       properties: {
-        xJson: { type: "integer", format: "int32" },
+        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
       },
     });
   });
