@@ -451,7 +451,7 @@
         }
       }
     },
-    "/api/{api-version}/service-status/{api-version}": {
+    "/api/{api-version}/service-status": {
       "get": {
         "operationId": "GetServiceStatus",
         "description": "Responds with status information about the overall service.",
