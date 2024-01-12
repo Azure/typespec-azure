@@ -20,7 +20,7 @@
   ],
   "tags": [],
   "paths": {
-    "/api/{apiVersion}/manufacturers": {
+    "/api/{api-version}/manufacturers": {
       "get": {
         "operationId": "Manufacturers_ListManufacturers",
         "description": "List Manufacturer resources",
@@ -64,7 +64,7 @@
         }
       }
     },
-    "/api/{apiVersion}/manufacturers/{manufacturerId}": {
+    "/api/{api-version}/manufacturers/{manufacturerId}": {
       "get": {
         "operationId": "Manufacturers_GetManufacturer",
         "description": "Get a Manufacturer",
@@ -383,7 +383,7 @@
         "x-ms-long-running-operation": true
       }
     },
-    "/api/{apiVersion}/manufacturers/{manufacturerId}/operations/{operationId}": {
+    "/api/{api-version}/manufacturers/{manufacturerId}/operations/{operationId}": {
       "get": {
         "operationId": "Manufacturers_GetManufacturerOperationStatus",
         "description": "Gets status of a Manufacturer operation.",
@@ -451,7 +451,7 @@
         }
       }
     },
-    "/api/{apiVersion}/service-status": {
+    "/api/{api-version}/service-status/{api-version}": {
       "get": {
         "operationId": "GetServiceStatus",
         "description": "Responds with status information about the overall service.",
@@ -500,7 +500,7 @@
         }
       }
     },
-    "/api/{apiVersion}/widgets": {
+    "/api/{api-version}/widgets": {
       "get": {
         "operationId": "Widgets_ListWidgets",
         "description": "List Widget resources",
@@ -556,7 +556,7 @@
         }
       }
     },
-    "/api/{apiVersion}/widgets/{widgetName}": {
+    "/api/{api-version}/widgets/{widgetName}": {
       "get": {
         "operationId": "Widgets_GetWidget",
         "description": "Get a Widget",
@@ -889,7 +889,7 @@
         "x-ms-long-running-operation": true
       }
     },
-    "/api/{apiVersion}/widgets/{widgetName}/operations/{operationId}": {
+    "/api/{api-version}/widgets/{widgetName}/operations/{operationId}": {
       "get": {
         "operationId": "Widgets_GetWidgetOperationStatus",
         "description": "Gets status of a Widget operation.",
@@ -1195,12 +1195,13 @@
   },
   "parameters": {
     "ApiVersionPathParameter": {
-      "name": "apiVersion",
+      "name": "api-version",
       "in": "path",
       "description": "The API version to use for this operation.",
       "required": true,
       "type": "string",
-      "x-ms-parameter-location": "method"
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "apiVersion"
     },
     "Azure.Core.ClientRequestIdHeader": {
       "name": "x-ms-client-request-id",
