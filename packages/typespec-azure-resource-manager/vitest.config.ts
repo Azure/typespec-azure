@@ -1,8 +1,4 @@
 import { defineConfig } from "vitest/config";
 import { defaultTypeSpecVitestConfig } from "../../core/vitest.workspace";
 
-export default defineConfig({
-  test: {
-    ...defaultTypeSpecVitestConfig,
-  },
-});
+export default mergeConfig(defaultTypeSpecVitestConfig, defineConfig({}));
