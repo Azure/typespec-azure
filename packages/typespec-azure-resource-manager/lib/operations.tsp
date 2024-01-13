@@ -11,6 +11,7 @@ namespace Azure.ResourceManager;
 /**
  * A resource list operation, at the subscription scope
  * @template TResource the resource being patched
+ * @template Parameters Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("List {name} resources by subscription ID", TResource)
@@ -18,8 +19,8 @@ namespace Azure.ResourceManager;
 @segmentOf(TResource)
 @armResourceList(TResource)
 @get
-op ArmListBySubscription<TResource extends ArmResource>(
-  ...SubscriptionScope<TResource>,
+op ArmListBySubscription<TResource extends ArmResource, Parameters extends {} = {}>(
+  ...SubscriptionScope<TResource> & Parameters,
 ): ArmResponse<ResourceListResult<TResource>> | ErrorResponse;
 
 /**
@@ -28,6 +29,7 @@ op ArmListBySubscription<TResource extends ArmResource>(
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template TParentName Optional. The name of the parent resource
  * @template TParentFriendlyName Optional. The friendly name of the parent resource
+ * @template Parameters Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @get
 @autoRoute
@@ -39,15 +41,17 @@ op ArmResourceListByParent<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
   TParentName extends valueof string = "",
-  TParentFriendlyName extends valueof string = ""
+  TParentFriendlyName extends valueof string = "",
+  Parameters extends {} = {}
 >(
-  ...ResourceParentParameters<TResource, TBaseParameters>,
+  ...ResourceParentParameters<TResource, TBaseParameters> & Parameters,
 ): ArmResponse<ResourceListResult<TResource>> | ErrorResponse;
 
 /**
  * A resource list operation, with scope determined by TBaseParameters
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @get
 @autoRoute
@@ -57,22 +61,28 @@ op ArmResourceListByParent<
 @armResourceList(TResource)
 op ArmResourceListAtScope<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
 >(
-  ...ResourceParentParameters<TResource, TBaseParameters>,
+  ...ResourceParentParameters<TResource, TBaseParameters> & Parameters,
 ): ArmResponse<ResourceListResult<TResource>> | ErrorResponse;
 
 /**
  * A resource GET operation
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Get a {name}", TResource)
 @get
 @armResourceRead(TResource)
-op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BaseParameters<TResource>>(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+op ArmResourceRead<
+  TResource extends ArmResourceBase,
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
+>(
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 ): ArmResponse<TResource> | ErrorResponse;
 
 /**
@@ -80,6 +90,7 @@ op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BasePara
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Create a {name}", TResource)
@@ -95,10 +106,10 @@ op ArmResourceRead<TResource extends ArmResourceBase, TBaseParameters = BasePara
 op ArmResourceCreateOrUpdateAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = {}
+  LroHeaders extends TypeSpec.Reflection.Model = {},
+  Parameters extends {} = {},
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
-
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
   @doc("Resource create parameters.")
   @body
   resource: TResource,
@@ -111,6 +122,7 @@ op ArmResourceCreateOrUpdateAsync<
  * DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Create a {name}", TResource)
@@ -118,9 +130,10 @@ op ArmResourceCreateOrUpdateAsync<
 @put
 op ArmResourceCreateOrUpdateSync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {},
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("Resource create parameters.")
   @body
@@ -131,6 +144,7 @@ op ArmResourceCreateOrUpdateSync<
  * Synchronous PUT operation for ARM resources
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Create a {name}", TResource)
@@ -138,26 +152,36 @@ op ArmResourceCreateOrUpdateSync<
 @put
 op ArmResourceCreateOrReplaceSync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("Resource create parameters.")
   @body
   resource: TResource,
 ): ArmResourceUpdatedResponse<TResource> | ArmResourceCreatedSyncResponse<TResource> | ErrorResponse;
 
+/**
+ * @dev Asynchronous PUT operation for ARM resources
+ * @template TResource the resource being patched
+ * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
+ */
 op ArmResourceCreateOrReplaceAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
   LroHeaders extends TypeSpec.Reflection.Model = {}
-> is ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders>;
+  Parameters extends {} = {}
+> is ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters, LroHeaders, Parameters>;
 
 /**
  * @dev A long-running resource update that only allows updating resource tags (the minimum)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmTagsPatchAsync<
   TResource extends ArmResource,
@@ -167,8 +191,9 @@ op ArmTagsPatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResource,
     string
-  >
-> is ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters, LroHeaders>;
+  >,
+  Parameters extends {} = {}
+> is ArmCustomPatchAsync<TResource, TagsUpdateModel<TResource>, TBaseParameters, LroHeaders, Parameters>;
 
 /**
  * @dev A long-running resource update using the items from the resource marked with visibility "update"
@@ -176,6 +201,7 @@ op ArmTagsPatchAsync<
  * @template TProperties The model type of the resource properties
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmResourcePatchAsync<
   TResource extends ArmResource,
@@ -185,12 +211,14 @@ op ArmResourcePatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResource,
     string
-  >
+  >,
+  Parameters extends {} = {}
 > is ArmCustomPatchAsync<
   TResource,
   ResourceUpdateModel<TResource, TProperties>,
   TBaseParameters,
-  LroHeaders
+  LroHeaders,
+  Parameters
 >;
 
 /**
@@ -199,6 +227,7 @@ op ArmResourcePatchAsync<
  * @template TPatchModel The input model for the PATCH request
  * @template TBaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Update a {name}", TResource)
@@ -219,9 +248,10 @@ op ArmCustomPatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResource,
     string
-  >
+  >,
+  Parameters extends {} = {}
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("The resource properties to be updated.")
   @body
@@ -235,29 +265,34 @@ op ArmCustomPatchAsync<
  * @dev A resource update that only allows updating resource tags (the minimum)
  * @template TResource the resource being patched
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmTagsPatchSync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
-> is ArmCustomPatchSync<TResource, TagsUpdateModel<TResource>, TBaseParameters>;
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
+> is ArmCustomPatchSync<TResource, TagsUpdateModel<TResource>, TBaseParameters, Parameters>;
 
 /**
  * @dev A resource update using the items from the resource marked with visibility "update"
  * @template TResource the resource being patched
  * @template TProperties The model type of the resource properties
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmResourcePatchSync<
   TResource extends ArmResource,
   TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
-> is ArmCustomPatchSync<TResource, ResourceUpdateModel<TResource, TProperties>, TBaseParameters>;
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
+> is ArmCustomPatchSync<TResource, ResourceUpdateModel<TResource, TProperties>, TBaseParameters, Parameters>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
  * @template TResource the resource being patched
  * @template TPatchModel The input model for the PATCH request
  * @template TBaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Update a {name}", TResource)
@@ -266,9 +301,10 @@ op ArmResourcePatchSync<
 op ArmCustomPatchSync<
   TResource extends ArmResource,
   TPatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<TResource>,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {},
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("The resource properties to be updated.")
   @body
@@ -280,6 +316,7 @@ op ArmCustomPatchSync<
  * @template TResource The resource being deleted
  * @template TResponse The response type for the operation
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Delete a {name}", TResource)
@@ -295,23 +332,27 @@ op ArmCustomPatchSync<
 op ArmResourceDeleteAsyncBase<
   TResource extends ArmResource,
   TResponse,
-  TBaseParameters = BaseParameters<TResource>
->(...ResourceInstanceParameters<TResource, TBaseParameters>): TResponse | ErrorResponse;
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
+>(...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters): TResponse | ErrorResponse;
 
 /**
  * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
  * @template TResource The resource being deleted
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmResourceDeleteAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader,
+  Parameters extends {} = {}
 > is ArmResourceDeleteAsyncBase<
   TResource,
   ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
-  TBaseParameters
+  TBaseParameters,
+  Parameters
 >;
 
 /**
@@ -319,21 +360,25 @@ op ArmResourceDeleteAsync<
  * @template TResource The resource being deleted
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmResourceDeleteWithoutOkAsync<
   TResource extends ArmResource,
   TBaseParameters = BaseParameters<TResource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader,
+  Parameters extends {} = {}
 > is ArmResourceDeleteAsyncBase<
   TResource,
   ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
-  TBaseParameters
+  TBaseParameters,
+  Parameters
 >;
 
 /**
  * Delete a resource synchronously
  * @template TResource The resource being deleted
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @doc("Delete a {name}", TResource)
@@ -341,9 +386,10 @@ op ArmResourceDeleteWithoutOkAsync<
 @delete
 op ArmResourceDeleteSync<
   TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 ): ArmDeletedResponse | ArmDeletedNoContentResponse | ErrorResponse;
 
 /**
@@ -352,6 +398,7 @@ op ArmResourceDeleteSync<
  * @template TRequest The request model for the action
  * @template TResponse The response type for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @extension("x-ms-long-running-operation", true)
@@ -368,8 +415,9 @@ op ArmResourceActionAsyncBase<
   TRequest extends TypeSpec.Reflection.Model | void,
   TResponse extends TypeSpec.Reflection.Model | void,
   TBaseParameters extends TypeSpec.Reflection.Model
+  Parameters extends {} = {}
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("The content of the action request")
   @body
@@ -383,6 +431,7 @@ op ArmResourceActionAsyncBase<
  * @template TResponse The response model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @returnsDoc("ARM operation completed successfully.")
 op ArmResourceActionAsync<
@@ -394,12 +443,14 @@ op ArmResourceActionAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     TResponse,
     string
-  >
+  >,
+  Parameters extends {} = {}
 > is ArmResourceActionAsyncBase<
   TResource,
   TRequest,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | TResponse,
-  TBaseParameters
+  TBaseParameters,
+  Parameters
 >;
 
 /**
@@ -408,6 +459,7 @@ op ArmResourceActionAsync<
  * @template TRequest The request model for the action
  * @template TResponse The response model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @armResourceAction(TResource)
@@ -417,9 +469,10 @@ op ArmResourceActionSync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
   TResponse extends TypeSpec.Reflection.Model | void,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("The content of the action request")
   @body
@@ -432,6 +485,7 @@ op ArmResourceActionSync<
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  *
  */
 op ArmResourceActionNoContentAsync<
@@ -442,12 +496,14 @@ op ArmResourceActionNoContentAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
     string
-  >
+  >,
+  Parameters extends {} = {}
 > is ArmResourceActionAsyncBase<
   TResource,
   TRequest,
   ArmAcceptedLroResponse | ArmNoContentResponse<"Action completed successfully.">,
-  TBaseParameters
+  TBaseParameters,
+  Parameters
 >;
 
 /**
@@ -455,7 +511,8 @@ op ArmResourceActionNoContentAsync<
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
- * @template Headers Optional. Allows overriding the headers returned in the Accepted response
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 op ArmResourceActionNoResponseContentAsync<
   TResource extends ArmResource,
@@ -465,12 +522,14 @@ op ArmResourceActionNoResponseContentAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
     string
-  >
+  >,
+  Parameters extends {} = {}
 > is ArmResourceActionAsyncBase<
   TResource,
   TRequest,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
-  TBaseParameters
+  TBaseParameters,
+  Parameters
 >;
 
 /**
@@ -478,6 +537,7 @@ op ArmResourceActionNoResponseContentAsync<
  * @template TResource The resource being acted upon
  * @template TRequest The request model for the action
  * @template TBaseParameters Optional. Allows overriding the parameters for the operation
+ * @template Parameters Optional. Addiditional request parameters, represented as a model with each property name being a parameter name and each property type being the parameter type.
  */
 @autoRoute
 @armResourceAction(TResource)
@@ -485,9 +545,10 @@ op ArmResourceActionNoResponseContentAsync<
 op ArmResourceActionNoContentSync<
   TResource extends ArmResource,
   TRequest extends TypeSpec.Reflection.Model | void,
-  TBaseParameters = BaseParameters<TResource>
+  TBaseParameters = BaseParameters<TResource>,
+  Parameters extends {} = {}
 >(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+  ...ResourceInstanceParameters<TResource, TBaseParameters> & Parameters,
 
   @doc("The content of the action request")
   @body
@@ -500,18 +561,18 @@ op ArmResourceActionNoContentSync<
  * exposes and endpoint that uses the resource name in the url)
  * @template TRequest the availability request, defaults to the standard request, containing name and resource type
  * @template TResponse the availability response, default to the standard response
- * @template TAdditionalParams A model specifying additional non-path parameters to the availability request
+ * @template Parameters optional. A model specifying additional non-path parameters to the availability request
  */
 @doc("Implements global CheckNameAvailability operations")
 op checkGlobalNameAvailability<
   TRequest extends TypeSpec.Reflection.Model = Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest,
   TResponse extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
-  TAdditionalParams extends TypeSpec.Reflection.Model = {}
+  Parameters extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
   SubscriptionIdParameter & DefaultProviderNamespace,
   TRequest,
   TResponse,
-  TAdditionalParams
+  Parameters
 >;
 
 /**
@@ -520,7 +581,7 @@ op checkGlobalNameAvailability<
  * exposes and endpoint that uses the resource name in the url)
  * @template TRequest the availability request, defaults to the standard request, containing name and resource type
  * @template TResponse the availability response, default to the standard response
- * @template TAdditionalParams A model specifying additional non-path parameters to the availability request
+ * @template Parameters Optional. A model specifying additional non-path parameters to the availability request
  */
 @doc("Implements local CheckNameAvailability operations")
 op checkLocalNameAvailability<
@@ -531,5 +592,5 @@ op checkLocalNameAvailability<
   SubscriptionIdParameter & DefaultProviderNamespace & LocationParameter,
   TRequest,
   TResponse,
-  TAdditionalParams
+  Parameters
 >;
