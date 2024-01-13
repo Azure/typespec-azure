@@ -1,5 +1,4 @@
 import {
-  createProjectedNameProgram,
   Enum,
   getDeprecationDetails,
   getDoc,
@@ -14,6 +13,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  resolveEncodedName,
   Scalar,
   Type,
   Union,
@@ -160,13 +160,7 @@ export function getEmitterTargetName(context: SdkContext): string {
  * @returns a tuple of the library and wire name for a model property
  */
 export function getPropertyNames(context: SdkContext, property: ModelProperty): [string, string] {
-  if (!context.jsonProjectedProgram) {
-    context.jsonProjectedProgram = createProjectedNameProgram(context.program, "json");
-  }
-  return [
-    getLibraryName(context, property),
-    context.jsonProjectedProgram.getProjectedName(property),
-  ];
+  return [getLibraryName(context, property), getWireName(context, property)];
 }
 
 /**
@@ -186,22 +180,13 @@ export function getLibraryName(
   context: SdkContext,
   type: Model | ModelProperty | Operation
 ): string {
-  if (!context.languageProjectedProgram) {
-    context.languageProjectedProgram = createProjectedNameProgram(
-      context.program,
-      context.emitterName
-    );
-  }
   // 1. check if there's a specific name for our language
-  const emitterSpecificName = context.languageProjectedProgram.getProjectedName(type);
-  if (emitterSpecificName !== type.name) return emitterSpecificName;
+  const emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
+  if (emitterSpecificName) return emitterSpecificName;
 
   // 2. check if there's a client name
-  if (!context.clientProjectedProgram) {
-    context.clientProjectedProgram = createProjectedNameProgram(context.program, "client");
-  }
-  const clientSpecificName = context.clientProjectedProgram.getProjectedName(type);
-  if (clientSpecificName !== type.name) return clientSpecificName;
+  const clientSpecificName = getProjectedName(context.program, type, "client");
+  if (clientSpecificName) return clientSpecificName;
 
   // 3. check if there's a friendly name, if so return friendly name, otherwise return undefined
   return getFriendlyName(context.program, type) ?? type.name;
@@ -237,6 +222,10 @@ export function getDocHelper(context: SdkContext, type: Type): DocWrapper {
 }
 
 export function getWireName(context: SdkContext, type: Type & { name: string }) {
+  // 1. Check if there's an encoded name
+  const encodedName = resolveEncodedName(context.program, type, "application/json");
+  if (encodedName !== type.name) return encodedName;
+  // 2. Check if there's deprecated language projection
   return getProjectedName(context.program, type, "json") ?? type.name;
 }
 

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-autorest",
+      "comment": "Add support for `@encodedName` decorator",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-autorest"
+}
