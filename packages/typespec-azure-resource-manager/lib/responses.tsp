@@ -8,23 +8,23 @@ namespace Azure.ResourceManager;
 
 /**
  * The ARM synchronous OK response
- * @template T The contents of the response body
+ * @template Type The contents of the response body
  */
 @doc("ARM operation completed successfully.")
-model ArmResponse<T> {
+model ArmResponse<Type> {
   ...OkResponse;
-  ...Body<T>;
+  ...Body<Type>;
 }
 
 /**
  * The ARM 201 response for a resource
- * @template T The contents of the response body
+ * @template Type The contents of the response body
  */
 @doc("ARM create operation completed successfully.")
-model ArmCreatedResponse<T> {
+model ArmCreatedResponse<Type> {
   ...CreatedResponse;
   ...Azure.Core.Foundations.RetryAfterHeader;
-  ...Body<T>;
+  ...Body<Type>;
 }
 
 /**
@@ -49,10 +49,10 @@ model ArmDeleteAcceptedResponse is ArmAcceptedResponse<"Resource deletion accept
 
 /**
  * @dev The standard ACCEPTED response
- * @template TMessage The description of the response status (defaults to `Resource operation accepted`)
+ * @template Message The description of the response status (defaults to `Resource operation accepted`)
  */
-@doc(TMessage)
-model ArmAcceptedResponse<TMessage extends valueof string = "Resource operation accepted."> {
+@doc(Message)
+model ArmAcceptedResponse<Message extends valueof string = "Resource operation accepted."> {
   ...AcceptedResponse;
   ...Azure.Core.Foundations.RetryAfterHeader;
 }
@@ -180,20 +180,20 @@ model ArmDeletedNoContentResponse is ArmNoContentResponse<"Resource deleted succ
 
 /**
  * Standard ARM NoContent (204) response
- * @template TMessage The description of the response status (defaults to `Operation completed successfully`)
+ * @template Message The description of the response status (defaults to `Operation completed successfully`)
  */
-@doc(TMessage)
-model ArmNoContentResponse<TMessage extends valueof string = "Operation completed successfully."> {
+@doc(Message)
+model ArmNoContentResponse<Message extends valueof string = "Operation completed successfully."> {
   ...NoContentResponse;
 }
 
 /**
  * @dev Resource update operation succeeded
- * @template TResource The resource being updated
+ * @template Resource The resource being updated
  */
-@doc("Resource '{name}' update operation succeeded", TResource)
-model ArmResourceUpdatedResponse<TResource extends Azure.ResourceManager.Foundations.ArmResource>
-  is ArmResponse<TResource>;
+@doc("Resource '{name}' update operation succeeded", Resource)
+model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundations.ArmResource>
+  is ArmResponse<Resource>;
 
 /**
  * @dev Resource create operation succeeded
@@ -217,11 +217,11 @@ model ArmResourceCreatedResponse<
 
 /**
  * @dev Resource synchronous create operation succeeded
- * @template TResource The resource being updated
+ * @template Resource The resource being updated
  */
-@doc("Resource '{name}' create operation succeeded", TResource)
-model ArmResourceCreatedSyncResponse<TResource extends Azure.ResourceManager.Foundations.ArmResource>
-  is Body<TResource> {
+@doc("Resource '{name}' create operation succeeded", Resource)
+model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foundations.ArmResource>
+  is Body<Resource> {
   ...CreatedResponse;
 }
 

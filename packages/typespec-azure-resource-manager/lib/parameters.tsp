@@ -123,47 +123,47 @@ model ResourceUriParameter {
 /**
  * The dynamic parameters of a resource instance - pass in the proper base type to indicate
  * where the resource is based.  The default is in a resource group
- * @template TResource The resource to get parameters for
- * @template TBaseParameters The parameters representing the base Uri of the resource
+ * @template Resource The resource to get parameters for
+ * @template BaseParameters The parameters representing the base Uri of the resource
  */
 model ResourceInstanceParameters<
-  TResource extends ArmResourceBase,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResourceBase,
+  BaseParameters = BaseParameters<Resource>
 > {
-  ...TBaseParameters;
-  ...ProviderNamespace<TResource>;
-  ...KeysOf<TResource>;
+  ...BaseParameters;
+  ...ProviderNamespace<Resource>;
+  ...KeysOf<Resource>;
 }
 
 /**
  * The dynamic parameters of a list call for a resource instance - pass in the proper base type to indicate
  * where the list should take place.  The default is in a resource group
- * @template TResource The resource to get parameters for
- * @template TBaseParameters The parameters representing the base Uri of the resource
+ * @template Resource The resource to get parameters for
+ * @template BaseParameters The parameters representing the base Uri of the resource
  */
 model ResourceParentParameters<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = BaseParameters<Resource>
 > {
-  ...TBaseParameters;
-  ...ProviderNamespace<TResource>;
-  ...ParentKeysOf<TResource>;
+  ...BaseParameters;
+  ...ProviderNamespace<Resource>;
+  ...ParentKeysOf<Resource>;
 }
 
 /**
  * The dynamic parameters of a list call for an extension resource instance.
- * @template TResource The extension resource
+ * @template Resource The extension resource
  */
-alias ExtensionResourceInstanceParameters<TResource extends ArmResource> = ResourceInstanceParameters<
-  TResource,
+alias ExtensionResourceInstanceParameters<Resource extends ArmResource> = ResourceInstanceParameters<
+  Resource,
   ExtensionBaseParameters
 >;
 
 /**
  * The dynamic parameters of a list call for a tenant resource instance.
- * @template TResource the tenant resource
+ * @template Resource the tenant resource
  */
-alias TenantInstanceParameters<TResource extends ArmResource> = ResourceInstanceParameters<
-  TResource,
+alias TenantInstanceParameters<Resource extends ArmResource> = ResourceInstanceParameters<
+  Resource,
   TenantBaseParameters
 >;
