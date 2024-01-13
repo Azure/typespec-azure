@@ -37,28 +37,18 @@ import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
-type ScopedDecoratorInfo = {
-  value: unknown;
-  scopes?: string[];
-}
-
 function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type): any {
-  const retval: ScopedDecoratorInfo[] = context.program.stateMap(key).get(target);
+  const retval: Record<string, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
-  if (retval.length === 1 && !retval[0].scopes) return retval[0].value; // this means it applies to all languages
-  const existingValue = retval.find(x => x.scopes && x.scopes.includes(context.emitterName))
-  return existingValue?.value;
+  if (Object.keys(retval).includes(context.emitterName)) return retval[context.emitterName];
+  return retval[""]; // in this case it applies to all languages
 }
 
 function listScopedDecoratorData(context: SdkContext, key: symbol): any[] {
-  let retval: ScopedDecoratorInfo[] = [];
-  for (const values of context.program.stateMap(key).values()) {
-    retval = retval.concat(values);
-  }
-  return retval.filter((value) => {
-    if (!value.scopes) return true;
-    return value.scopes.includes(context.emitterName);
-  });
+  const retval = [...context.program.stateMap(key).values()];
+  return retval.filter(targetEntry => {return targetEntry[context.emitterName] || targetEntry[""]}).flatMap(
+    targetEntry => targetEntry[context.emitterName] ?? targetEntry[""]
+  );
 }
 
 function setScopedDecoratorData(
@@ -70,33 +60,30 @@ function setScopedDecoratorData(
   scope?: string,
   transitivity: boolean = false
 ): boolean {
-  const existingEntries: ScopedDecoratorInfo[] = context.program.stateMap(key).get(target);
-  if (!existingEntries) {
+  const targetEntry = context.program.stateMap(key).get(target);
+  // If target doesn't exist in decorator map, create a new entry
+  if (!targetEntry) {
     // value is going to be a list of tuples, each tuple is a value and a list of scopes
-    const scopedDecoratorInfo: ScopedDecoratorInfo = { value, scopes: scope ? [scope] : undefined };
-    context.program.stateMap(key).set(target, [scopedDecoratorInfo]);
+    context.program.stateMap(key).set(target, {[scope ?? ""]: value});
     return true;
   }
-  const existingEntrySameValue = existingEntries.find((info) => info.value === value);
-  if (existingEntrySameValue) {
-    // we only want to allow multiple decorators if they each specify a different scope
-    if (existingEntrySameValue.scopes && scope && !existingEntrySameValue.scopes.includes(scope)) {
-      existingEntrySameValue.scopes.push(scope);
-    return true;
-    }
-  } else if (scope && !existingEntries.find((info) => info.scopes && info.scopes.includes(scope))) {
-    existingEntries.push({ value, scopes: [scope] })
+
+  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
+  const scopes = Object.keys(targetEntry);
+  if (!scopes.includes("") && scope && !scopes.includes(scope)) {
+    targetEntry[scope] = value;
     return true;
   }
   if (!transitivity) {
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
-  if (!existingEntrySameValue) return false;
-  // for transitivity situation, we could allow scope extension
-  if (existingEntrySameValue.scopes && !scope) {
-    existingEntrySameValue.scopes = undefined;
-    return true;
+  if (!Object.keys(targetEntry).includes("") && !scope) {
+    for (const key of Object.keys(targetEntry)) {
+      if (key !== "") {
+        delete targetEntry[key];
+      }
+    }
   }
   return false;
 }
@@ -209,9 +196,7 @@ function hasExplicitClientOrOperationGroup(context: SdkContext): boolean {
  * @returns Array of clients
  */
 export function listClients(context: SdkContext): SdkClient[] {
-  const explicitClients = [...listScopedDecoratorData(context, clientKey)].map(
-    (value) => value.value
-  );
+  const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     return explicitClients;
   }
