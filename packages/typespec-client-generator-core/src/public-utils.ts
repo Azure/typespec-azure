@@ -29,7 +29,12 @@ import {
 import { getVersions, Version } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
-import { getClientNameOverride, listClients, listOperationGroups, listOperationsInOperationGroup } from "./decorators.js";
+import {
+  getClientNameOverride,
+  listClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
+} from "./decorators.js";
 import { SdkContext } from "./interfaces.js";
 import { parseEmitterName } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -186,7 +191,6 @@ export function getLibraryName(
   context: SdkContext,
   type: Model | ModelProperty | Operation
 ): string {
-  
   // 1. check if there's a specific name with @clientName
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;

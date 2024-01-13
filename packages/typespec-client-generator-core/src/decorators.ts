@@ -46,9 +46,11 @@ function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type):
 
 function listScopedDecoratorData(context: SdkContext, key: symbol): any[] {
   const retval = [...context.program.stateMap(key).values()];
-  return retval.filter(targetEntry => {return targetEntry[context.emitterName] || targetEntry[""]}).flatMap(
-    targetEntry => targetEntry[context.emitterName] ?? targetEntry[""]
-  );
+  return retval
+    .filter((targetEntry) => {
+      return targetEntry[context.emitterName] || targetEntry[""];
+    })
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[""]);
 }
 
 function setScopedDecoratorData(
@@ -64,7 +66,7 @@ function setScopedDecoratorData(
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
     // value is going to be a list of tuples, each tuple is a value and a list of scopes
-    context.program.stateMap(key).set(target, {[scope ?? ""]: value});
+    context.program.stateMap(key).set(target, { [scope ?? ""]: value });
     return true;
   }
 
@@ -210,8 +212,7 @@ export function listClients(context: SdkContext): SdkClient[] {
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName =
-      getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service.type);
@@ -815,9 +816,6 @@ export function $clientName(
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 
-export function getClientNameOverride(
-  context: SdkContext,
-  entity: Type
-): string | undefined {
+export function getClientNameOverride(context: SdkContext, entity: Type): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity);
 }
