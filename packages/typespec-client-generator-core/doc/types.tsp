@@ -527,9 +527,6 @@ model SdkFloat64Validation is SdkNumericValidationTemplate<"float64", float64>;
  * @property filterOutCoreModels: Whether to filter out core models in returned models. Defaults to true.
  * @property packageName: The name of the package
  * @property emitterName: The name of the emitter. If not passed, we will find the value ourselves.
- * @property languageProjectedProgram: Helper to manage language projected names.
- * @property clientProjectedProgram: Helper to manage client projected names.
- * @property jsonProjectedProgram: Helper to manage json projected names.
  * @property modelsMap: Type map we create to keep track of all models
  * @property operationModelsMap: Type map we create to keep track of mapping between operations and the models they use. Used for transitive closure on access.
  */
@@ -541,9 +538,6 @@ model SdkContext {
   filterOutCoreModels: boolean = true;
   packageName?: string;
   emitterName?: string;
-  languageProjectedProgram?: unknown;
-  clientProjectedProgram?: unknown;
-  jsonProjectedProgram?: unknown;
   modelsMap?: Record<Model>;
   operationModelsMap?: Record<Model>;
 }
