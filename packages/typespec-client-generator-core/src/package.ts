@@ -402,6 +402,7 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
+      apiVersions: getAvailableApiVersions<SdkServiceOperation>(context, httpOperation.operation),
     };
     let statusCode: number | string = "";
     if (typeof response.statusCodes === "number" || response.statusCodes === "*") {

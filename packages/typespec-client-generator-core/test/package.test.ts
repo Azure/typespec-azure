@@ -521,8 +521,98 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationGroup.methods[0].name, "func");
     });
 
-    it("api version no default", async () => {
-      await runner.compile(`
+    function getServiceNoDefaultApiVersion(op: string) {
+      return `
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        /**
+         * Need to be set as 'http://localhost:3000' in client.
+         */
+        endpoint: url,
+      }
+    )
+    @service({})
+    namespace Server.Versions.NotVersioned;
+
+    ${op}
+    `;
+    }
+
+    it("service with no default api version, method with no api version param", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceNoDefaultApiVersion(`
+        @route("/without-api-version")
+        @head
+        op withoutApiVersion(): OkResponse;
+        `)
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization?.properties.length, 1);
+      strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+
+      strictEqual(client.methods.length, 1);
+
+      const withoutApiVersion = client.methods[0];
+      strictEqual(withoutApiVersion.name, "withoutApiVersion");
+      strictEqual(withoutApiVersion.kind, "basic");
+      strictEqual(withoutApiVersion.parameters.length, 0);
+      strictEqual(withoutApiVersion.operation.parameters.length, 0);
+    });
+
+    it("service with no default api version, method with api version param", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceNoDefaultApiVersion(`
+      @route("/with-query-api-version")
+      @head
+      op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
+        `)
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const client = sdkPackage.clients[0];
+
+      strictEqual(client.initialization?.properties.length, 2);
+      strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      const clientApiVersionParam = client.initialization.properties[1];
+      strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
+      strictEqual(clientApiVersionParam.onClient, true);
+      strictEqual(clientApiVersionParam.optional, false);
+      strictEqual(clientApiVersionParam.kind, "method");
+      strictEqual(clientApiVersionParam.clientDefaultValue, undefined);
+      strictEqual(clientApiVersionParam.isApiVersionParam, true);
+      strictEqual(clientApiVersionParam.type.kind, "string");
+
+      strictEqual(sdkPackage.clients[0].methods.length, 1);
+      const withApiVersion = sdkPackage.clients[0].methods[0];
+      strictEqual(withApiVersion.kind, "basic");
+      strictEqual(withApiVersion.parameters.length, 0);
+      strictEqual(withApiVersion.operation.parameters.length, 1);
+
+      const apiVersionParam = withApiVersion.operation.parameters[0];
+      strictEqual(apiVersionParam.kind, "query");
+      strictEqual(apiVersionParam.isApiVersionParam, true);
+      strictEqual(apiVersionParam.optional, false);
+      strictEqual(apiVersionParam.onClient, true);
+      strictEqual(apiVersionParam.type.kind, "string");
+    });
+
+    function getServiceWithDefaultApiVersion(op: string) {
+      return `
       @server(
         "{endpoint}",
         "Testserver endpoint",
@@ -534,17 +624,37 @@ describe("typespec-client-generator-core: package", () => {
         }
       )
       @service({})
-      namespace Server.Versions.NotVersioned;
+      namespace Server.Versions.Versioned;
 
+      /**
+       * The version of the API.
+       */
+      enum Versions {
+        /**
+         * The version 2022-12-01-preview.
+         */
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+        v2022_12_01_preview: "2022-12-01-preview",
+      }
+
+      ${op}
+      `;
+    }
+
+    it("service with default api version, method without api version param", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceWithDefaultApiVersion(`
       @route("/without-api-version")
       @head
       op withoutApiVersion(): OkResponse;
-
-      @route("/with-query-api-version")
-      @head
-      op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
-      `);
-      const sdkPackage = runner.context.sdkPackage;
+      `)
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const client = sdkPackage.clients[0];
