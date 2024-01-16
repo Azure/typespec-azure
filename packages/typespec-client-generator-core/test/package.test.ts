@@ -609,6 +609,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.optional, false);
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.type.kind, "string");
+      strictEqual(apiVersionParam.clientDefaultValue, undefined);
     });
 
     function getServiceWithDefaultApiVersion(op: string) {
@@ -624,6 +625,7 @@ describe("typespec-client-generator-core: package", () => {
         }
       )
       @service({})
+      @versioned(Versions)
       namespace Server.Versions.Versioned;
 
       /**
@@ -658,24 +660,47 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const client = sdkPackage.clients[0];
+      strictEqual(client.initialization?.properties.length, 1);
+      strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+
+      const withoutApiVersion = client.methods[0];
+      strictEqual(withoutApiVersion.kind, "basic");
+      strictEqual(withoutApiVersion.parameters.length, 0);
+      strictEqual(withoutApiVersion.operation.parameters.length, 0);
+    });
+
+    it("service with default api version, method with api version param", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceWithDefaultApiVersion(`
+        @route("/with-query-api-version")
+        @head
+        op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
+      `)
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+
+      const client = sdkPackage.clients[0];
       strictEqual(client.initialization?.properties.length, 2);
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+
       const clientApiVersionParam = client.initialization.properties[1];
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
       strictEqual(clientApiVersionParam.optional, false);
       strictEqual(clientApiVersionParam.kind, "method");
-      strictEqual(clientApiVersionParam.clientDefaultValue, undefined);
+      strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
       strictEqual(clientApiVersionParam.isApiVersionParam, true);
       strictEqual(clientApiVersionParam.type.kind, "string");
-      strictEqual(client.methods.length, 2);
+      strictEqual(client.methods.length, 1);
 
-      const withoutApiVersion = client.methods.find((x) => x.name === "withoutApiVersion")!;
-      strictEqual(withoutApiVersion.kind, "basic");
-      strictEqual(withoutApiVersion.parameters.length, 0);
-      strictEqual(withoutApiVersion.operation.parameters.length, 0);
-
-      const withApiVersion = client.methods.find((x) => x.name === "withQueryApiVersion")!;
+      const withApiVersion = client.methods[0];
+      strictEqual(withApiVersion.name, "withQueryApiVersion");
       strictEqual(withApiVersion.kind, "basic");
       strictEqual(withApiVersion.parameters.length, 0);
       strictEqual(withApiVersion.operation.parameters.length, 1);
@@ -686,6 +711,54 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.optional, false);
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.type.kind, "string");
+      strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+    });
+
+    it("service with default api version, method with path api version param", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceWithDefaultApiVersion(`
+        @route("/with-path-api-version")
+        @head
+        op withPathApiVersion(@path apiVersion: string): OkResponse;
+      `)
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization?.properties.length, 2);
+      strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+
+      const clientApiVersionParam = client.initialization.properties[1];
+      strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
+      strictEqual(clientApiVersionParam.onClient, true);
+      strictEqual(clientApiVersionParam.optional, false);
+      strictEqual(clientApiVersionParam.kind, "method");
+      strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
+      strictEqual(clientApiVersionParam.isApiVersionParam, true);
+      strictEqual(clientApiVersionParam.type.kind, "string");
+      strictEqual(client.methods.length, 1);
+
+      const withApiVersion = client.methods[0];
+      strictEqual(withApiVersion.name, "withPathApiVersion");
+      strictEqual(withApiVersion.kind, "basic");
+      strictEqual(withApiVersion.parameters.length, 0);
+      strictEqual(withApiVersion.operation.parameters.length, 1);
+
+      const apiVersionParam = withApiVersion.operation.parameters[0];
+      strictEqual(apiVersionParam.kind, "path");
+      strictEqual(apiVersionParam.serializedName, "apiVersion");
+      strictEqual(apiVersionParam.nameInClient, "apiVersion");
+      strictEqual(apiVersionParam.isApiVersionParam, true);
+      strictEqual(apiVersionParam.optional, false);
+      strictEqual(apiVersionParam.onClient, true);
+      strictEqual(apiVersionParam.type.kind, "string");
+      strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
     });
   });
   describe("Parameters", () => {
