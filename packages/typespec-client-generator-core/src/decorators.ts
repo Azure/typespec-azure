@@ -81,11 +81,7 @@ function setScopedDecoratorData(
     return false;
   }
   if (!Object.keys(targetEntry).includes("") && !scope) {
-    for (const key of Object.keys(targetEntry)) {
-      if (key !== "") {
-        delete targetEntry[key];
-      }
-    }
+    context.program.stateMap(key).set(target, { [""]: value });
   }
   return false;
 }
