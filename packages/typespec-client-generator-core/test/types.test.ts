@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { UsageFlags } from "@typespec/compiler";
+import { Enum, UsageFlags } from "@typespec/compiler";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -11,8 +11,8 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { getAllModels, isReadOnly } from "../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
+import { getAllModels, getSdkEnum, isReadOnly } from "../src/types.js";
+import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
   let runner: SdkTestRunner;
@@ -870,6 +870,48 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       strictEqual(models[0].name, "Enum1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("projected name", async () => {
+      await runner.compileAndDiagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          @projectedName("java", "JavaEnum1")
+          enum Enum1{
+            @projectedName("java", "JavaOne")
+            One: "one",
+            two,
+            three
+          }
+        }
+      `);
+
+      async function helper(emitterName: string, enumName: string, enumValueName: string) {
+        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const { Enum1 } = (await runner.compile(`
+        @service({})
+        namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          @projectedName("java", "JavaEnum1")
+          enum Enum1{
+            @projectedName("java", "JavaOne")
+            One: "one",
+            two,
+            three
+          }
+        }
+      `)) as { Enum1: Enum };
+        const enum1 = getSdkEnum(runner.context, Enum1);
+        strictEqual(enum1.name, enumName);
+        strictEqual(enum1.values[0].name, enumValueName);
+      }
+      await helper("@azure-tools/typespec-csharp", "Enum1", "One");
+      await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
     });
   });
   describe("SdkBodyModelPropertyType", () => {
@@ -1872,6 +1914,36 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       strictEqual(models[0].name, "Model1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("model with client hierarchy", async () => {
+      await runner.compile(`
+        @service({})
+        namespace Test1Client {
+          model T1 {
+            prop: string;
+          }
+          model T2 {
+            prop: string;
+          }
+          @route("/b")
+          namespace B {
+            op x(): void;
+
+            @route("/c")
+            interface C {
+              op y(): T1;
+            }
+
+            @route("/d")
+            namespace D {
+              op z(@body body: T2): void;
+            }
+          }
+        }
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 2);
     });
   });
   describe("SdkTupleType", () => {
