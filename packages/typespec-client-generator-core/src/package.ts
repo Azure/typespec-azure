@@ -599,7 +599,7 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
       optional: false,
       ...updateWithApiVersionInformation(context, param),
       onClient: true,
-      description: servers[0].description,
+      description: sdkParam.description ?? servers[0].description,
     });
   }
   return {
