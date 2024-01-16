@@ -24,7 +24,6 @@ import {
 } from "./decorators.js";
 import {
   SdkBodyParameter,
-  SdkBuiltInType,
   SdkClient,
   SdkClientType,
   SdkContext,
@@ -145,6 +144,40 @@ function getSdkHttpBodyParameters(
   throw new Error("blah");
 }
 
+function createContentTypeOrAcceptHeader(
+  context: SdkContext<SdkHttpOperation>,
+  bodyObject: SdkBodyParameter | SdkHttpResponse
+): Omit<SdkMethodParameter, "kind"> {
+  const nameInClient = bodyObject.kind === "body" ? "contentType" : "accept";
+  let type: SdkType = {
+    kind: "string",
+    encode: "string",
+    nullable: false,
+  };
+  if (
+    bodyObject.contentTypes &&
+    bodyObject.contentTypes.length === 1 &&
+    /json/.test(bodyObject.contentTypes[0])
+  ) {
+    // in this case, we just want a content type of application/json
+    type = {
+      nullable: false,
+      kind: "constant",
+      value: bodyObject.contentTypes[0],
+      valueType: type,
+    };
+  }
+  return {
+    type,
+    clientDefaultValue: bodyObject.defaultContentType,
+    nameInClient,
+    apiVersions: bodyObject.apiVersions,
+    isApiVersionParam: false,
+    onClient: false,
+    optional: false,
+  };
+}
+
 function getSdkHttpOperation(
   context: SdkContext<SdkHttpOperation>,
   httpOperation: HttpOperation,
@@ -162,24 +195,14 @@ function getSdkHttpOperation(
     );
   const headerParams = parameters.filter((x): x is SdkHeaderParameter => x.kind === "header");
   const bodyParams = getSdkHttpBodyParameters(context, httpOperation, methodParameters);
-  const stringType: SdkBuiltInType = {
-    kind: "string",
-    encode: "string",
-    nullable: false,
-  };
+
   if (
     bodyParams &&
     !headerParams.some((h) => h.__raw && isContentTypeHeader(context.program, h.__raw))
   ) {
     // We will always add a content type parameter if a body is being inputted
     const contentTypeBase = {
-      clientDefaultValue: bodyParams[0].defaultContentType,
-      nameInClient: "contentType",
-      type: stringType,
-      apiVersions: bodyParams[0].apiVersions,
-      isApiVersionParam: false,
-      onClient: false,
-      optional: false,
+      ...createContentTypeOrAcceptHeader(context, bodyParams[0]),
       description: `Body parameter's content type. Known values are ${bodyParams[0].contentTypes}`,
     };
     parameters.push({
@@ -199,25 +222,17 @@ function getSdkHttpOperation(
     .filter((r) => r.type);
   if (responsesWithBodies.length > 0 && !headerParams.some((h) => isAcceptHeader(h))) {
     // Always have an accept header if we're returning any response with a body
-    const clientDefaultValue = responsesWithBodies[0].defaultContentType!;
     const acceptBase = {
-      nameInClient: "accept",
-      type: stringType,
-      apiVersions: context.__api_versions || [],
-      isApiVersionParam: false,
-      onClient: false,
-      optional: false,
+      ...createContentTypeOrAcceptHeader(context, responsesWithBodies[0]),
     };
     parameters.push({
       ...acceptBase,
       kind: "header",
-      clientDefaultValue,
       serializedName: "Accept",
     });
     if (!methodParameters.some((m) => m.nameInClient === "accept")) {
       methodParameters.push({
         ...acceptBase,
-        clientDefaultValue,
         kind: "method",
       });
     }

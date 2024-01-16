@@ -325,6 +325,7 @@ export interface SdkMethodResponse {
 export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
+  apiVersions: string[];
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {

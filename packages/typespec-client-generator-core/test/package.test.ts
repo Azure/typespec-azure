@@ -545,25 +545,37 @@ describe("typespec-client-generator-core: package", () => {
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
       `);
       const sdkPackage = runner.context.sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      strictEqual(sdkPackage.clients.length, 1);
 
-      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient")!;
-      const operationGroup = sdkPackage.clients.find((c) => c.name === "MyOperationGroup")!;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization?.properties.length, 2);
+      strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      const clientApiVersionParam = client.initialization.properties[1];
+      strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
+      strictEqual(clientApiVersionParam.onClient, true);
+      strictEqual(clientApiVersionParam.optional, false);
+      strictEqual(clientApiVersionParam.kind, "method");
+      strictEqual(clientApiVersionParam.clientDefaultValue, undefined);
+      strictEqual(clientApiVersionParam.isApiVersionParam, true);
+      strictEqual(clientApiVersionParam.type.kind, "string");
+      strictEqual(client.methods.length, 2);
 
-      strictEqual(mainClient.methods.length, 1);
-      strictEqual(mainClient.initialization!.properties.length, 1);
-      strictEqual(mainClient.initialization!.properties[0].nameInClient, "endpoint");
+      const withoutApiVersion = client.methods.find((x) => x.name === "withoutApiVersion")!;
+      strictEqual(withoutApiVersion.kind, "basic");
+      strictEqual(withoutApiVersion.parameters.length, 0);
+      strictEqual(withoutApiVersion.operation.parameters.length, 0);
 
-      const clientAccessor = mainClient.methods[0];
-      strictEqual(clientAccessor.kind, "clientaccessor");
-      strictEqual(clientAccessor.access, "internal");
-      strictEqual(clientAccessor.name, "getMyOperationGroup");
-      strictEqual(clientAccessor.parameters.length, 0);
-      strictEqual(clientAccessor.response, operationGroup);
+      const withApiVersion = client.methods.find((x) => x.name === "withQueryApiVersion")!;
+      strictEqual(withApiVersion.kind, "basic");
+      strictEqual(withApiVersion.parameters.length, 0);
+      strictEqual(withApiVersion.operation.parameters.length, 1);
 
-      strictEqual(operationGroup.initialization, undefined);
-      strictEqual(operationGroup.methods.length, 1);
-      strictEqual(operationGroup.methods[0].name, "func");
+      const apiVersionParam = withApiVersion.operation.parameters[0];
+      strictEqual(apiVersionParam.kind, "query");
+      strictEqual(apiVersionParam.isApiVersionParam, true);
+      strictEqual(apiVersionParam.optional, false);
+      strictEqual(apiVersionParam.onClient, true);
+      strictEqual(apiVersionParam.type.kind, "string");
     });
   });
   describe("Parameters", () => {
@@ -758,7 +770,7 @@ describe("typespec-client-generator-core: package", () => {
         (x) => x.nameInClient === "contentType"
       )!;
       strictEqual(methodContentTypeParam.clientDefaultValue, "application/json");
-      strictEqual(methodContentTypeParam.type.kind, "string");
+      strictEqual(methodContentTypeParam.type.kind, "constant");
       strictEqual(methodContentTypeParam.onClient, false);
       strictEqual(methodContentTypeParam.optional, false);
 
@@ -815,7 +827,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const contentTypeParam = method.parameters.find((x) => x.nameInClient === "contentType")!;
       strictEqual(contentTypeParam.clientDefaultValue, "application/json");
-      strictEqual(contentTypeParam.type.kind, "string");
+      strictEqual(contentTypeParam.type.kind, "constant");
       strictEqual(contentTypeParam.onClient, false);
 
       const serviceOperation = method.operation;
@@ -865,7 +877,7 @@ describe("typespec-client-generator-core: package", () => {
         (x) => x.nameInClient === "contentType"
       )!;
       strictEqual(contentTypeMethodParam.clientDefaultValue, "application/json");
-      strictEqual(contentTypeMethodParam.type.kind, "string");
+      strictEqual(contentTypeMethodParam.type.kind, "constant");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 1);
@@ -956,7 +968,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.type.kind, "constant");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.parameters.length, 3);
@@ -1011,7 +1023,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.type.kind, "constant");
+      strictEqual(methodParam.type.value, "application/json");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.parameters.length, 1);
@@ -1025,6 +1038,82 @@ describe("typespec-client-generator-core: package", () => {
       const correspondingHeaderParams = method.getParameterMapping(serviceOperation.parameters[0]);
       strictEqual(correspondingHeaderParams.length, 1);
       strictEqual(correspondingHeaderParams[0].nameInClient, "contentType");
+    });
+    it("ensure content type is a constant if only one possibility", async () => {
+      await runner.compileWithBuiltInService(`
+      model DefaultDatetimeProperty {
+        value: utcDateTime;
+      }
+      @post op default(@body body: DefaultDatetimeProperty): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+
+      strictEqual(method.parameters.length, 2);
+      const methodBodyParam = method.parameters[0];
+      strictEqual(methodBodyParam.nameInClient, "body");
+      strictEqual(methodBodyParam.type, sdkPackage.models[0]);
+
+      const methodContentTypeParam = method.parameters[1];
+      strictEqual(methodContentTypeParam.nameInClient, "contentType");
+
+      const serviceOperation = method.operation;
+      strictEqual(serviceOperation.bodyParams.length, 1);
+      const serviceBodyParam = serviceOperation.bodyParams[0];
+      strictEqual(serviceBodyParam.kind, "body");
+      strictEqual(serviceBodyParam.contentTypes.length, 1);
+      strictEqual(serviceBodyParam.defaultContentType, "application/json");
+      strictEqual(serviceBodyParam.contentTypes[0], "application/json");
+      deepStrictEqual(method.getParameterMapping(serviceBodyParam)[0], methodBodyParam);
+
+      strictEqual(serviceOperation.parameters.length, 1);
+      const serviceContentTypeParam = serviceOperation.parameters[0];
+      strictEqual(serviceContentTypeParam.nameInClient, "contentType");
+      strictEqual(serviceContentTypeParam.serializedName, "Content-Type");
+      strictEqual(serviceContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(serviceContentTypeParam.type.kind, "constant");
+      strictEqual(serviceContentTypeParam.type.value, "application/json");
+      strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
+      deepStrictEqual(
+        method.getParameterMapping(serviceContentTypeParam)[0],
+        methodContentTypeParam
+      );
+    });
+
+    it("ensure accept is a constant if only one possibility", async () => {
+      await runner.compileWithBuiltInService(`
+      model DefaultDatetimeProperty {
+        value: utcDateTime;
+      }
+      @get op default(): DefaultDatetimeProperty;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+
+      strictEqual(method.parameters.length, 1);
+      const methodAcceptParam = method.parameters[0];
+      strictEqual(methodAcceptParam.nameInClient, "accept");
+
+      const serviceOperation = method.operation;
+      strictEqual(serviceOperation.parameters.length, 1);
+      const serviceContentTypeParam = serviceOperation.parameters[0];
+      strictEqual(serviceContentTypeParam.nameInClient, "accept");
+      strictEqual(serviceContentTypeParam.serializedName, "Accept");
+      strictEqual(serviceContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(serviceContentTypeParam.type.kind, "constant");
+      strictEqual(serviceContentTypeParam.type.value, "application/json");
+      strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
+
+      strictEqual(Object.keys(serviceOperation.responses).length, 1);
+      const response = serviceOperation.responses[200];
+      strictEqual(response.kind, "http");
+      strictEqual(response.type, sdkPackage.models[0]);
+      strictEqual(response.contentTypes?.length, 1);
+      strictEqual(response.contentTypes[0], "application/json");
+      strictEqual(response.defaultContentType, "application/json");
+
+      strictEqual(method.response.kind, "method");
+      strictEqual(method.response.type, sdkPackage.models[0]);
     });
   });
 
