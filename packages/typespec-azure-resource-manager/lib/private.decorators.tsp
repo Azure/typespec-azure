@@ -54,9 +54,9 @@ extern dec armCommonParameter(
  *
  *   `model Server is TrackedResource<ServerProperties>;`
  *
- * The `TrackedResource<T>` type (and other associated base types) use the `@armResource`
- * decorator, so it also gets applied to the type which absorbs the `TrackedResource<T>`
- * definition by using the `is` keyword.
+ * The `TrackedResource<Resource>` type (and other associated base types) use the
+ * `@armResource` decorator, so it also gets applied to the type which absorbs the
+ * `TrackedResource<Resource>` definition by using the `is` keyword.
  *
  * @param properties Arm resource properties
  */

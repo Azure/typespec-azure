@@ -165,9 +165,9 @@ model PrivateLinkResourceListResult {
 
 /**
  * The name of the private endpoint connection associated with the Azure resource.
- * @template TSegment The resource type name for private endpoint connections (default is privateEndpointConnections)
+ * @template Segment The resource type name for private endpoint connections (default is privateEndpointConnections)
  */
-model PrivateEndpointConnectionParameter<TSegment extends valueof string = "privateEndpointConnections"> {
+model PrivateEndpointConnectionParameter<Segment extends valueof string = "privateEndpointConnections"> {
   /** The name of the private endpoint connection associated with the Azure resource. */
   @path
   @armCommonParameter(
@@ -183,19 +183,19 @@ model PrivateEndpointConnectionParameter<TSegment extends valueof string = "priv
     Azure.ResourceManager.CommonTypes.Versions.v5,
     "privatelinks.json"
   )
-  @TypeSpec.Rest.segment(TSegment)
+  @TypeSpec.Rest.segment(Segment)
   @key("privateEndpointConnectionName")
   name: string;
 }
 
 /**
  * The name of the private link associated with the Azure resource.
- * @template TSegment The resource type name for private links (default is privateLinkResources)
+ * @template Segment The resource type name for private links (default is privateLinkResources)
  */
-model PrivateLinkResourceParameter<TSegment extends valueof string = "privateLinkResources"> {
+model PrivateLinkResourceParameter<Segment extends valueof string = "privateLinkResources"> {
   /** The name of the private link associated with the Azure resource. */
   @path
-  @TypeSpec.Rest.segment(TSegment)
+  @TypeSpec.Rest.segment(Segment)
   @key("privateLinkResourcenName")
   name: string;
 }

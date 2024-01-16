@@ -66,14 +66,14 @@ namespace Azure {
      * Identifies a model property as containing the location to poll for operation state.
      * @param options PollingOptions for the poller pointed to by this link.  Overrides
      * settings derived from property value it is decorating, if the value of the
-     * property is ResourceLocation<T>
+     * property is ResourceLocation<Resource>
      */
     extern dec pollingLocation(entity: ModelProperty, options?: PollingOptions);
 
     /**
      * Identifies a ModelProperty as containing the final location for the operation result.
      * @param finalResult Sets the expected return value for the final result.  Overrides
-     * any value provided in the decorated property, if the property uses ResourceLocation<T>.
+     * any value provided in the decorated property, if the property uses ResourceLocation<Resource>.
      */
     extern dec finalLocation(entity: ModelProperty, finalResult?: Model | void);
 
@@ -81,7 +81,7 @@ namespace Azure {
      * Identifies an operation that is linked to the target operation.
      * @param linkedOperation The linked Operation
      * @param linkType A string indicating the role of the linked operation
-     * @param parameters Map of `RequestParameter<T>` and/or `ResponseProperty<T>` that will
+     * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
      * be passed to the linked operation request.
      */
     extern dec operationLink(
@@ -106,7 +106,7 @@ namespace Azure {
     /**
      * Identifies that an operation is a polling operation for an LRO.
      * @param linkedOperation The linked Operation
-     * @param parameters Map of `RequestParameter<T>` and/or `ResponseProperty<T>` that will
+     * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
      * be passed to the linked operation request.
      */
     extern dec pollingOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
@@ -114,7 +114,7 @@ namespace Azure {
     /**
      * Identifies that an operation is the final operation for an LRO.
      * @param linkedOperation The linked Operation
-     * @param parameters Map of `RequestParameter<T>` and/or `ResponseProperty<T>` that will
+     * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
      * be passed to the linked operation request.
      */
     extern dec finalOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
@@ -122,7 +122,7 @@ namespace Azure {
     /**
      * Identifies that an operation is used to retrieve the next page for paged operations.
      * @param linkedOperation The linked Operation
-     * @param parameters Map of `RequestParameter<T>` and/or `ResponseProperty<T>` that will
+     * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
      * be passed to the linked operation request.
      */
     extern dec nextPageOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
@@ -169,14 +169,14 @@ namespace Azure {
         extern dec spreadCustomResponseProperties(entity: Model, customizations: {});
 
         /**
-         * Checks the TResource parameter of an operation signature to ensure it's a valid resource type.
+         * Checks the Resource parameter of an operation signature to ensure it's a valid resource type.
          * Also marks the operation as a resource operation.
          * @param resourceType The possible resource Type to validate.
          */
         extern dec ensureResourceType(entity: TypeSpec.Reflection.Operation, resourceType: unknown);
 
         /**
-         * Checks the TResource parameter of an operation signature to ensure it's a valid resource type.
+         * Checks the Resource parameter of an operation signature to ensure it's a valid resource type.
          */
         extern dec needsRoute(entity: TypeSpec.Reflection.Operation);
 
