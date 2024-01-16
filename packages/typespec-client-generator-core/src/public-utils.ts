@@ -1,5 +1,6 @@
 import {
   Enum,
+  EnumMember,
   getDeprecationDetails,
   getDoc,
   getEffectiveModelType,
@@ -183,7 +184,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  */
 export function getLibraryName(
   context: SdkContext,
-  type: Model | ModelProperty | Operation
+  type: Model | ModelProperty | Operation | Enum | EnumMember
 ): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
