@@ -144,6 +144,14 @@ Changes the name of a method, parameter, property, or model generated in the cli
 op nameInService: void;
 ```
 
+```typespec
+@clientName("nameForJava", "java")
+@clientName("name_for_python", "python")
+@clientName("nameForCsharp", "csharp")
+@clientName("nameForJavascript", "javascript")
+op nameInService: void;
+```
+
 ### `@convenientAPI` {#@Azure.ClientGenerator.Core.convenientAPI}
 
 Whether you want to generate an operation as a convenient operation.

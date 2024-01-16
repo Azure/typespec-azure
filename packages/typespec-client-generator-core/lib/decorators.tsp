@@ -12,6 +12,15 @@ namespace Azure.ClientGenerator.Core;
  * @clientName("nameInClient")
  * op nameInService: void;
  * ```
+ *
+ * @example
+ * ```typespec
+ * @clientName("nameForJava", "java")
+ * @clientName("name_for_python", "python")
+ * @clientName("nameForCsharp", "csharp")
+ * @clientName("nameForJavascript", "javascript")
+ * op nameInService: void;
+ * ```
  */
 extern dec clientName(target: unknown, rename: valueof string, scope?: valueof string);
 
