@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-client-generator-core",
+      "comment": "Fix missing models when client hierarchy and naming issue for enum with projected name.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-client-generator-core"
+}

@@ -551,7 +551,7 @@ export function getSdkEnumValue(
   const docWrapper = getDocHelper(context, type);
   return {
     ...getSdkTypeBaseHelper(context, type, "enumvalue"),
-    name: type.name,
+    name: getLibraryName(context, type),
     value: type.value ?? type.name,
     description: docWrapper.description,
     details: docWrapper.details,
@@ -566,7 +566,7 @@ export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operatio
     const docWrapper = getDocHelper(context, type);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
-      name: type.name,
+      name: getLibraryName(context, type),
       description: docWrapper.description,
       details: docWrapper.details,
       valueType: getSdkEnumValueType(context, type.members.values().next().value),
@@ -1046,10 +1046,15 @@ export function getAllModels(
       // operations on a client
       updateTypesFromOperation(context, operation);
     }
-    for (const operationGroup of listOperationGroups(context, client)) {
-      for (const operation of listOperationsInOperationGroup(context, operationGroup)) {
+    const ogs = listOperationGroups(context, client);
+    while (ogs.length) {
+      const operationGroup = ogs.pop();
+      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         // operations on operation groups
         updateTypesFromOperation(context, operation);
+      }
+      if (operationGroup?.subOperationGroups) {
+        ogs.push(...operationGroup.subOperationGroups);
       }
     }
     // orphan models
