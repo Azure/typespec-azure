@@ -128,7 +128,7 @@ model ResourceUriParameter {
  */
 model ResourceInstanceParameters<
   Resource extends ArmResourceBase,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;
   ...ProviderNamespace<Resource>;
@@ -143,7 +143,7 @@ model ResourceInstanceParameters<
  */
 model ResourceParentParameters<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;
   ...ProviderNamespace<Resource>;

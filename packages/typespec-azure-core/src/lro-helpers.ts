@@ -15,6 +15,7 @@ import {
   ModelProperty,
   Operation,
   Program,
+  ProjectedProgram,
   Scalar,
   Type,
 } from "@typespec/compiler";
@@ -50,6 +51,11 @@ import {
   StatusMonitorPollingLocationInfo,
 } from "./decorators.js";
 import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
+
+export interface ServiceVersion {
+  version: string;
+  getProjectedProgram(progam: Program): ProjectedProgram;
+}
 
 /**
  * Custom polling

@@ -117,7 +117,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, 
-          Azure.ResourceManager.Foundations.BaseParameters<Widget>, 
+          Azure.ResourceManager.Foundations.DefaultBaseParameters<Widget>, 
           ArmCombinedLroHeaders<
             ArmOperationStatus,
             Widget,

@@ -45,7 +45,7 @@ interface Operations {
 interface ResourceOperations<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > extends TrackedResourceOperations<Resource, Properties, BaseParameters> {}
 
 /**
@@ -61,7 +61,7 @@ interface ResourceOperations<
 interface TrackedResourceOperations<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >
   extends ResourceInstanceOperations<Resource, Properties, BaseParameters>,
     ResourceCollectionOperations<Resource, BaseParameters> {}
@@ -79,7 +79,7 @@ interface TrackedResourceOperations<
  */
 interface ProxyResourceOperations<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >
   extends ResourceRead<Resource, BaseParameters>,
     ResourceCreate<Resource, BaseParameters>,
@@ -117,7 +117,7 @@ interface TenantResourceOperations<
 interface ResourceInstanceOperations<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   PatchModel = ResourceUpdateModel<Resource, Properties>
 >
   extends ResourceRead<Resource, BaseParameters>,
@@ -132,7 +132,7 @@ interface ResourceInstanceOperations<
  */
 interface ResourceCollectionOperations<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > extends ResourceListByParent<Resource, BaseParameters>, ResourceListBySubscription<Resource> {}
 
 /**
@@ -156,7 +156,7 @@ interface ResourceListBySubscription<Resource extends ArmResource> {
  */
 interface ResourceListByParent<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = ""
 > {
@@ -175,7 +175,10 @@ interface ResourceListByParent<
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
-interface ResourceRead<Resource extends ArmResource, BaseParameters = BaseParameters<Resource>> {
+interface ResourceRead<
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+> {
   /**
    * @dev Retrieve a resource.
    * @template Resource The ArmResource to retrieve.
@@ -191,7 +194,7 @@ interface ResourceRead<Resource extends ArmResource, BaseParameters = BaseParame
  */
 interface ResourceCreateSync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Create or update a resource using the synchronous call pattern.
@@ -208,7 +211,7 @@ interface ResourceCreateSync<
  */
 interface ResourceCreateAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Create or update a resource using the asynchronous call pattern.
@@ -227,7 +230,7 @@ interface ResourceCreateAsync<
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Delete a resource using the asynchronous call pattern.
@@ -245,7 +248,7 @@ interface ResourceDeleteAsync<
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteWithoutOkAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Delete a resource using the asynchronous call pattern.
@@ -263,7 +266,7 @@ interface ResourceDeleteWithoutOkAsync<
 @doc("Delete a resource")
 interface ResourceDeleteSync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Delete a resource using the synchronous call pattern.
@@ -283,7 +286,7 @@ interface ResourceDeleteSync<
 interface ResourceUpdateAsync<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Update a resource using the asynchronous call pattern.
@@ -308,7 +311,7 @@ interface ResourceUpdateAsync<
 interface ResourceUpdateSync<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Update a resource using the synchronous call pattern.
@@ -354,18 +357,18 @@ interface ExtensionResourceOperations<
 
 alias ResourceCreate<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceCreateAsync<Resource, BaseParameters>;
 
 alias ResourceUpdate<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceUpdateSync<Resource, Properties, BaseParameters>;
 
 alias ResourceDelete<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceDeleteAsync<Resource, BaseParameters>;
 
 alias ProxyResourceUpdate<

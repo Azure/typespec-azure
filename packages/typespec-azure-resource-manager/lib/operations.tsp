@@ -37,7 +37,7 @@ op ArmListBySubscription<Resource extends ArmResource>(
 @armResourceList(Resource)
 op ArmResourceListByParent<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = ""
 >(
@@ -55,7 +55,10 @@ op ArmResourceListByParent<
 @segmentOf(Resource)
 @armRenameListByOperation(Resource) // This must come before @armResourceList!
 @armResourceList(Resource)
-op ArmResourceListAtScope<Resource extends ArmResource, BaseParameters = BaseParameters<Resource>>(
+op ArmResourceListAtScope<
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+>(
   ...ResourceParentParameters<Resource, BaseParameters>,
 ): ArmResponse<ResourceListResult<Resource>> | ErrorResponse;
 
@@ -68,9 +71,10 @@ op ArmResourceListAtScope<Resource extends ArmResource, BaseParameters = BasePar
 @doc("Get a {name}", Resource)
 @get
 @armResourceRead(Resource)
-op ArmResourceRead<Resource extends ArmResourceBase, BaseParameters = BaseParameters<Resource>>(
-  ...ResourceInstanceParameters<Resource, BaseParameters>,
-): ArmResponse<Resource> | ErrorResponse;
+op ArmResourceRead<
+  Resource extends ArmResourceBase,
+  BaseParameters = DefaultBaseParameters<Resource>
+>(...ResourceInstanceParameters<Resource, BaseParameters>): ArmResponse<Resource> | ErrorResponse;
 
 /**
  * A long-running resource CreateOrUpdate (PUT)
@@ -91,7 +95,7 @@ op ArmResourceRead<Resource extends ArmResourceBase, BaseParameters = BaseParame
 @put
 op ArmResourceCreateOrUpdateAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = {}
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
@@ -115,7 +119,7 @@ op ArmResourceCreateOrUpdateAsync<
 @put
 op ArmResourceCreateOrUpdateSync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
 
@@ -135,7 +139,7 @@ op ArmResourceCreateOrUpdateSync<
 @put
 op ArmResourceCreateOrReplaceSync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
 
@@ -146,7 +150,7 @@ op ArmResourceCreateOrReplaceSync<
 
 op ArmResourceCreateOrReplaceAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = {}
 > is ArmResourceCreateOrUpdateAsync<Resource, BaseParameters, LroHeaders>;
 
@@ -159,7 +163,7 @@ op ArmResourceCreateOrReplaceAsync<
 op ArmTagsPatchAsync<
   Resource extends ArmResource,
   Properties extends {} = TagsUpdateModel<Resource>,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
@@ -177,7 +181,7 @@ op ArmTagsPatchAsync<
 op ArmResourcePatchAsync<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
@@ -211,7 +215,7 @@ op ArmResourcePatchAsync<
 op ArmCustomPatchAsync<
   Resource extends ArmResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
@@ -235,7 +239,7 @@ op ArmCustomPatchAsync<
  */
 op ArmTagsPatchSync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters>;
 
 /**
@@ -247,7 +251,7 @@ op ArmTagsPatchSync<
 op ArmResourcePatchSync<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 
 /**
@@ -263,7 +267,7 @@ op ArmResourcePatchSync<
 op ArmCustomPatchSync<
   Resource extends ArmResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
 
@@ -292,7 +296,7 @@ op ArmCustomPatchSync<
 op ArmResourceDeleteAsyncBase<
   Resource extends ArmResource,
   Response,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >(...ResourceInstanceParameters<Resource, BaseParameters>): Response | ErrorResponse;
 
 /**
@@ -303,7 +307,7 @@ op ArmResourceDeleteAsyncBase<
  */
 op ArmResourceDeleteAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
 > is ArmResourceDeleteAsyncBase<
   Resource,
@@ -319,7 +323,7 @@ op ArmResourceDeleteAsync<
  */
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends ArmResource,
-  BaseParameters = BaseParameters<Resource>,
+  BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
 > is ArmResourceDeleteAsyncBase<
   Resource,
@@ -336,7 +340,10 @@ op ArmResourceDeleteWithoutOkAsync<
 @doc("Delete a {name}", Resource)
 @armResourceDelete(Resource)
 @delete
-op ArmResourceDeleteSync<Resource extends ArmResource, BaseParameters = BaseParameters<Resource>>(
+op ArmResourceDeleteSync<
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+>(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
 ): ArmDeletedResponse | ArmDeletedNoContentResponse | ErrorResponse;
 
@@ -383,7 +390,7 @@ op ArmResourceActionAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
-  BaseParameters extends TypeSpec.Reflection.Model = BaseParameters<Resource>,
+  BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Response,
@@ -411,7 +418,7 @@ op ArmResourceActionSync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
 
@@ -431,7 +438,7 @@ op ArmResourceActionSync<
 op ArmResourceActionNoContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
-  BaseParameters extends TypeSpec.Reflection.Model = BaseParameters<Resource>,
+  BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
@@ -454,7 +461,7 @@ op ArmResourceActionNoContentAsync<
 op ArmResourceActionNoResponseContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
-  BaseParameters extends TypeSpec.Reflection.Model = BaseParameters<Resource>,
+  BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
@@ -479,7 +486,7 @@ op ArmResourceActionNoResponseContentAsync<
 op ArmResourceActionNoContentSync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
-  BaseParameters = BaseParameters<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
 

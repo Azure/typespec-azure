@@ -219,7 +219,7 @@ model ErrorDetail {
  * @template Resource The type of the resource.
  */
 @resourceBaseParametersOf(Resource)
-model BaseParameters<Resource extends ArmResourceBase> {
+model DefaultBaseParameters<Resource extends ArmResourceBase> {
   ...ApiVersionParameter;
 
   // unless tenant or extension
@@ -234,6 +234,12 @@ model BaseParameters<Resource extends ArmResourceBase> {
   // unless tenant, subscription, location, or resourceGroup
   ...ResourceUriParameter;
 }
+
+/**
+ * Base parameters for a resource.
+ * @template Resource The type of the resource.
+ */
+alias BaseParameters<Resource extends ArmResourceBase> = DefaultBaseParameters<Resource>;
 
 /**
  * The static parameters for a tenant-based resource
