@@ -394,7 +394,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("json", "madeFor")
+          @encodedName("application/json", "madeFor")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -419,7 +419,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           @projectedName("java", "MadeForJava")
           @projectedName("javascript", "MadeForTS")
           @projectedName("python", "made_for_python")
-          @projectedName("json", "madeFor")
+          @encodedName("application/json", "madeFor")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -441,7 +441,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         @test
         model MyModel {
           @projectedName("client", "propName")
-          @projectedName("json", "madeFor")
+          @encodedName("application/json", "madeFor")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -515,7 +515,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { func } = (await runner.compile(`
         @test
-        @projectedName("json", "NotToUseMeAsName") // Should be ignored
+        @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
         op func(@query("api-version") myApiVersion: string): void;
       `)) as { func: Operation };
         strictEqual(getLibraryName(runner.context, func), "func");
@@ -604,7 +604,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { MyModel } = (await runner.compile(`
         @test
-        @projectedName("json", "NotToUseMeAsName") // Should be ignored
+        @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
         model MyModel {
           prop: string
         }
@@ -755,7 +755,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { param } = (await runner.compile(`
         op func(
           @test
-          @projectedName("json", "ShouldBeIgnored")
+          @encodedName("application/json", "ShouldBeIgnored")
           @query("param")
           param: string
         ): void;

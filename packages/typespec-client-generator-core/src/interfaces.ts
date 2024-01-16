@@ -8,7 +8,6 @@ import {
   Namespace,
   Operation,
   Program,
-  ProjectedNameView,
   Type,
   Union,
   UsageFlags,
@@ -33,9 +32,6 @@ export interface SdkContext<
   generateConvenienceMethods: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
-  languageProjectedProgram?: ProjectedNameView;
-  clientProjectedProgram?: ProjectedNameView;
-  jsonProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   unionsMap?: Map<Union, SdkUnionType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;

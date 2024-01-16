@@ -1,5 +1,6 @@
 import {
   Enum,
+  EnumMember,
   Model,
   ModelProperty,
   Namespace,
@@ -27,7 +28,7 @@ import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import { listClients, listOperationGroups, listOperationsInOperationGroup } from "./decorators.js";
 import { SdkContext } from "./interfaces.js";
-import { getClientNamespaceStringHelper, parseEmitterName } from "./internal-utils.js";
+import { getClientNamespaceStringHelper, getWireName, parseEmitterName } from "./internal-utils.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -131,10 +132,7 @@ export function getEmitterTargetName(context: SdkContext): string {
  * @returns a tuple of the library and wire name for a model property
  */
 export function getPropertyNames(context: SdkContext, property: ModelProperty): [string, string] {
-  return [
-    getLibraryName(context, property),
-    getProjectedName(context.program, property, "json") ?? property.name,
-  ];
+  return [getLibraryName(context, property), getWireName(context, property)];
 }
 
 /**
@@ -152,7 +150,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  */
 export function getLibraryName(
   context: SdkContext,
-  type: Model | ModelProperty | Operation
+  type: Model | ModelProperty | Operation | Enum | EnumMember
 ): string {
   if (!context.emitterName) {
     // eslint-disable-next-line deprecation/deprecation

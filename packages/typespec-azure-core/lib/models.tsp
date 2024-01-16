@@ -80,6 +80,13 @@ model MaxPageSizeQueryParameter {
   maxpagesize?: int32;
 }
 
+@doc("Provides the standard 'filter' query parameter for list operations")
+model FilterParameter {
+  @query
+  @doc("The maximum number of result items per page.")
+  filter?: string;
+}
+
 @doc("Provides the standard 'orderby' query parameter for list operations.")
 model OrderByQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"

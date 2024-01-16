@@ -103,6 +103,14 @@ Provides the standard 'expand' query parameter for list operations.
 model Azure.Core.ExpandQueryParameter
 ```
 
+### `FilterParameter` {#Azure.Core.FilterParameter}
+
+Provides the standard 'filter' query parameter for list operations
+
+```typespec
+model Azure.Core.FilterParameter
+```
+
 ### `FilterQueryParameter` {#Azure.Core.FilterQueryParameter}
 
 Provides the standard 'filter' query parameter for list operations.
