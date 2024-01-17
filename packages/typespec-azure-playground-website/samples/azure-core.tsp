@@ -46,19 +46,19 @@ enum Versions {
 
 /** The color of a widget. */
 enum WidgetColor {
-  /** Black */
+  /** Black Widget Color */
   Black,
 
-  /** White */
+  /** White Widget Color */
   White,
 
-  /** Red */
+  /** Red Widget Color */
   Red,
 
-  /** Green */
+  /** Green Widget Color */
   Green,
 
-  /** Blue */
+  /** Blue Widget Color */
   Blue,
 }
 
