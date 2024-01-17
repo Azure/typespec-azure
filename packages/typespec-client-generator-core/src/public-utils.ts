@@ -9,6 +9,7 @@ import {
   getProjectedName,
   getSummary,
   ignoreDiagnostics,
+  Interface,
   listServices,
   Model,
   ModelProperty,
@@ -179,7 +180,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  */
 export function getLibraryName(
   context: SdkContext,
-  type: Model | ModelProperty | Operation | Enum | EnumMember
+  type: Type & { name?: string }
 ): string {
   // 1. check if there's a specific name for our language
   const emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
@@ -230,22 +231,26 @@ export function getWireName(context: SdkContext, type: Type & { name: string }) 
   return getProjectedName(context.program, type, "json") ?? type.name;
 }
 
-interface DefaultSdkTypeBase<TKind> {
-  __raw: Type;
-  nullable: boolean;
-  deprecation?: string;
-  kind: TKind;
-}
-
 /**
  * Helper function to return default values for nullable, encode etc
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
   context: SdkContext,
-  type: Type,
+  type: Type | string,
   kind: TKind
-): DefaultSdkTypeBase<TKind> {
+): {
+  __raw?: Type;
+  nullable: boolean;
+  deprecation?: string;
+  kind: TKind;
+}{
+  if (typeof type === "string") {
+    return {
+      nullable: false,
+      kind,
+    };
+  }
   return {
     __raw: type,
     nullable: false,
@@ -259,7 +264,7 @@ export function getSdkTypeBaseHelper<TKind>(
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: Model | Enum | Operation | Scalar): string {
+export function getCrossLanguageDefinitionId(type: {name: string, kind: string, interface?: Interface, namespace?: Namespace}): string {
   let retval = type.name;
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
