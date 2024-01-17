@@ -59,81 +59,81 @@ model TraitOverride<Trait> {}
 
 /**
  * Declares a trait that is applied as a query parameter.
- * @template TParams The name of the query parameter.
+ * @template Parameters The name of the query parameter.
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
-@Private.ensureAllQueryParams(TParams)
-model QueryParametersTrait<TParams, Contexts = unknown> {
+@Private.ensureAllQueryParams(Parameters)
+model QueryParametersTrait<Parameters, Contexts = unknown> {
   @traitContext(Contexts)
   queryParams: {
     @traitLocation(TraitLocation.Parameters)
-    parameters: TParams;
+    parameters: Parameters;
   };
 }
 
 /**
  * Declares a trait that is applied as a query parameter for list operations.
- * @template TParams Object describing the query parameters.
+ * @template Parameters Object describing the query parameters.
  */
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
-model ListQueryParametersTrait<TParams> is QueryParametersTrait<TParams, TraitContext.List>;
+model ListQueryParametersTrait<Parameters> is QueryParametersTrait<Parameters, TraitContext.List>;
 
 /**
  * Declares a trait that is applied as a request header parameter.
- * @template THeaders Object describing the request header parameters.
+ * @template Headers Object describing the request header parameters.
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
-@Private.ensureAllHeaderParams(THeaders)
-model RequestHeadersTrait<THeaders, Contexts = unknown> {
+@Private.ensureAllHeaderParams(Headers)
+model RequestHeadersTrait<Headers, Contexts = unknown> {
   @traitContext(Contexts)
   requestHeaders: {
     @traitLocation(TraitLocation.Parameters)
-    parameters: THeaders;
+    parameters: Headers;
   };
 }
 
 /**
  * Declares a trait that is applied as a response header parameter.
- * @template THeaders Object describing the response header parameters.
+ * @template Headers Object describing the response header parameters.
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
-@Private.ensureAllHeaderParams(THeaders)
-model ResponseHeadersTrait<THeaders, Contexts = unknown> {
+@Private.ensureAllHeaderParams(Headers)
+model ResponseHeadersTrait<Headers, Contexts = unknown> {
   @traitContext(Contexts)
   responseHeaders: {
     @traitLocation(TraitLocation.Response)
-    parameters: THeaders;
+    parameters: Headers;
   };
 }
 
 /**
  * Declares a version parameter trait.
- * @template TVersionParameter The type of the version parameter.
+ * @template VersionParameter The type of the version parameter.
  */
 @trait("VersionParameter")
 @added(Azure.Core.Versions.v1_0_Preview_2)
-model VersionParameterTrait<TVersionParameter> {
+model VersionParameterTrait<VersionParameter> {
   versionParameter: {
     @traitLocation(TraitLocation.ApiVersionParameter)
-    apiVersionParam: TVersionParameter;
+    apiVersionParam: VersionParameter;
   };
 }
 
 /**
  * Provides clientRequestId headers for requests and responses.
- * @template TVersionAdded The version when the trait was added to the specification.
+ * @template VersionAdded The version when the trait was added to the specification.
  *           Leave this empty if the trait is always supported.
  */
 @trait("ClientRequestId")
-@traitAdded(TVersionAdded)
-model SupportsClientRequestId<TVersionAdded extends EnumMember | null = null> {
+@traitAdded(VersionAdded)
+model SupportsClientRequestId<VersionAdded extends EnumMember | null = null> {
   #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This inline model is never used directly in operations."
   clientRequestId: {
     @traitLocation(TraitLocation.Parameters)
@@ -154,12 +154,12 @@ model NoClientRequestId {
 
 /**
  * Provides conditional request headers for requests and ETag headers for responses.
- * @template TVersionAdded The version when the trait was added to the specification.
+ * @template VersionAdded The version when the trait was added to the specification.
  *           Leave this empty if the trait is always supported.
  */
 @trait("ConditionalRequests")
-@traitAdded(TVersionAdded)
-model SupportsConditionalRequests<TVersionAdded extends EnumMember | null = null> {
+@traitAdded(VersionAdded)
+model SupportsConditionalRequests<VersionAdded extends EnumMember | null = null> {
   #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This inline model is never used directly in operations."
   conditionalRequests: {
     @traitContext(
@@ -184,12 +184,12 @@ model NoConditionalRequests {
 
 /**
  * Provides repeatable request headers for requests and responses.
- * @template TVersionAdded The version when the trait was added to the specification.
+ * @template VersionAdded The version when the trait was added to the specification.
  *           Leave this empty if the trait is always supported.
  */
 @trait("RepeatableRequests")
-@traitAdded(TVersionAdded)
-model SupportsRepeatableRequests<TVersionAdded extends EnumMember | null = null> {
+@traitAdded(VersionAdded)
+model SupportsRepeatableRequests<VersionAdded extends EnumMember | null = null> {
   #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This inline model is never used directly in operations."
   @traitContext(
     TraitContext.Create | TraitContext.Update | TraitContext.Delete | TraitContext.Action

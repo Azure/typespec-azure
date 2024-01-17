@@ -486,15 +486,15 @@ model SdkStringValidation extends SdkValidation {
 /**
  * Validations for a numeric type
  *
- * @parameter TKind: Kind of the numeric type
- * @parameter TType: SdkType of the min / max value
+ * @template Kind Kind of the numeric type
+ * @template Type SdkType of the min / max value
  * @property minValue: Validation on the min value of the number
  * @property maxValue: Validation on the max value of the number
  */
-model SdkNumericValidationTemplate<TKind, TType> extends SdkValidation {
-  kind: TKind;
-  minValue?: TType;
-  maxValue?: TType;
+model SdkNumericValidationTemplate<Kind, Type> extends SdkValidation {
+  kind: Kind;
+  minValue?: Type;
+  maxValue?: Type;
 }
 
 /**
