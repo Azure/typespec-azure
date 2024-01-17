@@ -53,7 +53,7 @@
   "typescript.tsdk": "./core/packages/compiler/node_modules/typescript/lib",
   "git.ignoreLimitWarning": true,
   "vitest.enable": true,
-  "vitest.commandLine": "node ./core/packages/compiler/node_modules/vitest/vitest.mjs --root .",
+  "vitest.commandLine": "node ./core/packages/compiler/node_modules/vitest/vitest.mjs",
   "prettier.configPath": ".prettierrc.json",
   "prettier.ignorePath": ".prettierignore",
   "prettier.prettierPath": "./core/packages/compiler/node_modules/prettier/index.cjs",
