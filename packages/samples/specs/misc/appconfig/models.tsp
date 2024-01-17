@@ -3,11 +3,11 @@ using TypeSpec.OpenAPI;
 
 namespace AppConfig;
 
-@friendlyName("Paged{name}", TResource)
-@doc("Paged collection of {name} items", TResource)
-model Page<TResource extends {}> {
-  @doc("The {name} items on this page", TResource)
-  items: TResource[];
+@friendlyName("Paged{name}", Resource)
+@doc("Paged collection of {name} items", Resource)
+model Page<Resource extends {}> {
+  @doc("The {name} items on this page", Resource)
+  items: Resource[];
 
   @doc("The link to the next page of items")
   nextLink?: string;

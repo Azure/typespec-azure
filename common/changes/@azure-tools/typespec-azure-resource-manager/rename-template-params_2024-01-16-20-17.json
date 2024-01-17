@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-azure-resource-manager",
+      "comment": "Renamed template parameters for clarity and consistency.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-azure-resource-manager"
+}

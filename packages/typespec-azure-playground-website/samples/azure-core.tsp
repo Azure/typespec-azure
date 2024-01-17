@@ -25,154 +25,154 @@ using Azure.Core.Traits;
   "{endpoint}/widget",
   "Contoso Widget APIs",
   {
-    @doc("""
+    /** 
 Supported Widget Services endpoints (protocol and hostname, for example:
 https://westus.api.widget.contoso.com).
-""")
+ */
     endpoint: string,
   }
 )
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
 
-@doc("The Contoso Widget Manager service version.")
+/** The Contoso Widget Manager service version. */
 enum Versions {
-  @doc("Version 2022-08-31")
+  /** Version 2022-08-31 */
   @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   `2022-08-30`,
 }
 
 // Models ////////////////////
 
-@doc("The color of a widget.")
+/** The color of a widget. */
 enum WidgetColor {
-  @doc("Black")
+  /** Black Widget Color */
   Black,
 
-  @doc("White")
+  /** White Widget Color */
   White,
 
-  @doc("Red")
+  /** Red Widget Color */
   Red,
 
-  @doc("Green")
+  /** Green Widget Color */
   Green,
 
-  @doc("Blue")
+  /** Blue Widget Color */
   Blue,
 }
 
-@doc("A widget.")
+/** A widget. */
 @resource("widgets")
 model Widget {
+  /** The widget name. */
   @key("widgetName")
-  @doc("The widget name.")
   @visibility("read")
   name: string;
 
-  @doc("The widget color.")
+  /** The widget color. */
   color: WidgetColor;
 
-  @doc("The ID of the widget's manufacturer.")
+  /** The ID of the widget's manufacturer. */
   manufacturerId: string;
 
   ...EtagProperty;
 }
 
-@doc("The repair state of a widget.")
+/** The repair state of a widget. */
 @lroStatus
 enum WidgetRepairState {
-  @doc("Widget repairs succeeded.")
+  /** Widget repairs succeeded. */
   Succeeded,
 
-  @doc("Widget repairs failed.")
+  /** Widget repairs failed. */
   Failed,
 
-  @doc("Widget repairs were canceled.")
+  /** Widget repairs were canceled. */
   Canceled,
 
-  @doc("Widget was sent to the manufacturer.")
+  /** Widget was sent to the manufacturer. */
   SentToManufacturer,
 }
 
-@doc("A submitted repair request for a widget.")
+/** A submitted repair request for a widget. */
 model WidgetRepairRequest {
-  @doc("The state of the widget repair request.")
+  /** The state of the widget repair request. */
   requestState: WidgetRepairState;
 
-  @doc("The date and time when the repair is scheduled to occur.")
+  /** The date and time when the repair is scheduled to occur. */
   scheduledDateTime: utcDateTime;
 
-  @doc("The date and time when the request was created.")
+  /** The date and time when the request was created. */
   createdDateTime: utcDateTime;
 
-  @doc("The date and time when the request was updated.")
+  /** The date and time when the request was updated. */
   updatedDateTime: utcDateTime;
 
-  @doc("The date and time when the request was completed.")
+  /** The date and time when the request was completed. */
   completedDateTime: utcDateTime;
 }
 
-@doc("The parameters for a widget status request")
+/** The parameters for a widget status request */
 model WidgetRepairStatusParams {
-  @doc("The ID of the widget being repaired.")
+  /** The ID of the widget being repaired. */
   @path
   widgetId: string;
 }
 
-@doc("A widget's part.")
+/** A widget's part. */
 @resource("parts")
 @parentResource(Widget)
 model WidgetPart {
+  /** The name of the part. */
   @key("widgetPartName")
-  @doc("The name of the part.")
   @visibility("read")
   name: string;
 
-  @doc("The ID to use for reordering the part.")
+  /** The ID to use for reordering the part. */
   partId: string;
 
-  @doc("The ID of the part's manufacturer.")
+  /** The ID of the part's manufacturer. */
   manufacturerId: string;
 
   ...EtagProperty;
 }
 
-@doc("The details of a reorder request for a WidgetPart.")
+/** The details of a reorder request for a WidgetPart. */
 model WidgetPartReorderRequest {
-  @doc("Identifies who signed off the reorder request.")
+  /** Identifies who signed off the reorder request. */
   signedOffBy: string;
 }
 
 // An example of a singleton resource
-@doc("Provides analytics about the use and maintenance of a Widget.")
+/** Provides analytics about the use and maintenance of a Widget. */
 @resource("analytics")
 @parentResource(Widget)
 model WidgetAnalytics {
+  /** The identifier for the analytics object.  There is only one named 'current'. */
   @key("analyticsId")
-  @doc("The identifier for the analytics object.  There is only one named 'current'.")
   @visibility("read")
   id: "current";
 
-  @doc("The number of uses of the widget.")
+  /** The number of uses of the widget. */
   useCount: int64;
 
-  @doc("The number of times the widget was repaired.")
+  /** The number of times the widget was repaired. */
   repairCount: int64;
 }
 
-@doc("A manufacturer of widgets.")
+/** A manufacturer of widgets. */
 @resource("manufacturers")
 model Manufacturer {
+  /** The manufacturer's unique ID. */
   @key("manufacturerId")
-  @doc("The manufacturer's unique ID.")
   @visibility("read")
   id: string;
 
-  @doc("The manufacturer's name.")
+  /** The manufacturer's name. */
   name: string;
 
-  @doc("The manufacturer's full address.")
+  /** The manufacturer's full address. */
   address: string;
 
   ...EtagProperty;
@@ -188,41 +188,41 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 interface Widgets {
   // Operation Status
-  @doc("Gets status of a Widget operation.")
+  /** Gets status of a Widget operation. */
   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
 
   // Widget Operations
-  @doc("Creates or updates a Widget asynchronously")
+  /** Creates or updates a Widget asynchronously */
   @pollingOperation(Widgets.getWidgetOperationStatus)
   createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
 
-  @doc("Get a Widget")
+  /** Get a Widget */
   getWidget is Operations.ResourceRead<Widget>;
 
-  @doc("Delete a Widget asynchronously.")
+  /** Delete a Widget asynchronously. */
   @pollingOperation(Widgets.getWidgetOperationStatus)
   deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
-  @doc("List Widget resources")
+  /** List Widget resources */
   listWidgets is Operations.ResourceList<
     Widget,
     ListQueryParametersTrait<StandardListQueryParameters & SelectQueryParameter>
   >;
 
   // Widget Analytics
-  @doc("Get a WidgetAnalytics")
+  /** Get a WidgetAnalytics */
   getAnalytics is Operations.ResourceRead<WidgetAnalytics>;
 
-  @doc("Creates or updates a WidgetAnalytics")
+  /** Creates or updates a WidgetAnalytics */
   updateAnalytics is Operations.ResourceCreateOrUpdate<WidgetAnalytics>;
 
   // Widget Repair Operations
+  /** Get the status of a WidgetRepairRequest. */
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a custom operation status endpoint."
-  @doc("Get the status of a WidgetRepairRequest.")
   @route("/widgets/{widgetId}/repairs/{operationId}")
   getRepairStatus is Foundations.GetOperationStatus<WidgetRepairStatusParams, WidgetRepairRequest>;
 
-  @doc("Schedule a widget for repairs.")
+  /** Schedule a widget for repairs. */
   @pollingOperation(Widgets.getWidgetOperationStatus)
   scheduleRepairs is Operations.LongRunningResourceAction<
     Widget,
@@ -232,22 +232,22 @@ interface Widgets {
 }
 
 interface WidgetParts {
-  @doc("Gets status of a WidgetPart operation.")
+  /** Gets status of a WidgetPart operation. */
   getWidgetPartOperationStatus is Operations.GetResourceOperationStatus<WidgetPart>;
 
-  @doc("Creates a WidgetPart")
+  /** Creates a WidgetPart */
   createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
 
-  @doc("Get a WidgetPart")
+  /** Get a WidgetPart */
   getWidgetPart is Operations.ResourceRead<WidgetPart>;
 
-  @doc("Delete a WidgetPart")
+  /** Delete a WidgetPart */
   deleteWidgetPart is Operations.ResourceDelete<WidgetPart>;
 
-  @doc("List WidgetPart resources")
+  /** List WidgetPart resources */
   listWidgetParts is Operations.ResourceList<WidgetPart>;
 
-  @doc("Reorder all parts for the widget.")
+  /** Reorder all parts for the widget. */
   @pollingOperation(WidgetParts.getWidgetPartOperationStatus)
   reorderParts is Operations.LongRunningResourceCollectionAction<
     WidgetPart,
@@ -257,26 +257,26 @@ interface WidgetParts {
 }
 
 interface Manufacturers {
-  @doc("Gets status of a Manufacturer operation.")
+  /** Gets status of a Manufacturer operation. */
   getManufacturerOperationStatus is Operations.GetResourceOperationStatus<Manufacturer>;
 
-  @doc("Creates or replaces a Manufacturer")
+  /** Creates or replaces a Manufacturer */
   createManufacturer is Operations.ResourceCreateOrReplace<Manufacturer>;
 
-  @doc("Get a Manufacturer")
+  /** Get a Manufacturer */
   getManufacturer is Operations.ResourceRead<Manufacturer>;
 
-  @doc("Delete a Manufacturer asynchronously.")
+  /** Delete a Manufacturer asynchronously. */
   @pollingOperation(Manufacturers.getManufacturerOperationStatus)
   deleteManufacturer is Operations.LongRunningResourceDelete<Manufacturer>;
 
-  @doc("List Manufacturer resources")
+  /** List Manufacturer resources */
   listManufacturers is Operations.ResourceList<Manufacturer>;
 }
 
 // A "global" RPC operation
+/** Responds with status information about the overall service. */
 @route("service-status")
-@doc("Responds with status information about the overall service.")
 op serviceStatus is RpcOperation<
   {},
   {
