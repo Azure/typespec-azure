@@ -167,9 +167,9 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
     };
   }
+  // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
-    clientDefaultValue: bodyObject.defaultContentType,
     nameInClient,
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,

@@ -952,7 +952,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodContentTypeParam = method.parameters.find(
         (x) => x.nameInClient === "contentType"
       )!;
-      strictEqual(methodContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(methodContentTypeParam.clientDefaultValue, undefined);
       strictEqual(methodContentTypeParam.type.kind, "constant");
       strictEqual(methodContentTypeParam.onClient, false);
       strictEqual(methodContentTypeParam.optional, false);
@@ -975,7 +975,7 @@ describe("typespec-client-generator-core: package", () => {
       const contentTypeParam = serviceOperation.parameters[0];
       strictEqual(contentTypeParam.nameInClient, "contentType");
       strictEqual(contentTypeParam.serializedName, "Content-Type");
-      strictEqual(contentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(contentTypeParam.clientDefaultValue, undefined);
       strictEqual(contentTypeParam.onClient, false);
       strictEqual(contentTypeParam.optional, false);
 
@@ -1009,7 +1009,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParam.type.kind, "string");
 
       const contentTypeParam = method.parameters.find((x) => x.nameInClient === "contentType")!;
-      strictEqual(contentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(contentTypeParam.clientDefaultValue, undefined);
       strictEqual(contentTypeParam.type.kind, "constant");
       strictEqual(contentTypeParam.onClient, false);
 
@@ -1059,7 +1059,7 @@ describe("typespec-client-generator-core: package", () => {
       const contentTypeMethodParam = method.parameters.find(
         (x) => x.nameInClient === "contentType"
       )!;
-      strictEqual(contentTypeMethodParam.clientDefaultValue, "application/json");
+      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
       strictEqual(contentTypeMethodParam.type.kind, "constant");
 
       const serviceOperation = method.operation;
@@ -1253,7 +1253,7 @@ describe("typespec-client-generator-core: package", () => {
       const serviceContentTypeParam = serviceOperation.parameters[0];
       strictEqual(serviceContentTypeParam.nameInClient, "contentType");
       strictEqual(serviceContentTypeParam.serializedName, "Content-Type");
-      strictEqual(serviceContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
       strictEqual(serviceContentTypeParam.type.kind, "constant");
       strictEqual(serviceContentTypeParam.type.value, "application/json");
       strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
@@ -1282,7 +1282,7 @@ describe("typespec-client-generator-core: package", () => {
       const serviceContentTypeParam = serviceOperation.parameters[0];
       strictEqual(serviceContentTypeParam.nameInClient, "accept");
       strictEqual(serviceContentTypeParam.serializedName, "Accept");
-      strictEqual(serviceContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
       strictEqual(serviceContentTypeParam.type.kind, "constant");
       strictEqual(serviceContentTypeParam.type.value, "application/json");
       strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
@@ -1507,27 +1507,27 @@ describe("typespec-client-generator-core: package", () => {
       const contentTypeOperationParam = headerParams.find(
         (x) => x.serializedName === "Content-Type"
       )!;
-      strictEqual(contentTypeOperationParam.clientDefaultValue, "application/json");
+      strictEqual(contentTypeOperationParam.clientDefaultValue, undefined);
       strictEqual(contentTypeOperationParam.onClient, false);
       strictEqual(contentTypeOperationParam.optional, false);
 
       const contentTypeMethodParam = method.parameters.find(
         (x) => x.nameInClient === "contentType"
       )!;
-      strictEqual(contentTypeMethodParam.clientDefaultValue, "application/json");
+      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
       strictEqual(contentTypeMethodParam.onClient, false);
       strictEqual(contentTypeMethodParam.optional, false);
 
       strictEqual(method.getParameterMapping(contentTypeOperationParam)[0], contentTypeMethodParam);
 
       const acceptOperationParam = headerParams.find((x) => x.serializedName === "Accept")!;
-      strictEqual(acceptOperationParam.clientDefaultValue, "application/json");
-      strictEqual(acceptOperationParam.clientDefaultValue, "application/json");
+      strictEqual(acceptOperationParam.clientDefaultValue, undefined);
+      strictEqual(acceptOperationParam.clientDefaultValue, undefined);
       strictEqual(acceptOperationParam.onClient, false);
       strictEqual(acceptOperationParam.optional, false);
 
       const acceptMethodParam = method.parameters.find((x) => x.nameInClient === "accept")!;
-      strictEqual(acceptMethodParam.clientDefaultValue, "application/json");
+      strictEqual(acceptMethodParam.clientDefaultValue, undefined);
       strictEqual(acceptMethodParam.onClient, false);
       strictEqual(acceptMethodParam.optional, false);
 
@@ -1550,7 +1550,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodIdParam.type.kind, "string");
 
       const methodAcceptParam = method.parameters.find((x) => x.nameInClient === "accept")!;
-      strictEqual(methodAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(methodAcceptParam.clientDefaultValue, undefined);
 
       const serviceOperation = method.operation;
 
@@ -1567,7 +1567,7 @@ describe("typespec-client-generator-core: package", () => {
       const operationAcceptParam = serviceOperation.parameters.find(
         (x) => x.kind === "header" && x.serializedName === "Accept"
       )!;
-      strictEqual(operationAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(operationAcceptParam.clientDefaultValue, undefined);
 
       strictEqual(method.getParameterMapping(operationAcceptParam)[0], methodAcceptParam);
 
@@ -1611,11 +1611,11 @@ describe("typespec-client-generator-core: package", () => {
       const methodContentTypeParam = method.parameters.find(
         (x) => x.nameInClient === "contentType"
       )!;
-      strictEqual(methodContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(methodContentTypeParam.clientDefaultValue, undefined);
       strictEqual(methodContentTypeParam.optional, false);
 
       const methodAcceptParam = method.parameters.find((x) => x.nameInClient === "accept")!;
-      strictEqual(methodAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(methodAcceptParam.clientDefaultValue, undefined);
       strictEqual(methodAcceptParam.optional, false);
 
       const serviceOperation = method.operation;
@@ -1646,11 +1646,11 @@ describe("typespec-client-generator-core: package", () => {
       const operationContentTypeParam = headerParams.find(
         (x) => x.serializedName === "Content-Type"
       )!;
-      strictEqual(operationContentTypeParam.clientDefaultValue, "application/json");
+      strictEqual(operationContentTypeParam.clientDefaultValue, undefined);
       strictEqual(operationContentTypeParam.optional, false);
 
       const operationAcceptParam = headerParams.find((x) => x.serializedName === "Accept")!;
-      strictEqual(operationAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(operationAcceptParam.clientDefaultValue, undefined);
       strictEqual(operationAcceptParam.optional, false);
 
       const correspondingMethodParams = method
@@ -1946,7 +1946,7 @@ describe("typespec-client-generator-core: package", () => {
       );
 
       const methodAcceptParam = method.parameters.find((x) => x.nameInClient === "accept")!;
-      strictEqual(methodAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(methodAcceptParam.clientDefaultValue, undefined);
       strictEqual(methodAcceptParam.onClient, false);
       strictEqual(methodAcceptParam.optional, false);
 
@@ -1956,7 +1956,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParams.length, 6);
 
       const operationAcceptParam = headerParams.find((x) => x.serializedName === "Accept")!;
-      strictEqual(operationAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(operationAcceptParam.clientDefaultValue, undefined);
       strictEqual(operationAcceptParam.onClient, false);
       strictEqual(operationAcceptParam.optional, false);
       strictEqual(method.getParameterMapping(operationAcceptParam)[0], methodAcceptParam);
@@ -2014,7 +2014,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodOperationId.optional, false);
 
       const methodAcceptParam = getStatus.parameters.find((x) => x.nameInClient === "accept")!;
-      strictEqual(methodAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(methodAcceptParam.clientDefaultValue, undefined);
       strictEqual(methodAcceptParam.onClient, false);
       strictEqual(methodAcceptParam.optional, false);
 
@@ -2052,7 +2052,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const operationAcceptParam = getStatus.operation.parameters.find((x) => x.kind === "header")!;
       strictEqual(operationAcceptParam.nameInClient, "accept");
-      strictEqual(operationAcceptParam.clientDefaultValue, "application/json");
+      strictEqual(operationAcceptParam.clientDefaultValue, undefined);
       strictEqual(operationAcceptParam.onClient, false);
       strictEqual(operationAcceptParam.optional, false);
       strictEqual(getStatus.getParameterMapping(operationAcceptParam)[0], methodAcceptParam);
