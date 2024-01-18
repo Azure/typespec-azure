@@ -36,21 +36,22 @@ import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type): any {
-  const retval: Record<string, any> = context.program.stateMap(key).get(target);
+  const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
   if (Object.keys(retval).includes(context.emitterName)) return retval[context.emitterName];
-  return retval[""]; // in this case it applies to all languages
+  return retval[AllScopes]; // in this case it applies to all languages
 }
 
 function listScopedDecoratorData(context: SdkContext, key: symbol): any[] {
   const retval = [...context.program.stateMap(key).values()];
   return retval
     .filter((targetEntry) => {
-      return targetEntry[context.emitterName] || targetEntry[""];
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
     })
-    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[""]);
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
 function setScopedDecoratorData(
@@ -66,13 +67,13 @@ function setScopedDecoratorData(
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
     // value is going to be a list of tuples, each tuple is a value and a list of scopes
-    context.program.stateMap(key).set(target, { [scope ?? ""]: value });
+    context.program.stateMap(key).set(target, { [scope ?? AllScopes]: value });
     return true;
   }
 
   // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
-  const scopes = Object.keys(targetEntry);
-  if (!scopes.includes("") && scope && !scopes.includes(scope)) {
+  const scopes = Reflect.ownKeys(targetEntry);
+  if (!scopes.includes(AllScopes) && scope && !scopes.includes(scope)) {
     targetEntry[scope] = value;
     return true;
   }
@@ -80,8 +81,8 @@ function setScopedDecoratorData(
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
-  if (!Object.keys(targetEntry).includes("") && !scope) {
-    context.program.stateMap(key).set(target, { [""]: value });
+  if (!Reflect.ownKeys(targetEntry).includes(AllScopes) && !scope) {
+    context.program.stateMap(key).set(target, { AllScopes: value });
   }
   return false;
 }
