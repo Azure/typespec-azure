@@ -285,7 +285,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkLogicalPath: pagedMetadata?.nextLinkSegments || [],
+    nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? getSdkServiceOperation<TServiceOperation>(
           context,

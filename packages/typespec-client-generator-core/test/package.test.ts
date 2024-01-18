@@ -2233,8 +2233,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(nextLinkProperty.kind, "property");
       strictEqual(nextLinkProperty.type.kind, "url");
       strictEqual(nextLinkProperty.serializedName, "nextLink");
-      strictEqual(listManufacturers.nextLinkLogicalPath?.length, 1);
-      strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkLogicalPath[0]);
+      strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
       const clientRequestIdProperty = pagingModel.properties.find(
         (x) => x.nameInClient === "clientRequestId"

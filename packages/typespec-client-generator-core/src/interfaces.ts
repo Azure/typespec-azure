@@ -465,7 +465,7 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 
 interface SdkPagingServiceMethodOptions {
   __raw_paged_metadata: PagedResultMetadata;
-  nextLinkLogicalPath?: string[]; // off means fake paging
+  nextLinkPath?: string; // off means fake paging
   nextLinkOperation?: SdkServiceOperation;
 }
 

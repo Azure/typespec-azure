@@ -600,13 +600,13 @@ model SdkBasicServiceOperation extends SdkServiceOperation {
  *
  * @property __raw_paged_metadata: The original TSP paging metadata
  * @property itemsMapping: Mapping of the items to return in the iterable
- * @property nextLinkLogicalPath: Where to get the next link. Off if we know there won't be a second page
+ * @property nextLinkPath: Where to get the next link. Off if we know there won't be a second page
  * @property nextLinkOperation: The operation to call to get the next page, if there is one
  */
 alias SdkPagingServiceOperationOptions = {
   __raw_paged_metadata: unknown;
   itemsMapping: SdkMethodServiceMapping;
-  nextLinkLogicalPath?: string;
+  nextLinkPath?: string;
   nextLinkOperation?: SdkServiceOperation;
 };
 
