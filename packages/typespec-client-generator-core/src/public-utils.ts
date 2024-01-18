@@ -30,7 +30,12 @@ import {
 import { getVersions, Version } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
-import { listClients, listOperationGroups, listOperationsInOperationGroup } from "./decorators.js";
+import {
+  getClientNameOverride,
+  listClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
+} from "./decorators.js";
 import { SdkContext } from "./interfaces.js";
 import { parseEmitterName } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -150,12 +155,7 @@ export function getEmitterTargetName(context: SdkContext): string {
 }
 
 /**
- * Get the library and wire name of a model property. Takes projections into account
- *
- * Gets library name from getLibraryName. Returns wire name in the following order of priority:
- * 1. projected wire name i.e. @projectedName("json", "jsonSpecificName") => jsonSpecificName
- * 2. name in typespec
- *
+ * Get the library and wire name of a model property. Takes @clientName and @encodedName into account
  * @param context
  * @param property
  * @returns a tuple of the library and wire name for a model property
@@ -168,10 +168,11 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  * Get the library name of a property / parameter / operation / model / enum. Takes projections into account
  *
  * Returns name in the following order of priority
- * 1. language emitter name, i.e. @projectedName("csharp", "csharpSpecificName") => "csharpSpecificName"
- * 2. client name, i.e. @projectedName("client", "clientName") => "clientName"
- * 3. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
- * 4. name in typespec
+ * 1. language emitter name, i.e. @clientName("csharpSpecificName", "csharp") => "csharpSpecificName"
+ * 2. client name, i.e. @clientName(""clientName") => "clientName"
+ * 3. deprecated projected name
+ * 4. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
+ * 5. name in typespec
  *
  * @param context
  * @param type
@@ -181,15 +182,19 @@ export function getLibraryName(
   context: SdkContext,
   type: Model | ModelProperty | Operation | Enum | EnumMember
 ): string {
-  // 1. check if there's a specific name for our language
-  const emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
+  // 1. check if there's a client name
+  let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;
 
-  // 2. check if there's a client name
+  // 2. check if there's a specific name for our language with deprecated @projectedName
+  emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
+  if (emitterSpecificName) return emitterSpecificName;
+
+  // 3. check if there's a client name with deprecated @projectedName
   const clientSpecificName = getProjectedName(context.program, type, "client");
   if (clientSpecificName) return clientSpecificName;
 
-  // 3. check if there's a friendly name, if so return friendly name, otherwise return undefined
+  // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
   return getFriendlyName(context.program, type) ?? type.name;
 }
 
