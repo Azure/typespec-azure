@@ -26,6 +26,7 @@ import {
 import { isHeader } from "@typespec/http";
 import {
   AccessFlags,
+  LanguageScopes,
   SdkClient,
   SdkContext,
   SdkEmitterOptions,
@@ -60,7 +61,7 @@ function setScopedDecoratorData(
   key: symbol,
   target: Type,
   value: unknown,
-  scope?: string,
+  scope?: LanguageScopes,
   transitivity: boolean = false
 ): boolean {
   const targetEntry = context.program.stateMap(key).get(target);
@@ -99,7 +100,7 @@ export function $client(
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Model,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -228,7 +229,7 @@ const operationGroupKey = createStateSymbol("operationGroup");
 export function $operationGroup(
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -491,7 +492,7 @@ export function $protocolAPI(
   context: DecoratorContext,
   entity: Operation,
   value: boolean,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
 }
@@ -502,7 +503,7 @@ export function $convenientAPI(
   context: DecoratorContext,
   entity: Operation,
   value: boolean,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 }
@@ -522,7 +523,7 @@ const excludeKey = createStateSymbol("exclude");
 /**
  * @deprecated Use `usage` and `access` decorator instead.
  */
-export function $exclude(context: DecoratorContext, entity: Model, scope?: string) {
+export function $exclude(context: DecoratorContext, entity: Model, scope?: LanguageScopes) {
   setScopedDecoratorData(context, $exclude, excludeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -531,7 +532,7 @@ const includeKey = createStateSymbol("include");
 /**
  * @deprecated Use `usage` and `access` decorator instead.
  */
-export function $include(context: DecoratorContext, entity: Model, scope?: string) {
+export function $include(context: DecoratorContext, entity: Model, scope?: LanguageScopes) {
   modelTransitiveSet(context, $include, includeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -555,7 +556,7 @@ function modelTransitiveSet(
   key: symbol,
   entity: Model,
   value: unknown,
-  scope?: string,
+  scope?: LanguageScopes,
   transitivity: boolean = false
 ) {
   if (!setScopedDecoratorData(context, decorator, key, entity, value, scope, transitivity)) {
@@ -590,7 +591,7 @@ export function $clientFormat(
   context: DecoratorContext,
   target: ModelProperty,
   format: ClientFormat,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   const expectedTargetTypes = allowedClientFormatToTargetTypeMap[format];
   if (
@@ -644,7 +645,7 @@ const internalKey = createStateSymbol("internal");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated Use `access` decorator instead.
  */
-export function $internal(context: DecoratorContext, target: Operation, scope?: string) {
+export function $internal(context: DecoratorContext, target: Operation, scope?: LanguageScopes) {
   setScopedDecoratorData(context, $internal, internalKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -685,7 +686,7 @@ export function $usage(
   context: DecoratorContext,
   entity: Model | Enum,
   value: EnumMember | Union,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   const isValidValue = (value: number): boolean => value === 2 || value === 4;
 
@@ -741,7 +742,7 @@ export function $access(
   context: DecoratorContext,
   entity: Model | Enum | Operation,
   value: EnumMember,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
@@ -787,7 +788,7 @@ const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated This decorator is not recommended to use.
  */
-export function $flattenProperty(context: DecoratorContext, target: ModelProperty, scope?: string) {
+export function $flattenProperty(context: DecoratorContext, target: ModelProperty, scope?: LanguageScopes) {
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -808,7 +809,7 @@ export function $clientName(
   context: DecoratorContext,
   entity: Type,
   value: string,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
