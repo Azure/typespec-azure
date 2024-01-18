@@ -155,12 +155,7 @@ export function getEmitterTargetName(context: SdkContext): string {
 }
 
 /**
- * Get the library and wire name of a model property. Takes projections into account
- *
- * Gets library name from getLibraryName. Returns wire name in the following order of priority:
- * 1. projected wire name i.e. @projectedName("json", "jsonSpecificName") => jsonSpecificName
- * 2. name in typespec
- *
+ * Get the library and wire name of a model property. Takes @clientName and @encodedName into account
  * @param context
  * @param property
  * @returns a tuple of the library and wire name for a model property
@@ -173,10 +168,11 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  * Get the library name of a property / parameter / operation / model / enum. Takes projections into account
  *
  * Returns name in the following order of priority
- * 1. language emitter name, i.e. @projectedName("csharp", "csharpSpecificName") => "csharpSpecificName"
- * 2. client name, i.e. @projectedName("client", "clientName") => "clientName"
- * 3. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
- * 4. name in typespec
+ * 1. language emitter name, i.e. @clientName("csharpSpecificName", "csharp") => "csharpSpecificName"
+ * 2. client name, i.e. @clientName(""clientName") => "clientName"
+ * 3. deprecated projected name
+ * 4. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
+ * 5. name in typespec
  *
  * @param context
  * @param type
