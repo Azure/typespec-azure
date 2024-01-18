@@ -319,7 +319,6 @@ export interface SdkServiceResponseHeader {
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
-  responsePath?: string; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
 }
 
 export interface SdkServiceResponse {
@@ -357,53 +356,6 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-/**
- * Flattened model body
- * def foo(bar: string, baz: string) -> string which sends body {"bar": string, "baz": string}
- *
- * Method
- * params: ["bar", "baz"]
- * getParameterMapping(body) === [bar, baz]
- * response: string
- * getResponseMapping(ServiceMethodResponse<string>) ===
- * // No response mapping if the same
- *
- * Service Operation
- * bodyParams: ["body"]
- * response: string
- *
- * Grouped model body
- * def foo(options: {"path": string, "query": string})
- *
- * Method
- * params: ["options"]
- * getParameterMapping(path) === [options.path]
- * getParameterMapping(query) === [options.query]
- *
- * Service Operation
- * params: ["path", "query"]
- *
- * Paging
- * def foo() -> ItemPaged[Item]
- *
- * Method
- * response: ItemPaged[Item]
- * getResponseMapping(response) === [response.nextLink]
- * responseMapping: {"$": "result.values"}
- *
- * Service Operation
- * response: {"nextValue": string, "values": Item[]}
- *
- * Grouping of header and body
- * def foo() -> {"header": string, "body": string}
- * response: {"header": string, "body": string}
- * responseMapping: {"result.header": "header", "result.body": "body"}
- *
- * Service Operation
- * response: {"body": string}
- * responseHeaders: ["header"]
- */
-
 interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   __raw?: Operation;
   name: string;
@@ -416,44 +368,12 @@ interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   overloading?: SdkMethod<TServiceOperation>;
 }
 
-/**
- * ResponseMapping
- *
- * Normal operation
- *
- * def foo() -> string
- * ServiceResponse: {type: string, headers: [{"x-ms-client-request-id": string}]}
- * MethodResponse: {type: string}
- * getResponseMapping: {resultPath: "", resultType: string}
- * return serviceResponse.body
- *
- * Paging operation
- * def list_foo() -> ItemPaged[Item]
- * ServiceResponse: {type: {"nextLink": string, "values": Item[]}]}
- * MethodResponse: Item[]
- * getResponseMapping: {resultPath: ".values", resultType: Item[]}
- * return serviceResponse.body.values
- *
- * LRO operation
- * def create_foo() -> Foo
- * ServiceResponse: {type: OperationStatus<Foo>, headers: [{"location": string}]}
- * MethodResponse:
- * getResponseMapping: {"$": ".result"}
- * return serviceResponse.body.result
- *
- * Return object of headers and body
- * def headers_and_body() -> HeaderAndBodyModel
- * ServiceResponse: {type: string, headers: [{"x-ms-client-request-id": string}]}
- * MethodResponse: {type: HeaderAndBodyModel}
- * return HeaderAndBodyModel(body=serviceResponse.body, client_request_id=serviceResponse.headers["x-ms-client-request-id"])
- * getResponseMapping: {"$.body": ".body", "$.client_request_id": ".headers["x-ms-client-request-id"]}
- */
-
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase<TServiceOperation> {
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
+  getResponseMapping(): string | undefined; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
 }

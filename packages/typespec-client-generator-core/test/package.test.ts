@@ -1330,7 +1330,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(errorResponse.type!, sdkPackage.models[0]);
 
       strictEqual(method.response.type, undefined);
-      strictEqual(method.response.responsePath, undefined);
+      strictEqual(method.getResponseMapping(), undefined);
     });
     it("basic returning model", async () => {
       await runner.compileWithBuiltInService(
@@ -1378,7 +1378,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.response.kind, "method");
       const methodResponseType = method.response.type!;
       strictEqual(methodResponseType, createResponse.type);
-      strictEqual(method.response.responsePath, undefined);
+      strictEqual(method.getResponseMapping(), undefined);
     });
 
     it("Headers and body", async () => {
@@ -1413,7 +1413,7 @@ describe("typespec-client-generator-core: package", () => {
         createResponse.type,
         sdkPackage.models.find((x) => x.name === "Widget")
       );
-      strictEqual(method.response.responsePath, undefined);
+      strictEqual(method.getResponseMapping(), undefined);
 
       strictEqual(method.response.kind, "method");
       const methodResponseType = method.response.type!;
@@ -1443,7 +1443,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(voidResponse.headers.length, 0);
 
       strictEqual(method.response.type, undefined);
-      strictEqual(method.response.responsePath, undefined);
+      strictEqual(method.getResponseMapping(), undefined);
     });
   });
   describe("Vanilla Widget Service", () => {
@@ -2154,7 +2154,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodResponse = createOrUpdate.response;
       strictEqual(methodResponse.kind, "method");
       strictEqual(methodResponse.type, widgetModel);
-      strictEqual(methodResponse.responsePath, "result");
+      strictEqual(createOrUpdate.getResponseMapping(), "result");
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({

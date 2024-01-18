@@ -275,9 +275,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 ): SdkPagingServiceMethod<TServiceOperation> {
   const pagedMetadata = getPagedResult(context.program, operation)!;
   const basic = getSdkBasicServiceMethod<TServiceOperation>(context, operation);
-  basic.response.responsePath = pagedMetadata.itemsSegments
-    ? pagedMetadata.itemsSegments.join(".")
-    : "";
   if (pagedMetadata.itemsProperty) {
     basic.response.type = getClientType(context, pagedMetadata.itemsProperty.type);
   }
@@ -293,6 +290,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           basic.parameters
         )
       : undefined,
+    getResponseMapping(): string | undefined {
+      return pagedMetadata?.itemsSegments?.join(".");
+    },
   };
 }
 
@@ -302,12 +302,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
 ): SdkLroServiceMethod<TServiceOperation> {
   const metadata = getLroMetadata(context.program, operation)!;
   const basicServiceMethod = getSdkBasicServiceMethod<TServiceOperation>(context, operation);
-  basicServiceMethod.response.responsePath =
-    metadata.logicalPath ??
-    (metadata.envelopeResult !== metadata.logicalResult &&
-    basicServiceMethod.operation.verb === "post"
-      ? "result"
-      : undefined);
+
   basicServiceMethod.response.type = getClientType(context, metadata.logicalResult);
   return {
     ...basicServiceMethod,
@@ -318,6 +313,14 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
       metadata.operation,
       basicServiceMethod.parameters
     ),
+    getResponseMapping(): string | undefined {
+      return (
+        metadata.logicalPath ??
+        (metadata.envelopeResult !== metadata.logicalResult && this.operation.verb === "post"
+          ? "result"
+          : undefined)
+      );
+    },
   };
 }
 
@@ -508,6 +511,9 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
       return getParameterMappingHelper<TServiceOperation>(context, this, serviceParam);
+    },
+    getResponseMapping: function getResponseMapping(): string | undefined {
+      return undefined; // currently we only return a value for paging or lro
     },
   };
 }
