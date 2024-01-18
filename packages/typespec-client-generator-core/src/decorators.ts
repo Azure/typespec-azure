@@ -788,7 +788,11 @@ const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated This decorator is not recommended to use.
  */
-export function $flattenProperty(context: DecoratorContext, target: ModelProperty, scope?: LanguageScopes) {
+export function $flattenProperty(
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes
+) {
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
