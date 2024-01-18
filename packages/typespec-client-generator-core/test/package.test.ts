@@ -984,6 +984,67 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(correspondingContentTypeMethodParams[0], methodContentTypeParam);
     });
 
+    it("body optional", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+
+        model Input {
+          key: string;
+        }
+
+        op myOp(@body body?: Input): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.models[0].name, "Input");
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 2);
+
+      const methodBodyParam = method.parameters.find((x) => x.nameInClient === "body")!;
+      strictEqual(methodBodyParam.kind, "method");
+      strictEqual(methodBodyParam.optional, true);
+      strictEqual(methodBodyParam.onClient, false);
+      strictEqual(methodBodyParam.isApiVersionParam, false);
+      strictEqual(methodBodyParam.type, sdkPackage.models[0]);
+
+      const methodContentTypeParam = method.parameters.find(
+        (x) => x.nameInClient === "contentType"
+      )!;
+      strictEqual(methodContentTypeParam.clientDefaultValue, undefined);
+      strictEqual(methodContentTypeParam.type.kind, "constant");
+      strictEqual(methodContentTypeParam.onClient, false);
+      strictEqual(methodContentTypeParam.optional, false);
+
+      const serviceOperation = method.operation;
+      strictEqual(serviceOperation.bodyParams.length, 1);
+      const bodyParameter = serviceOperation.bodyParams[0];
+      strictEqual(bodyParameter.kind, "body");
+      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
+      strictEqual(bodyParameter.defaultContentType, "application/json");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, true);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+
+      const correspondingMethodParams = method.getParameterMapping(bodyParameter);
+      strictEqual(correspondingMethodParams.length, 1);
+      strictEqual(bodyParameter.nameInClient, correspondingMethodParams[0].nameInClient);
+
+      strictEqual(serviceOperation.parameters.length, 1);
+      const contentTypeParam = serviceOperation.parameters[0];
+      strictEqual(contentTypeParam.nameInClient, "contentType");
+      strictEqual(contentTypeParam.serializedName, "Content-Type");
+      strictEqual(contentTypeParam.clientDefaultValue, undefined);
+      strictEqual(contentTypeParam.onClient, false);
+      strictEqual(contentTypeParam.optional, false);
+
+      const correspondingContentTypeMethodParams = method.getParameterMapping(contentTypeParam);
+      strictEqual(correspondingContentTypeMethodParams.length, 1);
+      strictEqual(correspondingContentTypeMethodParams[0], methodContentTypeParam);
+    });
+
     it("body spread", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
         @service({})

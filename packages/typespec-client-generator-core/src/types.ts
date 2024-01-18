@@ -916,7 +916,7 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
       contentTypes: ["application/json"], // will update when we get to the operation level
       defaultContentType: "application/json", // will update when we get to the operation level
       ...updateWithApiVersionInformation(context, type),
-      optional: false,
+      optional: type.optional,
     };
   } else {
     // I'm a body model property
