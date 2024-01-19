@@ -1343,6 +1343,26 @@ describe("typespec-client-generator-core: public-utils", () => {
           "RequestParameterWithAnonymousUnionRepeatabilityResult"
         );
       });
+
+      it("anonymous union with base type", async () => {
+        const { repeatabilityResult } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          model RequestParameterWithAnonymousUnion {
+            @header("Repeatability-Result")
+            @test
+            repeatabilityResult?: "accepted" | "rejected" | string;
+
+            test: string;
+          }
+  
+          op test(@header repeatabilityResult: "accepted" | "rejected"): void;
+        }
+        `)) as { repeatabilityResult: ModelProperty };
+
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union);
+        strictEqual(stringType?.kind, "string");
+      });
     });
   });
 });
