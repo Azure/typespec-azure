@@ -26,6 +26,7 @@ import {
 import { isHeader } from "@typespec/http";
 import {
   AccessFlags,
+  LanguageScopes,
   SdkClient,
   SdkContext,
   SdkEmitterOptions,
@@ -39,17 +40,17 @@ import { getSdkPackage } from "./package.js";
 import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 function getScopedDecoratorData<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: SdkContext<TServiceOperation>,
   key: symbol,
   target: Type
 ): any {
-  const retval = context.program.stateMap(key).get(target);
+  const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
-  if (!retval.scopes) return retval.value; // this means it applies to all languages
-  if (retval.scopes.includes(context.emitterName)) return retval.value;
-  return undefined;
+  if (Object.keys(retval).includes(context.emitterName)) return retval[context.emitterName];
+  return retval[AllScopes]; // in this case it applies to all languages
 }
 
 function listScopedDecoratorData<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
@@ -57,10 +58,11 @@ function listScopedDecoratorData<TServiceOperation extends SdkServiceOperation =
   key: symbol
 ): any[] {
   const retval = [...context.program.stateMap(key).values()];
-  return retval.filter((value) => {
-    if (!value.scopes) return true;
-    return value.scopes.includes(context.emitterName);
-  });
+  return retval
+    .filter((targetEntry) => {
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
+    })
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
 function setScopedDecoratorData(
@@ -69,27 +71,29 @@ function setScopedDecoratorData(
   key: symbol,
   target: Type,
   value: unknown,
-  scope?: string,
+  scope?: LanguageScopes,
   transitivity: boolean = false
 ): boolean {
-  const existing = context.program.stateMap(key).get(target);
-  if (!existing) {
-    context.program.stateMap(key).set(target, { value, scopes: scope ? [scope] : undefined });
+  const targetEntry = context.program.stateMap(key).get(target);
+  // If target doesn't exist in decorator map, create a new entry
+  if (!targetEntry) {
+    // value is going to be a list of tuples, each tuple is a value and a list of scopes
+    context.program.stateMap(key).set(target, { [scope ?? AllScopes]: value });
     return true;
   }
-  if (existing.scopes && scope && !existing.scopes.includes(scope)) {
-    // we only want to allow multiple decorators if they each specify a different scope
-    existing.scopes.push(scope);
+
+  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
+  const scopes = Reflect.ownKeys(targetEntry);
+  if (!scopes.includes(AllScopes) && scope && !scopes.includes(scope)) {
+    targetEntry[scope] = value;
     return true;
   }
   if (!transitivity) {
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
-  // for transitivity situation, we could allow scope extension
-  if (existing.scopes && !scope) {
-    existing.scopes = undefined;
-    return true;
+  if (!Reflect.ownKeys(targetEntry).includes(AllScopes) && !scope) {
+    context.program.stateMap(key).set(target, { AllScopes: value });
   }
   return false;
 }
@@ -106,7 +110,7 @@ export function $client(
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Model,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -209,9 +213,7 @@ function hasExplicitClientOrOperationGroup<
 export function listClients<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: SdkContext<TServiceOperation>
 ): SdkClient[] {
-  const explicitClients = [...listScopedDecoratorData(context, clientKey)].map(
-    (value) => value.value
-  );
+  const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     return explicitClients;
   }
@@ -220,8 +222,13 @@ export function listClients<TServiceOperation extends SdkServiceOperation = SdkH
   const services = listServices(context.program);
 
   return services.map((service) => {
-    const originalName =
-      getProjectedName(context.program, service.type, "client") ?? service.type.name;
+    let originalName = service.type.name;
+    const clientNameOverride = getClientNameOverride(context, service.type);
+    if (clientNameOverride) {
+      originalName = clientNameOverride;
+    } else {
+      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+    }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service.type);
     return {
@@ -239,7 +246,7 @@ const operationGroupKey = createStateSymbol("operationGroup");
 export function $operationGroup(
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -514,7 +521,7 @@ export function $protocolAPI(
   context: DecoratorContext,
   entity: Operation,
   value: boolean,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
 }
@@ -525,7 +532,7 @@ export function $convenientAPI(
   context: DecoratorContext,
   entity: Operation,
   value: boolean,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 }
@@ -549,7 +556,7 @@ const excludeKey = createStateSymbol("exclude");
 /**
  * @deprecated Use `usage` and `access` decorator instead.
  */
-export function $exclude(context: DecoratorContext, entity: Model, scope?: string) {
+export function $exclude(context: DecoratorContext, entity: Model, scope?: LanguageScopes) {
   setScopedDecoratorData(context, $exclude, excludeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -558,7 +565,7 @@ const includeKey = createStateSymbol("include");
 /**
  * @deprecated Use `usage` and `access` decorator instead.
  */
-export function $include(context: DecoratorContext, entity: Model, scope?: string) {
+export function $include(context: DecoratorContext, entity: Model, scope?: LanguageScopes) {
   modelTransitiveSet(context, $include, includeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -588,7 +595,7 @@ function modelTransitiveSet(
   key: symbol,
   entity: Model,
   value: unknown,
-  scope?: string,
+  scope?: LanguageScopes,
   transitivity: boolean = false
 ) {
   if (!setScopedDecoratorData(context, decorator, key, entity, value, scope, transitivity)) {
@@ -623,7 +630,7 @@ export function $clientFormat(
   context: DecoratorContext,
   target: ModelProperty,
   format: ClientFormat,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   const expectedTargetTypes = allowedClientFormatToTargetTypeMap[format];
   if (
@@ -677,7 +684,7 @@ const internalKey = createStateSymbol("internal");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated Use `access` decorator instead.
  */
-export function $internal(context: DecoratorContext, target: Operation, scope?: string) {
+export function $internal(context: DecoratorContext, target: Operation, scope?: LanguageScopes) {
   setScopedDecoratorData(context, $internal, internalKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -721,7 +728,7 @@ export function $usage(
   context: DecoratorContext,
   entity: Model | Enum,
   value: EnumMember | Union,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   const isValidValue = (value: number): boolean => value === 2 || value === 4;
 
@@ -780,7 +787,7 @@ export function $access(
   context: DecoratorContext,
   entity: Model | Enum | Operation,
   value: EnumMember,
-  scope?: string
+  scope?: LanguageScopes
 ) {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
@@ -826,7 +833,11 @@ const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated This decorator is not recommended to use.
  */
-export function $flattenProperty(context: DecoratorContext, target: ModelProperty, scope?: string) {
+export function $flattenProperty(
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes
+) {
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 }
 
@@ -839,4 +850,19 @@ export function $flattenProperty(context: DecoratorContext, target: ModelPropert
  */
 export function shouldFlattenProperty(context: SdkContext, target: ModelProperty): boolean {
   return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
+}
+
+const clientNameKey = createStateSymbol("clientName");
+
+export function $clientName(
+  context: DecoratorContext,
+  entity: Type,
+  value: string,
+  scope?: LanguageScopes
+) {
+  setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
+}
+
+export function getClientNameOverride(context: SdkContext, entity: Type): string | undefined {
+  return getScopedDecoratorData(context, clientNameKey, entity);
 }

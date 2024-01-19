@@ -442,3 +442,5 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
+
+export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
