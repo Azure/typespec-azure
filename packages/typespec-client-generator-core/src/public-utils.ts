@@ -157,14 +157,6 @@ export function getLibraryName(
     // eslint-disable-next-line deprecation/deprecation
     context.emitterName = getEmitterTargetName(context);
   }
-  /*const emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
-  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
-
-  const clientSpecificName = getProjectedName(context.program, type, "client");
-  if (clientSpecificName && clientSpecificName !== type.name) return clientSpecificName;
-
-  // 3. check if there's a friendly name, if so return friendly name, otherwise return typespec name
-  return getFriendlyName(context.program, type) ?? type.name;*/
 
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
