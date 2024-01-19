@@ -356,3 +356,5 @@ interface SdkFloat32Validation extends SdkNumericValidationBase {
 interface SdkFloat64Validation extends SdkNumericValidationBase {
   kind: "float64";
 }
+
+export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
