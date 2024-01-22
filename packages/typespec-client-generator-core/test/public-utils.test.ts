@@ -1143,11 +1143,15 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(statusProp.kind, "property");
         strictEqual(statusProp.type.kind, "union");
         strictEqual(statusProp.type.values.length, 2);
-        const startVal = statusProp.type.values.find((x) => x.kind === "constant" && x.value === "start")!;
+        const startVal = statusProp.type.values.find(
+          (x) => x.kind === "constant" && x.value === "start"
+        )!;
         strictEqual(startVal.kind, "constant");
         strictEqual(startVal.valueType.kind, "string");
 
-        const stopVal = statusProp.type.values.find((x) => x.kind === "constant" && x.value === "stop")!;
+        const stopVal = statusProp.type.values.find(
+          (x) => x.kind === "constant" && x.value === "stop"
+        )!;
         strictEqual(stopVal.kind, "constant");
         strictEqual(stopVal.valueType.kind, "string");
       });
@@ -1356,12 +1360,18 @@ describe("typespec-client-generator-core: public-utils", () => {
             test: string;
           }
   
-          op test(@header repeatabilityResult: "accepted" | "rejected"): void;
+          op test(...RequestParameterWithAnonymousUnion): void;
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union);
-        strictEqual(stringType?.kind, "string");
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
+        strictEqual(stringType.kind, "union");
+        strictEqual(stringType.values.length, 3);
+        strictEqual(stringType.values[0].kind, "constant");
+        strictEqual(stringType.values[0].value, "accepted");
+        strictEqual(stringType.values[1].kind, "constant");
+        strictEqual(stringType.values[1].value, "rejected");
+        strictEqual(stringType.values[2].kind, "string");
       });
     });
   });

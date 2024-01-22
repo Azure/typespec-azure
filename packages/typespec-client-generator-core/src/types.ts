@@ -373,18 +373,18 @@ export function getSdkUnion(
     clientType.nullable = true;
     return clientType;
   }
-  const values = nonNullOptions.map((x) => getClientType(context, x, operation));
-  const baseScalarDef = nonNullOptions.find(x => x.kind === "Scalar");
-  const sdkBaseScalar = baseScalarDef ? getClientType(context, baseScalarDef, operation) : undefined;
-  if (sdkBaseScalar && values.every(x => (x.kind === "constant" && x.valueType.kind === sdkBaseScalar.kind) || x.kind === sdkBaseScalar.kind)) {
-    // This means everything is either a constant or a scalar of the same kind, in this case we just return the scalar kind
-    return sdkBaseScalar;
-  }
+  // const values = ;
+  // const baseScalarDef = nonNullOptions.find(x => x.kind === "Scalar");
+  // const sdkBaseScalar = baseScalarDef ? getClientType(context, baseScalarDef, operation) : undefined;
+  // if (sdkBaseScalar && values.every(x => (x.kind === "constant" && x.valueType.kind === sdkBaseScalar.kind) || x.kind === sdkBaseScalar.kind)) {
+  //   // This means everything is either a constant or a scalar of the same kind, in this case we just return the scalar kind
+  //   return sdkBaseScalar;
+  // }
   return {
     ...getSdkTypeBaseHelper(context, type, "union"),
     name: type.name,
     generatedName: type.name ? undefined : getGeneratedName(context, type),
-    values,
+    values: nonNullOptions.map((x) => getClientType(context, x, operation)),
     nullable: nonNullOptions.length < type.variants.size,
   };
 }
