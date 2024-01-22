@@ -25,7 +25,7 @@
     "@mdx-js/react": "^3.0.0",
     "@typespec/playground": "workspace:~0.1.0-alpha.4",
     "@typespec/website": "workspace:~1.0.0",
-    "clsx": "~2.0.0",
+    "clsx": "^2.0.0",
     "es-module-shims": "~1.8.0",
     "prism-react-renderer": "^2.1.0",
     "prismjs": "~1.29.0",
