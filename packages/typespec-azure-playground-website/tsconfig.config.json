@@ -1,4 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../core/tsconfig.base.json",
   "compilerOptions": {}
 }
