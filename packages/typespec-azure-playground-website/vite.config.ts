@@ -8,7 +8,6 @@ export default defineConfig(({ mode }) => {
   return definePlaygroundViteConfig({
     ...TypeSpecPlaygroundConfig,
     links: {
-      githubIssueUrl: `https://github.com/Azure/typespec-azure/issues/new`,
       documentationUrl: "https://azure.github.io/typespec-azure",
     },
     skipBundleLibraries: !useLocalLibraries,
