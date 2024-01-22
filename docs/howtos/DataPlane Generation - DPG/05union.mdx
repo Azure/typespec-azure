@@ -128,8 +128,7 @@ FIXME
 
 ### Merge `@sharedRoute` operations into one.
 
-If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by projecting
-the same name on both operations.
+If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by renaming both operations to the same name using `@clientName`
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -148,8 +147,8 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@projectedName(a, "client", "Foo");
-@@projectedName(b, "client", "Foo");
+@@clientName(a, "Foo");
+@@clientName(b, "Foo");
 ```
 
 </TabItem>

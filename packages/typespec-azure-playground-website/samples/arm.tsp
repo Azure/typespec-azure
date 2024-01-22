@@ -10,19 +10,25 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
+/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service({
   title: "ContosoProviderHubClient",
-  version: "2021-10-01-preview",
 })
-@doc("Contoso Resource Provider management API.")
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-@doc("A ContosoProviderHub resource")
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2021-10-01-preview`,
+}
+
+/** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
-  @doc("Name of employee")
+  /** Name of employee */
   @pattern("^[a-zA-Z0-9-]{3,24}$")
   @key("employeeName")
   @path
@@ -30,39 +36,54 @@ model Employee is TrackedResource<EmployeeProperties> {
   name: string;
 }
 
-@doc("Employee properties")
+/** Employee properties */
 model EmployeeProperties {
-  @doc("Age of employee")
+  /** Age of employee */
   age?: int32;
 
-  @doc("City of employee")
+  /** City of employee */
   city?: string;
 
-  @doc("Profile of employee")
+  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
+  /** The status of the last operation. */
   @visibility("read")
-  @doc("The status of the last operation.")
   provisioningState?: ProvisioningState;
 }
 
-@doc("The provisioning state of a resource.")
+/** The provisioning state of a resource. */
 @lroStatus
 enum ProvisioningState {
   ...ResourceProvisioningState,
 
-  @doc("The resource is being provisioned")
+  /** The resource is being provisioned */
   Provisioning,
 
-  @doc("The resource is updating")
+  /** The resource is updating */
   Updating,
 
-  @doc("The resource is being deleted")
+  /** The resource is being deleted */
   Deleting,
 
-  @doc("The resource create request has been accepted")
+  /** The resource create request has been accepted */
   Accepted,
+}
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -70,9 +91,12 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrUpdateAsync<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
   update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-  delete is ArmResourceDeleteSync<Employee>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
+
+  /** A sample resource action that move employee to different location */
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 }
