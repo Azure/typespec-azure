@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-autorest",
+      "comment": "Fix: Inline enums properties with default values as `default` is not allowed next to `$ref`",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-autorest"
+}
