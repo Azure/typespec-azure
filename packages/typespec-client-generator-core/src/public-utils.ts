@@ -1,6 +1,4 @@
 import {
-  Enum,
-  EnumMember,
   getDeprecationDetails,
   getDoc,
   getEffectiveModelType,
@@ -16,7 +14,6 @@ import {
   Namespace,
   Operation,
   resolveEncodedName,
-  Scalar,
   Type,
   Union,
 } from "@typespec/compiler";
@@ -179,10 +176,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(
-  context: SdkContext,
-  type: Type & { name?: string }
-): string {
+export function getLibraryName(context: SdkContext, type: Type & { name?: string }): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;
@@ -249,7 +243,7 @@ export function getSdkTypeBaseHelper<TKind>(
   nullable: boolean;
   deprecation?: string;
   kind: TKind;
-}{
+} {
   if (typeof type === "string") {
     return {
       nullable: false,
@@ -269,7 +263,12 @@ export function getSdkTypeBaseHelper<TKind>(
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: {name: string, kind: string, interface?: Interface, namespace?: Namespace}): string {
+export function getCrossLanguageDefinitionId(type: {
+  name: string;
+  kind: string;
+  interface?: Interface;
+  namespace?: Namespace;
+}): string {
   let retval = type.name;
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;

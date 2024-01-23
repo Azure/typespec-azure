@@ -1389,7 +1389,10 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(petKind.isFixed, false);
       strictEqual(petKind.valueType.kind, "string");
       const values = petKind.values;
-      deepStrictEqual(values.map((x) => x.name), ["Cat", "Dog"]);
+      deepStrictEqual(
+        values.map((x) => x.name),
+        ["Cat", "Dog"]
+      );
 
       const catValue = values.find((x) => x.name === "Cat")!;
       strictEqual(catValue.value, "cat");
@@ -1403,7 +1406,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(dogValue.valueType, petKind.valueType);
       strictEqual(dogValue.kind, "enumvalue");
     });
-
 
     it("enum discriminator model without base discriminator property", async () => {
       await runner.compileWithBuiltInService(`

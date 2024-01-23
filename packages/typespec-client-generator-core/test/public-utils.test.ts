@@ -1257,7 +1257,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           @usage(Usage.input | Usage.output)
           @access(Access.public)
           model A {
-            status: string | number;
+            status: "start" | "stop";
           }
         `
         );

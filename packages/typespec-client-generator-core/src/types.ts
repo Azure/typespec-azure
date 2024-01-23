@@ -1,4 +1,9 @@
-import { UnionEnum, getLroMetadata, getUnionAsEnum, isFixed } from "@azure-tools/typespec-azure-core";
+import {
+  UnionEnum,
+  getLroMetadata,
+  getUnionAsEnum,
+  isFixed,
+} from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   BytesKnownEncoding,
@@ -531,7 +536,11 @@ export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operatio
   return sdkType;
 }
 
-function getSdkUnionEnumValues(context: SdkContext, type: UnionEnum, enumType: SdkEnumType): SdkEnumValueType[] {
+function getSdkUnionEnumValues(
+  context: SdkContext,
+  type: UnionEnum,
+  enumType: SdkEnumType
+): SdkEnumValueType[] {
   const values: SdkEnumValueType[] = [];
   for (const [name, member] of type.flattenedMembers.entries()) {
     const docWrapper = getDocHelper(context, member.variant);
@@ -543,7 +552,7 @@ function getSdkUnionEnumValues(context: SdkContext, type: UnionEnum, enumType: S
       value: member.value,
       valueType: enumType.valueType,
       enumType,
-      nullable: false
+      nullable: false,
     });
   }
   return values;
@@ -552,23 +561,23 @@ function getSdkUnionEnumValues(context: SdkContext, type: UnionEnum, enumType: S
 function getSdkUnionEnum(context: SdkContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
-    if (!type.union.name) throw new Error("Your union must be named in order to generate an enum")
-    const union = type.union as Union & {name: string};
+    if (!type.union.name) throw new Error("Your union must be named in order to generate an enum");
+    const union = type.union as Union & { name: string };
     const docWrapper = getDocHelper(context, union);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name: getLibraryName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: {...getSdkTypeBaseHelper(context, type.kind, "string"), encode: "string"},
+      valueType: { ...getSdkTypeBaseHelper(context, type.kind, "string"), encode: "string" },
       values: [],
       nullable: false,
       isFixed: !type.open,
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union), 
-    }
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
+    };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
   updateModelsMap(context, type.union, sdkType, operation);
