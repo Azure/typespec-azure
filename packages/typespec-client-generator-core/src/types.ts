@@ -651,7 +651,7 @@ export function getClientType(context: SdkContext, type: Type, operation?: Opera
     case "Union":
       // start off with just handling nullable type
       const unionAsEnum = ignoreDiagnostics(getUnionAsEnum(type));
-      if (unionAsEnum) {
+      if (unionAsEnum && type.name) {
         return getSdkUnionEnum(context, unionAsEnum, operation);
       }
       const union = getSdkUnion(context, type, operation);
