@@ -2,6 +2,47 @@
   "name": "@azure-tools/typespec-client-generator-core",
   "entries": [
     {
+      "version": "0.38.0",
+      "tag": "@azure-tools/typespec-client-generator-core_v0.38.0",
+      "date": "Tue, 23 Jan 2024 23:47:52 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add type info for additional properties in model type."
+          },
+          {
+            "comment": "add decorator @clientName"
+          },
+          {
+            "comment": "Fix missing models when client hierarchy and naming issue for enum with projected name."
+          },
+          {
+            "comment": "Renamed template parameters for clarity and consistency."
+          },
+          {
+            "comment": "add support for encodedName"
+          },
+          {
+            "comment": "feat(decorator): add `@flattenProperty`"
+          },
+          {
+            "comment": "remove dynamic testing to support vitest plugin"
+          },
+          {
+            "comment": "add tests for unions of literals and types"
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.0",
       "tag": "@azure-tools/typespec-client-generator-core_v0.37.0",
       "date": "Wed, 06 Dec 2023 19:47:28 GMT",

@@ -2,6 +2,26 @@
   "name": "@azure-tools/typespec-autorest",
   "entries": [
     {
+      "version": "0.38.0",
+      "tag": "@azure-tools/typespec-autorest_v0.38.0",
+      "date": "Tue, 23 Jan 2024 23:47:52 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add support for `@encodedName` decorator"
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.2",
       "tag": "@azure-tools/typespec-autorest_v0.37.2",
       "date": "Thu, 14 Dec 2023 01:19:27 GMT",

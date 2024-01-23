@@ -1,6 +1,25 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-This log was last generated on Wed, 06 Dec 2023 19:47:28 GMT and should not be manually modified.
+This log was last generated on Tue, 23 Jan 2024 23:47:52 GMT and should not be manually modified.
+
+## 0.38.0
+Tue, 23 Jan 2024 23:47:52 GMT
+
+### Minor changes
+
+- Update dependencies.
+
+### Updates
+
+- Add type info for additional properties in model type.
+- add decorator @clientName
+- Fix missing models when client hierarchy and naming issue for enum with projected name.
+- Renamed template parameters for clarity and consistency.
+- add support for encodedName
+- feat(decorator): add `@flattenProperty`
+- remove dynamic testing to support vitest plugin
+- add tests for unions of literals and types
+- Update dependencies
 
 ## 0.37.0
 Wed, 06 Dec 2023 19:47:28 GMT

@@ -1,6 +1,19 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
-This log was last generated on Wed, 20 Dec 2023 05:29:22 GMT and should not be manually modified.
+This log was last generated on Tue, 23 Jan 2024 23:47:52 GMT and should not be manually modified.
+
+## 0.38.0
+Tue, 23 Jan 2024 23:47:52 GMT
+
+### Minor changes
+
+- Update dependencies.
+
+### Updates
+
+- Fix: Resolve selected arm common version when used on version enum members
+- Renamed template parameters for clarity and consistency.
+- Update dependencies
 
 ## 0.37.1
 Wed, 20 Dec 2023 05:29:22 GMT

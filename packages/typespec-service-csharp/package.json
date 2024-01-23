@@ -49,19 +49,19 @@
     "@typespec/rest": "workspace:~0.52.0",
     "@typespec/http": "workspace:~0.52.0",
     "@typespec/versioning": "workspace:~0.52.0",
-    "@azure-tools/typespec-autorest": "~0.37.2",
-    "@azure-tools/typespec-azure-core": "~0.37.2"
+    "@azure-tools/typespec-autorest": "~0.38.0",
+    "@azure-tools/typespec-azure-core": "~0.38.0"
   },
   "dependencies": {
     "change-case": "~5.3.0"
   },
   "devDependencies": {
     "@typespec/compiler": "workspace:~0.52.0",
-    "@azure-tools/typespec-autorest": "workspace:~0.37.2",
+    "@azure-tools/typespec-autorest": "workspace:~0.38.0",
     "@typespec/openapi": "workspace:~0.52.0",
     "@typespec/rest": "workspace:~0.52.0",
     "@typespec/http": "workspace:~0.52.0",
-    "@azure-tools/typespec-azure-core": "workspace:~0.37.2",
+    "@azure-tools/typespec-azure-core": "workspace:~0.38.0",
     "@types/node": "~18.11.9",
     "@typespec/eslint-config-typespec": "workspace:~0.52.0",
     "@typespec/library-linter": "workspace:~0.52.0",

@@ -2,6 +2,29 @@
   "name": "@azure-tools/typespec-azure-resource-manager",
   "entries": [
     {
+      "version": "0.38.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.38.0",
+      "date": "Tue, 23 Jan 2024 23:47:52 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Fix: Resolve selected arm common version when used on version enum members"
+          },
+          {
+            "comment": "Renamed template parameters for clarity and consistency."
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.1",
       "tag": "@azure-tools/typespec-azure-resource-manager_v0.37.1",
       "date": "Wed, 20 Dec 2023 05:29:22 GMT",

@@ -11,9 +11,9 @@ title: "[I] SdkDatetimeType"
 
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
-| `__raw`? | `Type` | - | SdkTypeBase.\_\_raw |
-| `deprecation`? | `string` | - | SdkTypeBase.deprecation |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
 | `encode` | `DateTimeKnownEncoding` | - | - |
-| `kind` | `"datetime"` | - | SdkTypeBase.kind |
-| `nullable` | `boolean` | - | SdkTypeBase.nullable |
+| `kind` | `"datetime"` | - | `SdkTypeBase.kind` |
+| `nullable` | `boolean` | - | `SdkTypeBase.nullable` |
 | `wireType` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |
