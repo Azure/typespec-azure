@@ -57,21 +57,21 @@
     "change-case": "~5.3.0"
   },
   "peerDependencies": {
-    "@typespec/compiler": "workspace:~0.51.0",
-    "@typespec/http": "workspace:~0.51.0",
-    "@typespec/rest": "workspace:~0.51.0",
-    "@typespec/versioning": "workspace:~0.51.0"
+    "@typespec/compiler": "workspace:~0.52.0",
+    "@typespec/http": "workspace:~0.52.0",
+    "@typespec/rest": "workspace:~0.52.0",
+    "@typespec/versioning": "workspace:~0.52.0"
   },
   "devDependencies": {
-    "@typespec/compiler": "workspace:~0.51.0",
-    "@typespec/http": "workspace:~0.51.0",
-    "@typespec/rest": "workspace:~0.51.0",
-    "@typespec/eslint-config-typespec": "workspace:~0.51.0",
-    "@typespec/library-linter": "workspace:~0.51.0",
-    "@typespec/eslint-plugin": "workspace:~0.51.0",
-    "@typespec/versioning": "workspace:~0.51.0",
+    "@typespec/compiler": "workspace:~0.52.0",
+    "@typespec/http": "workspace:~0.52.0",
+    "@typespec/rest": "workspace:~0.52.0",
+    "@typespec/eslint-config-typespec": "workspace:~0.52.0",
+    "@typespec/library-linter": "workspace:~0.52.0",
+    "@typespec/eslint-plugin": "workspace:~0.52.0",
+    "@typespec/versioning": "workspace:~0.52.0",
     "@azure-tools/typespec-azure-core": "workspace:~0.37.2",
-    "@typespec/prettier-plugin-typespec": "workspace:~0.51.0",
+    "@typespec/prettier-plugin-typespec": "workspace:~0.52.0",
     "@typespec/tspd": "workspace:~0.46.0",
     "@types/node": "~18.11.9",
     "eslint": "^8.55.0",
