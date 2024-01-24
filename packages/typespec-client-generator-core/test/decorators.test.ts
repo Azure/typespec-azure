@@ -926,7 +926,7 @@ describe("typespec-client-generator-core: decorators", () => {
         `
         namespace Customizations;
 
-        @@projectedName(A, "client", "Test1Client");
+        @@clientName(A, "Test1Client");
       `
       );
 

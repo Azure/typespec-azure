@@ -7,7 +7,6 @@ import {
   Namespace,
   Operation,
   Program,
-  ProjectedNameView,
   Type,
   UsageFlags,
 } from "@typespec/compiler";
@@ -37,9 +36,6 @@ export interface SdkContext<TOptions extends object = Record<string, any>> {
   generateConvenienceMethods: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
-  languageProjectedProgram?: ProjectedNameView;
-  clientProjectedProgram?: ProjectedNameView;
-  jsonProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Set<string>;
@@ -360,3 +356,5 @@ interface SdkFloat32Validation extends SdkNumericValidationBase {
 interface SdkFloat64Validation extends SdkNumericValidationBase {
   kind: "float64";
 }
+
+export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;

@@ -2,6 +2,7 @@
 **/dist-dev/
 **/test/output/
 **/bin/
+**/out/
 **/obj/
 **/.vs/
 **/common/temp/
@@ -65,3 +66,7 @@ eng/feeds/
 # Auto generated templates
 core/packages/compiler/templates/scaffolding.json
 core/packages/compiler/templates/__snapshots__/
+
+# Skip formatting tsp files
+
+*.noformat.tsp

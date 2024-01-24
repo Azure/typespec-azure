@@ -37,7 +37,7 @@ importers:
         version: 5.3.3
       vitest:
         specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        version: 1.1.0
 
   core:
     devDependencies:
@@ -70,7 +70,7 @@ importers:
         version: 5.3.3
       vitest:
         specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        version: 1.1.0
 
   core/packages/best-practices:
     devDependencies:
@@ -78,17 +78,20 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -102,8 +105,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/bundle-uploader:
     dependencies:
@@ -114,7 +117,7 @@ importers:
         specifier: ~12.17.0
         version: 12.17.0
       '@typespec/bundler':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../bundler
       json5:
         specifier: ^2.2.3
@@ -133,11 +136,14 @@ importers:
         specifier: ^7.5.6
         version: 7.5.6
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -151,8 +157,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/bundler:
     dependencies:
@@ -175,7 +181,7 @@ importers:
         specifier: ~3.0.1
         version: 3.0.2(rollup@4.9.1)
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       picocolors:
         specifier: ~1.0.0
@@ -194,11 +200,14 @@ importers:
         specifier: ~17.0.32
         version: 17.0.32
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -215,8 +224,8 @@ importers:
         specifier: ^5.0.8
         version: 5.0.10(@types/node@18.11.19)
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/compiler:
     dependencies:
@@ -282,14 +291,17 @@ importers:
         specifier: ~17.0.32
         version: 17.0.32
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -309,7 +321,7 @@ importers:
         specifier: ~0.5.21
         version: 0.5.21
       tmlanguage-generator:
-        specifier: workspace:~0.5.1
+        specifier: workspace:~0.5.2
         version: link:../tmlanguage-generator
       ts-node:
         specifier: ~10.9.1
@@ -318,8 +330,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
       vscode-oniguruma:
         specifier: ~2.0.1
         version: 2.0.1
@@ -376,11 +388,14 @@ importers:
         specifier: ~6.14.0
         version: 6.14.0(@eslint/eslintrc@3.0.0)(eslint@8.56.0)(typescript@5.3.3)
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -394,8 +409,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/html-program-viewer:
     dependencies:
@@ -428,14 +443,17 @@ importers:
         specifier: ~18.2.7
         version: 18.2.18
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -449,8 +467,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/http:
     devDependencies:
@@ -458,23 +476,26 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../library-linter
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -488,8 +509,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/internal-build-utils:
     dependencies:
@@ -516,11 +537,14 @@ importers:
         specifier: ~17.0.32
         version: 17.0.32
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -537,8 +561,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/json-schema:
     dependencies:
@@ -550,26 +574,29 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../library-linter
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       ajv:
         specifier: ~8.12.0
         version: 8.12.0
@@ -589,8 +616,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/library-linter:
     devDependencies:
@@ -598,14 +625,17 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -619,8 +649,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/openapi:
     devDependencies:
@@ -628,29 +658,32 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../library-linter
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -664,8 +697,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/openapi3:
     dependencies:
@@ -677,35 +710,38 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../openapi
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../versioning
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -719,8 +755,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/playground:
     dependencies:
@@ -728,37 +764,37 @@ importers:
         specifier: ~9.42.0
         version: 9.42.0(@types/react-dom@18.2.18)(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
       '@fluentui/react-icons':
-        specifier: ~2.0.217
+        specifier: ^2.0.221
         version: 2.0.224(react@18.2.0)
       '@typespec/bundler':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../bundler
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/html-program-viewer':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../html-program-viewer
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.51.1
+        specifier: workspace:~0.52.0
         version: link:../openapi3
       '@typespec/protobuf':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../protobuf
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../rest
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../versioning
       clsx:
-        specifier: ~2.0.0
+        specifier: ^2.0.0
         version: 2.0.0
       debounce:
         specifier: ~2.0.0
@@ -822,7 +858,7 @@ importers:
         specifier: ^4.18.0
         version: 4.18.3
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitejs/plugin-react':
         specifier: ~4.2.1
@@ -864,34 +900,34 @@ importers:
   core/packages/playground-website:
     dependencies:
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/html-program-viewer':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../html-program-viewer
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/json-schema':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../json-schema
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.51.1
+        specifier: workspace:~0.52.0
         version: link:../openapi3
       '@typespec/playground':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../playground
       '@typespec/protobuf':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../protobuf
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../rest
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../versioning
       es-module-shims:
         specifier: ~1.8.0
@@ -928,7 +964,7 @@ importers:
         specifier: ^4.18.0
         version: 4.18.3
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@vitejs/plugin-react':
         specifier: ~4.2.1
@@ -974,10 +1010,10 @@ importers:
         specifier: ~5.0.2
         version: 5.0.5(rollup@4.9.1)
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       prettier_2:
         specifier: npm:prettier@2.8.7
@@ -986,8 +1022,8 @@ importers:
         specifier: ~4.9.0
         version: 4.9.1
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1
 
   core/packages/protobuf:
     devDependencies:
@@ -998,20 +1034,23 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1028,8 +1067,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/rest:
     devDependencies:
@@ -1037,26 +1076,29 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../library-linter
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1070,8 +1112,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/samples:
     dependencies:
@@ -1079,42 +1121,45 @@ importers:
         specifier: workspace:~0.45.0
         version: link:../best-practices
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/html-program-viewer':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../html-program-viewer
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/json-schema':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../json-schema
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.51.1
+        specifier: workspace:~0.52.0
         version: link:../openapi3
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../rest
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../versioning
     devDependencies:
       '@types/node':
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       autorest:
         specifier: ~3.3.2
         version: 3.3.2
@@ -1131,8 +1176,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/spec:
     devDependencies:
@@ -1140,7 +1185,7 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       ecmarkup:
         specifier: ~18.1.0
@@ -1162,7 +1207,7 @@ importers:
         specifier: ~3.0.5
         version: 3.0.5
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       eslint:
         specifier: ^8.55.0
@@ -1177,7 +1222,7 @@ importers:
   core/packages/tspd:
     dependencies:
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       picocolors:
         specifier: ~1.0.0
@@ -1199,14 +1244,17 @@ importers:
         specifier: ~17.0.32
         version: 17.0.32
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/prettier-plugin-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../prettier-plugin-typespec
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1229,16 +1277,16 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/typespec-vs:
     devDependencies:
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       typespec-vscode:
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../typespec-vscode
 
   core/packages/typespec-vscode:
@@ -1259,17 +1307,20 @@ importers:
         specifier: ~1.85.0
         version: 1.85.0
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       '@vscode/vsce':
         specifier: ~2.22.0
         version: 2.22.0
@@ -1289,8 +1340,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
       vscode-languageclient:
         specifier: ~9.0.0
         version: 9.0.1
@@ -1301,23 +1352,26 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-plugin-typespec
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../library-linter
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1331,8 +1385,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   core/packages/website:
     dependencies:
@@ -1345,6 +1399,9 @@ importers:
       '@docusaurus/preset-classic':
         specifier: ^3.0.0
         version: 3.0.1(@algolia/client-search@4.22.0)(@swc/core@1.3.101)(@types/react@18.2.45)(eslint@8.56.0)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.13.0)(typescript@5.3.3)
+      '@docusaurus/theme-classic':
+        specifier: ~3.0.0
+        version: 3.0.1(@swc/core@1.3.101)(@types/react@18.2.45)(eslint@8.56.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
       '@docusaurus/theme-common':
         specifier: ~3.0.0
         version: 3.0.1(@docusaurus/types@3.0.1)(@swc/core@1.3.101)(eslint@8.56.0)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
@@ -1354,12 +1411,18 @@ importers:
       '@fluentui/react-components':
         specifier: ~9.42.0
         version: 9.42.0(@types/react-dom@18.2.18)(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
+      '@fluentui/react-icons':
+        specifier: ^2.0.221
+        version: 2.0.224(react@18.2.0)
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.0.0(@types/react@18.2.45)(react@18.2.0)
       '@typespec/playground':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../playground
+      clsx:
+        specifier: ^2.0.0
+        version: 2.0.0
       es-module-shims:
         specifier: ~1.8.0
         version: 1.8.2
@@ -1395,34 +1458,34 @@ importers:
         specifier: ~18.2.22
         version: 18.2.45
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../eslint-config-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../http
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../internal-build-utils
       '@typespec/json-schema':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../json-schema
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.51.1
+        specifier: workspace:~0.52.0
         version: link:../openapi3
       '@typespec/playground-website':
         specifier: workspace:*
         version: link:../playground-website
       '@typespec/protobuf':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../protobuf
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../rest
       '@typespec/spec':
         specifier: workspace:*
@@ -1431,7 +1494,7 @@ importers:
         specifier: workspace:~0.46.0
         version: link:../tspd
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../versioning
       dotenv:
         specifier: ~16.3.1
@@ -1470,7 +1533,7 @@ importers:
   packages/e2e-tests:
     devDependencies:
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       dotenv:
         specifier: ~16.3.1
@@ -1482,51 +1545,54 @@ importers:
   packages/samples:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.38.0
         version: link:../typespec-client-generator-core
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.51.1
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi3
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
     devDependencies:
       '@types/node':
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/internal-build-utils
       '@typespec/samples':
         specifier: workspace:~1.0.0
         version: link:../../core/packages/samples
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       autorest:
         specifier: ~3.3.2
         version: 3.3.2
@@ -1543,50 +1609,53 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   packages/typespec-autorest:
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/json-schema':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/json-schema
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1603,8 +1672,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   packages/typespec-azure-core:
     devDependencies:
@@ -1612,35 +1681,38 @@ importers:
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1654,43 +1726,43 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   packages/typespec-azure-playground-website:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.38.0
         version: link:../typespec-client-generator-core
       '@emotion/react':
         specifier: ^11.11.1
         version: 11.11.3(@types/react@18.2.45)(react@18.2.0)
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.51.1
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi3
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
       '@vitejs/plugin-react':
         specifier: ~4.2.1
@@ -1721,13 +1793,13 @@ importers:
         specifier: ~18.2.7
         version: 18.2.18
       '@typespec/bundler':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../../core/packages/bundler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/playground':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../../core/packages/playground
       cross-env:
         specifier: ~7.0.3
@@ -1745,44 +1817,47 @@ importers:
   packages/typespec-azure-resource-manager:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1796,8 +1871,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   packages/typespec-client-generator-core:
     dependencies:
@@ -1809,7 +1884,7 @@ importers:
         version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.9
@@ -1818,35 +1893,38 @@ importers:
         specifier: ^0.0.30
         version: 0.0.30
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/library-linter
       '@typespec/prettier-plugin-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/prettier-plugin-typespec
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
+      '@vitest/ui':
+        specifier: ~1.1.3
+        version: 1.1.3(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1860,54 +1938,54 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   packages/typespec-service-csharp:
     dependencies:
       '@typespec/versioning':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/versioning
       change-case:
         specifier: ~5.3.0
         version: 5.3.0
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: ^1.1.0
-        version: 1.1.0(vitest@1.1.0)
+        version: 1.1.0(vitest@1.2.1)
       c8:
         specifier: ~8.0.1
         version: 8.0.1
@@ -1921,8 +1999,8 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
       vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@18.11.19)
+        specifier: ^1.2.0
+        version: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
 
   packages/website:
     dependencies:
@@ -1945,13 +2023,13 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(@types/react@18.2.45)(react@18.2.0)
       '@typespec/playground':
-        specifier: workspace:~0.1.0-alpha.4
+        specifier: workspace:~0.1.0-alpha.5
         version: link:../../core/packages/playground
       '@typespec/website':
         specifier: workspace:~1.0.0
         version: link:../../core/packages/website
       clsx:
-        specifier: ~2.0.0
+        specifier: ^2.0.0
         version: 2.0.0
       es-module-shims:
         specifier: ~1.8.0
@@ -1970,16 +2048,16 @@ importers:
         version: 18.2.0(react@18.2.0)
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.37.2
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-playground-website':
         specifier: workspace:~1.0.0
         version: link:../typespec-azure-playground-website
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.37.1
+        specifier: workspace:~0.38.0
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.37.0
+        specifier: workspace:~0.38.0
         version: link:../typespec-client-generator-core
       '@azure-tools/typespec-service-csharp':
         specifier: workspace:~0.32.0
@@ -2000,7 +2078,7 @@ importers:
         specifier: ~18.2.22
         version: 18.2.45
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.51.0
+        specifier: workspace:~0.52.0
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/tspd':
         specifier: workspace:~0.46.0
@@ -7963,7 +8041,6 @@ packages:
 
   /@polka/url@1.0.0-next.24:
     resolution: {integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ==}
-    dev: false
 
   /@rollup/plugin-alias@5.0.1(rollup@4.9.1):
     resolution: {integrity: sha512-JObvbWdOHoMy9W7SU0lvGhDtWq9PllP5mjpAy+TUslZG/WzOId9u80Hsqq1vCUn9pFJ0cxpdcnAv+QzU2zFH3Q==}
@@ -9596,7 +9673,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@vitest/coverage-v8@1.1.0(vitest@1.1.0):
+  /@vitest/coverage-v8@1.1.0(vitest@1.2.1):
     resolution: {integrity: sha512-kHQRk70vTdXAyQY2C0vKOHPyQD/R6IUzcGdO4vCuyr4alE5Yg1+Sk2jSdjlIrTTXdcNEs+ReWVM09mmSFJpzyQ==}
     peerDependencies:
       vitest: ^1.0.0
@@ -9614,7 +9691,7 @@ packages:
       std-env: 3.7.0
       test-exclude: 6.0.0
       v8-to-istanbul: 9.2.0
-      vitest: 1.1.0(@types/node@18.11.19)
+      vitest: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9626,12 +9703,28 @@ packages:
       '@vitest/utils': 1.1.0
       chai: 4.3.10
 
+  /@vitest/expect@1.2.1:
+    resolution: {integrity: sha512-/bqGXcHfyKgFWYwIgFr1QYDaR9e64pRKxgBNWNXPefPFRhgm+K3+a/dS0cUGEreWngets3dlr8w8SBRw2fCfFQ==}
+    dependencies:
+      '@vitest/spy': 1.2.1
+      '@vitest/utils': 1.2.1
+      chai: 4.3.10
+    dev: true
+
   /@vitest/runner@1.1.0:
     resolution: {integrity: sha512-zdNLJ00pm5z/uhbWF6aeIJCGMSyTyWImy3Fcp9piRGvueERFlQFbUwCpzVce79OLm2UHk9iwaMSOaU9jVHgNVw==}
     dependencies:
       '@vitest/utils': 1.1.0
       p-limit: 5.0.0
       pathe: 1.1.1
+
+  /@vitest/runner@1.2.1:
+    resolution: {integrity: sha512-zc2dP5LQpzNzbpaBt7OeYAvmIsRS1KpZQw4G3WM/yqSV1cQKNKwLGmnm79GyZZjMhQGlRcSFMImLjZaUQvNVZQ==}
+    dependencies:
+      '@vitest/utils': 1.2.1
+      p-limit: 5.0.0
+      pathe: 1.1.1
+    dev: true
 
   /@vitest/snapshot@1.1.0:
     resolution: {integrity: sha512-5O/wyZg09V5qmNmAlUgCBqflvn2ylgsWJRRuPrnHEfDNT6tQpQ8O1isNGgo+VxofISHqz961SG3iVvt3SPK/QQ==}
@@ -9640,10 +9733,39 @@ packages:
       pathe: 1.1.1
       pretty-format: 29.7.0
 
+  /@vitest/snapshot@1.2.1:
+    resolution: {integrity: sha512-Tmp/IcYEemKaqAYCS08sh0vORLJkMr0NRV76Gl8sHGxXT5151cITJCET20063wk0Yr/1koQ6dnmP6eEqezmd/Q==}
+    dependencies:
+      magic-string: 0.30.5
+      pathe: 1.1.1
+      pretty-format: 29.7.0
+    dev: true
+
   /@vitest/spy@1.1.0:
     resolution: {integrity: sha512-sNOVSU/GE+7+P76qYo+VXdXhXffzWZcYIPQfmkiRxaNCSPiLANvQx5Mx6ZURJ/ndtEkUJEpvKLXqAYTKEY+lTg==}
     dependencies:
       tinyspy: 2.2.0
+
+  /@vitest/spy@1.2.1:
+    resolution: {integrity: sha512-vG3a/b7INKH7L49Lbp0IWrG6sw9j4waWAucwnksPB1r1FTJgV7nkBByd9ufzu6VWya/QTvQW4V9FShZbZIB2UQ==}
+    dependencies:
+      tinyspy: 2.2.0
+    dev: true
+
+  /@vitest/ui@1.1.3(vitest@1.2.1):
+    resolution: {integrity: sha512-JKGgftXZgTtK7kfQNicE9Q2FuiUlYvCGyUENkA2/S1VBThtfQyGUwaJmiDFVAKBOrW305cNgjP67vsxMm9/SDQ==}
+    peerDependencies:
+      vitest: ^1.0.0
+    dependencies:
+      '@vitest/utils': 1.1.3
+      fast-glob: 3.3.2
+      fflate: 0.8.1
+      flatted: 3.2.9
+      pathe: 1.1.1
+      picocolors: 1.0.0
+      sirv: 2.0.4
+      vitest: 1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3)
+    dev: true
 
   /@vitest/utils@1.1.0:
     resolution: {integrity: sha512-z+s510fKmYz4Y41XhNs3vcuFTFhcij2YF7F8VQfMEYAAUfqQh0Zfg7+w9xdgFGhPf3tX3TicAe+8BDITk6ampQ==}
@@ -9651,6 +9773,24 @@ packages:
       diff-sequences: 29.6.3
       loupe: 2.3.7
       pretty-format: 29.7.0
+
+  /@vitest/utils@1.1.3:
+    resolution: {integrity: sha512-Dyt3UMcdElTll2H75vhxfpZu03uFpXRCHxWnzcrFjZxT1kTbq8ALUYIeBgGolo1gldVdI0YSlQRacsqxTwNqwg==}
+    dependencies:
+      diff-sequences: 29.6.3
+      estree-walker: 3.0.3
+      loupe: 2.3.7
+      pretty-format: 29.7.0
+    dev: true
+
+  /@vitest/utils@1.2.1:
+    resolution: {integrity: sha512-bsH6WVZYe/J2v3+81M5LDU8kW76xWObKIURpPrOXm2pjBniBu2MERI/XP60GpS4PHU3jyK50LUutOwrx4CyHUg==}
+    dependencies:
+      diff-sequences: 29.6.3
+      estree-walker: 3.0.3
+      loupe: 2.3.7
+      pretty-format: 29.7.0
+    dev: true
 
   /@vscode/vsce@2.22.0:
     resolution: {integrity: sha512-8df4uJiM3C6GZ2Sx/KilSKVxsetrTBBIUb3c0W4B1EWHcddioVs5mkyDKtMNP0khP/xBILVSzlXxhV+nm2rC9A==}
@@ -9844,6 +9984,11 @@ packages:
   /acorn-walk@8.3.1:
     resolution: {integrity: sha512-TgUZgYvqZprrl7YldZNoa9OciCAyZR+Ejm9eXzKCmjsF5IKp/wgQ7Z/ZpjpGTIUPwrHQIcYeI8qDh4PsEwxMbw==}
     engines: {node: '>=0.4.0'}
+
+  /acorn-walk@8.3.2:
+    resolution: {integrity: sha512-cjkyv4OtNCIeqhHrfS81QWXoCBPExR/J62oyEqepVw8WaQeSqpW2uhuLPh1m9eWhDuOo/jUXVTlifvesOWp/4A==}
+    engines: {node: '>=0.4.0'}
+    dev: true
 
   /acorn@7.4.1:
     resolution: {integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==}
@@ -12446,7 +12591,7 @@ packages:
       '@typescript-eslint/eslint-plugin': 6.16.0(@typescript-eslint/parser@6.16.0)(eslint@8.56.0)(typescript@5.3.3)
       '@typescript-eslint/utils': 6.16.0(eslint@8.56.0)(typescript@5.3.3)
       eslint: 8.56.0
-      vitest: 1.1.0(@types/node@18.11.19)
+      vitest: 1.1.0
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -12602,7 +12747,6 @@ packages:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
     dependencies:
       '@types/estree': 1.0.5
-    dev: false
 
   /esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
@@ -12818,6 +12962,10 @@ packages:
     dependencies:
       xml-js: 1.6.11
     dev: false
+
+  /fflate@0.8.1:
+    resolution: {integrity: sha512-/exOvEuc+/iaUm105QIiOt4LpBdMTWsXxqR0HDF35vx3fmaKzw7354gTilCh5rkzEt8WYyG//ku3h3nRmd7CHQ==}
+    dev: true
 
   /file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
@@ -15949,7 +16097,6 @@ packages:
   /mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
-    dev: false
 
   /ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
@@ -18655,7 +18802,6 @@ packages:
       '@polka/url': 1.0.0-next.24
       mrmime: 2.0.0
       totalist: 3.0.1
-    dev: false
 
   /sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
@@ -19403,7 +19549,6 @@ packages:
   /totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
     engines: {node: '>=6'}
-    dev: false
 
   /tough-cookie@4.1.3:
     resolution: {integrity: sha512-aX/y5pVRkfRnfmuX+OdbSdXvPe6ieKX/G2s7e98f4poJHnqH3281gDPm/metm6E/WRamfx7WC4HUqkWHfQHprw==}
@@ -20036,7 +20181,7 @@ packages:
       vfile-message: 4.0.2
     dev: false
 
-  /vite-node@1.1.0(@types/node@18.11.19):
+  /vite-node@1.1.0:
     resolution: {integrity: sha512-jV48DDUxGLEBdHCQvxL1mEh7+naVy+nhUUUaPAZLd3FJgXuxQiewHcfeZebbJ6onDqNGkP4r3MhQ342PRlG81Q==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -20055,6 +20200,27 @@ packages:
       - sugarss
       - supports-color
       - terser
+
+  /vite-node@1.2.1(@types/node@18.11.19):
+    resolution: {integrity: sha512-fNzHmQUSOY+y30naohBvSW7pPn/xn3Ib/uqm+5wAJQJiqQsU0NBR78XdRJb04l4bOFKjpTWld0XAfkKlrDbySg==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    dependencies:
+      cac: 6.7.14
+      debug: 4.3.4
+      pathe: 1.1.1
+      picocolors: 1.0.0
+      vite: 5.0.10(@types/node@18.11.19)
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+    dev: true
 
   /vite@5.0.10(@types/node@18.11.19):
     resolution: {integrity: sha512-2P8J7WWgmc355HUMlFrwofacvr98DAjoE52BfdbwQtyLH06XKwaL/FMnmKM2crF0iX4MpmMKoDlNCB1ok7zHCw==}
@@ -20091,7 +20257,7 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
 
-  /vitest@1.1.0(@types/node@18.11.19):
+  /vitest@1.1.0:
     resolution: {integrity: sha512-oDFiCrw7dd3Jf06HoMtSRARivvyjHJaTxikFxuqJjO76U436PqlVw1uLn7a8OSPrhSfMGVaRakKpA2lePdw79A==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -20116,7 +20282,6 @@ packages:
       jsdom:
         optional: true
     dependencies:
-      '@types/node': 18.11.19
       '@vitest/expect': 1.1.0
       '@vitest/runner': 1.1.0
       '@vitest/snapshot': 1.1.0
@@ -20136,7 +20301,7 @@ packages:
       tinybench: 2.5.1
       tinypool: 0.8.1
       vite: 5.0.10(@types/node@18.11.19)
-      vite-node: 1.1.0(@types/node@18.11.19)
+      vite-node: 1.1.0
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
@@ -20146,6 +20311,120 @@ packages:
       - sugarss
       - supports-color
       - terser
+
+  /vitest@1.2.1:
+    resolution: {integrity: sha512-TRph8N8rnSDa5M2wKWJCMnztCZS9cDcgVTQ6tsTFTG/odHJ4l5yNVqvbeDJYJRZ6is3uxaEpFs8LL6QM+YFSdA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@types/node': ^18.0.0 || >=20.0.0
+      '@vitest/browser': ^1.0.0
+      '@vitest/ui': ^1.0.0
+      happy-dom: '*'
+      jsdom: '*'
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@types/node':
+        optional: true
+      '@vitest/browser':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+    dependencies:
+      '@vitest/expect': 1.2.1
+      '@vitest/runner': 1.2.1
+      '@vitest/snapshot': 1.2.1
+      '@vitest/spy': 1.2.1
+      '@vitest/utils': 1.2.1
+      acorn-walk: 8.3.2
+      cac: 6.7.14
+      chai: 4.3.10
+      debug: 4.3.4
+      execa: 8.0.1
+      local-pkg: 0.5.0
+      magic-string: 0.30.5
+      pathe: 1.1.1
+      picocolors: 1.0.0
+      std-env: 3.7.0
+      strip-literal: 1.3.0
+      tinybench: 2.5.1
+      tinypool: 0.8.1
+      vite: 5.0.10(@types/node@18.11.19)
+      vite-node: 1.2.1(@types/node@18.11.19)
+      why-is-node-running: 2.2.2
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+    dev: true
+
+  /vitest@1.2.1(@types/node@18.11.19)(@vitest/ui@1.1.3):
+    resolution: {integrity: sha512-TRph8N8rnSDa5M2wKWJCMnztCZS9cDcgVTQ6tsTFTG/odHJ4l5yNVqvbeDJYJRZ6is3uxaEpFs8LL6QM+YFSdA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@types/node': ^18.0.0 || >=20.0.0
+      '@vitest/browser': ^1.0.0
+      '@vitest/ui': ^1.0.0
+      happy-dom: '*'
+      jsdom: '*'
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@types/node':
+        optional: true
+      '@vitest/browser':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+    dependencies:
+      '@types/node': 18.11.19
+      '@vitest/expect': 1.2.1
+      '@vitest/runner': 1.2.1
+      '@vitest/snapshot': 1.2.1
+      '@vitest/spy': 1.2.1
+      '@vitest/ui': 1.1.3(vitest@1.2.1)
+      '@vitest/utils': 1.2.1
+      acorn-walk: 8.3.2
+      cac: 6.7.14
+      chai: 4.3.10
+      debug: 4.3.4
+      execa: 8.0.1
+      local-pkg: 0.5.0
+      magic-string: 0.30.5
+      pathe: 1.1.1
+      picocolors: 1.0.0
+      std-env: 3.7.0
+      strip-literal: 1.3.0
+      tinybench: 2.5.1
+      tinypool: 0.8.1
+      vite: 5.0.10(@types/node@18.11.19)
+      vite-node: 1.2.1(@types/node@18.11.19)
+      why-is-node-running: 2.2.2
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+    dev: true
 
   /vscode-jsonrpc@8.2.0:
     resolution: {integrity: sha512-C+r0eKJUIfiDIfwJhria30+TYWPtuHJXHtI7J0YlOmKAo7ogxP20T0zxB7HZQIFhIyvoBPwWskjxrvAtfjyZfA==}

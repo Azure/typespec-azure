@@ -9,55 +9,55 @@ namespace Azure.Core;
 
 /**
  * Describes a page of resource object.
- * @template TResource The resource type.
+ * @template Resource The resource type.
  */
 @pagedResult
-@friendlyName("Paged{name}", TResource)
-@doc("Paged collection of {name} items", TResource)
-model Page<TResource extends TypeSpec.Reflection.Model> {
-  @doc("The {name} items on this page", TResource)
+@friendlyName("Paged{name}", Resource)
+@doc("Paged collection of {name} items", Resource)
+model Page<Resource extends TypeSpec.Reflection.Model> {
+  @doc("The {name} items on this page", Resource)
   @items
-  value: TResource[];
+  value: Resource[];
 
   @doc("The link to the next page of items")
   @nextLink
-  nextLink?: ResourceLocation<TResource>;
+  nextLink?: ResourceLocation<Resource>;
 }
 
 /**
  * Defines a property as a request parameter.
- * @template T The parameter name.
+ * @template Name The parameter name.
  */
-@Foundations.requestParameter(T)
-model RequestParameter<T extends valueof string> {}
+@Foundations.requestParameter(Name)
+model RequestParameter<Name extends valueof string> {}
 
 /**
  * Defines a property as a response header.
- * @template T The header name.
+ * @template Name The header name.
  */
-@Foundations.responseProperty(T)
-model ResponseProperty<T extends valueof string> {}
+@Foundations.responseProperty(Name)
+model ResponseProperty<Name extends valueof string> {}
 
 /**
  * @dev Provides the status of a resource operation.
- * @template TResource The resource type.
- * @template TStatusResult Model describing the status result object. If not specified, the default is the resource type.
- * @template TStatusError Model describing the status error object. If not specified, the default is the Foundations.Error.
+ * @template Resource The resource type.
+ * @template StatusResult Model describing the status result object. If not specified, the default is the resource type.
+ * @template StatusError Model describing the status error object. If not specified, the default is the Foundations.Error.
  */
 @resource("operations")
-@parentResource(TResource)
+@parentResource(Resource)
 model ResourceOperationStatus<
-  TResource extends TypeSpec.Reflection.Model,
-  TStatusResult = TResource,
-  TStatusError = Foundations.Error
-> is Azure.Core.Foundations.OperationStatus<TStatusResult, TStatusError>;
+  Resource extends TypeSpec.Reflection.Model,
+  StatusResult = Resource,
+  StatusError = Foundations.Error
+> is Azure.Core.Foundations.OperationStatus<StatusResult, StatusError>;
 
 #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This is acceptable in Azure.Core."
 alias ResourceOperationStatusResponse<
-  TResource extends TypeSpec.Reflection.Model,
-  TStatusResult,
-  TStatusError
-> = ResourceOperationStatus<TResource, TStatusResult, TStatusError>;
+  Resource extends TypeSpec.Reflection.Model,
+  StatusResult,
+  StatusError
+> = ResourceOperationStatus<Resource, StatusResult, StatusError>;
 
 @doc("Provides the standard 'top' query parameter for list operations.")
 model TopQueryParameter {
@@ -78,6 +78,13 @@ model MaxPageSizeQueryParameter {
   @query
   @doc("The maximum number of result items per page.")
   maxpagesize?: int32;
+}
+
+@doc("Provides the standard 'filter' query parameter for list operations")
+model FilterParameter {
+  @query
+  @doc("The maximum number of result items per page.")
+  filter?: string;
 }
 
 @doc("Provides the standard 'orderby' query parameter for list operations.")
@@ -221,10 +228,10 @@ model RequestIdResponseHeader {
 
 /**
  * A vector embedding frequently used in similarity search.
- * @template TType The data type of the embedding vector.
+ * @template Element The element type of the embedding vector.
  */
-@Foundations.Private.embeddingVector(TType)
-model EmbeddingVector<TType extends numeric = float32> is Array<TType>;
+@Foundations.Private.embeddingVector(Element)
+model EmbeddingVector<Element extends numeric = float32> is Array<Element>;
 
 /**
  * Options for overriding a polling endpoint that uses a StatusMonitor

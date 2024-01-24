@@ -11,19 +11,19 @@ title: "[I] SdkModelType"
 
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
-| `__raw`? | `Type` | - | SdkTypeBase.\_\_raw |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
 | `access` | `undefined` \| [`AccessFlags`](../type-aliases/AccessFlags.md) | - | - |
-| `additionalProperties` | `boolean` | - | - |
-| `baseModel`? | [`SdkModelType`](SdkModelType.md) | - | - |
+| `additionalProperties` | `undefined` \| [`SdkType`](../type-aliases/SdkType.md) | - | - |
+| `baseModel?` | [`SdkModelType`](SdkModelType.md) | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - |
-| `deprecation`? | `string` | - | SdkTypeBase.deprecation |
-| `description`? | `string` | - | - |
-| `details`? | `string` | - | - |
-| `discriminatedSubtypes`? | `Record`<`string`, [`SdkModelType`](SdkModelType.md)\> | - | - |
-| `discriminatorValue`? | `string` | - | - |
-| `generatedName`? | `string` | - | - |
-| `kind` | `"model"` | - | SdkTypeBase.kind |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | - |
+| `details?` | `string` | - | - |
+| `discriminatedSubtypes?` | `Record`<`string`, [`SdkModelType`](SdkModelType.md)\> | - | - |
+| `discriminatorValue?` | `string` | - | - |
+| `generatedName?` | `string` | - | - |
+| `kind` | `"model"` | - | `SdkTypeBase.kind` |
 | `name` | `string` | - | - |
-| `nullable` | `boolean` | - | SdkTypeBase.nullable |
+| `nullable` | `boolean` | - | `SdkTypeBase.nullable` |
 | `properties` | [`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md)[] | - | - |
 | `usage` | `UsageFlags` | - | - |

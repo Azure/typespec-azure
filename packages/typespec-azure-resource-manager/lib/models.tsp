@@ -11,49 +11,49 @@ namespace Azure.ResourceManager;
  * Concrete tracked resource types can be created by aliasing this type using a specific property type.
  *
  * See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
- * @template TProperties A model containing the provider-specific properties for this resource
+ * @template Properties A model containing the provider-specific properties for this resource
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
-@armResourceInternal(TProperties)
+@armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model TrackedResource<TProperties extends {}> extends TrackedResourceBase {
+model TrackedResource<Properties extends {}> extends TrackedResourceBase {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
-  properties?: TProperties;
+  properties?: Properties;
 }
 
 /**
  * Concrete proxy resource types can be created by aliasing this type using a specific property type.
  *
  * See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
- * @template TProperties A model containing the provider-specific properties for this resource
+ * @template Properties A model containing the provider-specific properties for this resource
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
-@armResourceInternal(TProperties)
+@armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ProxyResource<TProperties extends {}> extends ProxyResourceBase {
+model ProxyResource<Properties extends {}> extends ProxyResourceBase {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
-  properties?: TProperties;
+  properties?: Properties;
 }
 
 /**
  * Concrete extension resource types can be created by aliasing this type using a specific property type.
  *
  * See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
- * @template TProperties A model containing the provider-specific properties for this resource
+ * @template Properties A model containing the provider-specific properties for this resource
  */
 @extensionResource
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
-@armResourceInternal(TProperties)
+@armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ExtensionResource<TProperties extends {}> extends ExtensionResourceBase {
+model ExtensionResource<Properties extends {}> extends ExtensionResourceBase {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
-  properties?: TProperties;
+  properties?: Properties;
 }
 //#region
 
@@ -61,26 +61,26 @@ model ExtensionResource<TProperties extends {}> extends ExtensionResourceBase {
 
 /**
  * Extracts the key (path) parameters from a resource and its parents
- * @template TResource The resource to extract properties from
+ * @template Resource The resource to extract properties from
  */
 @copyResourceKeyParameters
-model KeysOf<TResource> {}
+model KeysOf<Resource> {}
 
 /**
  * Extracts the key (path) parameters from the parent(s) of the given resource
- * @template TResource The resource to extract properties from
+ * @template Resource The resource to extract properties from
  */
 @copyResourceKeyParameters("parent")
-model ParentKeysOf<TResource> {}
+model ParentKeysOf<Resource> {}
 
 /**
  * Model describing the provider namespace.
- * @template TResource The resource provided by the namespace.
+ * @template Resource The resource provided by the namespace.
  */
-model ProviderNamespace<TResource extends {}> {
+model ProviderNamespace<Resource extends {}> {
   @path
   @segment("providers")
-  @assignProviderNameValue(TResource)
+  @assignProviderNameValue(Resource)
   @doc("The provider namespace for the resource.")
   provider: "Microsoft.ThisWillBeReplaced";
 }
@@ -95,17 +95,18 @@ model ProviderNamespace<TResource extends {}> {
  *   otherArmId: ResourceIdentifier;
  *   networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
  *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
- * @template T An array of allowed resource types for the resource reference
+ * @template AllowedResourceTypes An array of allowed resource types for the resource reference
  */
 @doc("A type definition that refers the id to an ARM resource.")
 @format("arm-id")
 @OpenAPI.extension(
   "x-ms-arm-id-details",
   {
-    allowedResources: T,
+    allowedResources: AllowedResourceTypes,
   }
 )
-scalar ResourceIdentifier<T extends ResourceIdentifierAllowedResource[] = []> extends string;
+scalar ResourceIdentifier<AllowedResourceTypes extends ResourceIdentifierAllowedResource[] = []>
+  extends string;
 
 /**
  * Used in ResourceIdentifier definition to represent a particular type of ARM resource, enabling constraints based on resource type.
@@ -229,11 +230,11 @@ model ResourceKind {
 
 /**
  * Paged response containing resources
- * @template TResource The type of the values returned in the paged response (must be a resource)
+ * @template Resource The type of the values returned in the paged response (must be a resource)
  */
-@doc("The response of a {name} list operation.", TResource)
-@friendlyName("{name}ListResult", TResource)
-model ResourceListResult<TResource extends ArmResource> is Azure.Core.Page<TResource>;
+@doc("The response of a {name} list operation.", Resource)
+@friendlyName("{name}ListResult", Resource)
+model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resource>;
 
 /**
  * Model used only to spread in the standard `plan` envelope property for a resource

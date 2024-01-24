@@ -93,10 +93,10 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@projectedName(InputModel, "client", "InputOptions"); // Use InputOptions as a base name in clients
-@@projectedName(InputModel, "csharp", "ParameterOptions"); // Prefer a different name for C# only
+@@clientName(InputModel, "InputOptions"); // Use InputOptions as a base name in clients
+@@clientName(InputModel, "ParameterOptions", "csharp"); // Prefer a different name for C# only
 
-@@projectedName(InputModel.name, "python", "input_name"); // Python may need a different to be idiomatic
+@@clientName(InputModel.name, "input_name", "python"); // Python may need a different to be idiomatic
 ```
 
 </TabItem>
@@ -143,8 +143,8 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@projectedName(GetModel, "client", "ReadModel"); // Use InputOptions as a base name in clients
-@@projectedName(GetModel, "python", "GetComputedModel"); // Note that Python will still snake_case it
+@@clientName(GetModel, "ReadModel"); // Use InputOptions as a base name in clients
+@@clientName(GetModel, "GetComputedModel", "python"); // Note that Python will still snake_case it
 ```
 
 </TabItem>
@@ -183,27 +183,22 @@ FIXME
 
 ### Order of Operations
 
-For consistency when generating code, the order in which projections are applied is important. Code emitters should apply projections in the following order.
+For consistency when generating code, the order in which overrides are applied is important. Code emitters should apply overrides in the following order.
 
 #### Over-the-Wire JSON Names
 
 For determining the final name of a TypeSpec entity when sent over-the-wire in JSON:
 
-1. Run the `#target("json")` projection
-2. Run the `#customTarget("json")` projection, if it exists
-3. Apply the `@projectedName` decorator using the `getProjectedName` helper method.
+1. If the `@encodedName` decorator exists, use this value
+2. Use the original name in the spec
 
 #### Client SDK Names
 
 For determining the final name of a TypeSpec entity when used in a client SDK (e.g. Python):
 
-1. Determine the name based on the client target:
-   1. Run the `#target("client")` projection
-   1. Run the `#customTarget("client")` projection, if it exists
-   1. Apply the `@projectedName` decorator using the `getProjectedName` helper method.
-1. Determine the name based on the language target:
-   1. Run the `#target("python")` projection
-   1. Run the `#customTarget("python")` projection, if it exists
-   1. Apply the `@projectedName` decorator using the `getProjectedName` helper method.
-1. If the language target name is different from the client target name, use the language target name. Otherwise, use the client name.
-1. For names based on language target projections, do not alter the casing. For names based on the client target projections, apply casing heuristics appropriate for the language (for example, snake case, Pascal case, etc.).
+1. Check if there's a scoped `@clientName` decorator for your emitter
+2. Check if there's a `@clientName` decorator at all
+3. Check the friendly name
+4. Use the original name in the spec
+
+**Note: If the object name is from `@clientName` decorator, do not apply your language's casing rules on it. If it's not, apply your language's heuristics (i.e. for Python, apply snake casing)**

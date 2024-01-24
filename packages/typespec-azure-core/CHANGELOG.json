@@ -2,6 +2,29 @@
   "name": "@azure-tools/typespec-azure-core",
   "entries": [
     {
+      "version": "0.38.0",
+      "tag": "@azure-tools/typespec-azure-core_v0.38.0",
+      "date": "Wed, 24 Jan 2024 05:47:19 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Relaxing camelCase linting rule to allow a single non-alphabetical char. Also added standard filterParameter"
+          },
+          {
+            "comment": "Renamed template parameters for clarity and consistency."
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.2",
       "tag": "@azure-tools/typespec-azure-core_v0.37.2",
       "date": "Wed, 20 Dec 2023 05:29:22 GMT",

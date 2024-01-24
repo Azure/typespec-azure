@@ -327,11 +327,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("client", "NotToUseMeAsName") // Should be ignored
-          @projectedName("csharp", "MadeForCS")
-          @projectedName("java", "MadeForJava")
-          @projectedName("javascript", "MadeForTS")
-          @projectedName("python", "made_for_python")
+          @clientName("MadeForCS", "csharp")
+          @clientName("MadeForJava", "java")
+          @clientName("MadeForTS", "javascript")
+          @clientName("made_for_python", "python")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -351,11 +350,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("client", "NotToUseMeAsName") // Should be ignored
-          @projectedName("csharp", "MadeForCS")
-          @projectedName("java", "MadeForJava")
-          @projectedName("javascript", "MadeForTS")
-          @projectedName("python", "made_for_python")
+          @clientName("MadeForCS", "csharp")
+          @clientName("MadeForJava", "java")
+          @clientName("MadeForTS", "javascript")
+          @clientName("made_for_python", "python")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -375,7 +373,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("client", "NameForAllLanguage")
+          @clientName("NameForAllLanguage")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -395,7 +393,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("json", "madeFor")
+          @encodedName("application/json", "madeFor")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -415,12 +413,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("client", "NotToUseMeAsName") // Should be ignored
-          @projectedName("csharp", "MadeForCS")
-          @projectedName("java", "MadeForJava")
-          @projectedName("javascript", "MadeForTS")
-          @projectedName("python", "made_for_python")
-          @projectedName("json", "madeFor")
+          @clientName("MadeForCS", "csharp")
+          @clientName("MadeForJava", "java")
+          @clientName("MadeForTS", "javascript")
+          @clientName("made_for_python", "python")
+          @encodedName("application/json", "madeFor")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -441,8 +438,8 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
-          @projectedName("client", "propName")
-          @projectedName("json", "madeFor")
+          @clientName("propName")
+          @encodedName("application/json", "madeFor")
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
@@ -463,7 +460,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       async function helper(emitterName: string) {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { func } = (await runner.compile(`
-        @test @projectedName("client", "rightName") op func(@query("api-version") myApiVersion: string): void;
+        @test @clientName("rightName") op func(@query("api-version") myApiVersion: string): void;
       `)) as { func: Operation };
         strictEqual(getLibraryName(runner.context, func), "rightName");
       }
@@ -477,11 +474,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { func } = (await runner.compile(`
         @test
-        @projectedName("client", "NotToUseMeAsName") // Should be ignored
-        @projectedName("csharp", "madeForCS")
-        @projectedName("java", "madeForJava")
-        @projectedName("javascript", "madeForTS")
-        @projectedName("python", "made_for_python")
+        @clientName("madeForCS", "csharp")
+        @clientName("madeForJava", "java")
+        @clientName("madeForTS", "javascript")
+        @clientName("made_for_python", "python")
         op func(@query("api-version") myApiVersion: string): void;
       `)) as { func: Operation };
         strictEqual(getLibraryName(runner.context, func), expected);
@@ -498,11 +494,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         @test
         op func(@query("api-version") myApiVersion: string): void;
 
-        @@projectedName(func, "client", "NotToUseMeAsName"); // Should be ignored
-        @@projectedName(func, "csharp", "madeForCS");
-        @@projectedName(func, "java", "madeForJava");
-        @@projectedName(func, "javascript", "madeForTS");
-        @@projectedName(func, "python", "made_for_python");
+        @@clientName(func, "madeForCS", "csharp");
+        @@clientName(func, "madeForJava", "java");
+        @@clientName(func, "madeForTS", "javascript");
+        @@clientName(func, "made_for_python", "python");
       `)) as { func: Operation };
         strictEqual(getLibraryName(runner.context, func), expected);
       }
@@ -516,7 +511,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { func } = (await runner.compile(`
         @test
-        @projectedName("json", "NotToUseMeAsName") // Should be ignored
+        @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
         op func(@query("api-version") myApiVersion: string): void;
       `)) as { func: Operation };
         strictEqual(getLibraryName(runner.context, func), "func");
@@ -545,7 +540,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { MyModel } = (await runner.compile(`
         @test
-        @projectedName("client", "RightName")
+        @clientName("RightName")
         model MyModel {
           prop: string
         }
@@ -562,11 +557,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { MyModel } = (await runner.compile(`
         @test
-        @projectedName("client", "ShouldBeIgnored")
-        @projectedName("csharp", "CsharpModel")
-        @projectedName("java", "JavaModel")
-        @projectedName("javascript", "JavascriptModel")
-        @projectedName("python", "PythonModel")
+        @clientName("CsharpModel", "csharp")
+        @clientName("JavaModel", "java")
+        @clientName("JavascriptModel", "javascript")
+        @clientName("PythonModel", "python")
         model MyModel {
           prop: string
         }
@@ -587,11 +581,10 @@ describe("typespec-client-generator-core: public-utils", () => {
           prop: string
         }
 
-        @@projectedName(MyModel, "client", "ShouldBeIgnored");
-        @@projectedName(MyModel, "csharp", "CsharpModel");
-        @@projectedName(MyModel, "java", "JavaModel");
-        @@projectedName(MyModel, "javascript", "JavascriptModel");
-        @@projectedName(MyModel, "python", "PythonModel");
+        @@clientName(MyModel, "CsharpModel", "csharp");
+        @@clientName(MyModel, "JavaModel", "java");
+        @@clientName(MyModel, "JavascriptModel", "javascript");
+        @@clientName(MyModel, "PythonModel", "python");
       `)) as { MyModel: Model };
         strictEqual(getLibraryName(runner.context, MyModel), expected);
       }
@@ -605,7 +598,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const runner = await createTcgcTestRunnerForEmitter(emitterName);
         const { MyModel } = (await runner.compile(`
         @test
-        @projectedName("json", "NotToUseMeAsName") // Should be ignored
+        @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
         model MyModel {
           prop: string
         }
@@ -674,10 +667,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
-        @projectedName("csharp", "CsharpModel")
-        @projectedName("java", "JavaModel")
-        @projectedName("javascript", "JavascriptModel")
-        @projectedName("python", "PythonModel")
+        @clientName("CsharpModel", "csharp")
+        @clientName("JavaModel", "java")
+        @clientName("JavascriptModel", "javascript")
+        @clientName("PythonModel", "python")
         model MyModel {
           prop: string
         }
@@ -696,7 +689,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
-        @projectedName("client", "clientName")
+        @clientName("clientName")
         model MyModel {
           prop: string
         }
@@ -715,7 +708,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { param } = (await runner.compile(`
         op func(
           @test
-          @projectedName("client", "rightName")
+          @clientName("rightName")
           @query("param")
           param: string
         ): void;
@@ -733,11 +726,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { param } = (await runner.compile(`
         op func(
           @test
-          @projectedName("client", "ShouldBeIgnored")
-          @projectedName("csharp", "csharpParam")
-          @projectedName("java", "javaParam")
-          @projectedName("javascript", "javascriptParam")
-          @projectedName("python", "python_param")
+          @clientName("csharpParam", "csharp")
+          @clientName("javaParam", "java")
+          @clientName("javascriptParam", "javascript")
+          @clientName("python_param", "python")
           @query("param")
           param: string
         ): void;
@@ -756,7 +748,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const { param } = (await runner.compile(`
         op func(
           @test
-          @projectedName("json", "ShouldBeIgnored")
+          @encodedName("application/json", "ShouldBeIgnored")
           @query("param")
           param: string
         ): void;
@@ -1146,6 +1138,22 @@ describe("typespec-client-generator-core: public-utils", () => {
         const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
           .generatedName;
         strictEqual(unionName, "AStatus");
+        strictEqual(models[0].kind, "model");
+        const statusProp = models[0].properties[0];
+        strictEqual(statusProp.kind, "property");
+        strictEqual(statusProp.type.kind, "union");
+        strictEqual(statusProp.type.values.length, 2);
+        const startVal = statusProp.type.values.find(
+          (x) => x.kind === "constant" && x.value === "start"
+        )!;
+        strictEqual(startVal.kind, "constant");
+        strictEqual(startVal.valueType.kind, "string");
+
+        const stopVal = statusProp.type.values.find(
+          (x) => x.kind === "constant" && x.value === "stop"
+        )!;
+        strictEqual(stopVal.kind, "constant");
+        strictEqual(stopVal.valueType.kind, "string");
       });
 
       it("should handle union of anonymous model", async () => {
@@ -1338,6 +1346,32 @@ describe("typespec-client-generator-core: public-utils", () => {
           (union as SdkUnionType).generatedName,
           "RequestParameterWithAnonymousUnionRepeatabilityResult"
         );
+      });
+
+      it("anonymous union with base type", async () => {
+        const { repeatabilityResult } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          model RequestParameterWithAnonymousUnion {
+            @header("Repeatability-Result")
+            @test
+            repeatabilityResult?: "accepted" | "rejected" | string;
+
+            test: string;
+          }
+  
+          op test(...RequestParameterWithAnonymousUnion): void;
+        }
+        `)) as { repeatabilityResult: ModelProperty };
+
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
+        strictEqual(stringType.kind, "union");
+        strictEqual(stringType.values.length, 3);
+        strictEqual(stringType.values[0].kind, "constant");
+        strictEqual(stringType.values[0].value, "accepted");
+        strictEqual(stringType.values[1].kind, "constant");
+        strictEqual(stringType.values[1].value, "rejected");
+        strictEqual(stringType.values[2].kind, "string");
       });
     });
   });

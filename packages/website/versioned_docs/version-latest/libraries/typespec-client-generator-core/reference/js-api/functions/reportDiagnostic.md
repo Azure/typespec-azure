@@ -23,7 +23,8 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"invalid-usage"`
   \| `"invalid-encode"`
   \| `"discriminator-not-constant"`
-  \| `"discriminator-not-string"` |
+  \| `"discriminator-not-string"`
+  \| `"wrong-client-decorator"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters
