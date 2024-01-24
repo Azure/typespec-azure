@@ -11,9 +11,9 @@ title: "[I] SdkDurationType"
 
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
-| `__raw`? | `Type` | - | SdkTypeBase.\_\_raw |
-| `deprecation`? | `string` | - | SdkTypeBase.deprecation |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
 | `encode` | `DurationKnownEncoding` | - | - |
-| `kind` | `"duration"` | - | SdkTypeBase.kind |
-| `nullable` | `boolean` | - | SdkTypeBase.nullable |
+| `kind` | `"duration"` | - | `SdkTypeBase.kind` |
+| `nullable` | `boolean` | - | `SdkTypeBase.nullable` |
 | `wireType` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |
