@@ -18,7 +18,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 ## Needed for Changesets to find `main` branch
-
+          submodules: recursive
+          
       - run: git pull --force --no-tags origin main:main
         name: Get main ref
 
