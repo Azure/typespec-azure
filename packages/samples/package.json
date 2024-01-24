@@ -38,20 +38,20 @@
     "!dist/test/**"
   ],
   "dependencies": {
-    "@typespec/versioning": "workspace:~0.51.0",
-    "@typespec/compiler": "workspace:~0.51.0",
-    "@typespec/openapi": "workspace:~0.51.0",
-    "@typespec/openapi3": "workspace:~0.51.1",
-    "@typespec/http": "workspace:~0.51.0",
-    "@typespec/rest": "workspace:~0.51.0",
-    "@azure-tools/typespec-azure-core": "workspace:~0.37.2",
-    "@azure-tools/typespec-autorest": "workspace:~0.37.2",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.37.1",
-    "@azure-tools/typespec-client-generator-core": "workspace:~0.37.0"
+    "@typespec/versioning": "workspace:~0.52.0",
+    "@typespec/compiler": "workspace:~0.52.0",
+    "@typespec/openapi": "workspace:~0.52.0",
+    "@typespec/openapi3": "workspace:~0.52.0",
+    "@typespec/http": "workspace:~0.52.0",
+    "@typespec/rest": "workspace:~0.52.0",
+    "@azure-tools/typespec-azure-core": "workspace:~0.38.0",
+    "@azure-tools/typespec-autorest": "workspace:~0.38.0",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.38.0",
+    "@azure-tools/typespec-client-generator-core": "workspace:~0.38.0"
   },
   "devDependencies": {
-    "@typespec/internal-build-utils": "workspace:~0.51.0",
-    "@typespec/eslint-config-typespec": "workspace:~0.51.0",
+    "@typespec/internal-build-utils": "workspace:~0.52.0",
+    "@typespec/eslint-config-typespec": "workspace:~0.52.0",
     "@typespec/samples": "workspace:~1.0.0",
     "@types/node": "~18.11.9",
     "cross-env": "~7.0.3",

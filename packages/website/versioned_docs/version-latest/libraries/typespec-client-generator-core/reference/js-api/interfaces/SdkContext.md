@@ -5,7 +5,7 @@ title: "[I] SdkContext"
 ---
 ## Type parameters
 
-| Parameter | Default |
+| Parameter | Value |
 | :------ | :------ |
 | `TOptions` extends `object` | `Record`<`string`, `any`\> |
 
@@ -13,17 +13,14 @@ title: "[I] SdkContext"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
-| `arm`? | `boolean` | - |
-| `clientProjectedProgram`? | `ProjectedNameView` | - |
+| `arm?` | `boolean` | - |
 | `emitContext` | `EmitContext`<`TOptions`\> | - |
 | `emitterName` | `string` | - |
-| `filterOutCoreModels`? | `boolean` | - |
+| `filterOutCoreModels?` | `boolean` | - |
 | `generateConvenienceMethods` | `boolean` | - |
 | `generateProtocolMethods` | `boolean` | - |
-| `generatedNames`? | `Set`<`string`\> | - |
-| `jsonProjectedProgram`? | `ProjectedNameView` | - |
-| `languageProjectedProgram`? | `ProjectedNameView` | - |
-| `modelsMap`? | `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\> | - |
-| `operationModelsMap`? | `Map`<`Operation`, `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\>\> | - |
-| `packageName`? | `string` | - |
+| `generatedNames?` | `Set`<`string`\> | - |
+| `modelsMap?` | `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\> | - |
+| `operationModelsMap?` | `Map`<`Operation`, `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\>\> | - |
+| `packageName?` | `string` | - |
 | `program` | `Program` | - |

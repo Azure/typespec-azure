@@ -15,5 +15,5 @@ the operation has no logical final result when polling completes.
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
 | `kind` | `"pollingSuccessNoResult"` | - | - |
-| `responseModel` | `Model` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep`](LogicalOperationStep.md).`responseModel` |
+| `responseModel` | `Model` \| `IntrinsicType` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep.responseModel`](LogicalOperationStep.md) |
 | `target` | `null` | There is no target | - |

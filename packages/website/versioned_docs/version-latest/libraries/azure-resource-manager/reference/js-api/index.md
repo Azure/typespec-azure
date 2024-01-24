@@ -3,13 +3,11 @@ jsApi: true
 title: "[P] JS Api"
 
 ---
-## Exports
-
-### Enumerations
+## Enumerations
 
 - [ResourceBaseType](enumerations/ResourceBaseType.md)
 
-### Interfaces
+## Interfaces
 
 - [ArmCommonTypeVersions](interfaces/ArmCommonTypeVersions.md)
 - [ArmLifecycleOperations](interfaces/ArmLifecycleOperations.md)
@@ -18,18 +16,18 @@ title: "[P] JS Api"
 - [ArmResourceOperation](interfaces/ArmResourceOperation.md)
 - [ArmResourceOperations](interfaces/ArmResourceOperations.md)
 
-### Type Aliases
+## Type Aliases
 
 - [ArmLifecycleOperationKind](type-aliases/ArmLifecycleOperationKind.md)
 - [ArmOperationKind](type-aliases/ArmOperationKind.md)
 - [ArmResourceKind](type-aliases/ArmResourceKind.md)
 
-### Variables
+## Variables
 
 - [$lib](variables/$lib.md)
 - [namespace](variables/namespace.md)
 
-### Functions
+## Functions
 
 - [$armCommonTypesVersion](functions/$armCommonTypesVersion.md)
 - [$armLibraryNamespace](functions/$armLibraryNamespace.md)

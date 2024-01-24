@@ -9,7 +9,7 @@ createSdkContext<TOptions>(context, emitterName?): SdkContext<TOptions>
 
 ## Type parameters
 
-| Parameter | Default |
+| Parameter | Value |
 | :------ | :------ |
 | `TOptions` extends `Record`<`string`, `any`\> | [`SdkEmitterOptions`](../interfaces/SdkEmitterOptions.md) |
 

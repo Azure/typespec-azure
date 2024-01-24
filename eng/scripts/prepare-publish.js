@@ -20,7 +20,9 @@ const Major = 3;
  * DO NOT LEAVE TO FALSE
  */
 const production = true;
+
 let branch;
+
 if (production) {
   // Create and checkout branches
   branch = `publish/${Date.now().toString(36)}`;
@@ -123,6 +125,12 @@ function typespecAzureRun(command, ...args) {
   run(command, args, { cwd: repoRoot });
 }
 
+function typespecAzureRunWithOptions(options, command, ...args) {
+  console.log();
+  console.log("## typespec-azure ##");
+  run(command, args, { cwd: repoRoot, ...options });
+}
+
 function typespecRunWithRetries(tries, command, ...args) {
   try {
     console.log();
@@ -212,7 +220,11 @@ function bumpCrossSubmoduleDependencies() {
 
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   typespecAzureRunWithRetries(3, "rush", "update");
-  typespecAzureRun("rush", "rebuild");
+  typespecAzureRunWithOptions(
+    { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
+    "rush",
+    "rebuild"
+  );
   typespecAzureRun("rush", "regen-samples");
   if (checkForChangedFiles(repoRoot, undefined, { silent: true }) && production) {
     typespecAzureRun("git", "add", "-A");
