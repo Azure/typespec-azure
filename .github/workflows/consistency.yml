@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: 20.x
 
+      - run: pnpm install
+        name: Install dependencies
+
       - run: npx -p @changesets/cli changeset status --since=main
         name: Check changelog
         if: ${{ !startsWith(github.head_ref, 'publish/') && !startsWith(github.head_ref, 'dependabot/') && !startsWith(github.head_ref, 'backmerge/') }}
