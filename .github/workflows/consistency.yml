@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
+          
+      - uses: pnpm/action-setup@v2
 
       - run: pnpm install
         name: Install dependencies
