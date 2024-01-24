@@ -3,17 +3,15 @@ jsApi: true
 title: "[P] JS Api"
 
 ---
-## Exports
-
-### Interfaces
+## Interfaces
 
 - [CSharpServiceEmitterOptions](interfaces/CSharpServiceEmitterOptions.md)
 
-### Variables
+## Variables
 
 - [$lib](variables/$lib.md)
 
-### Functions
+## Functions
 
 - [$onEmit](functions/$onEmit.md)
 - [getTracer](functions/getTracer.md)

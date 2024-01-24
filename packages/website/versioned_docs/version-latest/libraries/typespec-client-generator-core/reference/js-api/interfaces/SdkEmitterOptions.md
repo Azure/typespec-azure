@@ -7,7 +7,7 @@ title: "[I] SdkEmitterOptions"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
-| `filter-out-core-models`? | `boolean` | - |
-| `generate-convenience-methods`? | `boolean` | - |
-| `generate-protocol-methods`? | `boolean` | - |
-| `package-name`? | `string` | - |
+| `filter-out-core-models?` | `boolean` | - |
+| `generate-convenience-methods?` | `boolean` | - |
+| `generate-protocol-methods?` | `boolean` | - |
+| `package-name?` | `string` | - |
