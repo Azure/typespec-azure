@@ -15,7 +15,7 @@ import {
   getTypeName,
 } from "@typespec/compiler";
 import { getSegment } from "@typespec/rest";
-import { Version, getVersionDependencies } from "@typespec/versioning";
+import { getVersion } from "@typespec/versioning";
 import { getArmCommonTypesVersion, getArmCommonTypesVersions } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
@@ -125,22 +125,15 @@ function resolveCommonTypesVersion(
   const { allVersions } = getArmCommonTypesVersions(program) ?? {};
 
   if (params.service) {
-    const versionMap = getVersionDependencies(program, params.service.type);
+    const versionMap = getVersion(program, params.service.type);
 
     // If the service is versioned, extract the common-types version from the
     // service version enum
     if (params.version && versionMap) {
-      for (const [_, version] of versionMap) {
-        if (!("enumMember" in version)) {
-          const foundVersion = Array.from<Version>(version.keys()).find(
-            (v) => v.name === params.version
-          );
-          if (foundVersion) {
-            selectedVersion = getArmCommonTypesVersion(program, foundVersion.enumMember);
-          }
-        } else if (version.name === params.version) {
-          selectedVersion = getArmCommonTypesVersion(program, version.enumMember);
-        }
+      const versionEnumMember = versionMap.getVersions().find((x) => x.value === params.version)
+        ?.enumMember;
+      if (versionEnumMember) {
+        selectedVersion = getArmCommonTypesVersion(program, versionEnumMember);
       }
     }
 

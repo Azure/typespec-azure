@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-azure-resource-manager",
+      "comment": "Fix: Resolve selected arm common version when used on version enum members",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-azure-resource-manager"
+}
