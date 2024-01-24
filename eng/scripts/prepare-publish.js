@@ -221,7 +221,7 @@ function bumpCrossSubmoduleDependencies() {
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   typespecAzureRunWithRetries(3, "rush", "update");
   typespecAzureRunWithOptions(
-    { env: { ...process.env, TYPESPEC_WEBSITE_LINK_ACTION: "ignore" } },
+    { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
     "rush",
     "rebuild"
   );
