@@ -561,7 +561,6 @@ function getSdkUnionEnumValues(
 function getSdkUnionEnum(context: SdkContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
-    if (!type.union.name) throw new Error("Your union must be named in order to generate an enum");
     const union = type.union as Union & { name: string };
     const docWrapper = getDocHelper(context, union);
     sdkType = {

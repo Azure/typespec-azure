@@ -230,6 +230,13 @@ export function getWireName(context: SdkContext, type: Type & { name: string }) 
   return getProjectedName(context.program, type, "json") ?? type.name;
 }
 
+interface SdkTypeBaseHelper<TKind> {
+  __raw?: Type;
+  nullable: boolean;
+  deprecation?: string;
+  kind: TKind;
+}
+
 /**
  * Helper function to return default values for nullable, encode etc
  * @param type
@@ -238,12 +245,7 @@ export function getSdkTypeBaseHelper<TKind>(
   context: SdkContext,
   type: Type | string,
   kind: TKind
-): {
-  __raw?: Type;
-  nullable: boolean;
-  deprecation?: string;
-  kind: TKind;
-} {
+): SdkTypeBaseHelper<TKind> {
   if (typeof type === "string") {
     return {
       nullable: false,

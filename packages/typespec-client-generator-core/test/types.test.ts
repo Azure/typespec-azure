@@ -1379,7 +1379,7 @@ describe("typespec-client-generator-core: types", () => {
       }
 
       @route("/extensible-enum")
-      @get
+      @put
       op putPet(@body petKind: PetKind): void;
       `);
       const models = Array.from(getAllModels(runner.context));
