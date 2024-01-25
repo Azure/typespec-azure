@@ -7,11 +7,11 @@ title: "[I] PagedResultMetadata"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
-| `itemsPath`? | `string` | **Deprecated**<br /><br />use itemsSegments |
-| `itemsProperty`? | `ModelProperty` | - |
-| `itemsSegments`? | `string`[] | Path to the items property. |
+| ~~`itemsPath?`~~ | `string` | **Deprecated**<br />use itemsSegments |
+| `itemsProperty?` | `ModelProperty` | - |
+| `itemsSegments?` | `string`[] | Path to the items property. |
 | `modelType` | `Model` | - |
-| `nextLinkOperation`? | `Operation` | - |
-| `nextLinkPath`? | `string` | **Deprecated**<br /><br />use nextLinkSegments |
-| `nextLinkProperty`? | `ModelProperty` | - |
-| `nextLinkSegments`? | `string`[] | Path to the next link property. |
+| `nextLinkOperation?` | `Operation` | - |
+| ~~`nextLinkPath?`~~ | `string` | **Deprecated**<br />use nextLinkSegments |
+| `nextLinkProperty?` | `ModelProperty` | - |
+| `nextLinkSegments?` | `string`[] | Path to the next link property. |

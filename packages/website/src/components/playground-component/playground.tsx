@@ -57,8 +57,15 @@ export const WebsitePlayground = ({ versionData }: WebsitePlaygroundProps) => {
       editorOptions={editorOptions}
       footer={<PlaygroundFooter versionData={versionData} />}
       fallback={<LoadingSpinner message="Loading libraries..." />}
+      onFileBug={fileBugToGithub}
     />
   );
+};
+
+const fileBugToGithub = () => {
+  const bodyPayload = encodeURIComponent(`\n\n\n[Playground Link](${document.location.href})`);
+  const url = `https://github.com/Azure/typespec-azure/issues/new?body=${bodyPayload}`;
+  window.open(url, "_blank");
 };
 
 interface PlaygroundFooterProps {

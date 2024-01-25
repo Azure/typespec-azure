@@ -53,7 +53,7 @@ FIXME
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-FIXME
+FIXME;
 ```
 
 </TabItem>
@@ -69,16 +69,15 @@ FIXME
 Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
 you must use `@sharedRoute`. By default, codegen will generate one method per operation name.
 
-
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
 @sharedRoute("/foo")
-op a(x: int) : float
+op a(x: int): float;
 
 @sharedRoute("/foo")
-op b(x: string) : int64
+op b(x: string): int64;
 ```
 
 </TabItem>
@@ -110,7 +109,7 @@ public Response<long> B(string x, Cancellation token);
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-FIXME
+FIXME;
 ```
 
 </TabItem>
@@ -123,13 +122,11 @@ FIXME
 </TabItem>
 </Tabs>
 
-
 ## Customizations
 
 ### Merge `@sharedRoute` operations into one.
 
-If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by projecting
-the same name on both operations.
+If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by renaming both operations to the same name using `@clientName`
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -148,8 +145,8 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@projectedName(a, "client", "Foo");
-@@projectedName(b, "client", "Foo");
+@@clientName(a, "Foo");
+@@clientName(b, "Foo");
 ```
 
 </TabItem>
@@ -184,7 +181,7 @@ public Response<long> Foo(string x, Cancellation token);
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-FIXME
+FIXME;
 ```
 
 </TabItem>
@@ -196,4 +193,3 @@ FIXME
 
 </TabItem>
 </Tabs>
-
