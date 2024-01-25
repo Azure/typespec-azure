@@ -61,6 +61,7 @@ import {
   SdkEnumValueType,
   SdkModelPropertyTypeBase,
   SdkModelType,
+  SdkMultipartFileType,
   SdkTupleType,
   SdkType,
 } from "./interfaces.js";
@@ -261,6 +262,13 @@ export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurati
   };
 }
 
+function getSdkMultipartFileType(context: SdkContext, type: Scalar): SdkMultipartFileType {
+  return {
+    ...getSdkTypeBaseHelper(context, type, "multipartFile"),
+    encode: "binary",
+  };
+}
+
 export function getSdkArrayOrDict(
   context: SdkContext,
   type: Model,
@@ -428,8 +436,24 @@ function addDiscriminatorToModelType(
 export function getSdkModel(context: SdkContext, type: Model, operation?: Operation): SdkModelType {
   type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
+  const httpOperation = operation
+    ? ignoreDiagnostics(getHttpOperation(context.program, operation))
+    : undefined;
+  const isFormDataType = httpOperation
+    ? Boolean(httpOperation.parameters.body?.contentTypes.includes("multipart/form-data"))
+    : false;
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
+    if (isFormDataType !== sdkType.isFormDataType) {
+      // This means we have a model that is used both for formdata input and for regular body input
+      reportDiagnostic(context.program, {
+        code: "conflicting-multipart-model-usage",
+        target: type,
+        format: {
+          modelName: sdkType.name,
+        },
+      });
+    }
   } else {
     const docWrapper = getDocHelper(context, type);
     sdkType = {
@@ -443,6 +467,7 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      isFormDataType,
     };
 
     updateModelsMap(context, type, sdkType, operation);
@@ -597,6 +622,15 @@ export function getClientType(context: SdkContext, type: Type, operation?: Opera
       }
       if (type.name === "duration") {
         return getSdkDurationType(context, type);
+      }
+      const httpOperation = operation
+        ? ignoreDiagnostics(getHttpOperation(context.program, operation))
+        : undefined;
+      const hasMultipartInput =
+        httpOperation &&
+        httpOperation.parameters.body?.contentTypes.includes("multipart/form-data");
+      if (type.name === "bytes" && hasMultipartInput) {
+        return getSdkMultipartFileType(context, type);
       }
       const scalarType = getSdkBuiltInType(context, type);
       // just add default encode, normally encode is on extended scalar and model property

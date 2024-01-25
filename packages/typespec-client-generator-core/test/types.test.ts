@@ -1,5 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Enum, UsageFlags } from "@typespec/compiler";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -1944,6 +1945,54 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = Array.from(getAllModels(runner.context));
       strictEqual(models.length, 2);
+    });
+  });
+  describe("SdkMultipartFormType", () => {
+    it("multipart form basic", async function () {
+      await runner.compileWithBuiltInService(`
+      model MultiPartRequest {
+        id: string;
+        profileImage: bytes;
+      }
+
+      op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      `);
+
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 1);
+      const model = models[0] as SdkModelType;
+      strictEqual(model.kind, "model");
+      strictEqual(model.isFormDataType, true);
+      strictEqual(model.name, "MultiPartRequest");
+      strictEqual(model.properties.length, 2);
+      const id = model.properties.find((x) => x.nameInClient === "id")!;
+      strictEqual(id.kind, "property");
+      strictEqual(id.type.kind, "string");
+      const profileImage = model.properties.find((x) => x.nameInClient === "profileImage")!;
+      strictEqual(profileImage.kind, "property");
+      strictEqual(profileImage.type.kind, "multipartFile");
+    });
+    it("multipart conflicting model usage", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+        }
+  
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+        @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
+      `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+      });
+
+      // expectDiagnostics(getAllModels(runner.context), {
+      //   code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+      // });
     });
   });
   describe("SdkTupleType", () => {
