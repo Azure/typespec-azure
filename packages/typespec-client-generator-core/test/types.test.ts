@@ -1994,6 +1994,35 @@ describe("typespec-client-generator-core: types", () => {
       //   code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       // });
     });
+    it("multipart resolving conflicting model usage with spread", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model B {
+          doc: bytes
+        }
+        
+        model A {
+          ...B
+        }
+        
+        @put op multipartOperation(@header contentType: "multipart/form-data", ...A): void;
+        @post op normalOperation(...B): void;
+        `
+      );
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 2);
+      const modelA = models.find((x) => x.name === "A")!;
+      strictEqual(modelA.kind, "model");
+      strictEqual(modelA.isFormDataType, true);
+      strictEqual(modelA.properties.length, 1);
+      strictEqual(modelA.properties[0].type.kind, "multipartFile");
+
+      const modelB = models.find((x) => x.name === "B")!;
+      strictEqual(modelB.kind, "model");
+      strictEqual(modelB.isFormDataType, false);
+      strictEqual(modelB.properties.length, 1);
+      strictEqual(modelB.properties[0].type.kind, "bytes");
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {
