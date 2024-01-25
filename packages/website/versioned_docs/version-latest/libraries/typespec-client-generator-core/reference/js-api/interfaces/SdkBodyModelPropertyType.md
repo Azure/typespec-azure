@@ -11,14 +11,14 @@ title: "[I] SdkBodyModelPropertyType"
 
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
-| `__raw`? | `ModelProperty` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`__raw` |
-| `apiVersions` | `string`[] | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`apiVersions` |
-| `description`? | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`description` |
-| `details`? | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`details` |
+| `__raw?` | `ModelProperty` | - | [`SdkModelPropertyTypeBase.__raw`](SdkModelPropertyTypeBase.md) |
+| `apiVersions` | `string`[] | - | [`SdkModelPropertyTypeBase.apiVersions`](SdkModelPropertyTypeBase.md) |
+| `description?` | `string` | - | [`SdkModelPropertyTypeBase.description`](SdkModelPropertyTypeBase.md) |
+| `details?` | `string` | - | [`SdkModelPropertyTypeBase.details`](SdkModelPropertyTypeBase.md) |
 | `discriminator` | `boolean` | - | - |
 | `kind` | `"property"` | - | - |
-| `nameInClient` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nameInClient` |
-| `optional` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`optional` |
+| `nameInClient` | `string` | - | [`SdkModelPropertyTypeBase.nameInClient`](SdkModelPropertyTypeBase.md) |
+| `optional` | `boolean` | - | [`SdkModelPropertyTypeBase.optional`](SdkModelPropertyTypeBase.md) |
 | `serializedName` | `string` | - | - |
-| `type` | [`SdkType`](../type-aliases/SdkType.md) | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`type` |
-| `visibility`? | `Visibility`[] | - | - |
+| `type` | [`SdkType`](../type-aliases/SdkType.md) | - | [`SdkModelPropertyTypeBase.type`](SdkModelPropertyTypeBase.md) |
+| `visibility?` | `Visibility`[] | - | - |

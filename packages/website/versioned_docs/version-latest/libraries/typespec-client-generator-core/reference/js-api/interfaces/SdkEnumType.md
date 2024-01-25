@@ -11,17 +11,17 @@ title: "[I] SdkEnumType"
 
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
-| `__raw`? | `Type` | - | SdkTypeBase.\_\_raw |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
 | `access` | `undefined` \| [`AccessFlags`](../type-aliases/AccessFlags.md) | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - |
-| `deprecation`? | `string` | - | SdkTypeBase.deprecation |
-| `description`? | `string` | - | - |
-| `details`? | `string` | - | - |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | - |
+| `details?` | `string` | - | - |
 | `isFixed` | `boolean` | - | - |
 | `isFlags` | `boolean` | - | - |
-| `kind` | `"enum"` | - | SdkTypeBase.kind |
+| `kind` | `"enum"` | - | `SdkTypeBase.kind` |
 | `name` | `string` | - | - |
-| `nullable` | `boolean` | - | SdkTypeBase.nullable |
+| `nullable` | `boolean` | - | `SdkTypeBase.nullable` |
 | `usage` | `UsageFlags` | - | - |
 | `valueType` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |
 | `values` | [`SdkEnumValueType`](SdkEnumValueType.md)[] | - | - |

@@ -18,51 +18,86 @@ model Azure.ResourceManager.ApiVersionParameter
 
 ### `ArmAcceptedLroResponse` {#Azure.ResourceManager.ArmAcceptedLroResponse}
 
-The standard ARM response for asynchronous PATCH, POST, and DELETE operations
-
 ```typespec
-model Azure.ResourceManager.ArmAcceptedLroResponse<TMessage>
+model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                                                        |
-| -------- | ---------------------------------------------------------------------------------- |
-| TMessage | The description of the response status (defaults to `Resource operation accepted`) |
+| Name        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Description | The description of the response status (defaults to `Resource operation accepted`) |
+| LroHeaders  | Optional. The lro headers that appear in the Accepted response                     |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
 
-The standard ACCEPTED response
-
 ```typespec
-model Azure.ResourceManager.ArmAcceptedResponse<TMessage>
+model Azure.ResourceManager.ArmAcceptedResponse<Message>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                                                        |
-| -------- | ---------------------------------------------------------------------------------- |
-| TMessage | The description of the response status (defaults to `Resource operation accepted`) |
+| Name    | Description                                                                        |
+| ------- | ---------------------------------------------------------------------------------- |
+| Message | The description of the response status (defaults to `Resource operation accepted`) |
+
+### `ArmAsyncOperationHeader` {#Azure.ResourceManager.ArmAsyncOperationHeader}
+
+The standard header for asynchronous operation polling
+
+```typespec
+model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
+```
+
+#### Template Parameters
+
+| Name          | Description                                       |
+| ------------- | ------------------------------------------------- |
+| StatusMonitor | The status monitor type for lro polling           |
+| UrlValue      | The value type of the Azure-AsyncOperation header |
+
+### `ArmCombinedLroHeaders` {#Azure.ResourceManager.ArmCombinedLroHeaders}
+
+Provide Both Azure-AsyncOperation and Location headers
+
+```typespec
+model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, PollingUrlValue, FinalUrlValue>
+```
+
+#### Template Parameters
+
+| Name            | Description                                                                       |
+| --------------- | --------------------------------------------------------------------------------- |
+| StatusMonitor   | The type of the polling StatusMonitor when following the Azure-AsyncOperation url |
+| FinalResult     | The type of the logical result when following the location header                 |
+| PollingUrlValue | The value type of the link to the status monitor                                  |
+| FinalUrlValue   | The value type fo the link to the final result                                    |
 
 ### `ArmCreatedResponse` {#Azure.ResourceManager.ArmCreatedResponse}
 
 The ARM 201 response for a resource
 
 ```typespec
-model Azure.ResourceManager.ArmCreatedResponse<T>
+model Azure.ResourceManager.ArmCreatedResponse<ResponseBody>
 ```
 
 #### Template Parameters
 
-| Name | Description                       |
-| ---- | --------------------------------- |
-| T    | The contents of the response body |
+| Name         | Description                       |
+| ------------ | --------------------------------- |
+| ResponseBody | The contents of the response body |
 
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 
 ```typespec
-model Azure.ResourceManager.ArmDeleteAcceptedLroResponse
+model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 ```
+
+#### Template Parameters
+
+| Name       | Description                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| LroHeaders | Optional. Allows overriding the Lro headers returned in the response. |
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 
@@ -84,75 +119,101 @@ The response for synchronous delete of a resource
 model Azure.ResourceManager.ArmDeletedResponse
 ```
 
+### `ArmLroLocationHeader` {#Azure.ResourceManager.ArmLroLocationHeader}
+
+The default header for lro PUT and DELETE polling
+
+```typespec
+model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue>
+```
+
+#### Template Parameters
+
+| Name              | Description                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| LroPollingOptions | The polling options when polling the url in the location header |
+| FinalResult       | The ultimate final result of the logical operation              |
+| UrlValue          | The value type for the location header                          |
+
 ### `ArmNoContentResponse` {#Azure.ResourceManager.ArmNoContentResponse}
 
 Standard ARM NoContent (204) response
 
 ```typespec
-model Azure.ResourceManager.ArmNoContentResponse<TMessage>
+model Azure.ResourceManager.ArmNoContentResponse<Message>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                                                             |
-| -------- | --------------------------------------------------------------------------------------- |
-| TMessage | The description of the response status (defaults to `Operation completed successfully`) |
+| Name    | Description                                                                             |
+| ------- | --------------------------------------------------------------------------------------- |
+| Message | The description of the response status (defaults to `Operation completed successfully`) |
+
+### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
+
+Standard ARM operation status response
+
+```typespec
+model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
+```
+
+#### Template Parameters
+
+| Name         | Description                                    |
+| ------------ | ---------------------------------------------- |
+| Properties   | Optional resource-specific properties          |
+| StatusValues | The set of allowed values for operation status |
 
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
-Resource create operation succeeded
-
 ```typespec
-model Azure.ResourceManager.ArmResourceCreatedResponse<TResource>
+model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 ```
 
 #### Template Parameters
 
-| Name      | Description                |
-| --------- | -------------------------- |
-| TResource | The resource being updated |
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being updated                                 |
+| LroHeaders | Optional. The lro headers returned with a Created response |
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
 
-Resource synchronous create operation succeeded
-
 ```typespec
-model Azure.ResourceManager.ArmResourceCreatedSyncResponse<TResource>
+model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description                |
-| --------- | -------------------------- |
-| TResource | The resource being updated |
+| Name     | Description                |
+| -------- | -------------------------- |
+| Resource | The resource being updated |
 
 ### `ArmResourceUpdatedResponse` {#Azure.ResourceManager.ArmResourceUpdatedResponse}
 
-Resource update operation succeeded
-
 ```typespec
-model Azure.ResourceManager.ArmResourceUpdatedResponse<TResource>
+model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description                |
-| --------- | -------------------------- |
-| TResource | The resource being updated |
+| Name     | Description                |
+| -------- | -------------------------- |
+| Resource | The resource being updated |
 
 ### `ArmResponse` {#Azure.ResourceManager.ArmResponse}
 
 The ARM synchronous OK response
 
 ```typespec
-model Azure.ResourceManager.ArmResponse<T>
+model Azure.ResourceManager.ArmResponse<ResponseBody>
 ```
 
 #### Template Parameters
 
-| Name | Description                       |
-| ---- | --------------------------------- |
-| T    | The contents of the response body |
+| Name         | Description                       |
+| ------------ | --------------------------------- |
+| ResponseBody | The contents of the response body |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
 
@@ -236,35 +297,44 @@ Concrete extension resource types can be created by aliasing this type using a s
 See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.ExtensionResource<TProperties>
+model Azure.ResourceManager.ExtensionResource<Properties>
 ```
 
 #### Template Parameters
 
-| Name        | Description                                                           |
-| ----------- | --------------------------------------------------------------------- |
-| TProperties | A model containing the provider-specific properties for this resource |
+| Name       | Description                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| Properties | A model containing the provider-specific properties for this resource |
 
 ### `KeysOf` {#Azure.ResourceManager.KeysOf}
 
 Extracts the key (path) parameters from a resource and its parents
 
 ```typespec
-model Azure.ResourceManager.KeysOf<TResource>
+model Azure.ResourceManager.KeysOf<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description                             |
-| --------- | --------------------------------------- |
-| TResource | The resource to extract properties from |
+| Name     | Description                             |
+| -------- | --------------------------------------- |
+| Resource | The resource to extract properties from |
 
 ### `LocationParameter` {#Azure.ResourceManager.LocationParameter}
 
+DEPRECATED - DO NOT USE
 The default location parameter type.
 
 ```typespec
 model Azure.ResourceManager.LocationParameter
+```
+
+### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.LocationResourceParameter
 ```
 
 ### `ManagedBy` {#Azure.ResourceManager.ManagedBy}
@@ -306,14 +376,14 @@ model Azure.ResourceManager.ManagedSystemAssignedIdentity
 Extracts the key (path) parameters from the parent(s) of the given resource
 
 ```typespec
-model Azure.ResourceManager.ParentKeysOf<TResource>
+model Azure.ResourceManager.ParentKeysOf<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description                             |
-| --------- | --------------------------------------- |
-| TResource | The resource to extract properties from |
+| Name     | Description                             |
+| -------- | --------------------------------------- |
+| Resource | The resource to extract properties from |
 
 ### `PrivateEndpoint` {#Azure.ResourceManager.PrivateEndpoint}
 
@@ -336,14 +406,14 @@ model Azure.ResourceManager.PrivateEndpointConnection
 The name of the private endpoint connection associated with the Azure resource.
 
 ```typespec
-model Azure.ResourceManager.PrivateEndpointConnectionParameter<TSegment>
+model Azure.ResourceManager.PrivateEndpointConnectionParameter<Segment>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                                                                     |
-| -------- | ----------------------------------------------------------------------------------------------- |
-| TSegment | The resource type name for private endpoint connections (default is privateEndpointConnections) |
+| Name    | Description                                                                                     |
+| ------- | ----------------------------------------------------------------------------------------------- |
+| Segment | The resource type name for private endpoint connections (default is privateEndpointConnections) |
 
 ### `PrivateEndpointConnectionProperties` {#Azure.ResourceManager.PrivateEndpointConnectionProperties}
 
@@ -380,14 +450,14 @@ model Azure.ResourceManager.PrivateLinkResourceListResult
 The name of the private link associated with the Azure resource.
 
 ```typespec
-model Azure.ResourceManager.PrivateLinkResourceParameter<TSegment>
+model Azure.ResourceManager.PrivateLinkResourceParameter<Segment>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                                                |
-| -------- | -------------------------------------------------------------------------- |
-| TSegment | The resource type name for private links (default is privateLinkResources) |
+| Name    | Description                                                                |
+| ------- | -------------------------------------------------------------------------- |
+| Segment | The resource type name for private links (default is privateLinkResources) |
 
 ### `PrivateLinkResourceProperties` {#Azure.ResourceManager.PrivateLinkResourceProperties}
 
@@ -410,14 +480,14 @@ model Azure.ResourceManager.PrivateLinkServiceConnectionState
 Model describing the provider namespace.
 
 ```typespec
-model Azure.ResourceManager.ProviderNamespace<TResource>
+model Azure.ResourceManager.ProviderNamespace<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description                             |
-| --------- | --------------------------------------- |
-| TResource | The resource provided by the namespace. |
+| Name     | Description                             |
+| -------- | --------------------------------------- |
+| Resource | The resource provided by the namespace. |
 
 ### `ProxyResource` {#Azure.ResourceManager.ProxyResource}
 
@@ -426,14 +496,14 @@ Concrete proxy resource types can be created by aliasing this type using a speci
 See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.ProxyResource<TProperties>
+model Azure.ResourceManager.ProxyResource<Properties>
 ```
 
 #### Template Parameters
 
-| Name        | Description                                                           |
-| ----------- | --------------------------------------------------------------------- |
-| TProperties | A model containing the provider-specific properties for this resource |
+| Name       | Description                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| Properties | A model containing the provider-specific properties for this resource |
 
 ### `ResourceGroupParameter` {#Azure.ResourceManager.ResourceGroupParameter}
 
@@ -458,15 +528,15 @@ The dynamic parameters of a resource instance - pass in the proper base type to 
 where the resource is based. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceInstanceParameters<TResource, TBaseParameters>
+model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 ```
 
 #### Template Parameters
 
-| Name            | Description                                              |
-| --------------- | -------------------------------------------------------- |
-| TResource       | The resource to get parameters for                       |
-| TBaseParameters | The parameters representing the base Uri of the resource |
+| Name           | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| Resource       | The resource to get parameters for                       |
+| BaseParameters | The parameters representing the base Uri of the resource |
 
 ### `ResourceKind` {#Azure.ResourceManager.ResourceKind}
 
@@ -490,14 +560,14 @@ model Foo is TrackedResource<FooProperties> {
 Paged response containing resources
 
 ```typespec
-model Azure.ResourceManager.ResourceListResult<TResource>
+model Azure.ResourceManager.ResourceListResult<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description                                                                |
-| --------- | -------------------------------------------------------------------------- |
-| TResource | The type of the values returned in the paged response (must be a resource) |
+| Name     | Description                                                                |
+| -------- | -------------------------------------------------------------------------- |
+| Resource | The type of the values returned in the paged response (must be a resource) |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
@@ -505,15 +575,15 @@ The dynamic parameters of a list call for a resource instance - pass in the prop
 where the list should take place. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceParentParameters<TResource, TBaseParameters>
+model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 ```
 
 #### Template Parameters
 
-| Name            | Description                                              |
-| --------------- | -------------------------------------------------------- |
-| TResource       | The resource to get parameters for                       |
-| TBaseParameters | The parameters representing the base Uri of the resource |
+| Name           | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| Resource       | The resource to get parameters for                       |
+| BaseParameters | The parameters representing the base Uri of the resource |
 
 ### `ResourcePlan` {#Azure.ResourceManager.ResourcePlan}
 
@@ -565,6 +635,18 @@ The default subscriptionId parameter type.
 model Azure.ResourceManager.SubscriptionIdParameter
 ```
 
+### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
+
+```typespec
+model Azure.ResourceManager.SubscriptionLocationResource
+```
+
+### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
+
+```typespec
+model Azure.ResourceManager.TenantLocationResource
+```
+
 ### `TrackedResource` {#Azure.ResourceManager.TrackedResource}
 
 Concrete tracked resource types can be created by aliasing this type using a specific property type.
@@ -572,14 +654,14 @@ Concrete tracked resource types can be created by aliasing this type using a spe
 See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.TrackedResource<TProperties>
+model Azure.ResourceManager.TrackedResource<Properties>
 ```
 
 #### Template Parameters
 
-| Name        | Description                                                           |
-| ----------- | --------------------------------------------------------------------- |
-| TProperties | A model containing the provider-specific properties for this resource |
+| Name       | Description                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| Properties | A model containing the provider-specific properties for this resource |
 
 ### `InfrastructureEncryption` {#Azure.ResourceManager.InfrastructureEncryption}
 
@@ -701,6 +783,14 @@ Base model that defines common properties for all ARM resources.
 model Azure.ResourceManager.Foundations.ArmResource
 ```
 
+### `ArmResourceBase` {#Azure.ResourceManager.Foundations.ArmResourceBase}
+
+Base class used for type definitions
+
+```typespec
+model Azure.ResourceManager.Foundations.ArmResourceBase
+```
+
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}
 
 Standard type definition for ARM Tags property.
@@ -710,20 +800,6 @@ It is included in the TrackedResource template definition.
 ```typespec
 model Azure.ResourceManager.Foundations.ArmTagsProperty
 ```
-
-### `BaseParameters` {#Azure.ResourceManager.Foundations.BaseParameters}
-
-Base parameters for a resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.BaseParameters<TResource>
-```
-
-#### Template Parameters
-
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest}
 
@@ -740,6 +816,20 @@ The check availability result.
 ```typespec
 model Azure.ResourceManager.Foundations.CheckNameAvailabilityResponse
 ```
+
+### `DefaultBaseParameters` {#Azure.ResourceManager.Foundations.DefaultBaseParameters}
+
+Base parameters for a resource.
+
+```typespec
+model Azure.ResourceManager.Foundations.DefaultBaseParameters<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `ErrorAdditionalInfo` {#Azure.ResourceManager.Foundations.ErrorAdditionalInfo}
 
@@ -778,14 +868,14 @@ model Azure.ResourceManager.Foundations.ExtensionResourceBase
 Parameter model for listing an extension resource
 
 ```typespec
-model Azure.ResourceManager.Foundations.ExtensionScope<TResource>
+model Azure.ResourceManager.Foundations.ExtensionScope<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `LocationBaseParameters` {#Azure.ResourceManager.Foundations.LocationBaseParameters}
 
@@ -800,14 +890,14 @@ model Azure.ResourceManager.Foundations.LocationBaseParameters
 Parameter model for listing a resource at the location scope
 
 ```typespec
-model Azure.ResourceManager.Foundations.LocationScope<TResource>
+model Azure.ResourceManager.Foundations.LocationScope<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `ManagedIdentityProperties` {#Azure.ResourceManager.Foundations.ManagedIdentityProperties}
 
@@ -878,15 +968,15 @@ model Azure.ResourceManager.Foundations.ProxyResourceBase
 The type used for update operations of the resource.
 
 ```typespec
-model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<TResource, TProperties>
+model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<Resource, Properties>
 ```
 
 #### Template Parameters
 
-| Name        | Description                 |
-| ----------- | --------------------------- |
-| TResource   | The type of the resource.   |
-| TProperties | The type of the properties. |
+| Name       | Description                 |
+| ---------- | --------------------------- |
+| Resource   | The type of the resource.   |
+| Properties | The type of the properties. |
 
 ### `ResourceGroupBaseParameters` {#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters}
 
@@ -901,14 +991,14 @@ model Azure.ResourceManager.Foundations.ResourceGroupBaseParameters
 Parameter model for listing a resource at the resource group scope
 
 ```typespec
-model Azure.ResourceManager.Foundations.ResourceGroupScope<TResource>
+model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `ResourcePlanType` {#Azure.ResourceManager.Foundations.ResourcePlanType}
 
@@ -932,15 +1022,15 @@ Defines a model type used to create named resource update models
 e.g. `model MyResourceUpdate is ResourceUpdate<MyResourceProperties> {}`
 
 ```typespec
-model Azure.ResourceManager.Foundations.ResourceUpdateModel<TResource, TProperties>
+model Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>
 ```
 
 #### Template Parameters
 
-| Name        | Description                 |
-| ----------- | --------------------------- |
-| TResource   | The type of the resource.   |
-| TProperties | The type of the properties. |
+| Name       | Description                 |
+| ---------- | --------------------------- |
+| Resource   | The type of the resource.   |
+| Properties | The type of the properties. |
 
 ### `ResourceUpdateModelProperties` {#Azure.ResourceManager.Foundations.ResourceUpdateModelProperties}
 
@@ -948,15 +1038,15 @@ Defines a properties type used to create named resource update models.
 This type is not used directly, it is referenced by ResourceUpdateModel.
 
 ```typespec
-model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<TResource, TProperties>
+model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>
 ```
 
 #### Template Parameters
 
-| Name        | Description                 |
-| ----------- | --------------------------- |
-| TResource   | The type of the resource.   |
-| TProperties | The type of the properties. |
+| Name       | Description                 |
+| ---------- | --------------------------- |
+| Resource   | The type of the resource.   |
+| Properties | The type of the properties. |
 
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 
@@ -971,14 +1061,14 @@ model Azure.ResourceManager.Foundations.SubscriptionBaseParameters
 Parameter model for listing a resource at the subscription scope
 
 ```typespec
-model Azure.ResourceManager.Foundations.SubscriptionScope<TResource>
+model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `SystemData` {#Azure.ResourceManager.Foundations.SystemData}
 
@@ -993,14 +1083,14 @@ model Azure.ResourceManager.Foundations.SystemData
 The type used for updating tags in resources.
 
 ```typespec
-model Azure.ResourceManager.Foundations.TagsUpdateModel<TResource>
+model Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `TenantBaseParameters` {#Azure.ResourceManager.Foundations.TenantBaseParameters}
 
@@ -1015,14 +1105,14 @@ model Azure.ResourceManager.Foundations.TenantBaseParameters
 Parameter model for listing a resource at the tenant scope
 
 ```typespec
-model Azure.ResourceManager.Foundations.TenantScope<TResource>
+model Azure.ResourceManager.Foundations.TenantScope<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `TrackedResourceBase` {#Azure.ResourceManager.Foundations.TrackedResourceBase}
 

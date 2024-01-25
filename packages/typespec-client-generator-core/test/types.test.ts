@@ -1370,6 +1370,43 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(dogKindProperty.type, dogKind);
     });
 
+    it("union to extensible enum values", async () => {
+      await runner.compileWithBuiltInService(`
+      union PetKind {
+        Cat: "cat",
+        Dog: "dog",
+        string,
+      }
+
+      @route("/extensible-enum")
+      @put
+      op putPet(@body petKind: PetKind): void;
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 1);
+      const petKind = models[0] as SdkEnumType;
+      strictEqual(petKind.name, "PetKind");
+      strictEqual(petKind.isFixed, false);
+      strictEqual(petKind.valueType.kind, "string");
+      const values = petKind.values;
+      deepStrictEqual(
+        values.map((x) => x.name),
+        ["Cat", "Dog"]
+      );
+
+      const catValue = values.find((x) => x.name === "Cat")!;
+      strictEqual(catValue.value, "cat");
+      strictEqual(catValue.enumType, petKind);
+      strictEqual(catValue.valueType, petKind.valueType);
+      strictEqual(catValue.kind, "enumvalue");
+
+      const dogValue = values.find((x) => x.name === "Dog")!;
+      strictEqual(dogValue.value, "dog");
+      strictEqual(dogValue.enumType, petKind);
+      strictEqual(dogValue.valueType, petKind.valueType);
+      strictEqual(dogValue.kind, "enumvalue");
+    });
+
     it("enum discriminator model without base discriminator property", async () => {
       await runner.compileWithBuiltInService(`
       enum DogKind {
