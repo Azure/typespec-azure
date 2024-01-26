@@ -1096,6 +1096,22 @@ describe("typespec-client-generator-core: public-utils", () => {
         const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
           .generatedName;
         strictEqual(unionName, "AStatus");
+        strictEqual(models[0].kind, "model");
+        const statusProp = models[0].properties[0];
+        strictEqual(statusProp.kind, "property");
+        strictEqual(statusProp.type.kind, "union");
+        strictEqual(statusProp.type.values.length, 2);
+        const startVal = statusProp.type.values.find(
+          (x) => x.kind === "constant" && x.value === "start"
+        )!;
+        strictEqual(startVal.kind, "constant");
+        strictEqual(startVal.valueType.kind, "string");
+
+        const stopVal = statusProp.type.values.find(
+          (x) => x.kind === "constant" && x.value === "stop"
+        )!;
+        strictEqual(stopVal.kind, "constant");
+        strictEqual(stopVal.valueType.kind, "string");
       });
 
       it("should handle union of anonymous model", async () => {
@@ -1288,6 +1304,32 @@ describe("typespec-client-generator-core: public-utils", () => {
           (union as SdkUnionType).generatedName,
           "RequestParameterWithAnonymousUnionRepeatabilityResult"
         );
+      });
+
+      it("anonymous union with base type", async () => {
+        const { repeatabilityResult } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          model RequestParameterWithAnonymousUnion {
+            @header("Repeatability-Result")
+            @test
+            repeatabilityResult?: "accepted" | "rejected" | string;
+
+            test: string;
+          }
+  
+          op test(...RequestParameterWithAnonymousUnion): void;
+        }
+        `)) as { repeatabilityResult: ModelProperty };
+
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
+        strictEqual(stringType.kind, "union");
+        strictEqual(stringType.values.length, 3);
+        strictEqual(stringType.values[0].kind, "constant");
+        strictEqual(stringType.values[0].value, "accepted");
+        strictEqual(stringType.values[1].kind, "constant");
+        strictEqual(stringType.values[1].value, "rejected");
+        strictEqual(stringType.values[2].kind, "string");
       });
     });
   });

@@ -7,4 +7,4 @@ title: "[I] CSharpServiceEmitterOptions"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
-| `skip-format`? | `boolean` | Skip formatting of output. Default is false (generated c-sharp files are formatted) |
+| `skip-format?` | `boolean` | Skip formatting of output. Default is false (generated c-sharp files are formatted) |

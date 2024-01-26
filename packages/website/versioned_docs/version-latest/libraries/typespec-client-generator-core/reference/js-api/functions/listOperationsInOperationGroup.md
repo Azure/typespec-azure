@@ -4,17 +4,21 @@ title: "[F] listOperationsInOperationGroup"
 
 ---
 ```ts
-listOperationsInOperationGroup(context, group): Operation[]
+listOperationsInOperationGroup(
+   context, 
+   group, 
+   ignoreHierarchy): Operation[]
 ```
 
-List operation in the given operation group. Pass a client to list the operation at the root of the client.
+List operations inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operations.
 
 ## Parameters
 
-| Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | - |
-| `group` | [`SdkClient`](../interfaces/SdkClient.md) \| [`SdkOperationGroup`](../interfaces/SdkOperationGroup.md) |  |
+| Parameter | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | `undefined` | - |
+| `group` | [`SdkClient`](../interfaces/SdkClient.md) \| [`SdkOperationGroup`](../interfaces/SdkOperationGroup.md) | `undefined` | Client or operation group to list operations |
+| `ignoreHierarchy` | `boolean` | `false` | Whether to get all nested operations |
 
 ## Returns
 

@@ -3,13 +3,12 @@ jsApi: true
 title: "[P] JS Api"
 
 ---
-## Exports
-
-### Enumerations
+## Enumerations
 
 - [FinalStateValue](enumerations/FinalStateValue.md)
+- [pollingOptionsKind](enumerations/pollingOptionsKind.md)
 
-### Interfaces
+## Interfaces
 
 - [EmbeddingVectorMetadata](interfaces/EmbeddingVectorMetadata.md)
 - [FinalOperationLink](interfaces/FinalOperationLink.md)
@@ -21,33 +20,38 @@ title: "[P] JS Api"
 - [ModelPropertyTerminationStatus](interfaces/ModelPropertyTerminationStatus.md)
 - [NextOperationLink](interfaces/NextOperationLink.md)
 - [NextOperationReference](interfaces/NextOperationReference.md)
+- [NoPollingSuccessProperty](interfaces/NoPollingSuccessProperty.md)
 - [OperationLink](interfaces/OperationLink.md)
 - [OperationLinkMetadata](interfaces/OperationLinkMetadata.md)
 - [OperationReference](interfaces/OperationReference.md)
 - [PagedResultMetadata](interfaces/PagedResultMetadata.md)
 - [ParameterSource](interfaces/ParameterSource.md)
+- [PollingLocationBase](interfaces/PollingLocationBase.md)
 - [PollingOperationStep](interfaces/PollingOperationStep.md)
 - [PollingSuccessNoResult](interfaces/PollingSuccessNoResult.md)
 - [PollingSuccessProperty](interfaces/PollingSuccessProperty.md)
+- [StatusMonitorPollingLocationInfo](interfaces/StatusMonitorPollingLocationInfo.md)
 
-### Type Aliases
+## Type Aliases
 
 - [FinalOperationStep](type-aliases/FinalOperationStep.md)
 - [OperationStep](type-aliases/OperationStep.md)
+- [PollingLocationInfo](type-aliases/PollingLocationInfo.md)
 - [TerminationStatus](type-aliases/TerminationStatus.md)
 - [UnionEnum](type-aliases/UnionEnum.md)
 - [nextOperationStep](type-aliases/nextOperationStep.md)
 
-### Variables
+## Variables
 
 - [$lib](variables/$lib.md)
+- [$linter](variables/$linter.md)
 - [FinalOperationKey](variables/FinalOperationKey.md)
 - [PollingOperationKey](variables/PollingOperationKey.md)
 - [namespace](variables/namespace.md)
 - [preventRestLibraryInterfaces](variables/preventRestLibraryInterfaces.md)
 - [useStandardOperations](variables/useStandardOperations.md)
 
-### Functions
+## Functions
 
 - [$addTraitProperties](functions/$addTraitProperties.md)
 - [$applyTraitOverride](functions/$applyTraitOverride.md)
@@ -93,6 +97,7 @@ title: "[P] JS Api"
 - [filterResponseModels](functions/filterResponseModels.md)
 - [getAllProperties](functions/getAllProperties.md)
 - [getAsEmbeddingVector](functions/getAsEmbeddingVector.md)
+- [getFinalLocationValue](functions/getFinalLocationValue.md)
 - [getHttpMetadata](functions/getHttpMetadata.md)
 - [getItems](functions/getItems.md)
 - [getLongRunningStates](functions/getLongRunningStates.md)
@@ -105,6 +110,7 @@ title: "[P] JS Api"
 - [getOperationLinks](functions/getOperationLinks.md)
 - [getOperationResponse](functions/getOperationResponse.md)
 - [getPagedResult](functions/getPagedResult.md)
+- [getPollingLocationInfo](functions/getPollingLocationInfo.md)
 - [getPollingOperationParameter](functions/getPollingOperationParameter.md)
 - [getRequestParameter](functions/getRequestParameter.md)
 - [getResponseProperty](functions/getResponseProperty.md)

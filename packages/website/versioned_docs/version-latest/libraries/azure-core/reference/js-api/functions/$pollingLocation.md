@@ -4,7 +4,10 @@ title: "[F] $pollingLocation"
 
 ---
 ```ts
-$pollingLocation(context, entity): void
+$pollingLocation(
+   context, 
+   entity, 
+   options?): void
 ```
 
 ## Parameters
@@ -13,6 +16,7 @@ $pollingLocation(context, entity): void
 | :------ | :------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
+| `options`? | `Model` |
 
 ## Returns
 

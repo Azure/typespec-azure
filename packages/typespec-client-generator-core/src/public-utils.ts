@@ -1,11 +1,9 @@
 import {
-  Enum,
-  EnumMember,
   Model,
   ModelProperty,
   Namespace,
   Operation,
-  Scalar,
+  Interface,
   Type,
   Union,
   getEffectiveModelType,
@@ -149,10 +147,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(
-  context: SdkContext,
-  type: Model | ModelProperty | Operation | Enum | EnumMember
-): string {
+export function getLibraryName(context: SdkContext, type: Type & { name?: string }): string {
   if (!context.emitterName) {
     // eslint-disable-next-line deprecation/deprecation
     context.emitterName = getEmitterTargetName(context);
@@ -179,7 +174,12 @@ export function getLibraryName(
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: Model | Enum | Operation | Scalar): string {
+export function getCrossLanguageDefinitionId(type: {
+  name: string;
+  kind: string;
+  interface?: Interface;
+  namespace?: Namespace;
+}): string {
   let retval = type.name;
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
