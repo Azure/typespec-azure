@@ -55,7 +55,8 @@
   ],
   "peerDependencies": {
     "@typespec/compiler": "workspace:~0.52.0",
-    "@azure-tools/typespec-azure-core": "~0.38.0",
+    "@azure-tools/typespec-azure-core": "workplace:~0.38.0",
+    "@azure-tools/typespec-client-generator-core": "workspace:~0.38.0",
     "@typespec/http": "workspace:~0.52.0",
     "@typespec/rest": "workspace:~0.52.0",
     "@typespec/openapi": "workspace:~0.52.0",

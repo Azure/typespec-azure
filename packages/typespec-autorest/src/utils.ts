@@ -2,7 +2,6 @@ import {
   ModelProperty,
   Operation,
   Program,
-  ProjectedNameView,
   Service,
   Type,
   getFriendlyName,
@@ -18,8 +17,7 @@ export interface AutorestEmitterContext {
   program: Program;
   service: Service;
   version?: string;
-  jsonView: ProjectedNameView;
-  clientView: ProjectedNameView;
+  getClientName: (type: Type & { name: string }) => string;
 }
 
 /**
@@ -61,17 +59,15 @@ export function shouldInline(program: Program, type: Type): boolean {
  * @returns Operation ID in this format `<name>` or `<group>_<name>`
  */
 export function resolveOperationId(context: AutorestEmitterContext, operation: Operation) {
-  const { program, clientView } = context;
+  const { program, getClientName } = context;
   const explicitOperationId = getOperationId(program, operation);
   if (explicitOperationId) {
     return explicitOperationId;
   }
 
-  const operationName = clientView.getProjectedName(operation);
+  const operationName = getClientName(operation);
   if (operation.interface) {
-    return pascalCaseForOperationId(
-      `${clientView.getProjectedName(operation.interface)}_${operationName}`
-    );
+    return pascalCaseForOperationId(`${getClientName(operation.interface)}_${operationName}`);
   }
   const namespace = operation.namespace;
   if (
