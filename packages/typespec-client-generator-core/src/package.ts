@@ -145,7 +145,6 @@ function getSdkHttpBodyParameters(
 }
 
 function createContentTypeOrAcceptHeader(
-  context: SdkContext<SdkHttpOperation>,
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
   const nameInClient = bodyObject.kind === "body" ? "contentType" : "accept";
@@ -154,10 +153,17 @@ function createContentTypeOrAcceptHeader(
     encode: "string",
     nullable: false,
   };
+  // for contentType, we treat it as a constant IFF there's one value and it's application/json.
+  // this is to prevent a breaking change when a service adds more content types in the future.
+  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
+  //
+  // for accept, we treat it as a constant IFF there's a single value. adding more content types
+  // for this case is considered a breaking change for SDKs so we want to surface it as such.
+  // e.g. the service returns image/png then later provides the option to return image/jpeg.
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    /json/.test(bodyObject.contentTypes[0])
+    (/json/.test(bodyObject.contentTypes[0]) || nameInClient === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -202,7 +208,7 @@ function getSdkHttpOperation(
   ) {
     // We will always add a content type parameter if a body is being inputted
     const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(context, bodyParams[0]),
+      ...createContentTypeOrAcceptHeader(bodyParams[0]),
       description: `Body parameter's content type. Known values are ${bodyParams[0].contentTypes}`,
     };
     parameters.push({
@@ -223,7 +229,7 @@ function getSdkHttpOperation(
   if (responsesWithBodies.length > 0 && !headerParams.some((h) => isAcceptHeader(h))) {
     // Always have an accept header if we're returning any response with a body
     const acceptBase = {
-      ...createContentTypeOrAcceptHeader(context, responsesWithBodies[0]),
+      ...createContentTypeOrAcceptHeader(responsesWithBodies[0]),
     };
     parameters.push({
       ...acceptBase,

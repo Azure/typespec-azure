@@ -1324,7 +1324,7 @@ describe("typespec-client-generator-core: package", () => {
       );
     });
 
-    it("ensure accept is a constant if only one possibility", async () => {
+    it("ensure accept is a constant if only one possibility (json)", async () => {
       await runner.compileWithBuiltInService(`
       model DefaultDatetimeProperty {
         value: utcDateTime;
@@ -1358,6 +1358,45 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.response.kind, "method");
       strictEqual(method.response.type, sdkPackage.models[0]);
+    });
+
+    it("ensure accept is a constant if only one possibility (non-json)", async () => {
+      await runner.compileWithBuiltInService(`
+      @get op default(): {
+        @header
+        contentType: "image/png";
+    
+        @body
+        value: bytes;
+      };
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+
+      strictEqual(method.parameters.length, 1);
+      const methodAcceptParam = method.parameters[0];
+      strictEqual(methodAcceptParam.nameInClient, "accept");
+
+      const serviceOperation = method.operation;
+      strictEqual(serviceOperation.parameters.length, 1);
+      const serviceContentTypeParam = serviceOperation.parameters[0];
+      strictEqual(serviceContentTypeParam.nameInClient, "accept");
+      strictEqual(serviceContentTypeParam.serializedName, "Accept");
+      strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
+      strictEqual(serviceContentTypeParam.type.kind, "constant");
+      strictEqual(serviceContentTypeParam.type.value, "image/png");
+      strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
+
+      strictEqual(Object.keys(serviceOperation.responses).length, 1);
+      const response = serviceOperation.responses[200];
+      strictEqual(response.kind, "http");
+      strictEqual(sdkPackage.models.length, 0);
+      strictEqual(response.contentTypes?.length, 1);
+      strictEqual(response.contentTypes[0], "image/png");
+      strictEqual(response.defaultContentType, "image/png");
+
+      strictEqual(method.response.kind, "method");
+      strictEqual(method.response.type?.kind, "bytes");
     });
   });
 
