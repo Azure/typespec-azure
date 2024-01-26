@@ -1,9 +1,9 @@
 import {
+  Interface,
   Model,
   ModelProperty,
   Namespace,
   Operation,
-  Interface,
   Type,
   Union,
   getEffectiveModelType,
