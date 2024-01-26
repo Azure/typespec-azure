@@ -1,4 +1,3 @@
-import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
 import { checkForChangedFiles, coreRepoRoot, repoRoot } from "./helpers.js";
 
 if (
@@ -17,7 +16,7 @@ In the future, remember to alert coworkers to avoid merging additional changes w
 Close this PR, run prepare-publish again.`
     );
   }
-  await runOrExit("git", ["diff"], { cwd: coreRepoRoot });
-  await runOrExit("git", ["diff"], { cwd: repoRoot });
+  run("git", ["diff"], { cwd: coreRepoRoot });
+  run("git", ["diff"], { cwd: repoRoot });
   process.exit(1);
 }

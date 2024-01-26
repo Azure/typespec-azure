@@ -7,5 +7,7 @@ title: "[I] SdkOperationGroup"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
+| `groupPath` | `string` | - |
 | `kind` | `"SdkOperationGroup"` | - |
+| `subOperationGroups?` | [`SdkOperationGroup`](SdkOperationGroup.md)[] | - |
 | `type` | `Interface` \| `Namespace` | - |

@@ -34,11 +34,11 @@ enum OperationState {
 
 /**
  * Provides status details for long running operations.
- * @template TStatusResult The type of the operation status result.
- * @template TStatusError The type of the operation status error. If not provided, the default error is used.
+ * @template StatusResult The type of the operation status result.
+ * @template StatusError The type of the operation status error. If not provided, the default error is used.
  */
 @doc("Provides status details for long running operations.")
-model OperationStatus<TStatusResult = never, TStatusError = Foundations.Error> {
+model OperationStatus<StatusResult = never, StatusError = Foundations.Error> {
   @key("operationId")
   @doc("The unique ID of the operation.")
   id: string;
@@ -47,79 +47,79 @@ model OperationStatus<TStatusResult = never, TStatusError = Foundations.Error> {
   status: OperationState;
 
   @doc("Error object that describes the error when status is \"Failed\".")
-  error?: TStatusError;
+  error?: StatusError;
 
   @doc("The result of the operation.")
-  result?: TStatusResult;
+  result?: StatusResult;
 }
 
 /**
  * Conveys the resource instance to an operation as a request body.
- * @template T The type of the resource instance.
+ * @template Resource The type of the resource instance.
  */
 @added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Conveys the resource instance to an operation as a request body.")
-model ResourceBody<T> {
+model ResourceBody<Resource> {
   @doc("The resource instance.")
   @body
-  resource: T;
+  resource: Resource;
 }
 
 // TODO: There is a ARM linter rule that verifies that
 // there is no response body. However, long running
 // operations are allowed to have it.
-alias ResourceCreatedResponse<T extends TypeSpec.Reflection.Model> = TypeSpec.Http.Response<201> &
-  T;
+alias ResourceCreatedResponse<Resource extends TypeSpec.Reflection.Model> = TypeSpec.Http.Response<201> &
+  Resource;
 
-alias ResourceOkResponse<T> = TypeSpec.Http.Response<200> & T;
+alias ResourceOkResponse<Resource> = TypeSpec.Http.Response<200> & Resource;
 
-alias ResourceCreatedOrOkResponse<T extends TypeSpec.Reflection.Model> = ResourceCreatedResponse<T> | ResourceOkResponse<T>;
+alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> = ResourceCreatedResponse<Resource> | ResourceOkResponse<Resource>;
 
 /**
  * Response describing the location of a created resource.
  * @template T The type of the created resource.
  */
-model LocationOfCreatedResourceResponse<T extends TypeSpec.Reflection.Model>
+model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.CreatedResponse {
   @finalLocation
   @TypeSpec.Http.header("Location")
-  location: ResourceLocation<T>;
+  location: ResourceLocation<Resource>;
 }
 
 /**
  * Response describing the location of a resource created with a service-provided name.
  * @template T The type of the created resource.
  */
-model LocationOfCreatedResourceWithServiceProvidedNameResponse<T extends TypeSpec.Reflection.Model>
+model LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.AcceptedResponse {
   @finalLocation
   @TypeSpec.Http.header("Location")
-  location: ResourceLocation<T>;
+  location: ResourceLocation<Resource>;
 }
 
 /**
  * Metadata for long running operation status monitor locations.
- * @template TStatusResult The type of the operation status result.
+ * @template StatusResult The type of the operation status result.
  */
 @doc("Metadata for long running operation status monitor locations")
-model LongRunningStatusLocation<TStatusResult = never> {
+model LongRunningStatusLocation<StatusResult = never> {
   @pollingLocation
   @doc("The location for monitoring the operation state.")
   @TypeSpec.Http.header("Operation-Location")
-  operationLocation: ResourceLocation<OperationStatus<TStatusResult>>;
+  operationLocation: ResourceLocation<OperationStatus<StatusResult>>;
 }
 
-alias AcceptedResponse<T = {}> = TypeSpec.Http.AcceptedResponse & T;
+alias AcceptedResponse<Resource = {}> = TypeSpec.Http.AcceptedResponse & Resource;
 
 /**
  * A response containing error details.
- * @template TError The type of the error object.
+ * @template Error The type of the error object.
  */
 @error
 @doc("A response containing error details.")
-model ErrorResponseBase<TError> {
+model ErrorResponseBase<Error> {
   @doc("The error object.")
-  error: TError;
+  error: Error;
 
   @header("x-ms-error-code")
   @doc("String error code indicating what went wrong.")
@@ -174,93 +174,93 @@ model InnerError {
 
 /**
  * Version of a model for a create or replace operation which only includes updateable properties.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
 @omitKeyProperties
-model ResourceCreateOrReplaceModel<TResource extends TypeSpec.Reflection.Model>
-  is UpdateableProperties<DefaultKeyVisibility<TResource, "read">>;
+model ResourceCreateOrReplaceModel<Resource extends TypeSpec.Reflection.Model>
+  is UpdateableProperties<DefaultKeyVisibility<Resource, "read">>;
 
 /**
  * Collection of properties from a resource that are visible to create or update scopes.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
 @withVisibility("create", "update")
-model CreateableAndUpdateableProperties<TResource> {
-  ...TResource;
+model CreateableAndUpdateableProperties<Resource> {
+  ...Resource;
 }
 
 /**
  * Version of a model for a create or update operation which only includes updateable properties.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
 @omitKeyProperties
-model ResourceCreateOrUpdateModel<TResource>
-  is OptionalProperties<CreateableAndUpdateableProperties<DefaultKeyVisibility<TResource, "read">>>;
+model ResourceCreateOrUpdateModel<Resource>
+  is OptionalProperties<CreateableAndUpdateableProperties<DefaultKeyVisibility<Resource, "read">>>;
 
 /**
  * Version of a model for an update operation which only includes updateable properties.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
 @omitKeyProperties
-model ResourceUpdateModel<TResource>
-  is OptionalProperties<UpdateableProperties<DefaultKeyVisibility<TResource, "read">>>;
+model ResourceUpdateModel<Resource>
+  is OptionalProperties<UpdateableProperties<DefaultKeyVisibility<Resource, "read">>>;
 
 /**
  * A model containing the keys of the provided resource.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
 @copyResourceKeyParameters
-model ItemKeysOf<TResource> {}
+model ItemKeysOf<Resource> {}
 
 /**
  * A model containing the collection keys of the provided resource's parent resource.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
 @copyResourceKeyParameters("parent")
-model CollectionKeysOf<TResource> {}
+model CollectionKeysOf<Resource> {}
 
 /**
  * A model describing a set of custom request parameters.
- * @template TCustom An object describing custom request parameters.
+ * @template Custom An object describing custom request parameters.
  */
-@Private.spreadCustomParameters(TCustom)
-model CustomParameters<TCustom extends TypeSpec.Reflection.Model> {}
+@Private.spreadCustomParameters(Custom)
+model CustomParameters<Custom extends TypeSpec.Reflection.Model> {}
 
 /**
  * A model describing a set of custom response properties.
- * @template TCustom An object describing custom response properties.
+ * @template Custom An object describing custom response properties.
  */
-@Private.spreadCustomResponseProperties(TCustom)
-model CustomResponseFields<TCustom extends TypeSpec.Reflection.Model> {}
+@Private.spreadCustomResponseProperties(Custom)
+model CustomResponseFields<Custom extends TypeSpec.Reflection.Model> {}
 
 /**
  * A model describing a customized page of resources.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  * @template Traits Traits which apply to the page.
  */
 @pagedResult
-@friendlyName("Paged{name}", TResource)
-@doc("Paged collection of {name} items", TResource)
+@friendlyName("Paged{name}", Resource)
+@doc("Paged collection of {name} items", Resource)
 model CustomPage<
-  TResource extends TypeSpec.Reflection.Model,
+  Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
 > {
-  @doc("The {name} items on this page", TResource)
+  @doc("The {name} items on this page", Resource)
   @items
-  value: TResource[];
+  value: Resource[];
 
   @doc("The link to the next page of items")
   @nextLink
-  nextLink?: ResourceLocation<TResource>;
+  nextLink?: ResourceLocation<Resource>;
 
   // Include custom response fields
   ...TraitProperties<Traits, TraitLocation.Response, TraitContext.List>;
 }
 
 /**
- * The expected shape of model types passed to the TCustom parameter of operation signatures.
+ * The expected shape of model types passed to the Custom parameter of operation signatures.
  */
-@doc("The expected shape of model types passed to the TCustom parameter of operation signatures.")
+@doc("The expected shape of model types passed to the Custom parameter of operation signatures.")
 model CustomizationFields {
   @doc("An object containing custom parameters that will be included in the operation.")
   parameters?: {};
@@ -273,171 +273,171 @@ model CustomizationFields {
 
 /**
  * The most basic operation.
- * @template TParams Object describing the request parameters of the operation.
- * @template TResponse Object describing the response properties of the operation.
+ * @template Parameters Object describing the request parameters of the operation.
+ * @template Response Object describing the response properties of the operation.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 op Operation<
-  TParams extends TypeSpec.Reflection.Model,
-  TResponse,
+  Parameters extends TypeSpec.Reflection.Model,
+  Response,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
 >(
   ...TraitProperties<
     Traits & VersionParameterTrait<ApiVersionParameter>,
     TraitLocation.ApiVersionParameter
   >,
-  ...TParams,
-): TResponse | TErrorResponse;
+  ...Parameters,
+): Response | ErrorResponse;
 
 /**
  * Long-running operation.
- * @template TParams Object describing the request parameters of the operation.
- * @template TResponse Object describing the response properties of the operation. If not provided, the AcceptedResponse type will be used.
+ * @template Parameters Object describing the request parameters of the operation.
+ * @template Response Object describing the response properties of the operation. If not provided, the AcceptedResponse type will be used.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This operation signature is not used in Azure Resource Manager operations (yet)"
 op LongRunningOperation<
-  TParams extends TypeSpec.Reflection.Model,
-  TResponse = AcceptedResponse,
+  Parameters extends TypeSpec.Reflection.Model,
+  Response = AcceptedResponse,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
-> is Operation<TParams, TResponse & Foundations.LongRunningStatusLocation, Traits, TErrorResponse>;
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
+> is Operation<Parameters, Response & Foundations.LongRunningStatusLocation, Traits, ErrorResponse>;
 
 /**
  * Operation that returns the status of another operation.
- * @template TParams Object describing the request parameters of the operation.
- * @template TStatusResult The type of the operation status result.
- * @template TStatusError The type of the operation status error.
+ * @template Parameters Object describing the request parameters of the operation.
+ * @template StatusResult The type of the operation status result.
+ * @template StatusError The type of the operation status error.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 op GetOperationStatus<
-  TParams = {},
-  TStatusResult = never,
-  TStatusError = Error,
+  Parameters = {},
+  StatusResult = never,
+  StatusError = Error,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > is Foundations.Operation<
-  TParams & {
+  Parameters & {
     @doc("The unique ID of the operation.")
     @path
     operationId: string;
   },
-  OperationStatus<TStatusResult, TStatusError>,
+  OperationStatus<StatusResult, StatusError>,
   Traits,
-  TErrorResponse
+  ErrorResponse
 >;
 
 // Fundamental Resource Operation Shapes
 
 /**
  * The most basic operation that applies to a resource.
- * @template TResource The type of the resource.
- * @template TParams Object describing the request parameters of the operation.
- * @template TResponse Object describing the response properties of the operation.
+ * @template Resource The type of the resource.
+ * @template Parameters Object describing the request parameters of the operation.
+ * @template Response Object describing the response properties of the operation.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/no-response-body" "This operation must return a status monitor in its response."
 @autoRoute
-@Private.ensureResourceType(TResource)
+@Private.ensureResourceType(Resource)
 op ResourceOperation<
-  TResource extends TypeSpec.Reflection.Model,
-  TParams extends TypeSpec.Reflection.Model,
-  TResponse,  // No constraint here on purpose, some responses are unions
+  Resource extends TypeSpec.Reflection.Model,
+  Parameters extends TypeSpec.Reflection.Model,
+  Response,  // No constraint here on purpose, some responses are unions
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
-> is Operation<Foundations.ItemKeysOf<TResource> & TParams, TResponse, Traits, TErrorResponse>;
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
+> is Operation<Foundations.ItemKeysOf<Resource> & Parameters, Response, Traits, ErrorResponse>;
 
 /**
  * Operation that applies to a collection of resources.
- * @template TResource The type of the resource.
- * @template TParams Object describing the request parameters of the operation.
- * @template TResponse Object describing the response properties of the operation.
+ * @template Resource The type of the resource.
+ * @template Parameters Object describing the request parameters of the operation.
+ * @template Response Object describing the response properties of the operation.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/no-response-body" "This operation must return a status monitor in its response."
 @autoRoute
-@Private.ensureResourceType(TResource)
+@Private.ensureResourceType(Resource)
 op ResourceCollectionOperation<
-  TResource extends TypeSpec.Reflection.Model,
-  TParams extends TypeSpec.Reflection.Model,
-  TResponse extends TypeSpec.Reflection.Model,
+  Resource extends TypeSpec.Reflection.Model,
+  Parameters extends TypeSpec.Reflection.Model,
+  Response extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > is Operation<
-  Foundations.CollectionKeysOf<TResource> & TParams,
-  TResponse,
+  Foundations.CollectionKeysOf<Resource> & Parameters,
+  Response,
   Traits,
-  TErrorResponse
+  ErrorResponse
 >;
 
 /**
  * Operation that lists resources in a paginated way.
- * @template TResource The type of the resource.
- * @template TParams Object describing the request parameters of the operation.
- * @template TResponse Object describing the response properties of the operation.
+ * @template Resource The type of the resource.
+ * @template Parameters Object describing the request parameters of the operation.
+ * @template Response Object describing the response properties of the operation.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
-@listsResource(TResource)
-@Private.ensureResourceType(TResource)
+@listsResource(Resource)
+@Private.ensureResourceType(Resource)
 op ResourceList<
-  TResource extends TypeSpec.Reflection.Model,
-  TParams extends TypeSpec.Reflection.Model,
-  TResponse extends TypeSpec.Reflection.Model,
+  Resource extends TypeSpec.Reflection.Model,
+  Parameters extends TypeSpec.Reflection.Model,
+  Response extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
-> is ResourceCollectionOperation<TResource, TParams, TResponse, Traits, TErrorResponse>;
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
+> is ResourceCollectionOperation<Resource, Parameters, Response, Traits, ErrorResponse>;
 
 /**
  * Operation that lists resources in a non-paginated way.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This operation signature is not used in Azure Resource Manager operations (yet)"
 @autoRoute
 op NonPagedResourceList<
-  TResource extends TypeSpec.Reflection.Model,
+  Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > is Foundations.ResourceList<
-  TResource,
+  Resource,
   TraitProperties<Traits, TraitLocation.Parameters, TraitContext.List>,
-  Body<TResource[]> & TraitProperties<Traits, TraitLocation.Response, TraitContext.List>,
+  Body<Resource[]> & TraitProperties<Traits, TraitLocation.Response, TraitContext.List>,
   Traits,
-  TErrorResponse
+  ErrorResponse
 >;
 
 /**
  * Long-running operation that updates a resource.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  * @template Traits Traits which apply to the operation.
- * @template TErrorResponse The type of the error response. If not provided, the default error response type will be used.
+ * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
-@updatesResource(TResource)
+@updatesResource(Resource)
 op LongRunningResourceUpdate<
-  TResource extends TypeSpec.Reflection.Model,
+  Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {},
-  TErrorResponse = Azure.Core.Foundations.ErrorResponse
+  ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > is Foundations.ResourceOperation<
-  TResource,
+  Resource,
   {
     @doc("This request has a JSON Merge Patch body.")
     @TypeSpec.Http.header("Content-Type")
     contentType: "application/merge-patch+json";
 
-    ...Foundations.ResourceBody<TResource>;
+    ...Foundations.ResourceBody<Resource>;
     ...TraitProperties<Traits, TraitLocation.Parameters, TraitContext.Update>;
   },
-  Foundations.ResourceOkResponse<TResource &
+  Foundations.ResourceOkResponse<Resource &
     TraitProperties<Traits, TraitLocation.Response, TraitContext.Update> &
-    Foundations.LongRunningStatusLocation<TResource>>,
+    Foundations.LongRunningStatusLocation<Resource>>,
   Traits,
-  TErrorResponse
+  ErrorResponse
 >;

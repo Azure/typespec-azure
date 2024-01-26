@@ -63,14 +63,14 @@ model SelectParameter {
   $select?: string;
 }
 
-model CollectionResult<T, N> {
-  @extension("x-ms-client-name", N)
-  value: T;
+model CollectionResult<Value, Name> {
+  @extension("x-ms-client-name", Name)
+  value: Value;
 }
 
-model SearchCreatedResponse<T> {
+model SearchCreatedResponse<ResponseBody> {
   ...CreatedResponse;
-  @body body: T;
+  @body body: ResponseBody;
 }
 
 model ETag {
