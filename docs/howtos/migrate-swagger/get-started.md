@@ -13,7 +13,7 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
-- Running the conversion tool:
+- Run the conversion tool:
 
 ```bash
 tsp-client convert --swagger-readme [path to readme.md]
