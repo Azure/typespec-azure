@@ -6,16 +6,22 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 
 ## Steps of running the tool
 
-- Ensure `powershell` is installed.
-- Ensure `autorest` tool is installed. [Installation guide](https://github.com/Azure/autorest/blob/main/docs/install/readme.md)
-- Download conversion script [here](https://aka.ms/azsdk/openapi-to-typespec-script).
-- Running the conversion tool.
+- Install [`@azure-tools/typespec-client-generator-cli`](https://www.npmjs.com/package/@azure-tools/typespec-client-generator-cli):
 
-```powershell
-./convert.ps1 [path to readme.md] [path to output folder]
+```bash
+npm install -g @azure-tools/typespec-client-generator-cli
+```
 
-# OR specify parameter by name
-./convert.ps1 -swaggerConfigFile [path to readme.md] -outputFolder [path to output folder]
+- Running the conversion tool:
+
+```bash
+tsp-client convert --swagger-readme [path to readme.md]
+```
+
+Run the tool from the directory you would like to output your files, alternately specify an output directory:
+
+```bash
+tsp-client convert --swagger-readme [path to readme.md] --output-dir [path to output directory]
 ```
 
 - Review generated TypeSpec
