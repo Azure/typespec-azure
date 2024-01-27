@@ -9,13 +9,13 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 - Ensure [Node.js 18.3 LTS](https://nodejs.org/en/download/) or later is installed.
 - Install [`@azure-tools/typespec-client-generator-cli`](https://www.npmjs.com/package/@azure-tools/typespec-client-generator-cli):
 
-```bash
+```shell
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
 - Run the tool from the directory you would like to output your files:
 
-```bash
+```shell
 tsp-client convert --swagger-readme [path to readme.md]
 ```
 
