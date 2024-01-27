@@ -19,7 +19,7 @@ npm install -g @azure-tools/typespec-client-generator-cli
 tsp-client convert --swagger-readme [path to readme.md]
 ```
 
-To specify an alternate output directory pass the `--output-dir` flag to the command.
+> NOTE: To specify an alternate output directory pass the `--output-dir` flag to the command.
 
 
 - Review generated TypeSpec
