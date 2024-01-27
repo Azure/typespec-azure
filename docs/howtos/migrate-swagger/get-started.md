@@ -13,17 +13,14 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
-- Run the conversion tool:
+- Run the tool from the directory you would like to output your files:
 
 ```bash
 tsp-client convert --swagger-readme [path to readme.md]
 ```
 
-Run the tool from the directory you would like to output your files, alternately specify an output directory:
+To specify an alternate output directory pass the `--output-dir` flag to the command.
 
-```bash
-tsp-client convert --swagger-readme [path to readme.md] --output-dir [path to output directory]
-```
 
 - Review generated TypeSpec
 - Layout [the TypeSpec project folders appropriately](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
