@@ -132,7 +132,7 @@ You can generally choose an asynchronous operation template that matches your op
   update is ArmTagsPatchAsync<Resource>;
   ```
 
-- `ArmResourcePatchAsync`is a PATCH operation that uses the visibility settings to select properties for the PATCH request body(any property with no visibility setting, or including visibility "update").  It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
+- `ArmResourcePatchAsync`is a PATCH operation that uses the visibility settings to select properties for the PATCH request body(any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
 
   ```tsp
   update is ArmResourcePatchAsync<Resource, ResourceProperties>;

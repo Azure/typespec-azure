@@ -1,12 +1,12 @@
 # `ProvisioningStateMustBeReadOnly` lintdiff violation in TypeSpec for ARM Service
 
 When trying to check in an ARM specification to the `azure-rest-api-specs` repository, your specification
-shows violations of the  `ProvisioningStateMustBeReadOnly` lintdiff check.
+shows violations of the `ProvisioningStateMustBeReadOnly` lintdiff check.
 
 ## Symptoms
 
 In the `Swagger LintDiff` or `Swagger(RPaaS) LintDiff` checks, your specification shows one or more
-violations of the  `ProvisioningStateMustBeReadOnly` lintdiff check.
+violations of the `ProvisioningStateMustBeReadOnly` lintdiff check.
 
 ## Cause
 
@@ -22,9 +22,8 @@ enabled automatically.
 
 ```yml
 emit:
-  - '@azure-tools/typespec-autorest'
+  - "@azure-tools/typespec-autorest"
 options:
-  '@azure-tools/typespec-autorest':
+  "@azure-tools/typespec-autorest":
     use-read-only-status-schema: true
-
 ```
