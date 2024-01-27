@@ -201,7 +201,7 @@ interface ResourceCreateSync<
    * @template Resource The ArmResource to create or update.
    * @template BaseParameters The http parameters that are part of the request
    */
-  createOrUpdate is ArmResourceCreateOrUpdateSync<Resource, BaseParameters>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Resource, BaseParameters>;
 }
 
 /**

@@ -239,8 +239,15 @@ op ArmTagsPatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
     string
-  >, Parameters extends {} = {}
-> is ArmCustomPatchAsync<Resource, TagsUpdateModel<Resource>, BaseParameters, LroHeaders, Parameters>;
+  >,
+  Parameters extends {} = {}
+> is ArmCustomPatchAsync<
+  Resource,
+  TagsUpdateModel<Resource>,
+  BaseParameters,
+  LroHeaders,
+  Parameters
+>;
 
 /**
  * @dev A long-running resource update using the items from the resource marked with visibility "update"
@@ -264,7 +271,8 @@ op ArmResourcePatchAsync<
   Resource,
   ResourceUpdateModel<Resource, Properties>,
   BaseParameters,
-  LroHeaders, Parameters
+  LroHeaders,
+  Parameters
 >;
 
 /**
@@ -334,7 +342,12 @@ op ArmResourcePatchSync<
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {}
-> is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters, Parameters>;
+> is ArmCustomPatchSync<
+  Resource,
+  ResourceUpdateModel<Resource, Properties>,
+  BaseParameters,
+  Parameters
+>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
@@ -356,7 +369,12 @@ op ArmCustomPatchSync<
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
   Error extends {} = ErrorResponse
-> is ArmUpdateOperation<ResourceInstanceParameters<Resource, BaseParameters> & Parameters, PatchModel, Response, Error>;
+> is ArmUpdateOperation<
+  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  PatchModel,
+  Response,
+  Error
+>;
 
 /**
  * @dev Delete a resource asynchronously
@@ -393,7 +411,7 @@ op ArmResourceDeleteAsyncBase<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 op ArmResourceDeleteAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -401,13 +419,7 @@ op ArmResourceDeleteAsync<
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
-> is ArmResourceDeleteAsyncBase<
-  Resource,
-  Response,
-  BaseParameters,
-  Parameters,
-  Error
->;
+> is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error>;
 
 /**
  * @dev Delete a resource asynchronously
@@ -417,7 +429,7 @@ op ArmResourceDeleteAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -425,13 +437,7 @@ op ArmResourceDeleteWithoutOkAsync<
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
-> is ArmResourceDeleteAsyncBase<
-  Resource,
-  Response,
-  BaseParameters,
-  Parameters,
-  Error
->;
+> is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error>;
 
 /**
  * Delete a resource synchronously
@@ -440,7 +446,7 @@ op ArmResourceDeleteWithoutOkAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 @autoRoute
 @doc("Delete a {name}", Resource)
 @armResourceDelete(Resource)
@@ -451,9 +457,7 @@ op ArmResourceDeleteSync<
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters): Response | Error;
 
 /**
  * A long-running resource action.
@@ -463,7 +467,7 @@ op ArmResourceDeleteSync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 @autoRoute
 @extension("x-ms-long-running-operation", true)
 @extension(
@@ -482,7 +486,8 @@ op ArmResourceActionAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
-  ...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters,
+  ...ResourceInstanceParameters<Resource, BaseParameters>,
+  ...Parameters,
 
   @doc("The content of the action request")
   @body
@@ -498,7 +503,7 @@ op ArmResourceActionAsyncBase<
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionAsync<
   Resource extends ArmResource,
@@ -529,7 +534,7 @@ op ArmResourceActionAsync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 @autoRoute
 @armResourceAction(Resource)
 @post
@@ -539,11 +544,11 @@ op ArmResourceActionSync<
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
-  ,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
-  ...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters,
+  ...ResourceInstanceParameters<Resource, BaseParameters>,
+  ...Parameters,
 
   @doc("The content of the action request")
   @body
@@ -558,7 +563,7 @@ op ArmResourceActionSync<
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 op ArmResourceActionNoContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
@@ -587,7 +592,7 @@ op ArmResourceActionNoContentAsync<
  * @template Headers Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 op ArmResourceActionNoResponseContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
@@ -615,7 +620,7 @@ op ArmResourceActionNoResponseContentAsync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- */ 
+ */
 @autoRoute
 @armResourceAction(Resource)
 @post
@@ -626,7 +631,8 @@ op ArmResourceActionNoContentSync<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
-  ...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters,
+  ...ResourceInstanceParameters<Resource, BaseParameters>,
+  ...Parameters,
 
   @doc("The content of the action request")
   @body
