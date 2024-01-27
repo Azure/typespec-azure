@@ -66,7 +66,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
             }
@@ -177,7 +177,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MonitorResourceListResult"
             }
@@ -214,7 +214,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MonitorResourceListResult"
             }
@@ -258,7 +258,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MonitorResource"
             }
@@ -297,7 +297,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/MonitorResource"
@@ -371,7 +371,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MonitorResource"
             }
@@ -427,7 +427,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -510,7 +510,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MonitoredResourceListResponse"
             }
@@ -554,7 +554,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/VMResourcesListResponse"
             }
@@ -598,7 +598,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/DynatraceSingleSignOnResourceListResult"
             }
@@ -640,7 +640,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/VMResourcesListResponse"
             }
@@ -691,7 +691,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/DynatraceSingleSignOnResource"
             }
@@ -737,7 +737,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/DynatraceSingleSignOnResource"
@@ -804,7 +804,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TagRuleListResult"
             }
@@ -855,7 +855,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TagRule"
             }
@@ -901,7 +901,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TagRule"
@@ -982,7 +982,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TagRule"
             }
@@ -1045,7 +1045,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -1087,7 +1087,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/VMExtensionPayload"
             }
@@ -1131,7 +1131,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/VMResourcesListResponse"
             }
@@ -1553,7 +1553,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The ARM id of the resource."
+          "description": "The Resource id of the resource."
         },
         "sendingMetrics": {
           "$ref": "#/definitions/SendingMetricsStatus",

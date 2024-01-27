@@ -60,7 +60,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
             }
@@ -94,7 +94,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/CustomAttributesResourceListResult"
             }
@@ -131,7 +131,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/CustomAttributesResourceListResult"
             }
@@ -175,7 +175,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/CustomAttributesResource"
             }
@@ -214,7 +214,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/CustomAttributesResource"
@@ -288,7 +288,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/CustomAttributesResource"
             }
@@ -344,7 +344,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",

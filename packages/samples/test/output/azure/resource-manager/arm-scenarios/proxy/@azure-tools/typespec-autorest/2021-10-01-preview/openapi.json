@@ -64,7 +64,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
             }
@@ -98,7 +98,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/EmployeeListResult"
             }
@@ -135,7 +135,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/EmployeeListResult"
             }
@@ -180,7 +180,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/Employee"
             }
@@ -220,7 +220,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Employee"
@@ -295,7 +295,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/Employee"
             }
@@ -338,7 +338,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -377,7 +377,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/DependentListResult"
             }
@@ -430,7 +430,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/Dependent"
             }
@@ -478,7 +478,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Dependent"
@@ -561,7 +561,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/Dependent"
             }
@@ -612,7 +612,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -660,7 +660,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MoveResponse"
             }

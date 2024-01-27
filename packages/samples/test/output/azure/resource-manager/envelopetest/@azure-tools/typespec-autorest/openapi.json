@@ -63,7 +63,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
             }
@@ -97,7 +97,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/AllPropertiesResourceListResult"
             }
@@ -131,7 +131,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/SystemOnlyResourceListResult"
             }
@@ -168,7 +168,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/AllPropertiesResourceListResult"
             }
@@ -212,7 +212,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/AllPropertiesResource"
             }
@@ -251,7 +251,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/AllPropertiesResource"
@@ -325,7 +325,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/AllPropertiesResource"
             }
@@ -381,7 +381,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -416,7 +416,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/SystemOnlyResourceListResult"
             }
@@ -460,7 +460,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/SystemOnlyResource"
             }
@@ -499,7 +499,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/SystemOnlyResource"
@@ -573,7 +573,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/SystemOnlyResource"
             }
@@ -629,7 +629,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",

@@ -63,7 +63,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LinkerResourceListResult"
             }
@@ -104,7 +104,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LinkerResource"
             }
@@ -140,7 +140,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "Resource create Parameters",
             "required": true,
             "schema": {
               "$ref": "#/definitions/LinkerResource"
@@ -211,7 +211,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LinkerResource"
             }
@@ -264,7 +264,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -303,7 +303,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/SourceConfigurationResult"
             }
@@ -341,7 +341,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/ValidateResult"
             }
@@ -369,7 +369,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
             }

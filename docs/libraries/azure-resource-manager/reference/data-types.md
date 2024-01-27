@@ -75,7 +75,7 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 
 ### `ArmCreatedResponse` {#Azure.ResourceManager.ArmCreatedResponse}
 
-The ARM 201 response for a resource
+The Azure Resource Manager 201 response for a resource
 
 ```typespec
 model Azure.ResourceManager.ArmCreatedResponse<ResponseBody>
@@ -137,7 +137,7 @@ model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult,
 
 ### `ArmNoContentResponse` {#Azure.ResourceManager.ArmNoContentResponse}
 
-Standard ARM NoContent (204) response
+Standard Azure Resource Manager NoContent (204) response
 
 ```typespec
 model Azure.ResourceManager.ArmNoContentResponse<Message>
@@ -151,7 +151,7 @@ model Azure.ResourceManager.ArmNoContentResponse<Message>
 
 ### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
 
-Standard ARM operation status response
+Standard Azure Resource Manager operation status response
 
 ```typespec
 model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
@@ -203,7 +203,7 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 
 ### `ArmResponse` {#Azure.ResourceManager.ArmResponse}
 
-The ARM synchronous OK response
+The Azure Resource Manager synchronous OK response
 
 ```typespec
 model Azure.ResourceManager.ArmResponse<ResponseBody>
@@ -284,7 +284,7 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ErrorResponse` {#Azure.ResourceManager.ErrorResponse}
 
-The standard ARM error response
+The standard Azure Resource Manager error response
 
 ```typespec
 model Azure.ResourceManager.ErrorResponse
@@ -294,7 +294,7 @@ model Azure.ResourceManager.ErrorResponse
 
 Concrete extension resource types can be created by aliasing this type using a specific property type.
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 model Azure.ResourceManager.ExtensionResource<Properties>
@@ -356,7 +356,7 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.ManagedServiceIdentity}
 
-Standard ARM definition of ManagedServiceIdentity
+Standard Azure Resource Manager definition of ManagedServiceIdentity
 
 ```typespec
 model Azure.ResourceManager.ManagedServiceIdentity
@@ -364,7 +364,7 @@ model Azure.ResourceManager.ManagedServiceIdentity
 
 ### `ManagedSystemAssignedIdentity` {#Azure.ResourceManager.ManagedSystemAssignedIdentity}
 
-Standard ARM definition of ManagedServiceIdentity for services
+Standard Azure Resource Manager definition of ManagedServiceIdentity for services
 that only support system-defined identities
 
 ```typespec
@@ -493,7 +493,7 @@ model Azure.ResourceManager.ProviderNamespace<Resource>
 
 Concrete proxy resource types can be created by aliasing this type using a specific property type.
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 model Azure.ResourceManager.ProxyResource<Properties>
@@ -515,7 +515,7 @@ model Azure.ResourceManager.ResourceGroupParameter
 
 ### `ResourceIdentifierAllowedResource` {#Azure.ResourceManager.ResourceIdentifierAllowedResource}
 
-Used in ResourceIdentifier definition to represent a particular type of ARM resource, enabling constraints based on resource type.
+Used in ResourceIdentifier definition to represent a particular type of Azure Resource Manager resource, enabling constraints based on resource type.
 See [link](https://github.com/Azure/autorest/tree/main/docs/extensions#schema)
 
 ```typespec
@@ -651,7 +651,7 @@ model Azure.ResourceManager.TenantLocationResource
 
 Concrete tracked resource types can be created by aliasing this type using a specific property type.
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 model Azure.ResourceManager.TrackedResource<Properties>
@@ -726,7 +726,7 @@ enum Azure.ResourceManager.Versions
 
 ### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
 
-A type definition that refers the id to an ARM resource.
+A type definition that refers the id to an Azure Resource Manager resource.
 
 Sample usage:
 otherArmId: ResourceIdentifier;
@@ -739,7 +739,7 @@ scalar Azure.ResourceManager.ResourceIdentifier
 
 ### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
 
-A type definition that refers the id to an ARM resource.
+A type definition that refers the id to an Azure Resource Manager resource.
 
 Sample usage:
 otherArmId: ResourceIdentifier;
@@ -752,7 +752,7 @@ scalar Azure.ResourceManager.ResourceIdentifier
 
 ### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
 
-A type definition that refers the id to an ARM resource.
+A type definition that refers the id to an Azure Resource Manager resource.
 
 Sample usage:
 otherArmId: ResourceIdentifier;
@@ -767,7 +767,7 @@ scalar Azure.ResourceManager.ResourceIdentifier
 
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 
-The ARM common-types versions.
+The Azure Resource Manager common-types versions.
 
 ```typespec
 enum Azure.ResourceManager.CommonTypes.Versions
@@ -777,7 +777,7 @@ enum Azure.ResourceManager.CommonTypes.Versions
 
 ### `ArmResource` {#Azure.ResourceManager.Foundations.ArmResource}
 
-Base model that defines common properties for all ARM resources.
+Base model that defines common properties for all Azure Resource Manager resources.
 
 ```typespec
 model Azure.ResourceManager.Foundations.ArmResource
@@ -793,7 +793,7 @@ model Azure.ResourceManager.Foundations.ArmResourceBase
 
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}
 
-Standard type definition for ARM Tags property.
+Standard type definition for Azure Resource Manager Tags property.
 
 It is included in the TrackedResource template definition.
 
