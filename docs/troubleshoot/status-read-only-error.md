@@ -1,37 +1,30 @@
-# Duplicate Body Error When Instantiating `ProxyResourceOperations`
+# `ProvisioningStateMustBeReadOnly` lintdiff violation in TypeSpec for ARM Service
 
-When instantiating the `ProxyResourceOperations<TResource>` template with an incorrect second parameter, a "duplicate body" error like the following may result:
-
-```javascript
-error @typespec/http/duplicate-body
-Operation has a @body and an unannotated parameter. There can only be one representing the body
-```
+When trying to check in an ARM specification to the `azure-rest-api-specs` repository, your specification
+shows violations of the  `ProvisioningStateMustBeReadOnly` lintdiff check.
 
 ## Symptoms
 
-When instantiating the `ProxyResourceOperations<TResource>` template, it is easy to assume that the second parameter should contain the RP-specific properties of the resource, as with the `TrackedResourceOperations<TResource, TProperties>` template.
-
-```typespec
-// INCORRECT USAGE OF THE TEMPLATE
-interface MyResourceOperations extends ProxyResourceOperations<MyResource, MyResourceProperties> {}
-```
-
-However, this usage is **incorrect**, the second parameter to `ProxyResourceOperations` is optional and, if provided, is expecting an entirely different TypeSpec type. If the resource properties are supplied instead, a "duplicate body" error like the following will result:
-
-```javascript
-error @typespec/http/duplicate-body
-Operation has a @body and an unannotated parameter. There can only be one representing the body
-```
+In the `Swagger LintDiff` or `Swagger(RPaaS) LintDiff` checks, your specification shows one or more
+violations of the  `ProvisioningStateMustBeReadOnly` lintdiff check.
 
 ## Cause
 
-This error occurs because the second parameter is an optional override for the shared request parameters for the `read`, `createOrUpdate`, and `delete` operations for the proxy resource. When the rp-specific properties are provided instead, the operation request parameters clash with the request body parameter for `createOrUpdate`.
+The LintDiff swagger scripts use an old validation mechanism that does not detect `readOnly` properties, but requires the
+type schema referenced by the properties to be `readOnly` instead.
 
 ## Workaround
 
-To fix this error, provide only one parameter to ProxyResourceOperations, the type of the resource that the operations apply to.
+Until this validation is fixed, you can configure the `@azure-tools/typespec-autorest` emitter in `tspConfig.yaml`
+to always output any `ProvisioningState` schema as readOnly, using the `read-only-status-schema` option. This
+resolves the LintDiff violation. Note that if you use the scaffolding template for `ARM`, this configuration is
+enabled automatically.
 
-```typespec
-// CORRECT
-interface MyResourceOperations extends ProxyResourceOperations<MyResource> {}
+```yml
+emit:
+  - '@azure-tools/typespec-autorest'
+options:
+  '@azure-tools/typespec-autorest':
+    use-read-only-status-schema: true
+
 ```

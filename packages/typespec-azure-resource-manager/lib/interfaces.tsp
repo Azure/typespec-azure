@@ -8,9 +8,9 @@ using Azure.ResourceManager.Private;
 namespace Azure.ResourceManager;
 
 /**
- * This is the interface that implements the standard ARM operation that returns
+ * This is the interface that implements the standard Azure Resource Manager operation that returns
  * all supported RP operations. You should have exactly one declaration for each
- * ARM service. It implements
+ * Azure Resource Manager service. It implements
  *   GET "/providers/Microsoft.ContosoProviderHub/operations"
  */
 interface Operations {
