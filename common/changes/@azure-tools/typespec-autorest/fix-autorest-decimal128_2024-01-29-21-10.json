@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@azure-tools/typespec-autorest",
+      "comment": "Fix: Autorest emitter should generated format: decimal",
+      "type": "none"
+    }
+  ],
+  "packageName": "@azure-tools/typespec-autorest"
+}

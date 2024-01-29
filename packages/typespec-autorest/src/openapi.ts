@@ -2111,7 +2111,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
       case "decimal":
         return { type: "number", format: "decimal" };
       case "decimal128":
-        return { type: "number", format: "decimal128" };
+        return { type: "number", format: "decimal" };
       case "string":
         return { type: "string" };
       case "boolean":
