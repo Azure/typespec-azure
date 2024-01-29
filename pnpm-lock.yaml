@@ -1554,7 +1554,7 @@ importers:
   packages/samples:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -1741,7 +1741,7 @@ importers:
   packages/typespec-azure-playground-website:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -1826,7 +1826,7 @@ importers:
   packages/typespec-azure-resource-manager:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -1960,7 +1960,7 @@ importers:
         version: 5.3.0
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
