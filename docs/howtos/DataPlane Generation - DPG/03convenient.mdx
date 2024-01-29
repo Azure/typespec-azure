@@ -132,6 +132,9 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
+// Model class is not generated.
+// Convenient method is not generated.
+
 public final class PetStoreNamespaceClient {
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
 }
@@ -185,6 +188,9 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
+// Model class resides in implementation package.
+// Client method is package private.
+
 package com.petstorenamespace.implementation.models;
 public final class OutputModel {
     public String getName()
@@ -255,6 +261,9 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
+// If a model class is output-only, its constructor is not public.
+// Adding Usage.input to it would make its constructor public.
+
 package com.azure.ai.openai.models;
 
 public final class AzureCognitiveSearchIndexFieldMappingOptions {
