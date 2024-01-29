@@ -63,7 +63,16 @@ const model: OutputModel = await client.path("/petStore/model/{name}").get();
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class OutputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    public OutputModel getModel(String name)
+}
 ```
 
 </TabItem>
@@ -123,7 +132,9 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+}
 ```
 
 </TabItem>
@@ -174,7 +185,16 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.implementation.models;
+public final class OutputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    OutputModel getModel(String name)
+}
 ```
 
 </TabItem>
@@ -235,7 +255,20 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.azure.ai.openai.models;
+
+public final class AzureCognitiveSearchIndexFieldMappingOptions {
+    public AzureCognitiveSearchIndexFieldMappingOptions()
+    public String getTitleField()
+    public AzureCognitiveSearchIndexFieldMappingOptions setTitleField(String titleField)
+    ...
+}
+
+public final class ImageGenerations {
+    public ImageGenerations(OffsetDateTime createdAt, List<ImageGenerationData> data)
+    public OffsetDateTime getCreatedAt()
+    public List<ImageGenerationData> getData()
+}
 ```
 
 </TabItem>

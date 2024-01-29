@@ -60,7 +60,22 @@ FIXME;
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+public enum Mode {
+    STRICT("strict"),
+    LENIENT("lenient");
+}
+
+public final class CompletionInput {
+    public CompletionInput(BinaryData input)
+    public BinaryData getInput()
+}
+
+public final class Client {
+    public Response<BinaryData> analyzeWithResponse(String mode, BinaryData image, RequestOptions requestOptions)
+    public Response<BinaryData> completionsWithResponse(BinaryData input, RequestOptions requestOptions)
+    public AnalyzeResult analyze(Mode mode, byte[] image)
+    public CompletionResult completions(CompletionInput input)
+}
 ```
 
 </TabItem>
@@ -73,10 +88,12 @@ you must use `@sharedRoute`. By default, codegen will generate one method per op
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
-@sharedRoute("/foo")
-op a(x: int): float;
+@sharedRoute
+@route("/foo")
+op a(x: int32): float;
 
-@sharedRoute("/foo")
+@sharedRoute
+@route("/foo")
 op b(x: string): int64;
 ```
 
@@ -116,7 +133,12 @@ FIXME;
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+public final class Client {
+    public Response<BinaryData> aWithResponse(BinaryData request, RequestOptions requestOptions)
+    public Response<BinaryData> bWithResponse(BinaryData request, RequestOptions requestOptions)
+    public double a(int x)
+    public long b(String x)
+}
 ```
 
 </TabItem>
@@ -133,10 +155,12 @@ If your shared routes are actually one unique semantic operation, you may want t
 
 ```typescript
 // main.tsp
-@sharedRoute("/foo")
+@sharedRoute
+@route("/foo")
 op a(x: int) : float
 
-@sharedRoute("/foo")
+@sharedRoute
+@route("/foo")
 op b(x: string) : int64
 
 // client.tsp
@@ -188,7 +212,7 @@ FIXME;
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+NOT_SUPPORTED
 ```
 
 </TabItem>
