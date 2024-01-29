@@ -1,6 +1,4 @@
 import {
-  Enum,
-  EnumMember,
   getDeprecationDetails,
   getDoc,
   getEffectiveModelType,
@@ -9,13 +7,13 @@ import {
   getProjectedName,
   getSummary,
   ignoreDiagnostics,
+  Interface,
   listServices,
   Model,
   ModelProperty,
   Namespace,
   Operation,
   resolveEncodedName,
-  Scalar,
   Type,
   Union,
 } from "@typespec/compiler";
@@ -178,10 +176,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(
-  context: SdkContext,
-  type: Model | ModelProperty | Operation | Enum | EnumMember
-): string {
+export function getLibraryName(context: SdkContext, type: Type & { name?: string }): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;
@@ -235,8 +230,8 @@ export function getWireName(context: SdkContext, type: Type & { name: string }) 
   return getProjectedName(context.program, type, "json") ?? type.name;
 }
 
-interface DefaultSdkTypeBase<TKind> {
-  __raw: Type;
+interface SdkTypeBaseHelper<TKind> {
+  __raw?: Type;
   nullable: boolean;
   deprecation?: string;
   kind: TKind;
@@ -248,9 +243,15 @@ interface DefaultSdkTypeBase<TKind> {
  */
 export function getSdkTypeBaseHelper<TKind>(
   context: SdkContext,
-  type: Type,
+  type: Type | string,
   kind: TKind
-): DefaultSdkTypeBase<TKind> {
+): SdkTypeBaseHelper<TKind> {
+  if (typeof type === "string") {
+    return {
+      nullable: false,
+      kind,
+    };
+  }
   return {
     __raw: type,
     nullable: false,
@@ -264,7 +265,12 @@ export function getSdkTypeBaseHelper<TKind>(
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: Model | Enum | Operation | Scalar): string {
+export function getCrossLanguageDefinitionId(type: {
+  name: string;
+  kind: string;
+  interface?: Interface;
+  namespace?: Namespace;
+}): string {
   let retval = type.name;
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
