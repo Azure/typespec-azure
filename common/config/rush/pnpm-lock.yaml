@@ -1487,7 +1487,7 @@ importers:
   ../../packages/samples:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -1674,7 +1674,7 @@ importers:
   ../../packages/typespec-azure-playground-website:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -1759,7 +1759,7 @@ importers:
   ../../packages/typespec-azure-resource-manager:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -1893,7 +1893,7 @@ importers:
         version: 5.3.0
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.38.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.38.0
@@ -14709,6 +14709,7 @@ packages:
   /mimic-response@3.1.0:
     resolution: {integrity: sha512-z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==}
     engines: {node: '>=10'}
+    requiresBuild: true
 
   /mimic-response@4.0.0:
     resolution: {integrity: sha512-e5ISH9xMYU0DzrT+jl8q2ze9D6eWBto+I8CNpe+VI+K2J/F/k3PdkdTdz4wvGVH4NTpo+NRYTVIuMQEMMcsLqg==}
