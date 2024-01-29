@@ -67,6 +67,13 @@ export const $lib = createTypeSpecLibrary({
         wrongType: paramMessage`Encoding '${"encoding"}' cannot be used on type '${"type"}'`,
       },
     },
+    "conflicting-multipart-model-usage": {
+      severity: "error",
+      messages: {
+        default: "Invalid encoding",
+        wrongType: paramMessage`Model '${"modelName"}' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model ${"modelName"}FormData' extends ${"modelName"} {}`,
+      },
+    },
     "discriminator-not-constant": {
       severity: "error",
       messages: {
