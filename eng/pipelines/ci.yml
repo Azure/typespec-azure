@@ -92,4 +92,4 @@ jobs:
       - script: pnpm -r --filter="@azure-tools/*" publish --access public --no-git-checks --tag next
         name: Publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: $(azure-sdk-npm-token)
