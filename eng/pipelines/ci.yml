@@ -69,7 +69,7 @@ jobs:
     timeoutInMinutes: 90
     # dependsOn: npm_stable
     displayName: Npm publish dev version
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main') # Only publish -dev on main branch.
+    # condition: eq(variables['Build.SourceBranch'], 'refs/heads/main') # Only publish -dev on main branch.
     pool:
       name: azsdk-pool-mms-win-2022-general
       vmImage: windows-2022
