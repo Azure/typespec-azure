@@ -89,7 +89,13 @@ jobs:
       - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
         displayName: Bump version to prerelease targets
 
-      - script: pnpm -r --filter="@azure-tools/*" publish --access public --no-git-checks --tag next
+      - script: pnpm -r --filter='!./core' publish --access public --no-git-checks --tag next --dry-run
+        displayName: Dry run
+
+      - script: |
+          pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
+
+          pnpm -r --filter='!./core' publish --access public --no-git-checks --tag next
         name: Publish
         env:
           NODE_AUTH_TOKEN: $(azure-sdk-npm-token)
