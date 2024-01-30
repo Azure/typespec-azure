@@ -99,11 +99,6 @@ jobs:
         displayName: Dry run 3
 
       - script: |
-          pnpm config set loglevel=debug
-          pnpm config set registry=https://registry.npmjs.org/
           pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
-
-          pnpm -r publish --access public --no-git-checks --tag next
+          pnpm -r publish --access public --no-git-checks
         name: Publish
-        env:
-          NODE_AUTH_TOKEN: $(azure-sdk-npm-token)
