@@ -64,7 +64,16 @@ const model: InputModel = await client.path("/petStore/model/{name}").get();
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class InputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    public InputModel getModel(String name)
+}
 ```
 
 </TabItem>
@@ -126,7 +135,16 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class InputOptions {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    public InputOptions getModel(String name)
+}
 ```
 
 </TabItem>
@@ -173,7 +191,16 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class InputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> readModelWithResponse(String name, RequestOptions requestOptions)
+    public InputModel readModel(String name)
+}
 ```
 
 </TabItem>

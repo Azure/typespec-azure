@@ -86,7 +86,7 @@ jobs:
           nodeVersion: "20.x"
       - template: ./templates/build.yml
 
-      - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview . ./core
+      - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
         displayName: Bump version to prerelease targets
 
       - script: |
