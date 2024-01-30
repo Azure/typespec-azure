@@ -32,11 +32,11 @@ op completions(@body input: CompletionInput): CompletionResult;
 <TabItem value="python" label="Python">
 
 ```python
-def analyze(*, mode: Literal["strict", "lenient"], image: bytes) -> AnalyzeResult:
+def analyze(image: bytes, *, mode: Literal["strict", "lenient"]) -> AnalyzeResult:
   ...
 
 class CompletionInput:
-  input: str | List[str] = rest_field(readonly=True)
+  input: Union[str, List[str]] = rest_field(readonly=True)
 
 def completions(input: CompletionInput) -> CompletionResult:
   ...
