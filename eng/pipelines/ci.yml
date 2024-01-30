@@ -67,7 +67,7 @@ jobs:
 
   - job: npm_preview
     timeoutInMinutes: 90
-    dependsOn: npm_stable
+    # dependsOn: npm_stable
     displayName: Npm publish dev version
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/main') # Only publish -dev on main branch.
     pool:
