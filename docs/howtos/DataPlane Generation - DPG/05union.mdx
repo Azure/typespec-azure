@@ -46,7 +46,31 @@ def completions(input: CompletionInput) -> CompletionResult:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-FIXME
+// Union "strict" | "lenient" will be generate as extensible enum
+public readonly partial struct Mode : IEquatable<Mode>
+{
+  public static Mode Strict { get; } = new Mode(StrictValue);
+  public static Mode Lenient { get; } = new Mode(LenientValue);
+}
+//protocol method
+public virtual async Task<Response> AnalyzeAsync(string mode, RequestContent content, RequestContext context = null)
+public virtual Response Analyze(string mode, RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response<AnalyzeResult>> AnalyzeAsync(Mode mode, BinaryData image, CancellationToken cancellationToken = default)
+public virtual Response<AnalyzeResult> Analyze(Mode mode, BinaryData image, CancellationToken cancellationToken = default)
+
+// other union which cannot be convert to enum will generate as BinaryData
+public partial class CompletionInput
+{
+  public CompletionInput(BinaryData input)
+  public BinaryData Input { get; }
+}
+//protocol method
+public virtual async Task<Response> CompletionsAsync(RequestContent content, RequestContext context = null)
+public virtual Response Completions(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response<CompletionResult>> CompletionsAsync(CompletionInput input, CancellationToken cancellationToken = default)
+public virtual Response<CompletionResult> Completions(CompletionInput input, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>

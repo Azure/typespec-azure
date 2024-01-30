@@ -45,7 +45,26 @@ FIXME
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-FIXME
+namespace PetStoreNamespace.Models
+{
+  public partial class OutputModel
+  {
+    public string Name { get; }
+  }
+}
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetModelAsync(string name, RequestContext context)
+    public virtual Response GetModel(string name, RequestContext context)
+    // convenience method
+    public virtual async Task<Response<OutputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default)
+    public virtual Response<OutputModel> GetModel(string name, CancellationToken cancellationToken = default)
+  }
+}
 ```
 
 </TabItem>
@@ -120,7 +139,18 @@ using Azure.ClientGenerator.Core;
 <TabItem value="csharp" label="CSharp" >
 
 ```c#
-FIXME
+// Model class is not generated.
+// Convenient method is not generated.
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetModelAsync(string name, RequestContext context)
+    public virtual Response GetModel(string name, RequestContext context)
+  }
+}
 ```
 
 </TabItem>
@@ -177,7 +207,27 @@ class _GetModel:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-FIXME
+// Model class is internal
+namespace PetStoreNamespace.Models
+{
+  internal partial class OutputModel
+  {
+    public string Name { get; }
+  }
+}
+// Client method is internal
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    //protocol method
+    internal virtual async Task<Response> GetModelAsync(string name, RequestContext context)
+    internal virtual Response GetModel(string name, RequestContext context)
+    //convenience method
+    internal virtual async Task<Response<OutputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default)
+    internal virtual Response<OutputModel> GetModel(string name, CancellationToken cancellationToken = default)
+  }
+}
 ```
 
 </TabItem>
@@ -250,7 +300,37 @@ using Azure.ClientGenerator.Core;
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-FIXME
+// If a model is input-only, there will be one public constructor with all required properties as parameter.
+// And the required properties without setter. Optional properties will have both getter and setter
+namespace Azure.AI.OpenAI.Models
+{
+  public partial class AzureCognitiveSearchIndexFieldMappingOptions
+  {
+    public AzureCognitiveSearchIndexFieldMappingOptions()
+
+    public string TitleFieldName { get; set; }
+    public string UrlFieldName { get; set; }
+    public string FilepathFieldName { get; set; }
+    public IList<string> ContentFieldNames { get; }
+    public string ContentFieldSeparator { get; set; }
+    public IList<string> VectorFieldNames { get; }
+    public IList<string> ImageVectorFieldNames { get; }
+  }
+}
+// If a model is output-only, there is no public constructor, and all properties only have getter, no setter.
+
+// If a model is roundtrip (input + output), there will be one public constructor with all required properties as parameter.
+// And all properties will have both getter and setter
+namespace Azure.AI.OpenAI.Models
+{
+  public partial class ImageGenerations
+  {
+    public ImageGenerations(DateTimeOffset created, IEnumerable<ImageGenerationData> data)
+
+    public DateTimeOffset Created { get; set; }
+    public IList<ImageGenerationData> Data { get; }
+  }
+}
 ```
 
 </TabItem>
