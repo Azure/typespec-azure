@@ -407,10 +407,10 @@ enum SourceContentStructureKind {
   unstructured,
 }
 
-@friendlyName("{name}UpdateRecord", T)
-model UpdateRecord<T> {
+@friendlyName("{name}UpdateRecord", Value)
+model UpdateRecord<Value> {
   updateOperation: UpdateOperationKind;
-  value: T;
+  value: Value;
 }
 
 @doc("Update source record.")

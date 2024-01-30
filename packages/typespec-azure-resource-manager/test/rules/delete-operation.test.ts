@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { deleteOperationMissingRule } from "../../src/rules/delete-operation.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 

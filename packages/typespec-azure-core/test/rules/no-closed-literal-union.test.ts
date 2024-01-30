@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { noClosedLiteralUnionRule } from "../../src/rules/no-closed-literal-union.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

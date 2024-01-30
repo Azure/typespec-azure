@@ -20,7 +20,7 @@ model OperationListResult is Azure.Core.Page<Operation>;
  * Base model that defines common properties for all ARM resources.
  */
 @doc("Common properties for all ARM resources.")
-model ArmResource {
+model ArmResource extends ArmResourceBase {
   @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
   @visibility("read")
   id: string;
@@ -35,6 +35,9 @@ model ArmResource {
   @visibility("read")
   systemData?: SystemData;
 }
+
+/** Base class used for type definitions */
+model ArmResourceBase {}
 
 /**
  * The base tracked resource.
@@ -213,16 +216,23 @@ model ErrorDetail {
 
 /**
  * Base parameters for a resource.
- * @template TResource The type of the resource.
+ *
+ * @template Resource The type of the resource.
  */
-@resourceBaseParametersOf(TResource)
-model BaseParameters<TResource extends ArmResource> {
+alias BaseParameters<Resource extends ArmResourceBase> = DefaultBaseParameters<Resource>;
+
+/**
+ * Base parameters for a resource.
+ * @template Resource The type of the resource.
+ */
+@resourceBaseParametersOf(Resource)
+model DefaultBaseParameters<Resource extends ArmResourceBase> {
   ...ApiVersionParameter;
 
   // unless tenant or extension
   ...SubscriptionIdParameter;
 
-  //unless tenant, subscription, resourceGroup, or extension
+  // deprecated, should not be used
   ...LocationParameter;
 
   // unless tenant, subscription, location, or extension
@@ -455,80 +465,80 @@ enum ManagedSystemIdentityType {
 /**
  * Defines a properties type used to create named resource update models.
  * This type is not used directly, it is referenced by ResourceUpdateModel.
- * @template TResource The type of the resource.
- * @template TProperties The type of the properties.
+ * @template Resource The type of the resource.
+ * @template Properties The type of the properties.
  */
-@doc("The updatable properties of the {name}.", TResource)
-@friendlyName("{name}UpdateProperties", TResource)
+@doc("The updatable properties of the {name}.", Resource)
+@friendlyName("{name}UpdateProperties", Resource)
 model ResourceUpdateModelProperties<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
-> is OptionalProperties<UpdateableProperties<TProperties>>;
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
+> is OptionalProperties<UpdateableProperties<Properties>>;
 
 /**
  * Defines a model type used to create named resource update models
  * e.g. `model MyResourceUpdate is ResourceUpdate<MyResourceProperties> {}`
- * @template TResource The type of the resource.
- * @template TProperties The type of the properties.
+ * @template Resource The type of the resource.
+ * @template Properties The type of the properties.
  */
-@doc("The type used for update operations of the {name}.", TResource)
-@friendlyName("{name}Update", TResource)
+@doc("The type used for update operations of the {name}.", Resource)
+@friendlyName("{name}Update", Resource)
 @omitIfEmpty("properties")
 model ResourceUpdateModel<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
-> is OptionalProperties<UpdateableProperties<OmitProperties<TResource, "Name" | "name">>> {
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
+> is OptionalProperties<UpdateableProperties<OmitProperties<Resource, "Name" | "name">>> {
   @extension("x-ms-client-flatten", true)
-  properties?: ResourceUpdateModelProperties<TResource, TProperties>;
+  properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
 /**
  * The type used for updating tags in resources.
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
-@doc("The type used for updating tags in {name} resources.", TResource)
-@friendlyName("{name}TagsUpdate", TResource)
-model TagsUpdateModel<TResource extends ArmResource> {
+@doc("The type used for updating tags in {name} resources.", Resource)
+@friendlyName("{name}TagsUpdate", Resource)
+model TagsUpdateModel<Resource extends ArmResource> {
   ...ArmTagsProperty;
 }
 
 // Tenant resource operation definitions
 
-alias TenantParentScope<TResource extends ArmResource> = TenantScope<TResource>;
+alias TenantParentScope<Resource extends ArmResource> = TenantScope<Resource>;
 
 /**
  * Parameter model for listing a resource at the tenant scope
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
-model TenantScope<TResource extends ArmResource>
-  is ResourceParentParameters<TResource, TenantBaseParameters>;
+model TenantScope<Resource extends ArmResource>
+  is ResourceParentParameters<Resource, TenantBaseParameters>;
 
 /**
  * Parameter model for listing a resource at the subscription scope
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
-model SubscriptionScope<TResource extends ArmResource>
-  is ResourceParentParameters<TResource, SubscriptionBaseParameters>;
+model SubscriptionScope<Resource extends ArmResource>
+  is ResourceParentParameters<Resource, SubscriptionBaseParameters>;
 
 /**
  * Parameter model for listing a resource at the location scope
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
-model LocationScope<TResource extends ArmResource>
-  is ResourceParentParameters<TResource, LocationBaseParameters>;
+model LocationScope<Resource extends ArmResource>
+  is ResourceParentParameters<Resource, LocationBaseParameters>;
 
 /**
  * Parameter model for listing an extension resource
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
-model ExtensionScope<TResource extends ArmResource>
-  is ResourceParentParameters<TResource, ExtensionBaseParameters>;
+model ExtensionScope<Resource extends ArmResource>
+  is ResourceParentParameters<Resource, ExtensionBaseParameters>;
 
 /**
  * Parameter model for listing a resource at the resource group scope
- * @template TResource The type of the resource.
+ * @template Resource The type of the resource.
  */
-model ResourceGroupScope<TResource extends ArmResource> is ResourceParentParameters<TResource>;
+model ResourceGroupScope<Resource extends ArmResource> is ResourceParentParameters<Resource>;
 
 /**
  * Details of the resource plan.
@@ -598,17 +608,17 @@ enum SkuTier {
 
 /**
  * The type used for update operations of the resource.
- * @template TResource The type of the resource.
- * @template TProperties The type of the properties.
+ * @template Resource The type of the resource.
+ * @template Properties The type of the properties.
  */
-@doc("The type used for update operations of the {name}.", TResource)
-@friendlyName("{name}Update", TResource)
+@doc("The type used for update operations of the {name}.", Resource)
+@friendlyName("{name}Update", Resource)
 model ProxyResourceUpdateModel<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
 > {
   @extension("x-ms-client-flatten", true)
-  properties?: ResourceUpdateModelProperties<TResource, TProperties>;
+  properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
 /**
@@ -716,10 +726,10 @@ alias DefaultProviderNamespace = {
  * Adds check name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
  * exposes an endpoint that uses the resource name in the url)
- * @template TScopeParameters A parameter model with properties representing the scope of the resource
- * @template TRequest The operation request body
- * @template TResponse The operation response
- * @template TAdditionalParams A parameter model with properties representing non-path parameters
+ * @template ScopeParameters A parameter model with properties representing the scope of the resource
+ * @template Request The operation request body
+ * @template Response The operation response
+ * @template AdditionalParams A parameter model with properties representing non-path parameters
  */
 @TypeSpec.Rest.autoRoute
 @armResourceCollectionAction
@@ -728,16 +738,16 @@ alias DefaultProviderNamespace = {
 @TypeSpec.Rest.action("checkNameAvailability")
 @post
 op checkNameAvailability<
-  TScopeParameters extends TypeSpec.Reflection.Model,
-  TRequest extends TypeSpec.Reflection.Model = Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest,
-  TResponse extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
-  TAdditionalParams extends TypeSpec.Reflection.Model = {}
+  ScopeParameters extends TypeSpec.Reflection.Model,
+  Request extends TypeSpec.Reflection.Model = Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest,
+  Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
+  AdditionalParams extends TypeSpec.Reflection.Model = {}
 >(
   ...ApiVersionParameter,
-  ...TScopeParameters,
-  ...TAdditionalParams,
+  ...ScopeParameters,
+  ...AdditionalParams,
 
   @doc("The CheckAvailability request")
   @body
-  body: TRequest,
-): TResponse | ErrorResponse;
+  body: Request,
+): Response | ErrorResponse;

@@ -1,4 +1,5 @@
 import { deepStrictEqual } from "assert";
+import { describe, it } from "vitest";
 import { sortOpenAPIDocument } from "../src/openapi.js";
 
 describe("typespec-autorest: OpenAPI output should be determinstic", () => {

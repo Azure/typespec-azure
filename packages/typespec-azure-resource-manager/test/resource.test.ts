@@ -1,6 +1,7 @@
 import { Diagnostic, Model } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
 import { checkFor, getOpenApiAndDiagnostics, openApiFor } from "./test-host.js";
@@ -825,11 +826,11 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           assertRef(openApi.paths[path].get.parameters[0], `#/parameters/${paramName}`);
         }
 
-        async function testCommonTypesVersion(
+        function testCommonTypesVersion(
           version: string | undefined,
           assertFunc: (openApi: any) => void,
           expectedDiagnosticsPerVersion: Partial<Diagnostic>[]
-        ): Promise<void> {
+        ) {
           async function runTest(useVersionEnum: boolean): Promise<void> {
             const versions = useVersionEnum ? ["v1", "v2"] : undefined;
             const decorators = `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) ${
@@ -911,8 +912,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           });
         }
 
-        describe("v3", async () => {
-          await testCommonTypesVersion(
+        describe("v3", () => {
+          testCommonTypesVersion(
             "v3",
             (openApi) => {
               assertCommonDef(openApi, "/foo/{foo}", "Foo", "v3", "foo.json");
@@ -948,8 +949,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           );
         });
 
-        describe("v4", async () => {
-          await testCommonTypesVersion(
+        describe("v4", () => {
+          testCommonTypesVersion(
             "v4",
             (openApi) => {
               assertCommonDef(openApi, "/foo/{foo}", "Foo", "v3", "foo.json");
@@ -975,8 +976,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           );
         });
 
-        describe("v5", async () => {
-          await testCommonTypesVersion(
+        describe("v5", () => {
+          testCommonTypesVersion(
             "v5",
             (openApi) => {
               assertCommonDef(openApi, "/foo/{foo}", "Foo", "v3", "foo.json");
@@ -990,8 +991,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           );
         });
 
-        describe("unspecified version (use defaults)", async () => {
-          await testCommonTypesVersion(
+        describe("unspecified version (use defaults)", () => {
+          testCommonTypesVersion(
             undefined,
             (openApi) => {
               assertCommonDef(openApi, "/foo/{foo}", "Foo", "v3", "foo.json");

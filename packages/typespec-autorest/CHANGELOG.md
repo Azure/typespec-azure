@@ -1,6 +1,25 @@
 # Change Log - @azure-tools/typespec-autorest
 
-This log was last generated on Thu, 14 Dec 2023 01:19:27 GMT and should not be manually modified.
+This log was last generated on Mon, 29 Jan 2024 22:16:39 GMT and should not be manually modified.
+
+## 0.38.1
+Mon, 29 Jan 2024 22:16:39 GMT
+
+### Patches
+
+- Fix: Autorest emitter should generated format: decimal
+
+## 0.38.0
+Wed, 24 Jan 2024 05:47:18 GMT
+
+### Minor changes
+
+- Update dependencies.
+
+### Updates
+
+- Add support for `@encodedName` decorator
+- Update dependencies
 
 ## 0.37.2
 Thu, 14 Dec 2023 01:19:27 GMT

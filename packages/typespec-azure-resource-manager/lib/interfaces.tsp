@@ -32,405 +32,399 @@ interface Operations {
 
 /**
  * @deprecated Use Azure.ResourceManager.TrackedResourceOperations instead
- * A composite interface for resources that include `ResourceInstanceOperations<TResource, TProperties>`
- * and `ResourceCollectionOperations<TResource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
+ * A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
+ * and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
  * ListBySubscription operations. The actual route depends on the resource model.
  * This is the most common API pattern for Tracked Resources to use.
- * @template TResource the ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource the ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
+ * @template BaseParameters The http parameters that are part of the request
  *
  */
 #deprecated "Use Azure.ResourceManager.TrackedResourceOperations instead"
 interface ResourceOperations<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
-> extends TrackedResourceOperations<TResource, TProperties, TBaseParameters> {}
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model,
+  BaseParameters = DefaultBaseParameters<Resource>
+> extends TrackedResourceOperations<Resource, Properties, BaseParameters> {}
 
 /**
- * A composite interface for resources that include `ResourceInstanceOperations<TResource, TProperties>`
- * and `ResourceCollectionOperations<TResource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
+ * A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
+ * and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
  * ListBySubscription operations. The actual route depends on the resource model.
  * This is the most common API pattern for Tracked Resources to use.
- * @template TResource the ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource the ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
+ * @template BaseParameters The http parameters that are part of the request
  *
  */
 interface TrackedResourceOperations<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model,
+  BaseParameters = DefaultBaseParameters<Resource>
 >
-  extends ResourceInstanceOperations<TResource, TProperties, TBaseParameters>,
-    ResourceCollectionOperations<TResource, TBaseParameters> {}
+  extends ResourceInstanceOperations<Resource, Properties, BaseParameters>,
+    ResourceCollectionOperations<Resource, BaseParameters> {}
 
 /**
- * A composite interface for Proxy resources that include `ResourceInstanceOperations<TResource, TProperties>`
- * and `ResourceListByParent<TResource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
+ * A composite interface for Proxy resources that include `ResourceInstanceOperations<Resource, Properties>`
+ * and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
  *
  * The actual route depends on the resource model but would have started with
  *   `/subscriptions/{id}/resourcegroups/{rg}/providers/Microsoft.XXX/...`
  *
  * This is the most common API pattern for Proxy Resources to use.
- * @template TResource the ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource the ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 interface ProxyResourceOperations<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
 >
-  extends ResourceRead<TResource, TBaseParameters>,
-    ResourceCreate<TResource, TBaseParameters>,
-    ResourceDelete<TResource, TBaseParameters>,
-    ResourceListByParent<TResource, TBaseParameters> {}
+  extends ResourceRead<Resource, BaseParameters>,
+    ResourceCreate<Resource, BaseParameters>,
+    ResourceDelete<Resource, BaseParameters>,
+    ResourceListByParent<Resource, BaseParameters> {}
 
 /**
- * A composite interface for Tenant resources that include `ResourceInstanceOperations<TResource, TProperties>`
- * and `ResourceListByParent<TResource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
+ * A composite interface for Tenant resources that include `ResourceInstanceOperations<Resource, Properties>`
+ * and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
  *
  * The routes are always start at root level:
  *   `/providers/Microsoft.XXX/...`
  *
  * This is the most common API pattern for Tenant Resources to use.
- * @template TResource the ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
+ * @template Resource the ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
  */
 interface TenantResourceOperations<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
 >
-  extends TenantResourceRead<TResource>,
-    TenantResourceCreate<TResource>,
-    TenantResourceUpdate<TResource, TProperties>,
-    TenantResourceDelete<TResource>,
-    TenantResourceListByParent<TResource> {}
+  extends TenantResourceRead<Resource>,
+    TenantResourceCreate<Resource>,
+    TenantResourceUpdate<Resource, Properties>,
+    TenantResourceDelete<Resource>,
+    TenantResourceListByParent<Resource> {}
 
 /**
  * A composite interface for resources that have CRUD operations.
- * @template TResource The ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
- * @template TBaseParameters The http parameters that are part of the request
- * @template TPatchModel The model used for PATCH operations
+ * @template Resource The ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
+ * @template BaseParameters The http parameters that are part of the request
+ * @template PatchModel The model used for PATCH operations
  */
 interface ResourceInstanceOperations<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>,
-  TPatchModel = ResourceUpdateModel<TResource, TProperties>
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  PatchModel = ResourceUpdateModel<Resource, Properties>
 >
-  extends ResourceRead<TResource, TBaseParameters>,
-    ResourceCreate<TResource, TBaseParameters>,
-    ResourceUpdate<TResource, TProperties, TBaseParameters>,
-    ResourceDelete<TResource, TBaseParameters> {}
+  extends ResourceRead<Resource, BaseParameters>,
+    ResourceCreate<Resource, BaseParameters>,
+    ResourceUpdate<Resource, Properties, BaseParameters>,
+    ResourceDelete<Resource, BaseParameters> {}
 
 /**
  * A composite interface for resource collections.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCollectionOperations<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
-> extends ResourceListByParent<TResource, TBaseParameters>, ResourceListBySubscription<TResource> {}
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+> extends ResourceListByParent<Resource, BaseParameters>, ResourceListBySubscription<Resource> {}
 
 /**
  * An interface for resources with can be listed by subscription.
- * @template TResource The ArmResource that provides these operations
+ * @template Resource The ArmResource that provides these operations
  */
-interface ResourceListBySubscription<TResource extends ArmResource> {
+interface ResourceListBySubscription<Resource extends ArmResource> {
   /**
    * @dev List resources by subscription.
-   * @template TResource The ArmResource to list.
+   * @template Resource The ArmResource to list.
    */
-  listBySubscription is ArmListBySubscription<TResource>;
+  listBySubscription is ArmListBySubscription<Resource>;
 }
 
 /**
  * An interface for resources which can be listed by parent.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
- * @template TParentName The name of the parent resource
- * @template TParentFriendlyName The friendly name of the parent resource
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
+ * @template ParentName The name of the parent resource
+ * @template ParentFriendlyName The friendly name of the parent resource
  */
 interface ResourceListByParent<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>,
-  TParentName extends valueof string = "",
-  TParentFriendlyName extends valueof string = ""
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  ParentName extends valueof string = "",
+  ParentFriendlyName extends valueof string = ""
 > {
   /**
    * @dev List resources by parent.
-   * @template TResource The ArmResource to list.
-   * @template TBaseParameters The http parameters that are part of the request
-   * @template TParentName The name of the parent resource
-   * @template TParentFriendlyName The friendly name of the parent resource
+   * @template Resource The ArmResource to list.
+   * @template BaseParameters The http parameters that are part of the request
+   * @template ParentName The name of the parent resource
+   * @template ParentFriendlyName The friendly name of the parent resource
    */
-  listByParent is ArmResourceListByParent<
-    TResource,
-    TBaseParameters,
-    TParentName,
-    TParentFriendlyName
-  >;
+  listByParent is ArmResourceListByParent<Resource, BaseParameters, ParentName, ParentFriendlyName>;
 }
 
 /**
  * A composite interface for resources that include a GET operation.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
-interface ResourceRead<TResource extends ArmResource, TBaseParameters = BaseParameters<TResource>> {
+interface ResourceRead<
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+> {
   /**
    * @dev Retrieve a resource.
-   * @template TResource The ArmResource to retrieve.
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to retrieve.
+   * @template BaseParameters The http parameters that are part of the request
    */
-  get is ArmResourceRead<TResource, TBaseParameters>;
+  get is ArmResourceRead<Resource, BaseParameters>;
 }
 
 /**
  * A composite interface for resources that include a synchronous create or update operation.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCreateSync<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Create or update a resource using the synchronous call pattern.
-   * @template TResource The ArmResource to create or update.
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to create or update.
+   * @template BaseParameters The http parameters that are part of the request
    */
-  createOrUpdate is ArmResourceCreateOrUpdateSync<TResource, TBaseParameters>;
+  createOrUpdate is ArmResourceCreateOrUpdateSync<Resource, BaseParameters>;
 }
 
 /**
  * A composite interface for resources that include a long-running create or update operation.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCreateAsync<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Create or update a resource using the asynchronous call pattern.
-   * @template TResource The ArmResource to create or update.
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to create or update.
+   * @template BaseParameters The http parameters that are part of the request
    */
-  createOrUpdate is ArmResourceCreateOrUpdateAsync<TResource, TBaseParameters>;
+  createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource, BaseParameters>;
 }
 
 /**
  * @dev A composite interface for resources that include a long-running delete operation.
  *      DEPRECATED: Use ResourceDeleteWithoutOkAsync instead
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteAsync<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Delete a resource using the asynchronous call pattern.
-   * @template TResource The ArmResource to delete.
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to delete.
+   * @template BaseParameters The http parameters that are part of the request
    */
-  delete is ArmResourceDeleteAsync<TResource, TBaseParameters>;
+  delete is ArmResourceDeleteAsync<Resource, BaseParameters>;
 }
 
 /**
  * @dev A composite interface for resources that include a synchronous delete operation.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteWithoutOkAsync<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Delete a resource using the asynchronous call pattern.
-   * @template TResource The ArmResource to delete.
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to delete.
+   * @template BaseParameters The http parameters that are part of the request
    */
-  delete is ArmResourceDeleteWithoutOkAsync<TResource, TBaseParameters>;
+  delete is ArmResourceDeleteWithoutOkAsync<Resource, BaseParameters>;
 }
 
 /**
  * A composite interface for resources that include a synchronous delete operation.
- * @template TResource The ArmResource that provides these operations
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Delete a resource")
 interface ResourceDeleteSync<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Delete a resource using the synchronous call pattern.
-   * @template TResource The ArmResource to delete.
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to delete.
+   * @template BaseParameters The http parameters that are part of the request
    */
-  delete is ArmResourceDeleteSync<TResource, TBaseParameters>;
+  delete is ArmResourceDeleteSync<Resource, BaseParameters>;
 }
 
 /**
  * @dev A composite interface for resources that include a long-running update operation.
- * @template TResource The ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
+ * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Asynchronous resource update")
 interface ResourceUpdateAsync<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Update a resource using the asynchronous call pattern.
-   * @template TResource The ArmResource to update.
-   * @template TProperties RP-specific property bag for the resource
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to update.
+   * @template Properties RP-specific property bag for the resource
+   * @template BaseParameters The http parameters that are part of the request
    */
   update is ArmCustomPatchAsync<
-    TResource,
-    ResourceUpdateModel<TResource, TProperties>,
-    TBaseParameters
+    Resource,
+    ResourceUpdateModel<Resource, Properties>,
+    BaseParameters
   >;
 }
 
 /**
  * A composite interface for resources that include a synchronous update operation.
- * @template TResource The ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
- * @template TBaseParameters The http parameters that are part of the request
+ * @template Resource The ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
+ * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Synchronous resource update")
 interface ResourceUpdateSync<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model,
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Update a resource using the synchronous call pattern.
-   * @template TResource The ArmResource to update.
-   * @template TProperties RP-specific property bag for the resource
-   * @template TBaseParameters The http parameters that are part of the request
+   * @template Resource The ArmResource to update.
+   * @template Properties RP-specific property bag for the resource
+   * @template BaseParameters The http parameters that are part of the request
    */
-  update is ArmCustomPatchSync<
-    TResource,
-    ResourceUpdateModel<TResource, TProperties>,
-    TBaseParameters
-  >;
+  update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
 
 /**
  * A composite interface for resources that includes CRUD operations.
- * @template TResource The ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
+ * @template Resource The ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
  */
 interface ExtensionResourceInstanceOperations<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
 >
-  extends ExtensionResourceRead<TResource>,
-    ExtensionResourceCreate<TResource>,
-    ExtensionResourceUpdate<TResource, TProperties>,
-    ExtensionResourceDelete<TResource> {}
+  extends ExtensionResourceRead<Resource>,
+    ExtensionResourceCreate<Resource>,
+    ExtensionResourceUpdate<Resource, Properties>,
+    ExtensionResourceDelete<Resource> {}
 
 /**
  * A composite interface for resource collections that include a paginated list operation.
- * @template TResource The ArmResource that provides these operations
+ * @template Resource The ArmResource that provides these operations
  */
-interface ExtensionResourceCollectionOperations<TResource extends ArmResource>
-  extends ExtensionResourceList<TResource> {}
+interface ExtensionResourceCollectionOperations<Resource extends ArmResource>
+  extends ExtensionResourceList<Resource> {}
 
 /**
  * A composite interface for resources that include CRUD and list operations.
- * @template TResource The ArmResource that provides these operations
- * @template TProperties RP-specific property bag for the resource
+ * @template Resource The ArmResource that provides these operations
+ * @template Properties RP-specific property bag for the resource
  */
 interface ExtensionResourceOperations<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
 >
-  extends ExtensionResourceInstanceOperations<TResource, TProperties>,
-    ExtensionResourceCollectionOperations<TResource> {}
+  extends ExtensionResourceInstanceOperations<Resource, Properties>,
+    ExtensionResourceCollectionOperations<Resource> {}
 
 alias ResourceCreate<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
-> = ResourceCreateAsync<TResource, TBaseParameters>;
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+> = ResourceCreateAsync<Resource, BaseParameters>;
 
 alias ResourceUpdate<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model,
-  TBaseParameters = BaseParameters<TResource>
-> = ResourceUpdateSync<TResource, TProperties, TBaseParameters>;
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model,
+  BaseParameters = DefaultBaseParameters<Resource>
+> = ResourceUpdateSync<Resource, Properties, BaseParameters>;
 
 alias ResourceDelete<
-  TResource extends ArmResource,
-  TBaseParameters = BaseParameters<TResource>
-> = ResourceDeleteAsync<TResource, TBaseParameters>;
+  Resource extends ArmResource,
+  BaseParameters = DefaultBaseParameters<Resource>
+> = ResourceDeleteAsync<Resource, BaseParameters>;
 
 alias ProxyResourceUpdate<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
-> = ResourceUpdate<TResource, TProperties>;
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
+> = ResourceUpdate<Resource, Properties>;
 
-alias ExtensionResourceRead<TResource extends ArmResource> = ResourceRead<
-  TResource,
+alias ExtensionResourceRead<Resource extends ArmResource> = ResourceRead<
+  Resource,
   ExtensionBaseParameters
 >;
 
-alias ExtensionResourceCreate<TResource extends ArmResource> = ResourceCreate<
-  TResource,
+alias ExtensionResourceCreate<Resource extends ArmResource> = ResourceCreate<
+  Resource,
   ExtensionBaseParameters
 >;
 
 alias ExtensionResourceUpdate<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
-> = ResourceUpdate<TResource, TProperties, ExtensionBaseParameters>;
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
+> = ResourceUpdate<Resource, Properties, ExtensionBaseParameters>;
 
-alias ExtensionResourceDelete<TResource extends ArmResource> = ResourceDelete<
-  TResource,
+alias ExtensionResourceDelete<Resource extends ArmResource> = ResourceDelete<
+  Resource,
   ExtensionBaseParameters
 >;
 
-alias ExtensionResourceList<TResource extends ArmResource> = ResourceListByParent<
-  TResource,
+alias ExtensionResourceList<Resource extends ArmResource> = ResourceListByParent<
+  Resource,
   ExtensionBaseParameters,
   "Extension",
   "parent"
 >;
 
-alias TenantResourceRead<TResource extends ArmResource> = ResourceRead<
-  TResource,
+alias TenantResourceRead<Resource extends ArmResource> = ResourceRead<
+  Resource,
   TenantBaseParameters
 >;
 
-alias TenantResourceCreate<TResource extends ArmResource> = ResourceCreateAsync<
-  TResource,
+alias TenantResourceCreate<Resource extends ArmResource> = ResourceCreateAsync<
+  Resource,
   TenantBaseParameters
 >;
 
-alias TenantResourceDelete<TResource extends ArmResource> = ResourceDelete<
-  TResource,
+alias TenantResourceDelete<Resource extends ArmResource> = ResourceDelete<
+  Resource,
   TenantBaseParameters
 >;
 
 alias TenantResourceUpdate<
-  TResource extends ArmResource,
-  TProperties extends TypeSpec.Reflection.Model
-> = ResourceUpdate<TResource, TProperties, TenantBaseParameters>;
+  Resource extends ArmResource,
+  Properties extends TypeSpec.Reflection.Model
+> = ResourceUpdate<Resource, Properties, TenantBaseParameters>;
 
-alias TenantResourceListByParent<TResource extends ArmResource> = ResourceListByParent<
-  TResource,
+alias TenantResourceListByParent<Resource extends ArmResource> = ResourceListByParent<
+  Resource,
   TenantBaseParameters,
   "Tenant",
   "tenant"

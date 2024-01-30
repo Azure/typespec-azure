@@ -1,4 +1,3 @@
-import "./index.js";
 import { reportDiagnostic } from "./lib.js";
 
 import { isErrorModel, Model, ModelProperty, Operation, Program } from "@typespec/compiler";

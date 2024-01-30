@@ -1,5 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok } from "assert";
+import { describe, it } from "vitest";
 import { OpenAPI2Parameter, OpenAPI2Schema } from "../src/types.js";
 import { diagnoseOpenApiFor, oapiForModel, openApiFor } from "./test-host.js";
 
@@ -27,7 +28,7 @@ describe("typespec-autorest: primitives", () => {
       ["duration", { type: "string", format: "duration" }],
       ["bytes", { type: "string", format: "byte" }],
       ["decimal", { type: "number", format: "decimal" }],
-      ["decimal128", { type: "number", format: "decimal128" }],
+      ["decimal128", { type: "number", format: "decimal" }],
     ];
 
     for (const test of cases) {

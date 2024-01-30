@@ -131,5 +131,5 @@ export function isPascalCaseNoAcronyms(name: string): boolean {
  */
 export function isCamelCaseNoAcronyms(name: string): boolean {
   if (name === undefined || name === null || name === "") return true;
-  return /^[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
+  return /^[^a-zA-Z0-9]?[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
 }

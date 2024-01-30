@@ -1,0 +1,71 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Sample showcasing encoded names",
+    "version": "0000-00-00",
+    "description": "This example showcase propviding a different name over the wire.\nIn this example the `WithEncodedNames` model has a `notBefore` property that should get serialized as `nbf` when serialized as json.",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "Test",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/WithEncodedNames"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "WithEncodedNames": {
+      "type": "object",
+      "properties": {
+        "nbf": {
+          "type": "integer",
+          "format": "int32",
+          "x-ms-client-name": "notBefore"
+        },
+        "exp": {
+          "type": "integer",
+          "format": "int32",
+          "x-ms-client-name": "expires"
+        },
+        "created": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "updated": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "nbf",
+        "exp",
+        "created",
+        "updated"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -15,10 +15,22 @@ using Azure.ResourceManager;
   version: "2022-11-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@useDependency(Azure.Core.Versions.v1_0_Preview_1)
 @armProviderNamespace
 namespace Microsoft.OperationsTest;
 
 interface Operations extends Azure.ResourceManager.Operations {}
+
+@parentResource(TenantLocationResource)
+model MyOpStatus is ArmOperationStatus;
+
+@parentResource(SubscriptionLocationResource)
+model MySubOpStatus is ArmOperationStatus;
+
+interface OperationStatuses {
+  getStatus is ArmResourceRead<MyOpStatus>;
+  getSubscriptionStatus is ArmResourceRead<MySubOpStatus>;
+}
 
 // Tracked resources
 model TestTrackedResource is TrackedResource<TestTrackedProperties> {

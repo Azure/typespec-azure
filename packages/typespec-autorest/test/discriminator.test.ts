@@ -1,5 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { createAutorestTestRunner, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: polymorphic model inheritance with discriminator", () => {

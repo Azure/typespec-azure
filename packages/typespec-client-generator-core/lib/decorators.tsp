@@ -3,6 +3,28 @@ using TypeSpec.Reflection;
 namespace Azure.ClientGenerator.Core;
 
 /**
+ * Changes the name of a method, parameter, property, or model generated in the client SDK
+ * @param rename The rename you want applied to the object
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * @clientName("nameInClient")
+ * op nameInService: void;
+ * ```
+ *
+ * @example
+ * ```typespec
+ * @clientName("nameForJava", "java")
+ * @clientName("name_for_python", "python")
+ * @clientName("nameForCsharp", "csharp")
+ * @clientName("nameForJavascript", "javascript")
+ * op nameInService: void;
+ * ```
+ */
+extern dec clientName(target: unknown, rename: valueof string, scope?: valueof string);
+
+/**
  * Whether you want to generate an operation as a convenient operation.
  * @param value Whether to generate the operation as convenience method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
@@ -194,3 +216,20 @@ enum Access {
  * ```
  */
 extern dec access(target: Model | Operation | Enum, value: EnumMember, scope?: valueof string);
+
+/**
+ * Set whether a model property should be flattened or not.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * model Foo {
+ *    @flattenProperty
+ *    prop: Bar;
+ * }
+ * model Bar {
+ * }
+ * ```
+ */
+#deprecated "@flattenProperty decorator is not recommended to use."
+extern dec flattenProperty(target: ModelProperty, scope?: valueof string);

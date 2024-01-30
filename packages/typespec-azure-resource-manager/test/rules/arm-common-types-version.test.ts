@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { armCommonTypesVersionRule } from "../../src/rules/arm-common-types-version.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 

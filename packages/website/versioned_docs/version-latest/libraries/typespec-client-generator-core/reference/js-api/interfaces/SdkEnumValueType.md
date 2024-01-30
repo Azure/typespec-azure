@@ -11,13 +11,13 @@ title: "[I] SdkEnumValueType"
 
 | Property | Type | Description | Inheritance |
 | :------ | :------ | :------ | :------ |
-| `__raw`? | `Type` | - | SdkTypeBase.\_\_raw |
-| `deprecation`? | `string` | - | SdkTypeBase.deprecation |
-| `description`? | `string` | - | - |
-| `details`? | `string` | - | - |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | - |
+| `details?` | `string` | - | - |
 | `enumType` | [`SdkEnumType`](SdkEnumType.md) | - | - |
-| `kind` | `"enumvalue"` | - | SdkTypeBase.kind |
+| `kind` | `"enumvalue"` | - | `SdkTypeBase.kind` |
 | `name` | `string` | - | - |
-| `nullable` | `boolean` | - | SdkTypeBase.nullable |
+| `nullable` | `boolean` | - | `SdkTypeBase.nullable` |
 | `value` | `string` \| `number` | - | - |
 | `valueType` | [`SdkType`](../type-aliases/SdkType.md) | - | - |

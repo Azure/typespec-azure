@@ -1,5 +1,5 @@
 {
-  "extends": "../../core/packages/tsconfig.json",
+  "extends": "../../core/tsconfig.base.json",
   "composite": true,
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.json" },
@@ -8,8 +8,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
-    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
-    "types": ["node", "mocha"]
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "exclude": ["dist", "node_modules", "temp", "input", "output"]
