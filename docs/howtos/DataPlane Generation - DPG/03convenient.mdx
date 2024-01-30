@@ -63,7 +63,18 @@ const model: OutputModel = await client.path("/petStore/model/{name}").get();
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class OutputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    // protocol method
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    // convenient method
+    public OutputModel getModel(String name)
+}
 ```
 
 </TabItem>
@@ -123,7 +134,13 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+// Model class is not generated.
+// Convenient method is not generated.
+
+public final class PetStoreNamespaceClient {
+    // protocol method
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+}
 ```
 
 </TabItem>
@@ -174,7 +191,21 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+// Model class resides in implementation package.
+// Client method is package private.
+
+package com.petstorenamespace.implementation.models;
+public final class OutputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    // protocol method
+    Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    // convenient method
+    OutputModel getModel(String name)
+}
 ```
 
 </TabItem>
@@ -235,7 +266,23 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+// If a model class is output-only, its constructor is not public.
+// Adding Usage.input to it would make its constructor public.
+
+package com.azure.ai.openai.models;
+
+public final class AzureCognitiveSearchIndexFieldMappingOptions {
+    public AzureCognitiveSearchIndexFieldMappingOptions()
+    public String getTitleField()
+    public AzureCognitiveSearchIndexFieldMappingOptions setTitleField(String titleField)
+    ...
+}
+
+public final class ImageGenerations {
+    public ImageGenerations(OffsetDateTime createdAt, List<ImageGenerationData> data)
+    public OffsetDateTime getCreatedAt()
+    public List<ImageGenerationData> getData()
+}
 ```
 
 </TabItem>
