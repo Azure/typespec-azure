@@ -89,7 +89,7 @@ jobs:
       - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
         displayName: Bump version to prerelease targets
 
-      - run: pnpm -r --filter="@azure-tools/*" publish --access public --no-git-checks --tag next
+      - script: pnpm -r --filter="@azure-tools/*" publish --access public --no-git-checks --tag next
         name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
