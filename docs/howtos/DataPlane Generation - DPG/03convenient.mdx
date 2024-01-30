@@ -70,7 +70,9 @@ public final class OutputModel {
 
 package com.petstorenamespace;
 public final class PetStoreNamespaceClient {
+    // protocol method
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    // convenient method
     public OutputModel getModel(String name)
 }
 ```
@@ -136,6 +138,7 @@ FIXME
 // Convenient method is not generated.
 
 public final class PetStoreNamespaceClient {
+    // protocol method
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
 }
 ```
@@ -198,7 +201,9 @@ public final class OutputModel {
 
 package com.petstorenamespace;
 public final class PetStoreNamespaceClient {
+    // protocol method
     Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    // convenient method
     OutputModel getModel(String name)
 }
 ```
