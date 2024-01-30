@@ -92,15 +92,18 @@ jobs:
       - script: pnpm -r publish --access public --no-git-checks --tag next --dry-run
         displayName: Dry run 1
 
-      - script: pnpm -r --filter='!@typespec/*' publish --access public --no-git-checks --tag next --dry-run
+      - script: pnpm --filter='@azure-tools/*' publish --access public --no-git-checks --tag next --dry-run
         displayName: Dry run 2
+
+      - script: pnpm --filter='!./core' publish --access public --no-git-checks --tag next --dry-run
+        displayName: Dry run 3
 
       - script: |
           pnpm config set loglevel=debug
           pnpm config set registry=https://registry.npmjs.org/
           pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
 
-          pnpm -r --filter='!./core' publish --access public --no-git-checks --tag next
+          pnpm -r --filter='@azure-tools/*' publish --access public --no-git-checks --tag next
         name: Publish
         env:
           NODE_AUTH_TOKEN: $(azure-sdk-npm-token)
