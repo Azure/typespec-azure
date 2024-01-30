@@ -1,5 +1,6 @@
 import { BasicTestRunner } from "@typespec/compiler/testing";
 import assert from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { createCSharpServiceEmitterTestRunner, getStandardService } from "./test-host.js";
 
 function getGeneratedFile(runner: BasicTestRunner, fileName: string): [string, string] {
@@ -47,8 +48,7 @@ async function compileAndValidateMultiple(
   fileChecks: [string, string[]][]
 ): Promise<void> {
   const spec = getStandardService(code);
-  const [_, diagnostics] = await runner.compileAndDiagnose(spec);
-  assert.ok(diagnostics === undefined || diagnostics.length === 0);
+  await runner.compile(spec);
   for (const [fileToCheck, expectedContent] of fileChecks) {
     const [modelKey, modelContents] = getGeneratedFile(runner, fileToCheck);
     expectedContent.forEach((element) => {

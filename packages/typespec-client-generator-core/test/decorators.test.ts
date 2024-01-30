@@ -1,6 +1,15 @@
-import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
+import {
+  Enum,
+  Interface,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+  UsageFlags,
+} from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
   getClient,
@@ -9,6 +18,7 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldFlattenProperty,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
@@ -916,7 +926,7 @@ describe("typespec-client-generator-core: decorators", () => {
         `
         namespace Customizations;
 
-        @@projectedName(A, "client", "Test1Client");
+        @@clientName(A, "Test1Client");
       `
       );
 
@@ -1243,56 +1253,77 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
-  describe("@protocolAPI", () => {
-    for (const protocolValue of [true, false]) {
-      for (const globalValue of [true, false]) {
-        const testDescription = `mark an operation as protocol ${protocolValue}, pass in sdkContext with generateProtocolMethods ${globalValue}`;
-        const testCode = `
+  async function protocolAPITestHelper(
+    runner: SdkTestRunner,
+    protocolValue: boolean,
+    globalValue: boolean
+  ): Promise<void> {
+    const testCode = `
           @protocolAPI(${protocolValue})
           @test
           op test(): void;
         `;
+    const { test } = await runner.compile(testCode);
 
-        it(testDescription, async () => {
-          const { test } = await runner.compile(testCode);
-
-          const actual = shouldGenerateProtocol(
-            createSdkContextTestHelper(runner.context.program, {
-              generateProtocolMethods: globalValue,
-              generateConvenienceMethods: false,
-            }),
-            test as Operation
-          );
-          strictEqual(actual, protocolValue);
-        });
-      }
-    }
+    const actual = shouldGenerateProtocol(
+      createSdkContextTestHelper(runner.context.program, {
+        generateProtocolMethods: globalValue,
+        generateConvenienceMethods: false,
+      }),
+      test as Operation
+    );
+    strictEqual(actual, protocolValue);
+  }
+  describe("@protocolAPI", () => {
+    it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
+      await protocolAPITestHelper(runner, true, true);
+    });
+    it("generateProtocolMethodsTrue, operation marked protocolAPI false", async () => {
+      await protocolAPITestHelper(runner, false, true);
+    });
+    it("generateProtocolMethodsFalse, operation marked protocolAPI true", async () => {
+      await protocolAPITestHelper(runner, true, false);
+    });
+    it("generateProtocolMethodsFalse, operation marked protocolAPI false", async () => {
+      await protocolAPITestHelper(runner, false, false);
+    });
   });
 
-  describe("@convenientAPI", () => {
-    for (const convenientValue of [true, false]) {
-      for (const globalValue of [true, false]) {
-        const testDescription = `mark an operation as convenient ${convenientValue}, pass in sdkContext with generateConvenienceMethods ${globalValue}`;
-        const testCode = `
+  async function convenientAPITestHelper(
+    runner: SdkTestRunner,
+    convenientValue: boolean,
+    globalValue: boolean
+  ): Promise<void> {
+    const testCode = `
           @convenientAPI(${convenientValue})
           @test
           op test(): void;
         `;
+    const { test } = await runner.compile(testCode);
 
-        it(testDescription, async () => {
-          const { test } = await runner.compile(testCode);
+    const actual = shouldGenerateConvenient(
+      createSdkContextTestHelper(runner.program, {
+        generateProtocolMethods: false,
+        generateConvenienceMethods: globalValue,
+      }),
+      test as Operation
+    );
+    strictEqual(actual, convenientValue);
+  }
 
-          const actual = shouldGenerateConvenient(
-            createSdkContextTestHelper(runner.program, {
-              generateProtocolMethods: false,
-              generateConvenienceMethods: globalValue,
-            }),
-            test as Operation
-          );
-          strictEqual(actual, convenientValue);
-        });
-      }
-    }
+  describe("@convenientAPI", () => {
+    it("generateConvenienceMethodsTrue, operation marked convenientAPI true", async () => {
+      await convenientAPITestHelper(runner, true, true);
+    });
+    it("generateConvenienceMethodsTrue, operation marked convenientAPI false", async () => {
+      await convenientAPITestHelper(runner, false, true);
+    });
+    it("generateConvenienceMethodsFalse, operation marked convenientAPI true", async () => {
+      await convenientAPITestHelper(runner, true, false);
+    });
+    it("generateConvenienceMethodsFalse, operation marked convenientAPI false", async () => {
+      await convenientAPITestHelper(runner, false, false);
+    });
 
     it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
       const { test } = await runner.compile(`
@@ -2194,6 +2225,104 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { Dog: Model };
 
       strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
+    });
+  });
+
+  describe("@flattenProperty", () => {
+    it("marks a model property to be flattened with suppression of deprecation warning", async () => {
+      const { Model1 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Model1{
+            #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `)) as { Model1: Model };
+
+      const childProperty = Model1.properties.get("child");
+      notStrictEqual(childProperty, undefined);
+      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), true);
+    });
+
+    it("doesn't mark a un-flattened model property", async () => {
+      const { Model1 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Model1{
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `)) as { Model1: Model };
+
+      const childProperty = Model1.properties.get("child");
+      notStrictEqual(childProperty, undefined);
+      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), false);
+    });
+
+    it("throws deprecation warning if not suppressed", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "deprecated",
+      });
+    });
+
+    it("throws error when used on other targets", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @flattenProperty
+          model Model1{
+            child: Model2;
+          }
+
+          @test
+          model Model2{}
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "decorator-wrong-target",
+      });
     });
   });
 });

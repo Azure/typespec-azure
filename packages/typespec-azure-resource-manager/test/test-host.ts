@@ -12,6 +12,7 @@ import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
+import { OpenAPI2Document } from "../../typespec-autorest/src/types.js";
 import { $lib } from "../src/lib.js";
 import { AzureResourceManagerTestLibrary } from "../src/testing/index.js";
 
@@ -71,6 +72,16 @@ export async function openApiFor(
   options: AutorestEmitterOptions = {},
   versions?: string[]
 ): Promise<any> {
+  const [openApi, diagnostics] = await getOpenApiAndDiagnostics(code, options, versions);
+  expectDiagnosticEmpty(diagnostics);
+  return openApi;
+}
+
+export async function openApiForVersions<T extends string>(
+  code: string,
+  versions: T[],
+  options: AutorestEmitterOptions = {}
+): Promise<Record<T, OpenAPI2Document>> {
   const [openApi, diagnostics] = await getOpenApiAndDiagnostics(code, options, versions);
   expectDiagnosticEmpty(diagnostics);
   return openApi;

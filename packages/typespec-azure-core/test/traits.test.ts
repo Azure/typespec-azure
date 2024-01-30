@@ -5,6 +5,7 @@ import {
   expectDiagnostics,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { getSourceTraitName } from "../src/traits.js";
 import { createAzureCoreTestRunner, getServiceForVersion } from "./test-host.js";
 

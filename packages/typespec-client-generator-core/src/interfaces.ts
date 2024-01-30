@@ -7,7 +7,6 @@ import {
   Namespace,
   Operation,
   Program,
-  ProjectedNameView,
   Type,
   UsageFlags,
 } from "@typespec/compiler";
@@ -37,9 +36,6 @@ export interface SdkContext<TOptions extends object = Record<string, any>> {
   generateConvenienceMethods: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
-  languageProjectedProgram?: ProjectedNameView;
-  clientProjectedProgram?: ProjectedNameView;
-  jsonProjectedProgram?: ProjectedNameView;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Set<string>;
@@ -87,7 +83,8 @@ export type SdkType =
   | SdkEnumValueType
   | SdkConstantType
   | SdkUnionType
-  | SdkModelType;
+  | SdkModelType
+  | SdkMultipartFileType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -114,7 +111,8 @@ export type SdkBuiltInKinds =
   | "armId"
   | "ipAddress"
   | "azureLocation"
-  | "etag";
+  | "etag"
+  | "multipartFile";
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
@@ -132,6 +130,11 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
+}
+
+export interface SdkMultipartFileType extends SdkTypeBase {
+  kind: "multipartFile";
+  encode: "binary";
 }
 
 export interface SdkArrayType extends SdkTypeBase {
@@ -192,6 +195,7 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
+  isFormDataType: boolean;
   generatedName?: string;
   description?: string;
   details?: string;
@@ -360,3 +364,5 @@ interface SdkFloat32Validation extends SdkNumericValidationBase {
 interface SdkFloat64Validation extends SdkNumericValidationBase {
   kind: "float64";
 }
+
+export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;

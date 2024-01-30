@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { bodyArrayRule } from "../../src/rules/request-body-array.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

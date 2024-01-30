@@ -1,6 +1,8 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { UsageFlags } from "@typespec/compiler";
+import { Enum, UsageFlags } from "@typespec/compiler";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import {
   SdkArrayType,
   SdkBodyModelPropertyType,
@@ -10,8 +12,8 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { getAllModels, isReadOnly } from "../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
+import { getAllModels, getSdkEnum, isReadOnly } from "../src/types.js";
+import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
   let runner: SdkTestRunner;
@@ -870,6 +872,48 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models[0].name, "Enum1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
     });
+
+    it("projected name", async () => {
+      await runner.compileAndDiagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          @projectedName("java", "JavaEnum1")
+          enum Enum1{
+            @projectedName("java", "JavaOne")
+            One: "one",
+            two,
+            three
+          }
+        }
+      `);
+
+      async function helper(emitterName: string, enumName: string, enumValueName: string) {
+        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const { Enum1 } = (await runner.compile(`
+        @service({})
+        namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          @projectedName("java", "JavaEnum1")
+          enum Enum1{
+            @projectedName("java", "JavaOne")
+            One: "one",
+            two,
+            three
+          }
+        }
+      `)) as { Enum1: Enum };
+        const enum1 = getSdkEnum(runner.context, Enum1);
+        strictEqual(enum1.name, enumName);
+        strictEqual(enum1.values[0].name, enumValueName);
+      }
+      await helper("@azure-tools/typespec-csharp", "Enum1", "One");
+      await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
+    });
   });
   describe("SdkBodyModelPropertyType", () => {
     it("required", async function () {
@@ -933,8 +977,11 @@ describe("typespec-client-generator-core: types", () => {
           javaWireName: string;
           @projectedName("client", "clientName")
           clientProjectedName: string;
+          @projectedName("json", "projectedWireName")
+          @encodedName("application/json", "encodedWireName")
+          jsonEncodedAndProjectedName: string;
           @projectedName("json", "realWireName")
-          jsonProjectedName: string;
+          jsonProjectedName: string; // deprecated
           regular: string;
         }
       `);
@@ -955,7 +1002,13 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(clientProjectedProp.kind, "property");
       strictEqual(clientProjectedProp.serializedName, "clientProjectedName");
 
-      // wire name test
+      // wire name test with encoded and projected
+      const jsonEncodedProp = sdkModel.properties.find(
+        (x) => x.kind === "property" && x.serializedName === "encodedWireName"
+      )!;
+      strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
+
+      // wire name test with deprecated projected
       const jsonProjectedProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "realWireName"
       )!;
@@ -1316,6 +1369,43 @@ describe("typespec-client-generator-core: types", () => {
         (x) => (x as SdkBodyModelPropertyType).serializedName === "kind"
       )! as SdkBodyModelPropertyType;
       strictEqual(dogKindProperty.type, dogKind);
+    });
+
+    it("union to extensible enum values", async () => {
+      await runner.compileWithBuiltInService(`
+      union PetKind {
+        Cat: "cat",
+        Dog: "dog",
+        string,
+      }
+
+      @route("/extensible-enum")
+      @put
+      op putPet(@body petKind: PetKind): void;
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 1);
+      const petKind = models[0] as SdkEnumType;
+      strictEqual(petKind.name, "PetKind");
+      strictEqual(petKind.isFixed, false);
+      strictEqual(petKind.valueType.kind, "string");
+      const values = petKind.values;
+      deepStrictEqual(
+        values.map((x) => x.name),
+        ["Cat", "Dog"]
+      );
+
+      const catValue = values.find((x) => x.name === "Cat")!;
+      strictEqual(catValue.value, "cat");
+      strictEqual(catValue.enumType, petKind);
+      strictEqual(catValue.valueType, petKind.valueType);
+      strictEqual(catValue.kind, "enumvalue");
+
+      const dogValue = values.find((x) => x.name === "Dog")!;
+      strictEqual(dogValue.value, "dog");
+      strictEqual(dogValue.enumType, petKind);
+      strictEqual(dogValue.valueType, petKind.valueType);
+      strictEqual(dogValue.kind, "enumvalue");
     });
 
     it("enum discriminator model without base discriminator property", async () => {
@@ -1862,6 +1952,113 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       strictEqual(models[0].name, "Model1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("model with client hierarchy", async () => {
+      await runner.compile(`
+        @service({})
+        namespace Test1Client {
+          model T1 {
+            prop: string;
+          }
+          model T2 {
+            prop: string;
+          }
+          @route("/b")
+          namespace B {
+            op x(): void;
+
+            @route("/c")
+            interface C {
+              op y(): T1;
+            }
+
+            @route("/d")
+            namespace D {
+              op z(@body body: T2): void;
+            }
+          }
+        }
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 2);
+    });
+  });
+  describe("SdkMultipartFormType", () => {
+    it("multipart form basic", async function () {
+      await runner.compileWithBuiltInService(`
+      model MultiPartRequest {
+        id: string;
+        profileImage: bytes;
+      }
+
+      op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      `);
+
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 1);
+      const model = models[0] as SdkModelType;
+      strictEqual(model.kind, "model");
+      strictEqual(model.isFormDataType, true);
+      strictEqual(model.name, "MultiPartRequest");
+      strictEqual(model.properties.length, 2);
+      const id = model.properties.find((x) => x.nameInClient === "id")!;
+      strictEqual(id.kind, "property");
+      strictEqual(id.type.kind, "string");
+      const profileImage = model.properties.find((x) => x.nameInClient === "profileImage")!;
+      strictEqual(profileImage.kind, "property");
+      strictEqual(profileImage.type.kind, "multipartFile");
+    });
+    it("multipart conflicting model usage", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+        }
+  
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+        @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
+      `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+      });
+
+      // expectDiagnostics(getAllModels(runner.context), {
+      //   code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+      // });
+    });
+    it("multipart resolving conflicting model usage with spread", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model B {
+          doc: bytes
+        }
+        
+        model A {
+          ...B
+        }
+        
+        @put op multipartOperation(@header contentType: "multipart/form-data", ...A): void;
+        @post op normalOperation(...B): void;
+        `
+      );
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 2);
+      const modelA = models.find((x) => x.name === "A")!;
+      strictEqual(modelA.kind, "model");
+      strictEqual(modelA.isFormDataType, true);
+      strictEqual(modelA.properties.length, 1);
+      strictEqual(modelA.properties[0].type.kind, "multipartFile");
+
+      const modelB = models.find((x) => x.name === "B")!;
+      strictEqual(modelB.kind, "model");
+      strictEqual(modelB.isFormDataType, false);
+      strictEqual(modelB.properties.length, 1);
+      strictEqual(modelB.properties[0].type.kind, "bytes");
     });
   });
   describe("SdkTupleType", () => {

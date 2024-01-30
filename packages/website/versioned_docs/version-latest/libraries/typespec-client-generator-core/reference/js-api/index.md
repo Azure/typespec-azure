@@ -3,9 +3,7 @@ jsApi: true
 title: "[P] JS Api"
 
 ---
-## Exports
-
-### Interfaces
+## Interfaces
 
 - [SdkArrayType](interfaces/SdkArrayType.md)
 - [SdkBodyModelPropertyType](interfaces/SdkBodyModelPropertyType.md)
@@ -25,10 +23,11 @@ title: "[P] JS Api"
 - [SdkTupleType](interfaces/SdkTupleType.md)
 - [SdkUnionType](interfaces/SdkUnionType.md)
 
-### Type Aliases
+## Type Aliases
 
 - [AccessFlags](type-aliases/AccessFlags.md)
 - [ClientFormat](type-aliases/ClientFormat.md)
+- [LanguageScopes](type-aliases/LanguageScopes.md)
 - [SdkBuiltInKinds](type-aliases/SdkBuiltInKinds.md)
 - [SdkModelPropertyType](type-aliases/SdkModelPropertyType.md)
 - [SdkOperation](type-aliases/SdkOperation.md)
@@ -37,18 +36,20 @@ title: "[P] JS Api"
 - [SdkType](type-aliases/SdkType.md)
 - [SdkValidation](type-aliases/SdkValidation.md)
 
-### Variables
+## Variables
 
 - [$lib](variables/$lib.md)
 - [namespace](variables/namespace.md)
 
-### Functions
+## Functions
 
 - [$access](functions/$access.md)
 - [$client](functions/$client.md)
 - [$clientFormat](functions/$clientFormat.md)
+- [$clientName](functions/$clientName.md)
 - [$convenientAPI](functions/$convenientAPI.md)
 - [$exclude](functions/$exclude.md)
+- [$flattenProperty](functions/$flattenProperty.md)
 - [$include](functions/$include.md)
 - [$internal](functions/$internal.md)
 - [$operationGroup](functions/$operationGroup.md)
@@ -63,6 +64,7 @@ title: "[P] JS Api"
 - [getAllModels](functions/getAllModels.md)
 - [getClient](functions/getClient.md)
 - [getClientFormat](functions/getClientFormat.md)
+- [getClientNameOverride](functions/getClientNameOverride.md)
 - [getClientNamespaceString](functions/getClientNamespaceString.md)
 - [getClientType](functions/getClientType.md)
 - [getCrossLanguageDefinitionId](functions/getCrossLanguageDefinitionId.md)
@@ -103,5 +105,6 @@ title: "[P] JS Api"
 - [listOperationsInOperationGroup](functions/listOperationsInOperationGroup.md)
 - [reportDiagnostic](functions/reportDiagnostic.md)
 - [reportUnionUnsupported](functions/reportUnionUnsupported.md)
+- [shouldFlattenProperty](functions/shouldFlattenProperty.md)
 - [shouldGenerateConvenient](functions/shouldGenerateConvenient.md)
 - [shouldGenerateProtocol](functions/shouldGenerateProtocol.md)

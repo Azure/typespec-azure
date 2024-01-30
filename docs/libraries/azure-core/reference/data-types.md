@@ -69,14 +69,14 @@ model Azure.Core.ConditionalRequestHeaders
 A vector embedding frequently used in similarity search.
 
 ```typespec
-model Azure.Core.EmbeddingVector<TType>
+model Azure.Core.EmbeddingVector<Element>
 ```
 
 #### Template Parameters
 
-| Name  | Description                            |
-| ----- | -------------------------------------- |
-| TType | The data type of the embedding vector. |
+| Name    | Description                               |
+| ------- | ----------------------------------------- |
+| Element | The element type of the embedding vector. |
 
 ### `EtagProperty` {#Azure.Core.EtagProperty}
 
@@ -101,6 +101,14 @@ Provides the standard 'expand' query parameter for list operations.
 
 ```typespec
 model Azure.Core.ExpandQueryParameter
+```
+
+### `FilterParameter` {#Azure.Core.FilterParameter}
+
+Provides the standard 'filter' query parameter for list operations
+
+```typespec
+model Azure.Core.FilterParameter
 ```
 
 ### `FilterQueryParameter` {#Azure.Core.FilterQueryParameter}
@@ -132,14 +140,22 @@ model Azure.Core.OrderByQueryParameter
 Describes a page of resource object.
 
 ```typespec
-model Azure.Core.Page<TResource>
+model Azure.Core.Page<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description        |
-| --------- | ------------------ |
-| TResource | The resource type. |
+| Name     | Description        |
+| -------- | ------------------ |
+| Resource | The resource type. |
+
+### `PollingOptions` {#Azure.Core.PollingOptions}
+
+Generic polling options for LRO operations.
+
+```typespec
+model Azure.Core.PollingOptions
+```
 
 ### `RepeatabilityRequestHeaders` {#Azure.Core.RepeatabilityRequestHeaders}
 
@@ -170,42 +186,42 @@ model Azure.Core.RequestIdResponseHeader
 Defines a property as a request parameter.
 
 ```typespec
-model Azure.Core.RequestParameter<T>
+model Azure.Core.RequestParameter<Name>
 ```
 
 #### Template Parameters
 
 | Name | Description         |
 | ---- | ------------------- |
-| T    | The parameter name. |
+| Name | The parameter name. |
 
 ### `ResourceOperationStatus` {#Azure.Core.ResourceOperationStatus}
 
 ```typespec
-model Azure.Core.ResourceOperationStatus<TResource, TStatusResult, TStatusError>
+model Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError>
 ```
 
 #### Template Parameters
 
-| Name          | Description                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------- |
-| TResource     | The resource type.                                                                                |
-| TStatusResult | Model describing the status result object. If not specified, the default is the resource type.    |
-| TStatusError  | Model describing the status error object. If not specified, the default is the Foundations.Error. |
+| Name         | Description                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| Resource     | The resource type.                                                                                |
+| StatusResult | Model describing the status result object. If not specified, the default is the resource type.    |
+| StatusError  | Model describing the status error object. If not specified, the default is the Foundations.Error. |
 
 ### `ResponseProperty` {#Azure.Core.ResponseProperty}
 
 Defines a property as a response header.
 
 ```typespec
-model Azure.Core.ResponseProperty<T>
+model Azure.Core.ResponseProperty<Name>
 ```
 
 #### Template Parameters
 
 | Name | Description      |
 | ---- | ---------------- |
-| T    | The header name. |
+| Name | The header name. |
 
 ### `SelectQueryParameter` {#Azure.Core.SelectQueryParameter}
 
@@ -231,6 +247,30 @@ Provides the most common query parameters for list operations.
 model Azure.Core.StandardListQueryParameters
 ```
 
+### `StatusMonitorOptions` {#Azure.Core.StatusMonitorOptions}
+
+Options for Lro status monitors.
+
+```typespec
+model Azure.Core.StatusMonitorOptions
+```
+
+### `StatusMonitorPollingOptions` {#Azure.Core.StatusMonitorPollingOptions}
+
+Options for overriding a polling endpoint that uses a StatusMonitor
+
+```typespec
+model Azure.Core.StatusMonitorPollingOptions<PollingModel, FinalResult, FinalProperty>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| PollingModel  | The model that is returned when polling should continue.         |
+| FinalResult   | The model that is returned when polling terminates successfully. |
+| FinalProperty | The property of the status monitor that contains results.        |
+
 ### `TopQueryParameter` {#Azure.Core.TopQueryParameter}
 
 Provides the standard 'top' query parameter for list operations.
@@ -245,6 +285,14 @@ Supported versions of Azure.Core TypeSpec building blocks.
 
 ```typespec
 enum Azure.Core.Versions
+```
+
+### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
+
+The available kinds of polling options
+
+```typespec
+union Azure.Core.PollingOptionKind
 ```
 
 ### `RepeatabilityResult` {#Azure.Core.RepeatabilityResult}
@@ -335,32 +383,32 @@ model Azure.Core.Foundations.ApiVersionParameter
 A model containing the collection keys of the provided resource's parent resource.
 
 ```typespec
-model Azure.Core.Foundations.CollectionKeysOf<TResource>
+model Azure.Core.Foundations.CollectionKeysOf<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `CreateableAndUpdateableProperties` {#Azure.Core.Foundations.CreateableAndUpdateableProperties}
 
 Collection of properties from a resource that are visible to create or update scopes.
 
 ```typespec
-model Azure.Core.Foundations.CreateableAndUpdateableProperties<TResource>
+model Azure.Core.Foundations.CreateableAndUpdateableProperties<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `CustomizationFields` {#Azure.Core.Foundations.CustomizationFields}
 
-The expected shape of model types passed to the TCustom parameter of operation signatures.
+The expected shape of model types passed to the Custom parameter of operation signatures.
 
 ```typespec
 model Azure.Core.Foundations.CustomizationFields
@@ -371,43 +419,43 @@ model Azure.Core.Foundations.CustomizationFields
 A model describing a customized page of resources.
 
 ```typespec
-model Azure.Core.Foundations.CustomPage<TResource, Traits>
+model Azure.Core.Foundations.CustomPage<Resource, Traits>
 ```
 
 #### Template Parameters
 
-| Name      | Description                     |
-| --------- | ------------------------------- |
-| TResource | The type of the resource.       |
-| Traits    | Traits which apply to the page. |
+| Name     | Description                     |
+| -------- | ------------------------------- |
+| Resource | The type of the resource.       |
+| Traits   | Traits which apply to the page. |
 
 ### `CustomParameters` {#Azure.Core.Foundations.CustomParameters}
 
 A model describing a set of custom request parameters.
 
 ```typespec
-model Azure.Core.Foundations.CustomParameters<TCustom>
+model Azure.Core.Foundations.CustomParameters<Custom>
 ```
 
 #### Template Parameters
 
-| Name    | Description                                     |
-| ------- | ----------------------------------------------- |
-| TCustom | An object describing custom request parameters. |
+| Name   | Description                                     |
+| ------ | ----------------------------------------------- |
+| Custom | An object describing custom request parameters. |
 
 ### `CustomResponseFields` {#Azure.Core.Foundations.CustomResponseFields}
 
 A model describing a set of custom response properties.
 
 ```typespec
-model Azure.Core.Foundations.CustomResponseFields<TCustom>
+model Azure.Core.Foundations.CustomResponseFields<Custom>
 ```
 
 #### Template Parameters
 
-| Name    | Description                                      |
-| ------- | ------------------------------------------------ |
-| TCustom | An object describing custom response properties. |
+| Name   | Description                                      |
+| ------ | ------------------------------------------------ |
+| Custom | An object describing custom response properties. |
 
 ### `Error` {#Azure.Core.Foundations.Error}
 
@@ -430,14 +478,14 @@ model Azure.Core.Foundations.ErrorResponse
 A response containing error details.
 
 ```typespec
-model Azure.Core.Foundations.ErrorResponseBase<TError>
+model Azure.Core.Foundations.ErrorResponseBase<Error>
 ```
 
 #### Template Parameters
 
-| Name   | Description                   |
-| ------ | ----------------------------- |
-| TError | The type of the error object. |
+| Name  | Description                   |
+| ----- | ----------------------------- |
+| Error | The type of the error object. |
 
 ### `InnerError` {#Azure.Core.Foundations.InnerError}
 
@@ -452,127 +500,127 @@ model Azure.Core.Foundations.InnerError
 A model containing the keys of the provided resource.
 
 ```typespec
-model Azure.Core.Foundations.ItemKeysOf<TResource>
+model Azure.Core.Foundations.ItemKeysOf<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `LocationOfCreatedResourceResponse` {#Azure.Core.Foundations.LocationOfCreatedResourceResponse}
 
 Response describing the location of a created resource.
 
 ```typespec
-model Azure.Core.Foundations.LocationOfCreatedResourceResponse<T>
+model Azure.Core.Foundations.LocationOfCreatedResourceResponse<Resource>
 ```
 
 #### Template Parameters
 
-| Name | Description                       |
-| ---- | --------------------------------- |
-| T    | The type of the created resource. |
+| Name     | Description |
+| -------- | ----------- |
+| Resource |             |
 
 ### `LocationOfCreatedResourceWithServiceProvidedNameResponse` {#Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse}
 
 Response describing the location of a resource created with a service-provided name.
 
 ```typespec
-model Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse<T>
+model Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource>
 ```
 
 #### Template Parameters
 
-| Name | Description                       |
-| ---- | --------------------------------- |
-| T    | The type of the created resource. |
+| Name     | Description |
+| -------- | ----------- |
+| Resource |             |
 
 ### `LongRunningStatusLocation` {#Azure.Core.Foundations.LongRunningStatusLocation}
 
 Metadata for long running operation status monitor locations.
 
 ```typespec
-model Azure.Core.Foundations.LongRunningStatusLocation<TStatusResult>
+model Azure.Core.Foundations.LongRunningStatusLocation<StatusResult>
 ```
 
 #### Template Parameters
 
-| Name          | Description                              |
-| ------------- | ---------------------------------------- |
-| TStatusResult | The type of the operation status result. |
+| Name         | Description                              |
+| ------------ | ---------------------------------------- |
+| StatusResult | The type of the operation status result. |
 
 ### `OperationStatus` {#Azure.Core.Foundations.OperationStatus}
 
 Provides status details for long running operations.
 
 ```typespec
-model Azure.Core.Foundations.OperationStatus<TStatusResult, TStatusError>
+model Azure.Core.Foundations.OperationStatus<StatusResult, StatusError>
 ```
 
 #### Template Parameters
 
-| Name          | Description                                                                         |
-| ------------- | ----------------------------------------------------------------------------------- |
-| TStatusResult | The type of the operation status result.                                            |
-| TStatusError  | The type of the operation status error. If not provided, the default error is used. |
+| Name         | Description                                                                         |
+| ------------ | ----------------------------------------------------------------------------------- |
+| StatusResult | The type of the operation status result.                                            |
+| StatusError  | The type of the operation status error. If not provided, the default error is used. |
 
 ### `ResourceBody` {#Azure.Core.Foundations.ResourceBody}
 
 Conveys the resource instance to an operation as a request body.
 
 ```typespec
-model Azure.Core.Foundations.ResourceBody<T>
+model Azure.Core.Foundations.ResourceBody<Resource>
 ```
 
 #### Template Parameters
 
-| Name | Description                        |
-| ---- | ---------------------------------- |
-| T    | The type of the resource instance. |
+| Name     | Description                        |
+| -------- | ---------------------------------- |
+| Resource | The type of the resource instance. |
 
 ### `ResourceCreateOrReplaceModel` {#Azure.Core.Foundations.ResourceCreateOrReplaceModel}
 
 Version of a model for a create or replace operation which only includes updateable properties.
 
 ```typespec
-model Azure.Core.Foundations.ResourceCreateOrReplaceModel<TResource>
+model Azure.Core.Foundations.ResourceCreateOrReplaceModel<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `ResourceCreateOrUpdateModel` {#Azure.Core.Foundations.ResourceCreateOrUpdateModel}
 
 Version of a model for a create or update operation which only includes updateable properties.
 
 ```typespec
-model Azure.Core.Foundations.ResourceCreateOrUpdateModel<TResource>
+model Azure.Core.Foundations.ResourceCreateOrUpdateModel<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `ResourceUpdateModel` {#Azure.Core.Foundations.ResourceUpdateModel}
 
 Version of a model for an update operation which only includes updateable properties.
 
 ```typespec
-model Azure.Core.Foundations.ResourceUpdateModel<TResource>
+model Azure.Core.Foundations.ResourceUpdateModel<Resource>
 ```
 
 #### Template Parameters
 
-| Name      | Description               |
-| --------- | ------------------------- |
-| TResource | The type of the resource. |
+| Name     | Description               |
+| -------- | ------------------------- |
+| Resource | The type of the resource. |
 
 ### `RetryAfterHeader` {#Azure.Core.Foundations.RetryAfterHeader}
 
@@ -597,14 +645,14 @@ enum Azure.Core.Foundations.OperationState
 Declares a trait that is applied as a query parameter for list operations.
 
 ```typespec
-model Azure.Core.Traits.ListQueryParametersTrait<TParams>
+model Azure.Core.Traits.ListQueryParametersTrait<Parameters>
 ```
 
 #### Template Parameters
 
-| Name    | Description                             |
-| ------- | --------------------------------------- |
-| TParams | Object describing the query parameters. |
+| Name       | Description                             |
+| ---------- | --------------------------------------- |
+| Parameters | Object describing the query parameters. |
 
 ### `NoClientRequestId` {#Azure.Core.Traits.NoClientRequestId}
 
@@ -635,29 +683,29 @@ model Azure.Core.Traits.NoRepeatableRequests
 Declares a trait that is applied as a query parameter.
 
 ```typespec
-model Azure.Core.Traits.QueryParametersTrait<TParams, Contexts>
+model Azure.Core.Traits.QueryParametersTrait<Parameters, Contexts>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                    |
-| -------- | ---------------------------------------------- |
-| TParams  | The name of the query parameter.               |
-| Contexts | The contexts in which the trait is applicable. |
+| Name       | Description                                    |
+| ---------- | ---------------------------------------------- |
+| Parameters | The name of the query parameter.               |
+| Contexts   | The contexts in which the trait is applicable. |
 
 ### `RequestHeadersTrait` {#Azure.Core.Traits.RequestHeadersTrait}
 
 Declares a trait that is applied as a request header parameter.
 
 ```typespec
-model Azure.Core.Traits.RequestHeadersTrait<THeaders, Contexts>
+model Azure.Core.Traits.RequestHeadersTrait<Headers, Contexts>
 ```
 
 #### Template Parameters
 
 | Name     | Description                                      |
 | -------- | ------------------------------------------------ |
-| THeaders | Object describing the request header parameters. |
+| Headers  | Object describing the request header parameters. |
 | Contexts | The contexts in which the trait is applicable.   |
 
 ### `ResponseHeadersTrait` {#Azure.Core.Traits.ResponseHeadersTrait}
@@ -665,14 +713,14 @@ model Azure.Core.Traits.RequestHeadersTrait<THeaders, Contexts>
 Declares a trait that is applied as a response header parameter.
 
 ```typespec
-model Azure.Core.Traits.ResponseHeadersTrait<THeaders, Contexts>
+model Azure.Core.Traits.ResponseHeadersTrait<Headers, Contexts>
 ```
 
 #### Template Parameters
 
 | Name     | Description                                       |
 | -------- | ------------------------------------------------- |
-| THeaders | Object describing the response header parameters. |
+| Headers  | Object describing the response header parameters. |
 | Contexts | The contexts in which the trait is applicable.    |
 
 ### `SupportsClientRequestId` {#Azure.Core.Traits.SupportsClientRequestId}
@@ -680,42 +728,42 @@ model Azure.Core.Traits.ResponseHeadersTrait<THeaders, Contexts>
 Provides clientRequestId headers for requests and responses.
 
 ```typespec
-model Azure.Core.Traits.SupportsClientRequestId<TVersionAdded>
+model Azure.Core.Traits.SupportsClientRequestId<VersionAdded>
 ```
 
 #### Template Parameters
 
-| Name          | Description                                                                                                        |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| TVersionAdded | The version when the trait was added to the specification.<br />Leave this empty if the trait is always supported. |
+| Name         | Description                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| VersionAdded | The version when the trait was added to the specification.<br />Leave this empty if the trait is always supported. |
 
 ### `SupportsConditionalRequests` {#Azure.Core.Traits.SupportsConditionalRequests}
 
 Provides conditional request headers for requests and ETag headers for responses.
 
 ```typespec
-model Azure.Core.Traits.SupportsConditionalRequests<TVersionAdded>
+model Azure.Core.Traits.SupportsConditionalRequests<VersionAdded>
 ```
 
 #### Template Parameters
 
-| Name          | Description                                                                                                        |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| TVersionAdded | The version when the trait was added to the specification.<br />Leave this empty if the trait is always supported. |
+| Name         | Description                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| VersionAdded | The version when the trait was added to the specification.<br />Leave this empty if the trait is always supported. |
 
 ### `SupportsRepeatableRequests` {#Azure.Core.Traits.SupportsRepeatableRequests}
 
 Provides repeatable request headers for requests and responses.
 
 ```typespec
-model Azure.Core.Traits.SupportsRepeatableRequests<TVersionAdded>
+model Azure.Core.Traits.SupportsRepeatableRequests<VersionAdded>
 ```
 
 #### Template Parameters
 
-| Name          | Description                                                                                                        |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| TVersionAdded | The version when the trait was added to the specification.<br />Leave this empty if the trait is always supported. |
+| Name         | Description                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| VersionAdded | The version when the trait was added to the specification.<br />Leave this empty if the trait is always supported. |
 
 ### `TraitOverride` {#Azure.Core.Traits.TraitOverride}
 
@@ -736,14 +784,14 @@ model Azure.Core.Traits.TraitOverride<Trait>
 Declares a version parameter trait.
 
 ```typespec
-model Azure.Core.Traits.VersionParameterTrait<TVersionParameter>
+model Azure.Core.Traits.VersionParameterTrait<VersionParameter>
 ```
 
 #### Template Parameters
 
-| Name              | Description                        |
-| ----------------- | ---------------------------------- |
-| TVersionParameter | The type of the version parameter. |
+| Name             | Description                        |
+| ---------------- | ---------------------------------- |
+| VersionParameter | The type of the version parameter. |
 
 ### `TraitContext` {#Azure.Core.Traits.TraitContext}
 

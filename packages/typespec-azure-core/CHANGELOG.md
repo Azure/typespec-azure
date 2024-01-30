@@ -1,6 +1,26 @@
 # Change Log - @azure-tools/typespec-azure-core
 
-This log was last generated on Mon, 11 Dec 2023 18:44:34 GMT and should not be manually modified.
+This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
+
+## 0.38.0
+Wed, 24 Jan 2024 05:47:19 GMT
+
+### Minor changes
+
+- Update dependencies.
+
+### Updates
+
+- Relaxing camelCase linting rule to allow a single non-alphabetical char. Also added standard filterParameter
+- Renamed template parameters for clarity and consistency.
+- Update dependencies
+
+## 0.37.2
+Wed, 20 Dec 2023 05:29:22 GMT
+
+### Patches
+
+- Add LRO support for ARM patterns
 
 ## 0.37.1
 Mon, 11 Dec 2023 18:44:34 GMT

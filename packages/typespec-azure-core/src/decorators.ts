@@ -10,9 +10,13 @@ import {
   getKnownValues,
   getNamespaceFullName,
   getTypeName,
+  ignoreDiagnostics,
+  IntrinsicType,
   isKey,
+  isNeverType,
   isStringType,
   isTemplateDeclarationOrInstance,
+  isVoidType,
   Model,
   ModelProperty,
   Operation,
@@ -26,9 +30,14 @@ import {
 import { getHttpOperation, getRoutePath } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
 import { OperationLink } from "./lro-helpers.js";
-import { getLroOperationInfo, PropertyMap, ResultInfo } from "./lro-info.js";
+import {
+  extractStatusMonitorInfo,
+  getLroOperationInfo,
+  PropertyMap,
+  ResultInfo,
+  StatusMonitorMetadata,
+} from "./lro-info.js";
 
-export const namespace = "Azure.Core";
 /*
  * Constants for polling and final operation links
  */
@@ -396,6 +405,22 @@ export function getLongRunningStates(
  * @param target The model to check for lro status
  */
 export function getLroStatusProperty(program: Program, target: Model): ModelProperty | undefined {
+  function getProvisioningState(props: Map<string, ModelProperty>): ModelProperty | undefined {
+    let innerProps: Map<string, ModelProperty> | undefined = undefined;
+    let result: ModelProperty | undefined = undefined;
+    const innerProperty = props.get("properties");
+    result = props.get("provisioningState");
+    if (
+      result === undefined &&
+      innerProperty !== undefined &&
+      innerProperty.type?.kind === "Model"
+    ) {
+      innerProps = getAllProperties(innerProperty.type);
+      result = innerProps.get("provisioningState");
+    }
+
+    return result;
+  }
   const props = getAllProperties(target);
   for (const [_, prop] of props.entries()) {
     let values = program.stateMap(lroStatusKey).get(prop);
@@ -406,7 +431,7 @@ export function getLroStatusProperty(program: Program, target: Model): ModelProp
     }
   }
 
-  const statusProp = props.get("status");
+  const statusProp = props.get("status") ?? getProvisioningState(props);
   if (statusProp) {
     const [states, _] = extractLroStates(program, statusProp);
     if (states !== undefined) return statusProp;
@@ -467,6 +492,7 @@ export function getLroResult(
   }
 
   if (resultProperty === undefined && useDefault) resultProperty = defaultProperty;
+  if (resultProperty && isNeverType(resultProperty.type)) resultProperty = undefined;
   return diagnostics.wrap(resultProperty);
 }
 
@@ -603,9 +629,142 @@ export function isLroFailedState(program: Program, entity: EnumMember): boolean 
 // @pollingLocation
 
 const pollingLocationsKey = createStateSymbol("pollingLocations");
+const pollingLocationInfoKey = createStateSymbol("pollingLocationInfo");
 
-export function $pollingLocation(context: DecoratorContext, entity: ModelProperty) {
-  context.program.stateSet(pollingLocationsKey).add(entity);
+/** Extra information about polling control stored with a polling link */
+export type PollingLocationInfo = StatusMonitorPollingLocationInfo;
+
+/** The abstract type for polling control information */
+export interface PollingLocationBase {
+  /** The kind of polling being done */
+  kind: pollingOptionsKind;
+  /** The model property containing the polling link */
+  target: ModelProperty;
+  /** The type of the poller */
+  pollingModel?: Model | IntrinsicType;
+  /** The type of the final result after polling completes */
+  finalResult?: Model | IntrinsicType;
+}
+
+/** Collected data for status monitor polling links */
+export interface StatusMonitorPollingLocationInfo extends PollingLocationBase {
+  /** The kind of status monitor */
+  kind: pollingOptionsKind.StatusMonitor;
+  /** The status monitor detailed data for control of polling. */
+  info: StatusMonitorMetadata;
+}
+
+// keys of the pollingOptions type
+const optionsKindKey = "kind";
+const finalPropertyKey = "finalProperty";
+const pollingModelKey = "pollingModel";
+const finalResultKey = "finalResult";
+
+export enum pollingOptionsKind {
+  StatusMonitor = "statusMonitor",
+}
+export function $pollingLocation(
+  context: DecoratorContext,
+  entity: ModelProperty,
+  options?: Model
+) {
+  const { program } = context;
+  if (options) {
+    if (isNeverType(options)) return;
+    const info = extractPollingLocationInfo(program, entity, options);
+    if (info) {
+      program.stateMap(pollingLocationInfoKey).set(entity, info);
+    }
+  }
+
+  program.stateSet(pollingLocationsKey).add(entity);
+}
+
+/**
+ * Gets polling information stored with a field that contains a link to an Lro polling endpoint
+ * @param program The program to check
+ * @param target The ModelProperty to check for polling info
+ */
+export function getPollingLocationInfo(
+  program: Program,
+  target: ModelProperty
+): PollingLocationInfo | undefined {
+  return program.stateMap(pollingLocationInfoKey).get(target);
+}
+
+function extractUnionVariantValue(type: Type): string | undefined {
+  if (type.kind === "UnionVariant" && type.type.kind === "String") return type.type.value;
+  return undefined;
+}
+
+function extractPollingLocationInfo(
+  program: Program,
+  target: ModelProperty,
+  options: Model
+): PollingLocationInfo | undefined {
+  const kind = options.properties.get(optionsKindKey);
+  if (kind === undefined) return undefined;
+  const kindValue: string | undefined = extractUnionVariantValue(kind.type);
+  if (kindValue === undefined) return undefined;
+  const pollingInfo: {
+    pollingModel?: Model | IntrinsicType;
+    finalResult?: Model | IntrinsicType;
+    target: ModelProperty;
+  } = { target: target };
+  const pollingModel = options.properties.get(pollingModelKey)?.type;
+  if (pollingModel && pollingModel.kind === "Model") pollingInfo.pollingModel = pollingModel;
+  if (pollingModel && isVoidType(pollingModel)) pollingInfo.pollingModel = program.checker.voidType;
+  const finalResult = options.properties.get(finalResultKey)?.type;
+  if (finalResult && finalResult.kind === "Model") pollingInfo.finalResult = finalResult;
+  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = program.checker.voidType;
+  switch (kindValue) {
+    case pollingOptionsKind.StatusMonitor:
+      return extractStatusMonitorLocationInfo(program, options, pollingInfo);
+    default:
+      return undefined;
+  }
+}
+
+function extractStatusMonitorLocationInfo(
+  program: Program,
+  options: Model,
+  baseInfo: {
+    pollingModel?: Model | IntrinsicType;
+    finalResult?: Model | IntrinsicType;
+    target: ModelProperty;
+  }
+): StatusMonitorPollingLocationInfo | undefined {
+  const kind = options.properties.get(optionsKindKey);
+  if (kind === undefined || extractUnionVariantValue(kind.type) !== "statusMonitor")
+    return undefined;
+  if (baseInfo.pollingModel === undefined || baseInfo.pollingModel.kind === "Intrinsic")
+    return undefined;
+  const finalProperty = options.properties.get(finalPropertyKey)?.type;
+  let finalPropertyValue: ModelProperty | undefined = undefined;
+  if (finalProperty && finalProperty.kind === "ModelProperty") finalPropertyValue = finalProperty;
+  if (
+    finalProperty &&
+    finalProperty.kind === "String" &&
+    baseInfo.pollingModel.properties.has(finalProperty.value)
+  ) {
+    finalPropertyValue = baseInfo.pollingModel.properties.get(finalProperty.value);
+  }
+  if (finalPropertyValue === undefined)
+    finalPropertyValue = ignoreDiagnostics(getLroResult(program, baseInfo.pollingModel, true));
+  const statusProperty = getLroStatusProperty(program, baseInfo.pollingModel);
+  if (statusProperty === undefined) return undefined;
+  const statusMonitor = ignoreDiagnostics(
+    extractStatusMonitorInfo(program, baseInfo.pollingModel, statusProperty)
+  );
+  if (statusMonitor === undefined) return undefined;
+  statusMonitor.successProperty = finalPropertyValue;
+  baseInfo.finalResult =
+    finalPropertyValue?.type?.kind === "Model" ? finalPropertyValue.type : program.checker.voidType;
+  return {
+    kind: pollingOptionsKind.StatusMonitor,
+    info: statusMonitor,
+    ...baseInfo,
+  };
 }
 
 /**
@@ -618,9 +777,25 @@ export function isPollingLocation(program: Program, entity: ModelProperty): bool
 // @finalLocation
 
 const finalLocationsKey = createStateSymbol("finalLocations");
+const finalLocationResultsKey = createStateSymbol("finalLocationResults");
 
-export function $finalLocation(context: DecoratorContext, entity: ModelProperty) {
-  context.program.stateSet(finalLocationsKey).add(entity);
+export function $finalLocation(
+  context: DecoratorContext,
+  entity: ModelProperty,
+  finalResult?: Model | IntrinsicType
+) {
+  const { program } = context;
+  if (finalResult !== undefined && isNeverType(finalResult)) return;
+  program.stateSet(finalLocationsKey).add(entity);
+  switch (finalResult?.kind) {
+    case "Model":
+      program.stateMap(finalLocationResultsKey).set(entity, finalResult);
+      break;
+    case "Intrinsic":
+      if (isVoidType(finalResult)) {
+        program.stateMap(finalLocationResultsKey).set(entity, finalResult);
+      }
+  }
 }
 
 /**
@@ -628,6 +803,13 @@ export function $finalLocation(context: DecoratorContext, entity: ModelProperty)
  */
 export function isFinalLocation(program: Program, entity: ModelProperty): boolean {
   return program.stateSet(finalLocationsKey).has(entity);
+}
+
+export function getFinalLocationValue(
+  program: Program,
+  entity: ModelProperty
+): Model | IntrinsicType | undefined {
+  return program.stateMap(finalLocationResultsKey).get(entity);
 }
 
 export function $omitKeyProperties(context: DecoratorContext, entity: Model) {
@@ -756,14 +938,14 @@ export function $pollingOperation(
   if (operationDetails.result.statusMonitor.terminationInfo.succeededState.length < 1) {
     reportDiagnostic(context.program, {
       code: "polling-operation-no-lro-success",
-      target: operationDetails.result.statusMonitor.type,
+      target: operationDetails.result.statusMonitor.monitorType,
     });
   }
 
   if (operationDetails.result.statusMonitor.terminationInfo.failedState.length < 1) {
     reportDiagnostic(context.program, {
       code: "polling-operation-no-lro-failure",
-      target: operationDetails.result.statusMonitor.type,
+      target: operationDetails.result.statusMonitor.monitorType,
     });
   }
 

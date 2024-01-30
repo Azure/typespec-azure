@@ -1,8 +1,9 @@
 import {
   BasicTestRunner,
-  createLinterRuleTester,
   LinterRuleTester,
+  createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { apiVersionRule } from "../../src/rules/api-version-parameter.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

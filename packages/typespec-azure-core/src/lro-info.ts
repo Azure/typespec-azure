@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  IntrinsicType,
   Model,
   ModelProperty,
   Operation,
@@ -20,8 +21,6 @@ import {
 } from "@typespec/http";
 import {
   LongRunningStates,
-  ModelPropertyTerminationStatus,
-  OperationLink,
   extractLroStates,
   getLongRunningStates,
   getLroErrorResult,
@@ -29,8 +28,9 @@ import {
   getLroStatusProperty,
   getPollingOperationParameter,
   isPollingLocation,
-} from "./index.js";
+} from "./decorators.js";
 import { createDiagnostic } from "./lib.js";
+import { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";
 import { getAllProperties } from "./utils.js";
 
 export interface LroOperationInfo {
@@ -60,11 +60,11 @@ export interface ResultInfo {
 /** Metadata for the STatusMonitor */
 export interface StatusMonitorMetadata {
   /** The model type of the status monitor */
-  type: Model;
+  monitorType: Model;
   /** Information on polling status property and termina states */
   terminationInfo: ModelPropertyTerminationStatus;
 
-  states: LongRunningStates;
+  lroStates: LongRunningStates;
 
   /** The property containing the response when polling terminates with success */
   successProperty?: ModelProperty;
@@ -73,10 +73,51 @@ export interface StatusMonitorMetadata {
   errorProperty?: ModelProperty;
 
   statusProperty: ModelProperty;
+
+  successType: Model | IntrinsicType;
+
+  errorType?: Model;
 }
 
 export type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
 
+export function extractStatusMonitorInfo(
+  program: Program,
+  model: Model,
+  statusProperty: ModelProperty
+): [StatusMonitorMetadata | undefined, readonly Diagnostic[]] {
+  const diagnosticsToToss = createDiagnosticCollector();
+  const diagnosticsToKeep = createDiagnosticCollector();
+  const lroResult = diagnosticsToKeep.pipe(getLroResult(program, model, true));
+  const successProperty: ModelProperty | undefined =
+    lroResult?.kind === "ModelProperty" ? lroResult : undefined;
+  const errorProperty: ModelProperty | undefined = diagnosticsToKeep.pipe(
+    getLroErrorResult(program, model, true)
+  );
+  const states: LongRunningStates | undefined =
+    getLongRunningStates(program, statusProperty) ??
+    diagnosticsToToss.pipe(extractLroStates(program, statusProperty));
+  if (!states || !statusProperty) return diagnosticsToKeep.wrap(undefined);
+  return diagnosticsToKeep.wrap({
+    monitorType: getEffectiveModelType(program, model, (p) => !isMetadata(program, p)) ?? model,
+    successProperty: successProperty,
+    errorProperty: errorProperty,
+    statusProperty: statusProperty,
+    lroStates: states,
+    errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
+    successType:
+      successProperty?.type?.kind === "Intrinsic" || successProperty?.type?.kind === "Model"
+        ? successProperty.type
+        : program.checker.voidType,
+    terminationInfo: {
+      kind: "model-property",
+      property: statusProperty,
+      canceledState: states.canceledState,
+      failedState: states.failedState,
+      succeededState: states.succeededState,
+    },
+  });
+}
 export function getLroOperationInfo(
   program: Program,
   sourceOperation: Operation,
@@ -181,7 +222,7 @@ export function getLroOperationInfo(
       visitResponse(program, response, (m) => {
         const status = getLroStatusProperty(program, m);
         if (status !== undefined) {
-          result = diagnostics.pipe(extractStatusMonitorInfo(m, status));
+          result = diagnostics.pipe(extractStatusMonitorInfo(program, m, status));
         }
       });
 
@@ -370,39 +411,6 @@ export function getLroOperationInfo(
           });
         }
     }
-  }
-
-  function extractStatusMonitorInfo(
-    model: Model,
-    statusProperty: ModelProperty
-  ): [StatusMonitorMetadata | undefined, readonly Diagnostic[]] {
-    const diagnosticsToToss = createDiagnosticCollector();
-    const diagnosticsToKeep = createDiagnosticCollector();
-    const lroResult = diagnosticsToKeep.pipe(getLroResult(program, model, true));
-    const successProperty: ModelProperty | undefined =
-      lroResult?.kind === "ModelProperty" ? lroResult : undefined;
-    const errorProperty: ModelProperty | undefined = diagnosticsToKeep.pipe(
-      getLroErrorResult(program, model, true)
-    );
-    const states: LongRunningStates | undefined =
-      getLongRunningStates(program, statusProperty) ??
-      diagnosticsToToss.pipe(extractLroStates(program, statusProperty));
-    if (!states || !statusProperty) return diagnosticsToKeep.wrap(undefined);
-
-    return diagnosticsToKeep.wrap({
-      type: getEffectiveModelType(program, model, (p) => !isMetadata(program, p)) ?? model,
-      successProperty: successProperty,
-      errorProperty: errorProperty,
-      statusProperty: statusProperty,
-      states: states,
-      terminationInfo: {
-        kind: "model-property",
-        property: statusProperty,
-        canceledState: states.canceledState,
-        failedState: states.failedState,
-        succeededState: states.succeededState,
-      },
-    });
   }
 
   function extractPollinglink(property: ModelProperty): OperationLink | undefined {

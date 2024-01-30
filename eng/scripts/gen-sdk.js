@@ -1,12 +1,13 @@
-import { autorest, run, scanSwaggers } from "./helpers.js";
+import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
+import { autorest, scanSwaggers } from "./helpers.js";
 
 const AUTOREST_CORE_VERSION = "3.7.2";
 
-function generateSDK(lang, swagger) {
+async function generateSDK(lang, swagger) {
   try {
     switch (lang) {
       case "python":
-        run(autorest, [
+        await runOrExit(autorest, [
           "--debug",
           "--verbose",
           `--version=${AUTOREST_CORE_VERSION}`,
@@ -20,7 +21,7 @@ function generateSDK(lang, swagger) {
 
         break;
       case "javascript":
-        run(autorest, [
+        await runOrExit(autorest, [
           `--version=${AUTOREST_CORE_VERSION}`,
           "--typescript",
           "--use=@autorest/typescript@6.0.0-rc.1",

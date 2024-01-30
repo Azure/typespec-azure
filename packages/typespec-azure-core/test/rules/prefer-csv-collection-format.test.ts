@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { preferCsvCollectionFormatRule } from "../../src/rules/prefer-csv-collection-format.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

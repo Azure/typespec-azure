@@ -4,6 +4,7 @@ import {
   createLinterRuleTester,
   extractCursor,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { requireDocumentation } from "../../src/rules/require-docs.js";
 import { createAzureCoreTestRunner, getRunnerPosOffset } from "../test-host.js";
 

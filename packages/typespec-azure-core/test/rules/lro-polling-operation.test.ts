@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { longRunningOperationsRequirePollingOperation } from "../../src/rules/lro-polling-operation.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

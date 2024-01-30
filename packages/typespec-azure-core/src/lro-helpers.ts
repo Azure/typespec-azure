@@ -1,4 +1,3 @@
-import "./index.js";
 import {
   filterModelProperties,
   filterResponseModels,
@@ -8,7 +7,9 @@ import {
 } from "./utils.js";
 
 import {
+  getEffectiveModelType,
   ignoreDiagnostics,
+  IntrinsicType,
   isNeverType,
   Model,
   ModelProperty,
@@ -22,6 +23,7 @@ import {
   getHttpOperation,
   getOperationVerb,
   HttpOperation,
+  isBody,
   isHeader,
 } from "@typespec/http";
 import {
@@ -33,14 +35,19 @@ import {
 import {
   extractLroStates,
   FinalOperationKey,
+  getFinalLocationValue,
   getLroResult,
   getOperationLink,
   getOperationLinks,
+  getPollingLocationInfo,
   isFinalLocation,
   isPollingLocation,
   LongRunningStates,
   OperationLinkMetadata,
+  PollingLocationInfo,
   PollingOperationKey,
+  pollingOptionsKind,
+  StatusMonitorPollingLocationInfo,
 } from "./decorators.js";
 import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 
@@ -51,7 +58,7 @@ import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 export interface OperationLink {
   kind: "link";
   /** Indicates whether the link is in the response header or response body */
-  location: "ResponseHeader" | "ResponseBody";
+  location: "ResponseHeader" | "ResponseBody" | "Self";
   /** The property that contains the link */
   property: ModelProperty;
 }
@@ -63,7 +70,7 @@ export interface OperationLink {
 export type TerminationStatus = HttpTerminationStatus | ModelPropertyTerminationStatus;
 
 /**
- * Definition of a StatusMonitor that uses http status rather then status code
+ * Definition of a StatusMonitor that uses http status rather then status code.
  */
 export interface HttpTerminationStatus {
   kind: "status-code";
@@ -116,7 +123,7 @@ export interface OperationReference {
  */
 export interface LogicalOperationStep {
   /** The TypeSpec type that is returned by following a link or calling a lined operation */
-  responseModel: Model;
+  responseModel: Model | IntrinsicType;
 }
 
 /** Information on how to get to the StatusMonitor */
@@ -134,6 +141,7 @@ export type OperationStep =
  */
 export interface PollingOperationStep extends LogicalOperationStep {
   kind: "pollingOperationStep";
+  responseModel: Model;
   /** Information on how to determine when the operation reaches a terminal state (most often, this is the terminal values that may be returned in the status field) */
   terminationStatus: TerminationStatus;
 
@@ -151,6 +159,7 @@ export type nextOperationStep = NextOperationLink | NextOperationReference;
  */
 export interface NextOperationLink extends LogicalOperationStep {
   kind: "nextOperationLink";
+  responseModel: Model;
   /** information on how to get the uri to the status monitor */
   target: OperationLink;
 }
@@ -160,6 +169,7 @@ export interface NextOperationLink extends LogicalOperationStep {
  */
 export interface NextOperationReference extends LogicalOperationStep {
   kind: "nextOperationReference";
+  responseModel: Model;
   /** Information on how to call the STatusMonitor operation */
   target: OperationReference;
 }
@@ -171,13 +181,15 @@ export interface NextOperationReference extends LogicalOperationStep {
 export type FinalOperationStep =
   | FinalOperationLink
   | FinalOperationReference
-  | PollingSuccessProperty;
+  | PollingSuccessProperty
+  | NoPollingSuccessProperty;
 
 /**
  * For long-running operations, the resource link to the final result
  */
 export interface FinalOperationLink extends LogicalOperationStep {
   kind: "finalOperationLink";
+
   /** if a link must be followed to get the result after polling completes, contains information about how to get the uri from the STatusMonitor */
   target: OperationLink;
 }
@@ -197,10 +209,16 @@ export interface FinalOperationReference extends LogicalOperationStep {
  */
 export interface PollingSuccessProperty extends LogicalOperationStep {
   kind: "pollingSuccessProperty";
+  responseModel: Model;
   /** The property containing the results of success */
   target: ModelProperty;
   /** The property in the response that contained a url to the status monitor */
-  sourceProperty: ModelProperty;
+  sourceProperty: ModelProperty | undefined;
+}
+
+export interface NoPollingSuccessProperty extends LogicalOperationStep {
+  kind: "noPollingResult";
+  responseModel: IntrinsicType;
 }
 
 /**
@@ -230,8 +248,6 @@ export enum FinalStateValue {
   customLink = "custom-link",
   /** Call a polling operation using the data in LroMetadata */
   customOperationReference = "custom-operation-reference",
-  /** Operation should return no result */
-  noResult = "no-result",
 }
 
 /**
@@ -297,7 +313,7 @@ export function getLroMetadata(program: Program, operation: Operation): LroMetad
     operation,
     context
   );
-  if (nextReference !== undefined) {
+  if (nextReference !== undefined && nextReference.responseModel.kind === "Model") {
     context.statusMonitorStep = nextReference;
     processFinalReference(program, nextReference.target.operation, context);
     processFinalLink(program, nextReference.target.operation, context);
@@ -342,7 +358,7 @@ interface StatusMonitorInfo {
   /** The TypeSpec Model type of the StatusMonitor */
   monitorType: Model;
   /** The type fo the 'results' field, if one exists */
-  successType?: Model;
+  successType?: Model | IntrinsicType;
   /** The property reference for the 'results' field, if one exists  */
   successProperty?: ModelProperty;
   /** The type of the error field, if one exists */
@@ -371,7 +387,7 @@ interface StatusMonitorLinkData {
   /** If another operation call is required after polling ends to get the results of the operation, a link to that 'final' operation */
   final?: OperationLink;
   /** If another operation call is required after polling ends to get the results of the operation, The model type that operation returns */
-  finalModel?: Model;
+  finalModel?: Model | IntrinsicType;
 }
 
 function createFinalOperationLink(
@@ -384,9 +400,12 @@ function createFinalOperationLink(
   if (property.type.kind === "Scalar" && property.type.name === "ResourceLocation") {
     resourceType = property.type.templateMapper?.args[0] as Model;
   }
+
+  // override this value if specified by the `@finalLocation` decorator
+  const override = getFinalLocationValue(program, property);
   return {
     kind: "finalOperationLink",
-    responseModel: resourceType ?? model,
+    responseModel: override ?? resourceType ?? model,
     target: {
       kind: "link",
       location: isHeader(program, property) ? "ResponseHeader" : "ResponseBody",
@@ -408,17 +427,17 @@ function createLroMetadata(
       ? context.finalStep.target.name
       : undefined;
 
-  let finalResult: Model | "void" = model;
-  let finalEnvelopeResult: Model | "void" = model;
+  let finalResult: Model | "void" = model.kind === "Model" ? model : "void";
+  let finalEnvelopeResult: Model | "void" = model.kind === "Model" ? model : "void";
   if (context.finalStep && context.finalStep.kind === "pollingSuccessProperty") {
     finalEnvelopeResult = context.pollingStep.responseModel;
-  } else if (finalState === FinalStateValue.noResult) {
+  } else if (context.finalStep && context.finalStep.kind === "noPollingResult") {
     finalResult = "void";
     finalEnvelopeResult = "void";
   }
   return {
     operation: operation,
-    logicalResult: model,
+    logicalResult: model.kind === "Intrinsic" ? context.pollingStep.responseModel : model,
     finalStateVia: finalState,
     statusMonitorStep: context.statusMonitorStep,
     pollingInfo: context.pollingStep,
@@ -432,9 +451,12 @@ function createLroMetadata(
 }
 
 function createOperationLink(program: Program, modelProperty: ModelProperty): OperationLink {
+  let location: "ResponseBody" | "ResponseHeader" | "Self" = "ResponseBody";
+  if (isHeader(program, modelProperty)) location = "ResponseHeader";
+  if (isBody(program, modelProperty)) location = "Self";
   return {
     kind: "link",
-    location: isHeader(program, modelProperty) ? "ResponseHeader" : "ResponseBody",
+    location: location,
     property: modelProperty,
   };
 }
@@ -504,6 +526,12 @@ function ensureContext(
   };
 }
 
+function getBodyType(program: Program, model: Model): Model | undefined {
+  const bodyProps = filterModelProperties(model, (p) => isBody(program, p));
+  if (bodyProps.length === 1 && bodyProps[0].type.kind === "Model") return bodyProps[0].type;
+  return undefined;
+}
+
 function getLogicalResourceOperation(
   program: Program,
   operation: Operation,
@@ -512,14 +540,17 @@ function getLogicalResourceOperation(
   const resOp = getResourceOperation(program, operation);
   if (resOp !== undefined) return resOp;
   if (model === undefined) return undefined;
+  const bodyModel = getBodyType(program, model);
+  if (bodyModel !== undefined) model = bodyModel;
+  model = getEffectiveModelType(program, model);
   let resultOp: string;
   const verb = getOperationVerb(program, operation);
   switch (verb) {
     case "delete":
-      resultOp = "deletesResource";
+      resultOp = "delete";
       break;
     case "put":
-      resultOp = "createsOrReplacesResource";
+      resultOp = "createOrReplace";
       break;
     default:
       return undefined;
@@ -532,20 +563,23 @@ function getFinalStateVia(
   program: Program,
   operation: Operation,
   context: LroContext
-): [FinalStateValue, Model | undefined] {
+): [FinalStateValue, Model | IntrinsicType | undefined] {
   const operationAction = getActionDetails(program, operation);
-  let model: Model | undefined =
+  let model: Model | IntrinsicType | undefined =
     context.originalModel?.name !== undefined ? context.originalModel : undefined;
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   const resOp = getLogicalResourceOperation(program, operation, model);
-  if (operationAction !== undefined || (resOp !== undefined && resOp.operation === "delete")) {
+  if (operationAction !== undefined || resOp?.operation === "delete") {
     finalState = FinalStateValue.operationLocation;
     model = context.pollingStep?.responseModel ?? context.originalModel;
   }
 
   if (
     context.finalStep &&
-    (context.finalStep.kind !== "pollingSuccessProperty" || resOp?.operation !== "createOrReplace")
+    context.finalStep.kind !== "noPollingResult" &&
+    (context.finalStep.kind !== "pollingSuccessProperty" ||
+      resOp?.operation === undefined ||
+      resOp.operation !== "createOrReplace")
   ) {
     model = context.finalStep.responseModel;
     if (
@@ -570,6 +604,7 @@ function getFinalStateVia(
 
   if (
     resOp !== undefined &&
+    resOp.operation !== undefined &&
     resOp.operation === "createOrReplace" &&
     resOp.resourceType !== undefined
   ) {
@@ -582,8 +617,7 @@ function getFinalStateVia(
     (operationAction !== undefined &&
       operationAction !== null &&
       context.statusMonitorStep !== undefined) ||
-    (resOp?.operation !== undefined &&
-      resOp.operation === "delete" &&
+    (resOp?.operation === "delete" &&
       context.pollingStep !== undefined &&
       context.statusMonitorStep !== undefined) ||
     (operationAction === undefined &&
@@ -593,14 +627,14 @@ function getFinalStateVia(
   ) {
     const info = getStatusMonitorInfo(program, context.statusMonitorStep.responseModel);
     if (info !== undefined) {
-      model = info.successType ?? info.monitorType;
+      model = info.successType ?? program.checker.voidType;
       finalState = getStatusFromLinkOrReference(
         program,
         operation,
         context.statusMonitorStep?.target
       );
       if (context.finalStep === undefined && info.successProperty === undefined) {
-        finalState = FinalStateValue.noResult;
+        context.finalStep = { kind: "noPollingResult", responseModel: program.checker.voidType };
       }
     }
   }
@@ -610,10 +644,10 @@ function getFinalStateVia(
 
 function getLroStatusFromHeaderProperty(
   program: Program,
-  property: ModelProperty
+  property: ModelProperty | undefined
 ): FinalStateValue {
   let finalState: FinalStateValue;
-  if (!isHeader(program, property)) return FinalStateValue.customLink;
+  if (property === undefined || !isHeader(program, property)) return FinalStateValue.customLink;
   const name = getHeaderFieldName(program, property);
   if (name === undefined) return FinalStateValue.customLink;
 
@@ -621,6 +655,7 @@ function getLroStatusFromHeaderProperty(
     case "operation-location":
       finalState = FinalStateValue.operationLocation;
       break;
+    case "azure-asyncoperation":
     case "azureasyncoperation":
       finalState = FinalStateValue.azureAsyncOperation;
       break;
@@ -660,10 +695,10 @@ function getPollingStep(
   }
   if (context.pollingOperationLink?.parameterMap === undefined) return undefined;
   const statusMonitorOverride = context.pollingOperationLink?.result?.statusMonitor;
-  if (statusMonitorOverride !== undefined && statusMonitorOverride.type !== undefined) {
+  if (statusMonitorOverride !== undefined && statusMonitorOverride.monitorType !== undefined) {
     info = {
-      lroStates: statusMonitorOverride.states,
-      monitorType: statusMonitorOverride.type,
+      lroStates: statusMonitorOverride.lroStates,
+      monitorType: statusMonitorOverride.monitorType,
       statusProperty: statusMonitorOverride.statusProperty,
       errorProperty: statusMonitorOverride.errorProperty,
       errorType: getModel(statusMonitorOverride.errorProperty),
@@ -691,9 +726,8 @@ function getPollingStep(
 function getStatusFromLinkOrReference(
   program: Program,
   sourceOperation: Operation,
-  target: OperationLink | OperationReference | ModelProperty | null
+  target: OperationLink | OperationReference | ModelProperty
 ): FinalStateValue {
-  if (target === null) return FinalStateValue.noResult;
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   switch (target.kind) {
     case "link":
@@ -728,11 +762,18 @@ function getStatusFromLinkOrReference(
  */
 function getStatusMonitorInfo(
   program: Program,
-  modelOrLink: Model | OperationLink
+  modelOrLink: Model | OperationLink,
+  pollingOverride?: PollingLocationInfo
 ): StatusMonitorInfo | undefined {
+  if (pollingOverride?.kind === pollingOptionsKind.StatusMonitor) {
+    return {
+      ...pollingOverride.info,
+    };
+  }
   if (modelOrLink.kind === "link") {
+    if (modelOrLink.property === undefined) return undefined;
     const statusMonitorType = resolveOperationLocation(program, modelOrLink.property);
-    if (statusMonitorType === undefined) return undefined;
+    if (statusMonitorType === undefined || statusMonitorType.kind === "Intrinsic") return undefined;
     modelOrLink = statusMonitorType;
   }
 
@@ -786,30 +827,42 @@ function getStatusMonitorLinksFromModel(
   program: Program,
   model: Model
 ): StatusMonitorLinkData | undefined {
-  const pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
+  let pollingData: StatusMonitorPollingLocationInfo | undefined = undefined;
+  let pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
     isPollingLocation(program, prop)
   );
-  if (pollingLinks === undefined || pollingLinks.length !== 1) return undefined;
-  const pollingLink = createOperationLink(program, pollingLinks[0]);
-  const monitorInfo = getStatusMonitorInfo(program, pollingLink);
+  if (pollingLinks === undefined) return undefined;
+  // favor status monitor links over stepwise polling
+  if (pollingLinks.length > 1) {
+    pollingLinks = pollingLinks.filter((p) => !isBody(program, p));
+  }
+  const pollingProperty = pollingLinks[0];
+  pollingData = getPollingLocationInfo(program, pollingProperty);
+  const pollingLink = createOperationLink(program, pollingProperty);
+  const monitorInfo = getStatusMonitorInfo(program, pollingLink, pollingData);
   if (monitorInfo === undefined) return undefined;
-  const finalLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
+  let finalLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
     isFinalLocation(program, prop)
   );
+  if ((finalLinks === undefined || finalLinks.length !== 1) && monitorInfo.monitorType) {
+    finalLinks = filterModelProperties(monitorInfo.monitorType, (prop) =>
+      isFinalLocation(program, prop)
+    );
+  }
   const finalLink =
     finalLinks === undefined || finalLinks.length !== 1
       ? undefined
       : createOperationLink(program, finalLinks[0]);
-  let finalTarget: [Model, ModelProperty | undefined] | undefined;
-  if (finalLink !== undefined) {
-    finalTarget = getTargetModelInformation(program, finalLink);
+  let finalTarget: Model | IntrinsicType | undefined;
+  if (finalLink !== undefined && finalLink.property !== undefined) {
+    finalTarget = resolveOperationLocation(program, finalLink.property);
   }
   return {
     model: monitorInfo.monitorType,
     statusMonitor: pollingLink,
     pollingData: monitorInfo,
     final: finalLink,
-    finalModel: finalTarget === undefined ? undefined : finalTarget[0],
+    finalModel: finalTarget,
   };
 }
 
@@ -821,11 +874,13 @@ function getStatusMonitorLinksFromModel(
  */
 function getTargetModelInformation(
   program: Program,
-  modelOrLink: OperationLink | Model
-): [Model, ModelProperty | undefined] | undefined {
+  modelOrLink: OperationLink | Model | IntrinsicType
+): [Model | IntrinsicType, ModelProperty | undefined] | undefined {
+  if (modelOrLink.kind === "Intrinsic") return undefined;
   if (modelOrLink.kind === "link") {
+    if (modelOrLink.property === undefined) return undefined;
     const linkModel = resolveOperationLocation(program, modelOrLink.property);
-    if (linkModel === undefined) return undefined;
+    if (linkModel === undefined || linkModel.kind === "Intrinsic") return undefined;
     modelOrLink = linkModel;
   }
 
@@ -926,8 +981,8 @@ function createStatusMonitorPollingData(data: StatusMonitorMetadata): StatusMoni
     return property?.type.kind === "Model" ? property.type : undefined;
   }
   return {
-    lroStates: data.states,
-    monitorType: data.type,
+    lroStates: data.lroStates,
+    monitorType: data.monitorType,
     statusProperty: data.statusProperty,
     errorProperty: data.errorProperty,
     errorType: getModel(data.errorProperty),
@@ -948,7 +1003,7 @@ function processStatusMonitorLink(
       context.pollingOperationLink.result.statusMonitor
     );
     lroData = {
-      model: context.pollingOperationLink.result.statusMonitor.type,
+      model: context.pollingOperationLink.result.statusMonitor.monitorType,
       pollingData: polling,
       statusMonitor: context.pollingOperationLink.link,
     };
@@ -976,7 +1031,8 @@ function processStatusMonitorLink(
       };
     } else if (
       lroData.pollingData.successProperty !== undefined &&
-      lroData.pollingData.successType !== undefined
+      lroData.pollingData.successType !== undefined &&
+      lroData.pollingData.successType.kind !== "Intrinsic"
     ) {
       const final: PollingSuccessProperty = {
         kind: "pollingSuccessProperty",
@@ -1046,7 +1102,12 @@ function processStatusMonitorReference(
   };
 }
 
-function resolveOperationLocation(program: Program, property: ModelProperty): Model | undefined {
+function resolveOperationLocation(
+  program: Program,
+  property: ModelProperty
+): Model | IntrinsicType | undefined {
+  const override = getFinalLocationValue(program, property);
+  if (override) return override;
   const resolvedScalar: Scalar | undefined = resolveToScalarType(program, property.type);
   if (resolvedScalar === undefined) return undefined;
   return getResourceLocationType(program, resolvedScalar);

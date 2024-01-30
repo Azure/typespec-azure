@@ -1,5 +1,6 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
+import { describe, it } from "vitest";
 import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: format", () => {

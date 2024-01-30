@@ -1,6 +1,7 @@
 import { resolvePath } from "@typespec/compiler";
+import { findTestPackageRoot } from "@typespec/compiler/testing";
 import { defineSampleSnaphotTests } from "@typespec/samples";
-import { fileURLToPath } from "url";
+import { describe } from "vitest";
 
 const excludedSamples = [
   // fails compilation by design to demo language server
@@ -9,7 +10,8 @@ const excludedSamples = [
   "multiple-types-union",
 ];
 
-const pkgRoot = resolvePath(fileURLToPath(import.meta.url), "../../..");
+const pkgRoot = await findTestPackageRoot(import.meta.url);
+
 const rootOutputDir = resolvePath(pkgRoot, "test/output");
 
 const azureSamplesPath = resolvePath(pkgRoot, "specs");

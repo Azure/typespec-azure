@@ -11,10 +11,10 @@ title: "[I] SdkModelPropertyTypeBase"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
-| `__raw`? | `ModelProperty` | - |
+| `__raw?` | `ModelProperty` | - |
 | `apiVersions` | `string`[] | - |
-| `description`? | `string` | - |
-| `details`? | `string` | - |
+| `description?` | `string` | - |
+| `details?` | `string` | - |
 | `nameInClient` | `string` | - |
 | `optional` | `boolean` | - |
 | `type` | [`SdkType`](../type-aliases/SdkType.md) | - |

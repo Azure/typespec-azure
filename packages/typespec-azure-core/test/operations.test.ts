@@ -6,6 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { HttpOperation } from "@typespec/http";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
 import { getPagedResult, isFinalLocation, isPollingLocation } from "../src/decorators.js";
 import { LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
 import { getNamespaceName } from "../src/rules/utils.js";
@@ -971,7 +972,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
       deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
 
-      deepStrictEqual(metadata.finalStateVia, "no-result");
+      deepStrictEqual(metadata.finalStateVia, "operation-location");
       deepStrictEqual(metadata.logicalResult.name, "OperationStatus");
       deepStrictEqual(
         getNamespaceName(runner.program, metadata.logicalResult.namespace),
@@ -983,6 +984,8 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResult, "void");
       deepStrictEqual(metadata.finalEnvelopeResult, "void");
       deepStrictEqual(metadata.finalResultPath, undefined);
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
     });
 
     it("Gets Lro for standard Async Delete with polling reference", async () => {
@@ -1000,9 +1003,9 @@ describe("typespec-azure-core: operation templates", () => {
 
       deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
       deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
 
-      deepStrictEqual(metadata.finalStateVia, "no-result");
+      deepStrictEqual(metadata.finalStateVia, "operation-location");
       deepStrictEqual(metadata.logicalResult.name, "ResourceOperationStatus");
       deepStrictEqual(
         getNamespaceName(runner.program, metadata.logicalResult.namespace),
@@ -1014,6 +1017,9 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResult, "void");
       deepStrictEqual(metadata.finalEnvelopeResult, "void");
       deepStrictEqual(metadata.finalResultPath, undefined);
+
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
     });
 
     it("Gets Lro for standard Async Update", async () => {
@@ -1367,6 +1373,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
       deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
 
+      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
       deepStrictEqual(metadata.finalStep?.target?.kind, "link");
       deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
       deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
@@ -1378,6 +1385,561 @@ describe("typespec-azure-core: operation templates", () => {
 
       deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
       deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async + location operation polling in createOrReplace operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+            @finalLocation(SimpleWidget)
+            @header location: string;
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async operation polling in createOrReplace operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      deepStrictEqual(metadata.finalStep, undefined);
+
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style location polling in createOrReplace operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+      deepStrictEqual(metadata.finalStep, undefined);
+
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async + location operation polling in update operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @patch op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+            @finalLocation(SimpleWidget)
+            @header location: string;
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async operation polling in update operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          @finalLocation(SimpleWidget)
+          @header location: string;
+        }
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @patch op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationLink");
+      deepStrictEqual((metadata.finalStep.responseModel as Model).name, "SimpleWidget");
+      deepStrictEqual(metadata.finalStep.target?.property.name, "location");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style location polling in update operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @patch op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 201;
+            @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationLink");
+      deepStrictEqual((metadata.finalStep.responseModel as Model).name, "SimpleWidget");
+      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.finalStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async + location operation polling in action operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 202;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+            @finalLocation(SimpleWidget)
+            @header location: string;
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async operation polling in action operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 202;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
+
+      deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+      deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual(metadata.finalResult, "void");
+      deepStrictEqual(metadata.finalEnvelopeResult, "void");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style location polling in action operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility("read")
+          @path
+          id: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+          value: string;
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+          {
+            @statusCode statusCode: 202;
+            @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
+            @body body?: SimpleWidget
+          };      
+        `,
+        "createWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.finalStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style azure-async operation polling in delete operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @delete op deleteWidget(@path id: string) : {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+          };      
+        `,
+        "deleteWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+      //ok(metadata.finalStep);
+      //deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
+
+      deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+      deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual(metadata.finalResult, "void");
+      deepStrictEqual(metadata.finalEnvelopeResult, "void");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
+    it("Gets Lro for arm-style location polling in delete operations", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+        
+        @route("/simpleWidgets/{id}")
+        @delete op deleteWidget(@path id: string) : {
+            @statusCode statusCode: 201;
+            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("location") opLink: string,
+          };      
+        `,
+        "deleteWidget"
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+      //ok(metadata.finalStep);
+      //deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
+
+      deepStrictEqual(metadata.finalStateVia, "location");
+      deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata?.logicalPath, undefined);
+
+      deepStrictEqual(metadata.finalResult, "void");
+      deepStrictEqual(metadata.finalEnvelopeResult, "void");
       deepStrictEqual(metadata.finalResultPath, undefined);
     });
 
@@ -1551,6 +2113,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
 
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
       deepStrictEqual(metadata.finalStep.target?.kind, "ModelProperty");
 
       ok(metadata.pollingInfo);
@@ -1641,7 +2204,7 @@ describe("typespec-azure-core: operation templates", () => {
       );
 
       ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "no-result");
+      deepStrictEqual(metadata.finalStateVia, "operation-location");
       deepStrictEqual(metadata.logicalResult.name, "UpdateOperation");
       deepStrictEqual(metadata?.envelopeResult.name, "UpdateOperation");
       deepStrictEqual(metadata?.logicalPath, undefined);
@@ -1653,7 +2216,8 @@ describe("typespec-azure-core: operation templates", () => {
       ok(metadata.statusMonitorStep);
       deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
 
-      ok(!metadata.finalStep);
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
 
       ok(metadata.pollingInfo);
       deepStrictEqual(metadata.pollingInfo.responseModel.name, "UpdateOperation");
@@ -1703,6 +2267,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
       deepStrictEqual(metadata.finalStateVia, "original-uri");
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);
@@ -1764,6 +2329,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
       deepStrictEqual(metadata.finalStateVia, "original-uri");
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);
@@ -1882,6 +2448,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResultPath, undefined);
 
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);
@@ -1941,6 +2508,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResultPath, undefined);
 
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);
@@ -2000,6 +2568,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResultPath, undefined);
 
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);
@@ -2068,6 +2637,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResultPath, undefined);
 
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);
@@ -2182,6 +2752,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResultPath, undefined);
 
       ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
       deepStrictEqual(metadata.finalStep.target?.kind, "reference");
       deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
       ok(metadata.statusMonitorStep);

@@ -116,7 +116,7 @@ interface Manufacturers {
 
 // A "global" RPC operation
 #suppress "@azure-tools/typespec-azure-core/no-rpc-path-params" "The API version is part of the route path."
-@route("/api/{apiVersion}/service-status")
+@route("/api/{api-version}/service-status")
 @doc("Responds with status information about the overall service.")
 op getServiceStatus is RpcOperation<
   {},

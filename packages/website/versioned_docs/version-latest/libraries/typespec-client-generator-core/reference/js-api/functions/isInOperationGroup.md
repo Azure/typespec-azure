@@ -7,7 +7,7 @@ title: "[F] isInOperationGroup"
 isInOperationGroup(context, type): boolean
 ```
 
-Check a namespace or interface is an operation group.
+Check an operation is in an operation group.
 
 ## Parameters
 

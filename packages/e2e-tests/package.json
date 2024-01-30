@@ -25,7 +25,7 @@
     "build": ""
   },
   "devDependencies": {
-    "@typespec/compiler": "workspace:~0.51.0",
+    "@typespec/compiler": "workspace:~0.52.0",
     "typescript": "~5.3.3",
     "dotenv": "~16.3.1"
   }

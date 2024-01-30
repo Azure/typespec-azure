@@ -10,17 +10,18 @@ getLibraryName(context, type): string
 Get the library name of a property / parameter / operation / model / enum. Takes projections into account
 
 Returns name in the following order of priority
-1. language emitter name, i.e. @projectedName("csharp", "csharpSpecificName") => "csharpSpecificName"
-2. client name, i.e. @projectedName("client", "clientName") => "clientName"
-3. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
-4. name in typespec
+1. language emitter name, i.e. @clientName("csharpSpecificName", "csharp") => "csharpSpecificName"
+2. client name, i.e. @clientName(""clientName") => "clientName"
+3. deprecated projected name
+4. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
+5. name in typespec
 
 ## Parameters
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |  |
-| `type` | `Model` \| `ModelProperty` \| `Operation` |  |
+| `type` |    \| `Model`   \| `ModelProperty`   \| `Enum`   \| `EnumMember`   \| `Operation` |  |
 
 ## Returns
 

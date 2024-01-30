@@ -37,18 +37,6 @@ Use the resources in this section for creating Azure ARM rest API specs. For Pro
 - Documentation
   - [TypeSpec Azure ARM library](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-azure-resource-manager/README.md)
 
-## Getting Started for Azure Management Plane ProviderHub UserRP service codegen
-
-If you intend to using TypeSpec to not only generate Azure ARM rest API specs but also leverage TypeSpec ProviderHub template package to help creating service implementation of ProviderHub user RP project, please see
-[step by step guide](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-providerhub-templates/README.md).
-
-- Documentation
-  - [ProviderHub Project Templates](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-providerhub-templates/README.md)
-  - [Checking in TypeSpec Generated Swagger](https://github.com/Azure/typespec-azure/blob/main/docs/checking-in-api-specs-guide.md)
-- Video Walkthroughs
-  - [Getting Started with TypeSpec for ProviderHub](https://microsoft.sharepoint.com/:v:/t/AzureDeveloperExperience/EYTV39X351FAlHb8tIPHdCgB1zgVDUGfcCE2mOoQAlVAcw?e=0D1IIW)
-  - [Service Code Generation](https://microsoft.sharepoint.com/:v:/t/AzureDeveloperExperience/EUqfqSySRipChjKAciFLHfMBXHnjti49ZTrLKvHW0UWL-Q?e=EDtBNk)
-
 ## Getting Started for Azure Data Plane Services
 
 - Documentation

@@ -3,6 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { useStandardOperations } from "../../src/rules/use-standard-ops.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 

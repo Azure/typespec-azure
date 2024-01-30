@@ -3,6 +3,6 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "streetsidesoftware.code-spell-checker",
-    "hbenl.vscode-mocha-test-adapter"
+    "ZixuanChen.vitest-explorer"
   ]
 }

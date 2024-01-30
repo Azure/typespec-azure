@@ -2,6 +2,49 @@
   "name": "@azure-tools/typespec-azure-resource-manager",
   "entries": [
     {
+      "version": "0.38.0",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.38.0",
+      "date": "Wed, 24 Jan 2024 05:47:19 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Fix: Resolve selected arm common version when used on version enum members"
+          },
+          {
+            "comment": "Renamed template parameters for clarity and consistency."
+          },
+          {
+            "comment": "Update dependencies"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.37.1",
+      "tag": "@azure-tools/typespec-azure-resource-manager_v0.37.1",
+      "date": "Wed, 20 Dec 2023 05:29:22 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Add types to support lro scenarios"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-azure-core\" from `~0.37.1` to `~0.37.2`"
+          },
+          {
+            "comment": "Updating dependency \"@azure-tools/typespec-azure-core\" from `~0.37.1` to `~0.37.2`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.37.0",
       "tag": "@azure-tools/typespec-azure-resource-manager_v0.37.0",
       "date": "Wed, 06 Dec 2023 19:47:28 GMT",
