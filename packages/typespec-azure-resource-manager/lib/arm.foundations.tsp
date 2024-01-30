@@ -753,7 +753,7 @@ op checkNameAvailability<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base temlate for Azure Resource Manager Operations.
+ * @dev The base template for Azure Resource Manager Operations.
  * @param Parameters The parameter object for the operation.
  * @param Response The response or union of responses for success.
  * @param ErrorResponse The error response.
