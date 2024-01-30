@@ -103,7 +103,7 @@ jobs:
           pnpm config set registry=https://registry.npmjs.org/
           pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
 
-          pnpm -r --filter='@azure-tools/*' publish --access public --no-git-checks --tag next
+          pnpm -r publish --access public --no-git-checks --tag next
         name: Publish
         env:
           NODE_AUTH_TOKEN: $(azure-sdk-npm-token)
