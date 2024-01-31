@@ -98,7 +98,14 @@ jobs:
       - script: pnpm --filter='!./core' publish --access public --no-git-checks --tag next --dry-run
         displayName: Dry run 3
 
+      - script: pnpm --filter='!./core' run lint
+        displayName: Dry run 4
+
       - script: |
-          pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
+          echo "Updating config"
+          pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+          echo "Publishing"
           pnpm -r publish --access public --no-git-checks
         name: Publish
+        env:
+          NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
