@@ -64,7 +64,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/RoleAssignmentListResult"
             }
@@ -106,7 +106,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/RoleAssignment"
             }
@@ -215,7 +215,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/RoleAssignment"
             }
@@ -255,7 +255,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -280,7 +280,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
             }

@@ -20,7 +20,7 @@ scalar MediumString extends string;
 
 @doc("A resource that is monitored by a Logz monitor instance.")
 model MonitoredResource {
-  @doc("The ARM id of the resource.")
+  @doc("The Resource id of the resource.")
   id: string;
 
   @doc("Flag indicating if resource is sending metrics to Logz.")
