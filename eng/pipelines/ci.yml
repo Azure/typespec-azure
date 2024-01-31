@@ -101,7 +101,7 @@ jobs:
       - script: pnpm --filter='!./core' run lint
         displayName: Dry run 4
 
-      - script: |
+      - pwsh: |
           echo "Updating config"
           pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
           echo "Publishing"
