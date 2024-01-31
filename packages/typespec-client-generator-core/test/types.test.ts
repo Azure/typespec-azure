@@ -1999,8 +1999,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const model = models[0] as SdkModelType;
       strictEqual(model.kind, "model");
-      strictEqual(model.isFormDataType, true);
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Multipart);
       strictEqual(model.name, "MultiPartRequest");
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Multipart);
       strictEqual(model.properties.length, 2);
       const id = model.properties.find((x) => x.nameInClient === "id")!;
       strictEqual(id.kind, "property");
@@ -2026,10 +2027,6 @@ describe("typespec-client-generator-core: types", () => {
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       });
-
-      // expectDiagnostics(getAllModels(runner.context), {
-      //   code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
-      // });
     });
     it("multipart resolving conflicting model usage with spread", async function () {
       await runner.compileWithBuiltInService(
@@ -2050,7 +2047,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 2);
       const modelA = models.find((x) => x.name === "A")!;
       strictEqual(modelA.kind, "model");
-      strictEqual(modelA.isFormDataType, true);
+      strictEqual(modelA.usage, UsageFlags.Input | UsageFlags.Multipart);
       strictEqual(modelA.properties.length, 1);
       const modelAProp = modelA.properties[0];
       strictEqual(modelAProp.kind, "property");
@@ -2058,7 +2055,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const modelB = models.find((x) => x.name === "B")!;
       strictEqual(modelB.kind, "model");
-      strictEqual(modelB.isFormDataType, false);
+      strictEqual(modelB.usage, UsageFlags.Input);
       strictEqual(modelB.properties.length, 1);
       strictEqual(modelB.properties[0].type.kind, "bytes");
     });

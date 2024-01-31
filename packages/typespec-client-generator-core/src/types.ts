@@ -442,8 +442,12 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
     : false;
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
-    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
+    if (
+      (isFormDataType ? UsageFlags.Multipart : UsageFlags.None) ^
+      (sdkType.usage & UsageFlags.Multipart)
+    ) {
       // This means we have a model that is used both for formdata input and for regular body input
+      // using xor
       reportDiagnostic(context.program, {
         code: "conflicting-multipart-model-usage",
         target: type,
@@ -465,7 +469,6 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
-      isFormDataType,
     };
 
     updateModelsMap(context, type, sdkType, operation);
@@ -968,7 +971,11 @@ function updateTypesFromOperation(context: SdkContext, operation: Operation): vo
       ["model", "enum", "array", "dict", "union"].includes(body.kind) &&
       generateConvenient
     ) {
-      updateUsageOfModel(context, body, UsageFlags.Input);
+      let usage = UsageFlags.Input;
+      if (httpOperation.parameters.body.contentTypes.includes("multipart/form-data")) {
+        usage |= UsageFlags.Multipart;
+      }
+      updateUsageOfModel(context, body, usage);
     }
   }
   for (const response of httpOperation.responses) {
