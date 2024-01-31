@@ -16,54 +16,54 @@ variables:
   - template: templates/variables/globals.yml
 
 jobs:
-  # - job: npm_stable
-  #   timeoutInMinutes: 90
-  #   displayName: Npm publish
-  #   pool:
-  #     name: azsdk-pool-mms-win-2022-general
-  #     vmImage: windows-2022
+  - job: npm_stable
+    timeoutInMinutes: 90
+    displayName: Npm publish
+    pool:
+      name: azsdk-pool-mms-win-2022-general
+      vmImage: windows-2022
 
-  #   variables:
-  #     TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+    variables:
+      TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
 
-  #   steps:
-  #     - checkout: self
-  #       submodules: true
+    steps:
+      - checkout: self
+        submodules: true
 
-  #     - template: ./templates/install.yml
-  #       parameters:
-  #         nodeVersion: "20.x"
-  #     - template: ./templates/build.yml
+      - template: ./templates/install.yml
+        parameters:
+          nodeVersion: "20.x"
+      - template: ./templates/build.yml
 
-  #     - script: pnpm run test-official
-  #       displayName: Test
+      - script: pnpm run test-official
+        displayName: Test
 
-  #     - template: ./templates/upload-coverage.yml
+      - template: ./templates/upload-coverage.yml
 
-  #     - script: |
-  #         pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
-  #         pnpm -r publish --access public --no-git-checks
-  #       displayName: Publish packages
+      - script: |
+          pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
+          pnpm -r publish --access public --no-git-checks
+        displayName: Publish packages
 
-  #     - task: AzureCLI@1
-  #       displayName: "Publish bundled packages to package storage"
-  #       inputs:
-  #         azureSubscription: "Azure SDK Engineering System"
-  #         scriptLocation: inlineScript
-  #         inlineScript: node ./eng/scripts/upload-bundler-packages.js
+      - task: AzureCLI@1
+        displayName: "Publish bundled packages to package storage"
+        inputs:
+          azureSubscription: "Azure SDK Engineering System"
+          scriptLocation: inlineScript
+          inlineScript: node ./eng/scripts/upload-bundler-packages.js
 
-  #     - task: AzureCLI@1
-  #       displayName: "Publish Azure playground"
-  #       inputs:
-  #         azureSubscription: "Azure SDK Engineering System"
-  #         scriptLocation: inlineScript
-  #         inlineScript: |
-  #           az storage blob upload-batch ^
-  #             --destination $web ^
-  #             --account-name "cadlplayground" ^
-  #             --destination-path cadl-azure/ ^
-  #             --source "./packages/typespec-azure-playground-website/dist/" ^
-  #             --overwrite
+      - task: AzureCLI@1
+        displayName: "Publish Azure playground"
+        inputs:
+          azureSubscription: "Azure SDK Engineering System"
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch ^
+              --destination $web ^
+              --account-name "cadlplayground" ^
+              --destination-path cadl-azure/ ^
+              --source "./packages/typespec-azure-playground-website/dist/" ^
+              --overwrite
 
   - job: npm_preview
     timeoutInMinutes: 90
@@ -84,11 +84,6 @@ jobs:
       - template: ./templates/install.yml
         parameters:
           nodeVersion: "20.x"
-      - pwsh: pnpm --filter='./packages/*' run lint
-        displayName: Dry run 1
-
-      - pwsh: pnpm --filter='!./core/*' run lint
-        displayName: Dry run 4
 
       - template: ./templates/build.yml
 
