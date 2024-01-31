@@ -2007,7 +2007,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(id.type.kind, "string");
       const profileImage = model.properties.find((x) => x.nameInClient === "profileImage")!;
       strictEqual(profileImage.kind, "property");
-      strictEqual(profileImage.type.kind, "multipartFile");
+      strictEqual(profileImage.isMultipartFileInput, true);
     });
     it("multipart conflicting model usage", async function () {
       const diagnostics = await runner.diagnose(
@@ -2052,7 +2052,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(modelA.kind, "model");
       strictEqual(modelA.isFormDataType, true);
       strictEqual(modelA.properties.length, 1);
-      strictEqual(modelA.properties[0].type.kind, "multipartFile");
+      const modelAProp = modelA.properties[0];
+      strictEqual(modelAProp.kind, "property");
+      strictEqual(modelAProp.isMultipartFileInput, true);
 
       const modelB = models.find((x) => x.name === "B")!;
       strictEqual(modelB.kind, "model");

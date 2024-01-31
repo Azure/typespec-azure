@@ -66,7 +66,6 @@ import {
   SdkEnumValueType,
   SdkModelPropertyTypeBase,
   SdkModelType,
-  SdkMultipartFileType,
   SdkTupleType,
   SdkType,
 } from "./interfaces.js";
@@ -267,13 +266,6 @@ export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurati
   };
 }
 
-function getSdkMultipartFileType(context: SdkContext, type: Scalar): SdkMultipartFileType {
-  return {
-    ...getSdkTypeBaseHelper(context, type, "multipartFile"),
-    encode: "binary",
-  };
-}
-
 export function getSdkArrayOrDict(
   context: SdkContext,
   type: Model,
@@ -434,6 +426,7 @@ function addDiscriminatorToModelType(
       type: discriminatorType!,
       nameInClient: discriminator.propertyName,
       apiVersions: getAvailableApiVersions(context, model.__raw!),
+      isMultipartFileInput: false, // discriminator property cannot be a file
     });
   }
 }
@@ -675,15 +668,6 @@ export function getClientType(context: SdkContext, type: Type, operation?: Opera
       if (type.name === "duration") {
         return getSdkDurationType(context, type);
       }
-      const httpOperation = operation
-        ? ignoreDiagnostics(getHttpOperation(context.program, operation))
-        : undefined;
-      const hasMultipartInput =
-        httpOperation &&
-        httpOperation.parameters.body?.contentTypes.includes("multipart/form-data");
-      if (type.name === "bytes" && hasMultipartInput) {
-        return getSdkMultipartFileType(context, type);
-      }
       const scalarType = getSdkBuiltInType(context, type);
       // just add default encode, normally encode is on extended scalar and model property
       addEncodeInfo(context, type, scalarType);
@@ -808,13 +792,22 @@ function getSdkBodyModelPropertyType(
   type: ModelProperty,
   operation?: Operation
 ): SdkBodyModelPropertyType {
+  const base = getSdkModelPropertyType(context, type, operation);
+  let operationIsMultipart = false;
+  if (operation) {
+    const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+    operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+  }
   return {
-    ...getSdkModelPropertyType(context, type, operation),
+    ...base,
     kind: "property",
     optional: type.optional,
     visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
+    isMultipartFileInput: base.type.kind === "bytes" && operationIsMultipart,
   };
 }
 
