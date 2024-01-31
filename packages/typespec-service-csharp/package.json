@@ -1,6 +1,7 @@
 {
   "name": "@azure-tools/typespec-service-csharp",
   "version": "0.32.0",
+  "private": true,
   "description": "Azure TypeSpec service code generator for c-sharp",
   "homepage": "https://azure.github.io/typespec-azure",
   "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-service-csharp/README.md",
