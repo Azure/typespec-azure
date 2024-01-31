@@ -200,7 +200,7 @@ model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Singleton Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/dynatrace/main.tsp#L120-L128).
+You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/arm-scenarios/singleton/main.tsp#L29).
 
 ## Designing Resource-specific Properties
 
