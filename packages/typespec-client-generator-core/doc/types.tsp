@@ -29,7 +29,6 @@ model SdkType {
 enum UsageFlags {
   input: 1,
   output: 2,
-  multipart: 8,
 }
 
 /**
