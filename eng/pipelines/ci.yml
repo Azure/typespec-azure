@@ -40,10 +40,14 @@ jobs:
 
       - template: ./templates/upload-coverage.yml
 
-      - script: |
-          pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
-          pnpm -r publish --access public --no-git-checks
-        displayName: Publish packages
+      - pwsh: |
+          echo "Updating config"
+          pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+          echo "Publishing"
+          pnpm -r --filter='./packages/*' publish --access public --no-git-checks
+        name: Publish
+        env:
+          NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
 
       - task: AzureCLI@1
         displayName: "Publish bundled packages to package storage"
@@ -84,12 +88,17 @@ jobs:
       - template: ./templates/install.yml
         parameters:
           nodeVersion: "20.x"
+
       - template: ./templates/build.yml
 
       - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
         displayName: Bump version to prerelease targets
 
-      - script: |
-          pnpm config set //registry.npmjs.org/:_authToken=$(azure-sdk-npm-token)
-          pnpm -r publish --access public --no-git-checks --tag next
-        displayName: Publish packages
+      - pwsh: |
+          echo "Updating config"
+          pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+          echo "Publishing"
+          pnpm -r --filter='./packages/*' publish --access public --no-git-checks --tag next
+        name: Publish
+        env:
+          NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
