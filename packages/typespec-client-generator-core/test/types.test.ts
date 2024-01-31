@@ -2060,6 +2060,30 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(modelB.properties.length, 1);
       strictEqual(modelB.properties[0].type.kind, "bytes");
     });
+
+    it("multipart with non-formdata model property", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model Address {
+          city: string;
+        }
+
+        model AddressFirstAppearance {
+          address: Address;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model AddressSecondAppearance {
+          address: Address;
+        }
+        
+        @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
+        `
+      );
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 3);
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {
