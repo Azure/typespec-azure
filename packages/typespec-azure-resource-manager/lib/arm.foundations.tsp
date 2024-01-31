@@ -776,7 +776,7 @@ op ArmCreateOperation<
   ErrorResponse extends {}
 >(
   ...HttpParameters,
-  @doc("Resource create Parameters") @body resource: BodyParameter,
+  @doc("Resource create parameters.") @body resource: BodyParameter,
 ): Response | ErrorResponse;
 
 /**

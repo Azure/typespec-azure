@@ -226,7 +226,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/LogzMonitorResource"
@@ -495,7 +495,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/SubAccountResource"
@@ -744,7 +744,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/SubAccountTagRuleResource"
@@ -1023,7 +1023,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/SingleSignOnConfigurationResource"
@@ -1306,7 +1306,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TagRuleResource"

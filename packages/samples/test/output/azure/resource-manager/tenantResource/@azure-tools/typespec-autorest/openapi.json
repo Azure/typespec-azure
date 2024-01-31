@@ -152,7 +152,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Permission"
@@ -407,7 +407,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Widget"
@@ -646,7 +646,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Flange"
@@ -965,7 +965,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Building"
@@ -1275,7 +1275,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Room"

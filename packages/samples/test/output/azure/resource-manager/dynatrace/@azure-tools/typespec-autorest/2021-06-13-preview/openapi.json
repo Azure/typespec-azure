@@ -297,7 +297,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/MonitorResource"
@@ -737,7 +737,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/DynatraceSingleSignOnResource"
@@ -901,7 +901,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TagRule"

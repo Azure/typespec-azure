@@ -179,7 +179,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestExtensionResource2"
@@ -404,7 +404,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestExtensionChild2"
@@ -622,7 +622,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestExtensionResource"
@@ -876,7 +876,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestExtensionChild"
@@ -1129,7 +1129,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTenantResource2"
@@ -1339,7 +1339,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTenantChile2"
@@ -1542,7 +1542,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTenantResource"
@@ -1781,7 +1781,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTenantChile"
@@ -1982,7 +1982,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/LocationResource"
@@ -2222,7 +2222,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/LocationChild"
@@ -2806,7 +2806,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTrackedResource2"
@@ -3046,7 +3046,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTrackedChild2"
@@ -3279,7 +3279,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTrackedResource"
@@ -3548,7 +3548,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/TestTrackedChild"

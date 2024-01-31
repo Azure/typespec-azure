@@ -155,7 +155,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
@@ -410,7 +410,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
@@ -748,7 +748,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/AllPropertiesResource"
@@ -996,7 +996,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Microsoft.OperationsTest.TestTrackedResource2"
@@ -1215,7 +1215,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
@@ -1484,7 +1484,7 @@
           {
             "name": "resource",
             "in": "body",
-            "description": "Resource create Parameters",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
