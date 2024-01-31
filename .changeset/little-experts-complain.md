@@ -1,5 +1,3 @@
 ---
-"@azure-tools/typespec-client-generator-core": patch
+"@azure-tools/typespec-client-generator-core": none
 ---
-
-switch detection of multipart file input from kind of type to bool on prop
