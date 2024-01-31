@@ -5,6 +5,7 @@
     "**/dist/**": true,
     "**/dist-dev/**": true,
     "**/CHANGELOG.json": true,
+    "./.changesets/*.md": true,
     "docs/spec.html": true,
     "**/bin/**": true,
     "**/node_modules/**": true,
