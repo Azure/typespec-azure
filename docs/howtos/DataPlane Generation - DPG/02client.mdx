@@ -126,10 +126,10 @@ client.cats.pet()
 using PetStore;
 
 PetStoreClient client = new PetStoreClient();
-client.GetDogs().Feed();
-client.GetDogs().Pet();
-client.GetCats().Feed();
-client.GetCats().Pet();
+client.GetDogsClient().Feed();
+client.GetDogsClient().Pet();
+client.GetCatsClient().Feed();
+client.GetCatsClient().Pet();
 ```
 
 </TabItem>
@@ -228,12 +228,12 @@ using PetStore;
 
 PetStoreClient client = new PetStoreClient();
 client.Info();
-client.GetBillings().History();
-client.GetPets().Info();
-client.GetPets().GetPetsActions().Feed();
-client.GetPets().GetPetsActions().Pet();
-client.GetActions().Open();
-client.GetActions().Close();
+client.GetBillingsClient().History();
+client.GetPetsClient().Info();
+client.GetPetsClient().GetPetsActionsClient().Feed();
+client.GetPetsClient().GetPetsActionsClient().Pet();
+client.GetActionsClient().Open();
+client.GetActionsClient().Close();
 ```
 
 </TabItem>
@@ -565,7 +565,7 @@ client2.pet()
 using PetStore;
 using PetStore.SubNamespace;
 
-PetActionClient petActionClient = new PetActionClient();
+SubNamespacePetActionClient petActionClient = new SubNamespacePetActionClient();
 FoodClient foodClient = new FoodClient();
 
 petActionClient.Pet();
