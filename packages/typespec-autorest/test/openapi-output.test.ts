@@ -670,6 +670,24 @@ describe("typespec-autorest: operations", () => {
     strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
     strictEqual(res.paths["/interface-and-op"].get.operationId, "ClientInterfaceName_ClientCall");
   });
+
+  it(`@clientName(<>) updates the operationId`, async () => {
+    const res = await openApiFor(`
+      @service namespace MyService;
+      @route("/op-only") @clientName( "clientCall") op serviceName(): void;
+
+      @clientName( "ClientInterfaceName") 
+      interface ServiceInterfaceName {
+        @route("/interface-only") same(): void;
+        @route("/interface-and-op") @clientName( "clientCall") serviceName(): void;
+      }
+     
+      `);
+
+    strictEqual(res.paths["/op-only"].get.operationId, "ClientCall");
+    strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
+    strictEqual(res.paths["/interface-and-op"].get.operationId, "ClientInterfaceName_ClientCall");
+  });
 });
 
 describe("typespec-autorest: request", () => {
