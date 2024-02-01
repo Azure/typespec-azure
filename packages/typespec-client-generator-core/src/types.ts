@@ -801,7 +801,9 @@ function getSdkBodyModelPropertyType(
     );
   }
   // Currently we only recognize bytes and list of bytes as potential file inputs
-  const isBytesInput = base.type.kind === "bytes" || (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
   return {
     ...base,
     kind: "property",
