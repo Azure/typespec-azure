@@ -2026,10 +2026,6 @@ describe("typespec-client-generator-core: types", () => {
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       });
-
-      // expectDiagnostics(getAllModels(runner.context), {
-      //   code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
-      // });
     });
     it("multipart resolving conflicting model usage with spread", async function () {
       await runner.compileWithBuiltInService(
@@ -2085,6 +2081,25 @@ describe("typespec-client-generator-core: types", () => {
       );
       const models = Array.from(getAllModels(runner.context));
       strictEqual(models.length, 3);
+    });
+
+    it("multipart with list of bytes", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model PictureWrapper {
+          pictures: bytes[];
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
+        `
+      );
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 1);
+      const model = models[0] as SdkModelType;
+      strictEqual(model.properties.length, 1);
+      const pictures = model.properties[0];
+      strictEqual(pictures.kind, "property");
+      strictEqual(pictures.isMultipartFileInput, true);
     });
   });
   describe("SdkTupleType", () => {
