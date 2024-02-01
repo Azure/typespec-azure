@@ -184,16 +184,16 @@ each individual repo as you would any other.
 ### Run tests same as the ci:
 
 ```bash
-rush e2e-tests
+pnpm e2e-tests
 
 ```
 
 ### Test with local cadl-ranch repo
 
 ```bash
-rush e2e-tests --local-cadl-ranch=<path> # where path is the absolute path to your local cadl-ranch repo.
+pnpm e2e-tests --local-cadl-ranch=<path> # where path is the absolute path to your local cadl-ranch repo.
 # Example
-rush e2e-tests --local-cadl-ranch=/Users/some/dev/cadl-ranch
+pnpm e2e-tests --local-cadl-ranch=/Users/some/dev/cadl-ranch
 ```
 
 ## Publishing
@@ -207,7 +207,7 @@ Do the following to publish a new release:
 2. Make sure your working copy is clean and you are up-to-date and on the
    main branch.
 
-3. Run `rush prepare-publish` to stage the publishing changes.
+3. Run `pnpm prepare-publish` to stage the publishing changes.
 
 If it works you'll get a message like this:
 
