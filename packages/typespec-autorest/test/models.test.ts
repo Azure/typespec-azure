@@ -54,6 +54,39 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it(`@clientName(<>) set the "x-ms-client-name" with the original name`, async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `model Foo {
+        @clientName("x")
+        xJson: int32;
+      };`
+    );
+
+    expect(res.defs.Foo).toMatchObject({
+      properties: {
+        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
+      },
+    });
+  });
+
+  it(`@clientName(<>) wins over @projectedName("client", <>)`, async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `model Foo {
+        @clientName("x")
+        @projectedName("client", "y")
+        xJson: int32;
+      };`
+    );
+
+    expect(res.defs.Foo).toMatchObject({
+      properties: {
+        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
+      },
+    });
+  });
+
   it("uses json name specified via @encodedName", async () => {
     const res = await oapiForModel(
       "Foo",

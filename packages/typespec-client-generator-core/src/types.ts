@@ -800,6 +800,10 @@ function getSdkBodyModelPropertyType(
       httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
     );
   }
+  // Currently we only recognize bytes and list of bytes as potential file inputs
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
   return {
     ...base,
     kind: "property",
@@ -807,7 +811,7 @@ function getSdkBodyModelPropertyType(
     visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
-    isMultipartFileInput: base.type.kind === "bytes" && operationIsMultipart,
+    isMultipartFileInput: isBytesInput && operationIsMultipart,
   };
 }
 

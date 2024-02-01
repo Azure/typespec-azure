@@ -2118,11 +2118,10 @@ components:
           type: string
           description: The source context used for selecting recursive inputs.
         inputs:
-          allOf:
-            - type: array
-              items:
-                $ref: '#/components/schemas/InputFieldMappingEntry'
           description: The recursive inputs used when creating a complex type.
+          type: array
+          items:
+            $ref: '#/components/schemas/InputFieldMappingEntry'
       description: Input field mapping for a skill.
     KeepTokenFilter:
       type: object
@@ -3304,11 +3303,10 @@ components:
             type: string
           description: A list of the names of synonym maps to associate with this field. This option can be used only with searchable fields. Currently only one synonym map per field is supported. Assigning a synonym map to a field ensures that query terms targeting that field are expanded at query-time using the rules in the synonym map. This attribute can be changed on existing fields. Must be null or an empty collection for complex fields.
         fields:
-          allOf:
-            - type: array
-              items:
-                $ref: '#/components/schemas/SearchField'
           description: A list of sub-fields if this is a field of type Edm.ComplexType or Collection(Edm.ComplexType). Must be null or empty for simple fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchField'
       description: Represents a field in an index definition, which describes the name, data type, and search behavior of a field.
     SearchFieldDataType:
       type: string

@@ -40,7 +40,7 @@ if (production) {
   typespecRun("git", "merge", "--ff-only", "FETCH_HEAD");
 }
 // Stage the typespec core publish
-typespecRun("pnpm", "changeset", "version");
+typespecRun("pnpm", "change", "version");
 typespecRun("pnpm", "update-latest-docs");
 typespecRunWithRetries(3, "pnpm", "install");
 if (production) {
@@ -65,7 +65,7 @@ const versions = await getProjectVersions();
 await bumpCrossSubmoduleDependencies();
 
 // Stage typespec-azure publish
-typespecAzureRun("pnpm", "changeset", "version");
+typespecAzureRun("pnpm", "change", "version");
 typespecAzureRun("pnpm", "update-latest-docs");
 if (production) {
   typespecAzureRun("git", "add", "-A");
@@ -97,7 +97,7 @@ function checkPrePublishState() {
 
   try {
     if (production) {
-      doubleRun("pnpm", "changeset", "status");
+      doubleRun("pnpm", "change", "status");
     }
   } catch (e) {
     if (e instanceof CommandFailedError) {
@@ -128,7 +128,7 @@ function typespecAzureRun(command, ...args) {
 function typespecAzureRunWithOptions(options, command, ...args) {
   console.log();
   console.log("## typespec-azure ##");
-  run(command, args, { cwd: repoRoot, ...options });
+  runOrExit(command, args, { cwd: repoRoot, ...options });
 }
 
 function typespecRunWithRetries(tries, command, ...args) {
