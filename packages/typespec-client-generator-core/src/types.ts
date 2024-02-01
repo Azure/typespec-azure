@@ -426,6 +426,7 @@ function addDiscriminatorToModelType(
       type: discriminatorType!,
       nameInClient: discriminator.propertyName,
       apiVersions: getAvailableApiVersions(context, model.__raw!),
+      isMultipartFileInput: false, // discriminator property cannot be a file
     });
   }
 }
@@ -433,8 +434,24 @@ function addDiscriminatorToModelType(
 export function getSdkModel(context: SdkContext, type: Model, operation?: Operation): SdkModelType {
   type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
+  const httpOperation = operation
+    ? ignoreDiagnostics(getHttpOperation(context.program, operation))
+    : undefined;
+  const isFormDataType = httpOperation
+    ? Boolean(httpOperation.parameters.body?.contentTypes.includes("multipart/form-data"))
+    : false;
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
+    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
+      // This means we have a model that is used both for formdata input and for regular body input
+      reportDiagnostic(context.program, {
+        code: "conflicting-multipart-model-usage",
+        target: type,
+        format: {
+          modelName: sdkType.name,
+        },
+      });
+    }
   } else {
     const docWrapper = getDocHelper(context, type);
     sdkType = {
@@ -448,6 +465,7 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      isFormDataType,
     };
 
     updateModelsMap(context, type, sdkType, operation);
@@ -774,13 +792,26 @@ function getSdkBodyModelPropertyType(
   type: ModelProperty,
   operation?: Operation
 ): SdkBodyModelPropertyType {
+  const base = getSdkModelPropertyType(context, type, operation);
+  let operationIsMultipart = false;
+  if (operation) {
+    const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+    operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+  }
+  // Currently we only recognize bytes and list of bytes as potential file inputs
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
   return {
-    ...getSdkModelPropertyType(context, type, operation),
+    ...base,
     kind: "property",
     optional: type.optional,
     visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
+    isMultipartFileInput: isBytesInput && operationIsMultipart,
   };
 }
 
