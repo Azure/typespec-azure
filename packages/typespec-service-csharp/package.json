@@ -1,6 +1,7 @@
 {
   "name": "@azure-tools/typespec-service-csharp",
   "version": "0.32.0",
+  "private": true,
   "description": "Azure TypeSpec service code generator for c-sharp",
   "homepage": "https://azure.github.io/typespec-azure",
   "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-service-csharp/README.md",
@@ -49,7 +50,7 @@
     "@typespec/rest": "workspace:~0.52.0",
     "@typespec/http": "workspace:~0.52.0",
     "@typespec/versioning": "workspace:~0.52.0",
-    "@azure-tools/typespec-autorest": "~0.38.0",
+    "@azure-tools/typespec-autorest": "~0.38.1",
     "@azure-tools/typespec-azure-core": "~0.38.0"
   },
   "dependencies": {
@@ -57,7 +58,7 @@
   },
   "devDependencies": {
     "@typespec/compiler": "workspace:~0.52.0",
-    "@azure-tools/typespec-autorest": "workspace:~0.38.0",
+    "@azure-tools/typespec-autorest": "workspace:~0.38.1",
     "@typespec/openapi": "workspace:~0.52.0",
     "@typespec/rest": "workspace:~0.52.0",
     "@typespec/http": "workspace:~0.52.0",
