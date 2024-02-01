@@ -78,7 +78,7 @@ enum SendSubscriptionLogsStatus {
 // perhaps ObservedResource
 @doc("Details of resource being monitored by Dynatrace monitor resource")
 model MonitoredResource {
-  @doc("The ARM id of the resource.")
+  @doc("The Resource id of the resource.")
   id?: string;
 
   @doc("Flag indicating if resource is sending metrics to Dynatrace.")

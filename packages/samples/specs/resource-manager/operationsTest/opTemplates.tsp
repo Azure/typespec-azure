@@ -23,7 +23,7 @@ model TestTrackedResource2 is TrackedResource<TestTrackedProperties2> {
 @armResourceOperations(TestTrackedResource2)
 interface Tracked2Operations {
   get is ArmResourceRead<TestTrackedResource2>;
-  create is ArmResourceCreateOrUpdateSync<TestTrackedResource2>;
+  create is ArmResourceCreateOrReplaceSync<TestTrackedResource2>;
   update is ArmResourcePatchSync<TestTrackedResource2, TestTrackedProperties2>;
   delete is ArmResourceDeleteSync<TestTrackedResource2>;
   listByResourceGroup is ArmResourceListByParent<TestTrackedResource2>;
@@ -60,7 +60,7 @@ model TrackedChildProperties2 {
 @armResourceOperations(TestTrackedChild2)
 interface TrackedChildOperations2 {
   get is ArmResourceRead<TestTrackedChild2>;
-  create is ArmResourceCreateOrUpdateSync<TestTrackedChild2>;
+  create is ArmResourceCreateOrReplaceSync<TestTrackedChild2>;
   update is ArmResourcePatchSync<TestTrackedChild2, TrackedChildProperties2>;
   delete is ArmResourceDeleteSync<TestTrackedChild2>;
   listByParent is ArmResourceListByParent<TestTrackedChild2>;
@@ -80,7 +80,7 @@ model TestTenantResource2 is ProxyResource<TestTenantProperties2> {
 @armResourceOperations(TestTenantResource2)
 interface TenantOperations2 {
   get is ArmResourceRead<TestTenantResource2>;
-  create is ArmResourceCreateOrUpdateSync<TestTenantResource2>;
+  create is ArmResourceCreateOrReplaceSync<TestTenantResource2>;
   update is ArmResourcePatchSync<TestTenantResource2, TestTenantProperties2>;
   delete is ArmResourceDeleteSync<TestTenantResource2>;
   listByParent is ArmResourceListByParent<TestTenantResource2>;
@@ -116,7 +116,7 @@ model TenantChildProperties2 {
 @armResourceOperations(TestTenantChile2)
 interface TenantChildOperations2 {
   get is ArmResourceRead<TestTenantChile2>;
-  create is ArmResourceCreateOrUpdateSync<TestTenantChile2>;
+  create is ArmResourceCreateOrReplaceSync<TestTenantChile2>;
   update is ArmResourcePatchSync<TestTenantChile2, TestTenantProperties2>;
   delete is ArmResourceDeleteSync<TestTenantChile2>;
   listByParent is ArmResourceListByParent<TestTenantChile2>;
@@ -135,7 +135,7 @@ model TestExtensionResource2 is ExtensionResource<TestExtensionProperties2> {
 @armResourceOperations(TestExtensionResource2)
 interface ExtensionOperations2 {
   get is ArmResourceRead<TestExtensionResource2>;
-  create is ArmResourceCreateOrUpdateSync<TestExtensionResource2>;
+  create is ArmResourceCreateOrReplaceSync<TestExtensionResource2>;
   update is ArmResourcePatchSync<TestExtensionResource2, TestExtensionProperties2>;
   delete is ArmResourceDeleteSync<TestExtensionResource2>;
   listByParent is ArmResourceListByParent<TestExtensionResource2>;
@@ -170,7 +170,7 @@ model ExtensionChildProperties2 {
 @armResourceOperations(TestExtensionChild2)
 interface ExtensionChildOperations2 {
   get is ArmResourceRead<TestExtensionChild2>;
-  create is ArmResourceCreateOrUpdateSync<TestExtensionChild2>;
+  create is ArmResourceCreateOrReplaceSync<TestExtensionChild2>;
   update is ArmResourcePatchSync<TestExtensionChild2, ExtensionChildProperties2>;
   delete is ArmResourceDeleteSync<TestExtensionChild2>;
   listByParent is ArmResourceListByParent<TestExtensionChild2>;
@@ -217,7 +217,7 @@ model LocationMungeResult {
 @armResourceOperations(LocationResource)
 interface LocationResourceOperations {
   get is ArmResourceRead<LocationResource>;
-  create is ArmResourceCreateOrUpdateSync<LocationResource>;
+  create is ArmResourceCreateOrReplaceSync<LocationResource>;
   update is ArmResourcePatchSync<LocationResource, LocationProperties>;
   delete is ArmResourceDeleteSync<LocationResource>;
   listByParent is ArmResourceListByParent<LocationResource>;
@@ -268,7 +268,7 @@ model LocationMungeChildResult {
 @armResourceOperations(LocationChild)
 interface LocationChildResourceOperations {
   get is ArmResourceRead<LocationChild>;
-  create is ArmResourceCreateOrUpdateSync<LocationChild>;
+  create is ArmResourceCreateOrReplaceSync<LocationChild>;
   update is ArmResourcePatchSync<LocationChild, LocationProperties>;
   delete is ArmResourceDeleteSync<LocationChild>;
   listByParent is ArmResourceListByParent<LocationChild>;
