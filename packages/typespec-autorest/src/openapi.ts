@@ -9,6 +9,11 @@ import {
   isFixed,
 } from "@azure-tools/typespec-azure-core";
 import {
+  SdkContext,
+  createSdkContext,
+  getClientNameOverride,
+} from "@azure-tools/typespec-client-generator-core";
+import {
   ArrayModelType,
   BooleanLiteral,
   DiagnosticTarget,
@@ -152,6 +157,7 @@ const defaultOptions = {
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
+  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {
@@ -172,7 +178,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
   };
 
-  const emitter = createOAPIEmitter(context.program, options);
+  const emitter = createOAPIEmitter(context.program, tcgcSdkContext, options);
   await emitter.emitOpenAPI();
 }
 
@@ -262,7 +268,11 @@ interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
 }
 
-function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOptions) {
+function createOAPIEmitter(
+  program: Program,
+  tcgcSdkContext: SdkContext,
+  options: ResolvedAutorestEmitterOptions
+) {
   const tracer = getTracer(program);
   tracer.trace("options", JSON.stringify(options, null, 2));
   const typeNameOptions: TypeNameOptions = {
@@ -332,8 +342,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
           program,
           service,
           version: record.version,
-          jsonView,
-          clientView,
+          getClientName,
         };
         const projectedServiceNs: Namespace = projectedProgram
           ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
@@ -1015,6 +1024,12 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     return encodedName === type.name ? viaProjection : encodedName;
   }
 
+  function getClientName(type: Type & { name: string }): string {
+    const viaProjection = clientView.getProjectedName(type);
+    const clientName = getClientNameOverride(tcgcSdkContext, type);
+    return clientName ?? viaProjection;
+  }
+
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
@@ -1676,7 +1691,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
       }
 
       const jsonName = getJsonName(prop);
-      const clientName = clientView.getProjectedName(prop);
+      const clientName = getClientName(prop);
 
       const description = getDoc(program, prop);
 
