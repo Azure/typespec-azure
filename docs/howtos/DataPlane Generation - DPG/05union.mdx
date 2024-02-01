@@ -112,13 +112,13 @@ export type DemoServiceContext = Client & {
         queryParameters: {
           mode: "strict" | "lenient";
         }
-      }): StreamableMethod<Analyze200Response | AnalyzeDefaultResponse>;
+      } & RequestParameters): StreamableMethod<Analyze200Response | AnalyzeDefaultResponse>;
     };
     /** Resource for '/completions' has methods for the following verbs: post */
     (path: "/completions"): {
       post(options: {
         body: CompletionInput
-      }): StreamableMethod<Completions200Response | CompletionsDefaultResponse>;
+      } & RequestParameters): StreamableMethod<Completions200Response | CompletionsDefaultResponse>;
     };
   };
 };
