@@ -1,6 +1,7 @@
 import {
   $doc,
   DecoratorContext,
+  getFriendlyName,
   ignoreDiagnostics,
   Model,
   Operation,
@@ -10,7 +11,12 @@ import { getHttpOperation, HttpOperation } from "@typespec/http";
 import { $actionSegment, getActionSegment, getParentResource, getSegment } from "@typespec/rest";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
-import { getArmResourceInfo, getResourceBaseType, ResourceBaseType } from "./resource.js";
+import {
+  getArmResourceInfo,
+  getResourceBaseType,
+  isArmBuiltInResource,
+  ResourceBaseType,
+} from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
 export type ArmLifecycleOperationKind = "read" | "createOrUpdate" | "update" | "delete";
@@ -205,7 +211,8 @@ export function $armRenameListByOperation(
     [parentTypeName, parentFriendlyTypeName] = getArmParentName(context.program, resourceType);
   }
   const parentType = getParentResource(program, resourceType);
-  if (parentType) {
+
+  if (parentType && !isArmBuiltInResource(program, parentType)) {
     const parentResourceInfo = getArmResourceInfo(program, parentType);
     if (
       !parentResourceInfo &&
@@ -238,10 +245,21 @@ export function $armRenameListByOperation(
   );
 
   // Set the operation name
-  entity.name = parentTypeName === "Extension" ? "list" : `listBy${parentTypeName}`;
+  entity.name =
+    parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1
+      ? "list"
+      : `listBy${parentTypeName}`;
 }
 
 function getArmParentName(program: Program, resource: Model): string[] {
+  const parent = getParentResource(program, resource);
+  if (parent && isArmBuiltInResource(program, parent)) {
+    const parentName = getFriendlyName(program, parent);
+    return [
+      parentName,
+      parentName.length > 1 ? parentName.charAt(0).toLowerCase() + parentName.substring(1) : "",
+    ];
+  }
   switch (getResourceBaseType(program, resource)) {
     case ResourceBaseType.Extension:
       return ["Extension", "parent"];

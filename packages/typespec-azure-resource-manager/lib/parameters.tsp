@@ -80,13 +80,36 @@ model LocationResourceParameter {
   location: string;
 }
 
-@tenantResource
-model TenantLocationResource {
-  ...LocationResourceParameter;
-}
+/**
+ * The location resource for tenant-based locations.  This can be used as a parent
+ * resource for resource types that are homed in a tenant-based location.
+ */
+model TenantLocationResource is ArmLocationResource<"Tenant">;
 
-@subscriptionResource
-model SubscriptionLocationResource {
+/**
+ * The location resource for subscription-based locations.  This can be used as a parent
+ * resource for resource types that are homed in a subscription-based location.
+ */
+model SubscriptionLocationResource is ArmLocationResource<"Subscription">;
+
+/**
+ * The location resource for resourceGroup-based locations.  This can be used as a parent
+ * resource for resource types that are homed in a resourceGroup-based location.
+ */
+model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
+
+/**
+ * Template for ARM location resources.  Use the parameter to specify
+ */
+@friendlyName("Location")
+@armBuiltInResource({})
+@resourceBaseType(BaseType)
+model ArmLocationResource<BaseType extends
+  | "Tenant"
+  | "Subscription"
+  | "ResourceGroup"
+  | "Location"
+  | "Extension" = never> {
   ...LocationResourceParameter;
 }
 

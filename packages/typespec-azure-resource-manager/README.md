@@ -58,6 +58,7 @@ Available ruleSets:
 
 ### Azure.ResourceManager
 
+- [`@armBuiltInResource`](#@armbuiltinresource)
 - [`@armCommonTypesVersion`](#@armcommontypesversion)
 - [`@armLibraryNamespace`](#@armlibrarynamespace)
 - [`@armProviderNamespace`](#@armprovidernamespace)
@@ -73,11 +74,31 @@ Available ruleSets:
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@extensionResource`](#@extensionresource)
 - [`@locationResource`](#@locationresource)
+- [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
 - [`@singleton`](#@singleton)
 - [`@subscriptionResource`](#@subscriptionresource)
 - [`@tenantResource`](#@tenantresource)
 - [`@useLibraryNamespace`](#@uselibrarynamespace)
+
+#### `@armBuiltInResource`
+
+This decorator is used on Azure Resource Manager resources that are not based on
+Azure.ResourceManager common types.
+
+```typespec
+@Azure.ResourceManager.armBuiltInResource(propertiesType: Model)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name           | Type    | Description                            |
+| -------------- | ------- | -------------------------------------- |
+| propertiesType | `Model` | : The type of the resource properties. |
 
 #### `@armCommonTypesVersion`
 
@@ -368,6 +389,24 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
+
+#### `@resourceBaseType`
+
+This decorator sets the base type of the given resource.
+
+```typespec
+@Azure.ResourceManager.resourceBaseType(baseType: Tenant | Subscription | ResourceGroup | Location | Extension)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name     | Type                                                                     | Description                                                                                                            |
+| -------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `union Tenant \| Subscription \| ResourceGroup \| Location \| Extension` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 

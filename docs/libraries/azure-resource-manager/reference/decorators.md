@@ -8,6 +8,25 @@ toc_max_heading_level: 3
 
 ## Azure.ResourceManager
 
+### `@armBuiltInResource` {#@Azure.ResourceManager.armBuiltInResource}
+
+This decorator is used on Azure Resource Manager resources that are not based on
+Azure.ResourceManager common types.
+
+```typespec
+@Azure.ResourceManager.armBuiltInResource(propertiesType: Model)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name           | Type    | Description                            |
+| -------------- | ------- | -------------------------------------- |
+| propertiesType | `Model` | : The type of the resource properties. |
+
 ### `@armCommonTypesVersion` {#@Azure.ResourceManager.armCommonTypesVersion}
 
 This decorator is used either on a namespace or a version enum value to indicate
@@ -297,6 +316,24 @@ See more details on [different Azure Resource Manager resource type here.](https
 #### Parameters
 
 None
+
+### `@resourceBaseType` {#@Azure.ResourceManager.resourceBaseType}
+
+This decorator sets the base type of the given resource.
+
+```typespec
+@Azure.ResourceManager.resourceBaseType(baseType: Tenant | Subscription | ResourceGroup | Location | Extension)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name     | Type                                                                     | Description                                                                                                            |
+| -------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `union Tenant \| Subscription \| ResourceGroup \| Location \| Extension` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 ### `@resourceGroupResource` {#@Azure.ResourceManager.resourceGroupResource}
 

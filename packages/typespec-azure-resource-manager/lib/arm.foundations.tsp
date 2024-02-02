@@ -753,7 +753,7 @@ op checkNameAvailability<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager Operations.
+ * @dev The base template for Azure Resource Manager GET Operations.
  * @param Parameters The parameter object for the operation.
  * @param Response The response or union of responses for success.
  * @param ErrorResponse The error response.
@@ -763,7 +763,7 @@ op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse ex
 ): Response | ErrorResponse;
 
 /**
- * @dev The base temlate for Azure Resource Manager PUT Operations.
+ * @dev The base template for Azure Resource Manager PUT Operations.
  * @param HttpParameters The parameter object for the operation.
  * @param BodyParameter The body parameter
  * @param Response The response or union of responses for success.
@@ -780,7 +780,7 @@ op ArmCreateOperation<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base temlate for Azure Resource Manager PATCH Operations.
+ * @dev The base template for Azure Resource Manager PATCH Operations.
  * @param HttpParameters The parameter object for the operation.
  * @param BodyParameter The body parameter
  * @param Response The response or union of responses for success.
