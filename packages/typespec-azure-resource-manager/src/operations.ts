@@ -14,7 +14,7 @@ import { isArmLibraryNamespace } from "./namespace.js";
 import {
   getArmResourceInfo,
   getResourceBaseType,
-  isArmBuiltInResource,
+  isArmVirtualResource,
   ResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -212,7 +212,7 @@ export function $armRenameListByOperation(
   }
   const parentType = getParentResource(program, resourceType);
 
-  if (parentType && !isArmBuiltInResource(program, parentType)) {
+  if (parentType && !isArmVirtualResource(program, parentType)) {
     const parentResourceInfo = getArmResourceInfo(program, parentType);
     if (
       !parentResourceInfo &&
@@ -253,8 +253,11 @@ export function $armRenameListByOperation(
 
 function getArmParentName(program: Program, resource: Model): string[] {
   const parent = getParentResource(program, resource);
-  if (parent && isArmBuiltInResource(program, parent)) {
-    const parentName = getFriendlyName(program, parent);
+  if (parent && isArmVirtualResource(program, parent)) {
+    const parentName = getFriendlyName(program, parent) ?? parent.name;
+    if (parentName === undefined || parentName.length < 2) {
+      return ["", ""];
+    }
     return [
       parentName,
       parentName.length > 1 ? parentName.charAt(0).toLowerCase() + parentName.substring(1) : "",

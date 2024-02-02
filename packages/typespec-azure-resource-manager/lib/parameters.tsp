@@ -102,7 +102,7 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
  * Template for ARM location resources.  Use the parameter to specify
  */
 @friendlyName("Location")
-@armBuiltInResource({})
+@armVirtualResource
 @resourceBaseType(BaseType)
 model ArmLocationResource<BaseType extends
   | "Tenant"

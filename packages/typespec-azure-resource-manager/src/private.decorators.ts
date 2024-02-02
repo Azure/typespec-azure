@@ -24,7 +24,7 @@ import {
   ResourceBaseType,
   getArmResourceKind,
   getResourceBaseType,
-  isArmBuiltInResource,
+  isArmVirtualResource,
   resolveResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -474,7 +474,7 @@ export function $armResourceInternal(
   }
 
   let kind = getArmResourceKind(resourceType);
-  if (isArmBuiltInResource(program, resourceType)) kind = "BuiltIn";
+  if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",

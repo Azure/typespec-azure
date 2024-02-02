@@ -22,7 +22,7 @@ import { ArmResourceOperations, resolveResourceOperations } from "./operations.j
 import { getArmResource, listArmResources } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "BuiltIn";
+export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual";
 
 /**
  * Interface for ARM resource detail base.
@@ -49,13 +49,10 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
  * @param entity The resource model
  * @param propertiesType The type of the resource properties
  */
-export function $armBuiltInResource(
-  context: DecoratorContext,
-  entity: Model,
-  propertiesType: Model
-) {
+export function $armVirtualResource(context: DecoratorContext, entity: Model) {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
+  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
   const pathProperty = getProperty(
     entity,
     (p) => isPathParam(program, p) && getSegment(program, p) !== undefined
@@ -65,12 +62,12 @@ export function $armBuiltInResource(
       code: "resource-without-path-and-segment",
       target: entity,
     });
+
     return;
   }
 
   const collectionName = getSegment(program, pathProperty);
   const keyName = getKeyName(program, pathProperty);
-
   if (collectionName === undefined || keyName === undefined) {
     reportDiagnostic(program, {
       code: "resource-without-path-and-segment",
@@ -78,9 +75,6 @@ export function $armBuiltInResource(
     });
     return;
   }
-  ("BuiltIn");
-
-  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "BuiltIn");
 }
 
 function getProperty(
@@ -99,9 +93,9 @@ function getProperty(
  * @param target The model to check.
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
-export function isArmBuiltInResource(program: Program, target: Model): boolean {
+export function isArmVirtualResource(program: Program, target: Model): boolean {
   if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
-  if (target.baseModel) return isArmBuiltInResource(program, target.baseModel);
+  if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
   return false;
 }
 
