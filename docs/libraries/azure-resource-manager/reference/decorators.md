@@ -8,25 +8,6 @@ toc_max_heading_level: 3
 
 ## Azure.ResourceManager
 
-### `@armBuiltInResource` {#@Azure.ResourceManager.armBuiltInResource}
-
-This decorator is used on Azure Resource Manager resources that are not based on
-Azure.ResourceManager common types.
-
-```typespec
-@Azure.ResourceManager.armBuiltInResource(propertiesType: Model)
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-| Name           | Type    | Description                            |
-| -------------- | ------- | -------------------------------------- |
-| propertiesType | `Model` | : The type of the resource properties. |
-
 ### `@armCommonTypesVersion` {#@Azure.ResourceManager.armCommonTypesVersion}
 
 This decorator is used either on a namespace or a version enum value to indicate
@@ -273,6 +254,23 @@ clients.
 | Name         | Type    | Description    |
 | ------------ | ------- | -------------- |
 | resourceType | `Model` | Resource model |
+
+### `@armVirtualResource` {#@Azure.ResourceManager.armVirtualResource}
+
+This decorator is used on Azure Resource Manager resources that are not based on
+Azure.ResourceManager common types.
+
+```typespec
+@Azure.ResourceManager.armVirtualResource
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+None
 
 ### `@extensionResource` {#@Azure.ResourceManager.extensionResource}
 

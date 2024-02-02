@@ -58,7 +58,6 @@ Available ruleSets:
 
 ### Azure.ResourceManager
 
-- [`@armBuiltInResource`](#@armbuiltinresource)
 - [`@armCommonTypesVersion`](#@armcommontypesversion)
 - [`@armLibraryNamespace`](#@armlibrarynamespace)
 - [`@armProviderNamespace`](#@armprovidernamespace)
@@ -72,6 +71,7 @@ Available ruleSets:
 - [`@armResourceOperations`](#@armresourceoperations)
 - [`@armResourceRead`](#@armresourceread)
 - [`@armResourceUpdate`](#@armresourceupdate)
+- [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
@@ -80,25 +80,6 @@ Available ruleSets:
 - [`@subscriptionResource`](#@subscriptionresource)
 - [`@tenantResource`](#@tenantresource)
 - [`@useLibraryNamespace`](#@uselibrarynamespace)
-
-#### `@armBuiltInResource`
-
-This decorator is used on Azure Resource Manager resources that are not based on
-Azure.ResourceManager common types.
-
-```typespec
-@Azure.ResourceManager.armBuiltInResource(propertiesType: Model)
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name           | Type    | Description                            |
-| -------------- | ------- | -------------------------------------- |
-| propertiesType | `Model` | : The type of the resource properties. |
 
 #### `@armCommonTypesVersion`
 
@@ -346,6 +327,23 @@ clients.
 | Name         | Type    | Description    |
 | ------------ | ------- | -------------- |
 | resourceType | `Model` | Resource model |
+
+#### `@armVirtualResource`
+
+This decorator is used on Azure Resource Manager resources that are not based on
+Azure.ResourceManager common types.
+
+```typespec
+@Azure.ResourceManager.armVirtualResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None
 
 #### `@extensionResource`
 
