@@ -1,8 +1,8 @@
 import { checkForChangedFiles, coreRepoRoot, repoRoot } from "./helpers.js";
 
 if (
-  checkForChangedFiles(coreRepoRoot, "## typespec ##") ||
-  checkForChangedFiles(repoRoot, "## typespec-azure ##")
+  (await checkForChangedFiles(coreRepoRoot, "## typespec ##")) ||
+  (await checkForChangedFiles(repoRoot, "## typespec-azure ##"))
 ) {
   if (process.argv[2] !== "publish") {
     console.error(

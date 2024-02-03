@@ -45,12 +45,12 @@ if (production) {
   // Create and checkout branches
   branch = `publish/${Date.now().toString(36)}`;
   log("Creating branch in both repos", branch);
-  doubleRun("git", "checkout", "-b", branch);
+  await doubleRun("git", "checkout", "-b", branch);
 }
 
 // Check that we have a clean slate before starting
 if (production) {
-  checkPrePublishState();
+  await checkPrePublishState();
 }
 
 // Update the typespec core submodule
@@ -68,7 +68,7 @@ typespecRunWithRetries(3, "pnpm", "install");
 if (production) {
   typespecRun("git", "add", "-A");
 }
-if (checkForChangedFiles(coreRepoRoot, undefined, { silent: true })) {
+if (await checkForChangedFiles(coreRepoRoot, undefined, { silent: true })) {
   if (production) {
     typespecRun("git", "commit", "-m", "Prepare typespec publish");
   }
@@ -76,7 +76,7 @@ if (checkForChangedFiles(coreRepoRoot, undefined, { silent: true })) {
   console.log("INFO: No changes to typespec.");
 }
 
-if (production && checkForChangedFiles(repoRoot, undefined, { silent: true })) {
+if (production && (await checkForChangedFiles(repoRoot, undefined, { silent: true }))) {
   typespecAzureRun("git", "commit", "-a", "-m", "Update core submodule");
 }
 
@@ -95,7 +95,7 @@ if (!args.values.onlyBumpVersions) {
 if (production) {
   typespecAzureRun("git", "add", "-A");
 }
-if (checkForChangedFiles(repoRoot, undefined, { silent: true })) {
+if (await checkForChangedFiles(repoRoot, undefined, { silent: true })) {
   if (production) {
     typespecAzureRun("git", "commit", "-m", "Prepare typespec-azure publish");
   }
@@ -114,16 +114,16 @@ if (production) {
   console.log("**DEVELOPMENT** The production flag is set to false");
 }
 
-function checkPrePublishState() {
+async function checkPrePublishState() {
   log("Checking repo state is clean");
-  if (checkForChangedFiles()) {
+  if (await checkForChangedFiles()) {
     console.error("ERROR: Cannot prepare publish because files above were modified.");
     process.exit(1);
   }
 
   try {
     if (production) {
-      doubleRun("pnpm", "change", "status");
+      await doubleRun("pnpm", "change", "status");
     }
   } catch (e) {
     if (e instanceof CommandFailedError) {
@@ -136,30 +136,30 @@ function checkPrePublishState() {
   logSuccess("Repo state is clean");
 }
 
-function doubleRun(command, ...args) {
-  typespecRun(command, ...args);
-  typespecAzureRun(command, ...args);
+async function doubleRun(command, ...args) {
+  await typespecRun(command, ...args);
+  await typespecAzureRun(command, ...args);
 }
 
-function typespecRun(command, ...args) {
+async function typespecRun(command, ...args) {
   console.log();
   console.log("## typespec ##");
   await runOrExit(command, args, { cwd: coreRepoRoot });
 }
 
-function typespecAzureRun(command, ...args) {
+async function typespecAzureRun(command, ...args) {
   console.log();
   console.log("## typespec-azure ##");
   await runOrExit(command, args, { cwd: repoRoot });
 }
 
-function typespecAzureRunWithOptions(options, command, ...args) {
+async function typespecAzureRunWithOptions(options, command, ...args) {
   console.log();
   console.log("## typespec-azure ##");
   await runOrExit(command, args, { cwd: repoRoot, ...options });
 }
 
-function typespecRunWithRetries(tries, command, ...args) {
+async function typespecRunWithRetries(tries, command, ...args) {
   try {
     console.log();
     console.log("## typespec ##");
@@ -167,12 +167,12 @@ function typespecRunWithRetries(tries, command, ...args) {
     await runOrExit(command, args, { cwd: coreRepoRoot });
   } catch (err) {
     if (tries-- > 0) {
-      typespecRunWithRetries(tries, command, ...args);
+      await typespecRunWithRetries(tries, command, ...args);
     } else throw err;
   }
 }
 
-function typespecAzureRunWithRetries(tries, command, ...args) {
+async function typespecAzureRunWithRetries(tries, command, ...args) {
   try {
     console.log();
     console.log("## typespec-azure ##");
@@ -180,7 +180,7 @@ function typespecAzureRunWithRetries(tries, command, ...args) {
     await runOrExit(command, args, { cwd: repoRoot });
   } catch (err) {
     if (tries-- > 0) {
-      typespecAzureRunWithRetries(tries, command, ...args);
+      await typespecAzureRunWithRetries(tries, command, ...args);
     } else throw err;
   }
 }
@@ -234,26 +234,31 @@ async function bumpCrossSubmoduleDependencies() {
   }
 
   if (changed && production) {
-    typespecAzureRun("git", "add", "-A");
-    typespecAzureRun("git", "commit", "-m", "Bump cross-submodule dependencies");
+    await typespecAzureRun("git", "add", "-A");
+    await typespecAzureRun("git", "commit", "-m", "Bump cross-submodule dependencies");
   }
 }
 
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
-  typespecAzureRunWithRetries(3, "pnpm", "install");
-  typespecAzureRunWithOptions(
+  await typespecAzureRunWithRetries(3, "pnpm", "install");
+  await typespecAzureRunWithOptions(
     { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
     "pnpm",
     "build"
   );
   if (!args.values.onlyBumpVersions) {
-    typespecAzureRun("pnpm", "build");
-    typespecAzureRun("pnpm", "regen-samples");
+    await typespecAzureRun("pnpm", "build");
+    await typespecAzureRun("pnpm", "regen-samples");
   }
 
-  if (checkForChangedFiles(repoRoot, undefined, { silent: true }) && production) {
-    typespecAzureRun("git", "add", "-A");
-    typespecAzureRun("git", "commit", "-m", "Rebuild and regen samples to bump template versions");
+  if ((await checkForChangedFiles(repoRoot, undefined, { silent: true })) && production) {
+    await typespecAzureRun("git", "add", "-A");
+    await typespecAzureRun(
+      "git",
+      "commit",
+      "-m",
+      "Rebuild and regen samples to bump template versions"
+    );
   }
 }
 
