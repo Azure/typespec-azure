@@ -144,19 +144,19 @@ function doubleRun(command, ...args) {
 function typespecRun(command, ...args) {
   console.log();
   console.log("## typespec ##");
-  runOrExit(command, args, { cwd: coreRepoRoot });
+  await runOrExit(command, args, { cwd: coreRepoRoot });
 }
 
 function typespecAzureRun(command, ...args) {
   console.log();
   console.log("## typespec-azure ##");
-  runOrExit(command, args, { cwd: repoRoot });
+  await runOrExit(command, args, { cwd: repoRoot });
 }
 
 function typespecAzureRunWithOptions(options, command, ...args) {
   console.log();
   console.log("## typespec-azure ##");
-  runOrExit(command, args, { cwd: repoRoot, ...options });
+  await runOrExit(command, args, { cwd: repoRoot, ...options });
 }
 
 function typespecRunWithRetries(tries, command, ...args) {
@@ -164,7 +164,7 @@ function typespecRunWithRetries(tries, command, ...args) {
     console.log();
     console.log("## typespec ##");
     console.log(`remaining tries: ${tries}`);
-    runOrExit(command, args, { cwd: coreRepoRoot });
+    await runOrExit(command, args, { cwd: coreRepoRoot });
   } catch (err) {
     if (tries-- > 0) {
       typespecRunWithRetries(tries, command, ...args);
@@ -177,7 +177,7 @@ function typespecAzureRunWithRetries(tries, command, ...args) {
     console.log();
     console.log("## typespec-azure ##");
     console.log(`remaining tries: ${tries}`);
-    runOrExit(command, args, { cwd: repoRoot });
+    await runOrExit(command, args, { cwd: repoRoot });
   } catch (err) {
     if (tries-- > 0) {
       typespecAzureRunWithRetries(tries, command, ...args);
