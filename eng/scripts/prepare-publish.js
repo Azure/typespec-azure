@@ -10,7 +10,15 @@ import {
   repoRoot,
 } from "./helpers.js";
 import { parseArgs } from "util";
+import pc from "picocolors";
 
+function log(...args) {
+  console.log( ...args);
+}
+
+function logSuccess(message) {
+  log(pc.green(`✓ ${message}`));
+}
 
 const args = parseArgs({
   options: {
@@ -36,6 +44,7 @@ let branch;
 if (production) {
   // Create and checkout branches
   branch = `publish/${Date.now().toString(36)}`;
+  log("Creating branch in both repos", branch);
   doubleRun("git", "checkout", "-b", branch);
 }
 
@@ -45,6 +54,7 @@ if (production) {
 }
 
 // Update the typespec core submodule
+log("Updating typespec core submodule");
 typespecRun("git", "fetch", "https://github.com/microsoft/typespec", "main");
 if (production) {
   typespecRun("git", "merge", "--ff-only", "FETCH_HEAD");
@@ -100,6 +110,7 @@ if (production) {
 }
 
 function checkPrePublishState() {
+  log("Checking repo state is clean");
   if (checkForChangedFiles()) {
     console.error("ERROR: Cannot prepare publish because files above were modified.");
     process.exit(1);
@@ -116,6 +127,8 @@ function checkPrePublishState() {
     }
     throw e;
   }
+
+  logSuccess("Repo state is clean");
 }
 
 function doubleRun(command, ...args) {
