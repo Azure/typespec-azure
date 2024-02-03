@@ -9,6 +9,16 @@ import {
   listPackages,
   repoRoot,
 } from "./helpers.js";
+import { parseArgs } from "util";
+
+
+const args = parseArgs({
+  options: {
+    noCommit: { type: "boolean" },
+  },
+  args: process.argv.slice(2),
+});
+
 
 const NoChange = 0;
 const Patch = 1;
@@ -19,7 +29,7 @@ const Major = 3;
  * Set this to false to test this script without creating a new branch, checking for changes etc.
  * DO NOT LEAVE TO FALSE
  */
-const production = true;
+const production = !args.values.noCommit;
 
 let branch;
 
@@ -173,37 +183,32 @@ async function bumpCrossSubmoduleDependencies() {
       return;
     }
 
-    const change = bumpDependencies(project);
+    const pkgJson = {...project.manifest}
+
+    const change = bumpDependencies(pkgJson);
     if (change == NoChange) {
       return;
     }
 
-    writeFileSync(join(project.dir, "package.json"), JSON.stringify(project, undefined, 2) + "\n");
+    writeFileSync(join(project.dir, "package.json"), JSON.stringify(pkgJson, undefined, 2) + "\n");
 
     if (project.manifest.private === false) {
       return;
     }
 
-    const changelog = {
-      changes: [
-        {
-          comment: "Update dependencies.",
-          type: change === Major ? "major" : change === Minor ? "minor" : "patch",
-          packageName: project.manifest.name,
-        },
-      ],
-      packageName: project.manifest.name,
-      email: "microsoftopensource@users.noreply.github.com",
-    };
 
-    const changelogDir = join(repoRoot, "common/changes", project.manifest.name ?? "unknown");
+    const changelog = [
+      "---",
+      `"${project.manifest.name}": ${change === Major ? "major" : change === Minor ? "minor" : "patch"}`,
+      "---",
+      "Update dependencies.",
+    ].join("\n");
+
+    const changelogDir = join(repoRoot, ".changesets");
     mkdirSync(changelogDir, { recursive: true });
 
     if (production) {
-      writeFileSync(
-        join(changelogDir, branch.replace("/", "-") + ".json"),
-        JSON.stringify(changelog, undefined, 2) + "\n"
-      );
+      writeFileSync(join(changelogDir, branch.replace("/", "-") + ".md"), changelog + "\n");
     }
 
     changed = true;
