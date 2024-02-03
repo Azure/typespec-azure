@@ -71,8 +71,10 @@ Available ruleSets:
 - [`@armResourceOperations`](#@armresourceoperations)
 - [`@armResourceRead`](#@armresourceread)
 - [`@armResourceUpdate`](#@armresourceupdate)
+- [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
 - [`@locationResource`](#@locationresource)
+- [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
 - [`@singleton`](#@singleton)
 - [`@subscriptionResource`](#@subscriptionresource)
@@ -326,6 +328,23 @@ clients.
 | ------------ | ------- | -------------- |
 | resourceType | `Model` | Resource model |
 
+#### `@armVirtualResource`
+
+This decorator is used on Azure Resource Manager resources that are not based on
+Azure.ResourceManager common types.
+
+```typespec
+@Azure.ResourceManager.armVirtualResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None
+
 #### `@extensionResource`
 
 `@extensionResource` marks an Azure Resource Manager resource model as an Extension resource.
@@ -368,6 +387,24 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
+
+#### `@resourceBaseType`
+
+This decorator sets the base type of the given resource.
+
+```typespec
+@Azure.ResourceManager.resourceBaseType(baseType: Tenant | Subscription | ResourceGroup | Location | Extension)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name     | Type                                                                     | Description                                                                                                            |
+| -------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `union Tenant \| Subscription \| ResourceGroup \| Location \| Extension` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 
