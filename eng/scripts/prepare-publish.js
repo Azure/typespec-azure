@@ -1,6 +1,8 @@
 // @ts-check
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
+import pc from "picocolors";
+import { parseArgs } from "util";
 import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
 import {
   CommandFailedError,
@@ -9,11 +11,9 @@ import {
   listPackages,
   repoRoot,
 } from "./helpers.js";
-import { parseArgs } from "util";
-import pc from "picocolors";
 
 function log(...args) {
-  console.log( ...args);
+  console.log(...args);
 }
 
 function logSuccess(message) {
@@ -23,11 +23,10 @@ function logSuccess(message) {
 const args = parseArgs({
   options: {
     noCommit: { type: "boolean" },
-    skipDocUpdate: { type: "boolean" },
+    onlyBumpVersions: { type: "boolean" }, // Only bump version, skip any extra steps like updating the docs and regenerating samples
   },
   args: process.argv.slice(2),
 });
-
 
 const NoChange = 0;
 const Patch = 1;
@@ -62,7 +61,7 @@ if (production) {
 }
 // Stage the typespec core publish
 typespecRun("pnpm", "change", "version");
-if(!args.values.skipDocUpdate) {
+if (!args.values.onlyBumpVersions) {
   typespecRun("pnpm", "update-latest-docs");
 }
 typespecRunWithRetries(3, "pnpm", "install");
@@ -90,7 +89,7 @@ await bumpCrossSubmoduleDependencies();
 
 // Stage typespec-azure publish
 typespecAzureRun("pnpm", "change", "version");
-if(!args.values.skipDocUpdate) {
+if (!args.values.onlyBumpVersions) {
   typespecAzureRun("pnpm", "update-latest-docs");
 }
 if (production) {
@@ -202,7 +201,7 @@ async function bumpCrossSubmoduleDependencies() {
       return;
     }
 
-    const pkgJson = {...project.manifest}
+    const pkgJson = { ...project.manifest };
 
     const change = bumpDependencies(pkgJson);
     if (change == NoChange) {
@@ -215,10 +214,11 @@ async function bumpCrossSubmoduleDependencies() {
       return;
     }
 
-
     const changelog = [
       "---",
-      `"${project.manifest.name}": ${change === Major ? "major" : change === Minor ? "minor" : "patch"}`,
+      `"${project.manifest.name}": ${
+        change === Major ? "major" : change === Minor ? "minor" : "patch"
+      }`,
       "---",
       "Update dependencies.",
     ].join("\n");
@@ -246,8 +246,10 @@ async function rebuildAndRegenSamplesToBumpTemplateVersions() {
     "pnpm",
     "build"
   );
-  typespecAzureRun("pnpm", "build");
-  typespecAzureRun("pnpm", "regen-samples");
+  if (!args.values.onlyBumpVersions) {
+    typespecAzureRun("pnpm", "build");
+    typespecAzureRun("pnpm", "regen-samples");
+  }
 
   if (checkForChangedFiles(repoRoot, undefined, { silent: true }) && production) {
     typespecAzureRun("git", "add", "-A");
