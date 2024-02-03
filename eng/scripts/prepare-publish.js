@@ -23,6 +23,7 @@ function logSuccess(message) {
 const args = parseArgs({
   options: {
     noCommit: { type: "boolean" },
+    skipDocUpdate: { type: "boolean" },
   },
   args: process.argv.slice(2),
 });
@@ -61,7 +62,9 @@ if (production) {
 }
 // Stage the typespec core publish
 typespecRun("pnpm", "change", "version");
-typespecRun("pnpm", "update-latest-docs");
+if(!args.values.skipDocUpdate) {
+  typespecRun("pnpm", "update-latest-docs");
+}
 typespecRunWithRetries(3, "pnpm", "install");
 if (production) {
   typespecRun("git", "add", "-A");
@@ -78,6 +81,7 @@ if (production && checkForChangedFiles(repoRoot, undefined, { silent: true })) {
   typespecAzureRun("git", "commit", "-a", "-m", "Update core submodule");
 }
 
+log("Bumping cross-submodule dependencies");
 // Determine project versions including any bumps from typespec publish above
 const versions = await getProjectVersions();
 
@@ -86,7 +90,9 @@ await bumpCrossSubmoduleDependencies();
 
 // Stage typespec-azure publish
 typespecAzureRun("pnpm", "change", "version");
-typespecAzureRun("pnpm", "update-latest-docs");
+if(!args.values.skipDocUpdate) {
+  typespecAzureRun("pnpm", "update-latest-docs");
+}
 if (production) {
   typespecAzureRun("git", "add", "-A");
 }
