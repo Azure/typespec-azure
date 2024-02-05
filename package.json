@@ -17,7 +17,7 @@
     "merge-coverage": "c8 -- report --reporter=cobertura --reporter=text",
     "pack:all": "node ./eng/scripts/pack-all.js",
     "preinstall": "npx only-allow pnpm",
-    "prepare-publish": "pnpm chronus version",
+    "prepare-publish": "node ./eng/scripts/prepare-publish.js",
     "prettier": "prettier . --config .prettierrc.json",
     "purge": "rimraf --glob \"packages/*/node_modules/\" --glob \"core/packages/*/node_modules/\"",
     "regen-docs": "pnpm -r  --parallel --aggregate-output --reporter=append-only run regen-docs",
@@ -50,5 +50,8 @@
       "prod",
       "resolutions"
     ]
+  },
+  "dependencies": {
+    "picocolors": "~1.0.0"
   }
 }
