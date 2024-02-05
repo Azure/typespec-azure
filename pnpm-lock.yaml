@@ -48,7 +48,7 @@ importers:
         specifier: ^2.26.2
         version: 2.27.1
       '@chronus/chronus':
-        specifier: ^0.5.1
+        specifier: ^0.5.0
         version: 0.5.1
       '@pnpm/find-workspace-packages':
         specifier: ^6.0.9
@@ -10796,7 +10796,7 @@ packages:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
     engines: {node: '>=10', npm: '>=6'}
     dependencies:
-      '@babel/runtime': 7.23.6
+      '@babel/runtime': 7.23.9
       cosmiconfig: 7.1.0
       resolve: 1.22.8
     dev: false
