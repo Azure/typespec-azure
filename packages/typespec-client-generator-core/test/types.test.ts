@@ -2101,6 +2101,24 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(pictures.kind, "property");
       strictEqual(pictures.isMultipartFileInput, true);
     });
+
+    it("multipart with encoding bytes raises error", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model EncodedBytesMFD {
+          @encode("base64")
+          pictures: bytes;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+        `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
+      });
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {
