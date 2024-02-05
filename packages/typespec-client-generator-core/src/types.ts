@@ -176,25 +176,17 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "int8":
     case "int16":
     case "int32":
+    case "int64":
     case "uint8":
     case "uint16":
     case "uint32":
+    case "uint64":
     case "numeric":
     case "integer":
-      return "int32";
     case "safeint":
-    case "uint64":
-    case "int64":
-      return "int64";
-    case "plainDate":
-      return "date";
-    case "plainTime":
-      return "time";
-    case "float":
-      return "float32";
     case "decimal128":
-      return "decimal128";
     case "bytes":
+    case "float":
     case "float32":
     case "float64":
     case "boolean":
@@ -202,6 +194,10 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "url":
     case "decimal":
       return scalar.name;
+    case "plainDate":
+      return "date";
+    case "plainTime":
+      return "time";
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
   }

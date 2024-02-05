@@ -302,7 +302,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "duration");
-      strictEqual(sdkType.wireType.kind, "float32");
+      strictEqual(sdkType.wireType.kind, "float");
       strictEqual(sdkType.encode, "seconds");
     });
 

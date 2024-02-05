@@ -90,27 +90,21 @@ export interface SdkBuiltInType extends SdkTypeBase {
   encode: string;
 }
 
+type SdkIntKinds = "numeric" | "integer" | "safeint" | "int8" | "int16" | "int32" | "int64" | "uint8" | "uint16" | "uint32" | "uint64";
+
+type SdkFloatKinds = "float" | "float32" | "float64" | "decimal" | "decimal128";
+
+type SdkStringKinds = "string" | "password" | "guid" | "url" | "uuid" | "etag" | "armId" | "ipAddress" | "azureLocation";
+
 export type SdkBuiltInKinds =
   | "bytes"
   | "boolean"
   | "date"
   | "time"
   | "any"
-  | "int32"
-  | "int64"
-  | "float32"
-  | "float64"
-  | "decimal"
-  | "decimal128"
-  | "string"
-  | "guid"
-  | "url"
-  | "uuid"
-  | "password"
-  | "armId"
-  | "ipAddress"
-  | "azureLocation"
-  | "etag";
+  | SdkIntKinds
+  | SdkFloatKinds
+  | SdkStringKinds;
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
