@@ -98,7 +98,7 @@ export function scanSwaggers(root) {
   return files;
 }
 
-export function checkForChangedFiles(cwd, comment = undefined, options = {}) {
+export async function checkForChangedFiles(cwd, comment = undefined, options = {}) {
   if (comment && !options.silent) {
     console.log();
     console.log(comment);
