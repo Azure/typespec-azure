@@ -111,6 +111,12 @@ export const $lib = createTypeSpecLibrary({
         notResourceType: paramMessage`Parent type ${"parent"} of ${"type"} is not registered as an ARM resource type.`,
       },
     },
+    "resource-without-path-and-segment": {
+      severity: "error",
+      messages: {
+        default: "Resource types must have a property with '@path` and '@segment' decorators.",
+      },
+    },
   },
   linter: {
     rules: [
