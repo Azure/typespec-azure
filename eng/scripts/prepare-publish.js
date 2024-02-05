@@ -12,12 +12,23 @@ import {
   repoRoot,
 } from "./helpers.js";
 
+const columns = process.stdout.columns;
 function log(...args) {
   console.log(...args);
 }
 
 function logSuccess(message) {
   log(pc.green(`✓ ${message}`));
+}
+
+function logRegionStart(text) {
+  const split = Math.floor((columns - text.length - 4) / 2);
+  log();
+  log(pc.cyan("-".repeat(split) + "  " + text + "  " + "-".repeat(split)));
+}
+
+function logRegionEnd() {
+  log(pc.cyan("-".repeat(columns)));
 }
 
 const args = parseArgs({
@@ -55,29 +66,28 @@ if (production) {
 
 // Update the typespec core submodule
 log("Updating typespec core submodule");
-typespecRun("git", "fetch", "https://github.com/microsoft/typespec", "main");
+await typespecRun("git", "fetch", "https://github.com/microsoft/typespec", "main");
 if (production) {
-  typespecRun("git", "merge", "--ff-only", "FETCH_HEAD");
+  await typespecRun("git", "merge", "--ff-only", "FETCH_HEAD");
 }
 // Stage the typespec core publish
-typespecRun("pnpm", "change", "version");
+await typespecRun("pnpm", "change", "version");
 if (!args.values.onlyBumpVersions) {
-  typespecRun("pnpm", "update-latest-docs");
+  await typespecRun("pnpm", "update-latest-docs");
 }
-typespecRunWithRetries(3, "pnpm", "install");
-if (production) {
-  typespecRun("git", "add", "-A");
-}
+await typespecRunWithRetries(3, "pnpm", "install");
+
 if (await checkForChangedFiles(coreRepoRoot, undefined, { silent: true })) {
   if (production) {
-    typespecRun("git", "commit", "-m", "Prepare typespec publish");
+    await typespecRun("git", "add", "-A");
+    await typespecRun("git", "commit", "-m", "Prepare typespec publish");
   }
 } else {
   console.log("INFO: No changes to typespec.");
 }
 
 if (production && (await checkForChangedFiles(repoRoot, undefined, { silent: true }))) {
-  typespecAzureRun("git", "commit", "-a", "-m", "Update core submodule");
+  await typespecAzureRun("git", "commit", "-a", "-m", "Update core submodule");
 }
 
 log("Bumping cross-submodule dependencies");
@@ -88,16 +98,14 @@ const versions = await getProjectVersions();
 await bumpCrossSubmoduleDependencies();
 
 // Stage typespec-azure publish
-typespecAzureRun("pnpm", "change", "version");
+await typespecAzureRun("pnpm", "change", "version");
 if (!args.values.onlyBumpVersions) {
-  typespecAzureRun("pnpm", "update-latest-docs");
-}
-if (production) {
-  typespecAzureRun("git", "add", "-A");
+  await typespecAzureRun("pnpm", "update-latest-docs");
 }
 if (await checkForChangedFiles(repoRoot, undefined, { silent: true })) {
   if (production) {
-    typespecAzureRun("git", "commit", "-m", "Prepare typespec-azure publish");
+    await typespecAzureRun("git", "add", "-A");
+    await typespecAzureRun("git", "commit", "-m", "Prepare typespec-azure publish");
   }
 } else {
   console.log("INFO: No changes to typespec-azure.");
@@ -143,29 +151,31 @@ async function doubleRun(command, ...args) {
 
 async function typespecRun(command, ...args) {
   console.log();
-  console.log("## typespec ##");
+  logRegionStart("typespec");
   await runOrExit(command, args, { cwd: coreRepoRoot });
+  logRegionEnd();
 }
 
 async function typespecAzureRun(command, ...args) {
   console.log();
-  console.log("## typespec-azure ##");
+  logRegionStart("typespec-azure");
   await runOrExit(command, args, { cwd: repoRoot });
+  logRegionEnd();
 }
 
 async function typespecAzureRunWithOptions(options, command, ...args) {
   console.log();
-  console.log("## typespec-azure ##");
+  logRegionStart("typespec-azure");
   await runOrExit(command, args, { cwd: repoRoot, ...options });
 }
 
 async function typespecRunWithRetries(tries, command, ...args) {
   try {
-    console.log();
-    console.log("## typespec ##");
-    console.log(`remaining tries: ${tries}`);
+    logRegionStart(`typespec (remaining tries: ${tries})`);
     await runOrExit(command, args, { cwd: coreRepoRoot });
+    logRegionEnd();
   } catch (err) {
+    logRegionEnd();
     if (tries-- > 0) {
       await typespecRunWithRetries(tries, command, ...args);
     } else throw err;
@@ -174,11 +184,11 @@ async function typespecRunWithRetries(tries, command, ...args) {
 
 async function typespecAzureRunWithRetries(tries, command, ...args) {
   try {
-    console.log();
-    console.log("## typespec-azure ##");
-    console.log(`remaining tries: ${tries}`);
+    logRegionStart(`typespec-azure (remaining tries: ${tries})`);
     await runOrExit(command, args, { cwd: repoRoot });
+    logRegionEnd();
   } catch (err) {
+    logRegionEnd();
     if (tries-- > 0) {
       await typespecAzureRunWithRetries(tries, command, ...args);
     } else throw err;
@@ -194,24 +204,27 @@ async function getProjectVersions() {
 }
 
 async function bumpCrossSubmoduleDependencies() {
+  logRegionStart("Bumping cross-submodule dependencies");
   let changed = false;
 
-  for (const project of await listPackages()) {
-    if (project.dir.startsWith(coreRepoRoot)) {
-      return;
-    }
+  const packages = await listPackages();
+
+  for (const project of packages.filter((x) => !x.dir.startsWith(coreRepoRoot))) {
+    log("Checking if deps needs to be bump for project: ", project.manifest.name);
 
     const pkgJson = { ...project.manifest };
 
     const change = bumpDependencies(pkgJson);
+
     if (change == NoChange) {
-      return;
+      continue;
     }
+    logSuccess(`Project ${project.manifest.name} changed saving package.json.`);
 
     writeFileSync(join(project.dir, "package.json"), JSON.stringify(pkgJson, undefined, 2) + "\n");
 
     if (project.manifest.private === false) {
-      return;
+      continue;
     }
 
     const changelog = [
@@ -232,6 +245,7 @@ async function bumpCrossSubmoduleDependencies() {
 
     changed = true;
   }
+  logRegionEnd();
 
   if (changed && production) {
     await typespecAzureRun("git", "add", "-A");
