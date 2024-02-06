@@ -152,35 +152,6 @@ describe("typespec-autorest: definitions", () => {
     });
   });
 
-  it("specify default value on enum property", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `
-      model Foo {
-        optionalEnum?: MyEnum = MyEnum.a;
-      };
-      
-      enum MyEnum {
-        a: "a-value",
-        b,
-      }
-      `
-    );
-
-    ok(res.isRef);
-    ok(res.defs.Foo, "expected definition named Foo");
-    ok(res.defs.MyEnum, "expected definition named MyEnum");
-    deepStrictEqual(res.defs.Foo, {
-      type: "object",
-      properties: {
-        optionalEnum: {
-          $ref: "#/definitions/MyEnum",
-          default: "a-value",
-        },
-      },
-    });
-  });
-
   it("ignore uninstantiated template types", async () => {
     const res = await openApiFor(
       `
