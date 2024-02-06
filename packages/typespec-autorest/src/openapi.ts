@@ -2237,6 +2237,7 @@ function createOAPIEmitter(
           format: { authType: (auth as any).type },
           target: currentService.type,
         });
+        return undefined;
     }
   }
 
