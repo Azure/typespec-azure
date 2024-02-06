@@ -8,6 +8,7 @@ import {
   BooleanLiteral,
   BytesKnownEncoding,
   DateTimeKnownEncoding,
+  Diagnostic,
   DurationKnownEncoding,
   Enum,
   EnumMember,
@@ -470,6 +471,19 @@ function addDiscriminatorToModelType<TServiceOperation extends SdkServiceOperati
   }
 }
 
+function getSdkModelWithDiagnostics<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Model,
+  operation?: Operation
+): void {
+  // eslint-disable-next-line deprecation/deprecation
+  const sdkType = getSdkModel(context, type, operation);
+  const a = "b";
+}
+
+/**
+ * @deprecated You should access the `.models` attribute on an `SdkPackage` instead
+ */
 export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: Model,
