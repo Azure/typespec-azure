@@ -26,7 +26,7 @@ model TestTrackedResource2 is TrackedResource<TestTrackedProperties2> {
 @armResourceOperations(TestTrackedResource2)
 interface Tracked2Operations {
   get is ArmResourceRead<TestTrackedResource2>;
-  create is ArmResourceCreateOrUpdateSync<TestTrackedResource2>;
+  create is ArmResourceCreateOrReplaceSync<TestTrackedResource2>;
   update is ArmResourcePatchSync<TestTrackedResource2, TestTrackedProperties2>;
   delete is ArmResourceDeleteSync<TestTrackedResource2>;
   listByResourceGroup is ArmResourceListByParent<TestTrackedResource2>;

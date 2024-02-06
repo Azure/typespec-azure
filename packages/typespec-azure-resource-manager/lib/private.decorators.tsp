@@ -5,7 +5,7 @@ namespace Azure.ResourceManager.Private;
 using TypeSpec.Reflection;
 
 /**
- * Update the ARM provider namespace for a given entity.
+ * Update the Azure Resource Manager provider namespace for a given entity.
  */
 extern dec armUpdateProviderNamespace(target: Reflection.Operation);
 
@@ -25,7 +25,7 @@ alias ArmCommonTypeVersionSpec = {
 
 /**
  * @param definitionName Definition name
- * @param version Arm Version
+ * @param version Azure Resource Manager Version
  * @param referenceFile Reference file
  */
 extern dec armCommonDefinition(
@@ -37,7 +37,7 @@ extern dec armCommonDefinition(
 
 /**
  * @param definitionName Definition name
- * @param version Arm Version
+ * @param version Azure Resource Manager Version
  * @param referenceFile Reference file
  */
 extern dec armCommonParameter(
@@ -48,7 +48,7 @@ extern dec armCommonParameter(
 );
 
 /**
- * This decorator is used to identify ARM resource types and extract their
+ * This decorator is used to identify Azure Resource Manager resource types and extract their
  * metadata.  It is *not* meant to be used directly by a spec author, it instead
  * gets implicitly applied when the spec author defines a model type in this form:
  *
@@ -58,7 +58,7 @@ extern dec armCommonParameter(
  * `@armResource` decorator, so it also gets applied to the type which absorbs the
  * `TrackedResource<Resource>` definition by using the `is` keyword.
  *
- * @param properties Arm resource properties
+ * @param properties Azure Resource Manager resource properties
  */
 extern dec armResourceInternal(target: Model, properties: Model);
 

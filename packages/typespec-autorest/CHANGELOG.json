@@ -2,6 +2,18 @@
   "name": "@azure-tools/typespec-autorest",
   "entries": [
     {
+      "version": "0.38.1",
+      "tag": "@azure-tools/typespec-autorest_v0.38.1",
+      "date": "Mon, 29 Jan 2024 22:16:39 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix: Autorest emitter should generated format: decimal"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.38.0",
       "tag": "@azure-tools/typespec-autorest_v0.38.0",
       "date": "Wed, 24 Jan 2024 05:47:18 GMT",

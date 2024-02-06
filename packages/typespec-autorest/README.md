@@ -148,7 +148,7 @@ Create read-only property schema for lro status
 
 #### `@useRef`
 
-`@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as ARM common types.
+`@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as Azure Resource Manager common types.
 
 `@useRef` can be specified on Models and ModelProperty.
 

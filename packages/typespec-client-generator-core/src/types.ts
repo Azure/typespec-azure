@@ -201,31 +201,25 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "int8":
     case "int16":
     case "int32":
+    case "int64":
     case "uint8":
     case "uint16":
     case "uint32":
+    case "uint64":
     case "numeric":
     case "integer":
-      return "int32";
     case "safeint":
-    case "uint64":
-    case "int64":
-      return "int64";
-    case "plainDate":
-      return "date";
-    case "plainTime":
-      return "time";
-    case "float":
-      return "float32";
     case "decimal128":
-      return "decimal128";
     case "bytes":
+    case "float":
     case "float32":
     case "float64":
     case "boolean":
     case "string":
     case "url":
     case "decimal":
+    case "plainDate":
+    case "plainTime":
       return scalar.name;
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
@@ -471,6 +465,7 @@ function addDiscriminatorToModelType<TServiceOperation extends SdkServiceOperati
       onClient: false,
       apiVersions: getAvailableApiVersions(context, type),
       isApiVersionParam: false,
+      isMultipartFileInput: false, // discriminator property cannot be a file
     });
   }
 }
@@ -482,8 +477,28 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
 ): SdkModelType {
   type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
+  const httpOperation = operation
+    ? ignoreDiagnostics(getHttpOperation(context.program, operation))
+    : undefined;
+  const httpBody = httpOperation?.parameters.body;
+  let isFormDataType = false;
+  if (httpBody && httpBody.type.kind === "Model") {
+    const isMultipartOperation = httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
+    isFormDataType =
+      isMultipartOperation && getEffectivePayloadType(context, httpBody.type) === type;
+  }
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
+    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
+      // This means we have a model that is used both for formdata input and for regular body input
+      reportDiagnostic(context.program, {
+        code: "conflicting-multipart-model-usage",
+        target: type,
+        format: {
+          modelName: sdkType.name,
+        },
+      });
+    }
   } else {
     const docWrapper = getDocHelper(context, type);
     sdkType = {
@@ -498,6 +513,7 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions<TServiceOperation>(context, type),
+      isFormDataType,
     };
     updateModelsMap(context, type, sdkType, operation);
 
@@ -767,20 +783,20 @@ function getSdkVisibility<TServiceOperation extends SdkServiceOperation>(
 ): Visibility[] | undefined {
   const visibility = getVisibility(context.program, type);
   if (visibility) {
-    const result = [];
-    if (visibility?.includes("read")) {
+    const result: Visibility[] = [];
+    if (visibility.includes("read")) {
       result.push(Visibility.Read);
     }
-    if (visibility?.includes("create")) {
+    if (visibility.includes("create")) {
       result.push(Visibility.Create);
     }
-    if (visibility?.includes("update")) {
+    if (visibility.includes("update")) {
       result.push(Visibility.Update);
     }
-    if (visibility?.includes("delete")) {
+    if (visibility.includes("delete")) {
       result.push(Visibility.Delete);
     }
-    if (visibility?.includes("query")) {
+    if (visibility.includes("query")) {
       result.push(Visibility.Query);
     }
     return result;
@@ -885,7 +901,7 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
     ...base,
     optional: type.optional,
     collectionFormat: getCollectionFormat(context, type),
-  };
+}
   if (options.isMethodParameter) {
     return {
       ...base,
@@ -927,6 +943,23 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
     };
   } else {
     // I'm a body model property
+    let operationIsMultipart = false;
+  if (options.operation) {
+    const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, options.operation));
+    operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+  }
+  // Currently we only recognize bytes and list of bytes as potential file inputs
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+  if (isBytesInput && getEncode(context.program, type)) {
+    reportDiagnostic(context.program, {
+      code: "encoding-multipart-bytes",
+      target: type,
+    });
+  }
     return {
       ...base,
       kind: "property",
@@ -934,6 +967,7 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
       visibility: getSdkVisibility(context, type),
       discriminator: false,
       serializedName: getPropertyNames(context, type)[1],
+      isMultipartFileInput: isBytesInput && operationIsMultipart,
       ...updateWithApiVersionInformation(context, type),
     };
   }

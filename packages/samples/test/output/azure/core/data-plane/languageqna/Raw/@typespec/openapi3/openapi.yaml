@@ -1213,11 +1213,10 @@ components:
           type: boolean
           description: If true, is context only.
         prompts:
-          allOf:
-            - type: array
-              items:
-                $ref: '#/components/schemas/QnaPrompt'
           description: The prompts to display.
+          type: array
+          items:
+            $ref: '#/components/schemas/QnaPrompt'
       description: A dialog to be displayed to the user.
     QnaDialogUpdate:
       type: object

@@ -66,7 +66,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../../specs/resource-manager/common-types/v4/types.json#/definitions/OperationListResult"
             }
@@ -100,7 +100,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResourceListResult"
             }
@@ -137,7 +137,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResourceListResult"
             }
@@ -181,7 +181,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource"
             }
@@ -294,7 +294,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource"
             }
@@ -350,7 +350,7 @@
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -392,7 +392,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/PrivateEndpointConnectionResourceListResult"
             }
@@ -439,7 +439,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/PrivateEndpointConnectionResource"
             }
@@ -541,7 +541,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -579,7 +579,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/PrivateLinkResourceListResult"
             }

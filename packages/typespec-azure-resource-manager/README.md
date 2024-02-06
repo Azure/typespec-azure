@@ -71,8 +71,10 @@ Available ruleSets:
 - [`@armResourceOperations`](#@armresourceoperations)
 - [`@armResourceRead`](#@armresourceread)
 - [`@armResourceUpdate`](#@armresourceupdate)
+- [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
 - [`@locationResource`](#@locationresource)
+- [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
 - [`@singleton`](#@singleton)
 - [`@subscriptionResource`](#@subscriptionresource)
@@ -82,7 +84,7 @@ Available ruleSets:
 #### `@armCommonTypesVersion`
 
 This decorator is used either on a namespace or a version enum value to indicate
-the version of the ARM common-types to use for refs in emitted Swagger files.
+the version of the Azure Resource Manager common-types to use for refs in emitted Swagger files.
 
 ```typespec
 @Azure.ResourceManager.armCommonTypesVersion(version: valueof string | EnumMember)
@@ -100,7 +102,7 @@ the version of the ARM common-types to use for refs in emitted Swagger files.
 
 #### `@armLibraryNamespace`
 
-`@armLibraryNamespace` designates a namespace as containign ARM Provider information.
+`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -123,7 +125,7 @@ namespace Microsoft.Contoso;
 
 #### `@armProviderNamespace`
 
-`@armProviderNamespace` sets the ARM provider name. It will default to use the
+`@armProviderNamespace` sets the Azure Resource Manager provider name. It will default to use the
 Namespace element value unless an override value is specified.
 
 ```typespec
@@ -155,7 +157,7 @@ namespace Microsoft.ContosoService;
 #### `@armProviderNameValue`
 
 `@armResourceType` sets the value fo the decorated string
-property to the type of the ARM resource.
+property to the type of the Azure Resource Manager resource.
 
 ```typespec
 @Azure.ResourceManager.armProviderNameValue
@@ -326,15 +328,32 @@ clients.
 | ------------ | ------- | -------------- |
 | resourceType | `Model` | Resource model |
 
+#### `@armVirtualResource`
+
+This decorator is used on Azure Resource Manager resources that are not based on
+Azure.ResourceManager common types.
+
+```typespec
+@Azure.ResourceManager.armVirtualResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None
+
 #### `@extensionResource`
 
-`@extensionResource` marks an ARM resource model as an Extension resource.
+`@extensionResource` marks an Azure Resource Manager resource model as an Extension resource.
 Extension resource extends other resource types. URL path is appended
 to another segment {scope} which refers to another Resource URL.
 
 `{resourceUri}/providers/Microsoft.Contoso/accessPermissions`
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 @Azure.ResourceManager.extensionResource
@@ -350,12 +369,12 @@ None
 
 #### `@locationResource`
 
-`@locationResource` marks an ARM resource model as a location based resource.
+`@locationResource` marks an Azure Resource Manager resource model as a location based resource.
 
 Location based resources have REST API paths like
 `/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.Contoso/employees`
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 @Azure.ResourceManager.locationResource
@@ -369,15 +388,33 @@ See more details on [different ARM resource type here.](https://azure.github.io/
 
 None
 
+#### `@resourceBaseType`
+
+This decorator sets the base type of the given resource.
+
+```typespec
+@Azure.ResourceManager.resourceBaseType(baseType: Tenant | Subscription | ResourceGroup | Location | Extension)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name     | Type                                                                     | Description                                                                                                            |
+| -------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `union Tenant \| Subscription \| ResourceGroup \| Location \| Extension` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
+
 #### `@resourceGroupResource`
 
-`@resourceGroupResource` marks an ARM resource model as a resource group level resource.
-This is the default option for ARM resources. It is provided for symmetry and clarity, and
+`@resourceGroupResource` marks an Azure Resource Manager resource model as a resource group level resource.
+This is the default option for Azure Resource Manager resources. It is provided for symmetry and clarity, and
 you typically do not need to specify it.
 
 `/subscription/{id}/resourcegroups/{rg}/providers/Microsoft.Contoso/employees`
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 @Azure.ResourceManager.resourceGroupResource
@@ -393,12 +430,12 @@ None
 
 #### `@singleton`
 
-`@singleton` marks an ARM resource model as a singleton resource.
+`@singleton` marks an Azure Resource Manager resource model as a singleton resource.
 
 Singleton resources only have a single instance with a fixed key name.
 `.../providers/Microsoft.Contoso/monthlyReports/default`
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 @Azure.ResourceManager.singleton(keyValue?: valueof string | default)
@@ -416,12 +453,12 @@ See more details on [different ARM resource type here.](https://azure.github.io/
 
 #### `@subscriptionResource`
 
-`@subscriptionResource` marks an ARM resource model as a subscription resource.
+`@subscriptionResource` marks an Azure Resource Manager resource model as a subscription resource.
 
 Subscription resources have REST API paths like:
 `/subscription/{id}/providers/Microsoft.Contoso/employees`
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 @Azure.ResourceManager.subscriptionResource
@@ -437,12 +474,12 @@ None
 
 #### `@tenantResource`
 
-`@tenantResource` marks an ARM resource model as a Tenant resource/Root resource/Top-Level resource.
+`@tenantResource` marks an Azure Resource Manager resource model as a Tenant resource/Root resource/Top-Level resource.
 
 Tenant resources have REST API paths like:
 `/provider/Microsoft.Contoso/FooResources`
 
-See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
 @Azure.ResourceManager.tenantResource
@@ -458,8 +495,8 @@ None
 
 #### `@useLibraryNamespace`
 
-Declare the ARM library namespaces used in this provider.
-This allows sharing ARM resource types across specifications
+Declare the Azure Resource Manager library namespaces used in this provider.
+This allows sharing Azure Resource Manager resource types across specifications
 
 ```typespec
 @Azure.ResourceManager.useLibraryNamespace(...namespaces: Namespace[])
@@ -471,6 +508,6 @@ This allows sharing ARM resource types across specifications
 
 ##### Parameters
 
-| Name       | Type                | Description                                           |
-| ---------- | ------------------- | ----------------------------------------------------- |
-| namespaces | `model Namespace[]` | The namespaces of arm libraries used in this provider |
+| Name       | Type                | Description                                                              |
+| ---------- | ------------------- | ------------------------------------------------------------------------ |
+| namespaces | `model Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
