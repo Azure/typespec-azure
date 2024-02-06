@@ -1,0 +1,54 @@
+{
+  "name": "@azure-tools/typespec-azure-portal-core",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test-official": "vitest run --coverage --reporter=junit --reporter=default --no-file-parallelism"
+  },
+  "keywords": [
+    "Azure",
+    "Portal",
+    "TypeSpec"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "tspMain": "lib/main.tsp",
+  "peerDependencies": {
+    "@typespec/compiler": "~0.52.0",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.38.0"
+
+  },
+  "devDependencies": {
+    "typescript": "~5.3.3",
+    "@azure-tools/typespec-azure-core": "workspace:~0.38.0",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.38.0",
+    "@azure-tools/typespec-client-generator-core": "workspace:~0.38.0",
+    "@azure-tools/typespec-autorest": "workspace:~0.38.1",
+    "@types/node": "~18.11.9",
+    "@typespec/compiler": "workspace:~0.52.0",
+    "@typespec/openapi": "workspace:~0.52.0",
+    "@typespec/http": "workspace:~0.52.0",
+    "@typespec/rest": "workspace:~0.52.0",
+    "@typespec/versioning": "workspace:~0.52.0",
+    "source-map-support": "~0.5.21",
+    "c8": "~8.0.1",
+    "path": "^0.12.7",
+    "vitest": "^1.2.0",
+    "@vitest/coverage-v8": "^1.1.0"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    },
+    "./testing": {
+      "default": "./dist/src/testing/index.js",
+      "types": "./dist/src/testing/index.d.ts"
+    }
+  }
+}
