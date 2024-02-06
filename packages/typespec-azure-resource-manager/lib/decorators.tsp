@@ -186,3 +186,21 @@ extern dec armCommonTypesVersion(
   target: Namespace | EnumMember,
   version: valueof string | EnumMember
 );
+
+/**
+ * This decorator is used on Azure Resource Manager resources that are not based on
+ * Azure.ResourceManager common types.
+ *
+ * @param propertiesType: The type of the resource properties.
+ */
+extern dec armVirtualResource(target: Model);
+
+/**
+ * This decorator sets the base type of the given resource.
+ *
+ * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
+ */
+extern dec resourceBaseType(
+  target: Model,
+  baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
+);
