@@ -434,9 +434,7 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
   const httpBody = httpOperation?.parameters.body;
   let isFormDataType = false;
   if (httpBody && httpBody.type.kind === "Model") {
-    const isMultipartOperation = Boolean(
-      httpBody.contentTypes.find((x) => x.startsWith("multipart/"))
-    );
+    const isMultipartOperation = httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
     isFormDataType =
       isMultipartOperation && getEffectivePayloadType(context, httpBody.type) === type;
   }
