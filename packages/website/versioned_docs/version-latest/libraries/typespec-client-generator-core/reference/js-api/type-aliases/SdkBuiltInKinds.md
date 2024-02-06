@@ -7,22 +7,10 @@ title: "[T] SdkBuiltInKinds"
 type SdkBuiltInKinds: 
   | "bytes"
   | "boolean"
-  | "date"
-  | "time"
+  | "plainDate"
+  | "plainTime"
   | "any"
-  | "int32"
-  | "int64"
-  | "float32"
-  | "float64"
-  | "decimal"
-  | "decimal128"
-  | "string"
-  | "guid"
-  | "url"
-  | "uuid"
-  | "password"
-  | "armId"
-  | "ipAddress"
-  | "azureLocation"
-  | "etag";
+  | SdkIntKinds
+  | SdkFloatKinds
+  | SdkStringKinds;
 ```

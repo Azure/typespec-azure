@@ -46,7 +46,26 @@ FIXME
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-FIXME
+namespace PetStoreNamespace.Models
+{
+  public partial class InputModel
+  {
+    public string Name { get; }
+  }
+}
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
+    public virtual Response GetModel(string name, RequestContext context) {}
+    // convenience method
+    public virtual async Task<Response<InputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<InputModel> GetModel(string name, CancellationToken cancellationToken = default) {}
+  }
+}
 ```
 
 </TabItem>
@@ -64,7 +83,16 @@ const model: InputModel = await client.path("/petStore/model/{name}").get();
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class InputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    public InputModel getModel(String name)
+}
 ```
 
 </TabItem>
@@ -112,7 +140,26 @@ FIXME
 <TabItem value="csharp" label="CSharp" >
 
 ```c#
-FIXME
+namespace PetStoreNamespace.Models
+{
+  public partial class ParameterOptions
+  {
+    public string Name { get; }
+  }
+}
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
+    public virtual Response GetModel(string name, RequestContext context) {}
+    // convenience method
+    public virtual async Task<Response<ParameterOptions>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<ParameterOptions> GetModel(string name, CancellationToken cancellationToken = default) {}
+  }
+}
 ```
 
 </TabItem>
@@ -126,7 +173,16 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class InputOptions {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    public InputOptions getModel(String name)
+}
 ```
 
 </TabItem>
@@ -159,7 +215,26 @@ client.get_computed_model()
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-FIXME
+namespace PetStoreNamespace.Models
+{
+  public partial class InputModel
+  {
+    public string Name { get; }
+  }
+}
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> ReadModelAsync(string name, RequestContext context) {}
+    public virtual Response ReadModel(string name, RequestContext context) {}
+    // convenience method
+    public virtual async Task<Response<InputModel>> ReadModelAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<InputModel> ReadModel(string name, CancellationToken cancellationToken = default) {}
+  }
+}
 ```
 
 </TabItem>
@@ -173,7 +248,16 @@ FIXME
 <TabItem value="java" label="Java" >
 
 ```java
-FIXME
+package com.petstorenamespace.models;
+public final class InputModel {
+    public String getName()
+}
+
+package com.petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> readModelWithResponse(String name, RequestOptions requestOptions)
+    public InputModel readModel(String name)
+}
 ```
 
 </TabItem>

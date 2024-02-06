@@ -33,10 +33,10 @@
     "react": "~18.2.0"
   },
   "devDependencies": {
-    "@azure-tools/typespec-azure-core": "workspace:~0.38.0",
+    "@azure-tools/typespec-azure-core": "workspace:~0.39.0",
     "@azure-tools/typespec-azure-playground-website": "workspace:~1.0.0",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.38.0",
-    "@azure-tools/typespec-client-generator-core": "workspace:~0.38.0",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.39.0",
+    "@azure-tools/typespec-client-generator-core": "workspace:~0.39.0",
     "@azure-tools/typespec-service-csharp": "workspace:~0.32.0",
     "@docusaurus/module-type-aliases": "^3.0.0",
     "@docusaurus/tsconfig": "^3.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-core",
-  "version": "0.38.0",
+  "version": "0.39.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Core library",
   "homepage": "https://azure.github.io/typespec-azure",
