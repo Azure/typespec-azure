@@ -1877,9 +1877,6 @@ importers:
       c8:
         specifier: ~8.0.1
         version: 8.0.1
-      path:
-        specifier: ^0.12.7
-        version: 0.12.7
       source-map-support:
         specifier: ~0.5.21
         version: 0.5.21
