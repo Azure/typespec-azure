@@ -176,31 +176,25 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "int8":
     case "int16":
     case "int32":
+    case "int64":
     case "uint8":
     case "uint16":
     case "uint32":
+    case "uint64":
     case "numeric":
     case "integer":
-      return "int32";
     case "safeint":
-    case "uint64":
-    case "int64":
-      return "int64";
-    case "plainDate":
-      return "date";
-    case "plainTime":
-      return "time";
-    case "float":
-      return "float32";
     case "decimal128":
-      return "decimal128";
     case "bytes":
+    case "float":
     case "float32":
     case "float64":
     case "boolean":
     case "string":
     case "url":
     case "decimal":
+    case "plainDate":
+    case "plainTime":
       return scalar.name;
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
@@ -804,6 +798,12 @@ function getSdkBodyModelPropertyType(
   const isBytesInput =
     base.type.kind === "bytes" ||
     (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+  if (isBytesInput && getEncode(context.program, type)) {
+    reportDiagnostic(context.program, {
+      code: "encoding-multipart-bytes",
+      target: type,
+    });
+  }
   return {
     ...base,
     kind: "property",
