@@ -83,8 +83,7 @@ export type SdkType =
   | SdkEnumValueType
   | SdkConstantType
   | SdkUnionType
-  | SdkModelType
-  | SdkMultipartFileType;
+  | SdkModelType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -111,8 +110,7 @@ export type SdkBuiltInKinds =
   | "armId"
   | "ipAddress"
   | "azureLocation"
-  | "etag"
-  | "multipartFile";
+  | "etag";
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
@@ -130,11 +128,6 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
-}
-
-export interface SdkMultipartFileType extends SdkTypeBase {
-  kind: "multipartFile";
-  encode: "binary";
 }
 
 export interface SdkArrayType extends SdkTypeBase {
@@ -229,6 +222,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
   serializedName: string;
+  isMultipartFileInput: boolean;
   visibility?: Visibility[];
 }
 
