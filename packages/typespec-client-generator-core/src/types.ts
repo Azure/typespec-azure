@@ -442,7 +442,11 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
     : false;
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
-    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
+    if (
+      httpOperation &&
+      isFormDataType !== sdkType.isFormDataType &&
+      sdkType.usage !== UsageFlags.Output
+    ) {
       // This means we have a model that is used both for formdata input and for regular body input
       reportDiagnostic(context.program, {
         code: "conflicting-multipart-model-usage",
