@@ -6,13 +6,13 @@ export const $lib = createTypeSpecLibrary({
     "file-not-found": {
       severity: "error",
       messages: {
-        default: paramMessage`cannot find @${"decoratorName"} file ${"propertyName"} from path ${"filePath"}`
+        default: paramMessage`cannot find @${"decoratorName"} file ${"propertyName"} from path ${"filePath"}`,
       },
     },
     "not-a-resource": {
       severity: "error",
       messages: {
-        default: paramMessage`@${"decoratorName"} can only be applied to TrackedResource and ProxyResource models`
+        default: paramMessage`@${"decoratorName"} can only be applied to TrackedResource and ProxyResource models`,
       },
     },
     "invalid-offer-id": {

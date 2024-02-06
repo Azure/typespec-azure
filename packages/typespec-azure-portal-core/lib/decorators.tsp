@@ -3,19 +3,19 @@ import "../dist/src/index.js";
 using TypeSpec.Reflection;
 namespace Azure.Portal;
 
-/** 
+/**
  * Provides a Model describing about of ARM resource.
  * @param options Property options allows more detailed infomation about the resourceType.
  */
 extern dec about(target: Model, options: AboutOptions);
 
-/** 
+/**
  * Provides a Model customizing browse view of ARM resource.
  * @param options Property options provides browsing information of the resourceType.
  */
 extern dec browse(target: Model, options: BrowseOptions);
 
-/** 
+/**
  * Provides a Model marketplace offer information of ARM resource.
  * @param options Property options provides marketplace offer information of the resourceType.
  */

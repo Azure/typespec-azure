@@ -1,17 +1,17 @@
 import { ArmResourceKind, getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 import {
+  CompilerHost,
+  DecoratorContext,
+  Model,
+  ModelProperty,
+  Program,
   StringLiteral,
+  Type,
   getDirectoryPath,
   getSourceLocation,
   normalizePath,
   resolvePath,
   validateDecoratorUniqueOnNode,
-  DecoratorContext,
-  Model,
-  ModelProperty,
-  Program,
-  Type,
-  CompilerHost,
 } from "@typespec/compiler";
 import * as fs from "fs";
 import { PortalCoreKeys } from "./keys.js";
@@ -68,22 +68,22 @@ export async function $browse(context: DecoratorContext, target: Model, options:
         //     });
         //   };
         // });
-          // if ((await isFileExist(context.program.host, filePath))) {
-          // //if (!result.isFile() || result.isDirectory()) {
-          //   reportDiagnostic(program, {
-          //     code: "fileNotFound",
-          //     messageId: "browseargQuery",
-          //     target,
-          //   });
-          // }
-        
+        // if ((await isFileExist(context.program.host, filePath))) {
+        // //if (!result.isFile() || result.isDirectory()) {
+        //   reportDiagnostic(program, {
+        //     code: "fileNotFound",
+        //     messageId: "browseargQuery",
+        //     target,
+        //   });
+        // }
+
         if (!fs.existsSync(filePath)) {
           reportDiagnostic(program, {
             code: "file-not-found",
             format: {
               decoratorName: "browse",
               propertyName: "argQuery",
-              filePath: filePath
+              filePath: filePath,
             },
             //messageId: "browseargQuery",
             target,
@@ -93,17 +93,17 @@ export async function $browse(context: DecoratorContext, target: Model, options:
         //(argQueryPath.type as StringLiteral).value = filePath;
         // const bOptions: BrowseOptions = {
         //   argQuery: {
-        //     filePath : filePath 
+        //     filePath : filePath
         //   }
         // }
         browseOptionsResult.argQuery = {
-          filePath: filePath
-        }
+          filePath: filePath,
+        };
         program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
       }
     } else if (query?.type.kind == "String") {
       // const bOptions: BrowseOptions = {
-      //   argQuery: (query.type as StringLiteral).value 
+      //   argQuery: (query.type as StringLiteral).value
       // }
       browseOptionsResult.argQuery = (query.type as StringLiteral).value;
       program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
@@ -143,7 +143,7 @@ export function isARMResource(
     reportDiagnostic(program, {
       code: "not-a-resource",
       format: {
-        decoratorName: decoratorName
+        decoratorName: decoratorName,
       },
       target,
     });
@@ -159,7 +159,7 @@ export async function $about(context: DecoratorContext, target: Model, options: 
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $about);
   isARMResource(program, target, "about");
-  const aboutOptionsResult : AboutOptions = {};
+  const aboutOptionsResult: AboutOptions = {};
 
   if (options && (options as Model).properties) {
     const icon = (options as Model).properties.get("icon");
@@ -209,7 +209,7 @@ export async function $about(context: DecoratorContext, target: Model, options: 
               format: {
                 decoratorName: "about",
                 propertyName: "icon",
-                filePath: filePath
+                filePath: filePath,
               },
               target,
             });
@@ -223,13 +223,17 @@ export async function $about(context: DecoratorContext, target: Model, options: 
     }
     if (learnMoreDocs) {
       if (learnMoreDocs.type.kind === "Tuple") {
-        const learnMoreDocsValues = learnMoreDocs.type.values.filter(value => value.kind === "String").map((value: Type) => (value as StringLiteral).value);
+        const learnMoreDocsValues = learnMoreDocs.type.values
+          .filter((value) => value.kind === "String")
+          .map((value: Type) => (value as StringLiteral).value);
         aboutOptionsResult.learnMoreDocs = learnMoreDocsValues;
       }
     }
     if (keywords) {
       if (keywords.type.kind === "Tuple") {
-        aboutOptionsResult.keywords = keywords.type.values.filter(value => value.kind === "String").map((value: Type) => (value as StringLiteral).value);
+        aboutOptionsResult.keywords = keywords.type.values
+          .filter((value) => value.kind === "String")
+          .map((value: Type) => (value as StringLiteral).value);
       }
     }
     if (displayName) {

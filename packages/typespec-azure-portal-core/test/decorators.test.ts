@@ -1,6 +1,7 @@
 import { ModelProperty } from "@typespec/compiler";
 import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import {
   getAboutDisplayName,
   getAboutKeywords,
@@ -10,8 +11,6 @@ import {
   getMarketplaceOfferId,
 } from "../src/decorators.js";
 import { createPortalCoreTestRunner } from "./test-host.js";
-import { describe, beforeEach, it } from "vitest";
-
 
 describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   let runner: BasicTestRunner;
