@@ -657,6 +657,7 @@ function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
     apiVersions: getAvailableApiVersions<TServiceOperation>(context, client.service),
+    isFormDataType: false,
   };
 }
 
