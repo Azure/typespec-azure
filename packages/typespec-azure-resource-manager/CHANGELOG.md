@@ -6,17 +6,6 @@
 
 - ebfe639: Fix Location resource issue, add mechanism for additional path segments
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
-- Updated dependencies [2f6bbc4]
-- Updated dependencies [8b072f4]
-- Updated dependencies [a1a2be7]
-- Updated dependencies [148eee4]
-  - @azure-tools/typespec-autorest@0.39.0
-  - @azure-tools/typespec-azure-core@0.39.0
-  - @typespec/compiler@0.53.0
-  - @typespec/http@0.53.0
-  - @typespec/openapi@0.53.0
-  - @typespec/rest@0.53.0
-  - @typespec/versioning@0.53.0
 
 This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 

@@ -12,10 +12,6 @@
 ### Patch Changes
 
 - 1f1864a: fix incorrect linter error for models not directly used in multipart operations
-  - @typespec/compiler@0.53.0
-  - @typespec/http@0.53.0
-  - @typespec/rest@0.53.0
-  - @typespec/versioning@0.53.0
 
 This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 

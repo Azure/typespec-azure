@@ -11,21 +11,6 @@
 - 2f6bbc4: Fix: Inline enums properties with default values as `default` is not allowed next to `$ref`
 - 8b072f4: Emit warning if using opendIdConnect http auth scheme
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
-- Updated dependencies [d46b6bf]
-- Updated dependencies [1f1864a]
-- Updated dependencies [3f98132]
-- Updated dependencies [c07c189]
-- Updated dependencies [310b23c]
-- Updated dependencies [acfb045]
-- Updated dependencies [3997779]
-- Updated dependencies [a770156]
-  - @azure-tools/typespec-azure-core@0.39.0
-  - @azure-tools/typespec-client-generator-core@0.39.0
-  - @typespec/compiler@0.53.0
-  - @typespec/http@0.53.0
-  - @typespec/openapi@0.53.0
-  - @typespec/rest@0.53.0
-  - @typespec/versioning@0.53.0
 
 This log was last generated on Mon, 29 Jan 2024 22:16:39 GMT and should not be manually modified.
 
