@@ -316,6 +316,12 @@ const libDef = {
         default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorest. It will not be emitted.`,
       },
     },
+    "unsupported-auth": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Authentication "${"authType"}" is not a known authentication by the openapi3 emitter, it will be ignored.`,
+      },
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<AutorestEmitterOptions>,
