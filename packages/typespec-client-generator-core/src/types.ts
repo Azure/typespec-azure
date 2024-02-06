@@ -441,9 +441,7 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
   let isFormDataType = false;
   if (httpBody) {
     const isMultipartOperation = httpBody.contentTypes.includes("multipart/form-data");
-    if (isMultipartOperation && httpBody.type === type) {
-      isFormDataType = true;
-    }
+    isFormDataType = isMultipartOperation && httpBody.type === type;
   }
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
