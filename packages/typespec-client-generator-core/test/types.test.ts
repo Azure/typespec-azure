@@ -2007,7 +2007,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(id.type.kind, "string");
       const profileImage = model.properties.find((x) => x.nameInClient === "profileImage")!;
       strictEqual(profileImage.kind, "property");
-      strictEqual(profileImage.type.kind, "multipartFile");
+      strictEqual(profileImage.isMultipartFileInput, true);
     });
     it("multipart conflicting model usage", async function () {
       const diagnostics = await runner.diagnose(
@@ -2026,10 +2026,6 @@ describe("typespec-client-generator-core: types", () => {
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       });
-
-      // expectDiagnostics(getAllModels(runner.context), {
-      //   code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
-      // });
     });
     it("multipart resolving conflicting model usage with spread", async function () {
       await runner.compileWithBuiltInService(
@@ -2052,13 +2048,76 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(modelA.kind, "model");
       strictEqual(modelA.isFormDataType, true);
       strictEqual(modelA.properties.length, 1);
-      strictEqual(modelA.properties[0].type.kind, "multipartFile");
+      const modelAProp = modelA.properties[0];
+      strictEqual(modelAProp.kind, "property");
+      strictEqual(modelAProp.isMultipartFileInput, true);
 
       const modelB = models.find((x) => x.name === "B")!;
       strictEqual(modelB.kind, "model");
       strictEqual(modelB.isFormDataType, false);
       strictEqual(modelB.properties.length, 1);
       strictEqual(modelB.properties[0].type.kind, "bytes");
+    });
+
+    it("multipart with non-formdata model property", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model Address {
+          city: string;
+        }
+
+        model AddressFirstAppearance {
+          address: Address;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model AddressSecondAppearance {
+          address: Address;
+        }
+        
+        @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
+        `
+      );
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 3);
+    });
+
+    it("multipart with list of bytes", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model PictureWrapper {
+          pictures: bytes[];
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
+        `
+      );
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 1);
+      const model = models[0] as SdkModelType;
+      strictEqual(model.properties.length, 1);
+      const pictures = model.properties[0];
+      strictEqual(pictures.kind, "property");
+      strictEqual(pictures.isMultipartFileInput, true);
+    });
+
+    it("multipart with encoding bytes raises error", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model EncodedBytesMFD {
+          @encode("base64")
+          pictures: bytes;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+        `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
+      });
     });
   });
   describe("SdkTupleType", () => {
