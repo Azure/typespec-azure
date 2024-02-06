@@ -1,6 +1,4 @@
-import { resolvePath } from "@typespec/compiler";
 import { createTestLibrary, findTestPackageRoot } from "@typespec/compiler/testing";
-import { fileURLToPath } from "url";
 
 export const PortalCoreTestLibrary = createTestLibrary({
   name: "@azure-tools/typespec-azure-portal-core",
