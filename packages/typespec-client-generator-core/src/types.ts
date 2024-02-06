@@ -437,12 +437,20 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
   const httpOperation = operation
     ? ignoreDiagnostics(getHttpOperation(context.program, operation))
     : undefined;
-  const isFormDataType = httpOperation
-    ? Boolean(httpOperation.parameters.body?.contentTypes.includes("multipart/form-data"))
-    : false;
+  const httpBody = httpOperation?.parameters.body;
+  let isFormDataType = false;
+  if (httpBody) {
+    const isMultipartOperation = httpBody.contentTypes.includes("multipart/form-data");
+    if (isMultipartOperation && httpBody.type === type) {
+      isFormDataType = true;
+    }
+  }
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
-    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
+    if (
+      httpOperation &&
+      isFormDataType !== sdkType.isFormDataType
+    ) {
       // This means we have a model that is used both for formdata input and for regular body input
       reportDiagnostic(context.program, {
         code: "conflicting-multipart-model-usage",

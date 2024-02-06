@@ -2119,6 +2119,33 @@ describe("typespec-client-generator-core: types", () => {
         code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
       });
     });
+
+    it("multipart with reused error model", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        model PictureWrapper {
+          pictures: bytes[];
+        }
+
+        model ErrorResponse {
+          errorCode: string;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void | ErrorResponse;
+        @post op normalOp(): void | ErrorResponse;
+        `
+      );
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+
+      const pictureWrapper = models.find((x) => x.name === "PictureWrapper")!;
+      strictEqual(pictureWrapper.kind, "model");
+      strictEqual(pictureWrapper.isFormDataType, true);
+
+      const errorResponse = models.find((x) => x.name === "ErrorResponse")!;
+      strictEqual(errorResponse.kind, "model");
+      strictEqual(errorResponse.isFormDataType, false);
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {
