@@ -193,11 +193,9 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "string":
     case "url":
     case "decimal":
-      return scalar.name;
     case "plainDate":
-      return "date";
     case "plainTime":
-      return "time";
+      return scalar.name;
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
   }
