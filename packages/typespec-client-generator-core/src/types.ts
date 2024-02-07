@@ -968,7 +968,7 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
   const isBytesInput =
     base.type.kind === "bytes" ||
     (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-  if (isBytesInput && getEncode(context.program, type)) {
+  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
     reportDiagnostic(context.program, {
       code: "encoding-multipart-bytes",
       target: type,

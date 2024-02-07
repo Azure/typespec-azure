@@ -4,5 +4,5 @@ title: "[T] ArmResourceKind"
 
 ---
 ```ts
-type ArmResourceKind: "Tracked" | "Proxy" | "Extension";
+type ArmResourceKind: "Tracked" | "Proxy" | "Extension" | "Virtual";
 ```
