@@ -12,13 +12,13 @@ export async function $onValidate(program: Program) {
       const filePath = icon.filePath;
       if (!(await isFileExist(program.host, filePath))) {
         reportDiagnostic(program, {
-            code: "file-not-found",
-            format: {
-                decoratorName: "about",
-                propertyName: "icon",
-                filePath: filePath,
-            },
-            target,
+          code: "file-not-found",
+          format: {
+            decoratorName: "about",
+            propertyName: "icon",
+            filePath: filePath,
+          },
+          target,
         });
       }
     }
@@ -29,13 +29,13 @@ export async function $onValidate(program: Program) {
       const filePath = argQuery.filePath;
       if (!(await isFileExist(program.host, filePath))) {
         reportDiagnostic(program, {
-            code: "file-not-found",
-            format: {
-                decoratorName: "browse",
-                propertyName: "argQuery",
-                filePath: filePath,
-            },
-            target,
+          code: "file-not-found",
+          format: {
+            decoratorName: "browse",
+            propertyName: "argQuery",
+            filePath: filePath,
+          },
+          target,
         });
       }
     }
