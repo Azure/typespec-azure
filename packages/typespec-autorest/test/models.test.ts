@@ -273,7 +273,7 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
-  it("specify default value on enum property", async () => {
+  it("specify default value on enum property inline the enum", async () => {
     const res = await oapiForModel(
       "Foo",
       `
@@ -287,15 +287,20 @@ describe("typespec-autorest: model definitions", () => {
       }
       `
     );
-
-    ok(res.isRef);
-    ok(res.defs.Foo, "expected definition named Foo");
-    ok(res.defs.MyEnum, "expected definition named MyEnum");
     deepStrictEqual(res.defs.Foo, {
       type: "object",
       properties: {
         optionalEnum: {
-          $ref: "#/definitions/MyEnum",
+          type: "string",
+          enum: ["a-value", "b"],
+          "x-ms-enum": {
+            name: "MyEnum",
+            modelAsString: true,
+            values: [
+              { name: "a", value: "a-value" },
+              { name: "b", value: "b" },
+            ],
+          },
           default: "a-value",
         },
       },

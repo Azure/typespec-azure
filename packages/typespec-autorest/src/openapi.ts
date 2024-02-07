@@ -1722,7 +1722,7 @@ function createOAPIEmitter(
         property.description = description;
       }
 
-      if (prop.default) {
+      if (prop.default && !("$ref" in property)) {
         property.default = getDefaultValue(prop.default);
       }
 
@@ -1793,7 +1793,10 @@ function createOAPIEmitter(
   }
 
   function resolveProperty(prop: ModelProperty, visibility: Visibility): OpenAPI2SchemaProperty {
-    const propSchema = getSchemaOrRef(prop.type, visibility);
+    const propSchema =
+      prop.type.kind === "Enum" && prop.default
+        ? getSchemaForEnum(prop.type)
+        : getSchemaOrRef(prop.type, visibility);
     return applyIntrinsicDecorators(prop, propSchema);
   }
 
