@@ -1836,43 +1836,43 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
 
-    packages/typespec-azure-portal-core:
+  packages/typespec-azure-portal-core:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.38.1
+        specifier: workspace:~0.39.0
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.39.0
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.39.0
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.38.0
+        specifier: workspace:~0.39.0
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~18.11.9
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.52.0
+        specifier: workspace:~0.53.0
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~0.52.0
+        specifier: workspace:~0.53.0
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.52.0
+        specifier: workspace:~0.53.0
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.52.0
+        specifier: workspace:~0.53.0
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.52.0
+        specifier: workspace:~0.53.0
         version: link:../../core/packages/rest
       '@typespec/tspd':
         specifier: workspace:~0.46.0
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.52.0
+        specifier: workspace:~0.53.0
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.1.0
