@@ -13,7 +13,6 @@ import {
   resolvePath,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
-import * as fs from "fs";
 import { PortalCoreKeys } from "./keys.js";
 import { reportDiagnostic } from "./lib.js";
 import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js";
@@ -23,7 +22,7 @@ import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js
  * @param target The model that is being decorated.
  * @param options BrowseOptions of the property.
  */
-export async function $browse(context: DecoratorContext, target: Model, options: BrowseOptions) {
+export function $browse(context: DecoratorContext, target: Model, options: BrowseOptions) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
   isARMResource(program, target, "browse");
@@ -42,69 +41,12 @@ export async function $browse(context: DecoratorContext, target: Model, options:
       let filePath = resolvePath(dirPath, argQueryPathValue); //if given path is fullpath, it will return the fullPath
       if (filePath && argQueryPath && argQueryPathValue) {
         filePath = normalizePath(filePath);
-        // const result = (await context.program.host.stat(filePath)).isFile();
-        //   if (!result) {
-        //     reportDiagnostic(program, {
-        //       code: "file-not-found",
-        //       format: {
-        //         decoratorName: "browse",
-        //         propertyName: "argQuery",
-        //         filePath: filePath
-        //       },
-        //       target,
-        //     });
-        //   }
-        // await context.program.host.stat(filePath).then(result => {
-        //   if (!result.isFile() || result.isDirectory()) {
-        //     reportDiagnostic(program, {
-        //       code: "file-not-found",
-        //       format: {
-        //         decoratorName: "browse",
-        //         propertyName: "argQuery",
-        //         filePath: filePath
-        //       },
-        //       // messageId: "browseargQuery",
-        //       target,
-        //     });
-        //   };
-        // });
-        // if ((await isFileExist(context.program.host, filePath))) {
-        // //if (!result.isFile() || result.isDirectory()) {
-        //   reportDiagnostic(program, {
-        //     code: "fileNotFound",
-        //     messageId: "browseargQuery",
-        //     target,
-        //   });
-        // }
-
-        if (!fs.existsSync(filePath)) {
-          reportDiagnostic(program, {
-            code: "file-not-found",
-            format: {
-              decoratorName: "browse",
-              propertyName: "argQuery",
-              filePath: filePath,
-            },
-            //messageId: "browseargQuery",
-            target,
-          });
-        }
-
-        //(argQueryPath.type as StringLiteral).value = filePath;
-        // const bOptions: BrowseOptions = {
-        //   argQuery: {
-        //     filePath : filePath
-        //   }
-        // }
         browseOptionsResult.argQuery = {
           filePath: filePath,
         };
         program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
       }
     } else if (query?.type.kind == "String") {
-      // const bOptions: BrowseOptions = {
-      //   argQuery: (query.type as StringLiteral).value
-      // }
       browseOptionsResult.argQuery = (query.type as StringLiteral).value;
       program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
     }
@@ -155,7 +97,7 @@ export function isARMResource(
  * @param target The model that is being decorated.
  * @param options AboutOptions of the property.
  */
-export async function $about(context: DecoratorContext, target: Model, options: AboutOptions) {
+export function $about(context: DecoratorContext, target: Model, options: AboutOptions) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $about);
   isARMResource(program, target, "about");
@@ -178,43 +120,6 @@ export async function $about(context: DecoratorContext, target: Model, options: 
         let filePath = resolvePath(dirPath, iconPathValue); //if given path is fullpath, it will return the fullPath
         if (filePath && iconPath && iconPathValue) {
           filePath = normalizePath(filePath);
-          // const result = (await context.program.host.stat(filePath)).isFile();
-          // if (!result) {
-          //   reportDiagnostic(program, {
-          //     code: "file-not-found",
-          //     format: {
-          //       decoratorName: "about",
-          //       propertyName: "icon",
-          //       filePath: filePath
-          //     },
-          //     target,
-          //   });
-          // }
-          // await context.program.host.stat(filePath).then(result => {
-          //   if (!result.isFile() || result.isDirectory()) {
-          //     reportDiagnostic(program, {
-          //       code: "file-not-found",
-          //       format: {
-          //         decoratorName: "about",
-          //         propertyName: "icon",
-          //         filePath: filePath
-          //       },
-          //       target,
-          //     });
-          //   };
-          // });
-          if (!fs.existsSync(filePath)) {
-            reportDiagnostic(program, {
-              code: "file-not-found",
-              format: {
-                decoratorName: "about",
-                propertyName: "icon",
-                filePath: filePath,
-              },
-              target,
-            });
-          }
-          //(iconPath.type as StringLiteral).value = filePath;
           aboutOptionsResult.icon = {
             filePath: filePath,
           };
@@ -289,21 +194,6 @@ export function $marketplaceOffer(
 export function getMarketplaceOfferId(program: Program, target: Type) {
   return program.stateMap(PortalCoreKeys.marketplaceOffer).get(target).id;
 }
-
-// export function $patternValidationMessage(context:DecoratorContext, target: Scalar | ModelProperty, message: string) {
-//   const { program } = context;
-//   validateDecoratorUniqueOnNode(context, target, $patternValidationMessage);
-//   validateDecoratorNotOnType(context, target, $pattern, $patternValidationMessage);
-//   const patternSymbol = Symbol.for("TypeSpec.pattern");
-//   const pattern = program.stateMap(patternSymbol).get(target);
-//   const pat = getPattern(program, target);
-//   program.stateMap(PortalCoreKeys.patternValidationMessage).set(target, message);
-// }
-
-// export function getPatternValidationMessage(program: Program, target: Type): string | undefined {
-//   const result = program.stateMap(PortalCoreKeys.patternValidationMessage).get(target);
-//   return result && result.value;
-// }
 
 export function $displayName(context: DecoratorContext, target: ModelProperty, name: string) {
   const { program } = context;

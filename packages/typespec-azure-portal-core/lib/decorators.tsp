@@ -26,9 +26,8 @@ extern dec marketplaceOffer(target: Model, options: marketplaceOfferOptions);
  */
 extern dec displayName(target: ModelProperty, name: valueof string);
 
+// this decorator will be available in next iteration
 //extern dec essentials(target: ModelProperty);
-
-//extern dec patternValidationMessage(target: ModelProperty, message: valueof string);
 
 /** Options for browse of ARM resource. */
 model BrowseOptions {
