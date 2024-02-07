@@ -1481,6 +1481,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of Manufacturer items
     PagedWidget:
       type: object
@@ -1496,6 +1497,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of Widget items
     PagedWidgetPart:
       type: object
@@ -1511,6 +1513,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of WidgetPart items
     RepeatabilityResult:
       type: string
