@@ -1856,6 +1856,12 @@ importers:
       '@typespec/compiler':
         specifier: workspace:~0.53.0
         version: link:../../core/packages/compiler
+      '@typespec/eslint-config-typespec':
+        specifier: workspace:~0.53.0
+        version: link:../../core/packages/eslint-config-typespec
+      '@typespec/eslint-plugin':
+        specifier: workspace:~0.53.0
+        version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
         specifier: workspace:~0.53.0
         version: link:../../core/packages/http

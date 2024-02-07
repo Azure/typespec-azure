@@ -35,7 +35,7 @@ export function $browse(context: DecoratorContext, target: Model, options: Brows
       const sourceLocation = getSourceLocation(decoratorTarget);
       const dirPath =
         sourceLocation && sourceLocation.file.path && getDirectoryPath(sourceLocation.file.path);
-      let argQueryPath = query.type && (query.type as Model).properties.get("filePath");
+      const argQueryPath = query.type && (query.type as Model).properties.get("filePath");
       const argQueryPathValue =
         argQueryPath && argQueryPath.type && (argQueryPath.type as StringLiteral).value;
       let filePath = resolvePath(dirPath, argQueryPathValue); //if given path is fullpath, it will return the fullPath
@@ -46,7 +46,7 @@ export function $browse(context: DecoratorContext, target: Model, options: Brows
         };
         program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
       }
-    } else if (query?.type.kind == "String") {
+    } else if (query?.type.kind === "String") {
       browseOptionsResult.argQuery = (query.type as StringLiteral).value;
       program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
     }
@@ -115,7 +115,7 @@ export function $about(context: DecoratorContext, target: Model, options: AboutO
         const sourceLocation = getSourceLocation(decoratorTarget);
         const dirPath =
           sourceLocation && sourceLocation.file.path && getDirectoryPath(sourceLocation.file.path);
-        let iconPath = icon.type && (icon.type as Model).properties.get("filePath");
+        const iconPath = icon.type && (icon.type as Model).properties.get("filePath");
         const iconPathValue = iconPath && iconPath.type && (iconPath.type as StringLiteral).value;
         let filePath = resolvePath(dirPath, iconPathValue); //if given path is fullpath, it will return the fullPath
         if (filePath && iconPath && iconPathValue) {
