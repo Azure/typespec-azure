@@ -1883,6 +1883,9 @@ importers:
       c8:
         specifier: ~8.0.1
         version: 8.0.1
+      eslint:
+        specifier: ^8.55.0
+        version: 8.56.0
       source-map-support:
         specifier: ~0.5.21
         version: 0.5.21
