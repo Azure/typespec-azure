@@ -13,8 +13,7 @@ import {
   resolvePath,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
-import { PortalCoreKeys } from "./keys.js";
-import { reportDiagnostic } from "./lib.js";
+import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js";
 
 /**
@@ -25,7 +24,7 @@ import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js
 export function $browse(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
-  isARMResource(program, target, "browse");
+  checkIsArmResource(program, target, "browse");
   const browseOptionsResult: BrowseOptions = {};
   if (options && options.properties) {
     const query = options.properties.get("argQuery");
@@ -73,7 +72,7 @@ export function getBrowseArgQuery(program: Program, target: Type) {
   return getBrowse(program, target)?.argQuery;
 }
 
-export function isARMResource(
+export function checkIsArmResource(
   program: Program,
   target: Model,
   decoratorName: "browse" | "about" | "marketplaceOffer"
@@ -89,7 +88,9 @@ export function isARMResource(
       },
       target,
     });
+    return false;
   }
+  return true;
 }
 
 /**
@@ -100,7 +101,7 @@ export function isARMResource(
 export function $about(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $about);
-  isARMResource(program, target, "about");
+  checkIsArmResource(program, target, "about");
   const aboutOptionsResult: AboutOptions = {};
 
   if (options && options.properties) {
@@ -166,14 +167,10 @@ export function getAboutLearnMoreDocs(program: Program, target: Type) {
   return getAbout(program, target).learnMoreDocs;
 }
 
-export function $marketplaceOffer(
-  context: DecoratorContext,
-  target: Model,
-  options: Model
-) {
+export function $marketplaceOffer(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
-  isARMResource(program, target, "marketplaceOffer");
+  checkIsArmResource(program, target, "marketplaceOffer");
   const marketPlaceOfferResult: marketplaceOfferOptions = {};
   if (options && options.properties) {
     const id = options.properties.get("id");

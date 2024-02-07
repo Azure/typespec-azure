@@ -109,9 +109,9 @@ export function createTestSpec(browseDec?: string, aboutDec?: string, marketplac
     @armProviderNamespace
     namespace Microsoft.Foo;
 
-    ${marketplaceOffer ? marketplaceOffer : ""}
-    ${aboutDec ? aboutDec : ""}
-    ${browseDec ? browseDec : ""}
+    ${marketplaceOffer ?? ""}
+    ${aboutDec ?? ""}
+    ${browseDec ?? ""}
     model Foo is TrackedResource<{}> {
       @key("widgetName")
       @segment("widgets")

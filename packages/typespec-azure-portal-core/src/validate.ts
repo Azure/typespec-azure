@@ -1,7 +1,6 @@
 import { Program } from "@typespec/compiler";
 import { isFileExist } from "./decorators.js";
-import { PortalCoreKeys } from "./keys.js";
-import { reportDiagnostic } from "./lib.js";
+import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 
 export async function $onValidate(program: Program) {
   const aboutEntries = program.stateMap(PortalCoreKeys.about).entries();

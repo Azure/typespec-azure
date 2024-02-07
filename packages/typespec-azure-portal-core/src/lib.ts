@@ -28,7 +28,13 @@ export const $lib = createTypeSpecLibrary({
       },
     },
   },
+  state: {
+    browse: { description: "State for the @browse decorator" },
+    about: { description: "State for the @about decorator" },
+    marketplaceOffer: { description: "State for the @marketplaceOffer decorator" },
+    displayName: { description: "State for the @displayName decorator" },
+  },
 } as const);
 
 // Optional but convenient, those are meant to be used locally in your library.
-export const { reportDiagnostic, createDiagnostic, createStateSymbol } = $lib;
+export const { reportDiagnostic, createDiagnostic, stateKeys: PortalCoreKeys } = $lib;
