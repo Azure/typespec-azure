@@ -22,9 +22,11 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"access"`
   \| `"invalid-usage"`
   \| `"invalid-encode"`
+  \| `"conflicting-multipart-model-usage"`
   \| `"discriminator-not-constant"`
   \| `"discriminator-not-string"`
-  \| `"wrong-client-decorator"` |
+  \| `"wrong-client-decorator"`
+  \| `"encoding-multipart-bytes"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters

@@ -16,6 +16,7 @@ title: "[I] SdkBodyModelPropertyType"
 | `description?` | `string` | - | [`SdkModelPropertyTypeBase.description`](SdkModelPropertyTypeBase.md) |
 | `details?` | `string` | - | [`SdkModelPropertyTypeBase.details`](SdkModelPropertyTypeBase.md) |
 | `discriminator` | `boolean` | - | - |
+| `isMultipartFileInput` | `boolean` | - | - |
 | `kind` | `"property"` | - | - |
 | `nameInClient` | `string` | - | [`SdkModelPropertyTypeBase.nameInClient`](SdkModelPropertyTypeBase.md) |
 | `optional` | `boolean` | - | [`SdkModelPropertyTypeBase.optional`](SdkModelPropertyTypeBase.md) |

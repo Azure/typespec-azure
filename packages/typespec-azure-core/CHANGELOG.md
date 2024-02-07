@@ -1,8 +1,17 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.39.0
+
+### Patch Changes
+
+- @typespec/compiler@0.53.0
+- @typespec/http@0.53.0
+- @typespec/rest@0.53.0
+
 This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 
 ## 0.38.0
+
 Wed, 24 Jan 2024 05:47:19 GMT
 
 ### Minor changes
@@ -16,6 +25,7 @@ Wed, 24 Jan 2024 05:47:19 GMT
 - Update dependencies
 
 ## 0.37.2
+
 Wed, 20 Dec 2023 05:29:22 GMT
 
 ### Patches
@@ -23,6 +33,7 @@ Wed, 20 Dec 2023 05:29:22 GMT
 - Add LRO support for ARM patterns
 
 ## 0.37.1
+
 Mon, 11 Dec 2023 18:44:34 GMT
 
 ### Patches
@@ -30,6 +41,7 @@ Mon, 11 Dec 2023 18:44:34 GMT
 - Give a name to the `RepeatabilityResult` union
 
 ## 0.37.0
+
 Wed, 06 Dec 2023 19:47:28 GMT
 
 ### Minor changes
@@ -46,6 +58,7 @@ Wed, 06 Dec 2023 19:47:28 GMT
 - Fix #3724 final-state-via for custom put
 
 ## 0.36.0
+
 Wed, 08 Nov 2023 00:11:02 GMT
 
 ### Minor changes
@@ -62,6 +75,7 @@ Wed, 08 Nov 2023 00:11:02 GMT
 - **BREAKING CHANGE** Minimum node version increased to 18
 
 ## 0.35.1
+
 Sat, 28 Oct 2023 15:59:07 GMT
 
 ### Patches
@@ -69,6 +83,7 @@ Sat, 28 Oct 2023 15:59:07 GMT
 - Fix #3745 correct property validation for lroResult and lroErrorResult
 
 ## 0.35.0
+
 Wed, 11 Oct 2023 23:51:36 GMT
 
 ### Updates
@@ -76,11 +91,12 @@ Wed, 11 Oct 2023 23:51:36 GMT
 - Fix issue where calling `createLroMetadata` could crash when an incomplete LRO specification was provided.
 - Migrate 'friendly-name' rule from typespec-code-generator-core to typespec-azure-core.
 - **Breaking** Fix parameter order of `Azure.Core.Foundations.GetOperationStatus`
-- **Breaking Change** When an interface based on `ResourceOperations` is created, a unique diagnostic will now be raised for each missing required trait.  This may require new suppressions to be added to existing specifications.
+- **Breaking Change** When an interface based on `ResourceOperations` is created, a unique diagnostic will now be raised for each missing required trait. This may require new suppressions to be added to existing specifications.
 - Update dependencies
 - Uptake changes to http libraries with status code ranges
 
 ## 0.34.0
+
 Tue, 12 Sep 2023 21:49:08 GMT
 
 ### Minor changes
@@ -90,20 +106,23 @@ Tue, 12 Sep 2023 21:49:08 GMT
 ### Updates
 
 - Migrating linter rules to new system. Linter rules will NOT be automatically enabled anymore.
-Add the following to your `tspconfig.yaml` to get the same behavior:
+  Add the following to your `tspconfig.yaml` to get the same behavior:
+
 ```yaml
 linter:
- extends: ['@azure-tools/typespec-azure-core/all'] 
+  extends: ["@azure-tools/typespec-azure-core/all"]
 ```
+
 - **Deprecation** Paging metadata provide a new segments array to resolve `items` and `nextLink` path. Old `itemsPath` and `nextLinkPath` are deprecated as they cannot be used when a property name has a `.`.
 - Fix issue where conditional request header only appeared on GET operations.
-- Properties inside of a trait envelope model can now have their own `@traitContext` decorator which overrides that of the trait envelope property.  This enables finer granularity for where trait properties can be applied.
+- Properties inside of a trait envelope model can now have their own `@traitContext` decorator which overrides that of the trait envelope property. This enables finer granularity for where trait properties can be applied.
 - Extend linter rule set from `@typespec/http` library
 - Fix #2964, Fix #2637, Fix #3410 LRO improvements and tests
-- Update `ResourceOperations.ResourceCreateOrUpdate` and `ResourceOperations.LongRunningResourceCreateOrUpdate` templates to work properly with parameters that have "create" visibility. 
+- Update `ResourceOperations.ResourceCreateOrUpdate` and `ResourceOperations.LongRunningResourceCreateOrUpdate` templates to work properly with parameters that have "create" visibility.
 - Fix to allow RpcOperation and LongRunningRpcOperation work with Traits.
 
 ## 0.33.1
+
 Fri, 11 Aug 2023 21:58:00 GMT
 
 ### Patches
@@ -111,6 +130,7 @@ Fri, 11 Aug 2023 21:58:00 GMT
 - Fix #3393 Status Monitor for createOrReplaceAsync template
 
 ## 0.33.0
+
 Tue, 08 Aug 2023 22:32:22 GMT
 
 ### Minor changes
@@ -124,6 +144,7 @@ Tue, 08 Aug 2023 22:32:22 GMT
 - Fix LRO status header property detection for `Location` headers
 
 ## 0.32.0
+
 Tue, 11 Jul 2023 22:06:14 GMT
 
 ### Minor changes
@@ -143,6 +164,7 @@ Tue, 11 Jul 2023 22:06:14 GMT
 - Update dependencies
 
 ## 0.31.0
+
 Tue, 06 Jun 2023 22:44:32 GMT
 
 ### Minor changes
@@ -157,7 +179,7 @@ Tue, 06 Jun 2023 22:44:32 GMT
 - Require documentation on enums and enum members.
 - **Added** new linter rule `known-encoding` verifying the use of known encoding with `@encode`
 - Add new scalars `uuid`, `ipV4Address`, `ipV6Address` and `eTag`
-- **Deprecation** The original resource operation signatures in Azure.Core have now been deprecated in favor of the new ResourceOperations interface.  See this documentation page for instructions on using the new pattern: https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05
+- **Deprecation** The original resource operation signatures in Azure.Core have now been deprecated in favor of the new ResourceOperations interface. See this documentation page for instructions on using the new pattern: https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05
 - Remove deprecation of v1 Azure.Core operation templates
 - Add better type constraints in Azure.Core operations and models with TypeSpec.Reflection.Model in places where unions or other types might be invalid.
 - Add `no-explicit-routes-resource-ops` linting rule to discourage the use of @route on standard resource operations
@@ -168,6 +190,7 @@ Tue, 06 Jun 2023 22:44:32 GMT
 - Added validation for `@pollingOperation` decorator checking it can only be applied to operation returning a model or union of models
 
 ## 0.30.1
+
 Tue, 16 May 2023 19:41:25 GMT
 
 ### Patches
@@ -175,6 +198,7 @@ Tue, 16 May 2023 19:41:25 GMT
 - Fix: `no-operation-id` rule requiring `openapi` package to be installed
 
 ## 0.30.0
+
 Wed, 10 May 2023 21:24:14 GMT
 
 ### Minor changes
@@ -200,9 +224,10 @@ Wed, 10 May 2023 21:24:14 GMT
 - **Added** linting rule discouraging use of `offsetDateTime`
 - Add trait properties to parameters and response of `RpcOperation`
 - Cleanup deprecated items
-- `byos` rule doesn't report twice on `op is` referencing a template instance 
+- `byos` rule doesn't report twice on `op is` referencing a template instance
 
 ## 0.29.0
+
 Tue, 11 Apr 2023 18:49:21 GMT
 
 ### Minor changes
@@ -220,6 +245,7 @@ Tue, 11 Apr 2023 18:49:21 GMT
 - Uptake changes to datetime types
 
 ## 0.28.1
+
 Mon, 27 Mar 2023 22:31:25 GMT
 
 ### Patches
@@ -227,6 +253,7 @@ Mon, 27 Mar 2023 22:31:25 GMT
 - Ignore diagnostics in getLroMetadata #2673
 
 ## 0.28.0
+
 Mon, 13 Mar 2023 21:30:57 GMT
 
 ### Minor changes
@@ -240,6 +267,7 @@ Mon, 13 Mar 2023 21:30:57 GMT
 - Change require-key-visibility diagnostic to warning
 
 ## 0.27.0
+
 Fri, 03 Mar 2023 19:59:30 GMT
 
 ### Minor changes
@@ -256,6 +284,7 @@ Fri, 03 Mar 2023 19:59:30 GMT
 - Rename to TypeSpec
 
 ## 0.26.0
+
 Tue, 07 Feb 2023 21:56:32 GMT
 
 ### Minor changes
@@ -269,10 +298,11 @@ Tue, 07 Feb 2023 21:56:32 GMT
 - Add linter rule to prevent multiple discriminators in class hierarchies.
 - Add `x-ms-error-code` response header for standard Error model.
 - The error response type in standard Azure.Core operations can now be customized.
-- Removes `@client`, `@clientDefinition` and `@returnsSubclient` decorators.  Removed `getClientItems`, `getClientDefinition`, `getClientDefinitions`, `getReturnedSubclient`, `gatherOperations` and `getClientOperations` functions. Removed `ClientDefinition` interface. Removed Subclient<TSubclient> operation template.
+- Removes `@client`, `@clientDefinition` and `@returnsSubclient` decorators. Removed `getClientItems`, `getClientDefinition`, `getClientDefinitions`, `getReturnedSubclient`, `gatherOperations` and `getClientOperations` functions. Removed `ClientDefinition` interface. Removed Subclient<TSubclient> operation template.
 - Fix issues when multiple copies of library are loaded.
 
 ## 0.25.0
+
 Fri, 13 Jan 2023 00:05:37 GMT
 
 ### Minor changes
@@ -284,6 +314,7 @@ Fri, 13 Jan 2023 00:05:37 GMT
 - Bump Azure.Core library version to v1.0-preview.2
 
 ## 0.24.0
+
 Wed, 07 Dec 2022 17:21:54 GMT
 
 ### Minor changes
@@ -307,6 +338,7 @@ Wed, 07 Dec 2022 17:21:54 GMT
 - Update test cases
 
 ## 0.9.0
+
 Sat, 12 Nov 2022 00:14:23 GMT
 
 ### Minor changes
@@ -328,6 +360,7 @@ Sat, 12 Nov 2022 00:14:23 GMT
 - Documentation change
 
 ## 0.8.0
+
 Wed, 12 Oct 2022 21:12:48 GMT
 
 ### Minor changes
@@ -349,6 +382,7 @@ Wed, 12 Oct 2022 21:12:48 GMT
 - Update readme on template url
 
 ## 0.7.0
+
 Thu, 08 Sep 2022 01:05:13 GMT
 
 ### Minor changes
@@ -365,6 +399,7 @@ Thu, 08 Sep 2022 01:05:13 GMT
 - Internal: Remove unnecessary, duplicate import
 
 ## 0.6.0
+
 Thu, 11 Aug 2022 19:05:47 GMT
 
 ### Minor changes
@@ -396,6 +431,7 @@ Thu, 11 Aug 2022 19:05:47 GMT
 - Refactoring.
 
 ## 0.5.0
+
 Fri, 08 Jul 2022 23:23:14 GMT
 
 ### Minor changes
@@ -406,9 +442,10 @@ Fri, 08 Jul 2022 23:23:14 GMT
 
 ### Patches
 
-- Fix buggy Azure.Core namespacing. 
+- Fix buggy Azure.Core namespacing.
 
 ## 0.4.0
+
 Mon, 13 Jun 2022 23:42:46 GMT
 
 ### Minor changes
@@ -424,6 +461,7 @@ Mon, 13 Jun 2022 23:42:46 GMT
 - add retry-after header
 
 ## 0.3.0
+
 Fri, 06 May 2022 17:20:15 GMT
 
 ### Minor changes
@@ -432,6 +470,7 @@ Fri, 06 May 2022 17:20:15 GMT
 - Remove node 14 support
 
 ## 0.2.0
+
 Thu, 31 Mar 2022 17:11:06 GMT
 
 ### Minor changes
@@ -439,6 +478,7 @@ Thu, 31 Mar 2022 17:11:06 GMT
 - Update dependencies.
 
 ## 0.1.0
+
 Wed, 09 Mar 2022 17:42:26 GMT
 
 ### Minor changes
@@ -448,4 +488,3 @@ Wed, 09 Mar 2022 17:42:26 GMT
 ### Patches
 
 - Introduce new Azure.Core library, @azure-tools/cadl-azure-core
-
