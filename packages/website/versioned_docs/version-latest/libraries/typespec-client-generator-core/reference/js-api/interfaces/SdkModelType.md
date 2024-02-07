@@ -22,6 +22,7 @@ title: "[I] SdkModelType"
 | `discriminatedSubtypes?` | `Record`<`string`, [`SdkModelType`](SdkModelType.md)\> | - | - |
 | `discriminatorValue?` | `string` | - | - |
 | `generatedName?` | `string` | - | - |
+| `isFormDataType` | `boolean` | - | - |
 | `kind` | `"model"` | - | `SdkTypeBase.kind` |
 | `name` | `string` | - | - |
 | `nullable` | `boolean` | - | `SdkTypeBase.nullable` |

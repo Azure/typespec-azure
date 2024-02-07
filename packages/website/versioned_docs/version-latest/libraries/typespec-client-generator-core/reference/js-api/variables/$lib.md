@@ -17,10 +17,15 @@ const $lib: TypeSpecLibrary<Object, Record<string, any>, never>;
 | `client-name.default` | `CallableMessage`<[`string`]\> | - |
 | `client-service` | `Object` | - |
 | `client-service.default` | `CallableMessage`<[`string`]\> | - |
+| `conflicting-multipart-model-usage` | `Object` | - |
+| `conflicting-multipart-model-usage.default` | `string` | - |
+| `conflicting-multipart-model-usage.wrongType` | `CallableMessage`<[`string`, `string`, `string`]\> | - |
 | `discriminator-not-constant` | `Object` | - |
 | `discriminator-not-constant.default` | `CallableMessage`<[`string`]\> | - |
 | `discriminator-not-string` | `Object` | - |
 | `discriminator-not-string.default` | `CallableMessage`<[`string`, `string`]\> | - |
+| `encoding-multipart-bytes` | `Object` | - |
+| `encoding-multipart-bytes.default` | `string` | - |
 | `incorrect-client-format` | `Object` | - |
 | `incorrect-client-format.default` | `CallableMessage`<[`string`, `string`]\> | - |
 | `invalid-encode` | `Object` | - |
