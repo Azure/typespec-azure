@@ -22,13 +22,13 @@ import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js
  * @param target The model that is being decorated.
  * @param options BrowseOptions of the property.
  */
-export function $browse(context: DecoratorContext, target: Model, options: BrowseOptions) {
+export function $browse(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
   isARMResource(program, target, "browse");
   const browseOptionsResult: BrowseOptions = {};
-  if (options && (options as Model).properties) {
-    const query = (options as Model).properties.get("argQuery");
+  if (options && options.properties) {
+    const query = options.properties.get("argQuery");
     if (query && query.type.kind === "Model") {
       //use decoratorTarget to find sourceLocation instead of target, since we want to find a file path related to where decorator was stated
       const decoratorTarget = context.decoratorTarget;
@@ -97,17 +97,17 @@ export function isARMResource(
  * @param target The model that is being decorated.
  * @param options AboutOptions of the property.
  */
-export function $about(context: DecoratorContext, target: Model, options: AboutOptions) {
+export function $about(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $about);
   isARMResource(program, target, "about");
   const aboutOptionsResult: AboutOptions = {};
 
-  if (options && (options as Model).properties) {
-    const icon = (options as Model).properties.get("icon");
-    const learnMoreDocs = (options as Model).properties.get("learnMoreDocs");
-    const keywords = (options as Model).properties.get("keywords");
-    const displayName = (options as Model).properties.get("displayName");
+  if (options && options.properties) {
+    const icon = options.properties.get("icon");
+    const learnMoreDocs = options.properties.get("learnMoreDocs");
+    const keywords = options.properties.get("keywords");
+    const displayName = options.properties.get("displayName");
     if (icon) {
       if (icon.type.kind === "Model") {
         //use decoratorTarget to find sourceLocation instead of target, since we want to find a file path related to where decorator was stated
@@ -169,14 +169,14 @@ export function getAboutLearnMoreDocs(program: Program, target: Type) {
 export function $marketplaceOffer(
   context: DecoratorContext,
   target: Model,
-  options: marketplaceOfferOptions
+  options: Model
 ) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
   isARMResource(program, target, "marketplaceOffer");
   const marketPlaceOfferResult: marketplaceOfferOptions = {};
-  if (options && (options as Model).properties) {
-    const id = (options as Model).properties.get("id");
+  if (options && options.properties) {
+    const id = options.properties.get("id");
     if (id?.type.kind === "String") {
       if (id.type.value.match(/\s/)) {
         reportDiagnostic(program, {
