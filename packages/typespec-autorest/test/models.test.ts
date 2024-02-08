@@ -307,6 +307,32 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("specify default value on union with variant", async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `
+      model Foo {
+        optionalUnion?: MyUnion = MyUnion.a;
+      };
+      
+      union MyUnion {
+        a: "a-value",
+        b: "b-value",
+      }
+      `
+    );
+
+    deepStrictEqual(res.defs.Foo, {
+      type: "object",
+      properties: {
+        optionalUnion: {
+          allOf: [{ $ref: "#/definitions/MyUnion" }],
+          default: "a-value",
+        },
+      },
+    });
+  });
+
   it("errors on empty enum", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `

@@ -1607,6 +1607,8 @@ function createOAPIEmitter(
               format: { type: type.kind },
               target: type,
             });
+      case "UnionVariant":
+        return getDefaultValue(type);
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
