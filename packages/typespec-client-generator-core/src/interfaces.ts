@@ -38,7 +38,7 @@ export interface SdkContext<
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;
   __api_versions?: string[];
-  __clients?: Map<SdkClient | SdkOperationGroup, SdkClientType<TServiceOperation>>;
+  __clients?: Map<string, SdkClientType<TServiceOperation>>;
   generatedNames?: Set<string>;
   arm?: boolean;
 }

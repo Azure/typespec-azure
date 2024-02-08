@@ -521,6 +521,60 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationGroup.methods[0].name, "func");
     });
 
+    it("operationGroup2", async () => {
+      await runner.compileWithBuiltInService(`
+        namespace Foo {
+          interface Bar {
+            @route("/one")
+            one(): void;
+          }
+        }
+        interface Bar {
+          @route("/two")
+          two(): void;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 3);
+
+      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient")!;
+      const fooClient = sdkPackage.clients.find((c) => c.name === "Foo")!;
+      const barClient = sdkPackage.clients.find((c) => c.name === "Bar")!;
+
+      strictEqual(mainClient.methods.length, 2);
+      strictEqual(mainClient.initialization!.properties.length, 1);
+      strictEqual(mainClient.initialization!.properties[0].nameInClient, "endpoint");
+
+      const fooAccessor = mainClient.methods[0];
+      strictEqual(fooAccessor.kind, "clientaccessor");
+      strictEqual(fooAccessor.access, "internal");
+      strictEqual(fooAccessor.name, "getFoo");
+      strictEqual(fooAccessor.parameters.length, 0);
+      strictEqual(fooAccessor.response, fooClient);
+
+      const barAccessor = mainClient.methods[1];
+      strictEqual(barAccessor.kind, "clientaccessor");
+      strictEqual(barAccessor.access, "internal");
+      strictEqual(barAccessor.name, "getBar");
+      strictEqual(barAccessor.parameters.length, 0);
+      strictEqual(barAccessor.response, barClient);
+
+      strictEqual(fooClient.initialization, undefined);
+      strictEqual(fooClient.methods.length, 1);
+      strictEqual(fooClient.methods[0].kind, "clientaccessor");
+      strictEqual(fooClient.methods[0].access, "internal");
+      strictEqual(fooClient.methods[0].name, "getBar");
+      strictEqual(fooClient.methods[0].parameters.length, 0);
+      strictEqual(fooClient.methods[0].response, barClient);
+
+      strictEqual(barClient.initialization, undefined);
+      strictEqual(barClient.methods.length, 2);
+      strictEqual(barClient.methods[0].kind, "basic");
+      strictEqual(barClient.methods[0].name, "one");
+      strictEqual(barClient.methods[1].kind, "basic");
+      strictEqual(barClient.methods[1].name, "two");
+    });
+
     function getServiceNoDefaultApiVersion(op: string) {
       return `
     @server(
