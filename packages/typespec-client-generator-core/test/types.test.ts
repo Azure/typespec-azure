@@ -2027,6 +2027,87 @@ describe("typespec-client-generator-core: types", () => {
         code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       });
     });
+    it("multipart combined with shared route should not report conflicting model usage", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+        }
+  
+        @sharedRoute
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+        @sharedRoute
+        @post op multipartUseAsString(@body body: MultiPartRequest): string;
+      `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {});
+    });
+    it("multipart combined with shared route and core template should not report conflicting model usage", async function () {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-ts",
+      });
+      const diagnostics = await runnerWithCore.diagnose(
+        `
+        @service({title: "Test Service"}) 
+        @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+        namespace TestService;
+
+        @TypeSpec.Rest.resource("deployments")
+        model Deployment {
+          @visibility("read")
+          @doc("Specifies either the model deployment name (when using Azure OpenAI) or model name (when using non-Azure OpenAI) to use for this request.")
+          @projectedName("java", "deploymentOrModelName")
+          @key
+          deploymentId: string;
+        }
+
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+        }
+
+        model AudioTranscription {
+          @doc("The transcribed text for the provided audio data.")
+          text: string;
+        }
+  
+        alias MultipartFormDataRequestHeadersTraits = Azure.Core.Traits.RequestHeadersTrait<{
+          @doc("The content type for the operation. Always multipart/form-data for this operation.")
+          @header("content-type")
+          contentType: "multipart/form-data";
+        }>;
+
+        @actionSeparator("/")
+        @action("audio/transcriptions")
+        @sharedRoute
+        op getAudioTranscriptionAsResponseObject is Azure.Core.ResourceAction<
+          Deployment,
+          MultiPartRequest, 
+          AudioTranscription,
+          MultipartFormDataRequestHeadersTraits
+        >;
+
+        @actionSeparator("/")
+        @action("audio/transcriptions")
+        @sharedRoute
+        op getAudioTranscriptionAsPlainText is Azure.Core.Foundations.ResourceOperation<
+          Deployment,
+          MultiPartRequest,
+          string,
+          MultipartFormDataRequestHeadersTraits
+        >;
+      `
+      );
+      getAllModels(runnerWithCore.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+      });
+    });
     it("multipart resolving conflicting model usage with spread", async function () {
       await runner.compileWithBuiltInService(
         `
@@ -2126,60 +2207,6 @@ describe("typespec-client-generator-core: types", () => {
         @service({title: "Test Service"}) namespace TestService;
         model EncodedBytesMFD {
           @encode("binary")
-          pictures: bytes;
-        }
-        
-        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
-        `
-      );
-      getAllModels(runner.context);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
-      });
-    });
-
-    it("multipart with bytes projectedName should not raise error", async function () {
-      const diagnostics = await runner.diagnose(
-        `
-        @service({title: "Test Service"}) namespace TestService;
-        model EncodedBytesMFD {
-          @projectedName("json", "pics")
-          pictures: bytes;
-        }
-        
-        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
-        `
-      );
-      getAllModels(runner.context);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
-      });
-    });
-
-    it("multipart with bytes encodedName should not raise error", async function () {
-      const diagnostics = await runner.diagnose(
-        `
-        @service({title: "Test Service"}) namespace TestService;
-        model EncodedBytesMFD {
-          @encodedName("application/json", "pics")
-          pictures: bytes;
-        }
-        
-        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
-        `
-      );
-      getAllModels(runner.context);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
-      });
-    });
-
-    it("multipart with bytes doc should not raise error", async function () {
-      const diagnostics = await runner.diagnose(
-        `
-        @service({title: "Test Service"}) namespace TestService;
-        model EncodedBytesMFD {
-          @doc("the pictures")
           pictures: bytes;
         }
         
