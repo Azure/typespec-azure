@@ -2120,6 +2120,78 @@ describe("typespec-client-generator-core: types", () => {
       });
     });
 
+    it("multipart with encoding as binary bytes should not raise error", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model EncodedBytesMFD {
+          @encode("binary")
+          pictures: bytes;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+        `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
+      });
+    });
+
+    it("multipart with bytes projectedName should not raise error", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model EncodedBytesMFD {
+          @projectedName("json", "pics")
+          pictures: bytes;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+        `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
+      });
+    });
+
+    it("multipart with bytes encodedName should not raise error", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model EncodedBytesMFD {
+          @encodedName("application/json", "pics")
+          pictures: bytes;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+        `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
+      });
+    });
+
+    it("multipart with bytes doc should not raise error", async function () {
+      const diagnostics = await runner.diagnose(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model EncodedBytesMFD {
+          @doc("the pictures")
+          pictures: bytes;
+        }
+        
+        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+        `
+      );
+      getAllModels(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
+      });
+    });
+
     it("multipart with reused error model", async function () {
       await runner.compileWithBuiltInService(
         `
