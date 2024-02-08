@@ -1,5 +1,3 @@
 ---
-"@azure-tools/typespec-client-generator-core": patch
+"@azure-tools/typespec-client-generator-core": none
 ---
-
-add-ut-for-mfd-bytes
