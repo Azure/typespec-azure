@@ -1035,8 +1035,8 @@ importers:
         specifier: workspace:~
         version: link:../internal-build-utils
       prettier_2:
-        specifier: npm:prettier@3.2.5
-        version: /prettier@3.2.5
+        specifier: npm:prettier@2.8.7
+        version: /prettier@2.8.7
       rollup:
         specifier: ~4.9.6
         version: 4.9.6
@@ -8660,6 +8660,7 @@ packages:
 
   /@swagger-api/apidom-ns-json-schema-draft-4@0.94.0:
     resolution: {integrity: sha512-Q3ExAtywZuoIhk87yK9Vomm/jDWshqDsf5m2X4k5TZeoCL8anvU0X6xaOPTqt0AelLHSNK4D0wO29V3okxPIcg==}
+    requiresBuild: true
     dependencies:
       '@babel/runtime-corejs3': 7.23.9
       '@swagger-api/apidom-ast': 0.94.0
@@ -17188,6 +17189,12 @@ packages:
     dependencies:
       prettier: 3.2.5
       typescript: 5.3.3
+    dev: true
+
+  /prettier@2.8.7:
+    resolution: {integrity: sha512-yPngTo3aXUUmyuTjeTUT75txrf+aMh9FiD7q9ZE/i6r0bPb22g4FsE6Y338PQX1bmfy08i9QQCB7/rcUAVntfw==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /prettier@2.8.8:
