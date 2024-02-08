@@ -50,7 +50,7 @@
     "@typespec/rest": "workspace:~0.53.0",
     "@typespec/http": "workspace:~0.53.0",
     "@typespec/versioning": "workspace:~0.53.0",
-    "@azure-tools/typespec-autorest": "~0.39.0",
+    "@azure-tools/typespec-autorest": "~0.39.1",
     "@azure-tools/typespec-azure-core": "~0.39.0"
   },
   "dependencies": {
@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@typespec/compiler": "workspace:~0.53.1",
-    "@azure-tools/typespec-autorest": "workspace:~0.39.0",
+    "@azure-tools/typespec-autorest": "workspace:~0.39.1",
     "@typespec/openapi": "workspace:~0.53.0",
     "@typespec/rest": "workspace:~0.53.0",
     "@typespec/http": "workspace:~0.53.0",
