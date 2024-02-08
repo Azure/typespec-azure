@@ -2141,6 +2141,9 @@ importers:
       '@azure-tools/typespec-azure-playground-website':
         specifier: workspace:~1.0.0
         version: link:../typespec-azure-playground-website
+      '@azure-tools/typespec-azure-portal-core':
+        specifier: workspace:~0.39.0
+        version: link:../typespec-azure-portal-core
       '@azure-tools/typespec-azure-resource-manager':
         specifier: workspace:~0.39.0
         version: link:../typespec-azure-resource-manager
