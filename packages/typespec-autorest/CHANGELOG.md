@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.39.1
+
+### Patch Changes
+
+- b5fa501: Support default value for union properties
+- b5fa501: Fix: Description being ignored on unions
+
 ## 0.39.0
 
 ### Minor Changes
