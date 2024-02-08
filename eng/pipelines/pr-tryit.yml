@@ -2,6 +2,7 @@ name: PR Tools
 trigger: none
 pr:
   - main
+  - release/*
 
 variables:
   - template: templates/variables/globals.yml

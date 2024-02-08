@@ -39,9 +39,9 @@
   ],
   "dependencies": {
     "@typespec/versioning": "workspace:~0.53.0",
-    "@typespec/compiler": "workspace:~0.53.0",
+    "@typespec/compiler": "workspace:~0.53.1",
     "@typespec/openapi": "workspace:~0.53.0",
-    "@typespec/openapi3": "workspace:~0.53.0",
+    "@typespec/openapi3": "workspace:~0.53.1",
     "@typespec/http": "workspace:~0.53.0",
     "@typespec/rest": "workspace:~0.53.0",
     "@azure-tools/typespec-azure-core": "workspace:~0.39.0",
