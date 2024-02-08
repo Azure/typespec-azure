@@ -52,27 +52,27 @@
     "!dist/test/**"
   ],
   "peerDependencies": {
-    "@typespec/compiler": "workspace:~0.53.1",
-    "@typespec/http": "workspace:~0.53.0",
-    "@typespec/rest": "workspace:~0.53.0"
+    "@typespec/compiler": "workspace:~",
+    "@typespec/http": "workspace:~",
+    "@typespec/rest": "workspace:~"
   },
   "devDependencies": {
-    "@typespec/compiler": "workspace:~0.53.1",
-    "@typespec/http": "workspace:~0.53.0",
-    "@typespec/rest": "workspace:~0.53.0",
-    "@typespec/eslint-config-typespec": "workspace:~0.53.0",
-    "@typespec/library-linter": "workspace:~0.53.0",
-    "@typespec/eslint-plugin": "workspace:~0.53.0",
-    "@typespec/openapi": "workspace:~0.53.0",
-    "@typespec/tspd": "workspace:~0.46.0",
-    "@typespec/versioning": "workspace:~0.53.0",
     "@types/node": "~18.11.19",
-    "eslint": "^8.56.0",
-    "vitest": "^1.2.2",
+    "@typespec/compiler": "workspace:~",
+    "@typespec/eslint-config-typespec": "workspace:~",
+    "@typespec/eslint-plugin": "workspace:~",
+    "@typespec/http": "workspace:~",
+    "@typespec/library-linter": "workspace:~",
+    "@typespec/openapi": "workspace:~",
+    "@typespec/rest": "workspace:~",
+    "@typespec/tspd": "workspace:~",
+    "@typespec/versioning": "workspace:~",
     "@vitest/coverage-v8": "^1.2.2",
-    "@vitest/ui": "^1.1.3",
+    "@vitest/ui": "^1.2.2",
     "c8": "^9.1.0",
+    "eslint": "^8.56.0",
     "rimraf": "~5.0.5",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "vitest": "^1.2.2"
   }
 }
