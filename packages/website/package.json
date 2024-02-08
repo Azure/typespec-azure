@@ -38,6 +38,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:~0.39.0",
     "@azure-tools/typespec-client-generator-core": "workspace:~0.39.0",
     "@azure-tools/typespec-service-csharp": "workspace:~0.32.0",
+    "@azure-tools/typespec-azure-portal-core": "workspace:~0.32.0",
     "@docusaurus/module-type-aliases": "^3.0.0",
     "@docusaurus/tsconfig": "^3.0.0",
     "@docusaurus/types": "^3.0.0",
