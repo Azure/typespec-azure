@@ -1532,7 +1532,7 @@ function createOAPIEmitter(
     if (e.nullable) {
       schema["x-nullable"] = true;
     }
-    return schema;
+    return applyIntrinsicDecorators(union, schema);
   }
 
   function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
@@ -1608,7 +1608,7 @@ function createOAPIEmitter(
               target: type,
             });
       case "UnionVariant":
-        return getDefaultValue(type);
+        return getDefaultValue(type.type);
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
@@ -1795,10 +1795,20 @@ function createOAPIEmitter(
   }
 
   function resolveProperty(prop: ModelProperty, visibility: Visibility): OpenAPI2SchemaProperty {
-    const propSchema =
-      prop.type.kind === "Enum" && prop.default
-        ? getSchemaForEnum(prop.type)
-        : getSchemaOrRef(prop.type, visibility);
+    let propSchema;
+    if (prop.type.kind === "Enum" && prop.default) {
+      propSchema = getSchemaForEnum(prop.type);
+    } else if (prop.type.kind === "Union" && prop.default) {
+      const [asEnum, _] = getUnionAsEnum(prop.type);
+      if (asEnum) {
+        propSchema = getSchemaForUnionEnum(prop.type, asEnum);
+      } else {
+        propSchema = getSchemaOrRef(prop.type, visibility);
+      }
+    } else {
+      propSchema = getSchemaOrRef(prop.type, visibility);
+    }
+
     return applyIntrinsicDecorators(prop, propSchema);
   }
 
@@ -1832,15 +1842,17 @@ function createOAPIEmitter(
   }
 
   function applyIntrinsicDecorators(
-    typespecType: Model | Scalar | ModelProperty,
+    typespecType: Model | Scalar | ModelProperty | Union,
     target: OpenAPI2Schema
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
     const isString =
-      typespecType.kind !== "Model" && isStringType(program, getPropertyType(typespecType));
+      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
+      isStringType(program, getPropertyType(typespecType));
     const isNumeric =
-      typespecType.kind !== "Model" && isNumericType(program, getPropertyType(typespecType));
+      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
+      isNumericType(program, getPropertyType(typespecType));
 
     if (docStr) {
       newTarget.description = docStr;
@@ -1929,7 +1941,9 @@ function createOAPIEmitter(
 
     attachExtensions(typespecType, newTarget);
 
-    return typespecType.kind === "Model" ? newTarget : applyEncoding(typespecType, newTarget);
+    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
+      ? applyEncoding(typespecType, newTarget)
+      : newTarget;
   }
 
   function applyEncoding(

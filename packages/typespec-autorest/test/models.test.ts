@@ -326,7 +326,16 @@ describe("typespec-autorest: model definitions", () => {
       type: "object",
       properties: {
         optionalUnion: {
-          allOf: [{ $ref: "#/definitions/MyUnion" }],
+          type: "string",
+          enum: ["a-value", "b-value"],
+          "x-ms-enum": {
+            values: [
+              { name: "a", value: "a-value" },
+              { name: "b", value: "b-value" },
+            ],
+            modelAsString: false,
+            name: "MyUnion",
+          },
           default: "a-value",
         },
       },
