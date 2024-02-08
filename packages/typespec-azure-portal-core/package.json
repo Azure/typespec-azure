@@ -37,7 +37,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:~0.39.0",
     "@azure-tools/typespec-client-generator-core": "workspace:~0.39.0",
     "@types/node": "~18.11.9",
-    "@typespec/compiler": "workspace:~0.53.0",
+    "@typespec/compiler": "workspace:~0.53.1",
     "@typespec/eslint-config-typespec": "workspace:~0.53.0",
     "@typespec/eslint-plugin": "workspace:~0.53.0",
     "@typespec/http": "workspace:~0.53.0",
