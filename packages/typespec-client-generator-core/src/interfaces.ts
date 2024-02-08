@@ -238,6 +238,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   serializedName: string;
   isMultipartFileInput: boolean;
   visibility?: Visibility[];
+  flatten: boolean;
 }
 
 type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
