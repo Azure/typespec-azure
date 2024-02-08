@@ -1564,7 +1564,7 @@ importers:
   packages/samples:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.39.0
+        specifier: workspace:~0.39.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.39.0
@@ -1655,7 +1655,7 @@ importers:
         specifier: workspace:~0.53.0
         version: link:../../core/packages/http
       '@typespec/json-schema':
-        specifier: workspace:~0.53.0
+        specifier: workspace:~0.53.1
         version: link:../../core/packages/json-schema
       '@typespec/library-linter':
         specifier: workspace:~0.53.0
@@ -1754,7 +1754,7 @@ importers:
   packages/typespec-azure-playground-website:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.39.0
+        specifier: workspace:~0.39.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.39.0
@@ -1839,7 +1839,7 @@ importers:
   packages/typespec-azure-portal-core:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.39.0
+        specifier: workspace:~0.39.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.39.0
@@ -1905,7 +1905,7 @@ importers:
   packages/typespec-azure-resource-manager:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.39.0
+        specifier: workspace:~0.39.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.39.0
@@ -2039,7 +2039,7 @@ importers:
         version: 5.3.0
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.39.0
+        specifier: workspace:~0.39.1
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~0.39.0
