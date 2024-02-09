@@ -12,7 +12,7 @@ describe("typespec-azure-core: no-enum rule", () => {
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner();
+    runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
     tester = createLinterRuleTester(runner, noEnumRule, "@azure-tools/typespec-azure-core");
   });
 
@@ -31,7 +31,6 @@ describe("typespec-azure-core: no-enum rule", () => {
         },
       ]);
   });
-
   it("allows the version enum", async () => {
     await tester
       .expect(
