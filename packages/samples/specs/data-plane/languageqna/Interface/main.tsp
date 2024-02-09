@@ -67,7 +67,7 @@ interface Synonyms
 interface Sources
   extends ResourceUpdate<QnaSourceRecord, ODataError>,
     ResourceList<QnaSourceRecord, ODataError> {
-  // TODO: Singlton Resource not represented correctly
+  // TODO: Singleton Resource not represented correctly
   @get
   @route("{projectName}/sources/jobs/{jobId}")
   GetJob(...ResourceParameters<QnaSourceRecord>, ...JobIdParameter): JobState | ODataError;

@@ -122,11 +122,11 @@ model Dependent is ProxyResource<DependentProperties> {
   name: string;
 }
 
-/** Depedent properties */
+/** Dependent properties */
 model DependentProperties {
-  /** Age of depedent */
+  /** Age of dependent */
   age: int32;
 
-  /** Gender of depedent */
+  /** Gender of dependent */
   gender: string;
 }

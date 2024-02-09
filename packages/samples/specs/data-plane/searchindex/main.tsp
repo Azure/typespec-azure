@@ -6,6 +6,8 @@
 // ISSUE: Can't set service description: https://github.com/Azure/typespec-azure/issues/1032
 // ISSUE: @extension on parameter doesn't work: https://github.com/Azure/typespec-azure/issues/1121
 
+// cspell:ignore Viet
+
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/openapi";
@@ -37,7 +39,7 @@ enum AutocompleteMode {
   @doc("Only one term is suggested. If the query has two terms, only the last term is completed. For example, if the input is 'washington medic', the suggested terms could include 'medicaid', 'medicare', and 'medicine'.")
   OneTerm: "oneTerm",
 
-  @doc("Matching two-term phrases in the index will be suggested. For example, if the inpu.t is 'medic', the suggested terms could include 'medicare coverage' and 'medical assistant'.")
+  @doc("Matching two-term phrases in the index will be suggested. For example, if the input is 'medic', the suggested terms could include 'medicare coverage' and 'medical assistant'.")
   TwoTerms: "twoTerms",
 
   @doc("Completes the last term in a query with two or more terms, where the last two terms are a phrase that exists in the index. For example, if the input is 'washington medic', the suggested terms could include 'washington medicaid' and 'washington medical'.")
@@ -1041,7 +1043,7 @@ interface Documents {
 }
 
 // ISSUE: Can't respond with empty object: https://github.com/Azure/typespec-azure/issues/1122.
-// They probably meant to have additonalProperties here? Surely this doesn't literally return `{}` always?
+// They probably meant to have additionalProperties here? Surely this doesn't literally return `{}` always?
 @tag("Documents")
 @route("/docs('{key}')")
 interface DocumentsByKey {

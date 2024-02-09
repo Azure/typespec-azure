@@ -2,6 +2,8 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/openapi";
 
+// cspell:ignore qnas
+
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
 
@@ -93,7 +95,7 @@ model MaxPageSizeParameter {
   @extension("x-ms-parameter-location", "method")
   @doc("The maximum number of resources to include in a single response")
   @query
-  mazpagesize?: int32;
+  maxpagesize?: int32;
 }
 
 alias ListParameters = TopParameter & SkipParameter & MaxPageSizeParameter;

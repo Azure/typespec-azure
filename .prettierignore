@@ -70,3 +70,6 @@ core/packages/compiler/templates/__snapshots__/
 # Skip formatting tsp files
 
 *.noformat.tsp
+
+# Tm Grammars generated files
+core/grammars/

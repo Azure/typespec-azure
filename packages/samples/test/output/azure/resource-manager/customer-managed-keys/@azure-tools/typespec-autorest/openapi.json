@@ -364,7 +364,7 @@
   "definitions": {
     "WidgetResource": {
       "type": "object",
-      "description": "Widget Resoruce",
+      "description": "Widget Resource",
       "properties": {
         "properties": {
           "$ref": "#/definitions/WidgetResourceProperties",

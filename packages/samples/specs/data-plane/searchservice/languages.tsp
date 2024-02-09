@@ -1,5 +1,7 @@
 namespace Azure.SearchService;
 
+// cspell:ignore Bangla Bokmaal Bokmål Piqd Kiswahili Yucatec Otomi
+
 @doc("The language codes supported for input text by KeyPhraseExtractionSkill.")
 enum KeyPhraseExtractionSkillLanguage {
   @doc("Danish") da,

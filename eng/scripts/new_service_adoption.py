@@ -74,9 +74,9 @@ def pr_for_new_service(pr, files: list[dict]):
     # Make sure there are at least 4 path segments
     pattern = r'specification/[a-z-]+/(data-plane|resource-manager)/.*/.*'
     filenames = [x['filename'] for x in files]
-    xfiles = [x for x in filenames if re.match(pattern, x) and 'common' not in x]
+    x_files = [x for x in filenames if re.match(pattern, x) and 'common' not in x]
     # The namespace is the combined 3 path segments after "specification"
-    namespaces = list({'/'.join(x.split('/')[1:4]) for x in xfiles})
+    namespaces = list({'/'.join(x.split('/')[1:4]) for x in x_files})
     for namespace in namespaces:
         if non_public(namespace):
             continue
