@@ -1542,11 +1542,6 @@ function createOAPIEmitter(
   }
 
   function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
-    const [asEnum, _] = getUnionAsEnum(union);
-    if (asEnum) {
-      return getSchemaForUnionEnum(union, asEnum);
-    }
-
     const nonNullOptions = [...union.variants.values()]
       .map((x) => x.type)
       .filter((t) => !isNullType(t));
@@ -1558,6 +1553,7 @@ function createOAPIEmitter(
 
     if (nonNullOptions.length === 1) {
       const type = nonNullOptions[0];
+
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, visibility);
       if (schema.$ref) {
@@ -1571,6 +1567,10 @@ function createOAPIEmitter(
         return schema;
       }
     } else {
+      const [asEnum, _] = getUnionAsEnum(union);
+      if (asEnum) {
+        return getSchemaForUnionEnum(union, asEnum);
+      }
       reportDiagnostic(program, {
         code: "union-unsupported",
         target: union,
