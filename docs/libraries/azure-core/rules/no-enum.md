@@ -27,3 +27,12 @@ union PetKind {
   string,
 }
 ```
+
+Ok. Enum is allowed for versioning purposes.
+
+```tsp
+enum Version {
+  2021_01_01: "2021-01-01",
+  2022_01_01: "2022-01-01",
+}
+```

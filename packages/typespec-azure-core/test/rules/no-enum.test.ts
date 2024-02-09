@@ -31,4 +31,19 @@ describe("typespec-azure-core: no-enum rule", () => {
         },
       ]);
   });
+
+  it("allows the version enum", async () => {
+    await tester
+      .expect(
+        `       
+        @service
+        @versioned(Versions)
+        namespace Foo; 
+        enum Versions {
+          v1, v2
+        }
+        `
+      )
+      .toBeValid();
+  });
 });
