@@ -1507,7 +1507,7 @@ function createOAPIEmitter(
     }> = [];
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
-      const description = getDoc(program, member.variant);
+      const description = getDoc(program, member.type);
       values.push({
         name: typeof name === "string" ? name : `${member.value}`,
         value: member.value,
@@ -1531,6 +1531,12 @@ function createOAPIEmitter(
     }
     if (e.nullable) {
       schema["x-nullable"] = true;
+    }
+    if (options.useReadOnlyStatusSchema) {
+      const [values, _] = extractLroStates(program, union);
+      if (values !== undefined) {
+        schema.readOnly = true;
+      }
     }
     return applyIntrinsicDecorators(union, schema);
   }

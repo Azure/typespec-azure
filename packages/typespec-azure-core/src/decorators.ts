@@ -330,7 +330,14 @@ export function extractLroStates(
   } else if (entity.kind === "Union") {
     for (const variant of entity.variants.values()) {
       const option = variant.type;
-      if (option.kind !== "String") {
+      if (option.kind === "Enum") {
+        for (const member of option.members.values()) {
+          storeLroState(program, result, member.name, member);
+        }
+      } else if (option.kind === "Scalar" && option.name === "string") {
+        // Ignore string marking this union as open.
+        continue;
+      } else if (option.kind !== "String") {
         diagnostics.add(
           createDiagnostic({
             code: "lro-status-union-non-string",
@@ -342,9 +349,9 @@ export function extractLroStates(
         );
 
         return diagnostics.wrap(undefined);
+      } else {
+        storeLroState(program, result, option.value, variant);
       }
-
-      storeLroState(program, result, option.value, variant);
     }
   } else {
     diagnostics.add(

@@ -415,13 +415,13 @@ describe("typespec-azure-core: decorators", () => {
 
         @test
         @lroStatus
-        enum CustomLroStates {
+        union CustomLroStates {
           @lroSucceeded "Donezo",
           @lroFailed "Borked",
           @lroCanceled "Chucked",
           "HaveAnother",
         }
-`)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
+      `)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
 
       deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
         succeededState: ["Succeeded"],
@@ -435,6 +435,30 @@ describe("typespec-azure-core: decorators", () => {
         failedState: ["Borked"],
         canceledState: ["Chucked"],
         states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
+      });
+    });
+
+    it("returns LRO states from an named union type built with enum", async () => {
+      const { DefaultLroStates, CustomLroStates } = (await runner.compile(`
+        enum CommonStates {
+          Succeeded,
+          Failed,
+          Canceled
+        }
+
+        @test
+        @lroStatus
+        union DefaultLroStates {
+          CommonStates,
+          "Extra",
+        }
+      `)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
+
+      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
+        succeededState: ["Succeeded"],
+        failedState: ["Failed"],
+        canceledState: ["Canceled"],
+        states: ["Succeeded", "Failed", "Canceled", "Extra"],
       });
     });
 
