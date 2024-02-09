@@ -30,7 +30,7 @@ interface Tracked2Operations {
   listBySubscription is ArmListBySubscription<TestTrackedResource2>;
 }
 
-@doc("rp-specific proeprties for the resource with all envelope properties")
+@doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties2 {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: EnvelopeProvisioningState;
@@ -86,7 +86,7 @@ interface TenantOperations2 {
   listByParent is ArmResourceListByParent<TestTenantResource2>;
 }
 
-@doc("rp-specific proeprties for the resource")
+@doc("rp-specific properties for the resource")
 model TestTenantProperties2 {
   @visibility("read")
   @doc("The status of the last operation performed on this resource.")

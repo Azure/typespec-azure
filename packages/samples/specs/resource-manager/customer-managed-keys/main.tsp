@@ -22,7 +22,7 @@ namespace Microsoft.UpdateTests;
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-@doc("Widget Resoruce")
+@doc("Widget Resource")
 model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @doc("The name of the widget.")
   @key("widgetName")

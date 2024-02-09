@@ -83,7 +83,7 @@ interface TenantOperations
   extends ProxyResourceOperations<TestTenantResource>,
     ResourceUpdate<TestTenantResource, TestTenantProperties> {}
 
-@doc("rp-specific proeprties for the resource")
+@doc("rp-specific properties for the resource")
 model TestTenantProperties {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: ResourceProvisioningState;
@@ -107,7 +107,7 @@ interface ExtensionOperations
   extends ProxyResourceOperations<TestExtensionResource>,
     ResourceUpdate<TestExtensionResource, TestExtensionProperties> {}
 
-@doc("rp-specific proeprties for the resource")
+@doc("rp-specific properties for the resource")
 model TestExtensionProperties {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: ResourceProvisioningState;
