@@ -293,12 +293,12 @@ describe("typespec-azure-core: decorators", () => {
         {
           code: "decorator-wrong-target",
           message:
-            "Cannot apply @lroStatus decorator to Azure.MyService.foo since it is not assignable to Enum | ModelProperty",
+            "Cannot apply @lroStatus decorator to Azure.MyService.foo since it is not assignable to Enum | Union | ModelProperty",
         },
         {
           code: "decorator-wrong-target",
           message:
-            "Cannot apply @lroStatus decorator to Azure.MyService.Foo since it is not assignable to Enum | ModelProperty",
+            "Cannot apply @lroStatus decorator to Azure.MyService.Foo since it is not assignable to Enum | Union | ModelProperty",
         },
       ]);
     });
@@ -384,6 +384,42 @@ describe("typespec-azure-core: decorators", () => {
           @lroFailed Borked,
           @lroCanceled Chucked,
           HaveAnother,
+        }
+`)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
+
+      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
+        succeededState: ["Succeeded"],
+        failedState: ["Failed"],
+        canceledState: ["Canceled"],
+        states: ["Succeeded", "Failed", "Canceled", "Extra"],
+      });
+
+      deepStrictEqual(getLongRunningStates(runner.program, CustomLroStates), {
+        succeededState: ["Donezo"],
+        failedState: ["Borked"],
+        canceledState: ["Chucked"],
+        states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
+      });
+    });
+
+    it("returns LRO states from an named union type", async () => {
+      const { DefaultLroStates, CustomLroStates } = (await runner.compile(`
+        @test
+        @lroStatus
+        union DefaultLroStates {
+          "Succeeded",
+          "Failed",
+          "Canceled",
+          "Extra",
+        }
+
+        @test
+        @lroStatus
+        enum CustomLroStates {
+          @lroSucceeded "Donezo",
+          @lroFailed "Borked",
+          @lroCanceled "Chucked",
+          "HaveAnother",
         }
 `)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
 
