@@ -439,7 +439,7 @@ describe("typespec-azure-core: decorators", () => {
     });
 
     it("returns LRO states from an named union type built with enum", async () => {
-      const { DefaultLroStates, CustomLroStates } = (await runner.compile(`
+      const { DefaultLroStates } = (await runner.compile(`
         enum CommonStates {
           Succeeded,
           Failed,
