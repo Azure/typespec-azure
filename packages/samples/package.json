@@ -38,29 +38,29 @@
     "!dist/test/**"
   ],
   "dependencies": {
-    "@typespec/versioning": "workspace:~0.53.0",
-    "@typespec/compiler": "workspace:~0.53.1",
-    "@typespec/openapi": "workspace:~0.53.0",
-    "@typespec/openapi3": "workspace:~0.53.1",
-    "@typespec/http": "workspace:~0.53.0",
-    "@typespec/rest": "workspace:~0.53.0",
-    "@azure-tools/typespec-azure-core": "workspace:~0.39.1",
-    "@azure-tools/typespec-autorest": "workspace:~0.39.2",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~0.39.0",
-    "@azure-tools/typespec-client-generator-core": "workspace:~0.39.0"
+    "@azure-tools/typespec-autorest": "workspace:~",
+    "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
+    "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@typespec/compiler": "workspace:~",
+    "@typespec/http": "workspace:~",
+    "@typespec/openapi": "workspace:~",
+    "@typespec/openapi3": "workspace:~",
+    "@typespec/rest": "workspace:~",
+    "@typespec/versioning": "workspace:~"
   },
   "devDependencies": {
-    "@typespec/internal-build-utils": "workspace:~0.53.0",
-    "@typespec/eslint-config-typespec": "workspace:~0.53.0",
-    "@typespec/samples": "workspace:~1.0.0",
-    "@types/node": "~18.11.9",
+    "@types/node": "~18.11.19",
+    "@typespec/eslint-config-typespec": "workspace:~",
+    "@typespec/internal-build-utils": "workspace:~",
+    "@typespec/samples": "workspace:~",
+    "@vitest/coverage-v8": "^1.2.2",
+    "@vitest/ui": "^1.2.2",
+    "autorest": "~3.7.1",
     "cross-env": "~7.0.3",
-    "eslint": "^8.55.0",
-    "vitest": "^1.2.0",
-    "@vitest/coverage-v8": "^1.1.0",
-    "@vitest/ui": "~1.1.3",
-    "autorest": "~3.3.2",
-    "rimraf": "~5.0.1",
-    "typescript": "~5.3.3"
+    "eslint": "^8.56.0",
+    "rimraf": "~5.0.5",
+    "typescript": "~5.3.3",
+    "vitest": "^1.2.2"
   }
 }

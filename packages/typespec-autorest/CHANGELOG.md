@@ -7,7 +7,6 @@
 - 9baadd2: `readonly` was not added when `use-read-only-status-schema` is set to `true` for union types.
 - 9baadd2: Fix `UnionType | null` would be inlined instead of referencing `UnionType`
 
-
 ## 0.39.1
 
 ### Patch Changes

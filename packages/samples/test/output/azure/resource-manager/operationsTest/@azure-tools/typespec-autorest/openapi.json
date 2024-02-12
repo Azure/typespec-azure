@@ -4257,7 +4257,7 @@
     },
     "TestExtensionProperties": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource",
+      "description": "rp-specific properties for the resource",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4528,7 +4528,7 @@
     },
     "TestTenantProperties": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource",
+      "description": "rp-specific properties for the resource",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4546,7 +4546,7 @@
     },
     "TestTenantProperties2": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource",
+      "description": "rp-specific properties for the resource",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4816,7 +4816,7 @@
     },
     "TestTrackedProperties2": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource with all envelope properties",
+      "description": "rp-specific properties for the resource with all envelope properties",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",

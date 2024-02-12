@@ -131,8 +131,9 @@ function resolveCommonTypesVersion(
     // If the service is versioned, extract the common-types version from the
     // service version enum
     if (params.version && versionMap) {
-      const versionEnumMember = versionMap.getVersions().find((x) => x.value === params.version)
-        ?.enumMember;
+      const versionEnumMember = versionMap
+        .getVersions()
+        .find((x) => x.value === params.version)?.enumMember;
       if (versionEnumMember) {
         selectedVersion = getArmCommonTypesVersion(program, versionEnumMember);
       }
