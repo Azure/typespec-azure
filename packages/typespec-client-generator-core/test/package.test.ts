@@ -100,7 +100,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.nameInClient, "endpoint");
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.optional, false);
-      strictEqual(endpointParam.clientDefaultValue, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "constant");
+      strictEqual(endpointParam.type.value, "http://localhost:3000");
       strictEqual(endpointParam.urlEncode, false);
     });
 
@@ -122,7 +123,8 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
-      strictEqual(endpointParam.clientDefaultValue, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "constant");
+      strictEqual(endpointParam.type.value, "http://localhost:3000");
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -160,7 +162,8 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
-      strictEqual(endpointParam.clientDefaultValue, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "constant");
+      strictEqual(endpointParam.type.value, "http://localhost:3000");
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -204,7 +207,8 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
-      strictEqual(endpointParam.clientDefaultValue, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "constant");
+      strictEqual(endpointParam.type.value, "http://localhost:3000");
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"

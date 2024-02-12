@@ -543,8 +543,27 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
 function getDefaultSdkEndpointParameter<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   client: SdkClient,
-  clientDefaultValue?: unknown
+  serverUrl?: string
 ): SdkEndpointParameter[] {
+  let type: SdkType;
+  if (serverUrl) {
+    // this is a fixed endpoint so we model it as a constant type
+    type = {
+      ...getSdkTypeBaseHelper(context, client.service, "constant"),
+      value: serverUrl,
+      valueType: {
+        kind: "string",
+        encode: "string",
+        nullable: false,
+      },
+    };
+  } else {
+    // this is a parameterized endpoint
+    type = {
+      ...getSdkTypeBaseHelper(context, client.service, "string"),
+      encode: "string",
+    };
+  }
   return [
     {
       kind: "endpoint",
@@ -553,12 +572,8 @@ function getDefaultSdkEndpointParameter<TServiceOperation extends SdkServiceOper
       onClient: true,
       urlEncode: false,
       apiVersions: getAvailableApiVersions<TServiceOperation>(context, client.type),
-      type: {
-        ...getSdkTypeBaseHelper<"string", TServiceOperation>(context, client.service, "string"),
-        encode: "string",
-      },
+      type: type,
       optional: false,
-      clientDefaultValue,
       isApiVersionParam: false,
     },
   ];
