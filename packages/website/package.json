@@ -33,7 +33,7 @@
     "react": "~18.2.0"
   },
   "devDependencies": {
-    "@azure-tools/typespec-azure-core": "workspace:~0.39.0",
+    "@azure-tools/typespec-azure-core": "workspace:~0.39.1",
     "@azure-tools/typespec-azure-playground-website": "workspace:~1.0.0",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~0.39.0",
     "@azure-tools/typespec-client-generator-core": "workspace:~0.39.0",
