@@ -664,6 +664,68 @@ describe("typespec-autorest: model definitions", () => {
         required: ["name"],
       });
     });
+
+    it("defines nullable enum", async () => {
+      const res = await oapiForModel(
+        "Pet",
+        `
+      enum PetKind { dog, cat }
+      model Pet {
+        kind: PetKind | null;
+      };
+      `
+      );
+      ok(res.isRef);
+      deepStrictEqual(res.defs.Pet, {
+        type: "object",
+        properties: {
+          kind: {
+            $ref: "#/definitions/PetKind",
+            "x-nullable": true,
+          },
+        },
+        required: ["kind"],
+      });
+      deepStrictEqual(res.defs.PetKind, {
+        type: "string",
+        enum: ["dog", "cat"],
+        "x-ms-enum": {
+          modelAsString: true,
+          name: "PetKind",
+        },
+      });
+    });
+
+    it("defines nullable union", async () => {
+      const res = await oapiForModel(
+        "Pet",
+        `
+      union PetKind { "dog", "cat" }
+      model Pet {
+        kind: PetKind | null;
+      };
+      `
+      );
+      ok(res.isRef);
+      deepStrictEqual(res.defs.Pet, {
+        type: "object",
+        properties: {
+          kind: {
+            $ref: "#/definitions/PetKind",
+            "x-nullable": true,
+          },
+        },
+        required: ["kind"],
+      });
+      deepStrictEqual(res.defs.PetKind, {
+        type: "string",
+        enum: ["dog", "cat"],
+        "x-ms-enum": {
+          modelAsString: false,
+          name: "PetKind",
+        },
+      });
+    });
   });
 
   it("recovers logical type name", async () => {

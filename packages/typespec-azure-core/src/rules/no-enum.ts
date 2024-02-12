@@ -1,5 +1,5 @@
 import { Enum, createRule, paramMessage } from "@typespec/compiler";
-
+import { getVersionsForEnum } from "@typespec/versioning";
 export const noEnumRule = createRule({
   name: "no-enum",
   description: "Azure services should not use enums.",
@@ -11,6 +11,9 @@ export const noEnumRule = createRule({
   create(context) {
     return {
       enum: (en: Enum) => {
+        if (getVersionsForEnum(context.program, en).length > 0) {
+          return;
+        }
         context.reportDiagnostic({
           format: { enumName: en.name },
           target: en,

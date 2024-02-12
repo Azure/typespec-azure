@@ -46,6 +46,29 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
       .toBeValid();
   });
 
+  it("succeed with union", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+
+        model FooResource is TrackedResource<FooProperties> {
+          @key @segment("foo") name: string;
+        }
+
+        model FooProperties {
+          provisioningState: FooProvisioningState;
+        }
+
+        union FooProvisioningState {
+          ${RequiredValues.map((x) => `${x}: "${x}"`).join(",")}
+        }
+        
+      `
+      )
+      .toBeValid();
+  });
+
   it("emit warning if resource has no provisioning state property", async () => {
     await tester
       .expect(
@@ -60,7 +83,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
         message:
-          "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
+          "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
       });
   });
 
@@ -87,7 +110,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
         message:
-          "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
+          "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
       });
   });
 
@@ -109,7 +132,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
         message:
-          "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
+          "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
       });
   });
 

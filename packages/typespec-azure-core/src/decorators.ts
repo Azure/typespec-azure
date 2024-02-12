@@ -25,6 +25,8 @@ import {
   setTypeSpecNamespace,
   StringLiteral,
   Type,
+  Union,
+  UnionVariant,
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import { getHttpOperation, getRoutePath } from "@typespec/http";
@@ -269,7 +271,7 @@ export interface LongRunningStates {
 
 const lroStatusKey = createStateSymbol("lroStatus");
 
-export function $lroStatus(context: DecoratorContext, entity: Enum | ModelProperty) {
+export function $lroStatus(context: DecoratorContext, entity: Enum | Union | ModelProperty) {
   const [states, diagnostics] = extractLroStates(context.program, entity);
   if (diagnostics.length > 0) context.program.reportDiagnostics(diagnostics);
   context.program.stateMap(lroStatusKey).set(entity, states);
@@ -286,18 +288,21 @@ function storeLroState(
   program: Program,
   states: PartialLongRunningStates,
   name: string,
-  enumMember?: EnumMember
+  member?: EnumMember | UnionVariant
 ) {
-  const expectedStates: [string, (program: Program, entity: EnumMember) => boolean, () => void][] =
-    [
-      ["Succeeded", isLroSucceededState, () => states.succeededState.push(name)],
-      ["Failed", isLroFailedState, () => states.failedState.push(name)],
-      ["Canceled", isLroCanceledState, () => states.canceledState.push(name)],
-    ];
+  const expectedStates: [
+    string,
+    (program: Program, entity: EnumMember | UnionVariant) => boolean,
+    () => void,
+  ][] = [
+    ["Succeeded", isLroSucceededState, () => states.succeededState.push(name)],
+    ["Failed", isLroFailedState, () => states.failedState.push(name)],
+    ["Canceled", isLroCanceledState, () => states.canceledState.push(name)],
+  ];
 
   states.states.push(name);
   for (const [knownState, stateTest, setter] of expectedStates) {
-    if (name === knownState || (enumMember && stateTest(program, enumMember))) {
+    if (name === knownState || (member && stateTest(program, member))) {
       setter();
       break;
     }
@@ -325,7 +330,14 @@ export function extractLroStates(
   } else if (entity.kind === "Union") {
     for (const variant of entity.variants.values()) {
       const option = variant.type;
-      if (option.kind !== "String") {
+      if (option.kind === "Enum") {
+        for (const member of option.members.values()) {
+          storeLroState(program, result, member.name, member);
+        }
+      } else if (option.kind === "Scalar" && option.name === "string") {
+        // Ignore string marking this union as open.
+        continue;
+      } else if (option.kind !== "String") {
         diagnostics.add(
           createDiagnostic({
             code: "lro-status-union-non-string",
@@ -337,9 +349,9 @@ export function extractLroStates(
         );
 
         return diagnostics.wrap(undefined);
+      } else {
+        storeLroState(program, result, option.value, variant);
       }
-
-      storeLroState(program, result, option.value);
     }
   } else {
     diagnostics.add(
@@ -585,14 +597,14 @@ export function getPollingOperationParameter(
 
 const lroSucceededKey = createStateSymbol("lroSucceeded");
 
-export function $lroSucceeded(context: DecoratorContext, entity: EnumMember) {
+export function $lroSucceeded(context: DecoratorContext, entity: EnumMember | UnionVariant) {
   context.program.stateSet(lroSucceededKey).add(entity);
 }
 
 /**
  *  Returns `true` if the enum member represents a "succeeded" state.
  */
-export function isLroSucceededState(program: Program, entity: EnumMember) {
+export function isLroSucceededState(program: Program, entity: EnumMember | UnionVariant) {
   return program.stateSet(lroSucceededKey).has(entity);
 }
 
@@ -600,14 +612,14 @@ export function isLroSucceededState(program: Program, entity: EnumMember) {
 
 const lroCanceledKey = createStateSymbol("lroCanceled");
 
-export function $lroCanceled(context: DecoratorContext, entity: EnumMember) {
+export function $lroCanceled(context: DecoratorContext, entity: EnumMember | UnionVariant) {
   context.program.stateSet(lroCanceledKey).add(entity);
 }
 
 /**
  *  Returns `true` if the enum member represents a "canceled" state.
  */
-export function isLroCanceledState(program: Program, entity: EnumMember) {
+export function isLroCanceledState(program: Program, entity: EnumMember | UnionVariant) {
   return program.stateSet(lroCanceledKey).has(entity);
 }
 
@@ -615,14 +627,14 @@ export function isLroCanceledState(program: Program, entity: EnumMember) {
 
 const lroFailedKey = createStateSymbol("lroFailed");
 
-export function $lroFailed(context: DecoratorContext, entity: EnumMember) {
+export function $lroFailed(context: DecoratorContext, entity: EnumMember | UnionVariant) {
   context.program.stateSet(lroFailedKey).add(entity);
 }
 
 /**
  *  Returns `true` if the enum member represents a "failed" state.
  */
-export function isLroFailedState(program: Program, entity: EnumMember): boolean {
+export function isLroFailedState(program: Program, entity: EnumMember | UnionVariant): boolean {
   return program.stateSet(lroFailedKey).has(entity);
 }
 

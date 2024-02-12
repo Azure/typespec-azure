@@ -106,4 +106,40 @@ describe("typespec-autorest: Property schema tests", () => {
     ok(!result.isRef);
     deepStrictEqual(result.definitions.FooPrime.readOnly, true);
   });
+
+  it("creates readOnly schema for status properties when set to 'use-read-only-status-schema': true for unions", async () => {
+    const result = await openApiFor(
+      `
+      @service({title: "Test"}) 
+      namespace Test;
+
+      model Bar {propB: int32;}
+      model Foo { prop1: string;}
+
+      union FooPrime { "Succeeded", "Failed", "Canceled"}
+
+      @pattern("[a-Z0-9]+")
+      scalar BarPrime extends string;
+
+      model UsesAll {
+        @visibility("read")
+        fooProp: Foo;
+        @visibility("read")
+        primeProp: FooPrime;
+        @visibility("read")
+        barPrimeProp: BarPrime;
+        otherProp: FooPrime;
+      }
+
+      op myOp(): void;
+
+
+      `,
+      undefined,
+      { "use-read-only-status-schema": true }
+    );
+
+    ok(!result.isRef);
+    deepStrictEqual(result.definitions.FooPrime.readOnly, true);
+  });
 });
