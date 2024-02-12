@@ -189,12 +189,20 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "decimal":
     case "plainDate":
     case "plainTime":
+    case "arm-id":
+    case "etag":
+    case "guid":
+    case "uuid":
+    case "password":
+    case "ipaddress":
+    case "azurelocation":
       return scalar.name;
+    case "uri":
+      return "url";
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
   }
 }
-
 /**
  * Get the sdk built in type for a given typespec type
  * @param context the sdk context
