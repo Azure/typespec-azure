@@ -559,7 +559,7 @@ function getSdkUnionEnumValues(
 ): SdkEnumValueType[] {
   const values: SdkEnumValueType[] = [];
   for (const [name, member] of type.flattenedMembers.entries()) {
-    const docWrapper = getDocHelper(context, member.variant);
+    const docWrapper = getDocHelper(context, member.type);
     values.push({
       kind: "enumvalue",
       name: typeof name === "string" ? name : `${member.value}`,

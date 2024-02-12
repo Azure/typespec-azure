@@ -1507,7 +1507,7 @@ function createOAPIEmitter(
     }> = [];
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
-      const description = getDoc(program, member.variant);
+      const description = getDoc(program, member.type);
       values.push({
         name: typeof name === "string" ? name : `${member.value}`,
         value: member.value,
@@ -1532,15 +1532,16 @@ function createOAPIEmitter(
     if (e.nullable) {
       schema["x-nullable"] = true;
     }
+    if (options.useReadOnlyStatusSchema) {
+      const [values, _] = extractLroStates(program, union);
+      if (values !== undefined) {
+        schema.readOnly = true;
+      }
+    }
     return applyIntrinsicDecorators(union, schema);
   }
 
   function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
-    const [asEnum, _] = getUnionAsEnum(union);
-    if (asEnum) {
-      return getSchemaForUnionEnum(union, asEnum);
-    }
-
     const nonNullOptions = [...union.variants.values()]
       .map((x) => x.type)
       .filter((t) => !isNullType(t));
@@ -1552,6 +1553,7 @@ function createOAPIEmitter(
 
     if (nonNullOptions.length === 1) {
       const type = nonNullOptions[0];
+
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, visibility);
       if (schema.$ref) {
@@ -1565,6 +1567,10 @@ function createOAPIEmitter(
         return schema;
       }
     } else {
+      const [asEnum, _] = getUnionAsEnum(union);
+      if (asEnum) {
+        return getSchemaForUnionEnum(union, asEnum);
+      }
       reportDiagnostic(program, {
         code: "union-unsupported",
         target: union,
