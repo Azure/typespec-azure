@@ -109,20 +109,14 @@ function addFormatInfo(
       case "uuid":
       case "password":
       case "etag":
+      case "arm-id":
+      case "ipaddress":
+      case "azurelocation":
         propertyType.kind = format;
         break;
       case "url":
       case "uri":
         propertyType.kind = "url";
-        break;
-      case "armid":
-        propertyType.kind = "armId";
-        break;
-      case "ipaddress":
-        propertyType.kind = "ipAddress";
-        break;
-      case "azurelocation":
-        propertyType.kind = "azureLocation";
         break;
       default:
         throw Error(`Unknown format ${format}`);

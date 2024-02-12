@@ -112,9 +112,9 @@ type SdkStringKinds =
   | "url"
   | "uuid"
   | "etag"
-  | "armId"
-  | "ipAddress"
-  | "azureLocation";
+  | "arm-id"
+  | "ipaddress"
+  | "azurelocation";
 
 export type SdkBuiltInKinds =
   | "bytes"
