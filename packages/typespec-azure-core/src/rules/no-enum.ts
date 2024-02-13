@@ -5,7 +5,9 @@ import {
   EnumSpreadMemberNode,
   Node,
   SyntaxKind,
+  TypeSpecScriptNode,
   createRule,
+  getPositionBeforeTrivia,
   getSourceLocation,
   paramMessage,
 } from "@typespec/compiler";
@@ -45,7 +47,7 @@ function createEnumToExtensibleUnionCodeFix(en: Enum): CodeFix {
               node.value.kind === SyntaxKind.NumericLiteral
                 ? node.value.value
                 : `"${node.value.value}"`
-            }}`
+            }`
           : `"${node.id.sv}"`;
     }
   }
@@ -55,35 +57,84 @@ function createEnumToExtensibleUnionCodeFix(en: Enum): CodeFix {
     label: "Convert to extensible union",
     fix(context) {
       const type = typeof [...en.members.values()][0].value === "number" ? "number" : "string";
+      const indent = getIndent(en.node);
+      const script = getTypeSpecScript(en.node);
+      if (script === undefined) {
+        return [];
+      }
       return [
         context.replaceText(
           getSourceLocation(en.node),
-          `${getNodeTrivia(en.node)}union ${en.name} {${type}, ${en.node.members.map(
-            (member) => `${getNodeTrivia(member)}${convertEnumMemberToUnionVariant(member)}`
-          )}}`
+          [
+            getNodeAnnotations(en.node),
+            `union ${en.name} {\n`,
+            `${indent}  `,
+            `${type},\n`,
+            ...en.node.members.map((member) => {
+              return `${getNodeTrivia(script, member)}${getNodeAnnotations(
+                member
+              )}${convertEnumMemberToUnionVariant(member)},`;
+            }),
+            getNodeTrivia(script, en.node.end - 1),
+            "}",
+          ].join("")
         ),
       ];
     },
   };
 }
 
-function getNodeTrivia(node: Node): string {
+function getIndent(node: Node) {
+  const source = getSourceLocation(node).file.text;
+  const start = source.lastIndexOf("\n", node.pos);
+  return source.slice(start + 1, node.pos);
+}
+
+function getTypeSpecScript(node: Node): TypeSpecScriptNode | undefined {
+  let root = node;
+
+  while (root.parent !== undefined) {
+    root = root.parent;
+  }
+  if (root.kind !== SyntaxKind.TypeSpecScript) {
+    return undefined;
+  }
+  return root;
+}
+
+function getNodeTrivia(root: TypeSpecScriptNode, node: Node | number): string {
+  const end = typeof node === "number" ? node : node.pos;
+  const pos = getPositionBeforeTrivia(root, end);
+  return root.file.text.slice(pos, end);
+}
+
+function getNodeAnnotations(node: Node): string {
+  const source = getSourceLocation(node).file.text;
+
   let endOfTrivia = node.pos;
   for (const directive of node.directives ?? []) {
-    if (directive.pos > endOfTrivia) {
-      endOfTrivia = directive.pos;
+    if (directive.end > endOfTrivia) {
+      endOfTrivia = directive.end;
     }
   }
   for (const doc of node.docs ?? []) {
-    if (doc.pos > endOfTrivia) {
-      endOfTrivia = doc.pos;
+    if (doc.end > endOfTrivia) {
+      endOfTrivia = doc.end;
     }
   }
   if ("decorators" in node) {
     for (const dec of node.decorators ?? []) {
-      if (dec.pos > endOfTrivia) {
-        endOfTrivia = dec.pos;
+      if (dec.end > endOfTrivia) {
+        endOfTrivia = dec.end;
       }
+    }
+  }
+
+  for (let i = endOfTrivia; i < node.end; i++) {
+    if (source[i] === " ") {
+      endOfTrivia = i + 1;
+    } else {
+      break;
     }
   }
 
