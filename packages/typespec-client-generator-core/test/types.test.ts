@@ -1488,6 +1488,43 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sharktypeProperty.type.kind, "string");
     });
 
+    it("union discriminator", async () => {
+      await runner.compileWithBuiltInService(`
+      union KindType {
+        string,
+        shark: "shark",
+        salmon: "salmon"
+      };
+
+      @discriminator("kind")
+      model Fish {
+        age: int32;
+      }
+
+      model Shark extends Fish {
+        kind: KindType.shark;
+        hasFin: boolean;
+      }
+
+      model Salmon extends Fish {
+        kind: KindType.salmon;
+        norweigan: boolean;
+      }
+
+      @get
+      op getModel(): Fish;
+      `);
+      const models = Array.from(getAllModels(runner.context));
+      strictEqual(models.length, 5);
+      const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
+      strictEqual(shark.properties.length, 2);
+      const sharktypeProperty = shark.properties.find(
+        (x) => x.nameInClient === "sharktype"
+      )! as SdkBodyModelPropertyType;
+      strictEqual(sharktypeProperty.discriminator, true);
+      strictEqual(sharktypeProperty.type.kind, "string");
+    });
+
     it("filterOutCoreModels true", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
