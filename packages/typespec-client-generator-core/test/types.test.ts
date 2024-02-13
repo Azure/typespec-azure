@@ -1515,14 +1515,11 @@ describe("typespec-client-generator-core: types", () => {
       op getModel(): Fish;
       `);
       const models = Array.from(getAllModels(runner.context));
-      strictEqual(models.length, 5);
+      strictEqual(models.length, 3);
       const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
-      strictEqual(shark.properties.length, 2);
-      const sharktypeProperty = shark.properties.find(
-        (x) => x.nameInClient === "sharktype"
-      )! as SdkBodyModelPropertyType;
-      strictEqual(sharktypeProperty.discriminator, true);
-      strictEqual(sharktypeProperty.type.kind, "string");
+      strictEqual(shark.discriminatorValue, "shark");
+      const salmon = models.find((x) => x.name === "Salmon")! as SdkModelType;
+      strictEqual(salmon.discriminatorValue, "salmon");
     });
 
     it("filterOutCoreModels true", async () => {
