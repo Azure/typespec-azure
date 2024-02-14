@@ -17,6 +17,7 @@ import {
   UsageFlags,
   getNamespaceFullName,
   getProjectedName,
+  ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
@@ -732,7 +733,7 @@ export function getUsage(context: SdkContext, entity: Model | Enum): UsageFlags 
     getAllModels(context); // this will populate modelsMap
   }
   return entity.kind === "Model"
-    ? getSdkModel(context, entity).usage
+    ? ignoreDiagnostics(getSdkModel(context, entity)).usage
     : getSdkEnum(context, entity).usage;
 }
 
@@ -775,7 +776,7 @@ export function getAccess(
   }
 
   return entity.kind === "Model"
-    ? getSdkModel(context, entity).access
+    ? ignoreDiagnostics(getSdkModel(context, entity)).access
     : getSdkEnum(context, entity).access;
 }
 
