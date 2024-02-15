@@ -1,3 +1,6 @@
+import { AutorestTestLibrary } from "@azure-tools/typespec-autorest/testing";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { Diagnostic, EmitContext, Program, Type } from "@typespec/compiler";
 import {
   BasicTestRunner,
@@ -7,6 +10,7 @@ import {
   createTestWrapper,
 } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { createSdkContext } from "../src/decorators.js";
@@ -51,6 +55,19 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
   emitterName?: string;
   librariesToAdd?: TypeSpecTestLibrary[];
   autoUsings?: string[];
+}
+
+export async function createArmSdkTestRunner(): Promise<SdkTestRunner> {
+  return createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-java",
+    librariesToAdd: [
+      AzureResourceManagerTestLibrary,
+      OpenAPITestLibrary,
+      AutorestTestLibrary,
+      AzureCoreTestLibrary,
+    ],
+    autoUsings: ["Azure.ResourceManager", "TypeSpec.OpenAPI", "Autorest", "Azure.Core"],
+  });
 }
 
 export async function createSdkTestRunner(

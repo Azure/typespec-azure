@@ -9,6 +9,7 @@ import {
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { listClients } from "../src/decorators.js";
 import { SdkEmitterOptions, SdkModelType, SdkUnionType } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
@@ -21,6 +22,7 @@ import {
 import { getAllModels, getSdkUnion } from "../src/types.js";
 import {
   SdkTestRunner,
+  createArmSdkTestRunner,
   createSdkContextTestHelper,
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
@@ -1289,6 +1291,124 @@ describe("typespec-client-generator-core: public-utils", () => {
         // bc each time we try to get body, we will get a new type from compiler
         // so we will keep the empty name
         ok(models.find((x) => (x as SdkModelType).generatedName === ""));
+      });
+
+      it("anonymous model for body parameter", async () => {
+        await runner.compileWithBuiltInService(
+          `
+          op test(foo: string, bar: string): void;
+        `
+        );
+        const models = getAllModels(runner.context);
+        strictEqual(models.length, 1);
+        ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
+      });
+
+      it("anonymous union in response header", async () => {
+        const { repeatabilityResult } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          model ResponseWithAnonymousUnion {
+            @header("Repeatability-Result")
+            @test
+            repeatabilityResult?: "accepted" | "rejected";
+
+            test: string;
+          }
+  
+          op test(): ResponseWithAnonymousUnion;
+        }
+        `)) as { repeatabilityResult: ModelProperty };
+
+        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
+        strictEqual(
+          (union as SdkUnionType).generatedName,
+          "ResponseWithAnonymousUnionRepeatabilityResult"
+        );
+      });
+
+      it("anonymous union in request header", async () => {
+        const { repeatabilityResult } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          model RequestParameterWithAnonymousUnion {
+            @header("Repeatability-Result")
+            @test
+            repeatabilityResult?: "accepted" | "rejected";
+
+            test: string;
+          }
+  
+          op test(...RequestParameterWithAnonymousUnion): void;
+        }
+        `)) as { repeatabilityResult: ModelProperty };
+
+        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
+        strictEqual(
+          (union as SdkUnionType).generatedName,
+          "RequestParameterWithAnonymousUnionRepeatabilityResult"
+        );
+      });
+
+      it("anonymous union with base type", async () => {
+        const { repeatabilityResult } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          model RequestParameterWithAnonymousUnion {
+            @header("Repeatability-Result")
+            @test
+            repeatabilityResult?: "accepted" | "rejected" | string;
+
+            test: string;
+          }
+  
+          op test(...RequestParameterWithAnonymousUnion): void;
+        }
+        `)) as { repeatabilityResult: ModelProperty };
+
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
+        strictEqual(stringType.kind, "union");
+        strictEqual(stringType.values.length, 3);
+        strictEqual(stringType.values[0].kind, "constant");
+        strictEqual(stringType.values[0].value, "accepted");
+        strictEqual(stringType.values[1].kind, "constant");
+        strictEqual(stringType.values[1].value, "rejected");
+        strictEqual(stringType.values[2].kind, "string");
+      });
+    });
+
+    describe("isArm", () => {
+      it("arm library with arm dependency", async () => {
+        const runnerWithArmCore = await createArmSdkTestRunner();
+        await runnerWithArmCore.compile(
+          `
+          @Azure.ResourceManager.armProviderNamespace
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          namespace Microsoft.NetworkAnalytics;
+
+          interface Operations {}
+        `
+        );
+        const clients = listClients(runnerWithArmCore.context);
+        strictEqual(clients.length, 1);
+        strictEqual(clients[0].arm, true);
+      });
+      it("regular library without arm dependency", async () => {
+        await runner.compile(
+          `
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          namespace Microsoft.NetworkAnalytics;
+
+          interface Operations {}
+        `
+        );
+        const clients = listClients(runner.context);
+        strictEqual(clients.length, 1);
+        strictEqual(clients[0].arm, false);
       });
 
       it("anonymous model for body parameter", async () => {
