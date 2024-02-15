@@ -689,10 +689,7 @@ export function getClientType(context: SdkContext, type: Type, operation?: Opera
       addFormatInfo(context, type, innerType);
       return getKnownValuesEnum(context, type, operation) ?? innerType;
     case "UnionVariant":
-      return {
-        ...getSdkTypeBaseHelper(context, type, "any"),
-        encode: getEncodeHelper(context, type, "any"),
-      };
+      return getClientType(context, type.type, operation);
     case "EnumMember":
       const enumType = getSdkEnum(context, type.enum, operation);
       return getSdkEnumValue(context, enumType, type);
