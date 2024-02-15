@@ -9,7 +9,7 @@ import {
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { listClients } from "../src/decorators.js";
+import { listClients, listOperationGroups, listOperationsInOperationGroup } from "../src/decorators.js";
 import { SdkEmitterOptions, SdkModelType, SdkUnionType } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
@@ -27,6 +27,7 @@ import {
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
 } from "./test-host.js";
+import { getLroMetadata } from "../../typespec-azure-core/dist/src/lro-helpers.js";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -1375,42 +1376,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.values[2].kind, "string");
       });
-    });
-
-    describe("isArm", () => {
-      it("arm library with arm dependency", async () => {
-        const runnerWithArmCore = await createArmSdkTestRunner();
-        await runnerWithArmCore.compile(
-          `
-          @Azure.ResourceManager.armProviderNamespace
-          @service({
-            title: "Microsoft.NetworkAnalytics",
-          })
-          namespace Microsoft.NetworkAnalytics;
-
-          interface Operations {}
-        `
-        );
-        const clients = listClients(runnerWithArmCore.context);
-        strictEqual(clients.length, 1);
-        strictEqual(clients[0].arm, true);
-      });
-      it("regular library without arm dependency", async () => {
-        await runner.compile(
-          `
-          @service({
-            title: "Microsoft.NetworkAnalytics",
-          })
-          namespace Microsoft.NetworkAnalytics;
-
-          interface Operations {}
-        `
-        );
-        const clients = listClients(runner.context);
-        strictEqual(clients.length, 1);
-        strictEqual(clients[0].arm, false);
-      });
-
       it("anonymous model for body parameter", async () => {
         await runner.compileWithBuiltInService(
           `
@@ -1494,5 +1459,81 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[2].kind, "string");
       });
     });
+    });
+
+    describe("isArm", () => {
+      it("arm library with arm dependency", async () => {
+        const runnerWithArmCore = await createArmSdkTestRunner();
+        await runnerWithArmCore.compile(
+          `
+          @armProviderNamespace
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          namespace Microsoft.NetworkAnalytics;
+
+          interface Operations {}
+        `
+        );
+        const clients = listClients(runnerWithArmCore.context);
+        strictEqual(clients.length, 1);
+        strictEqual(clients[0].arm, true);
+      });
+      it("regular library without arm dependency", async () => {
+        await runner.compile(
+          `
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          namespace Microsoft.NetworkAnalytics;
+
+          interface Operations {}
+        `
+        );
+        const clients = listClients(runner.context);
+        strictEqual(clients.length, 1);
+        strictEqual(clients[0].arm, false);
+      });
+      it("arm library with lro", async () => {
+        const runnerWithArmCore = await createArmSdkTestRunner();
+        await runnerWithArmCore.compile(
+          `
+          @armProviderNamespace
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          @versioned(Microsoft.NetworkAnalytics.Versions)
+          namespace Microsoft.NetworkAnalytics;
+
+          @doc("The available API versions for the Microsoft.NetworkAnalytics RP.")
+          enum Versions {
+            @doc("The 2023-11-15 stable version.")
+            @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+            v2023_11_15: "2023-11-15",
+          }
+
+          model OnlineEndpoint is ProxyResource<{}>{
+            @segment("onlineEndpoint")
+            @key("onlineEndpointName")
+            @path
+            name: string;
+          }
+
+          @armResourceOperations
+          interface OnlineEndpoints {
+            beginCreateOrUpdate is ArmResourceCreateOrUpdateAsync<OnlineEndpoint>;
+          }
+        `
+        );
+        const clients = listClients(runnerWithArmCore.context);
+        strictEqual(clients.length, 1);
+        strictEqual(clients[0].arm, true);
+        const operationGroups = listOperationGroups(runnerWithArmCore.context, clients[0]);
+        strictEqual(operationGroups.length, 1);
+        const operations = listOperationsInOperationGroup(runnerWithArmCore.context, operationGroups[0]);
+        strictEqual(operations.length, 1);
+        strictEqual(getLroMetadata(runnerWithArmCore.context.program, operations[0]), !undefined);
+      });
+    });
+      
   });
-});
