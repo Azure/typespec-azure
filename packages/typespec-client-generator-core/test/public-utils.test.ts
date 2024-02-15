@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Model,
   ModelProperty,
@@ -9,7 +10,11 @@ import {
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { listClients, listOperationGroups, listOperationsInOperationGroup } from "../src/decorators.js";
+import {
+  listClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
+} from "../src/decorators.js";
 import { SdkEmitterOptions, SdkModelType, SdkUnionType } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
@@ -27,7 +32,6 @@ import {
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
 } from "./test-host.js";
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -1377,13 +1381,13 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[2].kind, "string");
       });
     });
-    });
+  });
 
-    describe("isArm", () => {
-      it("arm library with arm dependency", async () => {
-        const runnerWithArmCore = await createArmSdkTestRunner();
-        await runnerWithArmCore.compile(
-          `
+  describe("isArm", () => {
+    it("arm library with arm dependency", async () => {
+      const runnerWithArmCore = await createArmSdkTestRunner();
+      await runnerWithArmCore.compile(
+        `
           @armProviderNamespace
           @service({
             title: "Microsoft.NetworkAnalytics",
@@ -1392,14 +1396,14 @@ describe("typespec-client-generator-core: public-utils", () => {
 
           interface Operations {}
         `
-        );
-        const clients = listClients(runnerWithArmCore.context);
-        strictEqual(clients.length, 1);
-        strictEqual(clients[0].arm, true);
-      });
-      it("regular library without arm dependency", async () => {
-        await runner.compile(
-          `
+      );
+      const clients = listClients(runnerWithArmCore.context);
+      strictEqual(clients.length, 1);
+      strictEqual(clients[0].arm, true);
+    });
+    it("regular library without arm dependency", async () => {
+      await runner.compile(
+        `
           @service({
             title: "Microsoft.NetworkAnalytics",
           })
@@ -1407,15 +1411,15 @@ describe("typespec-client-generator-core: public-utils", () => {
 
           interface Operations {}
         `
-        );
-        const clients = listClients(runner.context);
-        strictEqual(clients.length, 1);
-        strictEqual(clients[0].arm, false);
-      });
-      it("arm library with lro", async () => {
-        const runnerWithArmCore = await createArmSdkTestRunner();
-        await runnerWithArmCore.compile(
-          `
+      );
+      const clients = listClients(runner.context);
+      strictEqual(clients.length, 1);
+      strictEqual(clients[0].arm, false);
+    });
+    it("arm library with lro", async () => {
+      const runnerWithArmCore = await createArmSdkTestRunner();
+      await runnerWithArmCore.compile(
+        `
           @armProviderNamespace
           @service({
             title: "Microsoft.NetworkAnalytics",
@@ -1482,21 +1486,23 @@ describe("typespec-client-generator-core: public-utils", () => {
             delete is ArmResourceDeleteAsync<DataType>;
           }
         `
-        );
-        const clients = listClients(runnerWithArmCore.context);
-        strictEqual(clients.length, 1);
-        strictEqual(clients[0].arm, true);
-        const operationGroups = listOperationGroups(runnerWithArmCore.context, clients[0]);
-        strictEqual(operationGroups.length, 1);
-        const operations = listOperationsInOperationGroup(runnerWithArmCore.context, operationGroups[0]);
-        strictEqual(operations.length, 3);
-        const update = operations.find((x) => x.name === "update")!;
-        strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, update), true);
-        const deleteOperation = operations.find((x) => x.name === "delete")!;
-        strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, deleteOperation), true);
-        const createOrUpdate = operations.find((x) => x.name === "createOrUpdate")!;
-        strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, createOrUpdate), true);
-      });
+      );
+      const clients = listClients(runnerWithArmCore.context);
+      strictEqual(clients.length, 1);
+      strictEqual(clients[0].arm, true);
+      const operationGroups = listOperationGroups(runnerWithArmCore.context, clients[0]);
+      strictEqual(operationGroups.length, 1);
+      const operations = listOperationsInOperationGroup(
+        runnerWithArmCore.context,
+        operationGroups[0]
+      );
+      strictEqual(operations.length, 3);
+      const update = operations.find((x) => x.name === "update")!;
+      strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, update), true);
+      const deleteOperation = operations.find((x) => x.name === "delete")!;
+      strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, deleteOperation), true);
+      const createOrUpdate = operations.find((x) => x.name === "createOrUpdate")!;
+      strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, createOrUpdate), true);
     });
-      
   });
+});
