@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Model,
   ModelProperty,
@@ -10,6 +11,11 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import {
+  listClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
+} from "../src/decorators.js";
 import { SdkEmitterOptions, SdkModelType, SdkUnionType } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
@@ -22,6 +28,7 @@ import {
 import { getAllModels, getSdkUnion } from "../src/types.js";
 import {
   SdkTestRunner,
+  createArmSdkTestRunner,
   createSdkContextTestHelper,
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
@@ -1386,6 +1393,129 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.values[2].kind, "string");
       });
+    });
+  });
+
+  describe("isArm", () => {
+    it("arm library with arm dependency", async () => {
+      const runnerWithArmCore = await createArmSdkTestRunner();
+      await runnerWithArmCore.compile(
+        `
+          @armProviderNamespace
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          namespace Microsoft.NetworkAnalytics;
+
+          interface Operations {}
+        `
+      );
+      const clients = listClients(runnerWithArmCore.context);
+      strictEqual(clients.length, 1);
+      strictEqual(clients[0].arm, true);
+    });
+    it("regular library without arm dependency", async () => {
+      await runner.compile(
+        `
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          namespace Microsoft.NetworkAnalytics;
+
+          interface Operations {}
+        `
+      );
+      const clients = listClients(runner.context);
+      strictEqual(clients.length, 1);
+      strictEqual(clients[0].arm, false);
+    });
+    it("arm library with lro", async () => {
+      const runnerWithArmCore = await createArmSdkTestRunner();
+      await runnerWithArmCore.compile(
+        `
+          @armProviderNamespace
+          @service({
+            title: "Microsoft.NetworkAnalytics",
+          })
+          @versioned(Microsoft.NetworkAnalytics.Versions)
+          namespace Microsoft.NetworkAnalytics;
+
+          @doc("The available API versions for the Microsoft.NetworkAnalytics RP.")
+          enum Versions {
+            @doc("The 2023-11-15 stable version.")
+            @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+            v2023_11_15: "2023-11-15",
+          }
+
+          @doc("The data type properties")
+          @added(Versions.v2023_11_15)
+          model DataTypeProperties {
+            @doc("Latest provisioning state  of data product.")
+            @visibility("read")
+            provisioningState?: string;
+
+            @doc("State of data type.")
+            @visibility("read", "create", "update")
+            state?: string;
+
+            @doc("Reason for the state of data type.")
+            @visibility("read")
+            stateReason?: string;
+
+            @doc("Field for storage output retention in days.")
+            @visibility("read", "create", "update")
+            storageOutputRetention?: int32;
+
+            @doc("Field for database cache retention in days.")
+            @visibility("read", "create", "update")
+            databaseCacheRetention?: int32;
+
+            @doc("Field for database data retention in days.")
+            @visibility("read", "create", "update")
+            databaseRetention?: int32;
+
+            @doc("Url for data visualization.")
+            @visibility("read")
+            visualizationUrl?: string;
+          }
+
+          @doc("The data type resource.")
+          @added(Versions.v2023_11_15)
+          model DataType is ProxyResource<DataTypeProperties> {
+            @doc("The data type name.")
+            @segment("dataTypes")
+            @key("dataTypeName")
+            @path
+            @pattern("^[a-z][a-z0-9-]*$")
+            @minLength(3)
+            @maxLength(63)
+            name: string;
+          }
+
+          @armResourceOperations
+          interface DataTypes {
+            createOrUpdate is ArmResourceCreateOrUpdateAsync<DataType>;
+            update is ArmResourcePatchAsync<DataType, DataTypeProperties>;
+            delete is ArmResourceDeleteAsync<DataType>;
+          }
+        `
+      );
+      const clients = listClients(runnerWithArmCore.context);
+      strictEqual(clients.length, 1);
+      strictEqual(clients[0].arm, true);
+      const operationGroups = listOperationGroups(runnerWithArmCore.context, clients[0]);
+      strictEqual(operationGroups.length, 1);
+      const operations = listOperationsInOperationGroup(
+        runnerWithArmCore.context,
+        operationGroups[0]
+      );
+      strictEqual(operations.length, 3);
+      const update = operations.find((x) => x.name === "update")!;
+      strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, update), true);
+      const deleteOperation = operations.find((x) => x.name === "delete")!;
+      strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, deleteOperation), true);
+      const createOrUpdate = operations.find((x) => x.name === "createOrUpdate")!;
+      strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, createOrUpdate), true);
     });
   });
 });
