@@ -27,7 +27,7 @@ import {
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
 } from "./test-host.js";
-import { getLroMetadata } from "../../typespec-azure-core/dist/src/lro-helpers.js";
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -1376,88 +1376,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.values[2].kind, "string");
       });
-      it("anonymous model for body parameter", async () => {
-        await runner.compileWithBuiltInService(
-          `
-          op test(foo: string, bar: string): void;
-        `
-        );
-        const models = getAllModels(runner.context);
-        strictEqual(models.length, 1);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
-      });
-
-      it("anonymous union in response header", async () => {
-        const { repeatabilityResult } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          model ResponseWithAnonymousUnion {
-            @header("Repeatability-Result")
-            @test
-            repeatabilityResult?: "accepted" | "rejected";
-
-            test: string;
-          }
-  
-          op test(): ResponseWithAnonymousUnion;
-        }
-        `)) as { repeatabilityResult: ModelProperty };
-
-        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
-        strictEqual(
-          (union as SdkUnionType).generatedName,
-          "ResponseWithAnonymousUnionRepeatabilityResult"
-        );
-      });
-
-      it("anonymous union in request header", async () => {
-        const { repeatabilityResult } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          model RequestParameterWithAnonymousUnion {
-            @header("Repeatability-Result")
-            @test
-            repeatabilityResult?: "accepted" | "rejected";
-
-            test: string;
-          }
-  
-          op test(...RequestParameterWithAnonymousUnion): void;
-        }
-        `)) as { repeatabilityResult: ModelProperty };
-
-        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
-        strictEqual(
-          (union as SdkUnionType).generatedName,
-          "RequestParameterWithAnonymousUnionRepeatabilityResult"
-        );
-      });
-
-      it("anonymous union with base type", async () => {
-        const { repeatabilityResult } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          model RequestParameterWithAnonymousUnion {
-            @header("Repeatability-Result")
-            @test
-            repeatabilityResult?: "accepted" | "rejected" | string;
-
-            test: string;
-          }
-  
-          op test(...RequestParameterWithAnonymousUnion): void;
-        }
-        `)) as { repeatabilityResult: ModelProperty };
-
-        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
-        strictEqual(stringType.kind, "union");
-        strictEqual(stringType.values.length, 3);
-        strictEqual(stringType.values[0].kind, "constant");
-        strictEqual(stringType.values[0].value, "accepted");
-        strictEqual(stringType.values[1].kind, "constant");
-        strictEqual(stringType.values[1].value, "rejected");
-        strictEqual(stringType.values[2].kind, "string");
-      });
     });
     });
 
@@ -1512,16 +1430,56 @@ describe("typespec-client-generator-core: public-utils", () => {
             v2023_11_15: "2023-11-15",
           }
 
-          model OnlineEndpoint is ProxyResource<{}>{
-            @segment("onlineEndpoint")
-            @key("onlineEndpointName")
+          @doc("The data type properties")
+          @added(Versions.v2023_11_15)
+          model DataTypeProperties {
+            @doc("Latest provisioning state  of data product.")
+            @visibility("read")
+            provisioningState?: string;
+
+            @doc("State of data type.")
+            @visibility("read", "create", "update")
+            state?: string;
+
+            @doc("Reason for the state of data type.")
+            @visibility("read")
+            stateReason?: string;
+
+            @doc("Field for storage output retention in days.")
+            @visibility("read", "create", "update")
+            storageOutputRetention?: int32;
+
+            @doc("Field for database cache retention in days.")
+            @visibility("read", "create", "update")
+            databaseCacheRetention?: int32;
+
+            @doc("Field for database data retention in days.")
+            @visibility("read", "create", "update")
+            databaseRetention?: int32;
+
+            @doc("Url for data visualization.")
+            @visibility("read")
+            visualizationUrl?: string;
+          }
+
+          @doc("The data type resource.")
+          @added(Versions.v2023_11_15)
+          model DataType is ProxyResource<DataTypeProperties> {
+            @doc("The data type name.")
+            @segment("dataTypes")
+            @key("dataTypeName")
             @path
+            @pattern("^[a-z][a-z0-9-]*$")
+            @minLength(3)
+            @maxLength(63)
             name: string;
           }
 
           @armResourceOperations
-          interface OnlineEndpoints {
-            beginCreateOrUpdate is ArmResourceCreateOrUpdateAsync<OnlineEndpoint>;
+          interface DataTypes {
+            createOrUpdate is ArmResourceCreateOrUpdateAsync<DataType>;
+            update is ArmResourcePatchAsync<DataType, DataTypeProperties>;
+            delete is ArmResourceDeleteAsync<DataType>;
           }
         `
         );
@@ -1531,8 +1489,13 @@ describe("typespec-client-generator-core: public-utils", () => {
         const operationGroups = listOperationGroups(runnerWithArmCore.context, clients[0]);
         strictEqual(operationGroups.length, 1);
         const operations = listOperationsInOperationGroup(runnerWithArmCore.context, operationGroups[0]);
-        strictEqual(operations.length, 1);
-        strictEqual(getLroMetadata(runnerWithArmCore.context.program, operations[0]), !undefined);
+        strictEqual(operations.length, 3);
+        const update = operations.find((x) => x.name === "update")!;
+        strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, update), true);
+        const deleteOperation = operations.find((x) => x.name === "delete")!;
+        strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, deleteOperation), true);
+        const createOrUpdate = operations.find((x) => x.name === "createOrUpdate")!;
+        strictEqual(!!getLroMetadata(runnerWithArmCore.context.program, createOrUpdate), true);
       });
     });
       
