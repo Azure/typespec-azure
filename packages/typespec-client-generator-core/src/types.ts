@@ -735,7 +735,7 @@ export function getClientType(
       retval = getKnownValuesEnum(context, type, operation) ?? innerType;
       break;
     case "UnionVariant":
-      retval = getAnyType(context, type);
+      retval = diagnostics.pipe(getClientType(context, type.type, operation));
       break;
     case "EnumMember":
       const enumType = getSdkEnum(context, type.enum, operation);
