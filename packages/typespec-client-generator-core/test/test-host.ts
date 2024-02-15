@@ -5,13 +5,15 @@ import {
   TypeSpecTestLibrary,
   createTestHost,
   createTestWrapper,
+  expectDiagnosticEmpty,
 } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { createSdkContext } from "../src/decorators.js";
-import { SdkContext, SdkEmitterOptions } from "../src/interfaces.js";
+import { SdkContext, SdkEmitterOptions, SdkEnumType, SdkModelType } from "../src/interfaces.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
+import { getAllModels } from "../src/types.js";
 
 export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}) {
   let libraries = [SdkTestLibrary, HttpTestLibrary, RestTestLibrary, VersioningTestLibrary];
@@ -172,4 +174,13 @@ export async function createSdkTestRunner(
 export async function createTcgcTestRunnerForEmitter(emitterName: string): Promise<SdkTestRunner> {
   const runner = await createSdkTestRunner({ emitterName });
   return runner;
+}
+
+export function getAllModelsAssertNoDiagnostics(
+  context: SdkContext,
+  options = {}
+): (SdkModelType | SdkEnumType)[] {
+  const [models, diagnostics] = getAllModels(context, options);
+  expectDiagnosticEmpty(diagnostics);
+  return models;
 }
