@@ -1519,7 +1519,7 @@ describe("typespec-client-generator-core: types", () => {
       @get
       op getModel(): Fish;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModelsAssertNoDiagnostics(runner.context);
       strictEqual(models.length, 3);
       const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
       strictEqual(shark.discriminatorValue, "shark");
