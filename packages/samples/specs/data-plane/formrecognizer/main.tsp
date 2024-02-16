@@ -250,7 +250,7 @@ enum AnalyzeResultOperationStatus {
   notStarted,
 
   @doc("Operation is running.")
-  runnning,
+  running,
 
   @doc("Operation has failed.")
   failed,

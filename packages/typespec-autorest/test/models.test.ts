@@ -307,6 +307,41 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("specify default value on union with variant", async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `
+      model Foo {
+        optionalUnion?: MyUnion = MyUnion.a;
+      };
+      
+      union MyUnion {
+        a: "a-value",
+        b: "b-value",
+      }
+      `
+    );
+
+    deepStrictEqual(res.defs.Foo, {
+      type: "object",
+      properties: {
+        optionalUnion: {
+          type: "string",
+          enum: ["a-value", "b-value"],
+          "x-ms-enum": {
+            values: [
+              { name: "a", value: "a-value" },
+              { name: "b", value: "b-value" },
+            ],
+            modelAsString: false,
+            name: "MyUnion",
+          },
+          default: "a-value",
+        },
+      },
+    });
+  });
+
   it("errors on empty enum", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
@@ -627,6 +662,68 @@ describe("typespec-autorest: model definitions", () => {
           },
         },
         required: ["name"],
+      });
+    });
+
+    it("defines nullable enum", async () => {
+      const res = await oapiForModel(
+        "Pet",
+        `
+      enum PetKind { dog, cat }
+      model Pet {
+        kind: PetKind | null;
+      };
+      `
+      );
+      ok(res.isRef);
+      deepStrictEqual(res.defs.Pet, {
+        type: "object",
+        properties: {
+          kind: {
+            $ref: "#/definitions/PetKind",
+            "x-nullable": true,
+          },
+        },
+        required: ["kind"],
+      });
+      deepStrictEqual(res.defs.PetKind, {
+        type: "string",
+        enum: ["dog", "cat"],
+        "x-ms-enum": {
+          modelAsString: true,
+          name: "PetKind",
+        },
+      });
+    });
+
+    it("defines nullable union", async () => {
+      const res = await oapiForModel(
+        "Pet",
+        `
+      union PetKind { "dog", "cat" }
+      model Pet {
+        kind: PetKind | null;
+      };
+      `
+      );
+      ok(res.isRef);
+      deepStrictEqual(res.defs.Pet, {
+        type: "object",
+        properties: {
+          kind: {
+            $ref: "#/definitions/PetKind",
+            "x-nullable": true,
+          },
+        },
+        required: ["kind"],
+      });
+      deepStrictEqual(res.defs.PetKind, {
+        type: "string",
+        enum: ["dog", "cat"],
+        "x-ms-enum": {
+          modelAsString: false,
+          name: "PetKind",
+        },
       });
     });
   });

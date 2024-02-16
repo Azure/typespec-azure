@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.39.1
+
+### Patch Changes
+
+- 9baadd2: Allow to define lroStatus on a union type
+- 9baadd2: `no-enum` linter rule allows the `Version` enum.
+
+
 ## 0.39.0
 
 ### Patch Changes

@@ -33,7 +33,7 @@ interface Tracked2Operations {
   listBySubscription is ArmListBySubscription<TestTrackedResource2>;
 }
 
-@doc("rp-specific proeprties for the resource with all envelope properties")
+@doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties2 {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: ResourceProvisioningState;

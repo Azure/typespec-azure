@@ -1507,7 +1507,7 @@ function createOAPIEmitter(
     }> = [];
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
-      const description = getDoc(program, member.variant);
+      const description = getDoc(program, member.type);
       values.push({
         name: typeof name === "string" ? name : `${member.value}`,
         value: member.value,
@@ -1532,15 +1532,16 @@ function createOAPIEmitter(
     if (e.nullable) {
       schema["x-nullable"] = true;
     }
-    return schema;
+    if (options.useReadOnlyStatusSchema) {
+      const [values, _] = extractLroStates(program, union);
+      if (values !== undefined) {
+        schema.readOnly = true;
+      }
+    }
+    return applyIntrinsicDecorators(union, schema);
   }
 
   function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
-    const [asEnum, _] = getUnionAsEnum(union);
-    if (asEnum) {
-      return getSchemaForUnionEnum(union, asEnum);
-    }
-
     const nonNullOptions = [...union.variants.values()]
       .map((x) => x.type)
       .filter((t) => !isNullType(t));
@@ -1552,6 +1553,7 @@ function createOAPIEmitter(
 
     if (nonNullOptions.length === 1) {
       const type = nonNullOptions[0];
+
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, visibility);
       if (schema.$ref) {
@@ -1565,6 +1567,10 @@ function createOAPIEmitter(
         return schema;
       }
     } else {
+      const [asEnum, _] = getUnionAsEnum(union);
+      if (asEnum) {
+        return getSchemaForUnionEnum(union, asEnum);
+      }
       reportDiagnostic(program, {
         code: "union-unsupported",
         target: union,
@@ -1607,6 +1613,8 @@ function createOAPIEmitter(
               format: { type: type.kind },
               target: type,
             });
+      case "UnionVariant":
+        return getDefaultValue(type.type);
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
@@ -1793,10 +1801,20 @@ function createOAPIEmitter(
   }
 
   function resolveProperty(prop: ModelProperty, visibility: Visibility): OpenAPI2SchemaProperty {
-    const propSchema =
-      prop.type.kind === "Enum" && prop.default
-        ? getSchemaForEnum(prop.type)
-        : getSchemaOrRef(prop.type, visibility);
+    let propSchema;
+    if (prop.type.kind === "Enum" && prop.default) {
+      propSchema = getSchemaForEnum(prop.type);
+    } else if (prop.type.kind === "Union" && prop.default) {
+      const [asEnum, _] = getUnionAsEnum(prop.type);
+      if (asEnum) {
+        propSchema = getSchemaForUnionEnum(prop.type, asEnum);
+      } else {
+        propSchema = getSchemaOrRef(prop.type, visibility);
+      }
+    } else {
+      propSchema = getSchemaOrRef(prop.type, visibility);
+    }
+
     return applyIntrinsicDecorators(prop, propSchema);
   }
 
@@ -1830,15 +1848,17 @@ function createOAPIEmitter(
   }
 
   function applyIntrinsicDecorators(
-    typespecType: Model | Scalar | ModelProperty,
+    typespecType: Model | Scalar | ModelProperty | Union,
     target: OpenAPI2Schema
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
     const isString =
-      typespecType.kind !== "Model" && isStringType(program, getPropertyType(typespecType));
+      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
+      isStringType(program, getPropertyType(typespecType));
     const isNumeric =
-      typespecType.kind !== "Model" && isNumericType(program, getPropertyType(typespecType));
+      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
+      isNumericType(program, getPropertyType(typespecType));
 
     if (docStr) {
       newTarget.description = docStr;
@@ -1927,7 +1947,9 @@ function createOAPIEmitter(
 
     attachExtensions(typespecType, newTarget);
 
-    return typespecType.kind === "Model" ? newTarget : applyEncoding(typespecType, newTarget);
+    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
+      ? applyEncoding(typespecType, newTarget)
+      : newTarget;
   }
 
   function applyEncoding(
