@@ -170,17 +170,17 @@ enum Usage {
 }
 
 /**
- * Expand usage for models/enums. 
- * A model/enum's default usage info is always calculated by the operations that use it. 
- * You could use this decorator to expand the default usage info. 
- * For example, with operation definition `op test(): OutputModel`, 
- * the model `OutputModel` has default usage `Usage.output`. 
- * After adding decorator `@@usage(OutputModel, Usage.input)`, 
- * the final usage result for `OutputModel` is `Usage.input | Usage.output`. 
- * The calculation of default usage info for models will be propagated to models' properties, 
- * parent models, discriminated sub models. 
- * But the expanded usage from `@usage` decorator will not be propagated. 
- * If you want to do any customization for the usage of a model, 
+ * Expand usage for models/enums.
+ * A model/enum's default usage info is always calculated by the operations that use it.
+ * You could use this decorator to expand the default usage info.
+ * For example, with operation definition `op test(): OutputModel`,
+ * the model `OutputModel` has default usage `Usage.output`.
+ * After adding decorator `@@usage(OutputModel, Usage.input)`,
+ * the final usage result for `OutputModel` is `Usage.input | Usage.output`.
+ * The calculation of default usage info for models will be propagated to models' properties,
+ * parent models, discriminated sub models.
+ * But the expanded usage from `@usage` decorator will not be propagated.
+ * If you want to do any customization for the usage of a model,
  * you need to take care of all related models/enums.
  * @param value The usage info you want to set for this model.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
@@ -188,14 +188,14 @@ enum Usage {
  * @example Expand usage for model
  * ```typespec
  * op test(): OutputModel;
- * 
+ *
  * // usage result for `OutputModel` is `Usage.input | Usage.output`
  * @usage(Usage.input)
  * model OutputModel {
  *   prop: string
  * }
  * ```
- * 
+ *
  * @example Propagation of usage
  * ```typespec
  * // Usage.output
@@ -251,16 +251,16 @@ enum Access {
 }
 
 /**
- * Set explicit access for operations, models and enums. 
- * When setting access for models, 
+ * Set explicit access for operations, models and enums.
+ * When setting access for models,
  * the access info wll not be propagated to models' properties, base models or sub models.
- * When setting access for an operation, 
+ * When setting access for an operation,
  * it will influence the access info for models/enums that are used by this operation.
  * Models/enums that are used in any operations with `@access(Access.public)` will be implicitly set to access "public"
  * Models/enums that are only used in operations with `@access(Access.internal)` will be implicitly set to access "internal".
  * This influence will be propagated to models' properties, parent models, discriminated sub models.
  * But this influence will be override by `@usage` decorator on models/enums directly.
- * If an operation/model/enum has no `@access` decorator and is not influenced by any operation with `@access` decorator, 
+ * If an operation/model/enum has no `@access` decorator and is not influenced by any operation with `@access` decorator,
  * the access result is undefined.
  * @param value The access info you want to set for this model or operation.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
@@ -283,31 +283,31 @@ enum Access {
  * model Fish {
  *   age: int32;
  * }
- * 
+ *
  * // Access.internal
  * @discriminator("sharktype")
  * model Shark extends Fish {
  *   kind: "shark";
  *   origin: Origin;
  * }
- * 
+ *
  * // Access.internal
  * model Salmon extends Fish {
  *   kind: "salmon";
  * }
- * 
+ *
  * // Access.internal
  * model SawShark extends Shark {
  *   sharktype: "saw";
  * }
- * 
+ *
  * // Access.internal
  * model Origin {
  *   country: string;
  *   city: string;
  *   manufacture: string;
  * }
- * 
+ *
  * // Access.internal
  * @get
  * @access(Access.internal)
@@ -318,69 +318,69 @@ enum Access {
  * // Access.internal
  * model Test1 {
  * }
- * 
+ *
  * // Access.internal
  * @access(Access.internal)
  * @route("/func1")
  * op func1(
  *   @body body: Test1
  * ): void;
- *  
+ *
  * // undefined
  * model Test2 {
  * }
- * 
+ *
  * // undefined
  * @route("/func2")
  * op func2(
  *   @body body: Test2
  * ): void;
- * 
+ *
  * // Access.public
  * model Test3 {
  * }
- * 
+ *
  * // Access.public
  * @access(Access.public)
  * @route("/func3")
  * op func3(
  *   @body body: Test3
  * ): void;
- * 
+ *
  * // undefined
  * model Test4 {
  * }
- * 
+ *
  * // Access.internal
  * @access(Access.internal)
  * @route("/func4")
  * op func4(
  *   @body body: Test4
  * ): void;
- * 
+ *
  * // undefined
  * @route("/func5")
  * op func5(
  *   @body body: Test4
  * ): void;
- * 
+ *
  * // Access.public
  * model Test5 {
  * }
- * 
+ *
  * // Access.internal
  * @access(Access.internal)
  * @route("/func6")
  * op func6(
  *   @body body: Test5
  * ): void;
- * 
+ *
  * // undefined
  * @route("/func7")
  * op func7(
  *   @body body: Test5
  * ): void;
- * 
+ *
  * // Access.public
  * @access(Access.public)
  * @route("/func8")
