@@ -89,7 +89,7 @@ Identifies an EnumMember as a long-running "Canceled" terminal state.
 
 #### Target
 
-`EnumMember`
+`union EnumMember | UnionVariant`
 
 #### Parameters
 
@@ -124,7 +124,7 @@ Identifies an enum member as a long-running "Failed" terminal state.
 
 #### Target
 
-`EnumMember`
+`union EnumMember | UnionVariant`
 
 #### Parameters
 
@@ -160,7 +160,7 @@ status.
 
 #### Target
 
-`union Enum | ModelProperty`
+`union Enum | Union | ModelProperty`
 
 #### Parameters
 
@@ -177,7 +177,7 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 #### Target
 
-`EnumMember`
+`union EnumMember | UnionVariant`
 
 #### Parameters
 

@@ -577,7 +577,7 @@ components:
       type: string
       enum:
         - notStarted
-        - runnning
+        - running
         - failed
         - succeeded
       description: Operation status.

@@ -1,5 +1,5 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
@@ -137,6 +137,20 @@ describe("typespec-autorest: union schema", () => {
           modelAsString: false,
         },
       });
+    });
+
+    it("supports description on unions that reduce to enums", async () => {
+      const res = await openApiFor(
+        `
+      @doc("FooUnion")
+      union Foo {
+        "a";
+        "b";
+      }
+
+      `
+      );
+      strictEqual(res.definitions.Foo.description, "FooUnion");
     });
   });
 });

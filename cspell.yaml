@@ -13,12 +13,18 @@ ignorePaths:
   - "**/CHANGELOG.md"
   - common/scripts/*
   - packages/website/build/*
+  - pnpm-lock.yaml
+  - eng/feeds/**/examples/**
+  - packages/samples/test/output/**
+useGitignore: true
 enableFiletypes:
-  - cadl
+  - tsp
+  - typespec
 words:
   - allof
   - apim
   - apos
+  - armId
   - azsdk
   - Bazs
   - byos
@@ -29,20 +35,27 @@ words:
   - foos
   - horiz
   - Howtos
+  - infile
+  - kvset
   - liftr
   - logz
   - LRO
+  - lropaging
+  - Lucene
   - msazure
   - msdata
+  - mylocation
+  - nupkg
   - odata
   - Onco
   - oncophenotype
+  - PAYG
   - prismjs
+  - qnas
   - regionality
+  - Reranker
   - rpaasoneboxacr
   - rpass
   - SERVICERP
-  - userrp
-  - lropaging
-  - armId
   - tcgc
+  - userrp

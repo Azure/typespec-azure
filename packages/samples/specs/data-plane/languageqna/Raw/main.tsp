@@ -222,7 +222,6 @@ namespace QuestionAnsweringProjects {
     JobMetadata
   >;
 
-  // TODO: ok resonse code is incorrect
   @post
   @doc("Update Active Learning feedback.")
   @action("feedback")

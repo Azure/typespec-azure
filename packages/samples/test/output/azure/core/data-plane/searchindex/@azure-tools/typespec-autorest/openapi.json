@@ -935,7 +935,7 @@
                 {
                   "name": "TwoTerms",
                   "value": "twoTerms",
-                  "description": "Matching two-term phrases in the index will be suggested. For example, if the inpu.t is 'medic', the suggested terms could include 'medicare coverage' and 'medical assistant'."
+                  "description": "Matching two-term phrases in the index will be suggested. For example, if the input is 'medic', the suggested terms could include 'medicare coverage' and 'medical assistant'."
                 },
                 {
                   "name": "OneTermWithContext",
@@ -1430,7 +1430,7 @@
           {
             "name": "TwoTerms",
             "value": "twoTerms",
-            "description": "Matching two-term phrases in the index will be suggested. For example, if the inpu.t is 'medic', the suggested terms could include 'medicare coverage' and 'medical assistant'."
+            "description": "Matching two-term phrases in the index will be suggested. For example, if the input is 'medic', the suggested terms could include 'medicare coverage' and 'medical assistant'."
           },
           {
             "name": "OneTermWithContext",

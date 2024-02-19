@@ -648,7 +648,7 @@
           "description": "Name property with a very long description that does not fit on a single line and a line break."
         },
         "color": {
-          "$ref": "#/definitions/CMYKColors"
+          "$ref": "#/definitions/Colors"
         }
       },
       "required": [
@@ -684,7 +684,7 @@
         "field"
       ]
     },
-    "CMYKColors": {
+    "Colors": {
       "type": "string",
       "enum": [
         "cyan",
@@ -693,7 +693,7 @@
         "blacK"
       ],
       "x-ms-enum": {
-        "name": "CMYKColors",
+        "name": "Colors",
         "modelAsString": true
       }
     },

@@ -15,7 +15,7 @@ paths:
       tags:
         - DataSources
       operationId: DatasourcesApis_list
-      description: Lists all indexe data sources available for a search service.
+      description: Lists all indexes data sources available for a search service.
       parameters:
         - $ref: '#/components/parameters/SelectParameter'
         - $ref: '#/components/parameters/ClientRequestIdParameter'
@@ -1642,7 +1642,7 @@ components:
           description: Character classes to keep in the tokens.
       allOf:
         - $ref: '#/components/schemas/LexicalTokenizer'
-      description: Tokenizes the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.
+      description: Tokenize the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.
     ElisionTokenFilter:
       type: object
       required:
@@ -2851,7 +2851,7 @@ components:
           description: Character classes to keep in the tokens.
       allOf:
         - $ref: '#/components/schemas/LexicalTokenizer'
-      description: Tokenizes the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.
+      description: Tokenize the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.
     OcrSkill:
       type: object
       required:
@@ -4335,7 +4335,7 @@ components:
           default: 255
       allOf:
         - $ref: '#/components/schemas/LexicalTokenizer'
-      description: Tokenizes urls and emails as one token. This tokenizer is implemented using Apache Lucene.
+      description: Tokenize urls and emails as one token. This tokenizer is implemented using Apache Lucene.
     VisualFeature:
       type: string
       enum:

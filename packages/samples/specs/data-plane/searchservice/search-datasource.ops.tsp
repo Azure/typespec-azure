@@ -12,7 +12,7 @@ using TypeSpec.Rest.Resource;
 @tag("DataSources")
 interface DatasourcesApis {
   @route("/datasources")
-  @doc("Lists all indexe data sources available for a search service.")
+  @doc("Lists all indexes data sources available for a search service.")
   @get
   list(...SelectParameter, ...ClientRequestIdParameter, ...ApiVersionParameter): CollectionResult<
     SearchIndexerDataSource,
