@@ -2078,7 +2078,7 @@ describe("typespec-client-generator-core: types", () => {
         @sharedRoute
         @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
         @sharedRoute
-        @post op multipartUseAsString(@body body: MultiPartRequest): string;
+        @post op multipartUseAsString(@header contentType: "multipart/form-data", @body body: MultiPartRequest): string;
       `
       );
       getAllModels(runner.context);
