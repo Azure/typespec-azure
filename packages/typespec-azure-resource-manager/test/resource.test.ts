@@ -1,6 +1,6 @@
 import { Diagnostic, Model } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
@@ -1019,6 +1019,79 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           );
         });
       });
+    });
+  });
+
+  it("emits correct paths for ArmResourceHead operation", async () => {
+    const openApi = await openApiFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+        @doc("The name of the widget")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        @visibility("read")
+        name: string;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+        @doc("The spin of the widget")
+        @knownValues(SpinValues)
+        spin?: string;
+      }
+  
+      enum SpinValues {
+        up,
+        down,
+      }
+
+      interface Widgets extends Operations {
+        checkExist is ArmResourceHead<Widget>;
+      }
+  `);
+    const headOperation =
+      openApi.paths[
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
+      ].head;
+    ok(headOperation);
+
+    deepEqual(headOperation, {
+      description: "Check a Widget via HEAD operation",
+      operationId: "Widgets_CheckExist",
+      parameters: [
+        {
+          $ref: "../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter",
+        },
+        {
+          $ref: "../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter",
+        },
+        {
+          $ref: "../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter",
+        },
+        {
+          description: "The name of the widget",
+          in: "path",
+          name: "widgetName",
+          required: true,
+          type: "string",
+        },
+      ],
+      responses: {
+        "200": {
+          description: "The request has succeeded.",
+        },
+        default: {
+          description: "An unexpected error response.",
+          schema: {
+            $ref: "../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse",
+          },
+        },
+      },
     });
   });
 });
