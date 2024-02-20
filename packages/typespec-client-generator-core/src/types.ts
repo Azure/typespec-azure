@@ -134,7 +134,7 @@ function addFormatInfo(
         propertyType.kind = "azureLocation";
         break;
       default:
-        throw Error(`Unknown format ${format}`);
+        break;
     }
   }
 }
