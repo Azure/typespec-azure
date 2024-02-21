@@ -15,9 +15,9 @@ import {
   resolvePath,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
+import * as versioning from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
-import * as versioning from "@typespec/versioning";
 
 /**
  * This is a Browse decorator which will be use to put more info on the browse view.
@@ -75,8 +75,10 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
     if (autoUpdate) {
       promotionResult.autoUpdate = true;
     }
-    if(versions && versions[1] && versions[1].size > 0) {
-      const versionsList = (versions[1] as versioning.VersionMap).getVersions().map(version => version.value);
+    if (versions && versions[1] && versions[1].size > 0) {
+      const versionsList = (versions[1] as versioning.VersionMap)
+        .getVersions()
+        .map((version) => version.value);
       if (!versionsList.includes(currentApiVersion)) {
         reportDiagnostic(program, {
           code: "invalid-apiversion",
@@ -118,7 +120,7 @@ export function checkIsValidApiVersion(program: Program, target: Model, version:
       target,
     });
     return false;
-  };
+  }
   return true;
 }
 
@@ -230,18 +232,18 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
 
 function checkIsValidLinks(program: Program, target: Model, links: Type[]) {
   let valid = true;
-  links.forEach(value => {
+  links.forEach((value) => {
     const pattern = /^https:\/\//;
-      if (!(value as StringLiteral).value.match(pattern)) {
-        reportDiagnostic(program, {
-          code: "invalid-link",
-          format: {
-            link: (value as StringLiteral).value
-          },
-          target,
-        });
-        valid = false;
-      }
+    if (!(value as StringLiteral).value.match(pattern)) {
+      reportDiagnostic(program, {
+        code: "invalid-link",
+        format: {
+          link: (value as StringLiteral).value,
+        },
+        target,
+      });
+      valid = false;
+    }
   });
   return valid;
 }

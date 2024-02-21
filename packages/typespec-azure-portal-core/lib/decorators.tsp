@@ -18,7 +18,7 @@ extern dec browse(target: Model, options: BrowseOptions);
 /**
  * Provides a Model customizing deployment promotion apiVersion for ARM resource.
  * The apiVersion will be used as a version to deploy to Portal.
- * @param options Property options provides promotion information of the resourceType. 
+ * @param options Property options provides promotion information of the resourceType.
  */
 extern dec promotion(target: Model, options: PromotionOptions);
 

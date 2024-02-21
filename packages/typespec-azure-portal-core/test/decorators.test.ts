@@ -93,14 +93,16 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
       learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
       })`;
     const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
-    expectDiagnostics(diagnostics, [{
-      code: "@azure-tools/typespec-azure-portal-core/invalid-link",
-      message: "@about learnMoreDocs www.azure.com does not start with https://",
-    }, 
-    {
-      code: "@azure-tools/typespec-azure-portal-core/invalid-link",
-      message: "@about learnMoreDocs www.portal.azure.com does not start with https://",
-    }]);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-portal-core/invalid-link",
+        message: "@about learnMoreDocs www.azure.com does not start with https://",
+      },
+      {
+        code: "@azure-tools/typespec-azure-portal-core/invalid-link",
+        message: "@about learnMoreDocs www.portal.azure.com does not start with https://",
+      },
+    ]);
   });
 
   it("@marketplaceOffer.id", async () => {
@@ -112,7 +114,9 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
 
   it("@marketplaceOffer.id with space", async () => {
     const marketplaceOffer = `@test @marketplaceOffer({id: "id space"})`;
-    const diagnostics = await runner.diagnose(createTestSpec(undefined, undefined, marketplaceOffer));
+    const diagnostics = await runner.diagnose(
+      createTestSpec(undefined, undefined, marketplaceOffer)
+    );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-offer-id",
       message: "@marketplaceOffer id cannot have a blank space.",
@@ -121,7 +125,9 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
 
   it("@promotion", async () => {
     const promotion = `@test @promotion({apiVersion: "2024-02-20-preview"})`;
-    const { Foo } = await runner.compile(createTestSpec(undefined, undefined, undefined, promotion));
+    const { Foo } = await runner.compile(
+      createTestSpec(undefined, undefined, undefined, promotion)
+    );
     const promotionOptions = getPromotion(runner.program, Foo);
     strictEqual(promotionOptions.apiVersion, "2024-02-20-preview");
     strictEqual(promotionOptions.autoUpdate, false);
@@ -129,7 +135,9 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
 
   it("@promotion with wrong apiVersion", async () => {
     const promotion = `@test @promotion({apiVersion: "2024-02-20"})`;
-    const diagnostics = await runner.diagnose(createTestSpec(undefined, undefined, undefined, promotion));
+    const diagnostics = await runner.diagnose(
+      createTestSpec(undefined, undefined, undefined, promotion)
+    );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-apiversion",
       message: "@promotion apiVersion 2024-02-20 is not listed on ARM service API Version lists",
@@ -138,10 +146,13 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
 
   it("@promotion with incorrect apiVersion", async () => {
     const promotion = `@test @promotion({apiVersion: "2023-01"})`;
-    const diagnostics = await runner.diagnose(createTestSpec(undefined, undefined, undefined, promotion));
+    const diagnostics = await runner.diagnose(
+      createTestSpec(undefined, undefined, undefined, promotion)
+    );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-apiversion",
-      message: "@promotion apiVersion 2023-01 is invalid, should be yyyy-mm-dd or yyyy-mm-dd-preview format",
+      message:
+        "@promotion apiVersion 2023-01 is invalid, should be yyyy-mm-dd or yyyy-mm-dd-preview format",
     });
   });
 
@@ -150,15 +161,21 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
       apiVersion: Versions.v2024_02_20_preview, 
       autoUpdate: true
     })`;
-    const { Foo } = await runner.compile(createTestSpec(undefined, undefined, undefined, promotion));
+    const { Foo } = await runner.compile(
+      createTestSpec(undefined, undefined, undefined, promotion)
+    );
     const promotionOptions = getPromotion(runner.program, Foo);
     strictEqual(promotionOptions.apiVersion, "2024-02-20-preview");
     strictEqual(promotionOptions.autoUpdate, true);
   });
-
 });
 
-export function createTestSpec(browseDec?: string, aboutDec?: string, marketplaceOffer?: string, promotion?: string) {
+export function createTestSpec(
+  browseDec?: string,
+  aboutDec?: string,
+  marketplaceOffer?: string,
+  promotion?: string
+) {
   return `
     @service({title: "Microsoft.Foo"})
     @armProviderNamespace
