@@ -27,12 +27,27 @@ export const $lib = createTypeSpecLibrary({
         default: `essentials can be only used 5 times in ModelProperty.`,
       },
     },
+    "invalid-apiversion": {
+      severity: "error",
+      messages: {
+        versionsList: paramMessage `@promotion apiVersion ${"version"} is not listed on ARM service API Version lists`,
+        serviceVersion: paramMessage `@promotion apiVersion ${"version"} is not same as the @service.version`,
+        promotionVersion: paramMessage `@promotion apiVersion ${"version"} is invalid, should be yyyy-mm-dd or yyyy-mm-dd-preview format`
+      },
+    },
+    "invalid-link": {
+      severity: "error",
+      messages: {
+        default: paramMessage `@about learnMoreDocs ${"link"} does not start with https://`,
+      },
+    }
   },
   state: {
     browse: { description: "State for the @browse decorator" },
     about: { description: "State for the @about decorator" },
     marketplaceOffer: { description: "State for the @marketplaceOffer decorator" },
     displayName: { description: "State for the @displayName decorator" },
+    promotion: {description: "State for the @promotion decorator" },
   },
 } as const);
 

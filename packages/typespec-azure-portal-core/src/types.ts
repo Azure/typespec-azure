@@ -17,3 +17,8 @@ export interface BrowseOptions {
 export interface marketplaceOfferOptions {
   id?: string;
 }
+
+export interface PromotionOptions {
+  apiVersion: string;
+  autoUpdate?: boolean;
+}

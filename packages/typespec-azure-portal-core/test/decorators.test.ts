@@ -9,6 +9,7 @@ import {
   getBrowseArgQuery,
   getDisplayName,
   getMarketplaceOfferId,
+  getPromotion,
 } from "../src/decorators.js";
 import { createPortalCoreTestRunner } from "./test-host.js";
 
@@ -55,7 +56,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
       @test @about({
       displayName: "hello",
       keywords: ["a", "c", "b"],
-      learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
+      learnMoreDocs: ["https://www.azure.com", "https://www.portal.azure.com"],
       })
       @doc("this is doc for about decorator")`;
     const { Foo } = await runner.compile(createTestSpec(undefined, aboutTest));
@@ -65,7 +66,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
     strictEqual(Foo.kind, "Model");
     strictEqual(displayName, "hello");
     deepEqual(keywords, ["a", "c", "b"]);
-    deepEqual(learnMoreDocs, ["www.azure.com", "www.portal.azure.com"]);
+    deepEqual(learnMoreDocs, ["https://www.azure.com", "https://www.portal.azure.com"]);
   });
 
   it("@about on non-ARM resource", async () => {
@@ -73,7 +74,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
         @test @about({
         displayName: "hello",
         keywords: ["a", "c", "b"],
-        learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
+        learnMoreDocs: ["https://www.azure.com", "https://www.portal.azure.com"],
       })`;
     const diagnostics = await runner.diagnose(`
         ${aboutTest}
@@ -85,33 +86,99 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
     });
   });
 
+  it("@about with learnMoreDocs not starting with https", async () => {
+    const aboutTest = `
+      @test @about({
+      displayName: "hello",
+      learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
+      })`;
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
+    expectDiagnostics(diagnostics, [{
+      code: "@azure-tools/typespec-azure-portal-core/invalid-link",
+      message: "@about learnMoreDocs www.azure.com does not start with https://",
+    }, 
+    {
+      code: "@azure-tools/typespec-azure-portal-core/invalid-link",
+      message: "@about learnMoreDocs www.portal.azure.com does not start with https://",
+    }]);
+  });
+
   it("@marketplaceOffer.id", async () => {
     const marketplaceOffer = `@test @marketplaceOffer({id: "id"})`;
-    const { Foo } = await runner.compile(createTestSpec(undefined, marketplaceOffer));
+    const { Foo } = await runner.compile(createTestSpec(undefined, undefined, marketplaceOffer));
     const marketplaceOfferId = getMarketplaceOfferId(runner.program, Foo);
     strictEqual(marketplaceOfferId, "id");
   });
 
   it("@marketplaceOffer.id with space", async () => {
     const marketplaceOffer = `@test @marketplaceOffer({id: "id space"})`;
-    const diagnostics = await runner.diagnose(createTestSpec(undefined, marketplaceOffer));
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, undefined, marketplaceOffer));
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-offer-id",
       message: "@marketplaceOffer id cannot have a blank space.",
     });
   });
+
+  it("@promotion", async () => {
+    const promotion = `@test @promotion({apiVersion: "2024-02-20-preview"})`;
+    const { Foo } = await runner.compile(createTestSpec(undefined, undefined, undefined, promotion));
+    const promotionOptions = getPromotion(runner.program, Foo);
+    strictEqual(promotionOptions.apiVersion, "2024-02-20-preview");
+    strictEqual(promotionOptions.autoUpdate, false);
+  });
+
+  it("@promotion with wrong apiVersion", async () => {
+    const promotion = `@test @promotion({apiVersion: "2024-02-20"})`;
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, undefined, undefined, promotion));
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalid-apiversion",
+      message: "@promotion apiVersion 2024-02-20 is not listed on ARM service API Version lists",
+    });
+  });
+
+  it("@promotion with incorrect apiVersion", async () => {
+    const promotion = `@test @promotion({apiVersion: "2023-01"})`;
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, undefined, undefined, promotion));
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalid-apiversion",
+      message: "@promotion apiVersion 2023-01 is invalid, should be yyyy-mm-dd or yyyy-mm-dd-preview format",
+    });
+  });
+
+  it("@promotion with autoupdate true", async () => {
+    const promotion = `@test @promotion({
+      apiVersion: "2024-02-20-preview", 
+      autoUpdate: true
+    })`;
+    const { Foo } = await runner.compile(createTestSpec(undefined, undefined, undefined, promotion));
+    const promotionOptions = getPromotion(runner.program, Foo);
+    strictEqual(promotionOptions.apiVersion, "2024-02-20-preview");
+    strictEqual(promotionOptions.autoUpdate, true);
+  });
+
 });
 
-export function createTestSpec(browseDec?: string, aboutDec?: string, marketplaceOffer?: string) {
+export function createTestSpec(browseDec?: string, aboutDec?: string, marketplaceOffer?: string, promotion?: string) {
   return `
     @service({title: "Microsoft.Foo"})
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     @armProviderNamespace
+    @versioned(Versions)
     namespace Microsoft.Foo;
+
+    enum Versions {
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      v2022_09_02_preview: "2022-09-02-preview",
+    
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      v2023_03_15_preview: "2024-02-20-preview",
+    }
 
     ${marketplaceOffer ?? ""}
     ${aboutDec ?? ""}
     ${browseDec ?? ""}
+    ${promotion ?? ""}
     model Foo is TrackedResource<{}> {
       @key("widgetName")
       @segment("widgets")

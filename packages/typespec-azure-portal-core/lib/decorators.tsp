@@ -16,6 +16,13 @@ extern dec about(target: Model, options: AboutOptions);
 extern dec browse(target: Model, options: BrowseOptions);
 
 /**
+ * Provides a Model customizing deployment promotion apiVersion for ARM resource.
+ * The apiVersion will be used as a version to deploy to Portal.
+ * @param options Property options provides promotion information of the resourceType. 
+ */
+extern dec promotion(target: Model, options: PromotionOptions);
+
+/**
  * Provides a Model marketplace offer information of ARM resource.
  * @param options Property options provides marketplace offer information of the resourceType.
  */
@@ -62,4 +69,10 @@ model AboutOptions {
 
   /** Set of links which can help learn more about the resource */
   learnMoreDocs?: string[];
+}
+
+/** Options for promotion of ARM resource. */
+model PromotionOptions {
+  apiVersion: string;
+  autoUpdate?: boolean;
 }
