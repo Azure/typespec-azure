@@ -1946,7 +1946,10 @@ function createOAPIEmitter(
       }
     }
 
-    if (typespecType.kind === "ModelProperty" && shouldFlattenProperty(tcgcSdkContext, typespecType)) {
+    if (
+      typespecType.kind === "ModelProperty" &&
+      shouldFlattenProperty(tcgcSdkContext, typespecType)
+    ) {
       newTarget["x-ms-client-flatten"] = true;
     }
 

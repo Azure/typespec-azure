@@ -26,7 +26,7 @@ describe("typespec-autorest: flatten", () => {
     deepStrictEqual(model, {
       properties: {
         properties: {
-          "$ref": "#/definitions/WidgetProperties",
+          $ref: "#/definitions/WidgetProperties",
           "x-ms-client-flatten": true,
         },
       },
@@ -56,7 +56,7 @@ describe("typespec-autorest: flatten", () => {
     deepStrictEqual(model, {
       properties: {
         properties: {
-          "$ref": "#/definitions/WidgetProperties",
+          $ref: "#/definitions/WidgetProperties",
           "x-ms-client-flatten": true,
         },
       },
