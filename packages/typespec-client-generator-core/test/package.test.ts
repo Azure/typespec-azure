@@ -638,6 +638,17 @@ describe("typespec-client-generator-core: package", () => {
       @route("/with-query-api-version")
       @head
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
+
+
+
+      def my_paging_function(self) -> PagedIterable[Item]:
+        request = HttpRequest("GET", "/items")
+        operation_response = self._client.send_request(request)
+        items = operation_response.json()["items"]
+        next_link = operation_response.json().get("nextLink")
+        if next_link:
+          # keep paging
+        return PagedIterable(items)
         `)
       );
       const sdkPackage = runnerWithCore.context.sdkPackage;

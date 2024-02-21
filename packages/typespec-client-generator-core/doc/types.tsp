@@ -234,7 +234,7 @@ model SdkModelType extends SdkType {
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
-  dicriminatorValue?: string;
+  discriminatorValue?: string;
   discriminatedSubtypes?: Record<SdkModelType>;
   baseModel?: SdkModelType;
   nameSpace: string;
@@ -343,7 +343,7 @@ model SdkMethodParameter extends SdkModelPropertyType {
 /**
  * Represents a property for a body model type
  *
- * @property visibility: Visiblity of the model
+ * @property visibility: Visibility of the model
  * @property discriminator: Whether the property is a discriminator
  * @property serializedName: The name of the property we send over the wire to the services
  */

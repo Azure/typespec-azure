@@ -57,7 +57,7 @@ model LinkerProperties {
   ...DefaultProvisioningStateProperty;
 }
 
-@doc("The kmind of authentication used for this linker.")
+@doc("The kind of authentication used for this linker.")
 enum AuthType {
   @doc("System assigned identity")
   systemAssignedIdentity,

@@ -1,6 +1,7 @@
 import { LroMetadata, PagedResultMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
+  Diagnostic,
   DurationKnownEncoding,
   EmitContext,
   Interface,
@@ -456,6 +457,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  diagnostics: readonly Diagnostic[];
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;

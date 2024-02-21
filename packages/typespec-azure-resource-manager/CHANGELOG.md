@@ -1,5 +1,11 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.39.1
+
+### Patch Changes
+
+- `arm-resource-provisioning-state` works with unions
+
 ## 0.39.0
 
 ### Patch Changes
