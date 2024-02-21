@@ -147,7 +147,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
 
   it("@promotion with autoupdate true", async () => {
     const promotion = `@test @promotion({
-      apiVersion: "2024-02-20-preview", 
+      apiVersion: Versions.v2024_02_20_preview, 
       autoUpdate: true
     })`;
     const { Foo } = await runner.compile(createTestSpec(undefined, undefined, undefined, promotion));
@@ -172,7 +172,7 @@ export function createTestSpec(browseDec?: string, aboutDec?: string, marketplac
     
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      v2023_03_15_preview: "2024-02-20-preview",
+      v2024_02_20_preview: "2024-02-20-preview",
     }
 
     ${marketplaceOffer ?? ""}

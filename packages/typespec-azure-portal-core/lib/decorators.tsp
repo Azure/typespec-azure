@@ -73,6 +73,6 @@ model AboutOptions {
 
 /** Options for promotion of ARM resource. */
 model PromotionOptions {
-  apiVersion: string;
+  apiVersion: string | EnumMember;
   autoUpdate?: boolean;
 }
