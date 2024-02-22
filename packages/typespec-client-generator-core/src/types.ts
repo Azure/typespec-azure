@@ -449,7 +449,7 @@ function addDiscriminatorToModelType(
       nameInClient: discriminator.propertyName,
       apiVersions: getAvailableApiVersions(context, model.__raw!),
       isMultipartFileInput: false, // discriminator property cannot be a file
-      flatten: false,
+      flatten: false, // discriminator properties can not be flattened
     });
   }
   return diagnostics.wrap(undefined);
