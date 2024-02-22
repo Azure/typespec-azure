@@ -15,8 +15,12 @@ import {
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
-import { getAllModels } from "../src/types.js";
-import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner, getAllModelsAssertNoDiagnostics } from "./test-host.js";
+import {
+  SdkTestRunner,
+  createSdkContextTestHelper,
+  createSdkTestRunner,
+  getAllModelsAssertNoDiagnostics,
+} from "./test-host.js";
 
 describe("typespec-client-generator-core: decorators", () => {
   let runner: SdkTestRunner;
