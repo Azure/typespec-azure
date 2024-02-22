@@ -79,3 +79,22 @@ Provides a Model marketplace offer information of ARM resource.
 | Name    | Type                                         | Description                                                                  |
 | ------- | -------------------------------------------- | ---------------------------------------------------------------------------- |
 | options | `model Azure.Portal.marketplaceOfferOptions` | Property options provides marketplace offer information of the resourceType. |
+
+### `@promotion` {#@Azure.Portal.promotion}
+
+Provides a Model customizing deployment promotion apiVersion for ARM resource.
+The apiVersion will be used as a version to deploy to Portal.
+
+```typespec
+@Azure.Portal.promotion(options: Azure.Portal.PromotionOptions)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name    | Type                                  | Description                                                          |
+| ------- | ------------------------------------- | -------------------------------------------------------------------- |
+| options | `model Azure.Portal.PromotionOptions` | Property options provides promotion information of the resourceType. |
