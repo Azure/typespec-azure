@@ -118,20 +118,14 @@ function addFormatInfo(
       case "uuid":
       case "password":
       case "etag":
+      case "arm-id":
+      case "ipaddress":
+      case "azurelocation":
         propertyType.kind = format;
         break;
       case "url":
       case "uri":
         propertyType.kind = "url";
-        break;
-      case "armid":
-        propertyType.kind = "armId";
-        break;
-      case "ipaddress":
-        propertyType.kind = "ipAddress";
-        break;
-      case "azurelocation":
-        propertyType.kind = "azureLocation";
         break;
       default:
         break;
@@ -210,12 +204,20 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "decimal":
     case "plainDate":
     case "plainTime":
+    case "arm-id":
+    case "etag":
+    case "guid":
+    case "uuid":
+    case "password":
+    case "ipaddress":
+    case "azurelocation":
       return scalar.name;
+    case "uri":
+      return "url";
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
   }
 }
-
 /**
  * Get the sdk built in type for a given typespec type
  * @param context the sdk context
