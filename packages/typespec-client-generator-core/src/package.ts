@@ -215,7 +215,7 @@ function getSdkHttpOperation(
   );
 
   if (
-    bodyParams &&
+    bodyParams.length &&
     !headerParams.some((h) => h.__raw && isContentTypeHeader(context.program, h.__raw))
   ) {
     // We will always add a content type parameter if a body is being inputted

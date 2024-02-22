@@ -91,6 +91,8 @@ import {
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
+  isHttpOperation,
+  isMultipartOperation,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -494,6 +496,22 @@ function addDiscriminatorToModelType<TServiceOperation extends SdkServiceOperati
   return diagnostics.wrap(undefined);
 }
 
+function isOperationBodyType<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>,
+  type: Model,
+  operation?: Operation
+): boolean {
+  if (!isHttpOperation(context, operation)) return false;
+  const httpBody = operation
+    ? ignoreDiagnostics(getHttpOperation(context.program, operation)).parameters.body
+    : undefined;
+  return (
+    !!httpBody &&
+    httpBody.type.kind === "Model" &&
+    getEffectivePayloadType(context, httpBody.type) === type
+  );
+}
+
 export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>,
   type: Model,
@@ -502,30 +520,9 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
   const diagnostics = createDiagnosticCollector();
   type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
-  const httpOperation = operation
-    ? ignoreDiagnostics(getHttpOperation(context.program, operation))
-    : undefined;
-  const httpBody = httpOperation?.parameters.body;
-  let isFormDataType = false;
-  if (httpBody && httpBody.type.kind === "Model") {
-    const isMultipartOperation = httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
-    isFormDataType =
-      isMultipartOperation && getEffectivePayloadType(context, httpBody.type) === type;
-  }
+
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
-    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
-      // This means we have a model that is used both for formdata input and for regular body input
-      diagnostics.add(
-        createDiagnostic({
-          code: "conflicting-multipart-model-usage",
-          target: type,
-          format: {
-            modelName: sdkType.name,
-          },
-        })
-      );
-    }
   } else {
     const docWrapper = getDocHelper(context, type);
     sdkType = {
@@ -540,7 +537,8 @@ export function getSdkModel<TServiceOperation extends SdkServiceOperation>(
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions<TServiceOperation>(context, type),
-      isFormDataType,
+      isFormDataType:
+        isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation),
     };
     updateModelsMap(context, type, sdkType, operation);
 
@@ -1312,6 +1310,38 @@ function handleServiceOrphanType<TServiceOperation extends SdkServiceOperation>(
   }
 }
 
+function verifyNoConflictingMultipartModelUsage<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  for (const [operation, modelMap] of context.operationModelsMap!) {
+    for (const [type, sdkType] of modelMap.entries()) {
+      if (
+        sdkType.kind === "model" &&
+        sdkType.isFormDataType !== isMultipartOperation(context, operation)
+      ) {
+        // This means we have a model that is used both for formdata input and for regular body input
+        diagnostics.add(
+          createDiagnostic({
+            code: "conflicting-multipart-model-usage",
+            target: type,
+            format: {
+              modelName: sdkType.name,
+            },
+          })
+        );
+      }
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
+function modelChecks<TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TServiceOperation>
+): [void, readonly Diagnostic[]] {
+  return verifyNoConflictingMultipartModelUsage(context);
+}
+
 export function getAllModels<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: SdkContext<TServiceOperation>,
   options: GetAllModelsOptions = {}
@@ -1375,5 +1405,6 @@ export function getAllModels<TServiceOperation extends SdkServiceOperation = Sdk
   if (options.output) {
     filter += UsageFlags.Output;
   }
+  diagnostics.pipe(modelChecks(context));
   return diagnostics.wrap([...context.modelsMap.values()].filter((t) => (t.usage & filter) > 0));
 }

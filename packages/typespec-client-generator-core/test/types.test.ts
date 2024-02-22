@@ -797,9 +797,7 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      const models = runner.context.sdkPackage.models;
-      strictEqual(models.length, 1);
-      strictEqual(models[0].access, "internal");
+      strictEqual(runner.context.sdkPackage.enums[0].access, "internal");
     });
     it("crossLanguageDefinitionId", async () => {
       await runner.compile(`
@@ -822,7 +820,7 @@ describe("typespec-client-generator-core: types", () => {
           }
         }
       `);
-      strictEqual(runner.context.sdkPackage.enums.length, 2);
+      strictEqual(runner.context.sdkPackage.enums.length, 1);
       const integersEnum = runner.context.sdkPackage.enums[0];
       strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
     });
@@ -840,9 +838,7 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      const models = runner.context.sdkPackage.models;
-      strictEqual(models.length, 1);
-      strictEqual(models[0].deprecation, "no longer support");
+      strictEqual(runner.context.sdkPackage.enums[0].deprecation, "no longer support");
     });
 
     it("orphan enum", async () => {
@@ -866,9 +862,8 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      const models = runner.context.sdkPackage.models;
-      strictEqual(models[0].name, "Enum1");
-      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(runner.context.sdkPackage.enums[0].name, "Enum1");
+      strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
     });
 
     it("projected name", async () => {
@@ -1649,19 +1644,14 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
       const models = runnerWithCore.context.sdkPackage.models;
-      strictEqual(models.length, 6);
+      strictEqual(models.length, 5);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(
         modelNames,
-        [
-          "Error",
-          "ErrorResponse",
-          "InnerError",
-          "User",
-          "ResourceOperationStatus",
-          "OperationState",
-        ].sort()
+        ["Error", "ErrorResponse", "InnerError", "User", "ResourceOperationStatus"].sort()
       );
+      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
+      strictEqual(runnerWithCore.context.sdkPackage.enums[0].name, "OperationState");
     });
     it("no models filter core", async () => {
       await runner.compile(`
@@ -1705,7 +1695,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models[0].usage, UsageFlags.Output);
 
       strictEqual(models.filter((x) => x.usage === UsageFlags.Output).length, 1);
-      strictEqual(models.filter((x) => x.usage === UsageFlags.Output).length, 0);
+      strictEqual(models.filter((x) => x.usage === UsageFlags.Input).length, 0);
     });
 
     it("roundtrip usage", async () => {
@@ -1719,8 +1709,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
 
-      strictEqual(models.filter((x) => x.usage === UsageFlags.Output).length, 1);
-      strictEqual(models.filter((x) => x.usage === UsageFlags.Input).length, 1);
+      strictEqual(models.filter((x) => (x.usage & UsageFlags.Output) > 0).length, 1);
+      strictEqual(models.filter((x) => (x.usage & UsageFlags.Input) > 0).length, 1);
       strictEqual(models.filter((x) => x.usage === UsageFlags.None).length, 0);
     });
 

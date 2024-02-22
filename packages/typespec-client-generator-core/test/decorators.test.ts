@@ -215,7 +215,8 @@ describe("typespec-client-generator-core: decorators", () => {
         @service({})
         @test namespace MyClient;
 
-        @route("/root1") op atRoot1(): void;        @route("/root2") op atRoot2(): void;
+        @route("/root1") op atRoot1(): void;       
+        @route("/root2") op atRoot2(): void;
 
         @operationGroup
         @test interface MyGroup {

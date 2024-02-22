@@ -1,14 +1,17 @@
 import {
   ModelProperty,
   Namespace,
+  Operation,
   Type,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
   getProjectedName,
   getSummary,
+  ignoreDiagnostics,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { HttpOperation, getHttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import { SdkContext, SdkModelPropertyType, SdkServiceOperation, SdkType } from "./interfaces.js";
 import { isApiVersion } from "./public-utils.js";
@@ -202,4 +205,18 @@ export function getWireName(context: SdkContext, type: Type & { name: string }) 
   if (encodedName !== type.name) return encodedName;
   // 2. Check if there's deprecated language projection
   return getProjectedName(context.program, type, "json") ?? type.name;
+}
+
+export function isMultipartOperation(context: SdkContext, operation?: Operation): boolean {
+  if (!operation) return false;
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+  const httpBody = httpOperation.parameters.body;
+  if (httpBody && httpBody.type.kind === "Model") {
+    return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
+  }
+  return false;
+}
+
+export function isHttpOperation(context: SdkContext, obj: any): obj is HttpOperation {
+  return !!obj && obj.kind === "Operation" && !getHttpOperation(context.program, obj)[1].length;
 }
