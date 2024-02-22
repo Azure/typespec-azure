@@ -190,7 +190,7 @@ model FilteringTag {
   @doc("The value of the tag.")
   value: string;
 
-  @doc("The action associated with thsi tag.")
+  @doc("The action associated with this tag.")
   action: TagAction;
 }
 

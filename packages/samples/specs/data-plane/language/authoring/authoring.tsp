@@ -272,9 +272,8 @@ interface Projects {
   >;
 
   #suppress "@azure-tools/typespec-azure-core/long-running-polling-operation-required" "This operation does not follow the standard long-running operation pattern."
-  // NOTE: `import` is a reserved keyword
   @doc("Triggers a job to export a project's data.")
-  importx is Operations.ResourceAction<
+  `import` is Operations.ResourceAction<
     Project,
     ExportedProject,
     TypeSpec.Http.AcceptedResponse & Foundations.LongRunningStatusLocation

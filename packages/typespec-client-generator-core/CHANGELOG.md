@@ -1,5 +1,11 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.39.2
+
+### Patch Changes
+
+- Handle enums inside a union of literals
+
 ## 0.39.0
 
 ### Minor Changes

@@ -1,6 +1,8 @@
 import "@typespec/http";
 import "@typespec/rest";
 
+// cspell:ignore adls adlsgen
+
 import "./dataIdentity.model.tsp";
 import "./dataPolicy.model.tsp";
 
