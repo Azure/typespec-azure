@@ -132,11 +132,20 @@ export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKn
   return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-export interface SdkDatetimeType extends SdkTypeBase {
-  kind: "datetime";
+interface SdkDatetimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
+
+interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+  kind: "utcDateTime";
+}
+
+interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+  kind: "offsetDateTime";
+}
+
+export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
