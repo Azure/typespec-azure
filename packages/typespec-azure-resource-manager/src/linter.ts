@@ -24,10 +24,12 @@ import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 
 const rules = [
   armNoRecordRule,
   armCommonTypesVersionRule,
+  armDeleteResponseCodesRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
