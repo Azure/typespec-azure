@@ -52,6 +52,7 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldFlattenProperty,
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
@@ -437,6 +438,7 @@ function addDiscriminatorToModelType(
       nameInClient: discriminator.propertyName,
       apiVersions: getAvailableApiVersions(context, model.__raw!),
       isMultipartFileInput: false, // discriminator property cannot be a file
+      flatten: false, // discriminator properties can not be flattened
     });
   }
   return diagnostics.wrap(undefined);
@@ -862,6 +864,7 @@ function getSdkBodyModelPropertyType(
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
     isMultipartFileInput: isBytesInput && operationIsMultipart,
+    flatten: shouldFlattenProperty(context, type),
   });
 }
 
