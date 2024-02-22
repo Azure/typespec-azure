@@ -66,15 +66,12 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
       return;
     }
     const versions = getVersions(program, target);
-    const promotionResult: PromotionOptions = {
-      apiVersion: currentApiVersion,
-      autoUpdate: false,
-    };
     const autoUpdateProp = options.properties.get("autoUpdate");
     const autoUpdate = autoUpdateProp && (autoUpdateProp?.type as BooleanLiteral).value;
-    if (autoUpdate) {
-      promotionResult.autoUpdate = true;
-    }
+    const promotionResult: PromotionOptions = {
+      apiVersion: currentApiVersion,
+      autoUpdate: autoUpdate ?? false,
+    };
     if (versions && versions[1] && versions[1].size > 0) {
       const versionsList = (versions[1] as VersionMap)
         .getVersions()

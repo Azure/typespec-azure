@@ -21,6 +21,6 @@ export interface marketplaceOfferOptions {
 }
 
 export interface PromotionOptions {
-  apiVersion: string | EnumMember;
-  autoUpdate?: boolean;
+  readonly apiVersion: string | EnumMember;
+  readonly autoUpdate?: boolean;
 }
