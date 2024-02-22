@@ -61,6 +61,7 @@ import {
   SdkBuiltInType,
   SdkConstantType,
   SdkContext,
+  SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
   SdkEnumType,
@@ -696,7 +697,7 @@ export function getClientType(
           ...getSdkTypeBaseHelper(context, type, type.name),
           encode: "rfc3339",
           wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
-        };
+        } as SdkDatetimeType;
         break;
       }
       if (type.name === "duration") {
