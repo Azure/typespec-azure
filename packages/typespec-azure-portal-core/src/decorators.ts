@@ -15,7 +15,7 @@ import {
   resolvePath,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
-import * as versioning from "@typespec/versioning";
+import { getVersions, VersionMap } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
 
@@ -65,7 +65,7 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
     if (!checkIsValidApiVersion(program, target, currentApiVersion)) {
       return;
     }
-    const versions = versioning.getVersions(program, target);
+    const versions = getVersions(program, target);
     const promotionResult: PromotionOptions = {
       apiVersion: currentApiVersion,
       autoUpdate: false,
@@ -76,7 +76,7 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
       promotionResult.autoUpdate = true;
     }
     if (versions && versions[1] && versions[1].size > 0) {
-      const versionsList = (versions[1] as versioning.VersionMap)
+      const versionsList = (versions[1] as VersionMap)
         .getVersions()
         .map((version) => version.value);
       if (!versionsList.includes(currentApiVersion)) {
