@@ -59,6 +59,7 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldFlattenProperty,
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
@@ -158,7 +159,7 @@ export function addFormatInfo<TServiceOperation extends SdkServiceOperation>(
         propertyType.kind = "azureLocation";
         break;
       default:
-        throw Error(`Unknown format ${format}`);
+        break;
     }
   }
 }
@@ -491,6 +492,7 @@ function addDiscriminatorToModelType<TServiceOperation extends SdkServiceOperati
       apiVersions: getAvailableApiVersions(context, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
+      flatten: false, // discriminator properties can not be flattened
     });
   }
   return diagnostics.wrap(undefined);
@@ -1012,6 +1014,7 @@ export function getSdkModelPropertyType<TServiceOperation extends SdkServiceOper
       discriminator: false,
       serializedName: getPropertyNames(context, type)[1],
       isMultipartFileInput: isBytesInput && operationIsMultipart,
+      flatten: shouldFlattenProperty(context, type),
       ...updateWithApiVersionInformation(context, type),
     });
   }

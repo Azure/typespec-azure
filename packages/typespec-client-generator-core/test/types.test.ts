@@ -199,6 +199,22 @@ describe("typespec-client-generator-core: types", () => {
       }
     });
 
+    it("unknown format", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          @format("unknown")
+          unknownProp: string;
+        }
+      `
+      );
+      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      strictEqual(models[0].kind, "model");
+      strictEqual(models[0].properties[0].type.kind, "string");
+    });
+
     it("known values", async function () {
       await runner.compileWithBuiltInService(
         `

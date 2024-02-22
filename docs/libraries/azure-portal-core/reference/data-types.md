@@ -39,3 +39,11 @@ Options for marketplaceOffer
 ```typespec
 model Azure.Portal.marketplaceOfferOptions
 ```
+
+### `PromotionOptions` {#Azure.Portal.PromotionOptions}
+
+Options for promotion of ARM resource.
+
+```typespec
+model Azure.Portal.PromotionOptions
+```
