@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Added ArmResourceHead operation template
+Added `ArmResourceHead` operation template
