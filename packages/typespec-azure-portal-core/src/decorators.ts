@@ -15,7 +15,7 @@ import {
   resolvePath,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
-import { getVersions, VersionMap } from "@typespec/versioning";
+import { VersionMap, getVersions } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
 
