@@ -924,6 +924,7 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
     } else {
       context.operationModelsMap.set(operation, new Map([[type, sdkType]]));
     }
+    // TODO: it seems duplicate calculation, need to optimize later
     if (sdkType.kind === "model") {
       for (const prop of sdkType.properties) {
         if (prop.type.kind === "model" || prop.type.kind === "enum") {
@@ -945,6 +946,14 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
       }
       if (sdkType.baseModel) {
         updateModelsMap(context, sdkType.baseModel.__raw as any, sdkType.baseModel, operation);
+      }
+      if (sdkType.additionalProperties) {
+        updateModelsMap(
+          context,
+          sdkType.additionalProperties.__raw as any,
+          sdkType.additionalProperties,
+          operation
+        );
       }
       if (sdkType.discriminatedSubtypes) {
         for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
@@ -1012,6 +1021,9 @@ function updateUsageOfModel(
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
       updateUsageOfModel(context, discriminatedSubtype, usage, seenModelNames);
     }
+  }
+  if (type.additionalProperties) {
+    updateUsageOfModel(context, type.additionalProperties, usage, seenModelNames);
   }
   for (const property of type.properties) {
     updateUsageOfModel(context, property.type, usage, seenModelNames);

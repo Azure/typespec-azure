@@ -1907,6 +1907,39 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
       strictEqual(NonAdditionalPropertiesModel.additionalProperties, undefined);
     });
+    it("additionalProperties usage", async () => {
+      await runner.compileWithBuiltInService(`
+        @service({})
+        namespace MyService {
+          model AdditionalPropertiesModel extends Record<Test> {
+          }
+  
+          model AdditionalPropertiesModel2 is Record<Test> {
+          }
+
+          model Test {
+          }
+
+          op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+        }
+      `);
+      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      strictEqual(models.length, 3);
+      const AdditionalPropertiesModel = models.find(
+        (x) => x.name === "AdditionalPropertiesModel"
+      )! as SdkModelType;
+      const AdditionalPropertiesModel2 = models.find(
+        (x) => x.name === "AdditionalPropertiesModel2"
+      )! as SdkModelType;
+      const Test = models.find((x) => x.name === "Test")! as SdkModelType;
+      strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel.usage, UsageFlags.Input);
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel2.usage, UsageFlags.Output);
+      strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output);
+    });
     it("crossLanguageDefinitionId", async () => {
       await runner.compile(`
         @service({})
