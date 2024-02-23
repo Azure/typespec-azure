@@ -1145,7 +1145,7 @@ function handleServiceOrphanType(context: SdkContext, type: Model | Enum) {
   }
 }
 
-export function getAllModels(
+export function getAllModelsWithDiagnostics(
   context: SdkContext,
   options: GetAllModelsOptions = {}
 ): [(SdkModelType | SdkEnumType)[], readonly Diagnostic[]] {
@@ -1205,5 +1205,16 @@ export function getAllModels(
   if (options.output) {
     filter += UsageFlags.Output;
   }
+
   return diagnostics.wrap([...context.modelsMap.values()].filter((t) => (t.usage & filter) > 0));
+}
+
+export function getAllModels(
+  context: SdkContext,
+  options: GetAllModelsOptions = {}
+): (SdkModelType | SdkEnumType)[] {
+  // we currently don't return diagnostics even though we keep track of them
+  // when we move to the new sdk type ecosystem completely, we'll expose
+  // diagnostics as a separate property on the sdkContext
+  return ignoreDiagnostics(getAllModelsWithDiagnostics(context, options));
 }
