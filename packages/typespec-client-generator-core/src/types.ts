@@ -1070,16 +1070,18 @@ function updateTypesFromOperation(
     }
   }
   const lroMetaData = getLroMetadata(program, operation);
-  if (lroMetaData) {
+  if (lroMetaData && generateConvenient) {
     const logicalResult = diagnostics.pipe(
       checkAndGetClientType(context, lroMetaData.logicalResult, operation)
     );
-    if (
-      logicalResult &&
-      ["model", "enum", "array", "dict", "union"].includes(logicalResult.kind) &&
-      generateConvenient
-    ) {
+    if (logicalResult) {
       updateUsageOfModel(context, logicalResult, UsageFlags.Output);
+    }
+    const envelopeResult = diagnostics.pipe(
+      checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+    );
+    if (envelopeResult) {
+      updateUsageOfModel(context, envelopeResult, UsageFlags.Output);
     }
   }
   return diagnostics.wrap(undefined);
