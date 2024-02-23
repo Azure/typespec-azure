@@ -208,7 +208,7 @@ export function $about(context: DecoratorContext, target: Model, option: Model) 
         const learnMoreDocsValues = learnMoreDocs.type.values
           .filter((value) => value.kind === "String")
           .map((value: Type) => (value as StringLiteral).value);
-          aboutOptionResult.learnMoreDocs = learnMoreDocsValues;
+        aboutOptionResult.learnMoreDocs = learnMoreDocsValues;
       }
     }
     if (keywords) {
