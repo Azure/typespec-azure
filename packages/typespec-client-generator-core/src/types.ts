@@ -956,7 +956,11 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
       }
       if (sdkType.additionalProperties) {
         updateModelsMap(
-          context, sdkType.additionalProperties.__raw as any, sdkType.additionalProperties, operation);
+          context,
+          sdkType.additionalProperties.__raw as any,
+          sdkType.additionalProperties,
+          operation
+        );
       }
       if (sdkType.discriminatedSubtypes) {
         for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
