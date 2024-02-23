@@ -25,7 +25,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedModelSummary'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -58,7 +58,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelSummary'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -86,7 +86,7 @@ paths:
         '204':
           description: 'There is no content to send for this request, but the headers may be useful. '
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -125,7 +125,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AnalyzeResultOperation'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -178,7 +178,7 @@ paths:
               schema:
                 type: string
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -245,7 +245,7 @@ paths:
               schema:
                 type: string
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -278,7 +278,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CopyAuthorization'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -313,7 +313,7 @@ paths:
               schema:
                 type: string
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -348,7 +348,7 @@ paths:
               schema:
                 type: string
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -381,7 +381,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetInfoResponse'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -408,7 +408,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedOperationInfo'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
@@ -441,7 +441,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetOperationResponse'
         default:
-          description: An unexpected error response.
+          description: A response containing error details.
           headers:
             x-ms-error-code:
               required: false
