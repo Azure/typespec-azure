@@ -72,7 +72,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -113,7 +113,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -181,7 +181,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -244,7 +244,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -290,7 +290,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -333,7 +333,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -385,7 +385,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -424,7 +424,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -472,7 +472,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -544,7 +544,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -614,7 +614,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -667,7 +667,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -719,7 +719,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -764,7 +764,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -805,7 +805,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -848,7 +848,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },

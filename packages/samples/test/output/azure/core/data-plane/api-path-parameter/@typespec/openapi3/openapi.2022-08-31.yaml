@@ -13,7 +13,7 @@ paths:
         - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
       responses:
         '200':
-          description: Paged collection of Manufacturer items
+          description: The request has succeeded.
           headers:
             x-ms-client-request-id:
               required: false
@@ -25,7 +25,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedManufacturer'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -101,7 +101,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Manufacturer'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -154,7 +154,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Manufacturer'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -224,7 +224,7 @@ paths:
                     description: Error object that describes the error when status is "Failed".
                 description: Provides status details for long running operations.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -281,7 +281,7 @@ paths:
                     description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -318,7 +318,7 @@ paths:
                 required:
                   - statusString
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -342,7 +342,7 @@ paths:
         - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
       responses:
         '200':
-          description: Paged collection of Widget items
+          description: The request has succeeded.
           headers:
             x-ms-client-request-id:
               required: false
@@ -354,7 +354,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedWidget'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -442,7 +442,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Widget'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -495,7 +495,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Widget'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -565,7 +565,7 @@ paths:
                     description: Error object that describes the error when status is "Failed".
                 description: Provides status details for long running operations.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -622,7 +622,7 @@ paths:
                     description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false

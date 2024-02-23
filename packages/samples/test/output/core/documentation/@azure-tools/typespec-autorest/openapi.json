@@ -98,7 +98,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "The server cannot find the requested resource.",
             "schema": {
               "$ref": "#/definitions/NotFoundWithDocsResp"
             }

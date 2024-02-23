@@ -46,7 +46,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Paged collection of Widget items",
+            "description": "The request has succeeded.",
             "schema": {
               "$ref": "#/definitions/PagedWidget"
             },

@@ -21,7 +21,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedProjectMetadata'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -52,7 +52,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeletionJobState'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -83,7 +83,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProjectMetadata'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -119,7 +119,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProjectMetadata'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -179,7 +179,7 @@ paths:
                     description: Error object that describes the error when status is "Failed".
                 description: Provides status details for long running operations.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -215,7 +215,7 @@ paths:
                 type: string
                 format: uri
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -252,7 +252,7 @@ paths:
                 type: string
                 format: uri
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -284,7 +284,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedProjectDeployment'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -313,7 +313,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedSynonymAsset'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -338,7 +338,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedSynonymAsset'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -387,7 +387,7 @@ paths:
                 type: string
                 format: uri
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -430,7 +430,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeploymentJobState'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -467,7 +467,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExportJobState'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -494,7 +494,7 @@ paths:
         '204':
           description: 'There is no content to send for this request, but the headers may be useful. '
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -531,7 +531,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/JobState'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -560,7 +560,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedQnaSourceRecord'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -585,7 +585,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedQnaSourceRecord'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -619,7 +619,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/JobMetadata'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -648,7 +648,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedQnaSourceRecord'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -673,7 +673,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedQnaSourceRecord'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -707,7 +707,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/JobMetadata'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false

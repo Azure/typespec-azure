@@ -81,7 +81,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -110,7 +110,7 @@
             "description": "The request has succeeded."
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -139,7 +139,7 @@
             "description": "The request has succeeded."
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -168,7 +168,7 @@
             "description": "The request has succeeded."
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -200,7 +200,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -249,7 +249,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -291,7 +291,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -330,7 +330,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -369,7 +369,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -404,7 +404,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -444,7 +444,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -500,7 +500,7 @@
             }
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },
@@ -535,7 +535,7 @@
             "description": "There is no content to send for this request, but the headers may be useful. "
           },
           "default": {
-            "description": "A response containing error details.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
             },

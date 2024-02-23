@@ -66,7 +66,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -113,7 +113,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -192,7 +192,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -258,7 +258,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -336,7 +336,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -402,7 +402,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -472,7 +472,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -534,7 +534,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -579,7 +579,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -633,7 +633,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -697,7 +697,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -752,7 +752,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -805,7 +805,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -884,7 +884,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -931,7 +931,7 @@
             }
           },
           "default": {
-            "description": "Azure App Configuration error object.",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
             }

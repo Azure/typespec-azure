@@ -17,7 +17,7 @@ paths:
         - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
       responses:
         '200':
-          description: Paged collection of Widget items
+          description: The request has succeeded.
           headers:
             x-ms-client-request-id:
               required: false

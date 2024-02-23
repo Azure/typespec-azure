@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedKey'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -71,7 +71,7 @@ paths:
               schema:
                 type: string
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -120,7 +120,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedKeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -159,7 +159,7 @@ paths:
               schema:
                 type: string
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -210,7 +210,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -239,7 +239,7 @@ paths:
                 type: string
                 format: date
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -278,7 +278,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -340,7 +340,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -395,7 +395,7 @@ paths:
               schema:
                 type: string
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -435,7 +435,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedLabel'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -476,7 +476,7 @@ paths:
               schema:
                 type: string
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -513,7 +513,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -549,7 +549,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -601,7 +601,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedKeyValue'
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:
@@ -633,7 +633,7 @@ paths:
               schema:
                 type: string
         default:
-          description: Azure App Configuration error object.
+          description: An unexpected error response.
           content:
             application/problem+json:
               schema:

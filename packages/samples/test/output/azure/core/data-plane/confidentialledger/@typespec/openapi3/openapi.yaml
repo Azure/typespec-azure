@@ -21,7 +21,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Collection'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -43,7 +43,7 @@ paths:
         '200':
           description: The request has succeeded.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -65,7 +65,7 @@ paths:
         '200':
           description: The request has succeeded.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -87,7 +87,7 @@ paths:
         '200':
           description: The request has succeeded.
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -113,7 +113,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedLedgerEntries'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -141,7 +141,7 @@ paths:
                 type: string
                 format: uri
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -175,7 +175,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LedgerEntry'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -208,7 +208,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LedgerEntry'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -240,7 +240,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransactionReceipt'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -272,7 +272,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransactionStatus'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -302,7 +302,7 @@ paths:
         '204':
           description: 'There is no content to send for this request, but the headers may be useful. '
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -335,7 +335,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LedgerUser'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
@@ -374,7 +374,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LedgerUser'
         default:
-          description: A response containing error details.
+          description: An unexpected error response.
           headers:
             x-ms-error-code:
               required: false
