@@ -1,5 +1,6 @@
 import { ArmResourceKind, getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 import {
+  BooleanLiteral,
   CompilerHost,
   DecoratorContext,
   Model,
@@ -8,13 +9,15 @@ import {
   StringLiteral,
   Type,
   getDirectoryPath,
+  getService,
   getSourceLocation,
   normalizePath,
   resolvePath,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
+import { VersionMap, getVersions } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
-import { AboutOptions, BrowseOptions, marketplaceOfferOptions } from "./types.js";
+import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
 
 /**
  * This is a Browse decorator which will be use to put more info on the browse view.
@@ -52,6 +55,72 @@ export function $browse(context: DecoratorContext, target: Model, options: Model
   }
 }
 
+export function $promotion(context: DecoratorContext, target: Model, options: Model) {
+  const { program } = context;
+  validateDecoratorUniqueOnNode(context, target, $promotion);
+  checkIsArmResource(program, target, "promotion");
+  if (options && options.properties) {
+    const apiVersion = options.properties.get("apiVersion");
+    const currentApiVersion = (apiVersion?.type as StringLiteral).value;
+    if (!checkIsValidApiVersion(program, target, currentApiVersion)) {
+      return;
+    }
+    const versions = getVersions(program, target);
+    const autoUpdateProp = options.properties.get("autoUpdate");
+    const autoUpdate = autoUpdateProp && (autoUpdateProp?.type as BooleanLiteral).value;
+    const promotionResult: PromotionOptions = {
+      apiVersion: currentApiVersion,
+      autoUpdate: autoUpdate ?? false,
+    };
+    if (versions && versions[1] && versions[1].size > 0) {
+      const versionsList = (versions[1] as VersionMap)
+        .getVersions()
+        .map((version) => version.value);
+      if (!versionsList.includes(currentApiVersion)) {
+        reportDiagnostic(program, {
+          code: "invalid-apiversion",
+          messageId: "versionsList",
+          format: {
+            version: currentApiVersion,
+          },
+          target,
+        });
+        return;
+      }
+    } else if (target.namespace) {
+      const service = getService(program, target.namespace);
+      if (service?.version && currentApiVersion !== service.version) {
+        reportDiagnostic(program, {
+          code: "invalid-apiversion",
+          messageId: "serviceVersion",
+          format: {
+            version: currentApiVersion,
+          },
+          target,
+        });
+        return;
+      }
+    }
+    program.stateMap(PortalCoreKeys.promotion).set(target, promotionResult);
+  }
+}
+
+export function checkIsValidApiVersion(program: Program, target: Model, version: string) {
+  const pattern = /^(\d{4}-\d{2}-\d{2})(|-preview)$/;
+  if (version.match(pattern) == null) {
+    reportDiagnostic(program, {
+      code: "invalid-apiversion",
+      messageId: "promotionVersion",
+      format: {
+        version: version,
+      },
+      target,
+    });
+    return false;
+  }
+  return true;
+}
+
 export async function isFileExist(host: CompilerHost, filePath: string) {
   try {
     const stats = await host.stat(filePath);
@@ -62,6 +131,10 @@ export async function isFileExist(host: CompilerHost, filePath: string) {
     }
     throw e;
   }
+}
+
+export function getPromotion(program: Program, target: Type) {
+  return program.stateMap(PortalCoreKeys.promotion).get(target);
 }
 
 export function getBrowse(program: Program, target: Type) {
@@ -75,7 +148,7 @@ export function getBrowseArgQuery(program: Program, target: Type) {
 export function checkIsArmResource(
   program: Program,
   target: Model,
-  decoratorName: "browse" | "about" | "marketplaceOffer"
+  decoratorName: "browse" | "about" | "marketplaceOffer" | "promotion"
 ) {
   if (
     getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
@@ -129,6 +202,9 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     }
     if (learnMoreDocs) {
       if (learnMoreDocs.type.kind === "Tuple") {
+        if (!checkIsValidLinks(program, target, learnMoreDocs.type.values)) {
+          return;
+        }
         const learnMoreDocsValues = learnMoreDocs.type.values
           .filter((value) => value.kind === "String")
           .map((value: Type) => (value as StringLiteral).value);
@@ -149,6 +225,24 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     }
   }
   program.stateMap(PortalCoreKeys.about).set(target, aboutOptionsResult);
+}
+
+function checkIsValidLinks(program: Program, target: Model, links: Type[]) {
+  let valid = true;
+  links.forEach((value) => {
+    const pattern = /^https:\/\//;
+    if (!(value as StringLiteral).value.match(pattern)) {
+      reportDiagnostic(program, {
+        code: "invalid-link",
+        format: {
+          link: (value as StringLiteral).value,
+        },
+        target,
+      });
+      valid = false;
+    }
+  });
+  return valid;
 }
 
 export function getAbout(program: Program, target: Type) {
