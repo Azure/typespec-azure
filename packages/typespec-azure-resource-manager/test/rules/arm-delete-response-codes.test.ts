@@ -56,6 +56,40 @@ describe("typespec-azure-resource-manager: arm delete response codes rule", () =
       });
   });
 
+  it("Does not emit a warning for synchronous delete operation that contains the appropriate response codes", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<EmployeeProperties> {
+        @doc("Name of employee")
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      
+      model EmployeeProperties {}
+      
+      @armResourceOperations
+      interface Employees {
+        @armResourceDelete(Employee)
+        delete(...ApiVersionParameter): {
+          @statusCode _: 200;
+          result: boolean;
+        } | {
+          @statusCode _: 204;
+          result: boolean;
+        } | ErrorResponse
+      }`
+      )
+      .toBeValid();
+  });
+
   it("Emits a warning for long-running delete operation that does not contain the appropriate response codes", async () => {
     await tester
       .expect(
@@ -86,5 +120,32 @@ describe("typespec-azure-resource-manager: arm delete response codes rule", () =
         message:
           "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses.",
       });
+  });
+
+  it("Does not emit a warning for long-running delete operation that contains the appropriate response code", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Contoso;
+        
+        model Employee is ProxyResource<EmployeeProperties> {
+          @doc("Name of employee")
+          @pattern("^[a-zA-Z0-9-]{3,24}$")
+          @key("employeeName")
+          @path
+          @segment("employees")
+          name: string;
+        }
+
+        model EmployeeProperties {}
+
+        @armResourceOperations
+        interface Employees {
+          delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+        }`
+      )
+      .toBeValid();
   });
 });
