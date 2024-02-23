@@ -162,7 +162,7 @@ function addEncodeInfo(
       getClientType(context, encodeData.type)
     ) as SdkBuiltInType;
   }
-  if (propertyType.kind === "datetime") {
+  if (propertyType.kind === "utcDateTime" || propertyType.kind === "offsetDateTime") {
     if (encodeData) {
       propertyType.encode = encodeData.encoding as DateTimeKnownEncoding;
       propertyType.wireType = diagnostics.pipe(
@@ -252,17 +252,6 @@ export function getSdkBuiltInType(
     };
   }
   throw Error(`Unknown kind ${type.kind}`);
-}
-
-export function getSdkDatetimeType(context: SdkContext, type: Scalar): SdkDatetimeType {
-  // we don't get encode info until we get to the property / parameter level
-  // so we insert the default. Later in properties, we will check
-  // for encoding info and override accordingly
-  return {
-    ...getSdkTypeBaseHelper(context, type, "datetime"),
-    encode: "rfc3339",
-    wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
-  };
 }
 
 export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurationType {
@@ -706,7 +695,11 @@ export function getClientType(
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
-        retval = getSdkDatetimeType(context, type);
+        retval = {
+          ...getSdkTypeBaseHelper(context, type, type.name),
+          encode: "rfc3339",
+          wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
+        } as SdkDatetimeType;
         break;
       }
       if (type.name === "duration") {

@@ -361,7 +361,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
     });
@@ -377,7 +377,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
     });
@@ -393,7 +393,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc7231");
     });
@@ -410,7 +410,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
     });
@@ -430,7 +430,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "datetime");
+      strictEqual(sdkType.valueType.kind, "utcDateTime");
       strictEqual(sdkType.valueType.wireType.kind, "int64");
       strictEqual(sdkType.valueType.encode, "unixTimestamp");
     });
