@@ -4,7 +4,7 @@ export interface FilePath {
   filePath: string;
 }
 
-export interface AboutOptions {
+export interface AboutOption {
   icon?: FilePath;
   displayName?: string;
   description?: string;
@@ -12,15 +12,15 @@ export interface AboutOptions {
   learnMoreDocs?: string[];
 }
 
-export interface BrowseOptions {
+export interface BrowseOption {
   argQuery?: string | FilePath;
 }
 
-export interface marketplaceOfferOptions {
+export interface marketplaceOfferOption {
   id?: string;
 }
 
-export interface PromotionOptions {
+export interface PromotionOption {
   readonly apiVersion: string | EnumMember;
   readonly autoUpdate?: boolean;
 }

@@ -23,7 +23,7 @@ npm install @azure-tools/typespec-azure-portal-core
 Provides a Model describing about of ARM resource.
 
 ```typespec
-@Azure.Portal.about(options: Azure.Portal.AboutOptions)
+@Azure.Portal.about(option: Azure.Portal.AboutOption)
 ```
 
 ##### Target
@@ -32,16 +32,16 @@ Provides a Model describing about of ARM resource.
 
 ##### Parameters
 
-| Name    | Type                              | Description                                                              |
-| ------- | --------------------------------- | ------------------------------------------------------------------------ |
-| options | `model Azure.Portal.AboutOptions` | Property options allows more detailed infomation about the resourceType. |
+| Name   | Type                             | Description                                                             |
+| ------ | -------------------------------- | ----------------------------------------------------------------------- |
+| option | `model Azure.Portal.AboutOption` | Property option allows more detailed infomation about the resourceType. |
 
 #### `@browse`
 
 Provides a Model customizing browse view of ARM resource.
 
 ```typespec
-@Azure.Portal.browse(options: Azure.Portal.BrowseOptions)
+@Azure.Portal.browse(option: Azure.Portal.BrowseOption)
 ```
 
 ##### Target
@@ -50,9 +50,9 @@ Provides a Model customizing browse view of ARM resource.
 
 ##### Parameters
 
-| Name    | Type                               | Description                                                         |
-| ------- | ---------------------------------- | ------------------------------------------------------------------- |
-| options | `model Azure.Portal.BrowseOptions` | Property options provides browsing information of the resourceType. |
+| Name   | Type                              | Description                                                        |
+| ------ | --------------------------------- | ------------------------------------------------------------------ |
+| option | `model Azure.Portal.BrowseOption` | Property option provides browsing information of the resourceType. |
 
 #### `@displayName`
 
@@ -77,7 +77,7 @@ Provides a Model Property a display name
 Provides a Model marketplace offer information of ARM resource.
 
 ```typespec
-@Azure.Portal.marketplaceOffer(options: Azure.Portal.marketplaceOfferOptions)
+@Azure.Portal.marketplaceOffer(option: Azure.Portal.marketplaceOfferOption)
 ```
 
 ##### Target
@@ -86,9 +86,9 @@ Provides a Model marketplace offer information of ARM resource.
 
 ##### Parameters
 
-| Name    | Type                                         | Description                                                                  |
-| ------- | -------------------------------------------- | ---------------------------------------------------------------------------- |
-| options | `model Azure.Portal.marketplaceOfferOptions` | Property options provides marketplace offer information of the resourceType. |
+| Name   | Type                                        | Description                                                                 |
+| ------ | ------------------------------------------- | --------------------------------------------------------------------------- |
+| option | `model Azure.Portal.marketplaceOfferOption` | Property option provides marketplace offer information of the resourceType. |
 
 #### `@promotion`
 
@@ -96,7 +96,7 @@ Provides a Model customizing deployment promotion apiVersion for ARM resource.
 The apiVersion will be used as a version to deploy to Portal.
 
 ```typespec
-@Azure.Portal.promotion(options: Azure.Portal.PromotionOptions)
+@Azure.Portal.promotion(option: Azure.Portal.PromotionOption)
 ```
 
 ##### Target
@@ -105,6 +105,6 @@ The apiVersion will be used as a version to deploy to Portal.
 
 ##### Parameters
 
-| Name    | Type                                  | Description                                                          |
-| ------- | ------------------------------------- | -------------------------------------------------------------------- |
-| options | `model Azure.Portal.PromotionOptions` | Property options provides promotion information of the resourceType. |
+| Name   | Type                                 | Description                                                         |
+| ------ | ------------------------------------ | ------------------------------------------------------------------- |
+| option | `model Azure.Portal.PromotionOption` | Property option provides promotion information of the resourceType. |

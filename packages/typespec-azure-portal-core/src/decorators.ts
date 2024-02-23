@@ -17,20 +17,20 @@ import {
 } from "@typespec/compiler";
 import { VersionMap, getVersions } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
-import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
+import { AboutOption, BrowseOption, PromotionOption, marketplaceOfferOption } from "./types.js";
 
 /**
  * This is a Browse decorator which will be use to put more info on the browse view.
  * @param target The model that is being decorated.
- * @param options BrowseOptions of the property.
+ * @param option BrowseOption of the property.
  */
-export function $browse(context: DecoratorContext, target: Model, options: Model) {
+export function $browse(context: DecoratorContext, target: Model, option: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
   checkIsArmResource(program, target, "browse");
-  const browseOptionsResult: BrowseOptions = {};
-  if (options && options.properties) {
-    const query = options.properties.get("argQuery");
+  const browseOptionResult: BrowseOption = {};
+  if (option && option.properties) {
+    const query = option.properties.get("argQuery");
     if (query && query.type.kind === "Model") {
       //use decoratorTarget to find sourceLocation instead of target, since we want to find a file path related to where decorator was stated
       const decoratorTarget = context.decoratorTarget;
@@ -43,32 +43,32 @@ export function $browse(context: DecoratorContext, target: Model, options: Model
       let filePath = resolvePath(dirPath, argQueryPathValue); //if given path is fullpath, it will return the fullPath
       if (filePath && argQueryPath && argQueryPathValue) {
         filePath = normalizePath(filePath);
-        browseOptionsResult.argQuery = {
+        browseOptionResult.argQuery = {
           filePath: filePath,
         };
-        program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
+        program.stateMap(PortalCoreKeys.browse).set(target, browseOptionResult);
       }
     } else if (query?.type.kind === "String") {
-      browseOptionsResult.argQuery = (query.type as StringLiteral).value;
-      program.stateMap(PortalCoreKeys.browse).set(target, browseOptionsResult);
+      browseOptionResult.argQuery = (query.type as StringLiteral).value;
+      program.stateMap(PortalCoreKeys.browse).set(target, browseOptionResult);
     }
   }
 }
 
-export function $promotion(context: DecoratorContext, target: Model, options: Model) {
+export function $promotion(context: DecoratorContext, target: Model, option: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $promotion);
   checkIsArmResource(program, target, "promotion");
-  if (options && options.properties) {
-    const apiVersion = options.properties.get("apiVersion");
+  if (option && option.properties) {
+    const apiVersion = option.properties.get("apiVersion");
     const currentApiVersion = (apiVersion?.type as StringLiteral).value;
     if (!checkIsValidApiVersion(program, target, currentApiVersion)) {
       return;
     }
     const versions = getVersions(program, target);
-    const autoUpdateProp = options.properties.get("autoUpdate");
+    const autoUpdateProp = option.properties.get("autoUpdate");
     const autoUpdate = autoUpdateProp && (autoUpdateProp?.type as BooleanLiteral).value;
-    const promotionResult: PromotionOptions = {
+    const promotionResult: PromotionOption = {
       apiVersion: currentApiVersion,
       autoUpdate: autoUpdate ?? false,
     };
@@ -169,19 +169,19 @@ export function checkIsArmResource(
 /**
  * This is a About decorator that will be used to define icon, keywords and learnMoreDocs.
  * @param target The model that is being decorated.
- * @param options AboutOptions of the property.
+ * @param option AboutOption of the property.
  */
-export function $about(context: DecoratorContext, target: Model, options: Model) {
+export function $about(context: DecoratorContext, target: Model, option: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $about);
   checkIsArmResource(program, target, "about");
-  const aboutOptionsResult: AboutOptions = {};
+  const aboutOptionResult: AboutOption = {};
 
-  if (options && options.properties) {
-    const icon = options.properties.get("icon");
-    const learnMoreDocs = options.properties.get("learnMoreDocs");
-    const keywords = options.properties.get("keywords");
-    const displayName = options.properties.get("displayName");
+  if (option && option.properties) {
+    const icon = option.properties.get("icon");
+    const learnMoreDocs = option.properties.get("learnMoreDocs");
+    const keywords = option.properties.get("keywords");
+    const displayName = option.properties.get("displayName");
     if (icon) {
       if (icon.type.kind === "Model") {
         //use decoratorTarget to find sourceLocation instead of target, since we want to find a file path related to where decorator was stated
@@ -194,7 +194,7 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
         let filePath = resolvePath(dirPath, iconPathValue); //if given path is fullpath, it will return the fullPath
         if (filePath && iconPath && iconPathValue) {
           filePath = normalizePath(filePath);
-          aboutOptionsResult.icon = {
+          aboutOptionResult.icon = {
             filePath: filePath,
           };
         }
@@ -208,23 +208,23 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
         const learnMoreDocsValues = learnMoreDocs.type.values
           .filter((value) => value.kind === "String")
           .map((value: Type) => (value as StringLiteral).value);
-        aboutOptionsResult.learnMoreDocs = learnMoreDocsValues;
+          aboutOptionResult.learnMoreDocs = learnMoreDocsValues;
       }
     }
     if (keywords) {
       if (keywords.type.kind === "Tuple") {
-        aboutOptionsResult.keywords = keywords.type.values
+        aboutOptionResult.keywords = keywords.type.values
           .filter((value) => value.kind === "String")
           .map((value: Type) => (value as StringLiteral).value);
       }
     }
     if (displayName) {
       if (displayName.type.kind === "String") {
-        aboutOptionsResult.displayName = (displayName.type as StringLiteral).value;
+        aboutOptionResult.displayName = (displayName.type as StringLiteral).value;
       }
     }
   }
-  program.stateMap(PortalCoreKeys.about).set(target, aboutOptionsResult);
+  program.stateMap(PortalCoreKeys.about).set(target, aboutOptionResult);
 }
 
 function checkIsValidLinks(program: Program, target: Model, links: Type[]) {
@@ -261,13 +261,13 @@ export function getAboutLearnMoreDocs(program: Program, target: Type) {
   return getAbout(program, target).learnMoreDocs;
 }
 
-export function $marketplaceOffer(context: DecoratorContext, target: Model, options: Model) {
+export function $marketplaceOffer(context: DecoratorContext, target: Model, option: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
   checkIsArmResource(program, target, "marketplaceOffer");
-  const marketPlaceOfferResult: marketplaceOfferOptions = {};
-  if (options && options.properties) {
-    const id = options.properties.get("id");
+  const marketPlaceOfferResult: marketplaceOfferOption = {};
+  if (option && option.properties) {
+    const id = option.properties.get("id");
     if (id?.type.kind === "String") {
       if (id.type.value.match(/\s/)) {
         reportDiagnostic(program, {

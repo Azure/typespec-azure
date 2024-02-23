@@ -5,28 +5,28 @@ namespace Azure.Portal;
 
 /**
  * Provides a Model describing about of ARM resource.
- * @param options Property options allows more detailed infomation about the resourceType.
+ * @param option Property option allows more detailed infomation about the resourceType.
  */
-extern dec about(target: Model, options: AboutOptions);
+extern dec about(target: Model, option: AboutOption);
 
 /**
  * Provides a Model customizing browse view of ARM resource.
- * @param options Property options provides browsing information of the resourceType.
+ * @param option Property option provides browsing information of the resourceType.
  */
-extern dec browse(target: Model, options: BrowseOptions);
+extern dec browse(target: Model, option: BrowseOption);
 
 /**
  * Provides a Model customizing deployment promotion apiVersion for ARM resource.
  * The apiVersion will be used as a version to deploy to Portal.
- * @param options Property options provides promotion information of the resourceType.
+ * @param option Property option provides promotion information of the resourceType.
  */
-extern dec promotion(target: Model, options: PromotionOptions);
+extern dec promotion(target: Model, option: PromotionOption);
 
 /**
  * Provides a Model marketplace offer information of ARM resource.
- * @param options Property options provides marketplace offer information of the resourceType.
+ * @param option Property option provides marketplace offer information of the resourceType.
  */
-extern dec marketplaceOffer(target: Model, options: marketplaceOfferOptions);
+extern dec marketplaceOffer(target: Model, option: marketplaceOfferOption);
 
 /**
  * Provides a Model Property a display name
@@ -36,8 +36,8 @@ extern dec displayName(target: ModelProperty, name: valueof string);
 // this decorator will be available in next iteration
 //extern dec essentials(target: ModelProperty);
 
-/** Options for browse of ARM resource. */
-model BrowseOptions {
+/** Option for browse of ARM resource. */
+model BrowseOption {
   /** argQuery can be a literal string query or KQL file path.
    * KQL query which represents all possible data for your desired browse view.
    */
@@ -50,14 +50,14 @@ model FilePath {
   filePath: string;
 }
 
-/** Options for marketplaceOffer */
-model marketplaceOfferOptions {
+/** Option for marketplaceOffer */
+model marketplaceOfferOption {
   /** Marketplace offer id of a resource */
   id?: string;
 }
 
-/** Options for about of ARM resource. */
-model AboutOptions {
+/** Option for about of ARM resource. */
+model AboutOption {
   /** Icon which represent resource */
   icon?: FilePath;
 
@@ -71,8 +71,8 @@ model AboutOptions {
   learnMoreDocs?: string[];
 }
 
-/** Options for promotion of ARM resource. */
-model PromotionOptions {
+/** Option for promotion of ARM resource. */
+model PromotionOption {
   apiVersion: string | EnumMember;
   autoUpdate?: boolean;
 }

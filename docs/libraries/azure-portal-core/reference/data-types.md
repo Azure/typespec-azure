@@ -8,20 +8,20 @@ toc_max_heading_level: 3
 
 ## Azure.Portal
 
-### `AboutOptions` {#Azure.Portal.AboutOptions}
+### `AboutOption` {#Azure.Portal.AboutOption}
 
-Options for about of ARM resource.
+Option for about of ARM resource.
 
 ```typespec
-model Azure.Portal.AboutOptions
+model Azure.Portal.AboutOption
 ```
 
-### `BrowseOptions` {#Azure.Portal.BrowseOptions}
+### `BrowseOption` {#Azure.Portal.BrowseOption}
 
-Options for browse of ARM resource.
+Option for browse of ARM resource.
 
 ```typespec
-model Azure.Portal.BrowseOptions
+model Azure.Portal.BrowseOption
 ```
 
 ### `FilePath` {#Azure.Portal.FilePath}
@@ -32,18 +32,18 @@ File path of a file
 model Azure.Portal.FilePath
 ```
 
-### `marketplaceOfferOptions` {#Azure.Portal.marketplaceOfferOptions}
+### `marketplaceOfferOption` {#Azure.Portal.marketplaceOfferOption}
 
-Options for marketplaceOffer
+Option for marketplaceOffer
 
 ```typespec
-model Azure.Portal.marketplaceOfferOptions
+model Azure.Portal.marketplaceOfferOption
 ```
 
-### `PromotionOptions` {#Azure.Portal.PromotionOptions}
+### `PromotionOption` {#Azure.Portal.PromotionOption}
 
-Options for promotion of ARM resource.
+Option for promotion of ARM resource.
 
 ```typespec
-model Azure.Portal.PromotionOptions
+model Azure.Portal.PromotionOption
 ```
