@@ -1,4 +1,5 @@
 import { defineLinter } from "@typespec/compiler";
+import { armAvoidAdditionalPropertiesRule } from "./rules/arm-avoid-additional-properties.js";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
@@ -25,6 +26,7 @@ import { retryAfterRule } from "./rules/retry-after.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 
 const rules = [
+  armAvoidAdditionalPropertiesRule,
   armCommonTypesVersionRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
