@@ -293,9 +293,9 @@ clients.
 
 ##### Parameters
 
-| Name | Type                  | Description |
-| ---- | --------------------- | ----------- |
-| \_   | `(intrinsic) unknown` | DEPRECATED  |
+| Name | Type      | Description |
+| ---- | --------- | ----------- |
+| \_   | `unknown` | DEPRECATED  |
 
 #### `@armResourceRead`
 
@@ -394,7 +394,7 @@ None
 This decorator sets the base type of the given resource.
 
 ```typespec
-@Azure.ResourceManager.resourceBaseType(baseType: Tenant | Subscription | ResourceGroup | Location | Extension)
+@Azure.ResourceManager.resourceBaseType(baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
 ```
 
 ##### Target
@@ -403,9 +403,9 @@ This decorator sets the base type of the given resource.
 
 ##### Parameters
 
-| Name     | Type                                                                     | Description                                                                                                            |
-| -------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| baseType | `union Tenant \| Subscription \| ResourceGroup \| Location \| Extension` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
+| Name     | Type                                                                               | Description                                                                                                            |
+| -------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `union "Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 
@@ -439,7 +439,7 @@ Singleton resources only have a single instance with a fixed key name.
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-@Azure.ResourceManager.singleton(keyValue?: valueof string | default)
+@Azure.ResourceManager.singleton(keyValue?: valueof string | "default")
 ```
 
 ##### Target
@@ -448,9 +448,9 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 ##### Parameters
 
-| Name     | Type                              | Description                                                    |
-| -------- | --------------------------------- | -------------------------------------------------------------- |
-| keyValue | `valueof union string \| default` | The name of the singleton resource. Default name is "default". |
+| Name     | Type                                | Description                                                    |
+| -------- | ----------------------------------- | -------------------------------------------------------------- |
+| keyValue | `valueof union string \| "default"` | The name of the singleton resource. Default name is "default". |
 
 #### `@subscriptionResource`
 
@@ -509,6 +509,6 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ##### Parameters
 
-| Name       | Type                | Description                                                              |
-| ---------- | ------------------- | ------------------------------------------------------------------------ |
-| namespaces | `model Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+| Name       | Type    | Description                                                              |
+| ---------- | ------- | ------------------------------------------------------------------------ |
+| namespaces | `Array` | The namespaces of Azure Resource Manager libraries used in this provider |

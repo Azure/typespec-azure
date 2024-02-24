@@ -123,7 +123,7 @@ Identifies that an operation is the final operation for an LRO.
 | Name            | Type        | Description                                                                                                               |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `model {}`  | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | ``          | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@fixed`
 
@@ -296,7 +296,7 @@ Identifies that an operation is used to retrieve the next page for paged operati
 | Name            | Type        | Description                                                                                                               |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `model {}`  | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | ``          | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@operationLink`
 
@@ -316,7 +316,7 @@ Identifies an operation that is linked to the target operation.
 | --------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation`             | The linked Operation                                                                                                      |
 | linkType        | `valueof scalar string` | A string indicating the role of the linked operation                                                                      |
-| parameters      | `model {}`              | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | ``                      | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@pagedResult`
 
@@ -348,9 +348,9 @@ Identifies a model property as containing the location to poll for operation sta
 
 ##### Parameters
 
-| Name    | Type                              | Description                                                                                                                                                                                  |
-| ------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| options | `model Azure.Core.PollingOptions` | PollingOptions for the poller pointed to by this link. Overrides<br />settings derived from property value it is decorating, if the value of the<br />property is ResourceLocation<Resource> |
+| Name    | Type                                | Description                                                                                                                                                                                  |
+| ------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | [`PollingOptions`](#pollingoptions) | PollingOptions for the poller pointed to by this link. Overrides<br />settings derived from property value it is decorating, if the value of the<br />property is ResourceLocation<Resource> |
 
 #### `@pollingOperation`
 
@@ -369,7 +369,7 @@ Identifies that an operation is a polling operation for an LRO.
 | Name            | Type        | Description                                                                                                               |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `model {}`  | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | ``          | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@pollingOperationParameter`
 
@@ -466,7 +466,7 @@ checks.
 ##### Target
 
 The model type to mark as a trait.
-`(intrinsic) unknown`
+`unknown`
 
 ##### Parameters
 

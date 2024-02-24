@@ -32,9 +32,9 @@ Provides a Model describing about of ARM resource.
 
 ##### Parameters
 
-| Name    | Type                              | Description                                                              |
-| ------- | --------------------------------- | ------------------------------------------------------------------------ |
-| options | `model Azure.Portal.AboutOptions` | Property options allows more detailed infomation about the resourceType. |
+| Name    | Type                            | Description                                                              |
+| ------- | ------------------------------- | ------------------------------------------------------------------------ |
+| options | [`AboutOptions`](#aboutoptions) | Property options allows more detailed infomation about the resourceType. |
 
 #### `@browse`
 
@@ -50,9 +50,9 @@ Provides a Model customizing browse view of ARM resource.
 
 ##### Parameters
 
-| Name    | Type                               | Description                                                         |
-| ------- | ---------------------------------- | ------------------------------------------------------------------- |
-| options | `model Azure.Portal.BrowseOptions` | Property options provides browsing information of the resourceType. |
+| Name    | Type                              | Description                                                         |
+| ------- | --------------------------------- | ------------------------------------------------------------------- |
+| options | [`BrowseOptions`](#browseoptions) | Property options provides browsing information of the resourceType. |
 
 #### `@displayName`
 
@@ -86,9 +86,9 @@ Provides a Model marketplace offer information of ARM resource.
 
 ##### Parameters
 
-| Name    | Type                                         | Description                                                                  |
-| ------- | -------------------------------------------- | ---------------------------------------------------------------------------- |
-| options | `model Azure.Portal.marketplaceOfferOptions` | Property options provides marketplace offer information of the resourceType. |
+| Name    | Type                                                  | Description                                                                  |
+| ------- | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| options | [`marketplaceOfferOptions`](#marketplaceofferoptions) | Property options provides marketplace offer information of the resourceType. |
 
 #### `@promotion`
 
@@ -105,6 +105,6 @@ The apiVersion will be used as a version to deploy to Portal.
 
 ##### Parameters
 
-| Name    | Type                                  | Description                                                          |
-| ------- | ------------------------------------- | -------------------------------------------------------------------- |
-| options | `model Azure.Portal.PromotionOptions` | Property options provides promotion information of the resourceType. |
+| Name    | Type                                    | Description                                                          |
+| ------- | --------------------------------------- | -------------------------------------------------------------------- |
+| options | [`PromotionOptions`](#promotionoptions) | Property options provides promotion information of the resourceType. |

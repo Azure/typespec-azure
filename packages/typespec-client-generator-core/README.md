@@ -71,7 +71,7 @@ Create a ClientGenerator.Core client out of a namespace or interface
 
 | Name  | Type                    | Description                                                                                                   |
 | ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `model {}`              | Optional configuration for the service.                                                                       |
+| value | ``                      | Optional configuration for the service.                                                                       |
 | scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
@@ -113,7 +113,7 @@ Can be used to explain the client type that the current TYPESPEC
 type should map to.
 
 ```typespec
-@Azure.ClientGenerator.Core.clientFormat(value: valueof unixtime | iso8601 | rfc1123 | seconds)
+@Azure.ClientGenerator.Core.clientFormat(value: valueof "unixtime" | "iso8601" | "rfc1123" | "seconds")
 ```
 
 ##### Target
@@ -122,9 +122,9 @@ type should map to.
 
 ##### Parameters
 
-| Name  | Type                                                      | Description                 |
-| ----- | --------------------------------------------------------- | --------------------------- |
-| value | `valueof union unixtime \| iso8601 \| rfc1123 \| seconds` | The client format to apply. |
+| Name  | Type                                                              | Description                 |
+| ----- | ----------------------------------------------------------------- | --------------------------- |
+| value | `valueof union "unixtime" \| "iso8601" \| "rfc1123" \| "seconds"` | The client format to apply. |
 
 ##### Examples
 
@@ -145,7 +145,7 @@ Changes the name of a method, parameter, property, or model generated in the cli
 
 ##### Target
 
-`(intrinsic) unknown`
+`unknown`
 
 ##### Parameters
 
