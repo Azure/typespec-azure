@@ -33,21 +33,21 @@ import {
   SdkEmitterOptions,
   SdkOperationGroup,
 } from "./interfaces.js";
-import { parseEmitterName } from "./internal-utils.js";
+import { TCGCContext, createTCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
-function getScopedDecoratorData(context: SdkContext, key: symbol, target: Type): any {
+function getScopedDecoratorData(context: TCGCContext, key: symbol, target: Type): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
   if (Object.keys(retval).includes(context.emitterName)) return retval[context.emitterName];
   return retval[AllScopes]; // in this case it applies to all languages
 }
 
-function listScopedDecoratorData(context: SdkContext, key: symbol): any[] {
+function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
   const retval = [...context.program.stateMap(key).values()];
   return retval
     .filter((targetEntry) => {
@@ -161,11 +161,14 @@ function findClientService(
 /**
  * Return the client object for the given namespace or interface, or undefined if the given namespace or interface is not a client.
  *
- * @param context SdkContext
+ * @param context TCGCContext
  * @param type Type to check
  * @returns Client or undefined
  */
-export function getClient(context: SdkContext, type: Namespace | Interface): SdkClient | undefined {
+export function getClient(
+  context: TCGCContext,
+  type: Namespace | Interface
+): SdkClient | undefined {
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, clientKey, type);
   }
@@ -183,7 +186,7 @@ export function getClient(context: SdkContext, type: Namespace | Interface): Sdk
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: SdkContext): boolean {
+function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
     listScopedDecoratorData(context, clientKey).length > 0 ||
     listScopedDecoratorData(context, operationGroupKey).length > 0
@@ -193,10 +196,10 @@ function hasExplicitClientOrOperationGroup(context: SdkContext): boolean {
 /**
  * List all the clients.
  *
- * @param context SdkContext
+ * @param context TCGCContext
  * @returns Array of clients
  */
-export function listClients(context: SdkContext): SdkClient[] {
+export function listClients(context: TCGCContext): SdkClient[] {
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     return explicitClients;
@@ -255,11 +258,11 @@ export function $operationGroup(
 
 /**
  * Check a namespace or interface is an operation group.
- * @param context SdkContext
+ * @param context TCGCContext
  * @param type Type to check
  * @returns boolean
  */
-export function isOperationGroup(context: SdkContext, type: Namespace | Interface): boolean {
+export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
   }
@@ -274,12 +277,12 @@ export function isOperationGroup(context: SdkContext, type: Namespace | Interfac
 }
 /**
  * Check an operation is in an operation group.
- * @param context SdkContext
+ * @param context TCGCContext
  * @param type Type to check
  * @returns boolean
  */
 export function isInOperationGroup(
-  context: SdkContext,
+  context: TCGCContext,
   type: Namespace | Interface | Operation
 ): boolean {
   switch (type.kind) {
@@ -298,7 +301,7 @@ export function isInOperationGroup(
   }
 }
 
-function buildOperationGroupPath(context: SdkContext, type: Namespace | Interface): string {
+function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interface): string {
   const path = [];
   while (true) {
     const client = getClient(context, type);
@@ -319,12 +322,12 @@ function buildOperationGroupPath(context: SdkContext, type: Namespace | Interfac
 }
 /**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
- * @param context SdkContext
+ * @param context TCGCContext
  * @param type Type to check
  * @returns Operation group or undefined.
  */
 export function getOperationGroup(
-  context: SdkContext,
+  context: TCGCContext,
   type: Namespace | Interface
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
@@ -381,13 +384,13 @@ export function getOperationGroup(
 /**
  * List all the operation groups inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operation groups.
  *
- * @param context SdkContext
+ * @param context TCGCContext
  * @param group Client or operation group to list operation groups
  * @param ignoreHierarchy Whether to get all nested operation groups
  * @returns
  */
 export function listOperationGroups(
-  context: SdkContext,
+  context: TCGCContext,
   group: SdkClient | SdkOperationGroup,
   ignoreHierarchy = false
 ): SdkOperationGroup[] {
@@ -421,13 +424,13 @@ export function listOperationGroups(
 
 /**
  * List operations inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operations.
- * @param program SdkContext
+ * @param program TCGCContext
  * @param group Client or operation group to list operations
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
 export function listOperationsInOperationGroup(
-  context: SdkContext,
+  context: TCGCContext,
   group: SdkOperationGroup | SdkClient,
   ignoreHierarchy = false
 ): Operation[] {
@@ -477,7 +480,7 @@ export function createSdkContext<TOptions extends Record<string, any> = SdkEmitt
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
   return {
-    program: context.program,
+    ...createTCGCContext(context.program),
     emitContext: context,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
@@ -509,14 +512,14 @@ export function $convenientAPI(
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 }
 
-export function shouldGenerateProtocol(context: SdkContext, entity: Operation): boolean {
+export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
-  return value ?? context.generateProtocolMethods;
+  return value ?? !!context.generateProtocolMethods;
 }
 
-export function shouldGenerateConvenient(context: SdkContext, entity: Operation): boolean {
+export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, convenientAPIKey, entity);
-  return value ?? context.generateConvenienceMethods;
+  return value ?? !!context.generateConvenienceMethods;
 }
 
 const excludeKey = createStateSymbol("exclude");
@@ -540,14 +543,14 @@ export function $include(context: DecoratorContext, entity: Model, scope?: Langu
 /**
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function isExclude(context: SdkContext, entity: Model): boolean {
+export function isExclude(context: TCGCContext, entity: Model): boolean {
   return getScopedDecoratorData(context, excludeKey, entity) ?? false;
 }
 
 /**
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function isInclude(context: SdkContext, entity: Model): boolean {
+export function isInclude(context: TCGCContext, entity: Model): boolean {
   return getScopedDecoratorData(context, includeKey, entity) ?? false;
 }
 
@@ -619,7 +622,7 @@ export function $clientFormat(
  * @deprecated This function is unused and will be removed in a future release.
  */
 export function getClientFormat(
-  context: SdkContext,
+  context: TCGCContext,
   entity: ModelProperty
 ): ClientFormat | undefined {
   let retval: ClientFormat | undefined = getScopedDecoratorData(context, clientFormatKey, entity);
@@ -654,12 +657,15 @@ export function $internal(context: DecoratorContext, target: Operation, scope?: 
  * Whether a model / operation is internal or not. If it's internal, emitters
  * should not expose them to users
  *
- * @param context SdkContext
+ * @param context TCGCContext
  * @param entity model / operation that we want to check is internal or not
  * @returns whether the entity is internal
  * @deprecated This function is unused and will be removed in a future release.
  */
-export function isInternal(context: SdkContext, entity: Model | Operation | Enum | Union): boolean {
+export function isInternal(
+  context: TCGCContext,
+  entity: Model | Operation | Enum | Union
+): boolean {
   const found = getScopedDecoratorData(context, internalKey, entity) ?? false;
   if (entity.kind === "Operation" || found) {
     return found;
@@ -722,13 +728,13 @@ export function $usage(
 }
 
 export function getUsageOverride(
-  context: SdkContext,
+  context: TCGCContext,
   entity: Model | Enum
 ): UsageFlags | undefined {
   return getScopedDecoratorData(context, usageKey, entity);
 }
 
-export function getUsage(context: SdkContext, entity: Model | Enum): UsageFlags {
+export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
   if (!context.modelsMap) {
     getAllModels(context); // this will populate modelsMap
   }
@@ -756,14 +762,14 @@ export function $access(
 }
 
 export function getAccessOverride(
-  context: SdkContext,
+  context: TCGCContext,
   entity: Model | Enum | Operation
 ): AccessFlags | undefined {
   return getScopedDecoratorData(context, accessKey, entity);
 }
 
 export function getAccess(
-  context: SdkContext,
+  context: TCGCContext,
   entity: Model | Enum | Operation
 ): AccessFlags | undefined {
   const override = getScopedDecoratorData(context, accessKey, entity);
@@ -800,11 +806,11 @@ export function $flattenProperty(
 /**
  * Whether a model property should be flattened or not.
  *
- * @param context SdkContext
+ * @param context TCGCContext
  * @param target ModelProperty that we want to check whether it should be flattened or not
  * @returns whether the model property should be flattened or not
  */
-export function shouldFlattenProperty(context: SdkContext, target: ModelProperty): boolean {
+export function shouldFlattenProperty(context: TCGCContext, target: ModelProperty): boolean {
   return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
 }
 
@@ -819,6 +825,6 @@ export function $clientName(
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 
-export function getClientNameOverride(context: SdkContext, entity: Type): string | undefined {
+export function getClientNameOverride(context: TCGCContext, entity: Type): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity);
 }
