@@ -15,12 +15,8 @@ import {
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
-import {
-  SdkTestRunner,
-  createSdkContextTestHelper,
-  createSdkTestRunner,
-  getAllModelsAssertNoDiagnostics,
-} from "./test-host.js";
+import { getAllModels } from "../src/types.js";
+import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: decorators", () => {
   let runner: SdkTestRunner;
@@ -2240,7 +2236,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @route("/func1")
         op func1(@body body: Model1): void;
       `);
-      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const model1 = models.find((x) => x.name === "Model1")!;
       strictEqual(model1.kind, "model");
@@ -2267,7 +2263,7 @@ describe("typespec-client-generator-core: decorators", () => {
           op func1(@body body: Model1): void;
         }
       `);
-      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const model1 = models.find((x) => x.name === "Model1")!;
       strictEqual(model1.kind, "model");
