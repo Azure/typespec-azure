@@ -34,8 +34,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkContext } from "./interfaces.js";
-import { parseEmitterName } from "./internal-utils.js";
+import { parseEmitterName, TCGCContext } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 /**
@@ -45,7 +44,7 @@ import { reportDiagnostic } from "./lib.js";
  * @returns
  */
 export function getDefaultApiVersion(
-  context: SdkContext,
+  context: TCGCContext,
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
@@ -63,7 +62,7 @@ export function getDefaultApiVersion(
  * @returns
  */
 export function isApiVersion(
-  context: SdkContext,
+  context: TCGCContext,
   parameter: HttpOperationParameter | ModelProperty
 ): boolean {
   return (
@@ -78,7 +77,7 @@ export function isApiVersion(
  * @param context
  * @returns
  */
-export function getClientNamespaceString(context: SdkContext): string | undefined {
+export function getClientNamespaceString(context: TCGCContext): string | undefined {
   let packageName = context.packageName;
   if (packageName) {
     packageName = packageName
@@ -102,7 +101,7 @@ export function getClientNamespaceString(context: SdkContext): string | undefine
  * @param type
  * @returns
  */
-export function getEffectivePayloadType(context: SdkContext, type: Model): Model {
+export function getEffectivePayloadType(context: TCGCContext, type: Model): Model {
   const program = context.program;
 
   // if a type has name, we should resolve the name
@@ -148,7 +147,7 @@ export function isAzureCoreModel(t: Type): boolean {
  *
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
-export function getEmitterTargetName(context: SdkContext): string {
+export function getEmitterTargetName(context: TCGCContext): string {
   return parseEmitterName(context.program.emitters[0]?.metadata?.name); // eslint-disable-line deprecation/deprecation
 }
 
@@ -158,7 +157,7 @@ export function getEmitterTargetName(context: SdkContext): string {
  * @param property
  * @returns a tuple of the library and wire name for a model property
  */
-export function getPropertyNames(context: SdkContext, property: ModelProperty): [string, string] {
+export function getPropertyNames(context: TCGCContext, property: ModelProperty): [string, string] {
   return [getLibraryName(context, property), getWireName(context, property)];
 }
 
@@ -176,7 +175,7 @@ export function getPropertyNames(context: SdkContext, property: ModelProperty): 
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(context: SdkContext, type: Type & { name?: string }): string {
+export function getLibraryName(context: TCGCContext, type: Type & { name?: string }): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;
@@ -197,7 +196,7 @@ export function capitalize(name: string): string {
   return name[0].toUpperCase() + name.slice(1);
 }
 
-export function reportUnionUnsupported(context: SdkContext, type: Union): void {
+export function reportUnionUnsupported(context: TCGCContext, type: Union): void {
   reportDiagnostic(context.program, { code: "union-unsupported", target: type });
 }
 
@@ -210,7 +209,7 @@ interface DocWrapper {
   details?: string;
 }
 
-export function getDocHelper(context: SdkContext, type: Type): DocWrapper {
+export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
   if (getSummary(context.program, type)) {
     return {
       description: getSummary(context.program, type),
@@ -222,7 +221,7 @@ export function getDocHelper(context: SdkContext, type: Type): DocWrapper {
   };
 }
 
-export function getWireName(context: SdkContext, type: Type & { name: string }) {
+export function getWireName(context: TCGCContext, type: Type & { name: string }) {
   // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
@@ -242,7 +241,7 @@ interface SdkTypeBaseHelper<TKind> {
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
-  context: SdkContext,
+  context: TCGCContext,
   type: Type | string,
   kind: TKind
 ): SdkTypeBaseHelper<TKind> {
@@ -287,7 +286,7 @@ export function getCrossLanguageDefinitionId(type: {
  * @param type
  */
 export function getGeneratedName(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model | Union,
   operation?: Operation
 ): string {
@@ -308,7 +307,7 @@ export function getGeneratedName(
  * @param type
  * @returns
  */
-function findContextPath(context: SdkContext, type: Model | Union): ContextNode[] {
+function findContextPath(context: TCGCContext, type: Model | Union): ContextNode[] {
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
@@ -350,7 +349,7 @@ interface ContextNode {
  * @returns
  */
 function getContextPath(
-  context: SdkContext,
+  context: TCGCContext,
   root: Operation | Model,
   typeToFind: Model | Union
 ): ContextNode[] {
@@ -490,7 +489,7 @@ function getContextPath(
  * @param contextPaths
  * @returns
  */
-function buildNameFromContextPaths(context: SdkContext, contextPath: ContextNode[]): string {
+function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNode[]): string {
   // fallback to empty name for corner case
   if (contextPath.length === 0) {
     return "";
