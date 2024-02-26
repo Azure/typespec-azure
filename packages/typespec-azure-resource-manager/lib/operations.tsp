@@ -55,7 +55,7 @@ op ArmResourceListByParent<
 > is ArmReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
@@ -81,7 +81,7 @@ op ArmResourceListAtScope<
 > is ArmReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
@@ -105,11 +105,11 @@ op ArmResourceRead<
 > is ArmReadOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
- * A resource HEAD operation
+ * Check a resource's existence via HEAD operation
  * @template Resource the resource being checked
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -117,18 +117,18 @@ op ArmResourceRead<
  * @template Error Optional. The error response, if non-standard.
  */
 @autoRoute
-@doc("Check a {name} via HEAD operation", Resource)
+@doc("Check for the existence of a {name}", Resource)
 @head
-op ArmResourceHead<
+op ArmResourceCheckExistence<
   Resource extends ArmResourceBase,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} = OkResponse,
+  Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
   Error extends {} = ErrorResponse
 > is ArmReadOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**

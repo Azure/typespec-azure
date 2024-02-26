@@ -237,3 +237,19 @@ model ErrorResponse {
   @doc("The error object.")
   error?: ErrorDetail;
 }
+
+/**
+ * @dev Resource exists response
+ */
+@doc("The Azure resource exists")
+model ArmResourceExistsResponse {
+  ...NoContentResponse;
+}
+
+/**
+ * @dev Resource is not found response
+ */
+@doc("The Azure resource is not found")
+model ArmResourceNotFoundResponse {
+  ...NotFoundResponse;
+}
