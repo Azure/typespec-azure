@@ -1098,7 +1098,9 @@ function updateTypesFromOperation(
     const envelopeResult = diagnostics.pipe(
       checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
     );
-    if (envelopeResult) {
+    // TODO: currently skipping adding of envelopeResult due to arm error
+    // https://github.com/Azure/typespec-azure/issues/311
+    if (envelopeResult && !context.arm) {
       updateUsageOfModel(context, envelopeResult, UsageFlags.Output);
     }
   }
