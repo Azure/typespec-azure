@@ -64,7 +64,10 @@ export const $linter = defineLinter({
         // TODO: Enable this rule once azure-rest-api-specs repo is ready (issue #3839)
         [`@azure-tools/typespec-azure-resource-manager/${armCommonTypesVersionRule.name}`]: false,
       },
-      extends: ["@azure-tools/typespec-azure-core/all"],
+      extends: [
+        "@azure-tools/typespec-azure-core/all",
+        "@azure-tools/typespec-azure-core/canonical-versioning",
+      ],
     },
   },
 });
