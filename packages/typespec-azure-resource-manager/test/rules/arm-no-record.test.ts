@@ -4,10 +4,10 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { armAvoidAdditionalPropertiesRule } from "../../src/rules/arm-avoid-additional-properties.js";
+import { armNoRecordRule } from "../../src/rules/arm-no-record.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-describe("typespec-azure-resource-manager: ARM avoid-additional-properties rule", () => {
+describe("typespec-azure-resource-manager: ARM no-record rule", () => {
   let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
@@ -15,7 +15,7 @@ describe("typespec-azure-resource-manager: ARM avoid-additional-properties rule"
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      armAvoidAdditionalPropertiesRule,
+      armNoRecordRule,
       "@azure-tools/typespec-azure-resource-manager"
     );
   });
@@ -43,7 +43,7 @@ describe("typespec-azure-resource-manager: ARM avoid-additional-properties rule"
       `
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-avoid-additional-properties",
+        code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
       });
   });
 
@@ -68,7 +68,7 @@ describe("typespec-azure-resource-manager: ARM avoid-additional-properties rule"
       `
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-avoid-additional-properties",
+        code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
       });
   });
 
@@ -93,7 +93,7 @@ describe("typespec-azure-resource-manager: ARM avoid-additional-properties rule"
       `
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-avoid-additional-properties",
+        code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
       });
   });
 });

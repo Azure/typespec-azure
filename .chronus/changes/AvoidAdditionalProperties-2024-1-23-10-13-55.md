@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Add `arm-avoid-additional-properties` rule.
+Add `arm-no-record` rule.

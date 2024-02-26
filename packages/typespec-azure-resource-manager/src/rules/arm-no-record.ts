@@ -4,11 +4,11 @@ function isRecordType(model: Model): boolean {
   return model.name === "Record";
 }
 
-export const armAvoidAdditionalPropertiesRule = createRule({
-  name: "arm-avoid-additional-properties",
+export const armNoRecordRule = createRule({
+  name: "arm-no-record",
   severity: "warning",
-  description: "Avoid use of additional properties in ARM resources.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/avoid-additional-properties",
+  description: "Don't use Record types for ARM resources.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-record",
   messages: {
     default:
       "Definitions must not be of type Record. ARM requires Resource provider teams to define types explicitly.",
@@ -22,21 +22,21 @@ export const armAvoidAdditionalPropertiesRule = createRule({
         for (const prop of model.properties.values()) {
           if (prop.type.kind === "Model" && isRecordType(prop.type)) {
             context.reportDiagnostic({
-              code: "arm-avoid-additional-properties",
+              code: "arm-no-record",
               target: prop,
             });
           }
         }
         if (model.baseModel !== undefined && isRecordType(model.baseModel)) {
           context.reportDiagnostic({
-            code: "arm-avoid-additional-properties",
+            code: "arm-no-record",
             target: model,
             messageId: "extends",
           });
         }
         if (model.sourceModel !== undefined && isRecordType(model.sourceModel)) {
           context.reportDiagnostic({
-            code: "arm-avoid-additional-properties",
+            code: "arm-no-record",
             target: model,
             messageId: "is",
           });
