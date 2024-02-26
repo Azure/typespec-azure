@@ -5,8 +5,6 @@ import {
   Interface,
   ModelProperty,
   Namespace,
-  Operation,
-  Program,
   Type,
   UsageFlags,
 } from "@typespec/compiler";
@@ -18,6 +16,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import { TCGCContext } from "./internal-utils.js";
 
 export type SdkParameterLocation =
   | "endpointPath"
@@ -28,18 +27,8 @@ export type SdkParameterLocation =
   | "unknown";
 export type SdkParameterImplementation = "Client" | "Method";
 
-export interface SdkContext<TOptions extends object = Record<string, any>> {
-  program: Program;
+export interface SdkContext<TOptions extends object = Record<string, any>> extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  emitterName: string;
-  generateProtocolMethods: boolean;
-  generateConvenienceMethods: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Set<string>;
-  arm?: boolean;
 }
 
 export interface SdkEmitterOptions {

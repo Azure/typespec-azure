@@ -61,7 +61,6 @@ import {
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkConstantType,
-  SdkContext,
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
@@ -85,14 +84,16 @@ import {
   isAzureCoreModel,
 } from "./public-utils.js";
 
-function getAnyType(context: SdkContext, type: Type): SdkBuiltInType {
+import { TCGCContext } from "./internal-utils.js";
+
+function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
   return {
     ...getSdkTypeBaseHelper(context, type, "any"),
     encode: getEncodeHelper(context, type, "any"),
   };
 }
 
-function getEncodeHelper(context: SdkContext, type: Type, kind: string): string {
+function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
     return getEncode(context.program, type)?.encoding || kind;
   }
@@ -108,7 +109,7 @@ function getEncodeHelper(context: SdkContext, type: Type, kind: string): string 
  * @param propertyType the type of the property, i.e. the internal type that we add the format info onto
  */
 function addFormatInfo(
-  context: SdkContext,
+  context: TCGCContext,
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
@@ -149,7 +150,7 @@ function addFormatInfo(
  * @param propertyType the type of the property, i.e. the internal type that we add the encoding info onto
  */
 function addEncodeInfo(
-  context: SdkContext,
+  context: TCGCContext,
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): [void, readonly Diagnostic[]] {
@@ -224,7 +225,7 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
  * @returns the corresponding sdk type
  */
 export function getSdkBuiltInType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
 ): SdkBuiltInType {
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
@@ -254,7 +255,7 @@ export function getSdkBuiltInType(
   throw Error(`Unknown kind ${type.kind}`);
 }
 
-export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurationType {
+export function getSdkDurationType(context: TCGCContext, type: Scalar): SdkDurationType {
   // we don't get encode info until we get to the property / parameter level
   // so we insert the default. Later in properties, we will check
   // for encoding info and override accordingly
@@ -266,7 +267,7 @@ export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurati
 }
 
 export function getSdkArrayOrDict(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   operation?: Operation
 ): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
@@ -301,7 +302,7 @@ export function getSdkArrayOrDict(
 }
 
 export function getSdkTuple(
-  context: SdkContext,
+  context: TCGCContext,
   type: Tuple,
   operation?: Operation
 ): [SdkTupleType, readonly Diagnostic[]] {
@@ -314,12 +315,12 @@ export function getSdkTuple(
   });
 }
 
-function getNonNullOptions(context: SdkContext, type: Union): Type[] {
+function getNonNullOptions(context: TCGCContext, type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
 export function getSdkUnion(
-  context: SdkContext,
+  context: TCGCContext,
   type: Union,
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
@@ -350,7 +351,7 @@ export function getSdkUnion(
 }
 
 export function getSdkConstant(
-  context: SdkContext,
+  context: TCGCContext,
   type: StringLiteral | NumericLiteral | BooleanLiteral
 ): SdkConstantType {
   switch (type.kind) {
@@ -367,7 +368,7 @@ export function getSdkConstant(
 }
 
 function addDiscriminatorToModelType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   model: SdkModelType,
   operation?: Operation
@@ -455,7 +456,7 @@ function addDiscriminatorToModelType(
 }
 
 export function getSdkModel(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   operation?: Operation
 ): [SdkModelType, readonly Diagnostic[]] {
@@ -531,7 +532,7 @@ export function getSdkModel(
 }
 
 function getSdkEnumValueType(
-  context: SdkContext,
+  context: TCGCContext,
   type: EnumMember | StringLiteral | NumericLiteral
 ): SdkBuiltInType {
   let kind: "string" | "int32" | "float32" = "string";
@@ -545,7 +546,7 @@ function getSdkEnumValueType(
 }
 
 export function getSdkEnumValue(
-  context: SdkContext,
+  context: TCGCContext,
   enumType: SdkEnumType,
   type: EnumMember
 ): SdkEnumValueType {
@@ -561,7 +562,7 @@ export function getSdkEnumValue(
   };
 }
 
-export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operation): SdkEnumType {
+export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operation): SdkEnumType {
   let sdkType = context.modelsMap?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
     const docWrapper = getDocHelper(context, type);
@@ -587,7 +588,7 @@ export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operatio
 }
 
 function getSdkUnionEnumValues(
-  context: SdkContext,
+  context: TCGCContext,
   type: UnionEnum,
   enumType: SdkEnumType
 ): SdkEnumValueType[] {
@@ -608,7 +609,7 @@ function getSdkUnionEnumValues(
   return values;
 }
 
-function getSdkUnionEnum(context: SdkContext, type: UnionEnum, operation?: Operation) {
+function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
     const union = type.union as Union & { name: string };
@@ -634,7 +635,7 @@ function getSdkUnionEnum(context: SdkContext, type: UnionEnum, operation?: Opera
 }
 
 function getKnownValuesEnum(
-  context: SdkContext,
+  context: TCGCContext,
   type: Scalar | ModelProperty,
   operation?: Operation
 ): SdkEnumType | undefined {
@@ -672,7 +673,7 @@ function getKnownValuesEnum(
 }
 
 export function getClientTypeWithDiagnostics(
-  context: SdkContext,
+  context: TCGCContext,
   type: Type,
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
@@ -759,7 +760,7 @@ export function getClientTypeWithDiagnostics(
   return diagnostics.wrap(retval);
 }
 
-export function getClientType(context: SdkContext, type: Type, operation?: Operation): SdkType {
+export function getClientType(context: TCGCContext, type: Type, operation?: Operation): SdkType {
   return ignoreDiagnostics(getClientTypeWithDiagnostics(context, type, operation));
 }
 
@@ -774,7 +775,7 @@ export function isReadOnly(property: SdkBodyModelPropertyType) {
   return false;
 }
 
-function getSdkVisibility(context: SdkContext, type: ModelProperty): Visibility[] | undefined {
+function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility[] | undefined {
   const visibility = getVisibility(context.program, type);
   if (visibility) {
     const result = [];
@@ -798,7 +799,7 @@ function getSdkVisibility(context: SdkContext, type: ModelProperty): Visibility[
   return undefined;
 }
 
-function getAvailableApiVersions(context: SdkContext, type: Type): string[] {
+function getAvailableApiVersions(context: TCGCContext, type: Type): string[] {
   const allVersions = getVersions(context.program, type)[1]?.getVersions() ?? [];
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
@@ -824,7 +825,7 @@ function getAvailableApiVersions(context: SdkContext, type: Type): string[] {
 }
 
 function getSdkModelPropertyType(
-  context: SdkContext,
+  context: TCGCContext,
   type: ModelProperty,
   operation?: Operation
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
@@ -849,7 +850,7 @@ function getSdkModelPropertyType(
 }
 
 function getSdkBodyModelPropertyType(
-  context: SdkContext,
+  context: TCGCContext,
   type: ModelProperty,
   operation?: Operation
 ): [SdkBodyModelPropertyType, readonly Diagnostic[]] {
@@ -887,7 +888,7 @@ function getSdkBodyModelPropertyType(
 }
 
 function addPropertiesToModelType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   sdkType: SdkType,
   operation?: Operation
@@ -916,7 +917,12 @@ function addPropertiesToModelType(
   return diagnostics.wrap(undefined);
 }
 
-function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, operation?: Operation) {
+function updateModelsMap(
+  context: TCGCContext,
+  type: Type,
+  sdkType: SdkType,
+  operation?: Operation
+) {
   if (sdkType.kind !== "model" && sdkType.kind !== "enum") {
     return;
   }
@@ -983,7 +989,7 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
 }
 
 function checkAndGetClientType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Type,
   operation?: Operation
 ): [SdkType | undefined, readonly Diagnostic[]] {
@@ -999,7 +1005,7 @@ function checkAndGetClientType(
 }
 
 function updateUsageOfModel(
-  context: SdkContext,
+  context: TCGCContext,
   type: SdkType,
   usage: UsageFlags,
   seenModelNames?: Set<SdkType>
@@ -1049,7 +1055,7 @@ function updateUsageOfModel(
 }
 
 function updateTypesFromOperation(
-  context: SdkContext,
+  context: TCGCContext,
   operation: Operation
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -1107,7 +1113,7 @@ function updateTypesFromOperation(
   return diagnostics.wrap(undefined);
 }
 
-function updateAccessOfModel(context: SdkContext): void {
+function updateAccessOfModel(context: TCGCContext): void {
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
     const internal = isInternal(context, type as any); // eslint-disable-line deprecation/deprecation
     if (internal) {
@@ -1148,7 +1154,7 @@ interface GetAllModelsOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(context: SdkContext, type: Model | Enum) {
+function handleServiceOrphanType(context: TCGCContext, type: Model | Enum) {
   const diagnostics = createDiagnosticCollector();
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
@@ -1166,7 +1172,7 @@ function handleServiceOrphanType(context: SdkContext, type: Model | Enum) {
 }
 
 export function getAllModelsWithDiagnostics(
-  context: SdkContext,
+  context: TCGCContext,
   options: GetAllModelsOptions = {}
 ): [(SdkModelType | SdkEnumType)[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -1230,11 +1236,11 @@ export function getAllModelsWithDiagnostics(
 }
 
 export function getAllModels(
-  context: SdkContext,
+  context: TCGCContext,
   options: GetAllModelsOptions = {}
 ): (SdkModelType | SdkEnumType)[] {
   // we currently don't return diagnostics even though we keep track of them
   // when we move to the new sdk type ecosystem completely, we'll expose
-  // diagnostics as a separate property on the sdkContext
+  // diagnostics as a separate property on the TCGCContext
   return ignoreDiagnostics(getAllModelsWithDiagnostics(context, options));
 }
