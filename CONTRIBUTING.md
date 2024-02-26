@@ -236,11 +236,11 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 
 1. (only have not done for this sprint yet) Find the commit from the last release and make a new branch called `release/<sprint-name>` at that commit. For example `release/october-2022`. Push the branch to `upstream`.
 2. Make a new branch with your fix like any other bug fix or new feature
-3. Run `rush change` to describe your change
+3. Run `pnpm change add` to describe your change
 4. Make a new PR from that branch targeting the `release/xyz` branch
 5. Wait for CI & approval, then squash merge
 6. Make a new branch in this format `publish/hotfix/<hotfix-name>`
-7. Run `rush publish --apply` to bump the versions, commit push, make PR, wait for CI and squash merge.
+7. Run `pnpm change version --ignore-policies` to bump the versions, commit push, make PR, wait for CI and squash merge.
 8. The package should then get published
 9. A workflow should run automatically and create a branch named `backmerge/release/xyz-YYYY-MM-DD`.
 10. Find the backmerge branch [here](https://github.com/Azure/typespec-azure/branches) and click "New pull request".
