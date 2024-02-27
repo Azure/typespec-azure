@@ -35,8 +35,8 @@ import {
 } from "./interfaces.js";
 import { TCGCContext, createTCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 import { getLibraryName } from "./public-utils.js";
+import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
