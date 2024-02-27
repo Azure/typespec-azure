@@ -264,6 +264,43 @@
             }
           }
         }
+      },
+      "head": {
+        "operationId": "RoleAssignments_CheckExistence",
+        "tags": [
+          "RoleAssignments"
+        ],
+        "description": "A sample HEAD operation to check resource existence",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "name": "roleAssignmentName",
+            "in": "path",
+            "description": "Name of roleAssignment",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Azure resource exists"
+          },
+          "404": {
+            "description": "The Azure resource is not found"
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
       }
     },
     "/providers/Microsoft.ContosoProviderHub/operations": {
