@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Union, UsageFlags, ignoreDiagnostics } from "@typespec/compiler";
+import { Enum, Union, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -12,7 +12,13 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { getAllModels, getAllModelsWithDiagnostics, getClientType, getSdkEnum, getSdkUnion, isReadOnly } from "../src/types.js";
+import {
+  getAllModels,
+  getAllModelsWithDiagnostics,
+  getClientType,
+  getSdkEnum,
+  isReadOnly,
+} from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
@@ -960,7 +966,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enumType.values[1].name, "BRename");
     });
   });
-  
+
   describe("SdkBodyModelPropertyType", () => {
     it("required", async function () {
       await runner.compileWithBuiltInService(`

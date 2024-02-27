@@ -175,7 +175,10 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(context: TCGCContext, type: Type & { name?: string | symbol }): string {
+export function getLibraryName(
+  context: TCGCContext,
+  type: Type & { name?: string | symbol }
+): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;
