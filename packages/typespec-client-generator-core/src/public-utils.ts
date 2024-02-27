@@ -534,7 +534,7 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
   return createName;
 }
 
-export function recursivelyCheckIsErrorModel(context: TCGCContext, model: Model): boolean {
+export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
   const errorDecorator = isErrorModel(context.program, model);
   if (errorDecorator) return true;
   let baseModel = model.baseModel;

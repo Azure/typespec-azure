@@ -12,7 +12,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { recursivelyCheckIsErrorModel } from "../src/public-utils.js";
+import { isErrorOrChildOfError } from "../src/public-utils.js";
 import { getAllModels, getAllModelsWithDiagnostics, getSdkEnum, isReadOnly } from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
@@ -2067,7 +2067,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw!;
       strictEqual(rawModel.kind, "Model");
-      strictEqual(recursivelyCheckIsErrorModel(runner.context, rawModel), true);
+      strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
     });
 
     it("error model inheritance", async () => {
