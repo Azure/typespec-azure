@@ -1,6 +1,7 @@
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
+using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 
@@ -169,7 +170,8 @@ enum ResourceProvisioningState {
 @doc("Contains a default provisioningState property to be spread into resource property types")
 model DefaultProvisioningStateProperty {
   @doc("The provisioning state of the resource.")
-  provisioningState: ResourceProvisioningState;
+  @visibility("read")
+  provisioningState?: ResourceProvisioningState;
 }
 
 /**

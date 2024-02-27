@@ -1,4 +1,11 @@
-import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  Enum,
+  Model,
+  createRule,
+  getProperty,
+  getVisibility,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import { getArmResource } from "../resource.js";
@@ -12,6 +19,8 @@ export const armResourceProvisioningStateRule = createRule({
     default:
       "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
     missingValues: paramMessage`The "@knownValues" decorator for provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${"missingValues"}].`,
+    missingReadOnlyVisibility: "The provisioningState property must have a single read visibility.",
+    mustBeOptional: "The provisioningState property must be optional.",
   },
   create(context) {
     return {
@@ -32,6 +41,26 @@ export const armResourceProvisioningStateRule = createRule({
           });
         } else {
           provisioning = getSourceProperty(provisioning);
+
+          // validate provisioning state is optional
+          if (provisioning.optional !== false) {
+            context.reportDiagnostic({
+              messageId: "mustBeOptional",
+              target: provisioning,
+            });
+          }
+
+          // validate it must has a read only visibility
+          const visibilities = getVisibility(context.program, provisioning);
+          if (
+            !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "Read")
+          ) {
+            context.reportDiagnostic({
+              messageId: "missingReadOnlyVisibility",
+              target: provisioning,
+            });
+          }
+
           const provisioningType = provisioning.type;
           switch (provisioningType.kind) {
             case "Enum": {
