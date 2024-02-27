@@ -11,10 +11,10 @@ export const armNoRecordRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-record",
   messages: {
     default:
-      "Definitions must not be of type Record. ARM requires Resource provider teams to define types explicitly.",
+      "Properties should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
     extends:
-      "Definitions must not extend type Record. ARM requires Resource provider teams to define types explicitly.",
-    is: "Definitions must not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
+      "Models should not extend type Record. ARM requires Resource provider teams to define types explicitly.",
+    is: "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
   },
   create(context): SemanticNodeListener {
     return {
