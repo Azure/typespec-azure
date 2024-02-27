@@ -2092,12 +2092,10 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
-      },
-      "required": [
-        "provisioningState"
-      ]
+      }
     },
     "SubAccountResource": {
       "type": "object",
@@ -2211,12 +2209,10 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
-      },
-      "required": [
-        "provisioningState"
-      ]
+      }
     },
     "TagRuleResource": {
       "type": "object",

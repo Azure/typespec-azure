@@ -527,13 +527,13 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
         "role",
-        "employeeType",
-        "provisioningState"
+        "employeeType"
       ]
     },
     "EmployeeType": {
@@ -587,10 +587,6 @@
         "employeeType": {
           "$ref": "#/definitions/EmployeeType",
           "description": "The HR compensation type of the employee"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },

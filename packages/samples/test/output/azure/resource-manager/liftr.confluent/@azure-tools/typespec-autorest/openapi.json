@@ -516,12 +516,10 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
-      },
-      "required": [
-        "provisioningState"
-      ]
+      }
     },
     "MediumString": {
       "type": "string",
@@ -747,15 +745,15 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
         "organizationId",
         "ssoUrl",
         "offerDetail",
-        "userDetail",
-        "provisioningState"
+        "userDetail"
       ]
     },
     "OrganizationUpdate": {
@@ -786,10 +784,6 @@
         "userDetail": {
           "$ref": "#/definitions/UserDetailUpdate",
           "description": "Subscriber details."
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },

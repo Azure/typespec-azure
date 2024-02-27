@@ -491,13 +491,13 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
         "targetId",
-        "authInfo",
-        "provisioningState"
+        "authInfo"
       ]
     },
     "LinkerResource": {
@@ -562,10 +562,6 @@
         "authInfo": {
           "$ref": "#/definitions/AuthInfoBaseUpdate",
           "description": "The authentication type."
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },

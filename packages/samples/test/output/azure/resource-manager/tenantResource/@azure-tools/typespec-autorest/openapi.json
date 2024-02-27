@@ -1479,12 +1479,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "streetAddress",
-        "provisioningState"
+        "streetAddress"
       ]
     },
     "BuildingUpdate": {
@@ -1509,20 +1509,6 @@
           "additionalProperties": {
             "type": "string"
           }
-        },
-        "properties": {
-          "$ref": "#/definitions/BuildingUpdateProperties",
-          "x-ms-client-flatten": true
-        }
-      }
-    },
-    "BuildingUpdateProperties": {
-      "type": "object",
-      "description": "The updatable properties of the Building.",
-      "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -1582,13 +1568,13 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
         "description",
-        "weight",
-        "provisioningState"
+        "weight"
       ]
     },
     "Permission": {
@@ -1661,7 +1647,8 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
@@ -1669,8 +1656,7 @@
         "write",
         "execute",
         "delete",
-        "principalName",
-        "provisioningState"
+        "principalName"
       ]
     },
     "PermissionUpdate": {
@@ -1709,10 +1695,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -1767,12 +1749,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "desks",
-        "provisioningState"
+        "desks"
       ]
     },
     "Spin": {
@@ -1868,12 +1850,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "color",
-        "provisioningState"
+        "color"
       ]
     },
     "WidgetUpdate": {
@@ -1906,10 +1888,6 @@
         "spin": {
           "$ref": "#/definitions/Spin",
           "description": "The spin of the widget"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     }
