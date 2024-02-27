@@ -42,25 +42,6 @@ export const armResourceProvisioningStateRule = createRule({
         } else {
           provisioning = getSourceProperty(provisioning);
 
-          // validate provisioning state is optional
-          if (provisioning.optional !== false) {
-            context.reportDiagnostic({
-              messageId: "mustBeOptional",
-              target: provisioning,
-            });
-          }
-
-          // validate it must has a read only visibility
-          const visibilities = getVisibility(context.program, provisioning);
-          if (
-            !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "Read")
-          ) {
-            context.reportDiagnostic({
-              messageId: "missingReadOnlyVisibility",
-              target: provisioning,
-            });
-          }
-
           const provisioningType = provisioning.type;
           switch (provisioningType.kind) {
             case "Enum": {
@@ -116,6 +97,25 @@ export const armResourceProvisioningStateRule = createRule({
               context.reportDiagnostic({
                 target: provisioning,
               });
+          }
+
+          // validate provisioning state is optional
+          if (provisioning.optional !== true) {
+            context.reportDiagnostic({
+              messageId: "mustBeOptional",
+              target: provisioning,
+            });
+          }
+
+          // validate it must has a read only visibility
+          const visibilities = getVisibility(context.program, provisioning);
+          if (
+            !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "read")
+          ) {
+            context.reportDiagnostic({
+              messageId: "missingReadOnlyVisibility",
+              target: provisioning,
+            });
           }
         }
       },
