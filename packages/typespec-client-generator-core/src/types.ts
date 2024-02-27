@@ -82,6 +82,7 @@ import {
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
+  tcgcIsErrorModel,
 } from "./public-utils.js";
 
 import { TCGCContext } from "./internal-utils.js";
@@ -501,6 +502,7 @@ export function getSdkModel(
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       isFormDataType,
+      isError: tcgcIsErrorModel(context, type),
     };
 
     updateModelsMap(context, type, sdkType, operation);
