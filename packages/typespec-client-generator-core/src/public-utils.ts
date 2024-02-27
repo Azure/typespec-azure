@@ -8,6 +8,7 @@ import {
   getSummary,
   ignoreDiagnostics,
   Interface,
+  isErrorModel,
   listServices,
   Model,
   ModelProperty,
@@ -531,4 +532,15 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
     context.generatedNames = new Set<string>([createName]);
   }
   return createName;
+}
+
+export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
+  const errorDecorator = isErrorModel(context.program, model);
+  if (errorDecorator) return true;
+  let baseModel = model.baseModel;
+  while (baseModel) {
+    if (isErrorModel(context.program, baseModel)) return true;
+    baseModel = baseModel.baseModel;
+  }
+  return false;
 }
