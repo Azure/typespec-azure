@@ -168,3 +168,17 @@ it("emits diagnostic if an ARM Resource references a subnamespace model that use
         "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
     });
 });
+
+it("does not emit diagnostic if ArmTagsProperty is used", async () => {
+  await tester
+    .expect(
+      `
+    ${nsDef}
+    ${resource}
+    model WidgetProperties {
+      ...Foundations.ArmTagsProperty;
+    }
+    `
+    )
+    .toBeValid();
+});
