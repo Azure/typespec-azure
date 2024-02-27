@@ -50,7 +50,7 @@ it("emits diagnostic when a model property uses Record type", async () => {
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
       message:
-        "Properties should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
+        "Model properties or operation parameters should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
     });
 });
 

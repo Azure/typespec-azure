@@ -11,24 +11,6 @@ ARM requires Resource provider teams to define types explicitly. This is to ensu
 #### ❌ Incorrect
 
 ```tsp
-model Address extends Record<string> {}
-```
-
-#### ✅ Correct
-
-```tsp
-model Address {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  postalCode: string;
-}
-```
-
-#### ❌ Incorrect
-
-```tsp
 model Address {
   address: Record<string>;
   city: string;
@@ -52,6 +34,24 @@ model Address {
 
 ```tsp
 model Address is Record<string>;
+```
+
+#### ✅ Correct
+
+```tsp
+model Address {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+}
+```
+
+#### ❌ Incorrect
+
+```tsp
+model Address extends Record<string> {}
 ```
 
 #### ✅ Correct

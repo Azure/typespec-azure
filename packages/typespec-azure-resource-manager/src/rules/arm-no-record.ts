@@ -8,7 +8,7 @@ export const armNoRecordRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-record",
   messages: {
     default:
-      "Properties should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
+      "Model properties or operation parameters should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
     extends:
       "Models should not extend type Record. ARM requires Resource provider teams to define types explicitly.",
     is: "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
