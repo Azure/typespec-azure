@@ -1,4 +1,4 @@
-import { Model, SemanticNodeListener, createRule } from "@typespec/compiler";
+import { DiagnosticTarget, Model, SemanticNodeListener, createRule } from "@typespec/compiler";
 import { getArmResources } from "../resource.js";
 
 export const armNoRecordRule = createRule({
@@ -15,36 +15,23 @@ export const armNoRecordRule = createRule({
   },
   create(context): SemanticNodeListener {
     return {
-      root: (program) => {
-        function isRecordType(model: Model): boolean {
-          return model.name === "Record";
-        }
-
-        function checkModel(model: Model) {
-          if (model.baseModel !== undefined && isRecordType(model.baseModel)) {
+      root: (_) => {
+        function checkModel(model: Model, target: DiagnosticTarget, kind?: "extends" | "is") {
+          if (model.name === "Record") {
             context.reportDiagnostic({
               code: "arm-no-record",
-              target: model,
-              messageId: "extends",
+              target: target,
+              messageId: kind || "default",
             });
+          } else if (model.baseModel !== undefined) {
+            checkModel(model.baseModel, model, "extends");
+          } else if (model.sourceModel !== undefined) {
+            checkModel(model.sourceModel, model, "is");
           }
-          if (model.sourceModel !== undefined && isRecordType(model.sourceModel)) {
-            context.reportDiagnostic({
-              code: "arm-no-record",
-              target: model,
-              messageId: "is",
-            });
-          }
-          for (const prop of model.properties.values()) {
-            if (prop.type.kind === "Model") {
-              if (isRecordType(prop.type)) {
-                context.reportDiagnostic({
-                  code: "arm-no-record",
-                  target: prop,
-                  messageId: "default",
-                });
-              } else {
-                checkModel(prop.type);
+          if (model?.properties !== undefined) {
+            for (const prop of model.properties.values()) {
+              if (prop.type.kind === "Model") {
+                checkModel(prop.type, prop);
               }
             }
           }
@@ -53,7 +40,7 @@ export const armNoRecordRule = createRule({
         // ensure only ARM resources and models they touch are checked
         const resources = getArmResources(context.program);
         for (const resource of resources) {
-          checkModel(resource.typespecType);
+          checkModel(resource.typespecType, resource.typespecType);
         }
       },
     };

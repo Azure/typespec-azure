@@ -201,6 +201,6 @@ it("emits a diagnostic if a deeply aliased model use Record type", async () => {
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
       message:
-        "Model properties or operation parameters should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
+        "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
     });
 });
