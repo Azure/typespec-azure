@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Adding @visibility("read") & optional linting ruleslinting rules  for ARM provisioningState
+Adding `@visibility("read")` & optional linting rules linting rules for ARM `provisioningState`
