@@ -1,8 +1,5 @@
 import { Model, SemanticNodeListener, createRule } from "@typespec/compiler";
-
-function isRecordType(model: Model): boolean {
-  return model.name === "Record";
-}
+import { getArmResources } from "../resource.js";
 
 export const armNoRecordRule = createRule({
   name: "arm-no-record",
@@ -18,28 +15,45 @@ export const armNoRecordRule = createRule({
   },
   create(context): SemanticNodeListener {
     return {
-      model: (model: Model) => {
-        for (const prop of model.properties.values()) {
-          if (prop.type.kind === "Model" && isRecordType(prop.type)) {
+      root: (program) => {
+        function isRecordType(model: Model): boolean {
+          return model.name === "Record";
+        }
+
+        function checkModel(model: Model) {
+          if (model.baseModel !== undefined && isRecordType(model.baseModel)) {
             context.reportDiagnostic({
               code: "arm-no-record",
-              target: prop,
+              target: model,
+              messageId: "extends",
             });
           }
+          if (model.sourceModel !== undefined && isRecordType(model.sourceModel)) {
+            context.reportDiagnostic({
+              code: "arm-no-record",
+              target: model,
+              messageId: "is",
+            });
+          }
+          for (const prop of model.properties.values()) {
+            if (prop.type.kind === "Model") {
+              if (isRecordType(prop.type)) {
+                context.reportDiagnostic({
+                  code: "arm-no-record",
+                  target: prop,
+                  messageId: "default",
+                });
+              } else {
+                checkModel(prop.type);
+              }
+            }
+          }
         }
-        if (model.baseModel !== undefined && isRecordType(model.baseModel)) {
-          context.reportDiagnostic({
-            code: "arm-no-record",
-            target: model,
-            messageId: "extends",
-          });
-        }
-        if (model.sourceModel !== undefined && isRecordType(model.sourceModel)) {
-          context.reportDiagnostic({
-            code: "arm-no-record",
-            target: model,
-            messageId: "is",
-          });
+
+        // ensure only ARM resources and models they touch are checked
+        const resources = getArmResources(context.program);
+        for (const resource of resources) {
+          checkModel(resource.typespecType);
         }
       },
     };
