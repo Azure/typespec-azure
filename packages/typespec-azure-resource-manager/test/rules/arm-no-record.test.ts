@@ -182,3 +182,25 @@ it("does not emit diagnostic if ArmTagsProperty is used", async () => {
     )
     .toBeValid();
 });
+
+it("emits a diagnostic if a deeply aliased model use Record type", async () => {
+  await tester
+    .expect(
+      `
+    ${nsDef}
+
+    model Foo is Bar;
+    model Bar is Record<unknown>;
+
+    ${resource}
+    model WidgetProperties {
+      props: Foo;
+    }
+    `
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
+      message:
+        "Model properties or operation parameters should not be of type Record. ARM requires Resource provider teams to define types explicitly.",
+    });
+});
