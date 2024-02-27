@@ -771,6 +771,24 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: Microsoft.ThisWillBeRep
 | Parameters     | Optional. Additional parameters after the path parameters    |
 | Error          | Optional. The error response, if non-standard.               |
 
+### `ArmResourceCheckExistence` {#Azure.ResourceManager.ArmResourceCheckExistence}
+
+Check a resource's existence via HEAD operation
+
+```typespec
+op Azure.ResourceManager.ArmResourceCheckExistence(provider: Microsoft.ThisWillBeReplaced): Response | Error
+```
+
+#### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being checked                                |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the read operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
 ### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
 
 ```typespec
@@ -911,30 +929,12 @@ op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: Microsoft.Thi
 | Response       | Optional. The success response(s) for the delete operation                |
 | Error          | Optional. The error response, if non-standard.                            |
 
-### `ArmResourceHead` {#Azure.ResourceManager.ArmResourceHead}
-
-A resource HEAD operation
-
-```typespec
-op Azure.ResourceManager.ArmResourceHead(provider: Microsoft.ThisWillBeReplaced): Response | Azure.ResourceManager.ErrorResponse
-```
-
-#### Template Parameters
-
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| Resource       | the resource being checked                                |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the read operation     |
-| Error          | Optional. The error response, if non-standard.            |
-
 ### `ArmResourceListAtScope` {#Azure.ResourceManager.ArmResourceListAtScope}
 
 A resource list operation, with scope determined by BaseParameters
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListAtScope(provider: Microsoft.ThisWillBeReplaced): Response | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceListAtScope(provider: Microsoft.ThisWillBeReplaced): Response | Error
 ```
 
 #### Template Parameters
@@ -952,7 +952,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(provider: Microsoft.ThisWillBeRe
 A resource list operation, at the scope of the resource's parent
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListByParent(provider: Microsoft.ThisWillBeReplaced): Response | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceListByParent(provider: Microsoft.ThisWillBeReplaced): Response | Error
 ```
 
 #### Template Parameters
@@ -1003,7 +1003,7 @@ op Azure.ResourceManager.ArmResourcePatchSync(provider: Microsoft.ThisWillBeRepl
 A resource GET operation
 
 ```typespec
-op Azure.ResourceManager.ArmResourceRead(provider: Microsoft.ThisWillBeReplaced): Response | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceRead(provider: Microsoft.ThisWillBeReplaced): Response | Error
 ```
 
 #### Template Parameters

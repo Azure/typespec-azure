@@ -203,6 +203,18 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 | -------- | -------------------------- |
 | Resource | The resource being updated |
 
+### `ArmResourceExistsResponse` {#Azure.ResourceManager.ArmResourceExistsResponse}
+
+```typespec
+model Azure.ResourceManager.ArmResourceExistsResponse
+```
+
+### `ArmResourceNotFoundResponse` {#Azure.ResourceManager.ArmResourceNotFoundResponse}
+
+```typespec
+model Azure.ResourceManager.ArmResourceNotFoundResponse
+```
+
 ### `ArmResourceUpdatedResponse` {#Azure.ResourceManager.ArmResourceUpdatedResponse}
 
 ```typespec
