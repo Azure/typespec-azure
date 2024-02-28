@@ -826,11 +826,12 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
 
-    it("nested namespace and interface", async () => {
+    it("nested namespace and interface with naming change", async () => {
       await runner.compile(`
         @service({})
         namespace Test1Client {
           @route("/b")
+          @clientName("BRename")
           namespace B {
             op x(): void;
 
@@ -855,7 +856,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(b);
       strictEqual(b.subOperationGroups?.length, 1);
       strictEqual(listOperationGroups(runner.context, b).length, 1);
-      strictEqual(b.groupPath, "Test1Client.B");
+      strictEqual(b.groupPath, "Test1Client.BRename");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
         ["x"]
@@ -865,7 +866,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(c);
       strictEqual(c.subOperationGroups, undefined);
       strictEqual(listOperationGroups(runner.context, c).length, 0);
-      strictEqual(c.groupPath, "Test1Client.B.C");
+      strictEqual(c.groupPath, "Test1Client.BRename.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
         ["y"]

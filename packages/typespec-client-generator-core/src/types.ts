@@ -342,7 +342,7 @@ export function getSdkUnion(
   }
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
-    name: type.name,
+    name: getLibraryName(context, type),
     generatedName: type.name ? undefined : getGeneratedName(context, type),
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
@@ -595,11 +595,12 @@ function getSdkUnionEnumValues(
   enumType: SdkEnumType
 ): SdkEnumValueType[] {
   const values: SdkEnumValueType[] = [];
-  for (const [name, member] of type.flattenedMembers.entries()) {
+  for (const member of type.flattenedMembers.values()) {
     const docWrapper = getDocHelper(context, member.type);
+    const name = getLibraryName(context, member.type);
     values.push({
       kind: "enumvalue",
-      name: typeof name === "string" ? name : `${member.value}`,
+      name: name ? name : `${member.value}`,
       description: docWrapper.description,
       details: docWrapper.details,
       value: member.value,
@@ -654,7 +655,7 @@ function getKnownValuesEnum(
       const docWrapper = getDocHelper(context, type);
       sdkType = {
         ...getSdkTypeBaseHelper(context, type, "enum"),
-        name: type.name,
+        name: getLibraryName(context, type),
         description: docWrapper.description,
         details: docWrapper.details,
         valueType: getSdkEnumValueType(context, knownValues.members.values().next().value),

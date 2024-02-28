@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, UsageFlags } from "@typespec/compiler";
+import { Enum, Union, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -13,7 +13,13 @@ import {
   SdkUnionType,
 } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
-import { getAllModels, getAllModelsWithDiagnostics, getSdkEnum, isReadOnly } from "../src/types.js";
+import {
+  getAllModels,
+  getAllModelsWithDiagnostics,
+  getClientType,
+  getSdkEnum,
+  isReadOnly,
+} from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
@@ -444,7 +450,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "union");
-      strictEqual(sdkType.name, undefined);
+      strictEqual(sdkType.name, "");
       const values = sdkType.values;
       strictEqual(values.length, 2);
       strictEqual(values[0].kind, "string");
@@ -931,7 +937,37 @@ describe("typespec-client-generator-core: types", () => {
       await helper("@azure-tools/typespec-csharp", "Enum1", "One");
       await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
     });
+
+    it("union as enum rename", async () => {
+      const { TestUnion } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        namespace N {
+          @test
+          union TestUnion{
+            @clientName("ARename")
+            "A",
+            "B": "B_v",
+            string
+          }
+          op x(body: TestUnion): void;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(N.TestUnion, "TestUnionRename");
+        @@clientName(N.TestUnion.B, "BRename");
+      `
+      )) as { TestUnion: Union };
+
+      const enumType = getClientType(runner.context, TestUnion) as SdkEnumType;
+      strictEqual(enumType.name, "TestUnionRename");
+      strictEqual(enumType.values[0].name, "ARename");
+      strictEqual(enumType.values[1].name, "BRename");
+    });
   });
+
   describe("SdkBodyModelPropertyType", () => {
     it("required", async function () {
       await runner.compileWithBuiltInService(`
