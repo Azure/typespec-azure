@@ -616,11 +616,12 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name: getLibraryName(context, type.union),
+      generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
       valueType: { ...getSdkTypeBaseHelper(context, type.kind, "string"), encode: "string" },
       values: [],
-      nullable: false,
+      nullable: type.nullable,
       isFixed: !type.open,
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
@@ -727,9 +728,8 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkEnum(context, type, operation);
       break;
     case "Union":
-      // start off with just handling nullable type
       const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-      if (unionAsEnum && type.name) {
+      if (unionAsEnum) {
         retval = getSdkUnionEnum(context, unionAsEnum, operation);
       } else {
         retval = diagnostics.pipe(getSdkUnion(context, type, operation));

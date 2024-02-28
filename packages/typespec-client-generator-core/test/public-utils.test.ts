@@ -1139,25 +1139,25 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = getAllModels(runner.context);
-        strictEqual(models.length, 1);
+        strictEqual(models.length, 2);
         const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
           .generatedName;
         strictEqual(unionName, "AStatus");
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
-        strictEqual(statusProp.type.kind, "union");
+        strictEqual(statusProp.type.kind, "enum");
         strictEqual(statusProp.type.values.length, 2);
         const startVal = statusProp.type.values.find(
-          (x) => x.kind === "constant" && x.value === "start"
+          (x) => x.name === "start"
         )!;
-        strictEqual(startVal.kind, "constant");
+        strictEqual(startVal.kind, "enumvalue");
         strictEqual(startVal.valueType.kind, "string");
 
         const stopVal = statusProp.type.values.find(
-          (x) => x.kind === "constant" && x.value === "stop"
+          (x) => x.name === "stop"
         )!;
-        strictEqual(stopVal.kind, "constant");
+        strictEqual(stopVal.kind, "enumvalue");
         strictEqual(stopVal.valueType.kind, "string");
       });
 
@@ -1196,7 +1196,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = getAllModels(runner.context);
-        strictEqual(models.length, 2);
+        strictEqual(models.length, 3);
         const test1 = models.find((x) => (x as SdkModelType).generatedName === "AChoice")!;
         ok(test1);
         const unionName = ((test1 as SdkModelType).properties[0].type as SdkUnionType)

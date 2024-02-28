@@ -1465,45 +1465,23 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(dogValue.kind, "enumvalue");
     });
 
-    it("anonymous property of union to extensible enum", async () => {
+    it("property of anonymous union as enum", async () => {
       await runner.compileWithBuiltInService(`
-      union PetKind {
-        @doc("Cat")
-        Cat: "cat",
-        @doc("Dog")
-        Dog: "dog",
-        string,
+      model Pet {
+        kind: string | "cat" | "dog";
       }
 
       @route("/extensible-enum")
       @put
-      op putPet(@body petKind: PetKind): void;
+      op putPet(@body pet: Pet): void;
       `);
       const models = getAllModels(runner.context);
-      strictEqual(models.length, 1);
-      const petKind = models[0] as SdkEnumType;
-      strictEqual(petKind.name, "PetKind");
-      strictEqual(petKind.isFixed, false);
-      strictEqual(petKind.valueType.kind, "string");
-      const values = petKind.values;
-      deepStrictEqual(
-        values.map((x) => x.name),
-        ["Cat", "Dog"]
-      );
-
-      const catValue = values.find((x) => x.name === "Cat")!;
-      strictEqual(catValue.value, "cat");
-      strictEqual(catValue.description, "Cat");
-      strictEqual(catValue.enumType, petKind);
-      strictEqual(catValue.valueType, petKind.valueType);
-      strictEqual(catValue.kind, "enumvalue");
-
-      const dogValue = values.find((x) => x.name === "Dog")!;
-      strictEqual(dogValue.value, "dog");
-      strictEqual(dogValue.description, "Dog");
-      strictEqual(dogValue.enumType, petKind);
-      strictEqual(dogValue.valueType, petKind.valueType);
-      strictEqual(dogValue.kind, "enumvalue");
+      strictEqual(models.length, 2);
+      const pet = models.find((x) => x.name === "Pet")! as SdkModelType;
+      const kind = models.find((x) => x.name === "")!;
+      strictEqual(kind.generatedName, "PetKind");
+      const kindProperty = pet.properties.find((x) => x.nameInClient = "kind")! as SdkBodyModelPropertyType;
+      strictEqual(kindProperty.type, kind);
     });
 
     it("enum discriminator model without base discriminator property", async () => {
