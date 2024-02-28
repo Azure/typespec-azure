@@ -1321,9 +1321,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const union = ignoreDiagnostics(
-          getSdkUnion(runner.context, repeatabilityResult.type as Union)
-        );
+        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
         strictEqual(
           (union as SdkUnionType).generatedName,
           "ResponseWithAnonymousUnionRepeatabilityResult"
@@ -1346,9 +1344,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const union = ignoreDiagnostics(
-          getSdkUnion(runner.context, repeatabilityResult.type as Union)
-        );
+        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
         strictEqual(
           (union as SdkUnionType).generatedName,
           "RequestParameterWithAnonymousUnionRepeatabilityResult"
@@ -1371,9 +1367,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const stringType = ignoreDiagnostics(
-          getSdkUnion(runner.context, repeatabilityResult.type as Union)
-        )!;
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
         strictEqual(stringType.kind, "union");
         strictEqual(stringType.values.length, 3);
         strictEqual(stringType.values[0].kind, "constant");
