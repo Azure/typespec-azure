@@ -428,11 +428,7 @@ function addDiscriminatorToModelType(
       if (discriminatorProperty.type.kind === "constant") {
         discriminatorType = { ...discriminatorProperty.type.valueType };
       } else if (discriminatorProperty.type.kind === "enumvalue") {
-        discriminatorType = getSdkEnum(
-          context,
-          (discriminatorProperty.type.__raw as EnumMember).enum,
-          operation
-        );
+        discriminatorType = discriminatorProperty.type.enumType;
       }
     } else {
       discriminatorType = {
@@ -748,7 +744,14 @@ export function getClientTypeWithDiagnostics(
       retval = getKnownValuesEnum(context, type, operation) ?? innerType;
       break;
     case "UnionVariant":
-      retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      const unionType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.union, operation)
+      );
+      if (unionType.kind === "enum") {
+        retval = unionType.values.find((x) => x.name === getLibraryName(context, type))!;
+      } else {
+        retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      }
       break;
     case "EnumMember":
       const enumType = getSdkEnum(context, type.enum, operation);
