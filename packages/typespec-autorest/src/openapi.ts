@@ -90,6 +90,7 @@ import {
   stringTemplateToString,
 } from "@typespec/compiler";
 import {
+  Authentication,
   HttpAuth,
   HttpOperation,
   HttpOperationParameters,
@@ -99,7 +100,6 @@ import {
   HttpStatusCodesEntry,
   MetadataInfo,
   OAuth2FlowType,
-  ServiceAuthentication,
   Visibility,
   createMetadataInfo,
   getAllHttpServices,
@@ -2236,7 +2236,7 @@ function createOAPIEmitter(
   }
 
   function processServiceAuthentication(
-    authentication: ServiceAuthentication,
+    authentication: Authentication,
     serviceNamespace: Namespace
   ): {
     securitySchemes: Record<string, OpenAPI2SecurityScheme>;

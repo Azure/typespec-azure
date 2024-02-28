@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,
   ModelProperty,
@@ -19,13 +20,12 @@ import {
   getPropertyNames,
   isApiVersion,
 } from "../src/public-utils.js";
-import { getAllModels, getSdkUnion } from "../src/types.js";
+import { getAllModels, getAllModelsWithDiagnostics, getSdkUnion } from "../src/types.js";
 import {
   SdkTestRunner,
   createSdkContextTestHelper,
   createSdkTestRunner,
   createTcgcTestRunnerForEmitter,
-  getAllModelsAssertNoDiagnostics,
 } from "./test-host.js";
 
 describe("typespec-client-generator-core: public-utils", () => {
@@ -828,7 +828,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(`
         op test(@body body: {name: string}): void;
       `);
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         strictEqual((models[0] as SdkModelType).generatedName, "TestRequest");
       });
@@ -837,7 +837,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(`
           op test(): {name: string};
         `);
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         strictEqual((models[0] as SdkModelType).generatedName, "TestResponse");
       });
@@ -846,7 +846,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(`
           op test(@body body: {name: string}): {name: string};
         `);
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
         ok(models.find((x) => (x as SdkModelType).generatedName === "TestResponse"));
@@ -861,7 +861,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
           op test(): A;
         `);
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
       });
@@ -878,7 +878,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
       });
@@ -895,7 +895,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): A;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
       });
@@ -911,7 +911,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "AMember"));
       });
@@ -922,7 +922,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: {name: string}[]): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         strictEqual((models[0] as SdkModelType).generatedName, "TestRequest");
       });
@@ -933,7 +933,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: Record<{name: string}>): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         strictEqual((models[0] as SdkModelType).generatedName, "TestRequest");
       });
@@ -947,7 +947,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "AMember"));
         ok(models.find((x) => (x as SdkModelType).generatedName === "AMemberName"));
@@ -968,7 +968,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "BPForB"));
       });
@@ -998,7 +998,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: Fish): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 5);
         ok(models.find((x) => (x as SdkModelType).generatedName === "SharkPForShark"));
         ok(models.find((x) => (x as SdkModelType).generatedName === "SalmonPForSalmon"));
@@ -1021,7 +1021,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "BPForB"));
       });
@@ -1046,7 +1046,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 4);
         ok(models.find((x) => (x as SdkModelType).generatedName === "CP1ForC"));
       });
@@ -1068,7 +1068,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "BP2ForB"));
       });
@@ -1087,7 +1087,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForAPForAnonymousModel"));
@@ -1102,7 +1102,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
         ok(models.find((x) => (x as SdkModelType).generatedName === "APForAName"));
@@ -1119,7 +1119,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const [models, diagnostics] = getAllModels(runner.context);
+        const [models, diagnostics] = getAllModelsWithDiagnostics(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "AB"));
         expectDiagnostics(diagnostics, [
@@ -1138,7 +1138,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
           .generatedName;
@@ -1174,7 +1174,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const [models, diagnostics] = getAllModels(runner.context);
+        const [models, diagnostics] = getAllModelsWithDiagnostics(runner.context);
         strictEqual(models.length, 4);
         const union = (models[0] as SdkModelType).properties[0].type as SdkUnionType;
         strictEqual(union.generatedName, "AItems");
@@ -1195,7 +1195,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         const test1 = models.find((x) => (x as SdkModelType).generatedName === "AChoice")!;
         ok(test1);
@@ -1231,7 +1231,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op op3(@body body: B): boolean;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 3);
         ok(models.find((x) => (x as SdkModelType).generatedName === "BPForB"));
       });
@@ -1250,7 +1250,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         strictEqual(
           ((models[0] as SdkModelType).properties[0].type as SdkModelType).generatedName,
@@ -1268,7 +1268,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
           .generatedName;
@@ -1290,7 +1290,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(...RequestParameter): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         // we could not identify the anonymous model from alias spread
         // bc each time we try to get body, we will get a new type from compiler
@@ -1304,7 +1304,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(foo: string, bar: string): void;
         `
         );
-        const models = getAllModelsAssertNoDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 1);
         ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
       });
@@ -1325,9 +1325,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const union = ignoreDiagnostics(
-          getSdkUnion(runner.context, repeatabilityResult.type as Union)
-        );
+        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
         strictEqual(
           (union as SdkUnionType).generatedName,
           "ResponseWithAnonymousUnionRepeatabilityResult"
@@ -1350,9 +1348,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const union = ignoreDiagnostics(
-          getSdkUnion(runner.context, repeatabilityResult.type as Union)
-        );
+        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
         strictEqual(
           (union as SdkUnionType).generatedName,
           "RequestParameterWithAnonymousUnionRepeatabilityResult"
@@ -1375,9 +1371,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const stringType = ignoreDiagnostics(
-          getSdkUnion(runner.context, repeatabilityResult.type as Union)
-        )!;
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
         strictEqual(stringType.kind, "union");
         strictEqual(stringType.values.length, 3);
         strictEqual(stringType.values[0].kind, "constant");
@@ -1385,6 +1379,90 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].kind, "constant");
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.values[2].kind, "string");
+      });
+    });
+
+    describe("getLroMetadata", () => {
+      const lroCode = `
+      @versioned(Versions)
+      @service({title: "Test Service"})
+      namespace TestService;
+      alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
+      NoRepeatableRequests &
+      NoClientRequestId>;
+
+      @doc("The API version.")
+      enum Versions {
+        @doc("The 2022-12-01-preview version.")
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+        v2022_12_01_preview: "2022-12-01-preview",
+      }
+
+      @resource("users")
+      @doc("Details about a user.")
+      model User {
+      @key
+      @visibility("read")
+      @doc("The name of user.")
+      name: string;
+
+      @doc("The role of user")
+      role: string;
+      }
+
+      @doc("The parameters for exporting a user.")
+      model UserExportParams {
+      @query
+      @doc("The format of the data.")
+      format: string;
+      }
+
+      @doc("The exported user data.")
+      model ExportedUser {
+      @doc("The name of user.")
+      name: string;
+
+      @doc("The exported URI.")
+      resourceUri: string;
+      }
+
+      op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+    `;
+      it("filter-out-core-models true", async () => {
+        const runnerWithCore = await createSdkTestRunner({
+          librariesToAdd: [AzureCoreTestLibrary],
+          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+          emitterName: "@azure-tools/typespec-java",
+        });
+        await runnerWithCore.compile(lroCode);
+        const models = getAllModels(runnerWithCore.context);
+        strictEqual(models.length, 1);
+        // there should only be one non-core model
+        strictEqual(models[0].name, "ExportedUser");
+      });
+      it("filter-out-core-models false", async () => {
+        const runnerWithCore = await createSdkTestRunner({
+          librariesToAdd: [AzureCoreTestLibrary],
+          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+          emitterName: "@azure-tools/typespec-java",
+        });
+        await runnerWithCore.compile(lroCode);
+        runnerWithCore.context.filterOutCoreModels = false;
+        const models = getAllModels(runnerWithCore.context);
+        strictEqual(models.length, 7);
+        // there should only be one non-core model
+        deepStrictEqual(
+          models.map((x) => x.name),
+          [
+            "ResourceOperationStatus",
+            "OperationState",
+            "Error",
+            "InnerError",
+            "ExportedUser",
+            "ErrorResponse",
+            "OperationStatus",
+          ]
+        );
       });
     });
   });
