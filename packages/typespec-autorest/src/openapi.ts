@@ -110,7 +110,6 @@ import {
   getStatusCodeDescription,
   getVisibilitySuffix,
   isContentTypeHeader,
-  isExplicitBodyValid,
   isSharedRoute,
   reportIfNoRoutes,
   resolveRequestVisibility,
@@ -879,8 +878,7 @@ function createOAPIEmitter(
         ? { type: "file" }
         : getSchemaOrRef(body.type, {
             visibility: Visibility.Read,
-            ignoreMetadataAnnotations:
-              body.isExplicit && !isExplicitBodyValid(program, body.property!),
+            ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
           });
     }
 
@@ -1086,8 +1084,7 @@ function createOAPIEmitter(
       const schemaContext = {
         visibility,
         ignoreMetadataAnnotations:
-          methodParams.body.isExplicit &&
-          !isExplicitBodyValid(program, methodParams.body.parameter!),
+          methodParams.body.isExplicit && methodParams.body.containsMetadataAnnotations,
       };
       const schema = isBinary
         ? { type: "string", format: "binary" }
