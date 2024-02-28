@@ -8,9 +8,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
-  Program,
   Type,
-  Union,
   UsageFlags,
 } from "@typespec/compiler";
 import {
@@ -20,28 +18,15 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import { TCGCContext } from "./internal-utils.js";
 
 export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
   TOptions extends object = Record<string, any>,
-> {
-  program: Program;
-  sdkPackage: SdkPackage<TServiceOperation>;
+> extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  emitterName: string;
-  generateProtocolMethods: boolean;
-  generateConvenienceMethods: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  unionsMap?: Map<Union, SdkUnionType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  __api_version_parameter?: SdkParameter;
-  __api_version_client_default_value?: string;
-  __api_versions?: string[];
+  sdkPackage: SdkPackage<TServiceOperation>;
   __clients?: Map<string, SdkClientType<TServiceOperation>>;
-  generatedNames?: Set<string>;
-  arm?: boolean;
 }
 
 export interface SdkEmitterOptions {
@@ -154,11 +139,20 @@ export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKn
   return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-export interface SdkDatetimeType extends SdkTypeBase {
-  kind: "datetime";
+interface SdkDatetimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
+
+interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+  kind: "utcDateTime";
+}
+
+interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+  kind: "offsetDateTime";
+}
+
+export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
@@ -226,6 +220,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isFormDataType: boolean;
+  isError: boolean;
   generatedName?: string;
   description?: string;
   details?: string;

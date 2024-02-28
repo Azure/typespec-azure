@@ -11,7 +11,8 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { getSdkEnum, isReadOnly } from "../src/types.js";
+import { isErrorOrChildOfError } from "../src/public-utils.js";
+import { getAllModels, getAllModelsWithDiagnostics, getSdkEnum, isReadOnly } from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
@@ -210,7 +211,7 @@ describe("typespec-client-generator-core: types", () => {
         }
       `
       );
-      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      const models = getAllModels(runner.context);
       strictEqual(models[0].kind, "model");
       strictEqual(models[0].properties[0].type.kind, "string");
     });
@@ -355,7 +356,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
     });
@@ -371,7 +372,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
     });
@@ -387,7 +388,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc7231");
     });
@@ -404,7 +405,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
     });
@@ -424,7 +425,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "datetime");
+      strictEqual(sdkType.valueType.kind, "utcDateTime");
       strictEqual(sdkType.valueType.wireType.kind, "int64");
       strictEqual(sdkType.valueType.encode, "unixTimestamp");
     });
@@ -1908,6 +1909,39 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
       strictEqual(NonAdditionalPropertiesModel.additionalProperties, undefined);
     });
+    it("additionalProperties usage", async () => {
+      await runner.compileWithBuiltInService(`
+        @service({})
+        namespace MyService {
+          model AdditionalPropertiesModel extends Record<Test> {
+          }
+  
+          model AdditionalPropertiesModel2 is Record<Test> {
+          }
+
+          model Test {
+          }
+
+          op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+        }
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 3);
+      const AdditionalPropertiesModel = models.find(
+        (x) => x.name === "AdditionalPropertiesModel"
+      )! as SdkModelType;
+      const AdditionalPropertiesModel2 = models.find(
+        (x) => x.name === "AdditionalPropertiesModel2"
+      )! as SdkModelType;
+      const Test = models.find((x) => x.name === "Test")! as SdkModelType;
+      strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel.usage, UsageFlags.Input);
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel2.usage, UsageFlags.Output);
+      strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output);
+    });
     it("crossLanguageDefinitionId", async () => {
       await runner.compile(`
         @service({})
@@ -2037,6 +2071,56 @@ describe("typespec-client-generator-core: types", () => {
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 2);
     });
+    it("error model", async () => {
+      await runner.compileWithBuiltInService(`
+        @error
+        model ApiError {
+          code: string;
+        }
+
+        op test(): ApiError;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 1);
+      strictEqual(models[0].kind, "model");
+      strictEqual(models[0].isError, true);
+      const rawModel = models[0].__raw!;
+      strictEqual(rawModel.kind, "Model");
+      strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
+    });
+
+    it("error model inheritance", async () => {
+      await runner.compileWithBuiltInService(`
+        model ValidResponse {
+          prop: string;
+        };
+
+        @error
+        model ApiError {
+          code: string
+        };
+
+        model FourHundredError extends ApiError {};
+        model FourZeroFourError extends FourHundredError {};
+        model FiveHundredError extends ApiError {};
+
+        op test(): ValidResponse | FourZeroFourError | FiveHundredError;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 5);
+      const errorModels = models.filter((x) => x.kind === "model" && x.isError);
+      deepStrictEqual(errorModels.map((x) => x.name).sort(), [
+        "ApiError",
+        "FiveHundredError",
+        "FourHundredError",
+        "FourZeroFourError",
+      ]);
+      const validModel = models.filter((x) => x.kind === "model" && !x.isError);
+      deepStrictEqual(
+        validModel.map((x) => x.name),
+        ["ValidResponse"]
+      );
+    });
   });
   describe("SdkMultipartFormType", () => {
     it("multipart form basic", async function () {
@@ -2076,7 +2160,8 @@ describe("typespec-client-generator-core: types", () => {
         @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
       `
       );
-      expectDiagnostics(runner.context.sdkPackage.diagnostics, {
+      const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
+      expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       });
     });

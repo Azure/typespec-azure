@@ -2,7 +2,9 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  Program,
   Type,
+  Union,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
@@ -13,7 +15,14 @@ import {
 } from "@typespec/compiler";
 import { HttpOperation, getHttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { SdkContext, SdkModelPropertyType, SdkServiceOperation, SdkType } from "./interfaces.js";
+import {
+  SdkEnumType,
+  SdkModelPropertyType,
+  SdkModelType,
+  SdkParameter,
+  SdkType,
+  SdkUnionType,
+} from "./interfaces.js";
 import { isApiVersion } from "./public-utils.js";
 
 /**
@@ -40,7 +49,7 @@ export function parseEmitterName(emitterName?: string): string {
  * @returns The name of the namespace
  */
 export function getClientNamespaceStringHelper(
-  context: SdkContext,
+  context: TCGCContext,
   namespace?: Namespace
 ): string | undefined {
   let packageName = context.packageName;
@@ -63,7 +72,7 @@ export function getClientNamespaceStringHelper(
  * @returns Whether the type is the api version parameter and the default value for the client
  */
 export function updateWithApiVersionInformation(
-  context: SdkContext,
+  context: TCGCContext,
   type: ModelProperty
 ): {
   isApiVersionParam: boolean;
@@ -84,10 +93,7 @@ export function updateWithApiVersionInformation(
  * @param type
  * @returns All api versions the type is available on
  */
-export function getAvailableApiVersions<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
-  type: Type
-): string[] {
+export function getAvailableApiVersions(context: TCGCContext, type: Type): string[] {
   const apiVersions =
     context.__api_versions ||
     getVersions(context.program, type)[1]
@@ -125,7 +131,7 @@ interface DocWrapper {
  * @param type
  * @returns Returns the description and details of a type
  */
-export function getDocHelper(context: SdkContext, type: Type): DocWrapper {
+export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
   const program = context.program;
   if (getSummary(program, type)) {
     return {
@@ -165,8 +171,8 @@ interface DefaultSdkTypeBase<TKind> {
  * Helper function to return default values for nullable, encode etc
  * @param type
  */
-export function getSdkTypeBaseHelper<TKind, TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+export function getSdkTypeBaseHelper<TKind>(
+  context: TCGCContext,
   type: Type,
   kind: TKind
 ): DefaultSdkTypeBase<TKind> {
@@ -199,7 +205,7 @@ export function isAcceptHeader(param: SdkModelPropertyType): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
-export function getWireName(context: SdkContext, type: Type & { name: string }) {
+export function getWireName(context: TCGCContext, type: Type & { name: string }) {
   // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
@@ -207,7 +213,7 @@ export function getWireName(context: SdkContext, type: Type & { name: string }) 
   return getProjectedName(context.program, type, "json") ?? type.name;
 }
 
-export function isMultipartOperation(context: SdkContext, operation?: Operation): boolean {
+export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
   const httpBody = httpOperation.parameters.body;
@@ -217,6 +223,29 @@ export function isMultipartOperation(context: SdkContext, operation?: Operation)
   return false;
 }
 
-export function isHttpOperation(context: SdkContext, obj: any): obj is HttpOperation {
+export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
   return !!obj && obj.kind === "Operation" && !getHttpOperation(context.program, obj)[1].length;
+}
+export interface TCGCContext {
+  program: Program;
+  emitterName: string;
+  generateProtocolMethods?: boolean;
+  generateConvenienceMethods?: boolean;
+  filterOutCoreModels?: boolean;
+  packageName?: string;
+  arm?: boolean;
+  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  generatedNames?: Set<string>;
+  unionsMap?: Map<Union, SdkUnionType>;
+  __api_version_parameter?: SdkParameter;
+  __api_version_client_default_value?: string;
+  __api_versions?: string[];
+}
+
+export function createTCGCContext(program: Program): TCGCContext {
+  return {
+    program,
+    emitterName: "__TCGC_INTERNAL__",
+  };
 }
