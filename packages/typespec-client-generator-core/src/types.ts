@@ -271,6 +271,14 @@ export function getSdkArrayOrDict(
   context: TCGCContext,
   type: Model,
   operation?: Operation
+): (SdkDictionaryType | SdkArrayType) | undefined {
+  return ignoreDiagnostics(getSdkArrayOrDictWithDiagnostics(context, type, operation));
+}
+
+export function getSdkArrayOrDictWithDiagnostics(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
 ): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (type.indexer !== undefined) {
@@ -306,6 +314,14 @@ export function getSdkTuple(
   context: TCGCContext,
   type: Tuple,
   operation?: Operation
+): SdkTupleType {
+  return ignoreDiagnostics(getSdkTupleWithDiagnostics(context, type, operation));
+}
+
+export function getSdkTupleWithDiagnostics(
+  context: TCGCContext,
+  type: Tuple,
+  operation?: Operation
 ): [SdkTupleType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
@@ -321,6 +337,14 @@ function getNonNullOptions(context: TCGCContext, type: Union): Type[] {
 }
 
 export function getSdkUnion(
+  context: TCGCContext,
+  type: Union,
+  operation?: Operation
+): SdkType {
+  return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
+}
+
+export function getSdkUnionWithDiagnostics(
   context: TCGCContext,
   type: Union,
   operation?: Operation
@@ -379,7 +403,7 @@ function addDiscriminatorToModelType(
   if (discriminator) {
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
-      const childModelSdkType = diagnostics.pipe(getSdkModel(context, childModel, operation));
+      const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel, operation));
       updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
@@ -457,6 +481,14 @@ function addDiscriminatorToModelType(
 }
 
 export function getSdkModel(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
+): SdkModelType {
+  return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
+}
+
+export function getSdkModelWithDiagnostics(
   context: TCGCContext,
   type: Model,
   operation?: Operation
@@ -689,12 +721,12 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkConstant(context, type);
       break;
     case "Tuple":
-      retval = diagnostics.pipe(getSdkTuple(context, type, operation));
+      retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
       break;
     case "Model":
-      retval = diagnostics.pipe(getSdkArrayOrDict(context, type, operation));
+      retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        retval = diagnostics.pipe(getSdkModel(context, type, operation));
+        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
       }
       break;
     case "Intrinsic":
@@ -736,7 +768,7 @@ export function getClientTypeWithDiagnostics(
       if (unionAsEnum && type.name) {
         retval = getSdkUnionEnum(context, unionAsEnum, operation);
       } else {
-        retval = diagnostics.pipe(getSdkUnion(context, type, operation));
+        retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       }
       break;
     case "ModelProperty":
