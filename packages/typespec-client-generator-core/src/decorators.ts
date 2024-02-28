@@ -17,7 +17,6 @@ import {
   UsageFlags,
   getNamespaceFullName,
   getProjectedName,
-  ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
@@ -740,7 +739,7 @@ export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags
     getAllModels(context); // this will populate modelsMap
   }
   return entity.kind === "Model"
-    ? ignoreDiagnostics(getSdkModel(context, entity)).usage
+    ? getSdkModel(context, entity).usage
     : getSdkEnum(context, entity).usage;
 }
 
@@ -783,7 +782,7 @@ export function getAccess(
   }
 
   return entity.kind === "Model"
-    ? ignoreDiagnostics(getSdkModel(context, entity)).access
+    ? getSdkModel(context, entity).access
     : getSdkEnum(context, entity).access;
 }
 
