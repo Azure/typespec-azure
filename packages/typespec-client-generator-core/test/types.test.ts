@@ -1480,7 +1480,9 @@ describe("typespec-client-generator-core: types", () => {
       const pet = models.find((x) => x.name === "Pet")! as SdkModelType;
       const kind = models.find((x) => x.name === "")!;
       strictEqual(kind.generatedName, "PetKind");
-      const kindProperty = pet.properties.find((x) => x.nameInClient = "kind")! as SdkBodyModelPropertyType;
+      const kindProperty = pet.properties.find(
+        (x) => (x.nameInClient = "kind")
+      )! as SdkBodyModelPropertyType;
       strictEqual(kindProperty.type, kind);
     });
 

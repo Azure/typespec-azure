@@ -1148,15 +1148,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(statusProp.kind, "property");
         strictEqual(statusProp.type.kind, "enum");
         strictEqual(statusProp.type.values.length, 2);
-        const startVal = statusProp.type.values.find(
-          (x) => x.name === "start"
-        )!;
+        const startVal = statusProp.type.values.find((x) => x.name === "start")!;
         strictEqual(startVal.kind, "enumvalue");
         strictEqual(startVal.valueType.kind, "string");
 
-        const stopVal = statusProp.type.values.find(
-          (x) => x.name === "stop"
-        )!;
+        const stopVal = statusProp.type.values.find((x) => x.name === "stop")!;
         strictEqual(stopVal.kind, "enumvalue");
         strictEqual(stopVal.valueType.kind, "string");
       });
