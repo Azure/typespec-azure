@@ -17,7 +17,6 @@ import {
   UsageFlags,
   getNamespaceFullName,
   getProjectedName,
-  ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,

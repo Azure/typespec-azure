@@ -336,11 +336,7 @@ function getNonNullOptions(context: TCGCContext, type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-export function getSdkUnion(
-  context: TCGCContext,
-  type: Union,
-  operation?: Operation
-): SdkType {
+export function getSdkUnion(context: TCGCContext, type: Union, operation?: Operation): SdkType {
   return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
 }
 
@@ -403,7 +399,9 @@ function addDiscriminatorToModelType(
   if (discriminator) {
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
-      const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel, operation));
+      const childModelSdkType = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, childModel, operation)
+      );
       updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
