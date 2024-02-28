@@ -12,6 +12,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
+import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
   getAllModels,
   getAllModelsWithDiagnostics,
@@ -2086,6 +2087,56 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
+    });
+    it("error model", async () => {
+      await runner.compileWithBuiltInService(`
+        @error
+        model ApiError {
+          code: string;
+        }
+
+        op test(): ApiError;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 1);
+      strictEqual(models[0].kind, "model");
+      strictEqual(models[0].isError, true);
+      const rawModel = models[0].__raw!;
+      strictEqual(rawModel.kind, "Model");
+      strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
+    });
+
+    it("error model inheritance", async () => {
+      await runner.compileWithBuiltInService(`
+        model ValidResponse {
+          prop: string;
+        };
+
+        @error
+        model ApiError {
+          code: string
+        };
+
+        model FourHundredError extends ApiError {};
+        model FourZeroFourError extends FourHundredError {};
+        model FiveHundredError extends ApiError {};
+
+        op test(): ValidResponse | FourZeroFourError | FiveHundredError;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 5);
+      const errorModels = models.filter((x) => x.kind === "model" && x.isError);
+      deepStrictEqual(errorModels.map((x) => x.name).sort(), [
+        "ApiError",
+        "FiveHundredError",
+        "FourHundredError",
+        "FourZeroFourError",
+      ]);
+      const validModel = models.filter((x) => x.kind === "model" && !x.isError);
+      deepStrictEqual(
+        validModel.map((x) => x.name),
+        ["ValidResponse"]
+      );
     });
   });
   describe("SdkMultipartFormType", () => {

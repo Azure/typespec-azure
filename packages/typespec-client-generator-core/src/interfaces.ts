@@ -201,6 +201,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isFormDataType: boolean;
+  isError: boolean;
   generatedName?: string;
   description?: string;
   details?: string;
