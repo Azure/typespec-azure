@@ -648,7 +648,7 @@
   "definitions": {
     "AllPropertiesProperties": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource with all envelope properties",
+      "description": "rp-specific properties for the resource with all envelope properties",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",

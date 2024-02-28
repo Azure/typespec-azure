@@ -720,16 +720,16 @@
     },
     "DependentProperties": {
       "type": "object",
-      "description": "Depedent properties",
+      "description": "Dependent properties",
       "properties": {
         "age": {
           "type": "integer",
           "format": "int32",
-          "description": "Age of depedent"
+          "description": "Age of dependent"
         },
         "gender": {
           "type": "string",
-          "description": "Gender of depedent"
+          "description": "Gender of dependent"
         }
       },
       "required": [
@@ -754,11 +754,11 @@
         "age": {
           "type": "integer",
           "format": "int32",
-          "description": "Age of depedent"
+          "description": "Age of dependent"
         },
         "gender": {
           "type": "string",
-          "description": "Gender of depedent"
+          "description": "Gender of dependent"
         }
       }
     },

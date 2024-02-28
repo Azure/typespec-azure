@@ -1,3 +1,5 @@
+import { EnumMember } from "@typespec/compiler";
+
 export interface FilePath {
   filePath: string;
 }
@@ -16,4 +18,9 @@ export interface BrowseOptions {
 
 export interface marketplaceOfferOptions {
   id?: string;
+}
+
+export interface PromotionOptions {
+  readonly apiVersion: string | EnumMember;
+  readonly autoUpdate?: boolean;
 }

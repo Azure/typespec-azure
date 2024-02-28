@@ -413,7 +413,7 @@
     },
     "AuthType": {
       "type": "string",
-      "description": "The kmind of authentication used for this linker.",
+      "description": "The kind of authentication used for this linker.",
       "enum": [
         "systemAssignedIdentity",
         "userAssignedIdentity",

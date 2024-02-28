@@ -305,9 +305,9 @@
         "x-ms-long-running-operation": true
       }
     },
-    "/authoring/analyze-text/projects/{projectName}:importx": {
+    "/authoring/analyze-text/projects/{projectName}:import": {
       "post": {
-        "operationId": "Projects_Importx",
+        "operationId": "Projects_Import",
         "description": "Triggers a job to export a project's data.",
         "parameters": [
           {

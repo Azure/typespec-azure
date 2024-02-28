@@ -1520,6 +1520,7 @@ components:
       enum:
         - accepted
         - rejected
+      description: Repeatability Result header options
     Versions:
       type: string
       enum:

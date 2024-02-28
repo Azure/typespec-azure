@@ -581,9 +581,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
-  /authoring/analyze-text/projects/{projectName}:importx:
+  /authoring/analyze-text/projects/{projectName}:import:
     post:
-      operationId: Projects_importx
+      operationId: Projects_import
       description: Triggers a job to export a project's data.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'

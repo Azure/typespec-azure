@@ -1,14 +1,6 @@
-import {
-  Enum,
-  Interface,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  UsageFlags,
-} from "@typespec/compiler";
+import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
@@ -18,12 +10,12 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
-  shouldFlattenProperty,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
+import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: decorators", () => {
@@ -834,11 +826,12 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
 
-    it("nested namespace and interface", async () => {
+    it("nested namespace and interface with naming change", async () => {
       await runner.compile(`
         @service({})
         namespace Test1Client {
           @route("/b")
+          @clientName("BRename")
           namespace B {
             op x(): void;
 
@@ -863,7 +856,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(b);
       strictEqual(b.subOperationGroups?.length, 1);
       strictEqual(listOperationGroups(runner.context, b).length, 1);
-      strictEqual(b.groupPath, "Test1Client.B");
+      strictEqual(b.groupPath, "Test1Client.BRename");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
         ["x"]
@@ -873,7 +866,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(c);
       strictEqual(c.subOperationGroups, undefined);
       strictEqual(listOperationGroups(runner.context, c).length, 0);
-      strictEqual(c.groupPath, "Test1Client.B.C");
+      strictEqual(c.groupPath, "Test1Client.BRename.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
         ["y"]
@@ -2230,32 +2223,32 @@ describe("typespec-client-generator-core: decorators", () => {
 
   describe("@flattenProperty", () => {
     it("marks a model property to be flattened with suppression of deprecation warning", async () => {
-      const { Model1 } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Model1{
-            #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-            @flattenProperty
-            child: Model2;
-          }
-
-          @test
-          model Model2{}
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model1): void;
+      await runner.compileWithBuiltInService(`
+        model Model1{
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @flattenProperty
+          child: Model2;
         }
-      `)) as { Model1: Model };
 
-      const childProperty = Model1.properties.get("child");
-      notStrictEqual(childProperty, undefined);
-      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), true);
+        @test
+        model Model2{}
+
+        @test
+        @route("/func1")
+        op func1(@body body: Model1): void;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const model1 = models.find((x) => x.name === "Model1")!;
+      strictEqual(model1.kind, "model");
+      strictEqual(model1.properties.length, 1);
+      const childProperty = model1.properties[0];
+      strictEqual(childProperty.kind, "property");
+      strictEqual(childProperty.flatten, true);
     });
 
     it("doesn't mark a un-flattened model property", async () => {
-      const { Model1 } = (await runner.compile(`
+      await runner.compile(`
         @service({})
         @test namespace MyService {
           @test
@@ -2270,11 +2263,15 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/func1")
           op func1(@body body: Model1): void;
         }
-      `)) as { Model1: Model };
-
-      const childProperty = Model1.properties.get("child");
-      notStrictEqual(childProperty, undefined);
-      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), false);
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const model1 = models.find((x) => x.name === "Model1")!;
+      strictEqual(model1.kind, "model");
+      strictEqual(model1.properties.length, 1);
+      const childProperty = model1.properties[0];
+      strictEqual(childProperty.kind, "property");
+      strictEqual(childProperty.flatten, false);
     });
 
     it("throws deprecation warning if not suppressed", async () => {

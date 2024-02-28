@@ -4,11 +4,11 @@ namespace Organization
 {
   @get op get(@path subscription: string, @path resourceGroup: string, @path name: string) : ArmResponse<Organization>;
 
-  @slro("/operations", OperationStatus)
+  @lro("/operations", OperationStatus)
   @put op createOrUpdate(@path subscription: string, @path resourceGroup: string, @path name: string, Organization) : ArmResponse<Organization>;
   @patch op update(@path subscription: string, @path resourceGroup: string, @path name: string, OrganizationUpdate) : ArmResponse<Organization>;
   
-  @slro("/operations", OperationStatus)
+  @lro("/operations", OperationStatus)
   @delete op delete(@path subscription: string, @path resourceGroup: string, @path name: string) : ArmResponse;
 
   @post op getKeys(@path subscription: string, @path resourceGroup: string, @path name: string) : ArmResponse<OrganizationKeys>;

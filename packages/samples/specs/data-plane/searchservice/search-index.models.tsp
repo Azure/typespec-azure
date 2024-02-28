@@ -1,5 +1,7 @@
 import "./searchservice.models.tsp";
 
+// cspell:ignore Bangla Bokmaal Bokmål kstem Sorani Decompounder TFIDF
+
 using TypeSpec.OpenAPI;
 using TypeSpec.Rest;
 
@@ -628,7 +630,7 @@ enum LexicalTokenizerName {
   @doc("Grammar-based tokenizer that is suitable for processing most European-language documents. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/ClassicTokenizer.html")
   Classic: "classic",
 
-  @doc("Tokenizes the input from an edge into n-grams of the given size(s). See https://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/EdgeNGramTokenizer.html")
+  @doc("Tokenize the input from an edge into n-grams of the given size(s). See https://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/EdgeNGramTokenizer.html")
   EdgeNGram: "edgeNGram",
 
   @doc("Emits the entire input as a single token. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/core/KeywordTokenizer.html")
@@ -646,7 +648,7 @@ enum LexicalTokenizerName {
   @doc("Divides text using language-specific rules and reduces words to their base forms.")
   MicrosoftLanguageStemmingTokenizer: "microsoft_language_stemming_tokenizer",
 
-  @doc("Tokenizes the input into n-grams of the given size(s). See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/NGramTokenizer.html")
+  @doc("Tokenize the input into n-grams of the given size(s). See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/NGramTokenizer.html")
   NGram: "nGram",
 
   @doc("Tokenizer for path-like hierarchies. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/path/PathHierarchyTokenizer.html")
@@ -658,7 +660,7 @@ enum LexicalTokenizerName {
   @doc("Standard Lucene analyzer; Composed of the standard tokenizer, lowercase filter and stop filter. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/StandardTokenizer.html")
   Standard: "standard_v2",
 
-  @doc("Tokenizes urls and emails as one token. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/UAX29URLEmailTokenizer.html")
+  @doc("Tokenize urls and emails as one token. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/UAX29URLEmailTokenizer.html")
   UaxUrlEmail: "uax_url_email",
 
   @doc("Divides text at whitespace. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/core/WhitespaceTokenizer.html")
@@ -819,7 +821,7 @@ model ClassicTokenizer extends LexicalTokenizer {
   maxTokenLength?: int32 = 255;
 }
 
-@doc("Tokenizes the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.")
+@doc("Tokenize the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.")
 model EdgeNGramTokenizer extends LexicalTokenizer {
   `@odata.type`: "#Microsoft.Azure.Search.EdgeNGramTokenizer";
 
@@ -1164,7 +1166,7 @@ enum MicrosoftStemmingTokenizerLanguage {
   Vietnamese: "vietnamese",
 }
 
-@doc("Tokenizes the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.")
+@doc("Tokenize the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.")
 model NGramTokenizer extends LexicalTokenizer {
   `@odata.type`: "#Microsoft.Azure.Search.NGramTokenizer";
 
@@ -1236,7 +1238,7 @@ model LuceneStandardTokenizerV2 extends LexicalTokenizer {
   maxTokenLength?: int32 = 255;
 }
 
-@doc("Tokenizes urls and emails as one token. This tokenizer is implemented using Apache Lucene.")
+@doc("Tokenize urls and emails as one token. This tokenizer is implemented using Apache Lucene.")
 model UaxUrlEmailTokenizer extends LexicalTokenizer {
   `@odata.type`: "#Microsoft.Azure.Search.UaxUrlEmailTokenizer";
 

@@ -18,6 +18,7 @@ import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
+import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatUse } from "./rules/prevent-format.js";
 import { preventMultipleDiscriminator } from "./rules/prevent-multiple-discriminator.js";
@@ -34,42 +35,45 @@ import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model
 import { useStandardNames } from "./rules/use-standard-names.js";
 import { useStandardOperations } from "./rules/use-standard-ops.js";
 
+const rules = [
+  apiVersionRule,
+  authRequiredRule,
+  bodyArrayRule,
+  byosRule,
+  casingRule,
+  compositionOverInheritanceRule,
+  extensibleEnumRule,
+  knownEncodingRule,
+  longRunningOperationsRequirePollingOperation,
+  noClosedLiteralUnionRule,
+  noEnumRule,
+  noErrorStatusCodesRule,
+  noExplicitRoutesResourceOps,
+  noFixedEnumDiscriminatorRule,
+  nonBreakingVersioningRule,
+  noNullableRule,
+  noOffsetDateTimeRule,
+  noResponseBodyRule,
+  noRpcPathParamsRule,
+  operationIdRule,
+  preferCsvCollectionFormatRule,
+  preventFormatUse,
+  preventMultipleDiscriminator,
+  preventRestLibraryInterfaces,
+  preventUnknownType,
+  propertyNameRule,
+  recordTypeRule,
+  requireDocumentation,
+  requireKeyVisibility,
+  responseSchemaMultiStatusCodeRule,
+  rpcOperationRequestBodyRule,
+  spreadDiscriminatedModelRule,
+  useStandardNames,
+  useStandardOperations,
+];
+
 export const $linter = defineLinter({
-  rules: [
-    apiVersionRule,
-    authRequiredRule,
-    operationIdRule,
-    bodyArrayRule,
-    byosRule,
-    casingRule,
-    spreadDiscriminatedModelRule,
-    compositionOverInheritanceRule,
-    preferCsvCollectionFormatRule,
-    extensibleEnumRule,
-    knownEncodingRule,
-    useStandardOperations,
-    noClosedLiteralUnionRule,
-    noEnumRule,
-    noErrorStatusCodesRule,
-    noFixedEnumDiscriminatorRule,
-    noNullableRule,
-    noOffsetDateTimeRule,
-    noRpcPathParamsRule,
-    noExplicitRoutesResourceOps,
-    noResponseBodyRule,
-    preventFormatUse,
-    preventMultipleDiscriminator,
-    preventRestLibraryInterfaces,
-    preventUnknownType,
-    recordTypeRule,
-    responseSchemaMultiStatusCodeRule,
-    propertyNameRule,
-    rpcOperationRequestBodyRule,
-    requireDocumentation,
-    requireKeyVisibility,
-    longRunningOperationsRequirePollingOperation,
-    useStandardNames,
-  ],
+  rules,
   ruleSets: {
     all: {
       enable: {
@@ -109,6 +113,11 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: false,
       },
       extends: ["@typespec/http/all"],
+    },
+    "canonical-versioning": {
+      enable: {
+        [`@azure-tools/typespec-azure-core/${nonBreakingVersioningRule.name}`]: false,
+      },
     },
   },
 });

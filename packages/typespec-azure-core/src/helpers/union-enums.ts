@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  EnumMember,
   Type,
   Union,
   UnionVariant,
@@ -26,8 +27,8 @@ export interface UnionEnumBase<K extends string, T> {
 
 export interface UnionEnumVariant<T> {
   value: T;
-  /** Reference to the type used to construct this enum */
-  variant: UnionVariant;
+  /** Reference to the type used to construct this enum member */
+  type: UnionVariant | EnumMember;
 }
 
 export type UnionEnum = UnionEnumBase<"string", string> | UnionEnumBase<"number", number>;
@@ -82,6 +83,7 @@ export type UnionEnum = UnionEnumBase<"string", string> | UnionEnumBase<"number"
 export function getUnionAsEnum(union: Union): [UnionEnum | undefined, readonly Diagnostic[]] {
   return getUnionAsEnumInternal(union, new Set());
 }
+
 function getUnionAsEnumInternal(
   union: Union,
   visited: Set<Union>
@@ -117,11 +119,11 @@ function getUnionAsEnumInternal(
         break;
       case "String":
         kinds.add("string");
-        members.set(variant.name, { value: variant.type.value, variant });
+        members.set(variant.name, { value: variant.type.value, type: variant });
         break;
       case "Number":
         kinds.add("number");
-        members.set(variant.name, { value: variant.type.value, variant });
+        members.set(variant.name, { value: variant.type.value, type: variant });
         break;
       case "Union":
         const parentUnion = diagnostics.pipe(getUnionAsEnumInternal(variant.type, visited));
@@ -136,6 +138,12 @@ function getUnionAsEnumInternal(
           for (const [key, value] of parentUnion.flattenedMembers) {
             flattenedMembers.set(key, value);
           }
+        }
+        break;
+      case "Enum":
+        for (const member of variant.type.members.values()) {
+          kinds.add(typeof member.value === "number" ? "number" : "string");
+          flattenedMembers.set(member.name, { value: member.value ?? member.name, type: member });
         }
         break;
       case "Scalar":
