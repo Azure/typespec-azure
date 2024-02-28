@@ -649,7 +649,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: { ...getSdkTypeBaseHelper(context, type.kind, "string"), encode: "string" },
+      valueType: getSdkEnumValueType(context, type.flattenedMembers.values().next().value),
       values: [],
       nullable: type.nullable,
       isFixed: !type.open,
