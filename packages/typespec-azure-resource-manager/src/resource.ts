@@ -1,14 +1,20 @@
+import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
   DecoratorContext,
+  getKeyName,
   getTags,
   Interface,
   isGlobalNamespace,
+  isNeverType,
+  isTemplateDeclaration,
   Model,
+  ModelProperty,
   Operation,
   Program,
   Type,
 } from "@typespec/compiler";
+import { isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
@@ -16,7 +22,7 @@ import { ArmResourceOperations, resolveResourceOperations } from "./operations.j
 import { getArmResource, listArmResources } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension";
+export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual";
 
 /**
  * Interface for ARM resource detail base.
@@ -35,6 +41,62 @@ export interface ArmResourceDetailsBase {
 export interface ArmResourceDetails extends ArmResourceDetailsBase {
   operations: ArmResourceOperations;
   resourceTypePath?: string;
+}
+
+/**
+ * Marks the given resource as an external resource
+ * @param context The decorator context
+ * @param entity The resource model
+ * @param propertiesType The type of the resource properties
+ */
+export function $armVirtualResource(context: DecoratorContext, entity: Model) {
+  const { program } = context;
+  if (isTemplateDeclaration(entity)) return;
+  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
+  const pathProperty = getProperty(
+    entity,
+    (p) => isPathParam(program, p) && getSegment(program, p) !== undefined
+  );
+  if (pathProperty === undefined) {
+    reportDiagnostic(program, {
+      code: "resource-without-path-and-segment",
+      target: entity,
+    });
+
+    return;
+  }
+
+  const collectionName = getSegment(program, pathProperty);
+  const keyName = getKeyName(program, pathProperty);
+  if (collectionName === undefined || keyName === undefined) {
+    reportDiagnostic(program, {
+      code: "resource-without-path-and-segment",
+      target: entity,
+    });
+    return;
+  }
+}
+
+function getProperty(
+  target: Model,
+  predicate: (property: ModelProperty) => boolean
+): ModelProperty | undefined {
+  for (const prop of getAllProperties(target).values()) {
+    if (predicate(prop)) return prop;
+  }
+  return undefined;
+}
+
+/**
+ * Determine if the given model is an external resource.
+ * @param program The program to process.
+ * @param target The model to check.
+ * @returns true if the model or any model it extends is marked as a resource, otherwise false.
+ */
+export function isArmVirtualResource(program: Program, target: Model): boolean {
+  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
+  if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
+  return false;
 }
 
 function resolveArmResourceDetails(
@@ -209,6 +271,13 @@ export enum ResourceBaseType {
   Location = "Location",
   ResourceGroup = "ResourceGroup",
   Extension = "Extension",
+}
+
+export function $resourceBaseType(context: DecoratorContext, entity: Model, baseType: Type) {
+  let baseTypeString: string = "";
+  if (isNeverType(baseType)) return;
+  if (baseType?.kind === "String") baseTypeString = baseType.value;
+  setResourceBaseType(context.program, entity, baseTypeString);
 }
 
 export function $tenantResource(context: DecoratorContext, entity: Model) {

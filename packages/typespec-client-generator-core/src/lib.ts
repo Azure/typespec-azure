@@ -92,6 +92,19 @@ export const $lib = createTypeSpecLibrary({
         default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
       },
     },
+    "encoding-multipart-bytes": {
+      severity: "error",
+      messages: {
+        default:
+          "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",
+      },
+    },
+    "unsupported-kind": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Unsupported kind ${"kind"}`,
+      },
+    },
   },
 });
 

@@ -5,8 +5,6 @@ import {
   Interface,
   ModelProperty,
   Namespace,
-  Operation,
-  Program,
   Type,
   UsageFlags,
 } from "@typespec/compiler";
@@ -18,6 +16,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import { TCGCContext } from "./internal-utils.js";
 
 export type SdkParameterLocation =
   | "endpointPath"
@@ -28,18 +27,8 @@ export type SdkParameterLocation =
   | "unknown";
 export type SdkParameterImplementation = "Client" | "Method";
 
-export interface SdkContext<TOptions extends object = Record<string, any>> {
-  program: Program;
+export interface SdkContext<TOptions extends object = Record<string, any>> extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  emitterName: string;
-  generateProtocolMethods: boolean;
-  generateConvenienceMethods: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Set<string>;
-  arm?: boolean;
 }
 
 export interface SdkEmitterOptions {
@@ -83,36 +72,48 @@ export type SdkType =
   | SdkEnumValueType
   | SdkConstantType
   | SdkUnionType
-  | SdkModelType
-  | SdkMultipartFileType;
+  | SdkModelType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
 }
 
-export type SdkBuiltInKinds =
-  | "bytes"
-  | "boolean"
-  | "date"
-  | "time"
-  | "any"
+type SdkIntKinds =
+  | "numeric"
+  | "integer"
+  | "safeint"
+  | "int8"
+  | "int16"
   | "int32"
   | "int64"
-  | "float32"
-  | "float64"
-  | "decimal"
-  | "decimal128"
+  | "uint8"
+  | "uint16"
+  | "uint32"
+  | "uint64";
+
+type SdkFloatKinds = "float" | "float32" | "float64" | "decimal" | "decimal128";
+
+type SdkStringKinds =
   | "string"
+  | "password"
   | "guid"
   | "url"
   | "uuid"
-  | "password"
+  | "etag"
   | "armId"
   | "ipAddress"
-  | "azureLocation"
-  | "etag"
-  | "multipartFile";
+  | "azureLocation";
+
+export type SdkBuiltInKinds =
+  | "bytes"
+  | "boolean"
+  | "plainDate"
+  | "plainTime"
+  | "any"
+  | SdkIntKinds
+  | SdkFloatKinds
+  | SdkStringKinds;
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
@@ -120,21 +121,25 @@ export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKn
   return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-export interface SdkDatetimeType extends SdkTypeBase {
-  kind: "datetime";
+interface SdkDatetimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
+
+interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+  kind: "utcDateTime";
+}
+
+interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+  kind: "offsetDateTime";
+}
+
+export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
-}
-
-export interface SdkMultipartFileType extends SdkTypeBase {
-  kind: "multipartFile";
-  encode: "binary";
 }
 
 export interface SdkArrayType extends SdkTypeBase {
@@ -196,6 +201,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isFormDataType: boolean;
+  isError: boolean;
   generatedName?: string;
   description?: string;
   details?: string;
@@ -229,7 +235,9 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
   serializedName: string;
+  isMultipartFileInput: boolean;
   visibility?: Visibility[];
+  flatten: boolean;
 }
 
 type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";

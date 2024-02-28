@@ -9,6 +9,11 @@ import {
   isFixed,
 } from "@azure-tools/typespec-azure-core";
 import {
+  SdkContext,
+  createSdkContext,
+  getClientNameOverride,
+} from "@azure-tools/typespec-client-generator-core";
+import {
   ArrayModelType,
   BooleanLiteral,
   DiagnosticTarget,
@@ -152,6 +157,7 @@ const defaultOptions = {
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
+  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {
@@ -172,7 +178,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
   };
 
-  const emitter = createOAPIEmitter(context.program, options);
+  const emitter = createOAPIEmitter(context.program, tcgcSdkContext, options);
   await emitter.emitOpenAPI();
 }
 
@@ -262,7 +268,11 @@ interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
 }
 
-function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOptions) {
+function createOAPIEmitter(
+  program: Program,
+  tcgcSdkContext: SdkContext,
+  options: ResolvedAutorestEmitterOptions
+) {
   const tracer = getTracer(program);
   tracer.trace("options", JSON.stringify(options, null, 2));
   const typeNameOptions: TypeNameOptions = {
@@ -272,6 +282,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     },
   };
   let root: OpenAPI2Document;
+  let currentService: Service;
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
   let currentProduces: Set<string>;
@@ -317,6 +328,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
       services.push({ type: program.getGlobalNamespaceType() });
     }
     for (const service of services) {
+      currentService = service;
       const originalProgram = program;
       const versions = buildVersionProjections(program, service.type).filter(
         (v) => !options.version || options.version === v.version
@@ -332,8 +344,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
           program,
           service,
           version: record.version,
-          jsonView,
-          clientView,
+          getClientName,
         };
         const projectedServiceNs: Namespace = projectedProgram
           ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
@@ -1015,6 +1026,12 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     return encodedName === type.name ? viaProjection : encodedName;
   }
 
+  function getClientName(type: Type & { name: string }): string {
+    const viaProjection = clientView.getProjectedName(type);
+    const clientName = getClientNameOverride(tcgcSdkContext, type);
+    return clientName ?? viaProjection;
+  }
+
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
@@ -1490,7 +1507,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     }> = [];
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
-      const description = getDoc(program, member.variant);
+      const description = getDoc(program, member.type);
       values.push({
         name: typeof name === "string" ? name : `${member.value}`,
         value: member.value,
@@ -1515,15 +1532,16 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
     if (e.nullable) {
       schema["x-nullable"] = true;
     }
-    return schema;
+    if (options.useReadOnlyStatusSchema) {
+      const [values, _] = extractLroStates(program, union);
+      if (values !== undefined) {
+        schema.readOnly = true;
+      }
+    }
+    return applyIntrinsicDecorators(union, schema);
   }
 
   function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
-    const [asEnum, _] = getUnionAsEnum(union);
-    if (asEnum) {
-      return getSchemaForUnionEnum(union, asEnum);
-    }
-
     const nonNullOptions = [...union.variants.values()]
       .map((x) => x.type)
       .filter((t) => !isNullType(t));
@@ -1535,6 +1553,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
 
     if (nonNullOptions.length === 1) {
       const type = nonNullOptions[0];
+
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, visibility);
       if (schema.$ref) {
@@ -1548,6 +1567,10 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
         return schema;
       }
     } else {
+      const [asEnum, _] = getUnionAsEnum(union);
+      if (asEnum) {
+        return getSchemaForUnionEnum(union, asEnum);
+      }
       reportDiagnostic(program, {
         code: "union-unsupported",
         target: union,
@@ -1590,6 +1613,8 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
               format: { type: type.kind },
               target: type,
             });
+      case "UnionVariant":
+        return getDefaultValue(type.type);
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
@@ -1676,7 +1701,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
       }
 
       const jsonName = getJsonName(prop);
-      const clientName = clientView.getProjectedName(prop);
+      const clientName = getClientName(prop);
 
       const description = getDoc(program, prop);
 
@@ -1705,7 +1730,7 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
         property.description = description;
       }
 
-      if (prop.default) {
+      if (prop.default && !("$ref" in property)) {
         property.default = getDefaultValue(prop.default);
       }
 
@@ -1776,7 +1801,20 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
   }
 
   function resolveProperty(prop: ModelProperty, visibility: Visibility): OpenAPI2SchemaProperty {
-    const propSchema = getSchemaOrRef(prop.type, visibility);
+    let propSchema;
+    if (prop.type.kind === "Enum" && prop.default) {
+      propSchema = getSchemaForEnum(prop.type);
+    } else if (prop.type.kind === "Union" && prop.default) {
+      const [asEnum, _] = getUnionAsEnum(prop.type);
+      if (asEnum) {
+        propSchema = getSchemaForUnionEnum(prop.type, asEnum);
+      } else {
+        propSchema = getSchemaOrRef(prop.type, visibility);
+      }
+    } else {
+      propSchema = getSchemaOrRef(prop.type, visibility);
+    }
+
     return applyIntrinsicDecorators(prop, propSchema);
   }
 
@@ -1810,15 +1848,17 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
   }
 
   function applyIntrinsicDecorators(
-    typespecType: Model | Scalar | ModelProperty,
+    typespecType: Model | Scalar | ModelProperty | Union,
     target: OpenAPI2Schema
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
     const isString =
-      typespecType.kind !== "Model" && isStringType(program, getPropertyType(typespecType));
+      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
+      isStringType(program, getPropertyType(typespecType));
     const isNumeric =
-      typespecType.kind !== "Model" && isNumericType(program, getPropertyType(typespecType));
+      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
+      isNumericType(program, getPropertyType(typespecType));
 
     if (docStr) {
       newTarget.description = docStr;
@@ -1907,7 +1947,9 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
 
     attachExtensions(typespecType, newTarget);
 
-    return typespecType.kind === "Model" ? newTarget : applyEncoding(typespecType, newTarget);
+    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
+      ? applyEncoding(typespecType, newTarget)
+      : newTarget;
   }
 
   function applyEncoding(
@@ -2213,9 +2255,14 @@ function createOAPIEmitter(program: Program, options: ResolvedAutorestEmitterOpt
           } as any,
           flow.scopes.map((x) => x.value),
         ];
+      case "openIdConnect":
       default:
-        const _assertNever: never = auth;
-        compilerAssert(false, "Unreachable");
+        reportDiagnostic(program, {
+          code: "unsupported-auth",
+          format: { authType: (auth as any).type },
+          target: currentService.type,
+        });
+        return undefined;
     }
   }
 

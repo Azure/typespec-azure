@@ -72,7 +72,7 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
     strictEqual(res.nullable, true);
   });
 
-  it("resolve a open  number enum if include int32 scalar", async () => {
+  it("resolve a open number enum if include int32 scalar", async () => {
     const res = await testValidUnionAsEnum(`@test("target") union Test {0, 1, 2, int32}`);
     deepStrictEqual(getMemberValues(res.members), [0, 1, 2]);
     deepStrictEqual(getMemberValues(res.flattenedMembers), [0, 1, 2]);
@@ -84,6 +84,17 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
       `
       @test("target")  union Test { UpDown, "left", "right"} 
       union UpDown { "up", "down" }
+      `
+    );
+    deepStrictEqual(getMemberValues(res.members), ["left", "right"]);
+    deepStrictEqual(getMemberValues(res.flattenedMembers), ["up", "down", "left", "right"]);
+  });
+
+  it("flattendMembers include all members from included enums", async () => {
+    const res = await testValidUnionAsEnum(
+      `
+      @test("target")  union Test { UpDown, "left", "right"} 
+      enum UpDown { up, down }
       `
     );
     deepStrictEqual(getMemberValues(res.members), ["left", "right"]);

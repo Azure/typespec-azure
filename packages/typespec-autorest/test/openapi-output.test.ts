@@ -152,35 +152,6 @@ describe("typespec-autorest: definitions", () => {
     });
   });
 
-  it("specify default value on enum property", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `
-      model Foo {
-        optionalEnum?: MyEnum = MyEnum.a;
-      };
-      
-      enum MyEnum {
-        a: "a-value",
-        b,
-      }
-      `
-    );
-
-    ok(res.isRef);
-    ok(res.defs.Foo, "expected definition named Foo");
-    ok(res.defs.MyEnum, "expected definition named MyEnum");
-    deepStrictEqual(res.defs.Foo, {
-      type: "object",
-      properties: {
-        optionalEnum: {
-          $ref: "#/definitions/MyEnum",
-          default: "a-value",
-        },
-      },
-    });
-  });
-
   it("ignore uninstantiated template types", async () => {
     const res = await openApiFor(
       `
@@ -431,87 +402,6 @@ describe("typespec-autorest: definitions", () => {
     deepStrictEqual(res.defs.Pet.properties.someString.default, "withDefault");
   });
 
-  describe("nullable", () => {
-    it("defines nullable properties", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      model Pet {
-        name: string | null;
-      };
-      `
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-            "x-nullable": true,
-          },
-        },
-        required: ["name"],
-      });
-    });
-
-    it("defines nullable array", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      model Pet {
-        name: int32[] | null;
-      };
-      `
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          name: {
-            type: "array",
-            items: {
-              type: "integer",
-              format: "int32",
-            },
-            "x-nullable": true,
-          },
-        },
-        required: ["name"],
-      });
-    });
-
-    it("defines nullable enum", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      enum PetKind { dog, cat }
-      model Pet {
-        kind: PetKind | null;
-      };
-      `
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          kind: {
-            $ref: "#/definitions/PetKind",
-            "x-nullable": true,
-          },
-        },
-        required: ["kind"],
-      });
-      deepStrictEqual(res.defs.PetKind, {
-        type: "string",
-        enum: ["dog", "cat"],
-        "x-ms-enum": {
-          modelAsString: true,
-          name: "PetKind",
-        },
-      });
-    });
-  });
-
   describe("unions", () => {
     it("emit a warning", async () => {
       const diagnostics = await diagnoseOpenApiFor(`
@@ -662,6 +552,24 @@ describe("typespec-autorest: operations", () => {
       interface ServiceInterfaceName {
         @route("/interface-only") same(): void;
         @route("/interface-and-op") @projectedName("client", "clientCall") serviceName(): void;
+      }
+     
+      `);
+
+    strictEqual(res.paths["/op-only"].get.operationId, "ClientCall");
+    strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
+    strictEqual(res.paths["/interface-and-op"].get.operationId, "ClientInterfaceName_ClientCall");
+  });
+
+  it(`@clientName(<>) updates the operationId`, async () => {
+    const res = await openApiFor(`
+      @service namespace MyService;
+      @route("/op-only") @clientName( "clientCall") op serviceName(): void;
+
+      @clientName( "ClientInterfaceName") 
+      interface ServiceInterfaceName {
+        @route("/interface-only") same(): void;
+        @route("/interface-and-op") @clientName( "clientCall") serviceName(): void;
       }
      
       `);

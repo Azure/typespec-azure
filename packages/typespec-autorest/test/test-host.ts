@@ -1,4 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { SdkTestLibrary as TcgcTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
 import { Diagnostic } from "@typespec/compiler";
 import {
   TestHost,
@@ -25,6 +26,7 @@ export async function createAutorestTestHost() {
       AutorestTestLibrary,
       VersioningTestLibrary,
       AzureCoreTestLibrary,
+      TcgcTestLibrary,
     ],
   });
 }
@@ -42,6 +44,7 @@ export async function createAutorestTestRunner(
       "TypeSpec.OpenAPI",
       "Autorest",
       "Azure.Core",
+      "Azure.ClientGenerator.Core",
     ],
     compilerOptions: {
       emitters: { [AutorestTestLibrary.name]: { ...emitterOptions } },

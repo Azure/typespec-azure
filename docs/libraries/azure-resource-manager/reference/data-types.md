@@ -119,6 +119,20 @@ The response for synchronous delete of a resource
 model Azure.ResourceManager.ArmDeletedResponse
 ```
 
+### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
+
+Template for ARM location resources. Use the parameter to specify
+
+```typespec
+model Azure.ResourceManager.ArmLocationResource<BaseType>
+```
+
+#### Template Parameters
+
+| Name     | Description |
+| -------- | ----------- |
+| BaseType |             |
+
 ### `ArmLroLocationHeader` {#Azure.ResourceManager.ArmLroLocationHeader}
 
 The default header for lro PUT and DELETE polling
@@ -505,6 +519,15 @@ model Azure.ResourceManager.ProxyResource<Properties>
 | ---------- | --------------------------------------------------------------------- |
 | Properties | A model containing the provider-specific properties for this resource |
 
+### `ResourceGroupLocationResource` {#Azure.ResourceManager.ResourceGroupLocationResource}
+
+The location resource for resourceGroup-based locations. This can be used as a parent
+resource for resource types that are homed in a resourceGroup-based location.
+
+```typespec
+model Azure.ResourceManager.ResourceGroupLocationResource
+```
+
 ### `ResourceGroupParameter` {#Azure.ResourceManager.ResourceGroupParameter}
 
 The default resource group parameter type.
@@ -637,11 +660,17 @@ model Azure.ResourceManager.SubscriptionIdParameter
 
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
+The location resource for subscription-based locations. This can be used as a parent
+resource for resource types that are homed in a subscription-based location.
+
 ```typespec
 model Azure.ResourceManager.SubscriptionLocationResource
 ```
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
+
+The location resource for tenant-based locations. This can be used as a parent
+resource for resource types that are homed in a tenant-based location.
 
 ```typespec
 model Azure.ResourceManager.TenantLocationResource

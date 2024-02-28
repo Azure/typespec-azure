@@ -1,27 +1,4 @@
 import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
-import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
-import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
-import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
-import { interfacesRule } from "./rules/arm-resource-interfaces.js";
-import { invalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.js";
-import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-envelope-property.js";
-import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
-import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
-import { armResourceOperationsRule } from "./rules/arm-resource-operation-response.js";
-import { patchOperationsRule } from "./rules/arm-resource-patch.js";
-import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
-import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
-import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
-import { coreOperationsRule } from "./rules/core-operations.js";
-import { deleteOperationMissingRule } from "./rules/delete-operation.js";
-import { envelopePropertiesRules } from "./rules/envelope-properties.js";
-import { listBySubscriptionRule } from "./rules/list-operation.js";
-import { noResponseBodyRule } from "./rules/no-response-body.js";
-import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
-import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
-import { resourceNameRule } from "./rules/resource-name.js";
-import { retryAfterRule } from "./rules/retry-after.js";
-import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-resource-manager",
@@ -111,71 +88,10 @@ export const $lib = createTypeSpecLibrary({
         notResourceType: paramMessage`Parent type ${"parent"} of ${"type"} is not registered as an ARM resource type.`,
       },
     },
-  },
-  linter: {
-    rules: [
-      armResourceActionNoSegmentRule,
-      armResourceDuplicatePropertiesRule,
-      interfacesRule,
-      invalidActionVerbRule,
-      armResourceEnvelopeProperties,
-      armResourceInvalidVersionFormatRule,
-      armResourceKeyInvalidCharsRule,
-      armResourceOperationsRule,
-      patchOperationsRule,
-      armResourcePathInvalidCharsRule,
-      armResourceProvisioningStateRule,
-      armCommonTypesVersionRule,
-      beyondNestingRule,
-      coreOperationsRule,
-      deleteOperationMissingRule,
-      envelopePropertiesRules,
-      listBySubscriptionRule,
-      noResponseBodyRule,
-      operationsInterfaceMissingRule,
-      patchEnvelopePropertiesRules,
-      resourceNameRule,
-      retryAfterRule,
-      unsupportedTypeRule,
-    ],
-    ruleSets: {
-      all: {
-        enable: {
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceActionNoSegmentRule.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceDuplicatePropertiesRule.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${interfacesRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${invalidActionVerbRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceEnvelopeProperties.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceInvalidVersionFormatRule.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceKeyInvalidCharsRule.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceOperationsRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${patchOperationsRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourcePathInvalidCharsRule.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${armResourceProvisioningStateRule.name}`]:
-            true,
-          // TODO: Enable this rule once azure-rest-api-specs repo is ready (issue #3839)
-          [`@azure-tools/typespec-azure-resource-manager/${armCommonTypesVersionRule.name}`]: false,
-          [`@azure-tools/typespec-azure-resource-manager/${beyondNestingRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${coreOperationsRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${deleteOperationMissingRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${envelopePropertiesRules.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${listBySubscriptionRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${noResponseBodyRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${operationsInterfaceMissingRule.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${patchEnvelopePropertiesRules.name}`]:
-            true,
-          [`@azure-tools/typespec-azure-resource-manager/${resourceNameRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${retryAfterRule.name}`]: true,
-          [`@azure-tools/typespec-azure-resource-manager/${unsupportedTypeRule.name}`]: true,
-        },
-        extends: ["@azure-tools/typespec-azure-core/all"],
+    "resource-without-path-and-segment": {
+      severity: "error",
+      messages: {
+        default: "Resource types must have a property with '@path` and '@segment' decorators.",
       },
     },
   },

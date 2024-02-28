@@ -2,6 +2,8 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 import { VersionOptions } from "@docusaurus/plugin-content-docs";
+import { NormalizedSidebar } from "@docusaurus/plugin-content-docs/src/sidebars/types.js";
+import { Options } from "@docusaurus/preset-classic";
 import type { Config, Plugin, ThemeConfig } from "@docusaurus/types";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import { resolve } from "path";
@@ -34,6 +36,20 @@ function getVersionLabels() {
     };
   }
   return labels;
+}
+
+// Reverse the sidebar items ordering (including nested category items)
+function reverseSidebarItems(items: NormalizedSidebar) {
+  // Reverse items in categories
+  const result = items.map((item) => {
+    if (item.type === "category") {
+      return { ...item, items: reverseSidebarItems(item.items) };
+    }
+    return item;
+  });
+  // Reverse items at current level
+  result.reverse();
+  return result;
 }
 
 const config: Config = {
@@ -93,12 +109,17 @@ const config: Config = {
   presets: [
     [
       "classic",
-      /** @type {import('@docusaurus/preset-classic').Options} */
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           path: "../../docs",
           versions: getVersionLabels(),
+          async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
+            const sidebarItems = await defaultSidebarItemsGenerator(args);
+            return args.item.dirName === "release-notes"
+              ? reverseSidebarItems(sidebarItems)
+              : sidebarItems;
+          },
         },
         blog: {
           showReadingTime: true,
@@ -106,7 +127,7 @@ const config: Config = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      },
+      } satisfies Options,
     ],
   ],
   webpack: {
@@ -216,15 +237,14 @@ const config: Config = {
       return {
         name: "custom-configure-webpack",
         configureWebpack: (config, isServer, utils) => {
+          // Need to change the font rule to use asset/resource
+          const fontRule = config.module.rules.find(
+            (x) => typeof x === "object" && x.test?.toString().includes("ttf")
+          );
+          delete (fontRule as any).use;
+          (fontRule as any).type = "asset/resource";
+
           return {
-            module: {
-              rules: [
-                {
-                  test: /\.ttf$/,
-                  use: ["file-loader"],
-                },
-              ],
-            },
             plugins: [
               new MonacoWebpackPlugin({
                 languages: ["json"],

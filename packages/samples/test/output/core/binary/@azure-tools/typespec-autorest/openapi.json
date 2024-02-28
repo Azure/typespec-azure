@@ -47,10 +47,10 @@
       "post": {
         "operationId": "BytesMethod_GenericBinaryFile",
         "produces": [
-          "application/octect-stream"
+          "application/octet-stream"
         ],
         "consumes": [
-          "application/octect-stream"
+          "application/octet-stream"
         ],
         "parameters": [
           {

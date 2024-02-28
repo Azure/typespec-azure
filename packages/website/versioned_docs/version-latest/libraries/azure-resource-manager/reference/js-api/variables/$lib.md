@@ -35,5 +35,7 @@ const $lib: TypeSpecLibrary<Object, Record<string, any>, never>;
 | `decorator-param-wrong-type.armUpdateProviderNamespace` | `string` | - |
 | `parent-type` | `Object` | - |
 | `parent-type.notResourceType` | `CallableMessage`<[`string`, `string`]\> | - |
+| `resource-without-path-and-segment` | `Object` | - |
+| `resource-without-path-and-segment.default` | `string` | - |
 | `single-arm-provider` | `Object` | - |
 | `single-arm-provider.default` | `string` | - |
