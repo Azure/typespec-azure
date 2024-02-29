@@ -343,3 +343,16 @@ scalar ipV6Address extends string;
 #suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
 @format("eTag")
 scalar eTag extends string;
+
+/**
+ * Represents an Azure geography region where supported resource providers live.
+ *
+ * @example
+ *
+ * ```
+ * WestUS
+ * ```
+ */
+#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+@format("azureLocation")
+scalar azureLocation extends string;
