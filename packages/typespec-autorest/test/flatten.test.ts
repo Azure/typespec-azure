@@ -6,7 +6,7 @@ it("applies x-ms-client-flatten for property marked with @flattenProperty", asyn
   const res = await openApiFor(
     `
     model Widget {
-      #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+      #suppress "deprecated" "for test"
       @flattenProperty
       properties?: WidgetProperties;
     }
