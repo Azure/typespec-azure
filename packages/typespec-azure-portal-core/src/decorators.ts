@@ -89,6 +89,7 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
       }
     } else if (target.namespace) {
       const service = getService(program, target.namespace);
+      // eslint-disable-next-line deprecation/deprecation
       if (service?.version && currentApiVersion !== service.version) {
         reportDiagnostic(program, {
           code: "invalid-apiversion",
