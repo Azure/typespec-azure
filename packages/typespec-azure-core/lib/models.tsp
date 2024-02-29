@@ -354,5 +354,4 @@ scalar eTag extends string;
  * ```
  */
 #suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
-@format("azureLocation")
 scalar azureLocation extends string;
