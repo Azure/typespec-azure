@@ -94,16 +94,41 @@ type SdkIntKinds =
 
 type SdkFloatKinds = "float" | "float32" | "float64" | "decimal" | "decimal128";
 
-type SdkStringKinds =
-  | "string"
-  | "password"
-  | "guid"
-  | "url"
-  | "uuid"
-  | "etag"
-  | "armId"
-  | "ipAddress"
-  | "azureLocation";
+enum SdkAzureBuiltInStringKindsEnum {
+  uuid = "uuid",
+  ipV4Address = "ipV4Address",
+  ipV6Address = "ipV6Address",
+  eTag = "eTag",
+  armId = "armId",
+  azureLocation = "azureLocation",
+}
+
+type SdkAzureBuiltInStringKinds = keyof typeof SdkAzureBuiltInStringKindsEnum;
+
+export function isSdkAzureBuiltInStringKinds(kind: string): kind is SdkAzureBuiltInStringKinds {
+  return Object.keys(SdkAzureBuiltInStringKindsEnum).includes(kind);
+}
+
+enum SdkGenericBuiltInStringKindsEnum {
+  string = "string",
+  password = "password",
+  guid = "guid",
+  url = "url",
+  uri = "uri",
+  ipAddress = "ipAddress",
+}
+
+type SdkGenericBuiltInStringKinds = keyof typeof SdkGenericBuiltInStringKindsEnum;
+
+export function isSdkGenericBuiltInStringKinds(kind: string): kind is SdkGenericBuiltInStringKinds {
+  return Object.keys(SdkGenericBuiltInStringKindsEnum).includes(kind);
+}
+
+type SdkStringKinds = SdkGenericBuiltInStringKinds | SdkAzureBuiltInStringKinds;
+
+export function isSdkStringKind(kind: string): kind is SdkStringKinds {
+  return isSdkGenericBuiltInStringKinds(kind) || isSdkAzureBuiltInStringKinds(kind);
+}
 
 export type SdkBuiltInKinds =
   | "bytes"

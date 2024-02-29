@@ -28,6 +28,7 @@ import {
   getEncode,
   getFormat,
   getKnownValues,
+  getNamespaceFullName,
   getVisibility,
   ignoreDiagnostics,
   isNeverType,
@@ -70,6 +71,9 @@ import {
   SdkModelType,
   SdkTupleType,
   SdkType,
+  isSdkAzureBuiltInStringKinds,
+  isSdkGenericBuiltInStringKinds,
+  isSdkStringKind,
 } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -114,30 +118,20 @@ function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type)?.toLocaleLowerCase();
-  if (format) {
-    switch (format) {
-      case "guid":
-      case "uuid":
-      case "password":
-      case "etag":
-        propertyType.kind = format;
-        break;
-      case "url":
-      case "uri":
-        propertyType.kind = "url";
-        break;
-      case "armid":
-        propertyType.kind = "armId";
-        break;
-      case "ipaddress":
-        propertyType.kind = "ipAddress";
-        break;
-      case "azurelocation":
-        propertyType.kind = "azureLocation";
-        break;
-      default:
-        break;
+  const format = getFormat(context.program, type);
+
+  // verify when we are setting the built in kind types that they are the built in kinds
+  let typeNamespaceFullName: string = "";
+  if (type.kind === "ModelProperty" && type.type.kind === "Scalar" && type.type.namespace) {
+    typeNamespaceFullName = getNamespaceFullName(type.type.namespace);
+  } else if (type.kind === "Scalar" && type.namespace) {
+    typeNamespaceFullName = getNamespaceFullName(type.namespace);
+  }
+  if (format && isSdkStringKind(format)) {
+    if (isSdkAzureBuiltInStringKinds(format) && typeNamespaceFullName === "Azure.Core") {
+      propertyType.kind = format;
+    } else if (isSdkGenericBuiltInStringKinds(format) && typeNamespaceFullName === "TypeSpec") {
+      propertyType.kind = format;
     }
   }
 }
