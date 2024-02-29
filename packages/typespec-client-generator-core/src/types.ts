@@ -360,6 +360,12 @@ export function getSdkUnionWithDiagnostics(
     clientType.nullable = true;
     return diagnostics.wrap(clientType);
   }
+
+  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+  if (unionAsEnum) {
+    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  }
+
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
     name: getLibraryName(context, type),
@@ -758,12 +764,7 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkEnum(context, type, operation);
       break;
     case "Union":
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-      if (unionAsEnum) {
-        retval = getSdkUnionEnum(context, unionAsEnum, operation);
-      } else {
-        retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
-      }
+      retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
       const innerType = diagnostics.pipe(

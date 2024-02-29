@@ -1118,12 +1118,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const [models, diagnostics] = getAllModelsWithDiagnostics(runner.context);
+        const models = getAllModels(runner.context);
         strictEqual(models.length, 2);
         ok(models.find((x) => (x as SdkModelType).generatedName === "AB"));
-        expectDiagnostics(diagnostics, [
-          { code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind" },
-        ]);
       });
     });
 
@@ -1367,13 +1364,13 @@ describe("typespec-client-generator-core: public-utils", () => {
         `)) as { repeatabilityResult: ModelProperty };
 
         const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
-        strictEqual(stringType.kind, "union");
-        strictEqual(stringType.values.length, 3);
-        strictEqual(stringType.values[0].kind, "constant");
+        strictEqual(stringType.kind, "enum");
+        strictEqual(stringType.values.length, 2);
+        strictEqual(stringType.values[0].kind, "enumvalue");
         strictEqual(stringType.values[0].value, "accepted");
-        strictEqual(stringType.values[1].kind, "constant");
+        strictEqual(stringType.values[1].kind, "enumvalue");
         strictEqual(stringType.values[1].value, "rejected");
-        strictEqual(stringType.values[2].kind, "string");
+        strictEqual(stringType.valueType.kind, "string");
       });
     });
 
