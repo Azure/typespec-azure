@@ -14,7 +14,6 @@ import "./questionanswering-authoring_models.tsp";
 )
 @service({
   title: "Hello world",
-  version: "0.1.0",
 })
 namespace Azure.Language.QnA; //@route("")  // TODO
 

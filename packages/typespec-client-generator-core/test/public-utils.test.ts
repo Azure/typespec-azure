@@ -184,7 +184,6 @@ describe("typespec-client-generator-core: public-utils", () => {
       await runner.compile(`
         @service({
           title: "ApiVersion",
-          version: "1.0.0",
         })
         @server(
           "{endpoint}/{ApiVersion}",
