@@ -14,7 +14,6 @@ using Azure.Core;
 @armProviderNamespace("Microsoft.UpdateTests")
 @service({
   title: "Microsoft.UpdateTests",
-  version: "2023-03-01-preview",
 })
 @doc("Testing resource update using a Management API")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)

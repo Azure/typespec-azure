@@ -13,7 +13,6 @@ using Azure.Core;
 @armProviderNamespace("Contoso.CustomerManagedKeyExample")
 @service({
   title: "Contoso.CustomerManagedKeyExample",
-  version: "2023-03-01-preview",
 })
 @doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)

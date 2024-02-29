@@ -14,7 +14,6 @@ using Microsoft.DiscriminatorTest.Common;
 @armProviderNamespace
 @service({
   title: "DiscriminatorTest",
-  version: "2021-10-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @doc("DiscriminatorTest Resource Provider management API.")

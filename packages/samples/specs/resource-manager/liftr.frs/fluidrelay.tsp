@@ -12,7 +12,6 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Azure Fluid Relay",
-  version: "2021-03-12-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.FluidRelay;

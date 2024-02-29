@@ -13,7 +13,6 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.ServiceLinker provider",
-  version: "2021-01-01-privatepreview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.ServiceLinker;

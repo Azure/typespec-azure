@@ -13,7 +13,6 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.CSharpAttributeTest",
-  version: "2021-09-21-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.CSharpAttributeTest;

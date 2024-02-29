@@ -11,7 +11,6 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.Contoso",
-  version: "2022-05-22-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.Contoso;

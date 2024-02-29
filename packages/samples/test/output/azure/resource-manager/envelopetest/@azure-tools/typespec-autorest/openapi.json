@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Microsoft.EnvelopeTest",
-    "version": "2021-09-21-preview",
+    "version": "0000-00-00",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
