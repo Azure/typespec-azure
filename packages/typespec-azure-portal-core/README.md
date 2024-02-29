@@ -68,9 +68,9 @@ Provides a Model Property a display name
 
 ##### Parameters
 
-| Name | Type                    | Description |
-| ---- | ----------------------- | ----------- |
-| name | `valueof scalar string` |             |
+| Name | Type             | Description |
+| ---- | ---------------- | ----------- |
+| name | `valueof string` |             |
 
 #### `@marketplaceOffer`
 

@@ -37,10 +37,10 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `(number) 202` | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name        | Type    | Description                                                                                              |
+| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| statusCode  | `202`   | The status code.                                                                                         |
+| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
 
@@ -56,10 +56,10 @@ model Azure.ResourceManager.ArmAcceptedResponse<Message>
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `(number) 202` | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name        | Type    | Description                                                                                              |
+| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| statusCode  | `202`   | The status code.                                                                                         |
+| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
 
 ### `ArmAsyncOperationHeader` {#Azure.ResourceManager.ArmAsyncOperationHeader}
 
@@ -78,9 +78,9 @@ model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
 
 #### Properties
 
-| Name                 | Type       | Description                        |
-| -------------------- | ---------- | ---------------------------------- |
-| azureAsyncOperation? | `UrlValue` | A link to the status monitor<br /> |
+| Name                 | Type       | Description                  |
+| -------------------- | ---------- | ---------------------------- |
+| azureAsyncOperation? | `UrlValue` | A link to the status monitor |
 
 ### `ArmCombinedLroHeaders` {#Azure.ResourceManager.ArmCombinedLroHeaders}
 
@@ -101,10 +101,10 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 
 #### Properties
 
-| Name                 | Type              | Description                                                                                               |
-| -------------------- | ----------------- | --------------------------------------------------------------------------------------------------------- |
-| azureAsyncOperation? | `PollingUrlValue` | A link to the status monitor<br />                                                                        |
-| location?            | `FinalUrlValue`   | The Location header contains the URL where the status of the long running operation can be checked.<br /> |
+| Name                 | Type              | Description                                                                                         |
+| -------------------- | ----------------- | --------------------------------------------------------------------------------------------------- |
+| azureAsyncOperation? | `PollingUrlValue` | A link to the status monitor                                                                        |
+| location?            | `FinalUrlValue`   | The Location header contains the URL where the status of the long running operation can be checked. |
 
 ### `ArmCreatedResponse` {#Azure.ResourceManager.ArmCreatedResponse}
 
@@ -124,7 +124,7 @@ model Azure.ResourceManager.ArmCreatedResponse<ResponseBody>
 
 | Name        | Type           | Description                                                                                              |
 | ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `(number) 201` | The status code.                                                                                         |
+| statusCode  | `201`          | The status code.                                                                                         |
 | retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
 | body        | `ResponseBody` | The body type of the operation request or response.                                                      |
 
@@ -142,10 +142,10 @@ model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `(number) 202` | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name        | Type    | Description                                                                                              |
+| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| statusCode  | `202`   | The status code.                                                                                         |
+| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 
@@ -155,10 +155,10 @@ model Azure.ResourceManager.ArmDeleteAcceptedResponse
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `(number) 202` | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name        | Type    | Description                                                                                              |
+| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| statusCode  | `202`   | The status code.                                                                                         |
+| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
 
 ### `ArmDeletedNoContentResponse` {#Azure.ResourceManager.ArmDeletedNoContentResponse}
 
@@ -168,9 +168,9 @@ model Azure.ResourceManager.ArmDeletedNoContentResponse
 
 #### Properties
 
-| Name       | Type           | Description      |
-| ---------- | -------------- | ---------------- |
-| statusCode | `(number) 204` | The status code. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `204` | The status code. |
 
 ### `ArmDeletedResponse` {#Azure.ResourceManager.ArmDeletedResponse}
 
@@ -182,9 +182,9 @@ model Azure.ResourceManager.ArmDeletedResponse
 
 #### Properties
 
-| Name       | Type           | Description      |
-| ---------- | -------------- | ---------------- |
-| statusCode | `(number) 200` | The status code. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `200` | The status code. |
 
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
@@ -224,9 +224,9 @@ model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult,
 
 #### Properties
 
-| Name      | Type       | Description                                                                                               |
-| --------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| location? | `UrlValue` | The Location header contains the URL where the status of the long running operation can be checked.<br /> |
+| Name      | Type       | Description                                                                                         |
+| --------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| location? | `UrlValue` | The Location header contains the URL where the status of the long running operation can be checked. |
 
 ### `ArmNoContentResponse` {#Azure.ResourceManager.ArmNoContentResponse}
 
@@ -244,9 +244,9 @@ model Azure.ResourceManager.ArmNoContentResponse<Message>
 
 #### Properties
 
-| Name       | Type           | Description      |
-| ---------- | -------------- | ---------------- |
-| statusCode | `(number) 204` | The status code. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `204` | The status code. |
 
 ### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
 
@@ -265,16 +265,16 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 
 #### Properties
 
-| Name             | Type                                                                           | Description                                                                                                            |
-| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status<br /> |
-| status           | `StatusValues`                                                                 | The operation status<br />                                                                                             |
-| id               | `uuid`                                                                         | The unique identifier for the operationStatus resource<br />                                                           |
-| name?            | `string`                                                                       | The name of the operationStatus resource<br />                                                                         |
-| startTime?       | `utcDateTime`                                                                  | Operation start time<br />                                                                                             |
-| endTime?         | `utcDateTime`                                                                  | Operation complete time<br />                                                                                          |
-| percentComplete? | `float64`                                                                      | The progress made toward completing the operation<br />                                                                |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status<br />                                       |
+| Name             | Type                                                                           | Description                                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
+| status           | `StatusValues`                                                                 | The operation status                                                                                             |
+| id               | `Core.uuid`                                                                    | The unique identifier for the operationStatus resource                                                           |
+| name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
+| startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
+| endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
+| percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
 
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
@@ -291,11 +291,11 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `(number) 201` | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
-| body        | `Resource`     |                                                                                                          |
+| Name        | Type       | Description                                                                                              |
+| ----------- | ---------- | -------------------------------------------------------------------------------------------------------- |
+| statusCode  | `201`      | The status code.                                                                                         |
+| retryAfter? | `int32`    | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| body        | `Resource` |                                                                                                          |
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
 
@@ -311,10 +311,10 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| body       | `Resource`     | The body type of the operation request or response. |
-| statusCode | `(number) 201` | The status code.                                    |
+| Name       | Type       | Description                                         |
+| ---------- | ---------- | --------------------------------------------------- |
+| body       | `Resource` | The body type of the operation request or response. |
+| statusCode | `201`      | The status code.                                    |
 
 ### `ArmResourceUpdatedResponse` {#Azure.ResourceManager.ArmResourceUpdatedResponse}
 
@@ -330,10 +330,10 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `(number) 200` | The status code.                                    |
-| body       | `Resource`     | The body type of the operation request or response. |
+| Name       | Type       | Description                                         |
+| ---------- | ---------- | --------------------------------------------------- |
+| statusCode | `200`      | The status code.                                    |
+| body       | `Resource` | The body type of the operation request or response. |
 
 ### `ArmResponse` {#Azure.ResourceManager.ArmResponse}
 
@@ -353,7 +353,7 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 
 | Name       | Type           | Description                                         |
 | ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `(number) 200` | The status code.                                    |
+| statusCode | `200`          | The status code.                                    |
 | body       | `ResponseBody` | The body type of the operation request or response. |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
@@ -370,8 +370,8 @@ model Azure.ResourceManager.CustomerManagedKeyEncryption
 | ------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | keyEncryptionIdentity?          | [`KeyEncryptionIdentity`](./data-types.md#Azure.ResourceManager.KeyEncryptionIdentity) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
 | userAssignedIdentityResourceId? | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier)                      | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
-| federatedClientId?              | `uuid`                                                                                 | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
-| delegatedIdentityClientId       | `uuid`                                                                                 | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
+| federatedClientId?              | `Core.uuid`                                                                            | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
+| delegatedIdentityClientId       | `Core.uuid`                                                                            | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
@@ -510,8 +510,7 @@ model Azure.ResourceManager.KeysOf<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `LocationParameter` {#Azure.ResourceManager.LocationParameter}
 
@@ -610,8 +609,7 @@ model Azure.ResourceManager.ParentKeysOf<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `PrivateEndpoint` {#Azure.ResourceManager.PrivateEndpoint}
 
@@ -623,9 +621,9 @@ model Azure.ResourceManager.PrivateEndpoint
 
 #### Properties
 
-| Name | Type                                                              | Description                                        |
-| ---- | ----------------------------------------------------------------- | -------------------------------------------------- |
-| id?  | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier) | The resource identifier for private endpoint<br /> |
+| Name | Type                                                              | Description                                  |
+| ---- | ----------------------------------------------------------------- | -------------------------------------------- |
+| id?  | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier) | The resource identifier for private endpoint |
 
 ### `PrivateEndpointConnection` {#Azure.ResourceManager.PrivateEndpointConnection}
 
@@ -637,9 +635,9 @@ model Azure.ResourceManager.PrivateEndpointConnection
 
 #### Properties
 
-| Name        | Type                                                                                                               | Description                                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProperties) | The private endpoint connection properties<br /> |
+| Name        | Type                                                                                                               | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
 
 ### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.PrivateEndpointConnectionParameter}
 
@@ -657,9 +655,9 @@ model Azure.ResourceManager.PrivateEndpointConnectionParameter<Segment>
 
 #### Properties
 
-| Name | Type     | Description                                                                           |
-| ---- | -------- | ------------------------------------------------------------------------------------- |
-| name | `string` | The name of the private endpoint connection associated with the Azure resource.<br /> |
+| Name | Type     | Description                                                                     |
+| ---- | -------- | ------------------------------------------------------------------------------- |
+| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
 
 ### `PrivateEndpointConnectionProperties` {#Azure.ResourceManager.PrivateEndpointConnectionProperties}
 
@@ -671,12 +669,12 @@ model Azure.ResourceManager.PrivateEndpointConnectionProperties
 
 #### Properties
 
-| Name                              | Type                                                                                                                             | Description                                                                                                |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| groupIds?                         | `Array`                                                                                                                          | The group identifiers for the private endpoint resource<br />                                              |
-| privateEndpoint?                  | [`PrivateEndpoint`](./data-types.md#Azure.ResourceManager.PrivateEndpoint)                                                       | The private endpoint resource<br />                                                                        |
-| privateLinkServiceConnectionState | [`PrivateLinkServiceConnectionState`](./data-types.md#Azure.ResourceManager.PrivateLinkServiceConnectionState)                   | A collection of information about the state of the connection between service consumer and provider.<br /> |
-| provisioningState?                | [`PrivateEndpointConnectionProvisioningState`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState) | The provisioning state of the private endpoint connection resource.<br />                                  |
+| Name                              | Type                                                                                                                             | Description                                                                                          |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| groupIds?                         | `string[]`                                                                                                                       | The group identifiers for the private endpoint resource                                              |
+| privateEndpoint?                  | [`PrivateEndpoint`](./data-types.md#Azure.ResourceManager.PrivateEndpoint)                                                       | The private endpoint resource                                                                        |
+| privateLinkServiceConnectionState | [`PrivateLinkServiceConnectionState`](./data-types.md#Azure.ResourceManager.PrivateLinkServiceConnectionState)                   | A collection of information about the state of the connection between service consumer and provider. |
+| provisioningState?                | [`PrivateEndpointConnectionProvisioningState`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState) | The provisioning state of the private endpoint connection resource.                                  |
 
 ### `PrivateEndpointConnectionResourceListResult` {#Azure.ResourceManager.PrivateEndpointConnectionResourceListResult}
 
@@ -688,9 +686,9 @@ model Azure.ResourceManager.PrivateEndpointConnectionResourceListResult
 
 #### Properties
 
-| Name   | Type    | Description                                 |
-| ------ | ------- | ------------------------------------------- |
-| value? | `Array` | Array of private endpoint connections<br /> |
+| Name   | Type                                          | Description                           |
+| ------ | --------------------------------------------- | ------------------------------------- |
+| value? | `ResourceManager.PrivateEndpointConnection[]` | Array of private endpoint connections |
 
 ### `PrivateLinkResource` {#Azure.ResourceManager.PrivateLinkResource}
 
@@ -700,9 +698,9 @@ model Azure.ResourceManager.PrivateLinkResource
 
 #### Properties
 
-| Name        | Type                                                                                                   | Description                                    |
-| ----------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| properties? | [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.PrivateLinkResourceProperties) | Properties of the private link resource.<br /> |
+| Name        | Type                                                                                                   | Description                              |
+| ----------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| properties? | [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.PrivateLinkResourceProperties) | Properties of the private link resource. |
 
 ### `PrivateLinkResourceListResult` {#Azure.ResourceManager.PrivateLinkResourceListResult}
 
@@ -714,9 +712,9 @@ model Azure.ResourceManager.PrivateLinkResourceListResult
 
 #### Properties
 
-| Name   | Type    | Description                           |
-| ------ | ------- | ------------------------------------- |
-| value? | `Array` | Array of private link resources<br /> |
+| Name   | Type                                    | Description                     |
+| ------ | --------------------------------------- | ------------------------------- |
+| value? | `ResourceManager.PrivateLinkResource[]` | Array of private link resources |
 
 ### `PrivateLinkResourceParameter` {#Azure.ResourceManager.PrivateLinkResourceParameter}
 
@@ -734,9 +732,9 @@ model Azure.ResourceManager.PrivateLinkResourceParameter<Segment>
 
 #### Properties
 
-| Name | Type     | Description                                                            |
-| ---- | -------- | ---------------------------------------------------------------------- |
-| name | `string` | The name of the private link associated with the Azure resource.<br /> |
+| Name | Type     | Description                                                      |
+| ---- | -------- | ---------------------------------------------------------------- |
+| name | `string` | The name of the private link associated with the Azure resource. |
 
 ### `PrivateLinkResourceProperties` {#Azure.ResourceManager.PrivateLinkResourceProperties}
 
@@ -748,11 +746,11 @@ model Azure.ResourceManager.PrivateLinkResourceProperties
 
 #### Properties
 
-| Name               | Type     | Description                                                 |
-| ------------------ | -------- | ----------------------------------------------------------- |
-| groupId?           | `string` | The private link resource group id.<br />                   |
-| requiredMembers?   | `Array`  | The private link resource required member names.<br />      |
-| requiredZoneNames? | `Array`  | The private link resource private link DNS zone name.<br /> |
+| Name               | Type       | Description                                           |
+| ------------------ | ---------- | ----------------------------------------------------- |
+| groupId?           | `string`   | The private link resource group id.                   |
+| requiredMembers?   | `string[]` | The private link resource required member names.      |
+| requiredZoneNames? | `string[]` | The private link resource private link DNS zone name. |
 
 ### `PrivateLinkServiceConnectionState` {#Azure.ResourceManager.PrivateLinkServiceConnectionState}
 
@@ -764,11 +762,11 @@ model Azure.ResourceManager.PrivateLinkServiceConnectionState
 
 #### Properties
 
-| Name             | Type                                                                                                                     | Description                                                                                            |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| status?          | [`PrivateEndpointServiceConnectionStatus`](./data-types.md#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus) | Indicates whether the connection has been Approved/Rejected/Removed by the owner of the service.<br /> |
-| description?     | `string`                                                                                                                 | The reason for approval/rejection of the connection.<br />                                             |
-| actionsRequired? | `string`                                                                                                                 | A message indicating if changes on the service provider require any updates on the consumer.<br />     |
+| Name             | Type                                                                                                                     | Description                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| status?          | [`PrivateEndpointServiceConnectionStatus`](./data-types.md#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus) | Indicates whether the connection has been Approved/Rejected/Removed by the owner of the service. |
+| description?     | `string`                                                                                                                 | The reason for approval/rejection of the connection.                                             |
+| actionsRequired? | `string`                                                                                                                 | A message indicating if changes on the service provider require any updates on the consumer.     |
 
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
@@ -786,9 +784,9 @@ model Azure.ResourceManager.ProviderNamespace<Resource>
 
 #### Properties
 
-| Name     | Type                                      | Description |
-| -------- | ----------------------------------------- | ----------- |
-| provider | `(string) "Microsoft.ThisWillBeReplaced"` |             |
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ProxyResource` {#Azure.ResourceManager.ProxyResource}
 
@@ -852,10 +850,10 @@ model Azure.ResourceManager.ResourceIdentifierAllowedResource
 
 #### Properties
 
-| Name    | Type     | Description                                                                                                                                                                          |
-| ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| type    | `string` | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
-| scopes? | `Array`  | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
+| Name    | Type       | Description                                                                                                                                                                          |
+| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| type    | `string`   | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
+| scopes? | `string[]` | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
 
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
@@ -875,9 +873,9 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 
 #### Properties
 
-| Name     | Type                                      | Description                              |
-| -------- | ----------------------------------------- | ---------------------------------------- |
-| provider | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
+| Name     | Type                             | Description                              |
+| -------- | -------------------------------- | ---------------------------------------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
 
 ### `ResourceKind` {#Azure.ResourceManager.ResourceKind}
 
@@ -918,10 +916,10 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 
 #### Properties
 
-| Name      | Type               | Description                        |
-| --------- | ------------------ | ---------------------------------- |
-| value     | `Array`            | The {name} items on this page      |
-| nextLink? | `ResourceLocation` | The link to the next page of items |
+| Name      | Type                             | Description                        |
+| --------- | -------------------------------- | ---------------------------------- |
+| value     | `Array<Element>`                 | The {name} items on this page      |
+| nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
@@ -941,9 +939,9 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 
 #### Properties
 
-| Name     | Type                                      | Description                              |
-| -------- | ----------------------------------------- | ---------------------------------------- |
-| provider | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
+| Name     | Type                             | Description                              |
+| -------- | -------------------------------- | ---------------------------------------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
 
 ### `ResourcePlan` {#Azure.ResourceManager.ResourcePlan}
 
@@ -1209,8 +1207,7 @@ model Azure.ResourceManager.Foundations.ArmResourceBase
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}
 
@@ -1224,9 +1221,9 @@ model Azure.ResourceManager.Foundations.ArmTagsProperty
 
 #### Properties
 
-| Name  | Type     | Description    |
-| ----- | -------- | -------------- |
-| tags? | `Record` | Resource tags. |
+| Name  | Type             | Description    |
+| ----- | ---------------- | -------------- |
+| tags? | `Record<string>` | Resource tags. |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest}
 
@@ -1296,7 +1293,7 @@ model Azure.ResourceManager.Foundations.ErrorAdditionalInfo
 | Name  | Type     | Description               |
 | ----- | -------- | ------------------------- |
 | type? | `string` | The additional info type. |
-| info? | ``       | The additional info.      |
+| info? | `{}`     | The additional info.      |
 
 ### `ErrorDetail` {#Azure.ResourceManager.Foundations.ErrorDetail}
 
@@ -1308,13 +1305,13 @@ model Azure.ResourceManager.Foundations.ErrorDetail
 
 #### Properties
 
-| Name            | Type     | Description                |
-| --------------- | -------- | -------------------------- |
-| code?           | `string` | The error code.            |
-| message?        | `string` | The error message.         |
-| target?         | `string` | The error target.          |
-| details?        | `Array`  | The error details.         |
-| additionalInfo? | `Array`  | The error additional info. |
+| Name            | Type                                                | Description                |
+| --------------- | --------------------------------------------------- | -------------------------- |
+| code?           | `string`                                            | The error code.            |
+| message?        | `string`                                            | The error message.         |
+| target?         | `string`                                            | The error target.          |
+| details?        | `ResourceManager.Foundations.ErrorDetail[]`         | The error details.         |
+| additionalInfo? | `ResourceManager.Foundations.ErrorAdditionalInfo[]` | The error additional info. |
 
 ### `ExtensionBaseParameters` {#Azure.ResourceManager.Foundations.ExtensionBaseParameters}
 
@@ -1341,8 +1338,7 @@ model Azure.ResourceManager.Foundations.ExtensionResourceBase
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `ExtensionScope` {#Azure.ResourceManager.Foundations.ExtensionScope}
 
@@ -1360,11 +1356,11 @@ model Azure.ResourceManager.Foundations.ExtensionScope<Resource>
 
 #### Properties
 
-| Name        | Type                                      | Description                                                            |
-| ----------- | ----------------------------------------- | ---------------------------------------------------------------------- |
-| apiVersion  | `string`                                  | The API version to use for this operation.                             |
-| resourceUri | `string`                                  | The fully qualified Azure Resource manager identifier of the resource. |
-| provider    | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
+| Name        | Type                             | Description                                                            |
+| ----------- | -------------------------------- | ---------------------------------------------------------------------- |
+| apiVersion  | `string`                         | The API version to use for this operation.                             |
+| resourceUri | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
+| provider    | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
 
 ### `LocationBaseParameters` {#Azure.ResourceManager.Foundations.LocationBaseParameters}
 
@@ -1398,12 +1394,12 @@ model Azure.ResourceManager.Foundations.LocationScope<Resource>
 
 #### Properties
 
-| Name           | Type                                      | Description                                |
-| -------------- | ----------------------------------------- | ------------------------------------------ |
-| apiVersion     | `string`                                  | The API version to use for this operation. |
-| subscriptionId | `string`                                  | The ID of the target subscription.         |
-| location       | `string`                                  | The location name.                         |
-| provider       | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| Name           | Type                             | Description                                |
+| -------------- | -------------------------------- | ------------------------------------------ |
+| apiVersion     | `string`                         | The API version to use for this operation. |
+| subscriptionId | `string`                         | The ID of the target subscription.         |
+| location       | `string`                         | The location name.                         |
+| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
 
 ### `ManagedIdentityProperties` {#Azure.ResourceManager.Foundations.ManagedIdentityProperties}
 
@@ -1420,7 +1416,7 @@ model Azure.ResourceManager.Foundations.ManagedIdentityProperties
 | tenantId?               | `string`                                                                                       | The Active Directory tenant id of the principal.        |
 | principalId?            | `string`                                                                                       | The active directory identifier of this principal.      |
 | type                    | [`ManagedIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | `Record`                                                                                       | The identities assigned to this resource by the user.   |
+| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                     | The identities assigned to this resource by the user.   |
 
 ### `ManagedSystemIdentityProperties` {#Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties}
 
@@ -1497,10 +1493,10 @@ model Azure.ResourceManager.Foundations.OperationListResult
 
 #### Properties
 
-| Name      | Type               | Description                        |
-| --------- | ------------------ | ---------------------------------- |
-| value     | `Array`            | The Operation items on this page   |
-| nextLink? | `ResourceLocation` | The link to the next page of items |
+| Name      | Type                                      | Description                        |
+| --------- | ----------------------------------------- | ---------------------------------- |
+| value     | `ResourceManager.Foundations.Operation[]` | The Operation items on this page   |
+| nextLink? | `TypeSpec.Rest.ResourceLocation`          | The link to the next page of items |
 
 ### `OperationStatusResult` {#Azure.ResourceManager.Foundations.OperationStatusResult}
 
@@ -1520,7 +1516,7 @@ model Azure.ResourceManager.Foundations.OperationStatusResult
 | percentComplete? | `int32`                                                                        | Percent of the operation that is complete.  |
 | startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
 | endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
-| operations       | `Array`                                                                        | The operations list.                        |
+| operations       | `ResourceManager.Foundations.OperationStatusResult[]`                          | The operations list.                        |
 | error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | If present, details of the operation error. |
 
 ### `ProxyResourceBase` {#Azure.ResourceManager.Foundations.ProxyResourceBase}
@@ -1533,8 +1529,7 @@ model Azure.ResourceManager.Foundations.ProxyResourceBase
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `ProxyResourceUpdateModel` {#Azure.ResourceManager.Foundations.ProxyResourceUpdateModel}
 
@@ -1553,9 +1548,9 @@ model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<Resource, Prope
 
 #### Properties
 
-| Name        | Type                            | Description |
-| ----------- | ------------------------------- | ----------- |
-| properties? | `ResourceUpdateModelProperties` |             |
+| Name        | Type                                                                              | Description |
+| ----------- | --------------------------------------------------------------------------------- | ----------- |
+| properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
 
 ### `ResourceGroupBaseParameters` {#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters}
 
@@ -1589,14 +1584,14 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 
 #### Properties
 
-| Name              | Type                                      | Description                                                            |
-| ----------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
-| apiVersion        | `string`                                  | The API version to use for this operation.                             |
-| subscriptionId    | `string`                                  | The ID of the target subscription.                                     |
-| location          | `string`                                  | The location name.                                                     |
-| resourceGroupName | `string`                                  | The name of the resource group. The name is case insensitive.          |
-| resourceUri       | `string`                                  | The fully qualified Azure Resource manager identifier of the resource. |
-| provider          | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
+| Name              | Type                             | Description                                                            |
+| ----------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| apiVersion        | `string`                         | The API version to use for this operation.                             |
+| subscriptionId    | `string`                         | The ID of the target subscription.                                     |
+| location          | `string`                         | The location name.                                                     |
+| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
+| resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
+| provider          | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
 
 ### `ResourcePlanType` {#Azure.ResourceManager.Foundations.ResourcePlanType}
 
@@ -1652,9 +1647,9 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties
 
 #### Properties
 
-| Name        | Type                            | Description |
-| ----------- | ------------------------------- | ----------- |
-| properties? | `ResourceUpdateModelProperties` |             |
+| Name        | Type                                                                              | Description |
+| ----------- | --------------------------------------------------------------------------------- | ----------- |
+| properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
 
 ### `ResourceUpdateModelProperties` {#Azure.ResourceManager.Foundations.ResourceUpdateModelProperties}
 
@@ -1674,8 +1669,7 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, 
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 
@@ -1708,11 +1702,11 @@ model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 
 #### Properties
 
-| Name           | Type                                      | Description                                |
-| -------------- | ----------------------------------------- | ------------------------------------------ |
-| apiVersion     | `string`                                  | The API version to use for this operation. |
-| subscriptionId | `string`                                  | The ID of the target subscription.         |
-| provider       | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| Name           | Type                             | Description                                |
+| -------------- | -------------------------------- | ------------------------------------------ |
+| apiVersion     | `string`                         | The API version to use for this operation. |
+| subscriptionId | `string`                         | The ID of the target subscription.         |
+| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
 
 ### `SystemData` {#Azure.ResourceManager.Foundations.SystemData}
 
@@ -1749,9 +1743,9 @@ model Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>
 
 #### Properties
 
-| Name  | Type     | Description    |
-| ----- | -------- | -------------- |
-| tags? | `Record` | Resource tags. |
+| Name  | Type             | Description    |
+| ----- | ---------------- | -------------- |
+| tags? | `Record<string>` | Resource tags. |
 
 ### `TenantBaseParameters` {#Azure.ResourceManager.Foundations.TenantBaseParameters}
 
@@ -1783,10 +1777,10 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 #### Properties
 
-| Name       | Type                                      | Description                                |
-| ---------- | ----------------------------------------- | ------------------------------------------ |
-| apiVersion | `string`                                  | The API version to use for this operation. |
-| provider   | `(string) "Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| Name       | Type                             | Description                                |
+| ---------- | -------------------------------- | ------------------------------------------ |
+| apiVersion | `string`                         | The API version to use for this operation. |
+| provider   | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
 
 ### `TrackedResourceBase` {#Azure.ResourceManager.Foundations.TrackedResourceBase}
 
@@ -1798,10 +1792,10 @@ model Azure.ResourceManager.Foundations.TrackedResourceBase
 
 #### Properties
 
-| Name     | Type     | Description                               |
-| -------- | -------- | ----------------------------------------- |
-| location | `string` | The geo-location where the resource lives |
-| tags?    | `Record` | Resource tags.                            |
+| Name     | Type             | Description                               |
+| -------- | ---------------- | ----------------------------------------- |
+| location | `string`         | The geo-location where the resource lives |
+| tags?    | `Record<string>` | Resource tags.                            |
 
 ### `UserAssignedIdentity` {#Azure.ResourceManager.Foundations.UserAssignedIdentity}
 

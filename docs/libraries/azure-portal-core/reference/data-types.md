@@ -18,12 +18,12 @@ model Azure.Portal.AboutOptions
 
 #### Properties
 
-| Name           | Type                                                | Description                                                                                              |
-| -------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| icon?          | [`FilePath`](./data-types.md#Azure.Portal.FilePath) | Icon which represent resource<br />                                                                      |
-| displayName?   | `string`                                            | Display name which represent the resource<br />                                                          |
-| keywords?      | `Array`                                             | Comma-separated set of words or phrases which allow users to search for your asset by identifiers.<br /> |
-| learnMoreDocs? | `Array`                                             | Set of links which can help learn more about the resource<br />                                          |
+| Name           | Type                                                | Description                                                                                        |
+| -------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| icon?          | [`FilePath`](./data-types.md#Azure.Portal.FilePath) | Icon which represent resource                                                                      |
+| displayName?   | `string`                                            | Display name which represent the resource                                                          |
+| keywords?      | `string[]`                                          | Comma-separated set of words or phrases which allow users to search for your asset by identifiers. |
+| learnMoreDocs? | `string[]`                                          | Set of links which can help learn more about the resource                                          |
 
 ### `BrowseOptions` {#Azure.Portal.BrowseOptions}
 
@@ -35,9 +35,9 @@ model Azure.Portal.BrowseOptions
 
 #### Properties
 
-| Name      | Type                                    | Description                                                                                                                                    |
-| --------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| argQuery? | `union string \| Azure.Portal.FilePath` | argQuery can be a literal string query or KQL file path.<br />KQL query which represents all possible data for your desired browse view.<br /> |
+| Name      | Type                        | Description                                                                                                                              |
+| --------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| argQuery? | `string \| Portal.FilePath` | argQuery can be a literal string query or KQL file path.<br />KQL query which represents all possible data for your desired browse view. |
 
 ### `FilePath` {#Azure.Portal.FilePath}
 
@@ -49,9 +49,9 @@ model Azure.Portal.FilePath
 
 #### Properties
 
-| Name     | Type     | Description               |
-| -------- | -------- | ------------------------- |
-| filePath | `string` | File path of a file<br /> |
+| Name     | Type     | Description         |
+| -------- | -------- | ------------------- |
+| filePath | `string` | File path of a file |
 
 ### `marketplaceOfferOptions` {#Azure.Portal.marketplaceOfferOptions}
 
@@ -63,9 +63,9 @@ model Azure.Portal.marketplaceOfferOptions
 
 #### Properties
 
-| Name | Type     | Description                              |
-| ---- | -------- | ---------------------------------------- |
-| id?  | `string` | Marketplace offer id of a resource<br /> |
+| Name | Type     | Description                        |
+| ---- | -------- | ---------------------------------- |
+| id?  | `string` | Marketplace offer id of a resource |
 
 ### `PromotionOptions` {#Azure.Portal.PromotionOptions}
 
@@ -77,7 +77,7 @@ model Azure.Portal.PromotionOptions
 
 #### Properties
 
-| Name        | Type                         | Description |
-| ----------- | ---------------------------- | ----------- |
-| apiVersion  | `union string \| EnumMember` |             |
-| autoUpdate? | `boolean`                    |             |
+| Name        | Type                   | Description |
+| ----------- | ---------------------- | ----------- |
+| apiVersion  | `string \| EnumMember` |             |
+| autoUpdate? | `boolean`              |             |

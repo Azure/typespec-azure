@@ -19,13 +19,13 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 #### Target
 
-`union Namespace | EnumMember`
+`Namespace | EnumMember`
 
 #### Parameters
 
-| Name    | Type                                 | Description                                                                                                        |
-| ------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| version | `valueof union string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value. |
+| Name    | Type                           | Description                                                                                                        |
+| ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value. |
 
 ### `@armLibraryNamespace` {#@Azure.ResourceManager.armLibraryNamespace}
 
@@ -65,9 +65,9 @@ Namespace element value unless an override value is specified.
 
 #### Parameters
 
-| Name              | Type                    | Description        |
-| ----------------- | ----------------------- | ------------------ |
-| providerNamespace | `valueof scalar string` | Provider namespace |
+| Name              | Type             | Description        |
+| ----------------- | ---------------- | ------------------ |
+| providerNamespace | `valueof string` | Provider namespace |
 
 #### Examples
 
@@ -92,7 +92,7 @@ property to the type of the Azure Resource Manager resource.
 
 #### Target
 
-`union Operation | Model`
+`Operation | Model`
 
 #### Parameters
 
@@ -112,11 +112,11 @@ Marks the operation as being a collection action
 
 #### Parameters
 
-| Name                   | Type                    | Description               |
-| ---------------------- | ----------------------- | ------------------------- |
-| resourceType           | `Model`                 | Resource                  |
-| parentTypeName         | `valueof scalar string` | : Parent type name.       |
-| parentFriendlyTypeName | `valueof scalar string` | Friendly name for parent. |
+| Name                   | Type             | Description               |
+| ---------------------- | ---------------- | ------------------------- |
+| resourceType           | `Model`          | Resource                  |
+| parentTypeName         | `valueof string` | : Parent type name.       |
+| parentFriendlyTypeName | `valueof string` | Friendly name for parent. |
 
 ### `@armResourceAction` {#@Azure.ResourceManager.armResourceAction}
 
@@ -329,9 +329,9 @@ This decorator sets the base type of the given resource.
 
 #### Parameters
 
-| Name     | Type                                                                               | Description                                                                                                            |
-| -------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| baseType | `union "Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
+| Name     | Type                                                                         | Description                                                                                                            |
+| -------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 ### `@resourceGroupResource` {#@Azure.ResourceManager.resourceGroupResource}
 
@@ -374,9 +374,9 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 #### Parameters
 
-| Name     | Type                                | Description                                                    |
-| -------- | ----------------------------------- | -------------------------------------------------------------- |
-| keyValue | `valueof union string \| "default"` | The name of the singleton resource. Default name is "default". |
+| Name     | Type                          | Description                                                    |
+| -------- | ----------------------------- | -------------------------------------------------------------- |
+| keyValue | `valueof string \| "default"` | The name of the singleton resource. Default name is "default". |
 
 ### `@subscriptionResource` {#@Azure.ResourceManager.subscriptionResource}
 
@@ -435,6 +435,6 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 #### Parameters
 
-| Name       | Type    | Description                                                              |
-| ---------- | ------- | ------------------------------------------------------------------------ |
-| namespaces | `Array` | The namespaces of Azure Resource Manager libraries used in this provider |
+| Name       | Type          | Description                                                              |
+| ---------- | ------------- | ------------------------------------------------------------------------ |
+| namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |

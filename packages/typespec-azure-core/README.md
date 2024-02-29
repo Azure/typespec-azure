@@ -102,9 +102,9 @@ Identifies a ModelProperty as containing the final location for the operation re
 
 ##### Parameters
 
-| Name        | Type                  | Description                                                                                                                                                        |
-| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| finalResult | `union Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
+| Name        | Type            | Description                                                                                                                                                        |
+| ----------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| finalResult | `Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
 
 #### `@finalOperation`
 
@@ -123,7 +123,7 @@ Identifies that an operation is the final operation for an LRO.
 | Name            | Type        | Description                                                                                                               |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | ``          | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@fixed`
 
@@ -169,7 +169,7 @@ Identifies an EnumMember as a long-running "Canceled" terminal state.
 
 ##### Target
 
-`union EnumMember | UnionVariant`
+`EnumMember | UnionVariant`
 
 ##### Parameters
 
@@ -204,7 +204,7 @@ Identifies an enum member as a long-running "Failed" terminal state.
 
 ##### Target
 
-`union EnumMember | UnionVariant`
+`EnumMember | UnionVariant`
 
 ##### Parameters
 
@@ -240,7 +240,7 @@ status.
 
 ##### Target
 
-`union Enum | Union | ModelProperty`
+`Enum | Union | ModelProperty`
 
 ##### Parameters
 
@@ -257,7 +257,7 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 ##### Target
 
-`union EnumMember | UnionVariant`
+`EnumMember | UnionVariant`
 
 ##### Parameters
 
@@ -296,7 +296,7 @@ Identifies that an operation is used to retrieve the next page for paged operati
 | Name            | Type        | Description                                                                                                               |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | ``          | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@operationLink`
 
@@ -312,11 +312,11 @@ Identifies an operation that is linked to the target operation.
 
 ##### Parameters
 
-| Name            | Type                    | Description                                                                                                               |
-| --------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation`             | The linked Operation                                                                                                      |
-| linkType        | `valueof scalar string` | A string indicating the role of the linked operation                                                                      |
-| parameters      | ``                      | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| Name            | Type             | Description                                                                                                               |
+| --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| linkedOperation | `Operation`      | The linked Operation                                                                                                      |
+| linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
+| parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@pagedResult`
 
@@ -369,7 +369,7 @@ Identifies that an operation is a polling operation for an LRO.
 | Name            | Type        | Description                                                                                                               |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | ``          | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
+| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@pollingOperationParameter`
 
@@ -385,9 +385,9 @@ Used to define how to call custom polling operations for long-running operations
 
 ##### Parameters
 
-| Name            | Type                            | Description                                                                                                                                                                                        |
-| --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| targetParameter | `union ModelProperty \| string` | A reference to the polling operation parameter this parameter<br />provides a value for, or the name of that parameter. The default value is the name of<br />the decorated parameter or property. |
+| Name            | Type                      | Description                                                                                                                                                                                        |
+| --------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| targetParameter | `ModelProperty \| string` | A reference to the polling operation parameter this parameter<br />provides a value for, or the name of that parameter. The default value is the name of<br />the decorated parameter or property. |
 
 ### Azure.Core.Foundations
 
@@ -425,9 +425,9 @@ Identifies a property on a request model that serves as a linked operation param
 
 ##### Parameters
 
-| Name | Type                    | Description                 |
-| ---- | ----------------------- | --------------------------- |
-| name | `valueof scalar string` | Property name on the target |
+| Name | Type             | Description                 |
+| ---- | ---------------- | --------------------------- |
+| name | `valueof string` | Property name on the target |
 
 #### `@responseProperty`
 
@@ -443,9 +443,9 @@ Identifies a property on _all_ non-error response models that serve as a linked 
 
 ##### Parameters
 
-| Name | Type                    | Description                 |
-| ---- | ----------------------- | --------------------------- |
-| name | `valueof scalar string` | Property name on the target |
+| Name | Type             | Description                 |
+| ---- | ---------------- | --------------------------- |
+| name | `valueof string` | Property name on the target |
 
 ### Azure.Core.Traits
 
@@ -470,9 +470,9 @@ The model type to mark as a trait.
 
 ##### Parameters
 
-| Name      | Type                    | Description                                                                                        |
-| --------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
-| traitName | `valueof scalar string` | An optional name to uniquely identify the trait. If unspecified,<br />the model type name is used. |
+| Name      | Type             | Description                                                                                        |
+| --------- | ---------------- | -------------------------------------------------------------------------------------------------- |
+| traitName | `valueof string` | An optional name to uniquely identify the trait. If unspecified,<br />the model type name is used. |
 
 #### `@traitAdded`
 
@@ -485,13 +485,13 @@ to either a trait model type or its envelope property.
 
 ##### Target
 
-`union Model | ModelProperty`
+`Model | ModelProperty`
 
 ##### Parameters
 
-| Name         | Type                       | Description                                       |
-| ------------ | -------------------------- | ------------------------------------------------- |
-| addedVersion | `union EnumMember \| null` | The enum member representing the service version. |
+| Name         | Type                 | Description                                       |
+| ------------ | -------------------- | ------------------------------------------------- |
+| addedVersion | `EnumMember \| null` | The enum member representing the service version. |
 
 #### `@traitContext`
 
@@ -508,9 +508,9 @@ The trait envelope property where the context will be applied.
 
 ##### Parameters
 
-| Name     | Type                                   | Description                                                                                |
-| -------- | -------------------------------------- | ------------------------------------------------------------------------------------------ |
-| contexts | `union EnumMember \| Union \| unknown` | An enum member or union of enum members representing the trait's<br />applicable contexts. |
+| Name     | Type                             | Description                                                                                |
+| -------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
+| contexts | `EnumMember \| Union \| unknown` | An enum member or union of enum members representing the trait's<br />applicable contexts. |
 
 #### `@traitLocation`
 

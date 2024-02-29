@@ -26,10 +26,11 @@ model Azure.Core.AadOauth2Auth<Scopes, AuthUrl, TokenUrl>
 
 #### Properties
 
-| Name  | Type                                                                     | Description            |
-| ----- | ------------------------------------------------------------------------ | ---------------------- |
-| type  | `oauth2`                                                                 | OAuth2 authentication  |
-| flows | `(tuple) [model Azure.Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>]` | Supported OAuth2 flows |
+| Name          | Type                                                 | Description                                                                    |
+| ------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
+| type          | `TypeSpec.Http.AuthType.oauth2`                      | OAuth2 authentication                                                          |
+| flows         | `[Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>]` | Supported OAuth2 flows                                                         |
+| defaultScopes | `[]`                                                 | Oauth2 scopes of every flow. Overridden by scope definitions in specific flows |
 
 ### `AadTokenAuthFlow` {#Azure.Core.AadTokenAuthFlow}
 
@@ -49,12 +50,12 @@ model Azure.Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>
 
 #### Properties
 
-| Name             | Type                | Description |
-| ---------------- | ------------------- | ----------- |
-| type             | `authorizationCode` |             |
-| authorizationUrl | `AuthUrl`           |             |
-| tokenUrl         | `TokenUrl`          |             |
-| scopes           | `Scopes`            |             |
+| Name             | Type                                             | Description |
+| ---------------- | ------------------------------------------------ | ----------- |
+| type             | `TypeSpec.Http.OAuth2FlowType.authorizationCode` |             |
+| authorizationUrl | `AuthUrl`                                        |             |
+| tokenUrl         | `TokenUrl`                                       |             |
+| scopes           | `Scopes`                                         |             |
 
 ### `AzureApiKeyAuthentication` {#Azure.Core.AzureApiKeyAuthentication}
 
@@ -66,11 +67,11 @@ model Azure.Core.AzureApiKeyAuthentication
 
 #### Properties
 
-| Name | Type                                   | Description             |
-| ---- | -------------------------------------- | ----------------------- |
-| type | `apiKey`                               | API key authentication  |
-| in   | `header`                               | location of the API key |
-| name | `(string) "Ocp-Apim-Subscription-Key"` | name of the API key     |
+| Name | Type                                  | Description             |
+| ---- | ------------------------------------- | ----------------------- |
+| type | `TypeSpec.Http.AuthType.apiKey`       | API key authentication  |
+| in   | `TypeSpec.Http.ApiKeyLocation.header` | location of the API key |
+| name | `"Ocp-Apim-Subscription-Key"`         | name of the API key     |
 
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
@@ -119,8 +120,7 @@ model Azure.Core.EmbeddingVector<Element>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `EtagProperty` {#Azure.Core.EtagProperty}
 
@@ -161,9 +161,9 @@ model Azure.Core.ExpandQueryParameter
 
 #### Properties
 
-| Name    | Type    | Description                                       |
-| ------- | ------- | ------------------------------------------------- |
-| expand? | `Array` | Expand the indicated resources into the response. |
+| Name    | Type       | Description                                       |
+| ------- | ---------- | ------------------------------------------------- |
+| expand? | `string[]` | Expand the indicated resources into the response. |
 
 ### `FilterParameter` {#Azure.Core.FilterParameter}
 
@@ -217,9 +217,9 @@ model Azure.Core.OrderByQueryParameter
 
 #### Properties
 
-| Name     | Type    | Description                                             |
-| -------- | ------- | ------------------------------------------------------- |
-| orderby? | `Array` | Expressions that specify the order of returned results. |
+| Name     | Type       | Description                                             |
+| -------- | ---------- | ------------------------------------------------------- |
+| orderby? | `string[]` | Expressions that specify the order of returned results. |
 
 ### `Page` {#Azure.Core.Page}
 
@@ -237,10 +237,10 @@ model Azure.Core.Page<Resource>
 
 #### Properties
 
-| Name      | Type               | Description |
-| --------- | ------------------ | ----------- |
-| value     | `Array`            |             |
-| nextLink? | `ResourceLocation` |             |
+| Name      | Type                             | Description |
+| --------- | -------------------------------- | ----------- |
+| value     | `Array<Element>`                 |             |
+| nextLink? | `TypeSpec.Rest.ResourceLocation` |             |
 
 ### `PollingOptions` {#Azure.Core.PollingOptions}
 
@@ -252,11 +252,11 @@ model Azure.Core.PollingOptions
 
 #### Properties
 
-| Name          | Type                                                                | Description                                                           |
-| ------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| kind          | [`PollingOptionKind`](./data-types.md#Azure.Core.PollingOptionKind) | The kind of polling options<br />                                     |
-| pollingModel? | `union Model \| void`                                               | The model that is returned when polling should continue.<br />        |
-| finalResult?  | `union Model \| void`                                               | The type that is returned when polling terminates successfully.<br /> |
+| Name          | Type                                                                | Description                                                     |
+| ------------- | ------------------------------------------------------------------- | --------------------------------------------------------------- |
+| kind          | [`PollingOptionKind`](./data-types.md#Azure.Core.PollingOptionKind) | The kind of polling options                                     |
+| pollingModel? | `Model \| void`                                                     | The model that is returned when polling should continue.        |
+| finalResult?  | `Model \| void`                                                     | The type that is returned when polling terminates successfully. |
 
 ### `RepeatabilityRequestHeaders` {#Azure.Core.RepeatabilityRequestHeaders}
 
@@ -317,8 +317,7 @@ model Azure.Core.RequestParameter<Name>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `ResourceOperationStatus` {#Azure.Core.ResourceOperationStatus}
 
@@ -359,8 +358,7 @@ model Azure.Core.ResponseProperty<Name>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `SelectQueryParameter` {#Azure.Core.SelectQueryParameter}
 
@@ -372,9 +370,9 @@ model Azure.Core.SelectQueryParameter
 
 #### Properties
 
-| Name    | Type    | Description                                                 |
-| ------- | ------- | ----------------------------------------------------------- |
-| select? | `Array` | Select the specified fields to be included in the response. |
+| Name    | Type       | Description                                                 |
+| ------- | ---------- | ----------------------------------------------------------- |
+| select? | `string[]` | Select the specified fields to be included in the response. |
 
 ### `SkipQueryParameter` {#Azure.Core.SkipQueryParameter}
 
@@ -416,10 +414,10 @@ model Azure.Core.StatusMonitorOptions
 
 #### Properties
 
-| Name           | Type                               | Description                                                                                   |
-| -------------- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
-| kind           | `statusMonitor`                    | The kind of polling options<br />                                                             |
-| finalProperty? | `union ModelProperty \| ErrorType` | A reference to or name of the property of the status monitor that contains the response<br /> |
+| Name           | Type                         | Description                                                                             |
+| -------------- | ---------------------------- | --------------------------------------------------------------------------------------- |
+| kind           | `"statusMonitor"`            | The kind of polling options                                                             |
+| finalProperty? | `ModelProperty \| ErrorType` | A reference to or name of the property of the status monitor that contains the response |
 
 ### `StatusMonitorPollingOptions` {#Azure.Core.StatusMonitorPollingOptions}
 
@@ -439,12 +437,12 @@ model Azure.Core.StatusMonitorPollingOptions<PollingModel, FinalResult, FinalPro
 
 #### Properties
 
-| Name          | Type            | Description                                                           |
-| ------------- | --------------- | --------------------------------------------------------------------- |
-| kind          | `statusMonitor` | The kind of polling options<br />                                     |
-| pollingModel  | `PollingModel`  | The model that is returned when polling should continue<br />         |
-| finalResult   | `FinalResult`   | The model that is returned when polling terminates successfully<br /> |
-| finalProperty | `FinalProperty` | The property of the status monitor that contains results<br />        |
+| Name          | Type              | Description                                                     |
+| ------------- | ----------------- | --------------------------------------------------------------- |
+| kind          | `"statusMonitor"` | The kind of polling options                                     |
+| pollingModel  | `PollingModel`    | The model that is returned when polling should continue         |
+| finalResult   | `FinalResult`     | The model that is returned when polling terminates successfully |
+| finalProperty | `FinalProperty`   | The property of the status monitor that contains results        |
 
 ### `TopQueryParameter` {#Azure.Core.TopQueryParameter}
 
@@ -581,8 +579,7 @@ model Azure.Core.Foundations.CollectionKeysOf<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `CreateableAndUpdateableProperties` {#Azure.Core.Foundations.CreateableAndUpdateableProperties}
 
@@ -600,8 +597,7 @@ model Azure.Core.Foundations.CreateableAndUpdateableProperties<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `CustomizationFields` {#Azure.Core.Foundations.CustomizationFields}
 
@@ -615,8 +611,8 @@ model Azure.Core.Foundations.CustomizationFields
 
 | Name        | Type | Description                                                                    |
 | ----------- | ---- | ------------------------------------------------------------------------------ |
-| parameters? | ``   | An object containing custom parameters that will be included in the operation. |
-| response?   | ``   | An object containing custom properties that will be included in the response.  |
+| parameters? | `{}` | An object containing custom parameters that will be included in the operation. |
+| response?   | `{}` | An object containing custom properties that will be included in the response.  |
 
 ### `CustomPage` {#Azure.Core.Foundations.CustomPage}
 
@@ -635,10 +631,10 @@ model Azure.Core.Foundations.CustomPage<Resource, Traits>
 
 #### Properties
 
-| Name      | Type               | Description |
-| --------- | ------------------ | ----------- |
-| value     | `Array`            |             |
-| nextLink? | `ResourceLocation` |             |
+| Name      | Type                             | Description |
+| --------- | -------------------------------- | ----------- |
+| value     | `Array<Element>`                 |             |
+| nextLink? | `TypeSpec.Rest.ResourceLocation` |             |
 
 ### `CustomParameters` {#Azure.Core.Foundations.CustomParameters}
 
@@ -656,8 +652,7 @@ model Azure.Core.Foundations.CustomParameters<Custom>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `CustomResponseFields` {#Azure.Core.Foundations.CustomResponseFields}
 
@@ -675,8 +670,7 @@ model Azure.Core.Foundations.CustomResponseFields<Custom>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `Error` {#Azure.Core.Foundations.Error}
 
@@ -693,7 +687,7 @@ model Azure.Core.Foundations.Error
 | code        | `string`                                                          | One of a server-defined set of error codes.                                             |
 | message     | `string`                                                          | A human-readable representation of the error.                                           |
 | target?     | `string`                                                          | The target of the error.                                                                |
-| details?    | `Array`                                                           | An array of details about specific errors that led to this reported error.              |
+| details?    | `Core.Foundations.Error[]`                                        | An array of details about specific errors that led to this reported error.              |
 | innererror? | [`InnerError`](./data-types.md#Azure.Core.Foundations.InnerError) | An object containing more specific information than the current object about the error. |
 
 ### `ErrorResponse` {#Azure.Core.Foundations.ErrorResponse}
@@ -763,8 +757,7 @@ model Azure.Core.Foundations.ItemKeysOf<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `LocationOfCreatedResourceResponse` {#Azure.Core.Foundations.LocationOfCreatedResourceResponse}
 
@@ -782,10 +775,10 @@ model Azure.Core.Foundations.LocationOfCreatedResourceResponse<Resource>
 
 #### Properties
 
-| Name       | Type               | Description      |
-| ---------- | ------------------ | ---------------- |
-| statusCode | `(number) 201`     | The status code. |
-| location   | `ResourceLocation` |                  |
+| Name       | Type                             | Description      |
+| ---------- | -------------------------------- | ---------------- |
+| statusCode | `201`                            | The status code. |
+| location   | `TypeSpec.Rest.ResourceLocation` |                  |
 
 ### `LocationOfCreatedResourceWithServiceProvidedNameResponse` {#Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse}
 
@@ -803,10 +796,10 @@ model Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameRes
 
 #### Properties
 
-| Name       | Type               | Description      |
-| ---------- | ------------------ | ---------------- |
-| statusCode | `(number) 202`     | The status code. |
-| location   | `ResourceLocation` |                  |
+| Name       | Type                             | Description      |
+| ---------- | -------------------------------- | ---------------- |
+| statusCode | `202`                            | The status code. |
+| location   | `TypeSpec.Rest.ResourceLocation` |                  |
 
 ### `LongRunningStatusLocation` {#Azure.Core.Foundations.LongRunningStatusLocation}
 
@@ -824,9 +817,9 @@ model Azure.Core.Foundations.LongRunningStatusLocation<StatusResult>
 
 #### Properties
 
-| Name              | Type               | Description |
-| ----------------- | ------------------ | ----------- |
-| operationLocation | `ResourceLocation` |             |
+| Name              | Type                             | Description |
+| ----------------- | -------------------------------- | ----------- |
+| operationLocation | `TypeSpec.Rest.ResourceLocation` |             |
 
 ### `OperationStatus` {#Azure.Core.Foundations.OperationStatus}
 
@@ -888,8 +881,7 @@ model Azure.Core.Foundations.ResourceCreateOrReplaceModel<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `ResourceCreateOrUpdateModel` {#Azure.Core.Foundations.ResourceCreateOrUpdateModel}
 
@@ -907,8 +899,7 @@ model Azure.Core.Foundations.ResourceCreateOrUpdateModel<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `ResourceUpdateModel` {#Azure.Core.Foundations.ResourceUpdateModel}
 
@@ -926,8 +917,7 @@ model Azure.Core.Foundations.ResourceUpdateModel<Resource>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `RetryAfterHeader` {#Azure.Core.Foundations.RetryAfterHeader}
 
@@ -971,7 +961,7 @@ model Azure.Core.Traits.ListQueryParametersTrait<Parameters>
 
 | Name                   | Type         | Description |
 | ---------------------- | ------------ | ----------- |
-| queryParams            | ``           |             |
+| queryParams            | `{...}`      |             |
 | queryParams.parameters | `Parameters` |             |
 
 ### `NoClientRequestId` {#Azure.Core.Traits.NoClientRequestId}
@@ -986,7 +976,7 @@ model Azure.Core.Traits.NoClientRequestId
 
 | Name            | Type | Description |
 | --------------- | ---- | ----------- |
-| clientRequestId | ``   |             |
+| clientRequestId | `{}` |             |
 
 ### `NoConditionalRequests` {#Azure.Core.Traits.NoConditionalRequests}
 
@@ -1000,7 +990,7 @@ model Azure.Core.Traits.NoConditionalRequests
 
 | Name                | Type | Description |
 | ------------------- | ---- | ----------- |
-| conditionalRequests | ``   |             |
+| conditionalRequests | `{}` |             |
 
 ### `NoRepeatableRequests` {#Azure.Core.Traits.NoRepeatableRequests}
 
@@ -1014,7 +1004,7 @@ model Azure.Core.Traits.NoRepeatableRequests
 
 | Name               | Type | Description |
 | ------------------ | ---- | ----------- |
-| repeatableRequests | ``   |             |
+| repeatableRequests | `{}` |             |
 
 ### `QueryParametersTrait` {#Azure.Core.Traits.QueryParametersTrait}
 
@@ -1035,7 +1025,7 @@ model Azure.Core.Traits.QueryParametersTrait<Parameters, Contexts>
 
 | Name                   | Type         | Description |
 | ---------------------- | ------------ | ----------- |
-| queryParams            | ``           |             |
+| queryParams            | `{...}`      |             |
 | queryParams.parameters | `Parameters` |             |
 
 ### `RequestHeadersTrait` {#Azure.Core.Traits.RequestHeadersTrait}
@@ -1057,7 +1047,7 @@ model Azure.Core.Traits.RequestHeadersTrait<Headers, Contexts>
 
 | Name                      | Type      | Description |
 | ------------------------- | --------- | ----------- |
-| requestHeaders            | ``        |             |
+| requestHeaders            | `{...}`   |             |
 | requestHeaders.parameters | `Headers` |             |
 
 ### `ResponseHeadersTrait` {#Azure.Core.Traits.ResponseHeadersTrait}
@@ -1079,7 +1069,7 @@ model Azure.Core.Traits.ResponseHeadersTrait<Headers, Contexts>
 
 | Name                       | Type      | Description |
 | -------------------------- | --------- | ----------- |
-| responseHeaders            | ``        |             |
+| responseHeaders            | `{...}`   |             |
 | responseHeaders.parameters | `Headers` |             |
 
 ### `SupportsClientRequestId` {#Azure.Core.Traits.SupportsClientRequestId}
@@ -1100,7 +1090,7 @@ model Azure.Core.Traits.SupportsClientRequestId<VersionAdded>
 
 | Name                       | Type                                                                        | Description |
 | -------------------------- | --------------------------------------------------------------------------- | ----------- |
-| clientRequestId            | ``                                                                          |             |
+| clientRequestId            | `{...}`                                                                     |             |
 | clientRequestId.parameters | [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader) |             |
 | clientRequestId.response   | [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader) |             |
 
@@ -1122,7 +1112,7 @@ model Azure.Core.Traits.SupportsConditionalRequests<VersionAdded>
 
 | Name                           | Type                                                                                | Description |
 | ------------------------------ | ----------------------------------------------------------------------------------- | ----------- |
-| conditionalRequests            | ``                                                                                  |             |
+| conditionalRequests            | `{...}`                                                                             |             |
 | conditionalRequests.parameters | [`ConditionalRequestHeaders`](./data-types.md#Azure.Core.ConditionalRequestHeaders) |             |
 | conditionalRequests.response   | [`EtagResponseEnvelope`](./data-types.md#Azure.Core.EtagResponseEnvelope)           |             |
 
@@ -1144,7 +1134,7 @@ model Azure.Core.Traits.SupportsRepeatableRequests<VersionAdded>
 
 | Name                          | Type                                                                                      | Description |
 | ----------------------------- | ----------------------------------------------------------------------------------------- | ----------- |
-| repeatableRequests            | ``                                                                                        |             |
+| repeatableRequests            | `{...}`                                                                                   |             |
 | repeatableRequests.parameters | [`RepeatabilityRequestHeaders`](./data-types.md#Azure.Core.RepeatabilityRequestHeaders)   |             |
 | repeatableRequests.response   | [`RepeatabilityResponseHeaders`](./data-types.md#Azure.Core.RepeatabilityResponseHeaders) |             |
 
@@ -1164,8 +1154,7 @@ model Azure.Core.Traits.TraitOverride<Trait>
 
 #### Properties
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
+None
 
 ### `VersionParameterTrait` {#Azure.Core.Traits.VersionParameterTrait}
 
@@ -1185,7 +1174,7 @@ model Azure.Core.Traits.VersionParameterTrait<VersionParameter>
 
 | Name                             | Type               | Description |
 | -------------------------------- | ------------------ | ----------- |
-| versionParameter                 | ``                 |             |
+| versionParameter                 | `{...}`            |             |
 | versionParameter.apiVersionParam | `VersionParameter` |             |
 
 ### `TraitContext` {#Azure.Core.Traits.TraitContext}
