@@ -15,6 +15,9 @@ using Azure.Core;
 @service({
   title: "Microsoft.UpdateTests",
 })
+@OpenAPI.info({
+  version: "2022-05-22-preview",
+})
 @doc("Testing resource update using a Management API")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.UpdateTests;

@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "DiscriminatorTest",
-    "version": "0000-00-00",
+    "version": "2021-10-01-preview",
     "description": "DiscriminatorTest Resource Provider management API.",
     "x-typespec-generated": [
       {

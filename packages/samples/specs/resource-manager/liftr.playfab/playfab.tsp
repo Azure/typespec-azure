@@ -13,6 +13,9 @@ using Azure.ResourceManager;
 @service({
   title: "Azure PlayFab",
 })
+@OpenAPI.info({
+  version: "2021-06-15-preview",
+})
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.PlayFab;
 

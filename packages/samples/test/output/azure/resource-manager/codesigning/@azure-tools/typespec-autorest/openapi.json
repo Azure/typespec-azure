@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "CodeSigningManagementClient",
-    "version": "0000-00-00",
+    "version": "2020-12-14-preview",
     "description": "Code Sign Resource Provider Account and Certificate Profile management API.",
     "x-typespec-generated": [
       {

@@ -14,6 +14,9 @@ using Azure.Core;
 @service({
   title: "Contoso.CustomerManagedKeyExample",
 })
+@OpenAPI.info({
+  version: "2023-03-01-preview",
+})
 @doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)

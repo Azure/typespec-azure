@@ -13,6 +13,9 @@ using TypeSpec.Versioning;
 @service({
   title: "CodeSigningManagementClient",
 })
+@OpenAPI.info({
+  version: "2020-12-14-preview",
+})
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @doc("Code Sign Resource Provider Account and Certificate Profile management API.")
 namespace Microsoft.CodeSigning;

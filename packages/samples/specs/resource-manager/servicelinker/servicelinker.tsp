@@ -14,6 +14,9 @@ using Azure.ResourceManager;
 @service({
   title: "Microsoft.ServiceLinker provider",
 })
+@OpenAPI.info({
+  version: "2021-01-01-privatepreview",
+})
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.ServiceLinker;
 

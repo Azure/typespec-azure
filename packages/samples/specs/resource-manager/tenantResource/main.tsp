@@ -2,6 +2,7 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-resource-manager";
+import "@typespec/openapi";
 
 using TypeSpec.Rest;
 using TypeSpec.Http;
@@ -13,6 +14,9 @@ using Azure.ResourceManager;
   title: "Microsoft.Contoso",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@OpenAPI.info({
+  version: "2022-05-22-preview",
+})
 namespace Microsoft.Contoso;
 
 interface Operations extends Azure.ResourceManager.Operations {}
