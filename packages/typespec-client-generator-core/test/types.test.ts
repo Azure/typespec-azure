@@ -577,6 +577,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkType.name, "PetKind");
       strictEqual(sdkType.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
