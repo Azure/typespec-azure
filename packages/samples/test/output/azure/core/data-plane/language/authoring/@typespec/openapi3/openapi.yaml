@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Microsoft Cognitive Language Service - Analyze Text Authoring
-  version: 202ß2-05-15-preview
+  version: 0.0.0
 tags: []
 paths:
   /authoring/analyze-text/projects:
