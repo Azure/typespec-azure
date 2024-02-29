@@ -11,6 +11,7 @@ describe("autorest: response status code", () => {
   it("map single status code", async () => {
     await expectStatusCodes(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): {@statusCode _: 200, content: string};
       `,
       ["200"]
@@ -20,6 +21,7 @@ describe("autorest: response status code", () => {
   it("map multiple status code", async () => {
     await expectStatusCodes(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): {@statusCode _: 200 | 201 | 204, content: string};
       `,
       ["200", "201", "204"]
@@ -29,6 +31,7 @@ describe("autorest: response status code", () => {
   it("map simple status code range", async () => {
     await expectStatusCodes(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): {@minValue(400) @maxValue(499) @statusCode _: int32, content: string};
       `,
       ["4XX"]
@@ -38,6 +41,7 @@ describe("autorest: response status code", () => {
   it("map status code range going over multiple hundreds", async () => {
     await expectStatusCodes(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): {@minValue(400) @maxValue(599) @statusCode _: int32, content: string};
       `,
       ["4XX", "5XX"]
@@ -47,6 +51,7 @@ describe("autorest: response status code", () => {
   it("emit diagnostic if status code range is not supported", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): {@minValue(455) @maxValue(495) @statusCode _: int32, content: string};
       `
     );

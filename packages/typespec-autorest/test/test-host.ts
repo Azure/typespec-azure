@@ -122,7 +122,8 @@ export async function oapiForModel(name: string, modelDef: string) {
     @service({title: "Testing model"})
     @route("/")
     namespace root {
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): ${name};
     }
   `);

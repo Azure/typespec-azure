@@ -13,6 +13,7 @@ describe("typespec-autorest: return types", () => {
       model Key {
         key: string;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op read(): Key & ETagHeader;
       `
     );
@@ -34,6 +35,7 @@ describe("typespec-autorest: return types", () => {
         key: string;
       }
       @put
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op create(): TestCreatedResponse & Key;
       `
     );
@@ -53,6 +55,7 @@ describe("typespec-autorest: return types", () => {
         key: string;
       }
       @put
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op create(): TestCreatedResponse & Key;
       `
     );
@@ -73,6 +76,7 @@ describe("typespec-autorest: return types", () => {
         key: string;
       }
       @put
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op create(): { ...TestCreatedResponse, ...ETagHeader, @body body: Key};
       `
     );
@@ -98,6 +102,7 @@ describe("typespec-autorest: return types", () => {
         @body body: TestPage;
       }
       @put
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op create(): TestCreatePageResponse;
       `
     );
@@ -121,6 +126,7 @@ describe("typespec-autorest: return types", () => {
         key: string;
       }
       @put
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op create(): CreatedOrUpdatedResponse & DateHeader & Key;
       `
     );
@@ -150,6 +156,7 @@ describe("typespec-autorest: return types", () => {
         key: string;
       }
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): Key | Error;
       `
     );
@@ -181,6 +188,7 @@ describe("typespec-autorest: return types", () => {
       }
       @get
       // Note: & takes precedence over |
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): Key & TextPlain | Error;
       `
     );
@@ -200,6 +208,7 @@ describe("typespec-autorest: return types", () => {
         @header contentType: "text/plain" | "text/html" | "text/csv";
       }
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): { ...TextMulti, @body body: string };
     `
     );
@@ -219,7 +228,7 @@ describe("typespec-autorest: return types", () => {
         @header contentType: "application/xml";
         code: string;
       }
-
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(): Foo | Bar;
       `
     );
@@ -231,6 +240,7 @@ describe("typespec-autorest: return types", () => {
 
   it("defines responses with primitive types", async () => {
     const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get() op read(): string;
     `);
     ok(res.paths["/"].get.responses["200"]);
@@ -245,6 +255,7 @@ describe("typespec-autorest: return types", () => {
         foo: string;
       }
 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get() op read(): Foo[];
       `
     );
@@ -257,6 +268,7 @@ describe("typespec-autorest: return types", () => {
   it("return type with no properties should be 200 with empty object as type", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op test(): {};
       `
     );
@@ -271,6 +283,7 @@ describe("typespec-autorest: return types", () => {
   it("{} return type should produce 200 ", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op test(): {};
       `
     );
@@ -285,6 +298,7 @@ describe("typespec-autorest: return types", () => {
   it("produce additionalProperties schema if response is Record<T>", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op test(): Record<string>;
       `
     );
@@ -302,6 +316,7 @@ describe("typespec-autorest: return types", () => {
   it("return type with only response metadata should be 204 response w/ no content", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op delete(): {@header date: string};
       `
     );
@@ -316,6 +331,7 @@ describe("typespec-autorest: return types", () => {
     const res = await openApiFor(
       `
       @delete
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op delete(): { @header date: string };
       `
     );
@@ -339,6 +355,7 @@ describe("typespec-autorest: return types", () => {
       }
 
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op get(): Foo | Error;
       `
     );
@@ -365,8 +382,9 @@ describe("typespec-autorest: return types", () => {
         foo: string;
       }
 
-        @get
-        op get(): Foo | Error;
+      @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
+      op get(): Foo | Error;
       `
     );
     const responses = res.paths["/"].get.responses;
@@ -394,6 +412,7 @@ describe("typespec-autorest: return types", () => {
       }
 
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op get(): Foo | Error;
       `
     );
@@ -422,6 +441,7 @@ describe("typespec-autorest: return types", () => {
       }
 
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op get(): Foo | CustomizedErrorResponse | Error;
       `
     );
@@ -443,6 +463,7 @@ describe("typespec-autorest: return types", () => {
         foo: string;
       }
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op get(): Foo | Error;
       `
     );
@@ -462,6 +483,7 @@ describe("typespec-autorest: return types", () => {
     const res = await openApiFor(
       `
       @delete
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op delete(): { @header date: string, @body body: {} };
       `
     );
@@ -474,6 +496,7 @@ describe("typespec-autorest: return types", () => {
 
   it("return type with only statusCode should have specified status code and no content", async () => {
     const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op create(): {@statusCode code: 201};
       `);
 
@@ -485,18 +508,23 @@ describe("typespec-autorest: return types", () => {
   });
 
   it("defaults to 204 no content with void response type", async () => {
-    const res = await openApiFor(`@get op read(): void;`);
+    const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/example-required"
+      @get op read(): void;`);
     ok(res.paths["/"].get.responses["204"]);
   });
 
   it("defaults to 204 no content with void @body", async () => {
-    const res = await openApiFor(`@get op read(): {@body body: void};`);
+    const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/example-required"
+      @get op read(): {@body body: void};`);
     ok(res.paths["/"].get.responses["204"]);
   });
 
   describe("binary responses", () => {
     it("bytes responses should produce application/json with byte schema", async () => {
       const res = await openApiFor(`
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @get op read(): bytes;
       `);
       const operation = res.paths["/"].get;
@@ -507,6 +535,7 @@ describe("typespec-autorest: return types", () => {
 
     it("@body body: bytes responses should produce application/json with byte schema", async () => {
       const res = await openApiFor(`
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @get op read(): {@body body: bytes};
       `);
 
@@ -518,6 +547,7 @@ describe("typespec-autorest: return types", () => {
 
     it("@header contentType should override content type and set type to file", async () => {
       const res = await openApiFor(`
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @get op read(): {@header contentType: "image/png", @body body: bytes};
       `);
 

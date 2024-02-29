@@ -100,7 +100,8 @@ describe("typespec-autorest: options", () => {
     it("emit to {emitter-output-dir}/openapi.json if not provided", async () => {
       await runner.compile(
         `
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+        #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(): void;`,
         {
           noEmit: false,
@@ -115,7 +116,8 @@ describe("typespec-autorest: options", () => {
     it("emit to {emitter-output-dir}/{output-file} if provided", async () => {
       await runner.compile(
         `
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+        #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(): void;`,
         {
           noEmit: false,
@@ -139,7 +141,8 @@ describe("typespec-autorest: options", () => {
 namespace DemoService;
 enum Versions {v1, v2}
 
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+#suppress "@azure-tools/typespec-autorest/example-required"
 op test(): void;
       `,
         {
@@ -169,7 +172,8 @@ op test(): void;
 namespace TestService;
 enum Versions {v1, "v2-preview"}
 
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+#suppress "@azure-tools/typespec-autorest/example-required"
 op test(): void;
       `,
         {
@@ -203,6 +207,7 @@ op test(): void;
         `
         model NotReferenced {name: string}
         model Referenced {name: string}
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(): Referenced;
       `,
         {}
@@ -215,6 +220,7 @@ op test(): void;
         `
         model NotReferenced {name: string}
         model Referenced {name: string}
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(): Referenced;
       `,
         {

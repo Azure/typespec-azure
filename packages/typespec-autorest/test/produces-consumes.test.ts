@@ -100,7 +100,7 @@ describe("typespec-autorest: produces/consumes", () => {
 async function openApiForProducesConsumes(
   configuration: ProducesConsumesOperation[]
 ): Promise<ProducesConsumes> {
-  const apiDoc: string[] = createAdlFromConfig(configuration);
+  const apiDoc: string[] = createTypeSpecFromConfig(configuration);
 
   const input = apiDoc.join("\n");
   const openApi = await openApiFor(`@service({title: "Test"}) namespace Test; ${input}`);
@@ -123,7 +123,7 @@ async function openApiForProducesConsumes(
   return output;
 }
 
-function createAdlFromConfig(configuration: ProducesConsumesOperation[]): string[] {
+function createTypeSpecFromConfig(configuration: ProducesConsumesOperation[]): string[] {
   const apiDoc: string[] = [];
   configuration.forEach((config) => {
     const opString =
@@ -134,6 +134,7 @@ function createAdlFromConfig(configuration: ProducesConsumesOperation[]): string
     ${config.modelDef}
     @route("${config.path}")
     namespace ${config.namespace} {
+      #suppress "@azure-tools/typespec-autorest/example-required"
       ${opString}
     }
   `;

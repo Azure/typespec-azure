@@ -51,10 +51,12 @@ describe("typespec-autorest: shared routes", () => {
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listByResourceGroup(...Thing, @query resourceGroup: string, @query foo?: string): Thing[];
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listBySubscription(...Thing, @query subscription: string, @query foo?: string): Thing[];
       `
     );
@@ -83,10 +85,12 @@ describe("typespec-autorest: shared routes", () => {
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listByResourceGroup(...Thing, @query filter: "resourceGroup"): Thing[];
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listBySubscription(...Thing, @query filter: "subscription"): Thing[];
       `
     );
@@ -117,14 +121,17 @@ describe("typespec-autorest: shared routes", () => {
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listByResourceGroup(...Thing, @query apiVersion: string): Thing[];
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listBySubscription(...Thing, @query apiVersion: string): Thing[];
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listByNothing(...Thing, @query apiVersion: string): Thing[];
       `
     );
@@ -162,14 +169,17 @@ describe("typespec-autorest: shared routes", () => {
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listByResourceGroup(...Thing): Thing[];
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listBySubscription(...Thing): Thing[];
 
       @sharedRoute
       @route("/sharedroutes/resources")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op listByNothing(...Thing): Thing[];
       `
     );
@@ -200,8 +210,10 @@ describe("typespec-autorest: shared routes", () => {
   it("can share route with @autoRoute", async () => {
     const results = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @sharedRoute @autoRoute op one(...One): void;
 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @sharedRoute @autoRoute op two(...Two): void;
 
       @resource("operations")

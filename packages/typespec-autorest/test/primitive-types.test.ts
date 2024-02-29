@@ -69,7 +69,8 @@ describe("typespec-autorest: primitives", () => {
           @service({title: "Testing model"})
           @route("/")
           namespace root {
-            #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+            #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+            #suppress "@azure-tools/typespec-autorest/example-required"
             op read(): void;
 
             model Pet { name: ${test[0]} };
@@ -241,7 +242,8 @@ describe("typespec-autorest: primitives", () => {
         const oapi = await openApiFor(`
             model Test {@header @encode("rfc7231") param: utcDateTime};
            
-            #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+            #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+            #suppress "@azure-tools/typespec-autorest/example-required"
             op read(...Test): void;      
           `);
         const expected: OpenAPI2Parameter = {

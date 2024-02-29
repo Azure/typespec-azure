@@ -11,6 +11,7 @@ describe("typespec-autorest: union schema", () => {
         id: string;
         properties: Thing | null;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op doStuff(): Thing;
       `
     );
@@ -28,7 +29,7 @@ describe("typespec-autorest: union schema", () => {
         name: string;
         options: Record<string>;
       }
-      
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op foo(param: "all" | "none" | Params): void;
       `
     );

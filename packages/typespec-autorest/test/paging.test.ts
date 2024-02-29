@@ -10,6 +10,7 @@ describe("autorest: paging", () => {
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Test {
         @get
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op list(): Azure.Core.Page<{}>;
       }
       `
@@ -37,6 +38,7 @@ describe("autorest: paging", () => {
           @doc("Link to fetch more items.")
           \`@odata.nextLink\`?: string;
         }
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op list(): CustomPageModel<{}>;
       }
       `

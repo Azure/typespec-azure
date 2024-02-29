@@ -34,7 +34,8 @@ describe("typespec-autorest: definitions", () => {
         q: string;
       }
 
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @route("/test1")
       @get
       op test1(p: P): Q;
@@ -138,6 +139,7 @@ describe("typespec-autorest: definitions", () => {
       model Child extends Parent {
         y?: int32;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @route("/") op test(): Parent;
       `
     );
@@ -165,6 +167,7 @@ describe("typespec-autorest: definitions", () => {
       model Child extends TParent<string> {
         y?: int32;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @route("/") op test(): Parent;
       `
     );
@@ -198,6 +201,7 @@ describe("typespec-autorest: definitions", () => {
       model Child is TParent<string> {
         y?: int32;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @route("/") op test(): Parent;
       `
     );
@@ -408,6 +412,7 @@ describe("typespec-autorest: definitions", () => {
       model Pet {
         name: string | int32;
       };
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(): Pet;
       `);
       expectDiagnostics(diagnostics, {
@@ -447,6 +452,7 @@ describe("typespec-autorest: definitions", () => {
 
       @route("/things/{id}")
       @get
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op get(@path id: string, @query test: string, ...Thing): Thing & { @header test: string; };
       `
     );
@@ -499,6 +505,7 @@ describe("typespec-autorest: literals", () => {
 describe("typespec-autorest: operations", () => {
   it("define operations with param with defaults", async () => {
     const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op read(@query queryWithDefault?: string = "defaultValue"): string;
     `);
 
@@ -509,6 +516,7 @@ describe("typespec-autorest: operations", () => {
     const res = await openApiFor(`
       @get
       @route("/thing/{name}")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op getThing(
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @format("UUID")
@@ -536,6 +544,7 @@ describe("typespec-autorest: operations", () => {
     const res = await openApiFor(
       `
       #deprecated "use something else"
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op read(@query query: string): string;
       `
     );
@@ -546,11 +555,14 @@ describe("typespec-autorest: operations", () => {
   it(`@projectedName("client", <>) updates the operationId`, async () => {
     const res = await openApiFor(`
       @service namespace MyService;
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @route("/op-only") @projectedName("client", "clientCall") op serviceName(): void;
 
       @projectedName("client", "ClientInterfaceName") 
       interface ServiceInterfaceName {
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @route("/interface-only") same(): void;
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @route("/interface-and-op") @projectedName("client", "clientCall") serviceName(): void;
       }
      
@@ -564,11 +576,14 @@ describe("typespec-autorest: operations", () => {
   it(`@clientName(<>) updates the operationId`, async () => {
     const res = await openApiFor(`
       @service namespace MyService;
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @route("/op-only") @clientName( "clientCall") op serviceName(): void;
 
       @clientName( "ClientInterfaceName") 
       interface ServiceInterfaceName {
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @route("/interface-only") same(): void;
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @route("/interface-and-op") @clientName( "clientCall") serviceName(): void;
       }
      
@@ -584,6 +599,7 @@ describe("typespec-autorest: request", () => {
   describe("binary request", () => {
     it("bytes request should produce byte format with application/json", async () => {
       const res = await openApiFor(`
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @post op read(@body body: bytes): {};
       `);
       const operation = res.paths["/"].post;
@@ -596,6 +612,7 @@ describe("typespec-autorest: request", () => {
 
     it("bytes request should respect @header contentType", async () => {
       const res = await openApiFor(`
+        #suppress "@azure-tools/typespec-autorest/example-required"
         @post op read(@header contentType: "image/png", @body body: bytes): {};
       `);
 
@@ -775,6 +792,7 @@ describe("typespec-autorest: extension decorator", () => {
       model Pet {
         name: string;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op read(): Pet;
     `);
     ok(oapi.definitions.Pet);
@@ -789,6 +807,7 @@ describe("typespec-autorest: extension decorator", () => {
       }
       @get()
       @extension("x-operation-extension", "barbaz")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op list(): Pet[];
       `
     );
@@ -808,6 +827,7 @@ describe("typespec-autorest: extension decorator", () => {
         petId: string;
       }
       @route("/Pets")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op get(... PetId): Pet;
     `
     );
@@ -827,6 +847,7 @@ describe("typespec-autorest: extension decorator", () => {
         value: Pet[]
       }
       @route("/Pets")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op list(): PetList;
       `
     );
@@ -861,6 +882,7 @@ describe("typespec-autorest: multipart formData", () => {
     interface Widgets {
       @route(":upload")
       @post
+      #suppress "@azure-tools/typespec-autorest/example-required"
       upload(...WidgetForm): Widget;
     }
     `);

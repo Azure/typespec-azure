@@ -26,9 +26,8 @@ describe("typespec-autorest: Property schema tests", () => {
         barPrimeProp: BarPrime;
       }
 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op myOp(): void;
-
-
       `
     );
 
@@ -59,9 +58,8 @@ describe("typespec-autorest: Property schema tests", () => {
         barPrimeProp: BarPrime;
       }
 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op myOp(first: Foo, second: FooPrime, third: BarPrime): void;
-
-
       `,
       undefined,
       { "use-read-only-status-schema": false }
@@ -95,9 +93,8 @@ describe("typespec-autorest: Property schema tests", () => {
         otherProp: FooPrime;
       }
 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op myOp(): void;
-
-
       `,
       undefined,
       { "use-read-only-status-schema": true }
@@ -131,9 +128,8 @@ describe("typespec-autorest: Property schema tests", () => {
         otherProp: FooPrime;
       }
 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op myOp(): void;
-
-
       `,
       undefined,
       { "use-read-only-status-schema": true }

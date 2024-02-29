@@ -703,6 +703,14 @@ function createOAPIEmitter(
         (acc, example) => ({ ...acc, [example.title]: { $ref: example.pathOrUri } }),
         {}
       );
+    } else {
+      reportDiagnostic(program, {
+        code: "example-required",
+        target: op,
+        format: {
+          name: op.name,
+        },
+      });
     }
 
     if (options.examplesDirectory) {

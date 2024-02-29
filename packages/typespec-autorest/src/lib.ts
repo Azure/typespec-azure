@@ -215,6 +215,12 @@ const libDef = {
         default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
       },
     },
+    "example-required": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`No example provided for operation '${"name"}'.`,
+      },
+    },
     "invalid-schema": {
       severity: "error",
       messages: {

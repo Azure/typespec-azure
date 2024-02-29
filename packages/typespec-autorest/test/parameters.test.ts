@@ -8,6 +8,7 @@ describe("typespec-autorest: parameters", () => {
   it("create a query param", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@query arg1: string): void;
       `
     );
@@ -22,6 +23,7 @@ describe("typespec-autorest: parameters", () => {
   it("create a query param of array type", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@query({format: "multi"}) arg1: string[], @query({format: "csv"}) arg2: string[]): void;
       `
     );
@@ -46,6 +48,7 @@ describe("typespec-autorest: parameters", () => {
   it("create a header param of array type", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@header({format: "csv"}) arg1: string[]): void;
       `
     );
@@ -62,6 +65,7 @@ describe("typespec-autorest: parameters", () => {
   it("create a query param that is a model property", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@query id: UserContext.id): void;
       
       model UserContext {
@@ -80,6 +84,7 @@ describe("typespec-autorest: parameters", () => {
   it("set description on param", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@query @doc("my-doc") arg1: string): void;
       `
     );
@@ -91,6 +96,7 @@ describe("typespec-autorest: parameters", () => {
       `
       @doc("This is a shared scalar")
       scalar myString extends string; 
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@query @doc("my-doc") arg1: myString): void;
       `
     );
@@ -101,12 +107,14 @@ describe("typespec-autorest: parameters", () => {
     const res = await openApiFor(
       `
       @route("/{x-ms-arg-3}")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(
         @query("x-ms-arg-1") @doc("my-doc") arg1: string,
         @header("x-ms-arg-2") @doc("my-doc") arg2: string,
         @path("x-ms-arg-3") @doc("my-doc") arg3: string): void;
 
       @put
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test2(
         @projectedName("json", "x-body") @body @doc("my-doc") arg: string): void;
 
@@ -131,9 +139,11 @@ describe("typespec-autorest: parameters", () => {
       }
 
       @route("/test1")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test1(...P): void;
 
       @route("/test2")
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test2(...Q): void;
       `,
       { "omit-unreachable-types": true }
@@ -161,6 +171,7 @@ describe("typespec-autorest: parameters", () => {
       }
       @route("/Pets")
       @get()
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op get(... Pet$Id): Pet;
       `
     );
@@ -178,6 +189,7 @@ describe("typespec-autorest: parameters", () => {
         @extension("x-ms-parameter-location", "client")
         petId: string;
       }
+      #suppress "@azure-tools/typespec-autorest/example-required"
       @get op get(...PetId): void;
       `
     );
@@ -188,7 +200,9 @@ describe("typespec-autorest: parameters", () => {
   it("inline spread of parameters from anonymous model", async () => {
     const oapi = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op template<TParameters, TReturn>(...TParameters): TReturn;
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op instantiation is template<{@path id: string}, void>;
       `
     );
@@ -208,6 +222,7 @@ describe("typespec-autorest: parameters", () => {
   it("omit parameters with type never", async () => {
     const res = await openApiFor(
       `
+      #suppress "@azure-tools/typespec-autorest/example-required"
       op test(@query select: never, @query top: int32): void;
       `
     );
@@ -217,7 +232,10 @@ describe("typespec-autorest: parameters", () => {
   });
 
   it("omit request body if type is void", async () => {
-    const res = await openApiFor(`op test(@body foo: void): void;`);
+    const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/example-required"
+      op test(@body foo: void): void;
+    `);
     deepStrictEqual(res.paths["/"].post.parameters, []);
   });
 
@@ -225,6 +243,7 @@ describe("typespec-autorest: parameters", () => {
     it("header named with 'Content-Type' gets resolved as content type for operation.", async () => {
       const res = await openApiFor(
         `
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(
           @header("Content-Type") explicitContentType: "application/octet-stream",
           @body foo: string
@@ -237,6 +256,7 @@ describe("typespec-autorest: parameters", () => {
     it("header named contentType gets resolved as content type for operation.", async () => {
       const res = await openApiFor(
         `
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(
           @header contentType: "application/octet-stream",
           @body foo: string
@@ -249,6 +269,7 @@ describe("typespec-autorest: parameters", () => {
     it("query named contentType doesn't get resolved as the content type parmaeter.", async () => {
       const res = await openApiFor(
         `
+        #suppress "@azure-tools/typespec-autorest/example-required"
         op test(
           @query contentType: "application/octet-stream",
           @body foo: string
@@ -267,6 +288,7 @@ describe("typespec-autorest: parameters", () => {
           `
           union NamedUnion {"one", "two"}
           enum Foo {one, two}
+          #suppress "@azure-tools/typespec-autorest/example-required"
           op test(${decorator} arg1: ${type}): void;
           `
         );
