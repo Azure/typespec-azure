@@ -401,7 +401,7 @@ function createOAPIEmitter(
     operationExamplesMap = new Map();
     operationIdsWithExample = new Set();
 
-    outputFile = resolveOutputFile(service, multipleService, options, version);
+    outputFile = resolveOutputFile(program, service, multipleService, options, version);
   }
 
   function resolveHost(
@@ -2313,6 +2313,7 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
 }
 
 function resolveOutputFile(
+  program: Program,
   service: Service,
   multipleServices: boolean,
   options: ResolvedAutorestEmitterOptions,
@@ -2320,7 +2321,8 @@ function resolveOutputFile(
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   if (azureResourceProviderFolder) {
-    version = version ?? service.version ?? "0000-00-00";
+    const info = resolveInfo(program, service.type);
+    version = version ?? info?.version ?? "0000-00-00";
   }
   const interpolated = interpolatePath(options.outputFile, {
     "azure-resource-provider-folder": azureResourceProviderFolder,
