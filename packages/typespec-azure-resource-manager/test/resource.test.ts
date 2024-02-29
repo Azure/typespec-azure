@@ -81,7 +81,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("allows overriding armProviderNamespace", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test", version: "2022-03-01-preview"})
+      @service({title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test {
@@ -129,7 +129,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about ProxyResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test", version: "2022-03-01-preview"})
+      @service({title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test;
