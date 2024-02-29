@@ -12,6 +12,7 @@ import {
   SdkContext,
   createSdkContext,
   getClientNameOverride,
+  shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
@@ -1943,6 +1944,13 @@ function createOAPIEmitter(
         enumSchema["x-ms-enum"]!.name = (getPropertyType(typespecType) as Model).name;
         return enumSchema;
       }
+    }
+
+    if (
+      typespecType.kind === "ModelProperty" &&
+      shouldFlattenProperty(tcgcSdkContext, typespecType)
+    ) {
+      newTarget["x-ms-client-flatten"] = true;
     }
 
     attachExtensions(typespecType, newTarget);
