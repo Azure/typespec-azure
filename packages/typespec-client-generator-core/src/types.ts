@@ -72,6 +72,7 @@ import {
   SdkTupleType,
   SdkType,
   isSdkAzureBuiltInStringKinds,
+  isSdkBuiltInKind,
   isSdkGenericBuiltInStringKinds,
   isSdkStringKind,
 } from "./interfaces.js";
@@ -184,33 +185,10 @@ function addEncodeInfo(
  * @returns the corresponding sdk built in kind
  */
 function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
-  switch (scalar.name) {
-    case "int8":
-    case "int16":
-    case "int32":
-    case "int64":
-    case "uint8":
-    case "uint16":
-    case "uint32":
-    case "uint64":
-    case "numeric":
-    case "integer":
-    case "safeint":
-    case "decimal128":
-    case "bytes":
-    case "float":
-    case "float32":
-    case "float64":
-    case "boolean":
-    case "string":
-    case "url":
-    case "decimal":
-    case "plainDate":
-    case "plainTime":
-      return scalar.name;
-    default:
-      throw Error(`Unknown scalar kind ${scalar.name}`);
+  if (isSdkBuiltInKind(scalar.name)) {
+    return scalar.name;
   }
+  throw Error(`Unknown scalar kind ${scalar.name}`);
 }
 
 /**
