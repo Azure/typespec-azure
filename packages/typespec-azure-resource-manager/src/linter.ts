@@ -1,5 +1,6 @@
 import { defineLinter } from "@typespec/compiler";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
+import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
 import { interfacesRule } from "./rules/arm-resource-interfaces.js";
@@ -25,6 +26,7 @@ import { retryAfterRule } from "./rules/retry-after.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 
 const rules = [
+  armNoRecordRule,
   armCommonTypesVersionRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
@@ -63,6 +65,10 @@ export const $linter = defineLinter({
         ...allRulesEnabled,
         // TODO: Enable this rule once azure-rest-api-specs repo is ready (issue #3839)
         [`@azure-tools/typespec-azure-resource-manager/${armCommonTypesVersionRule.name}`]: false,
+      },
+      disable: {
+        [`@azure-tools/typespec-azure-core/bad-record-type`]:
+          "This clashes with the ARM `no-record` rule.",
       },
       extends: ["@azure-tools/typespec-azure-core/all"],
     },

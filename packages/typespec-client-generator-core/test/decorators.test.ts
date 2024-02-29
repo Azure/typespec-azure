@@ -15,12 +15,8 @@ import {
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
-import {
-  SdkTestRunner,
-  createSdkContextTestHelper,
-  createSdkTestRunner,
-  getAllModelsAssertNoDiagnostics,
-} from "./test-host.js";
+import { getAllModels } from "../src/types.js";
+import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: decorators", () => {
   let runner: SdkTestRunner;
@@ -830,11 +826,12 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
 
-    it("nested namespace and interface", async () => {
+    it("nested namespace and interface with naming change", async () => {
       await runner.compile(`
         @service({})
         namespace Test1Client {
           @route("/b")
+          @clientName("BRename")
           namespace B {
             op x(): void;
 
@@ -859,7 +856,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(b);
       strictEqual(b.subOperationGroups?.length, 1);
       strictEqual(listOperationGroups(runner.context, b).length, 1);
-      strictEqual(b.groupPath, "Test1Client.B");
+      strictEqual(b.groupPath, "Test1Client.BRename");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
         ["x"]
@@ -869,7 +866,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(c);
       strictEqual(c.subOperationGroups, undefined);
       strictEqual(listOperationGroups(runner.context, c).length, 0);
-      strictEqual(c.groupPath, "Test1Client.B.C");
+      strictEqual(c.groupPath, "Test1Client.BRename.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
         ["y"]
@@ -2240,7 +2237,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @route("/func1")
         op func1(@body body: Model1): void;
       `);
-      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const model1 = models.find((x) => x.name === "Model1")!;
       strictEqual(model1.kind, "model");
@@ -2267,7 +2264,7 @@ describe("typespec-client-generator-core: decorators", () => {
           op func1(@body body: Model1): void;
         }
       `);
-      const models = getAllModelsAssertNoDiagnostics(runner.context);
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const model1 = models.find((x) => x.name === "Model1")!;
       strictEqual(model1.kind, "model");

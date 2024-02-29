@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Confidential Ledger Service",
-    "version": "2022-05-13",
+    "version": "0000-00-00",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"

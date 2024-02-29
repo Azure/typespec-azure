@@ -14,6 +14,8 @@ using Autorest;
 @armProviderNamespace
 @service({
   title: "Microsoft.Confluent",
+})
+@OpenAPI.info({
   version: "2021-03-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)

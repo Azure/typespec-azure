@@ -24,7 +24,6 @@ import "@azure-tools/typespec-azure-core";
 )
 @service({
   title: "SearchIndexClient",
-  version: "2021-04-30-Preview",
 })
 namespace Azure.SearchIndex;
 
