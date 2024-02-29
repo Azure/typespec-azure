@@ -118,10 +118,10 @@ import {
   checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
-  getInfo,
   getOpenAPITypeName,
   getParameterKey,
   isReadonlyProperty,
+  resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
 import { buildVersionProjections } from "@typespec/versioning";
@@ -365,13 +365,13 @@ function createOAPIEmitter(
   function initializeEmitter(service: Service, multipleService: boolean, version?: string) {
     const auth = processAuth(service.type);
 
+    const info = resolveInfo(program, service.type);
     root = {
       swagger: "2.0",
       info: {
-        title: service.title ?? "(title)",
-        version: version ?? service.version ?? "0000-00-00",
-        description: getDoc(program, service.type),
-        ...getInfo(program, service.type),
+        title: "(title)",
+        ...info,
+        version: version ?? info?.version ?? "0000-00-00",
         "x-typespec-generated": getEmitterDetails(program),
       },
       schemes: ["https"],
