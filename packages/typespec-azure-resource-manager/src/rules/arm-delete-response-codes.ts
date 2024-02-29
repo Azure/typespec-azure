@@ -13,8 +13,8 @@ export const armDeleteResponseCodesRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/delete-operation-response-codes",
   description: "Ensure delete operations have the appropriate status codes.",
   messages: {
-    sync: `Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses.`,
-    async: `Long-running delete operations must have 202, 204 and default responses. They must not have any other responses.`,
+    sync: `Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.`,
+    async: `Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.`,
   },
   create(context) {
     return {

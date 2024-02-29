@@ -51,7 +51,7 @@ it("Emits a warning for synchronous delete operation that does not contain the a
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
       message:
-        "Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses.",
+        "Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.",
     });
 });
 
@@ -110,6 +110,7 @@ it("Emits a warning for long-running delete operation that does not contain the 
       
       @armResourceOperations
       interface Employees {
+        #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Employee>;
       }
     `
@@ -117,7 +118,7 @@ it("Emits a warning for long-running delete operation that does not contain the 
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
       message:
-        "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses.",
+        "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
     });
 });
 

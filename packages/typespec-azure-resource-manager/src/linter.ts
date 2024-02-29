@@ -1,7 +1,7 @@
 import { defineLinter } from "@typespec/compiler";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
-import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
+import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
 import { interfacesRule } from "./rules/arm-resource-interfaces.js";

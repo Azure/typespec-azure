@@ -30,10 +30,7 @@ Available ruleSets:
 
 | Name                                                                                                                                                                                                     | Description                                                                        |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-<<<<<<< HEAD
 | [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-record)                                             | Don't use Record types for ARM resources.                                          |
-=======
->>>>>>> 3d3d429 (Update docs and tests.)
 | `@azure-tools/typespec-azure-resource-manager/arm-common-types-version`                                                                                                                                  | Specify the ARM common-types version using @armCommonTypesVersion.                 |
 | [`@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/delete-operation-response-codes) | Ensure delete operations have the appropriate status codes.                        |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment`                                                                                                                            | `@armResourceAction` should not be used with `@segment`.                           |
