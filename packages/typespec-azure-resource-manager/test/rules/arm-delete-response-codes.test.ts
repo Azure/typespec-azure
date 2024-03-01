@@ -89,6 +89,33 @@ it("Does not emit a warning for synchronous delete operation that contains the a
     .toBeValid();
 });
 
+it("Does not emit a warning for synchronous delete operation that uses the `ArmResourceDeleteSync` template.", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+    
+    model Employee is ProxyResource<EmployeeProperties> {
+      @doc("Name of employee")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
+      @key("employeeName")
+      @path
+      @segment("employees")
+      name: string;
+    }
+    
+    model EmployeeProperties {}
+    
+    @armResourceOperations
+    interface Employees {
+      delete is ArmResourceDeleteSync<Employee>;
+    }`
+    )
+    .toBeValid();
+});
+
 it("Emits a warning for long-running delete operation that does not contain the appropriate response codes", async () => {
   await tester
     .expect(
@@ -122,7 +149,7 @@ it("Emits a warning for long-running delete operation that does not contain the 
     });
 });
 
-it("Does not emit a warning for long-running delete operation that contains the appropriate response code", async () => {
+it("Does not emit a warning for long-running delete operation that uses the `ArmResourceDeleteWithoutOkAsync` template.", async () => {
   await tester
     .expect(
       `
