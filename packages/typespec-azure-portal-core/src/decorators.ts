@@ -17,7 +17,13 @@ import {
 } from "@typespec/compiler";
 import { VersionMap, getVersions } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
-import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
+import {
+  AboutOptions,
+  BrowseOptions,
+  PromotionOptions,
+  learnMoreDocsOptions,
+  marketplaceOfferOptions,
+} from "./types.js";
 
 /**
  * This is a Browse decorator which will be use to put more info on the browse view.
@@ -203,13 +209,23 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     }
     if (learnMoreDocs) {
       if (learnMoreDocs.type.kind === "Tuple") {
-        if (!checkIsValidLinks(program, target, learnMoreDocs.type.values)) {
-          return;
-        }
-        const learnMoreDocsValues = learnMoreDocs.type.values
-          .filter((value) => value.kind === "String")
-          .map((value: Type) => (value as StringLiteral).value);
-        aboutOptionsResult.learnMoreDocs = learnMoreDocsValues;
+        const learnMoreDocsResult: learnMoreDocsOptions[] = [];
+        learnMoreDocs.type.values.forEach((learnMoreDoc) => {
+          const title = (learnMoreDoc as Model).properties.get("title");
+          const uri = (learnMoreDoc as Model).properties.get("uri");
+          const titleValue = title && (title.type as StringLiteral).value;
+          const uriValue = uri && (uri.type as StringLiteral).value;
+          if (titleValue && uriValue) {
+            if (!checkIsValidLink(program, target, uriValue)) {
+              return;
+            }
+            learnMoreDocsResult.push({
+              title: titleValue,
+              uri: uriValue,
+            } as learnMoreDocsOptions);
+          }
+        });
+        aboutOptionsResult.learnMoreDocs = learnMoreDocsResult;
       }
     }
     if (keywords) {
@@ -228,22 +244,19 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
   program.stateMap(PortalCoreKeys.about).set(target, aboutOptionsResult);
 }
 
-function checkIsValidLinks(program: Program, target: Model, links: Type[]) {
-  let valid = true;
-  links.forEach((value) => {
-    const pattern = /^https:\/\//;
-    if (!(value as StringLiteral).value.match(pattern)) {
-      reportDiagnostic(program, {
-        code: "invalid-link",
-        format: {
-          link: (value as StringLiteral).value,
-        },
-        target,
-      });
-      valid = false;
-    }
-  });
-  return valid;
+function checkIsValidLink(program: Program, target: Model, uri: string) {
+  const pattern = /^https:\/\//;
+  if (uri && !uri.match(pattern)) {
+    reportDiagnostic(program, {
+      code: "invalid-link",
+      format: {
+        link: uri,
+      },
+      target,
+    });
+    return false;
+  }
+  return true;
 }
 
 export function getAbout(program: Program, target: Type) {

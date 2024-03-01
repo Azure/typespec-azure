@@ -68,11 +68,17 @@ model AboutOptions {
   keywords?: string[];
 
   /** Set of links which can help learn more about the resource */
-  learnMoreDocs?: string[];
+  learnMoreDocs?: LearnMoreDocsOptions[];
 }
 
 /** Options for promotion of ARM resource. */
 model PromotionOptions {
   apiVersion: string | EnumMember;
   autoUpdate?: boolean;
+}
+
+/** Options for learnMoreDocs of ARM resources. */
+model LearnMoreDocsOptions {
+  title: string;
+  uri: string;
 }

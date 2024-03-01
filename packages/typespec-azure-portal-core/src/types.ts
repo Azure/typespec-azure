@@ -9,7 +9,7 @@ export interface AboutOptions {
   displayName?: string;
   description?: string;
   keywords?: string[];
-  learnMoreDocs?: string[];
+  learnMoreDocs?: learnMoreDocsOptions[];
 }
 
 export interface BrowseOptions {
@@ -23,4 +23,9 @@ export interface marketplaceOfferOptions {
 export interface PromotionOptions {
   readonly apiVersion: string | EnumMember;
   readonly autoUpdate?: boolean;
+}
+
+export interface learnMoreDocsOptions {
+  title: string;
+  uri: string;
 }
