@@ -21,7 +21,7 @@ import {
   AboutOptions,
   BrowseOptions,
   PromotionOptions,
-  learnMoreDocsOptions,
+  LearnMoreDocsOptions,
   marketplaceOfferOptions,
 } from "./types.js";
 
@@ -209,7 +209,7 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     }
     if (learnMoreDocs) {
       if (learnMoreDocs.type.kind === "Tuple") {
-        const learnMoreDocsResult: learnMoreDocsOptions[] = [];
+        const learnMoreDocsResult: LearnMoreDocsOptions[] = [];
         learnMoreDocs.type.values.forEach((learnMoreDoc) => {
           const title = (learnMoreDoc as Model).properties.get("title");
           const uri = (learnMoreDoc as Model).properties.get("uri");
@@ -222,7 +222,7 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
             learnMoreDocsResult.push({
               title: titleValue,
               uri: uriValue,
-            } as learnMoreDocsOptions);
+            } as LearnMoreDocsOptions);
           }
         });
         aboutOptionsResult.learnMoreDocs = learnMoreDocsResult;

@@ -9,7 +9,7 @@ export interface AboutOptions {
   displayName?: string;
   description?: string;
   keywords?: string[];
-  learnMoreDocs?: learnMoreDocsOptions[];
+  learnMoreDocs?: LearnMoreDocsOptions[];
 }
 
 export interface BrowseOptions {
@@ -25,7 +25,7 @@ export interface PromotionOptions {
   readonly autoUpdate?: boolean;
 }
 
-export interface learnMoreDocsOptions {
+export interface LearnMoreDocsOptions {
   title: string;
   uri: string;
 }
