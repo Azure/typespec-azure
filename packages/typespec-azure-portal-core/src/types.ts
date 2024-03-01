@@ -6,7 +6,7 @@ export interface FilePath {
 
 export interface AboutOptions {
   icon?: FilePath;
-  displayName?: string;
+  displayNames?: DisplayNamesOptions;
   description?: string;
   keywords?: string[];
   learnMoreDocs?: LearnMoreDocsOptions[];
@@ -28,4 +28,9 @@ export interface PromotionOptions {
 export interface LearnMoreDocsOptions {
   title: string;
   uri: string;
+}
+
+export interface DisplayNamesOptions {
+  singular: string;
+  plural: string;
 }

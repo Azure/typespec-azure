@@ -20,6 +20,7 @@ import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 import {
   AboutOptions,
   BrowseOptions,
+  DisplayNamesOptions,
   LearnMoreDocsOptions,
   MarketplaceOfferOptions,
   PromotionOptions,
@@ -188,7 +189,7 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     const icon = options.properties.get("icon");
     const learnMoreDocs = options.properties.get("learnMoreDocs");
     const keywords = options.properties.get("keywords");
-    const displayName = options.properties.get("displayName");
+    const displayNames = options.properties.get("displayNames");
     if (icon) {
       if (icon.type.kind === "Model") {
         //use decoratorTarget to find sourceLocation instead of target, since we want to find a file path related to where decorator was stated
@@ -235,9 +236,21 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
           .map((value: Type) => (value as StringLiteral).value);
       }
     }
-    if (displayName) {
-      if (displayName.type.kind === "String") {
-        aboutOptionsResult.displayName = (displayName.type as StringLiteral).value;
+    if (displayNames) {
+      if (displayNames.type.kind === "Model") {
+        const singular =
+          displayNames.type && (displayNames.type as Model).properties.get("singular");
+        const singularValue = singular && singular.type && (singular.type as StringLiteral).value;
+        const plural = displayNames.type && (displayNames.type as Model).properties.get("plural");
+        const pluralValue = plural && plural.type && (plural.type as StringLiteral).value;
+        let displayNamesResult = {} as DisplayNamesOptions;
+        if (singularValue && pluralValue) {
+          displayNamesResult = {
+            singular: singularValue,
+            plural: pluralValue,
+          };
+        }
+        aboutOptionsResult.displayNames = displayNamesResult;
       }
     }
   }
@@ -263,8 +276,8 @@ export function getAbout(program: Program, target: Type) {
   return program.stateMap(PortalCoreKeys.about).get(target);
 }
 
-export function getAboutDisplayName(program: Program, target: Type) {
-  return getAbout(program, target).displayName;
+export function getAboutDisplayNames(program: Program, target: Type) {
+  return getAbout(program, target).displayNames;
 }
 
 export function getAboutKeywords(program: Program, target: Type) {

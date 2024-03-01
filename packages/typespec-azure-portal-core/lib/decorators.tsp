@@ -61,8 +61,8 @@ model AboutOptions {
   /** Icon which represent resource */
   icon?: FilePath;
 
-  /** Display name which represent the resource */
-  displayName?: string;
+  /** Display names which represent the resource */
+  displayNames?: DisplayNamesOptions;
 
   /** Comma-separated set of words or phrases which allow users to search for your asset by identifiers. */
   keywords?: string[];
@@ -81,4 +81,10 @@ model PromotionOptions {
 model LearnMoreDocsOptions {
   title: string;
   uri: string;
+}
+
+/** Options for displayNames of ARM resources. */
+model DisplayNamesOptions {
+  singular: string;
+  plural: string;
 }
