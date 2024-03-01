@@ -61,6 +61,10 @@ export const $linter = defineLinter({
   rules,
   ruleSets: {
     all: {
+      extends: [
+        "@azure-tools/typespec-azure-core/all",
+        "@azure-tools/typespec-azure-core/canonical-versioning",
+      ],
       enable: {
         ...allRulesEnabled,
         // TODO: Enable this rule once azure-rest-api-specs repo is ready (issue #3839)
@@ -70,7 +74,6 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/bad-record-type`]:
           "This clashes with the ARM `no-record` rule.",
       },
-      extends: ["@azure-tools/typespec-azure-core/all"],
     },
   },
 });
