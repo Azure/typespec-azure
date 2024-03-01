@@ -180,6 +180,7 @@ model FlangeProperties {
   ...DefaultProvisioningStateProperty;
 }
 
+#suppress "deprecated" "Should replace TenantResourceDelete in the future"
 @armResourceOperations(Flange)
 interface Flanges
   extends TenantResourceCreate<Flange>,
