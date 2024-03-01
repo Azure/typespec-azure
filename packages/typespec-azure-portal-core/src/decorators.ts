@@ -20,8 +20,8 @@ import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 import {
   AboutOptions,
   BrowseOptions,
-  PromotionOptions,
   LearnMoreDocsOptions,
+  PromotionOptions,
   marketplaceOfferOptions,
 } from "./types.js";
 
