@@ -8,7 +8,7 @@ title: delete-operation-response-codes
 
 ## Synchronous
 
-Synchronous delete operations must have 200, 204, and default responses. They must not have any other responses.
+Synchronous delete operations should use the `ArmResourceDeleteSync` template. They must have 200, 204, default and no other responses.
 
 #### ❌ Incorrect
 
@@ -28,20 +28,13 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  @armResourceDelete(Employee)
-  delete(...ApiVersionParameter): {
-    @statusCode _: 200;
-    result: boolean;
-  } | {
-    @statusCode _: 204;
-    result: boolean;
-  } | ErrorResponse;
+  delete is ArmResourceDeleteSync<Employee>;
 }
 ```
 
 ## Asynchronous
 
-Long-running (LRO) delete operations must have 202, 204, and default responses. They must not have any other responses.
+Long-running (LRO) delete operations should use the `ArmResourceDeleteWithoutOkAsync` template. They must have 202, 204, default, and no other responses.
 
 #### ❌ Incorrect
 
