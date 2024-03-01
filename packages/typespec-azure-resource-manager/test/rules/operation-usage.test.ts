@@ -56,6 +56,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceCreate<FooResource>,ResourceDelete<FooResource> {
           @doc("Gets my Foos")

@@ -291,6 +291,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
       
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface Foos extends ResourceCreate<FooResource>,ResourceRead<FooResource>,ResourceDelete<FooResource> {}
 
       @doc("Bar properties")
@@ -702,6 +703,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         weight: safeint;
       }
       
+      #suppress "deprecated" "test"
       interface Flanges
         extends TenantResourceCreate<Flange>,
           TenantResourceDelete<Flange>,
