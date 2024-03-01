@@ -23,7 +23,7 @@ model Azure.Portal.AboutOptions
 | icon?          | [`FilePath`](./data-types.md#Azure.Portal.FilePath) | Icon which represent resource                                                                      |
 | displayName?   | `string`                                            | Display name which represent the resource                                                          |
 | keywords?      | `string[]`                                          | Comma-separated set of words or phrases which allow users to search for your asset by identifiers. |
-| learnMoreDocs? | `string[]`                                          | Set of links which can help learn more about the resource                                          |
+| learnMoreDocs? | `Portal.LearnMoreDocsOptions[]`                     | Set of links which can help learn more about the resource                                          |
 
 ### `BrowseOptions` {#Azure.Portal.BrowseOptions}
 
@@ -53,12 +53,27 @@ model Azure.Portal.FilePath
 | -------- | -------- | ------------------- |
 | filePath | `string` | File path of a file |
 
-### `marketplaceOfferOptions` {#Azure.Portal.marketplaceOfferOptions}
+### `LearnMoreDocsOptions` {#Azure.Portal.LearnMoreDocsOptions}
+
+Options for learnMoreDocs of ARM resources.
+
+```typespec
+model Azure.Portal.LearnMoreDocsOptions
+```
+
+#### Properties
+
+| Name  | Type     | Description |
+| ----- | -------- | ----------- |
+| title | `string` |             |
+| uri   | `string` |             |
+
+### `MarketplaceOfferOptions` {#Azure.Portal.MarketplaceOfferOptions}
 
 Options for marketplaceOffer
 
 ```typespec
-model Azure.Portal.marketplaceOfferOptions
+model Azure.Portal.MarketplaceOfferOptions
 ```
 
 #### Properties
