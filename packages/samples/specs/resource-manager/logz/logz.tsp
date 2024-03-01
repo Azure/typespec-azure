@@ -13,6 +13,8 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.Logz",
+})
+@OpenAPI.info({
   version: "2020-10-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1, Azure.Core.Versions.v1_0_Preview_2)

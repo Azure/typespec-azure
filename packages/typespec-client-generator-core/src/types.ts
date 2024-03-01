@@ -360,6 +360,12 @@ export function getSdkUnionWithDiagnostics(
     clientType.nullable = true;
     return diagnostics.wrap(clientType);
   }
+
+  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+  if (unionAsEnum) {
+    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  }
+
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
     name: getLibraryName(context, type),
@@ -450,11 +456,7 @@ function addDiscriminatorToModelType(
       if (discriminatorProperty.type.kind === "constant") {
         discriminatorType = { ...discriminatorProperty.type.valueType };
       } else if (discriminatorProperty.type.kind === "enumvalue") {
-        discriminatorType = getSdkEnum(
-          context,
-          (discriminatorProperty.type.__raw as EnumMember).enum,
-          operation
-        );
+        discriminatorType = discriminatorProperty.type.enumType;
       }
     } else {
       discriminatorType = {
@@ -650,11 +652,12 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name: getLibraryName(context, type.union),
+      generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: { ...getSdkTypeBaseHelper(context, type.kind, "string"), encode: "string" },
+      valueType: getSdkEnumValueType(context, type.flattenedMembers.values().next().value),
       values: [],
-      nullable: false,
+      nullable: type.nullable,
       isFixed: !type.open,
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
@@ -761,13 +764,7 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkEnum(context, type, operation);
       break;
     case "Union":
-      // start off with just handling nullable type
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-      if (unionAsEnum && type.name) {
-        retval = getSdkUnionEnum(context, unionAsEnum, operation);
-      } else {
-        retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
-      }
+      retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
       const innerType = diagnostics.pipe(
@@ -778,7 +775,14 @@ export function getClientTypeWithDiagnostics(
       retval = getKnownValuesEnum(context, type, operation) ?? innerType;
       break;
     case "UnionVariant":
-      retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      const unionType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.union, operation)
+      );
+      if (unionType.kind === "enum") {
+        retval = unionType.values.find((x) => x.name === getLibraryName(context, type))!;
+      } else {
+        retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      }
       break;
     case "EnumMember":
       const enumType = getSdkEnum(context, type.enum, operation);

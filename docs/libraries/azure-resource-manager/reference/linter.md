@@ -26,6 +26,7 @@ Available ruleSets:
 
 | Name                                                                                                                                           | Description                                                                        |
 | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](/libraries/azure-resource-manager/rules/no-record.md)                           | Don't use Record types for ARM resources.                                          |
 | `@azure-tools/typespec-azure-resource-manager/arm-common-types-version`                                                                        | Specify the ARM common-types version using @armCommonTypesVersion.                 |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment`                                                                  | `@armResourceAction` should not be used with `@segment`.                           |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property`                                                                 | Warn about duplicate properties in resources.                                      |

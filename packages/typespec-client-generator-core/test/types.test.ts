@@ -577,6 +577,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkType.name, "PetKind");
       strictEqual(sdkType.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
@@ -1427,7 +1428,9 @@ describe("typespec-client-generator-core: types", () => {
     it("union to extensible enum values", async () => {
       await runner.compileWithBuiltInService(`
       union PetKind {
+        @doc("Cat")
         Cat: "cat",
+        @doc("Dog")
         Dog: "dog",
         string,
       }
@@ -1450,15 +1453,38 @@ describe("typespec-client-generator-core: types", () => {
 
       const catValue = values.find((x) => x.name === "Cat")!;
       strictEqual(catValue.value, "cat");
+      strictEqual(catValue.description, "Cat");
       strictEqual(catValue.enumType, petKind);
       strictEqual(catValue.valueType, petKind.valueType);
       strictEqual(catValue.kind, "enumvalue");
 
       const dogValue = values.find((x) => x.name === "Dog")!;
       strictEqual(dogValue.value, "dog");
+      strictEqual(dogValue.description, "Dog");
       strictEqual(dogValue.enumType, petKind);
       strictEqual(dogValue.valueType, petKind.valueType);
       strictEqual(dogValue.kind, "enumvalue");
+    });
+
+    it("property of anonymous union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      model Pet {
+        kind: string | "cat" | "dog";
+      }
+
+      @route("/extensible-enum")
+      @put
+      op putPet(@body pet: Pet): void;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const pet = models.find((x) => x.name === "Pet")! as SdkModelType;
+      const kind = models.find((x) => x.name === "")!;
+      strictEqual(kind.generatedName, "PetKind");
+      const kindProperty = pet.properties.find(
+        (x) => (x.nameInClient = "kind")
+      )! as SdkBodyModelPropertyType;
+      strictEqual(kindProperty.type, kind);
     });
 
     it("enum discriminator model without base discriminator property", async () => {
@@ -1568,11 +1594,20 @@ describe("typespec-client-generator-core: types", () => {
       op getModel(): Fish;
       `);
       const models = getAllModels(runner.context);
-      strictEqual(models.length, 3);
+      strictEqual(models.length, 4);
+      const fish = models.find((x) => x.name === "Fish")! as SdkModelType;
+      let kindTypeProperty = fish.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enum");
       const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
       strictEqual(shark.discriminatorValue, "shark");
+      kindTypeProperty = shark.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
       const salmon = models.find((x) => x.name === "Salmon")! as SdkModelType;
+      kindTypeProperty = salmon.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
       strictEqual(salmon.discriminatorValue, "salmon");
+      const kindType = models.find((x) => x.name === "KindType")! as SdkEnumType;
+      strictEqual(kindType.isFixed, false);
     });
 
     it("filterOutCoreModels true", async () => {

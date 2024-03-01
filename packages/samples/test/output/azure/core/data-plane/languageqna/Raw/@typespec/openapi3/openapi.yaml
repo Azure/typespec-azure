@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Microsoft Cognitive Language Service - Question Answering - Authoring
-  version: 21-10-01
+  version: 0.0.0
 tags: []
 paths:
   /query-knowledgebases/projects:
