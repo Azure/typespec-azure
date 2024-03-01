@@ -17,7 +17,6 @@ import {
   UsageFlags,
   getNamespaceFullName,
   getProjectedName,
-  ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
@@ -35,6 +34,7 @@ import {
 } from "./interfaces.js";
 import { TCGCContext, createTCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { getLibraryName } from "./public-utils.js";
 import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -310,7 +310,7 @@ function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interfa
       break;
     }
     if (isOperationGroup(context, type)) {
-      path.push(type.name);
+      path.push(getLibraryName(context, type));
     }
     if (type.namespace) {
       type = type.namespace;
@@ -739,7 +739,7 @@ export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags
     getAllModels(context); // this will populate modelsMap
   }
   return entity.kind === "Model"
-    ? ignoreDiagnostics(getSdkModel(context, entity)).usage
+    ? getSdkModel(context, entity).usage
     : getSdkEnum(context, entity).usage;
 }
 
@@ -782,7 +782,7 @@ export function getAccess(
   }
 
   return entity.kind === "Model"
-    ? ignoreDiagnostics(getSdkModel(context, entity)).access
+    ? getSdkModel(context, entity).access
     : getSdkEnum(context, entity).access;
 }
 

@@ -8,6 +8,7 @@ import {
   getSummary,
   ignoreDiagnostics,
   Interface,
+  isErrorModel,
   listServices,
   Model,
   ModelProperty,
@@ -175,7 +176,10 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(context: TCGCContext, type: Type & { name?: string }): string {
+export function getLibraryName(
+  context: TCGCContext,
+  type: Type & { name?: string | symbol }
+): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName) return emitterSpecificName;
@@ -189,7 +193,7 @@ export function getLibraryName(context: TCGCContext, type: Type & { name?: strin
   if (clientSpecificName) return clientSpecificName;
 
   // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
-  return getFriendlyName(context.program, type) ?? type.name;
+  return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
 }
 
 export function capitalize(name: string): string {
@@ -531,4 +535,15 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
     context.generatedNames = new Set<string>([createName]);
   }
   return createName;
+}
+
+export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
+  const errorDecorator = isErrorModel(context.program, model);
+  if (errorDecorator) return true;
+  let baseModel = model.baseModel;
+  while (baseModel) {
+    if (isErrorModel(context.program, baseModel)) return true;
+    baseModel = baseModel.baseModel;
+  }
+  return false;
 }

@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   title: Search Service
-  version: 2021-04-30-Preview
   description: Client that can be used to manage and query indexes and documents, as well as manage other resources, on a search service.
+  version: 0.0.0
 tags:
   - name: DataSources
   - name: Service
