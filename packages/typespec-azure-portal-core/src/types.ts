@@ -16,7 +16,7 @@ export interface BrowseOptions {
   argQuery?: string | FilePath;
 }
 
-export interface marketplaceOfferOptions {
+export interface MarketplaceOfferOptions {
   id?: string;
 }
 

@@ -21,8 +21,8 @@ import {
   AboutOptions,
   BrowseOptions,
   LearnMoreDocsOptions,
+  MarketplaceOfferOptions,
   PromotionOptions,
-  marketplaceOfferOptions,
 } from "./types.js";
 
 /**
@@ -279,7 +279,7 @@ export function $marketplaceOffer(context: DecoratorContext, target: Model, opti
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
   checkIsArmResource(program, target, "marketplaceOffer");
-  const marketPlaceOfferResult: marketplaceOfferOptions = {};
+  const marketPlaceOfferResult: MarketplaceOfferOptions = {};
   if (options && options.properties) {
     const id = options.properties.get("id");
     if (id?.type.kind === "String") {

@@ -26,7 +26,7 @@ extern dec promotion(target: Model, options: PromotionOptions);
  * Provides a Model marketplace offer information of ARM resource.
  * @param options Property options provides marketplace offer information of the resourceType.
  */
-extern dec marketplaceOffer(target: Model, options: marketplaceOfferOptions);
+extern dec marketplaceOffer(target: Model, options: MarketplaceOfferOptions);
 
 /**
  * Provides a Model Property a display name
@@ -51,7 +51,7 @@ model FilePath {
 }
 
 /** Options for marketplaceOffer */
-model marketplaceOfferOptions {
+model MarketplaceOfferOptions {
   /** Marketplace offer id of a resource */
   id?: string;
 }
