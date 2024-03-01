@@ -77,7 +77,7 @@ Provides a Model Property a display name
 Provides a Model marketplace offer information of ARM resource.
 
 ```typespec
-@Azure.Portal.marketplaceOffer(options: Azure.Portal.marketplaceOfferOptions)
+@Azure.Portal.marketplaceOffer(options: Azure.Portal.MarketplaceOfferOptions)
 ```
 
 ##### Target
@@ -88,7 +88,7 @@ Provides a Model marketplace offer information of ARM resource.
 
 | Name    | Type                                                  | Description                                                                  |
 | ------- | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
-| options | [`marketplaceOfferOptions`](#marketplaceofferoptions) | Property options provides marketplace offer information of the resourceType. |
+| options | [`MarketplaceOfferOptions`](#marketplaceofferoptions) | Property options provides marketplace offer information of the resourceType. |
 
 #### `@promotion`
 
