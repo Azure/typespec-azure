@@ -2,7 +2,7 @@
 
 TypeSpec is a language for describing cloud service APIs and generating other API description languages, client and service code, documentation, and other assets. TypeSpec provides highly extensible core language primitives that can describe API shapes common among REST, GraphQL, gRPC, and other protocols.
 
-You can find more information at https://microsoft.github.io/typespec.
+You can find more information at https://typespec.io/docs.
 
 This site is focused on using TypeSpec in the context of Azure. We have published a set of libraries with standard patterns and templates to make defining Azure management and data-plane services easy and compliant with Azure API guidelines. Using these building blocks
 and guard rails, your service API will be easier to build, will have an easier time passing API reviews, will be consistent with other Azure
@@ -47,7 +47,7 @@ for specific scenarios:
     - A high-level description of the bug
     - Expected and Actual Results
     - Repro steps, including any TypeSpec code that you used
-    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](#troubleshooting-vscode-tooling-and-filing-issues)
+    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](./typespec-getting-started.md#troubleshooting-vscode-tooling-and-filing-issues)
 
 ## More Information About TypeSpec
 

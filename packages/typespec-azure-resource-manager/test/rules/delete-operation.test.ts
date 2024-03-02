@@ -34,6 +34,7 @@ describe("typespec-azure-resource-manager: delete operation missing rule", () =>
         }
 
         @armResourceOperations
+        #suppress "deprecated" "test"
         interface FooResources extends 
           ResourceUpdate<FooResource,{}>,
           ResourceRead<FooResource>,

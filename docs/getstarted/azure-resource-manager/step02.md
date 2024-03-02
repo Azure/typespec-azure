@@ -6,7 +6,7 @@ There are three essential components of a resource defined with TypeSpec:
 
 - A model type representing the resource, derived from one of the [base resource types](#base-resource-types)
 - A model type defining the properties of the resource type
-- An interface that defines the operations that can be performed on the resource type, usually a combination of [standard resource operations](#standard-resource-operations) and [custom actions](#custom-actions)
+- An interface that defines the operations that can be performed on the resource type, usually a combination of [recommended and required Operations](../../howtos/ARM/resource-operations.md#recommended-and-required-operations) and [resource actions](../../howtos/ARM/resource-operations.md#resource-actions-post)
 
 > Read the [TypeSpec tutorial](https://github.com/Microsoft/typespec/blob/main/docs/tutorial.md) to learn the basics about TypeSpec model types and interfaces.
 

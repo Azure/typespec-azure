@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "SearchIndexClient",
-    "version": "2021-04-30-Preview",
+    "version": "0000-00-00",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"

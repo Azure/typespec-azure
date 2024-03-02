@@ -1,6 +1,5 @@
 import {
   ArrayModelType,
-  Enum,
   ModelProperty,
   Program,
   createRule,
@@ -23,13 +22,6 @@ export const missingXmsIdentifiersRule = createRule({
   },
   create(context) {
     return {
-      enum: (en: Enum) => {
-        context.reportDiagnostic({
-          format: { enumName: en.name },
-          target: en,
-        });
-      },
-
       modelProperty: (property: ModelProperty) => {
         const type = property.type;
         if (type.kind === "Model" && isArrayModelType(context.program, type)) {

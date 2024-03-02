@@ -435,6 +435,7 @@ op ArmResourceDeleteAsyncBase<
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
  */
+#deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 op ArmResourceDeleteAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
