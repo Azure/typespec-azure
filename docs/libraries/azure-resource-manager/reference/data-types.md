@@ -322,11 +322,23 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 model Azure.ResourceManager.ArmResourceExistsResponse
 ```
 
+#### Properties
+
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `204` | The status code. |
+
 ### `ArmResourceNotFoundResponse` {#Azure.ResourceManager.ArmResourceNotFoundResponse}
 
 ```typespec
 model Azure.ResourceManager.ArmResourceNotFoundResponse
 ```
+
+#### Properties
+
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `404` | The status code. |
 
 ### `ArmResourceUpdatedResponse` {#Azure.ResourceManager.ArmResourceUpdatedResponse}
 

@@ -776,7 +776,7 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeRe
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCheckExistence(provider: Microsoft.ThisWillBeReplaced): Response | Error
+op Azure.ResourceManager.ArmResourceCheckExistence(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -934,7 +934,7 @@ op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: "Microsoft.Th
 A resource list operation, with scope determined by BaseParameters
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListAtScope(provider: Microsoft.ThisWillBeReplaced): Response | Error
+op Azure.ResourceManager.ArmResourceListAtScope(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -952,7 +952,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(provider: Microsoft.ThisWillBeRe
 A resource list operation, at the scope of the resource's parent
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListByParent(provider: Microsoft.ThisWillBeReplaced): Response | Error
+op Azure.ResourceManager.ArmResourceListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -1003,7 +1003,7 @@ op Azure.ResourceManager.ArmResourcePatchSync(provider: "Microsoft.ThisWillBeRep
 A resource GET operation
 
 ```typespec
-op Azure.ResourceManager.ArmResourceRead(provider: Microsoft.ThisWillBeReplaced): Response | Error
+op Azure.ResourceManager.ArmResourceRead(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
