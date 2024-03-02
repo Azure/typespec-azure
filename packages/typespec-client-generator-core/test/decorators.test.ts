@@ -1,4 +1,12 @@
-import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
+import {
+  Enum,
+  Interface,
+  Model,
+  Namespace,
+  Operation,
+  UsageFlags,
+  ignoreDiagnostics,
+} from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -14,7 +22,7 @@ import {
   shouldGenerateProtocol,
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
-import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
+import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
@@ -305,6 +313,24 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { one: Operation };
 
       strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+    });
+
+    it("crossLanguagePackageId", async () => {
+      await runner.compile(`
+        @client({name: "MyPackageClient"})
+        @service({})
+        namespace My.Package.Namespace;
+
+        namespace SubNamespace {
+          interface Widgets {
+            @test op one(): void;
+          }
+        }
+      `);
+      strictEqual(
+        ignoreDiagnostics(getCrossLanguagePackageId(runner.context)),
+        "My.Package.Namespace"
+      );
     });
 
     it("@operationGroup with scope", async () => {

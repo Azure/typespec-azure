@@ -62,6 +62,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
@@ -138,6 +139,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
@@ -198,6 +200,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           @autoRoute
