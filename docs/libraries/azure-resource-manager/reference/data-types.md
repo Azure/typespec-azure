@@ -393,9 +393,9 @@ model FooProperties {
 
 #### Properties
 
-| Name              | Type                                                                                           | Description                             |
-| ----------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------- |
-| provisioningState | [`ResourceProvisioningState`](./data-types.md#Azure.ResourceManager.ResourceProvisioningState) | The provisioning state of the resource. |
+| Name               | Type                                                                                           | Description                             |
+| ------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------- |
+| provisioningState? | [`ResourceProvisioningState`](./data-types.md#Azure.ResourceManager.ResourceProvisioningState) | The provisioning state of the resource. |
 
 ### `Encryption` {#Azure.ResourceManager.Encryption}
 
