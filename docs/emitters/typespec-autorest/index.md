@@ -74,7 +74,7 @@ or via the command line with
 
 #### `emitter-output-dir`
 
-Set the emitter output-dir. [See here](https://microsoft.github.io/typespec/introduction/configuration#emitter-output-dir)
+Set the emitter output-dir. [See here](https://typespec.io/docs/handbook/configuration#emitter-output-dir)
 
 #### `output-file`
 
