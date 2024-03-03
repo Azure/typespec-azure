@@ -771,6 +771,24 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeRe
 | Parameters     | Optional. Additional parameters after the path parameters    |
 | Error          | Optional. The error response, if non-standard.               |
 
+### `ArmResourceCheckExistence` {#Azure.ResourceManager.ArmResourceCheckExistence}
+
+Check a resource's existence via HEAD operation
+
+```typespec
+op Azure.ResourceManager.ArmResourceCheckExistence(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being checked                                |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the read operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
 ### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
 
 ```typespec
@@ -781,7 +799,7 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(provider: "Microsoft.Th
 
 | Name           | Description                                                             |
 | -------------- | ----------------------------------------------------------------------- |
-| Resource       | the resource being patched                                              |
+| Resource       | the resource being created or replaced                                  |
 | BaseParameters | Optional. Allows overriding the operation parameters                    |
 | LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
 | Parameters     | Optional. Additional parameters after the path parameters               |
@@ -800,7 +818,7 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(provider: "Microsoft.Thi
 
 | Name           | Description                                                     |
 | -------------- | --------------------------------------------------------------- |
-| Resource       | the resource being patched                                      |
+| Resource       | the resource being created or replaced                          |
 | BaseParameters | Optional. Allows overriding the operation parameters            |
 | Parameters     | Optional. Additional parameters after the path parameters       |
 | Response       | Optional. The success response for the createOrUpdate operation |
@@ -818,7 +836,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 
 | Name           | Description                                                             |
 | -------------- | ----------------------------------------------------------------------- |
-| Resource       | the resource being patched                                              |
+| Resource       | the resource being created or updated                                   |
 | BaseParameters | Optional. Allows overriding the operation parameters                    |
 | LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
 | Parameters     | Optional. Additional parameters after the path parameters               |
@@ -837,7 +855,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 
 | Name           | Description                                                     |
 | -------------- | --------------------------------------------------------------- |
-| Resource       | the resource being patched                                      |
+| Resource       | the resource being created or updated                           |
 | BaseParameters | Optional. Allows overriding the operation parameters            |
 | Parameters     | Optional. Additional parameters after the path parameters       |
 | Response       | Optional. The success response for the createOrUpdate operation |
@@ -916,7 +934,7 @@ op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: "Microsoft.Th
 A resource list operation, with scope determined by BaseParameters
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListAtScope(provider: "Microsoft.ThisWillBeReplaced"): Response | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceListAtScope(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -934,7 +952,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(provider: "Microsoft.ThisWillBeR
 A resource list operation, at the scope of the resource's parent
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -985,14 +1003,14 @@ op Azure.ResourceManager.ArmResourcePatchSync(provider: "Microsoft.ThisWillBeRep
 A resource GET operation
 
 ```typespec
-op Azure.ResourceManager.ArmResourceRead(provider: "Microsoft.ThisWillBeReplaced"): Response | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ArmResourceRead(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
 
 | Name           | Description                                               |
 | -------------- | --------------------------------------------------------- |
-| Resource       | the resource being patched                                |
+| Resource       | the resource being read                                   |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the read operation     |
