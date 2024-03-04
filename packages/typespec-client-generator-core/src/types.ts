@@ -28,6 +28,7 @@ import {
   getEncode,
   getFormat,
   getKnownValues,
+  getNamespaceFullName,
   getVisibility,
   ignoreDiagnostics,
   isNeverType,
@@ -114,7 +115,7 @@ function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type)?.toLocaleLowerCase();
+  const format = getFormat(context.program, type);
   if (format) {
     switch (format) {
       case "guid":
@@ -122,17 +123,13 @@ function addFormatInfo(
       case "password":
       case "etag":
       case "azureLocation":
+      case "armId":
+      case "ipAddress":
         propertyType.kind = format;
         break;
       case "url":
       case "uri":
         propertyType.kind = "url";
-        break;
-      case "armid":
-        propertyType.kind = "armId";
-        break;
-      case "ipaddress":
-        propertyType.kind = "ipAddress";
         break;
       default:
         break;
@@ -712,6 +709,11 @@ export function getClientTypeWithDiagnostics(
   type: Type,
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
+  if (!context.knownScalars) {
+    context.knownScalars = {
+      "Azure.Core.azureLocation": "azureLocation",
+    };
+  }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
   switch (type.kind) {
@@ -740,6 +742,13 @@ export function getClientTypeWithDiagnostics(
         addEncodeInfo(context, type, baseType);
         addFormatInfo(context, type, baseType);
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
+        if (
+          type.namespace &&
+          context.knownScalars[`${getNamespaceFullName(type.namespace)}.${type.name}`]
+        ) {
+          retval.kind =
+            context.knownScalars[`${getNamespaceFullName(type.namespace)}.${type.name}`];
+        }
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
