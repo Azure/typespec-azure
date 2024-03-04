@@ -27,6 +27,7 @@ import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { armResourceNamePatternRule } from "./rules/arm-resource-name-pattern.js";
 
 const rules = [
   armNoRecordRule,
@@ -39,6 +40,7 @@ const rules = [
   armResourceEnvelopeProperties,
   armResourceInvalidVersionFormatRule,
   armResourceKeyInvalidCharsRule,
+  armResourceNamePatternRule,
   armResourceOperationsRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
