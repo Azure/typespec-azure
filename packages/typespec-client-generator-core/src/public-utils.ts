@@ -1,4 +1,5 @@
 import {
+  Diagnostic,
   Interface,
   Model,
   ModelProperty,
@@ -6,6 +7,7 @@ import {
   Operation,
   Type,
   Union,
+  createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
   getNamespaceFullName,
@@ -37,6 +39,7 @@ import {
   getWireName,
   parseEmitterName,
 } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -152,12 +155,10 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
  * @param type
  * @returns the library name for a typespec type
  */
-export function getLibraryName(context: TCGCContext, type: Type & { name?: string }): string {
-  if (!context.emitterName) {
-    // eslint-disable-next-line deprecation/deprecation
-    context.emitterName = getEmitterTargetName(context);
-  }
-
+export function getLibraryName(
+  context: TCGCContext,
+  type: Type & { name?: string | symbol }
+): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
@@ -171,7 +172,7 @@ export function getLibraryName(context: TCGCContext, type: Type & { name?: strin
   if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
 
   // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
-  return getFriendlyName(context.program, type) ?? type.name;
+  return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
 }
 
 /**
@@ -193,6 +194,28 @@ export function getCrossLanguageDefinitionId(type: {
     retval = `${getNamespaceFullName(type.namespace!)}.${retval}`;
   }
   return retval;
+}
+
+/**
+ * Helper function return the cross langauge package id for a package
+ */
+export function getCrossLanguagePackageId(context: TCGCContext): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const services = listServices(context.program);
+  if (services.length === 0) return diagnostics.wrap("");
+  const serviceNamespace = getNamespaceFullName(services[0].type);
+  if (services.length > 1) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "multiple-services",
+        target: services[0].type,
+        format: {
+          service: serviceNamespace,
+        },
+      })
+    );
+  }
+  return diagnostics.wrap(serviceNamespace);
 }
 
 /**

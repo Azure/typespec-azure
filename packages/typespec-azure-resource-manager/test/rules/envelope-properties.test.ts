@@ -37,6 +37,7 @@ describe("typespec-azure-resource-manager: envelope properties rule", () => {
         bar?: string;
       }
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources extends
         ResourceUpdate<FooResource,FooResourceProperties>,
         ResourceRead<FooResource>,

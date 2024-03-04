@@ -105,6 +105,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Unsupported kind ${"kind"}`,
       },
     },
+    "multiple-services": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
+      },
+    },
   },
 });
 

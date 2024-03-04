@@ -56,6 +56,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceCreate<FooResource>,ResourceDelete<FooResource> {
           @doc("Gets my Foos")
@@ -166,7 +167,7 @@ describe("typespec-azure-resource-manager: improper list by subscription operati
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"; version: "2022-01-10-alpha.1"})
+    @service({title: "Microsoft.Foo"})
     
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)

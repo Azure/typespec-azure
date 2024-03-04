@@ -179,6 +179,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
+  generatedName?: string;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;

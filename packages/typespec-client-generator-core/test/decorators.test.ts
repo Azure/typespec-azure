@@ -1,4 +1,12 @@
-import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
+import {
+  Enum,
+  Interface,
+  Model,
+  Namespace,
+  Operation,
+  UsageFlags,
+  ignoreDiagnostics,
+} from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -14,7 +22,7 @@ import {
   shouldGenerateProtocol,
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
-import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
+import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
@@ -306,6 +314,24 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { one: Operation };
 
       strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+    });
+
+    it("crossLanguagePackageId", async () => {
+      await runner.compile(`
+        @client({name: "MyPackageClient"})
+        @service({})
+        namespace My.Package.Namespace;
+
+        namespace SubNamespace {
+          interface Widgets {
+            @test op one(): void;
+          }
+        }
+      `);
+      strictEqual(
+        ignoreDiagnostics(getCrossLanguagePackageId(runner.context)),
+        "My.Package.Namespace"
+      );
     });
 
     it("@operationGroup with scope", async () => {
@@ -827,11 +853,12 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
 
-    it("nested namespace and interface", async () => {
+    it("nested namespace and interface with naming change", async () => {
       await runner.compile(`
         @service({})
         namespace Test1Client {
           @route("/b")
+          @clientName("BRename")
           namespace B {
             op x(): void;
 
@@ -856,7 +883,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(b);
       strictEqual(b.subOperationGroups?.length, 1);
       strictEqual(listOperationGroups(runner.context, b).length, 1);
-      strictEqual(b.groupPath, "Test1Client.B");
+      strictEqual(b.groupPath, "Test1Client.BRename");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
         ["x"]
@@ -866,7 +893,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(c);
       strictEqual(c.subOperationGroups, undefined);
       strictEqual(listOperationGroups(runner.context, c).length, 0);
-      strictEqual(c.groupPath, "Test1Client.B.C");
+      strictEqual(c.groupPath, "Test1Client.BRename.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
         ["y"]

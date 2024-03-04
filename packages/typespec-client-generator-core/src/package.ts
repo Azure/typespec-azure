@@ -71,9 +71,7 @@ import {
 import {
   addEncodeInfo,
   addFormatInfo,
-  getAllModels,
   getAllModelsWithDiagnostics,
-  getClientType,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
@@ -683,6 +681,7 @@ function getClientDefaultApiVersion<TServiceOperation extends SdkServiceOperatio
 ): string | undefined {
   let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
   if (!defaultVersion) {
+    // eslint-disable-next-line deprecation/deprecation
     defaultVersion = getService(context.program, client.service)?.version;
   }
   return defaultVersion;

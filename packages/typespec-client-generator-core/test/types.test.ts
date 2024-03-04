@@ -1,18 +1,25 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, UsageFlags } from "@typespec/compiler";
+import { Enum, Union, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   SdkArrayType,
   SdkBodyModelPropertyType,
+  SdkEnumType,
   SdkEnumValueType,
   SdkModelType,
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
-import { getAllModels, getAllModelsWithDiagnostics, getSdkEnum, isReadOnly } from "../src/types.js";
+import {
+  getAllModels,
+  getAllModelsWithDiagnostics,
+  getClientType,
+  getSdkEnum,
+  isReadOnly,
+} from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
@@ -443,7 +450,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "union");
-      strictEqual(sdkType.name, undefined);
+      strictEqual(sdkType.name, "");
       const values = sdkType.values;
       strictEqual(values.length, 2);
       strictEqual(values[0].kind, "string");
@@ -570,6 +577,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkType.name, "PetKind");
       strictEqual(sdkType.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
@@ -924,7 +932,37 @@ describe("typespec-client-generator-core: types", () => {
       await helper("@azure-tools/typespec-csharp", "Enum1", "One");
       await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
     });
+
+    it("union as enum rename", async () => {
+      const { TestUnion } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        namespace N {
+          @test
+          union TestUnion{
+            @clientName("ARename")
+            "A",
+            "B": "B_v",
+            string
+          }
+          op x(body: TestUnion): void;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(N.TestUnion, "TestUnionRename");
+        @@clientName(N.TestUnion.B, "BRename");
+      `
+      )) as { TestUnion: Union };
+
+      const enumType = getClientType(runner.context, TestUnion) as SdkEnumType;
+      strictEqual(enumType.name, "TestUnionRename");
+      strictEqual(enumType.values[0].name, "ARename");
+      strictEqual(enumType.values[1].name, "BRename");
+    });
   });
+
   describe("SdkBodyModelPropertyType", () => {
     it("required", async function () {
       await runner.compileWithBuiltInService(`
@@ -1385,7 +1423,9 @@ describe("typespec-client-generator-core: types", () => {
     it("union to extensible enum values", async () => {
       await runner.compileWithBuiltInService(`
       union PetKind {
+        @doc("Cat")
         Cat: "cat",
+        @doc("Dog")
         Dog: "dog",
         string,
       }
@@ -1407,15 +1447,40 @@ describe("typespec-client-generator-core: types", () => {
 
       const catValue = values.find((x) => x.name === "Cat")!;
       strictEqual(catValue.value, "cat");
+      strictEqual(catValue.description, "Cat");
       strictEqual(catValue.enumType, petKind);
       strictEqual(catValue.valueType, petKind.valueType);
       strictEqual(catValue.kind, "enumvalue");
 
       const dogValue = values.find((x) => x.name === "Dog")!;
       strictEqual(dogValue.value, "dog");
+      strictEqual(dogValue.description, "Dog");
       strictEqual(dogValue.enumType, petKind);
       strictEqual(dogValue.valueType, petKind.valueType);
       strictEqual(dogValue.kind, "enumvalue");
+    });
+
+    it("property of anonymous union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      model Pet {
+        kind: string | "cat" | "dog";
+      }
+
+      @route("/extensible-enum")
+      @put
+      op putPet(@body pet: Pet): void;
+      `);
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      const pet = models.find((x) => x.name === "Pet")!;
+
+      const enums = runner.context.sdkPackage.enums;
+      const kind = enums.find((x) => x.name === "")!;
+      strictEqual(kind.generatedName, "PetKind");
+      const kindProperty = pet.properties.find(
+        (x) => (x.nameInClient = "kind")
+      )! as SdkBodyModelPropertyType;
+      strictEqual(kindProperty.type, kind);
     });
 
     it("enum discriminator model without base discriminator property", async () => {
@@ -1527,10 +1592,21 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 3);
-      const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
+      const fish = models.find((x) => x.name === "Fish")!;
+      let kindTypeProperty = fish.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enum");
+      const shark = models.find((x) => x.name === "Shark")!;
       strictEqual(shark.discriminatorValue, "shark");
-      const salmon = models.find((x) => x.name === "Salmon")! as SdkModelType;
+      kindTypeProperty = shark.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      const salmon = models.find((x) => x.name === "Salmon")!;
+      kindTypeProperty = salmon.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
       strictEqual(salmon.discriminatorValue, "salmon");
+
+      strictEqual(runner.context.sdkPackage.enums.length, 1);
+      const kindType = runner.context.sdkPackage.enums.find((x) => x.name === "KindType")!;
+      strictEqual(kindType.isFixed, false);
     });
 
     it("filterOutCoreModels true", async () => {
@@ -2100,9 +2176,22 @@ describe("typespec-client-generator-core: types", () => {
           code: string
         };
 
-        model FourHundredError extends ApiError {};
-        model FourZeroFourError extends FourHundredError {};
-        model FiveHundredError extends ApiError {};
+        model FourHundredError extends ApiError {
+          @statusCode
+          @minValue(400)
+          @maxValue(499)
+          statusCode: int32;
+        };
+        model FourZeroFourError extends FourHundredError {
+          @statusCode
+          statusCode: 404;
+        };
+        model FiveHundredError extends ApiError {
+          @statusCode
+          @minValue(500)
+          @maxValue(599)
+          statusCode: int32;
+        };
 
         op test(): ValidResponse | FourZeroFourError | FiveHundredError;
       `);

@@ -1609,9 +1609,14 @@ describe("typespec-client-generator-core: package", () => {
       return await runner.compile(`
       @service({
         title: "Widget Service",
-        version: "1.0.0",
       })
+      @versioned(Versions)
       namespace DemoService;
+
+      /** The Contoso Widget Manager service version. */
+      enum Versions {
+        "2022-08-30",
+      }
 
       model Widget {
         @visibility("read", "update")
@@ -1764,7 +1769,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParamColor.optional, false);
       strictEqual(methodParamColor.onClient, false);
       strictEqual(methodParamColor.isApiVersionParam, false);
-      strictEqual(methodParamColor.type.kind, "union");
+      strictEqual(methodParamColor.type.kind, "enum");
 
       const methodContentTypeParam = method.parameters.find(
         (x) => x.nameInClient === "contentType"

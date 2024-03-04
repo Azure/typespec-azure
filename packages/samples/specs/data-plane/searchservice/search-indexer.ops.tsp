@@ -16,7 +16,6 @@ import "./searchservice.models.tsp";
 )
 @service({
   title: "Search Service",
-  version: "2021-04-30-Preview",
 })
 namespace Azure.SearchService;
 

@@ -1,6 +1,6 @@
 # Content Type Negotiation
 
-See [Http documentation on content type negotiation](https://microsoft.github.io/typespec/next/standard-library/http/content-types#content-type-negotiation) for the general concept
+See [Http documentation on content type negotiation](https://typespec.io/docs/next/libraries/http/content-types#content-type-negotiation) for the general concept
 
 ## Usage with Azure.Core operations
 

@@ -12,6 +12,8 @@ using Azure.ResourceManager;
 
 @service({
   title: "Microsoft.OperationsTest",
+})
+@OpenAPI.info({
   version: "2022-11-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
