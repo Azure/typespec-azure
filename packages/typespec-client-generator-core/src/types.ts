@@ -742,13 +742,8 @@ export function getClientTypeWithDiagnostics(
         addEncodeInfo(context, type, baseType);
         addFormatInfo(context, type, baseType);
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
-        if (
-          type.namespace &&
-          context.knownScalars[`${getNamespaceFullName(type.namespace)}.${type.name}`]
-        ) {
-          retval.kind =
-            context.knownScalars[`${getNamespaceFullName(type.namespace)}.${type.name}`];
-        }
+        const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
+        retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
