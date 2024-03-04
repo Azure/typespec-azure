@@ -15,7 +15,6 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
-  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -73,6 +72,7 @@ import {
   SdkTupleType,
   SdkType,
   getKnownScalars,
+  isSdkBuiltInKind,
 } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -117,16 +117,8 @@ function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type);
-  let namespace: string = "";
-  if (type.kind === "ModelProperty" && type.type.kind === "Scalar") {
-    namespace = type.type.namespace ? getNamespaceFullName(type.type.namespace) : "";
-  } else if (type.kind === "Scalar") {
-    namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
-  }
-  if (format && context.knownScalars && context.knownScalars[`${namespace}.${type.name}`]) {
-    propertyType.kind = context.knownScalars[`${namespace}.${type.name}`];
-  }
+  const format = getFormat(context.program, type) ?? "";
+  if (isSdkBuiltInKind(format)) propertyType.kind = format;
 }
 
 /**
@@ -196,7 +188,9 @@ export function getSdkBuiltInType(
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
     if (type.kind === "Scalar") {
-      kind = getScalarKind(type);
+      if (isSdkBuiltInKind(type.name)) {
+        kind = getScalarKind(type);
+      }
     }
     return {
       ...getSdkTypeBaseHelper(context, type, kind),

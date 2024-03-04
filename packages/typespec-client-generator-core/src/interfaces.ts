@@ -136,8 +136,11 @@ export type SdkBuiltInKinds =
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
-  const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum).concat(Object.keys(SdkIntKindsEnum)).concat(Object.keys(SdkFloatKindsEnum)).concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
-  for (const kind in typespecNamespace) {
+  const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum)
+    .concat(Object.keys(SdkIntKindsEnum))
+    .concat(Object.keys(SdkFloatKindsEnum))
+    .concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
+  for (const kind of typespecNamespace) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
     retval[`TypeSpec.${kind}`] = kind;
   }
@@ -148,7 +151,7 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   return retval;
 }
 
-function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
+export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   return (
     Object.keys(SdkBuiltInKindsMiscellaneousEnum).includes(kind) ||
     Object.keys(SdkIntKindsEnum).includes(kind) ||
