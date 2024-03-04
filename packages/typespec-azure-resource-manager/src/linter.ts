@@ -11,6 +11,7 @@ import { invalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.
 import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-envelope-property.js";
 import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
 import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
+import { armResourceNamePatternRule } from "./rules/arm-resource-name-pattern.js";
 import { armResourceOperationsRule } from "./rules/arm-resource-operation-response.js";
 import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
@@ -27,7 +28,6 @@ import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
-import { armResourceNamePatternRule } from "./rules/arm-resource-name-pattern.js";
 
 const rules = [
   armNoRecordRule,

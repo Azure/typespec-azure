@@ -1,7 +1,6 @@
 import { Program, createRule } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { getHttpOperation } from "@typespec/http";
 import { getArmResources } from "../resource.js";
 
 /**
@@ -25,7 +24,7 @@ export const armDeleteResponseCodesRule = createRule({
             const deleteOperation = resource.operations.lifecycle.delete;
             const isAsync =
               getLroMetadata(context.program, deleteOperation.operation) !== undefined;
-            const [httpOp, _] = getHttpOperation(context.program, deleteOperation.operation);
+            const httpOp = deleteOperation.httpOperation;
             const statusCodes = new Set([...httpOp.responses.map((r) => r.statusCodes.toString())]);
             const expected = new Set(["204", "*"]);
             expected.add(isAsync ? "202" : "200");
