@@ -9,6 +9,32 @@ The examples must be placed in the `examples-directory` (default to `{project-ro
 Do not use `@extension("x-ms-examples", "<value>")`.
 :::
 
+## Example structure
+
+Example below assume `example-directory` is `{project-root}/examples`.
+
+- Single version structure
+
+```
+main.tsp
+examples/
+  example1.json
+  example2.json
+```
+
+- Multi version structure
+
+```
+main.tsp
+examples/
+  2021-01-01/
+    example1.json
+    example2.json
+  2021-01-02/
+    example1.json
+    example2.json
+```
+
 ## Generate the examples
 
 To generate the examples you can use [oav](https://github.com/Azure/oav). You can run that on the generated openapi.json file.
