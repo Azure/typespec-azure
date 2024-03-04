@@ -736,12 +736,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "userId",
-        "provisioningState"
+        "userId"
       ]
     },
     "PlayerDatabaseReference": {
@@ -788,10 +788,6 @@
           "items": {
             "$ref": "#/definitions/TitleReference"
           }
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -851,12 +847,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "parentDatabase",
-        "provisioningState"
+        "parentDatabase"
       ]
     },
     "TitleReference": {
@@ -882,20 +878,6 @@
           "additionalProperties": {
             "type": "string"
           }
-        },
-        "properties": {
-          "$ref": "#/definitions/TitleUpdateProperties",
-          "x-ms-client-flatten": true
-        }
-      }
-    },
-    "TitleUpdateProperties": {
-      "type": "object",
-      "description": "The updatable properties of the Title.",
-      "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     }
