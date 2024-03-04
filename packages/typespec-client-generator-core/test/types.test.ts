@@ -139,8 +139,17 @@ describe("typespec-client-generator-core: types", () => {
     });
 
     it("format", async function () {
-      await runner.compileWithBuiltInService(
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
         `
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+        @service({})
+        namespace MyService;
+
         @format("guid")
         scalar guid extends string;
 
@@ -158,9 +167,6 @@ describe("typespec-client-generator-core: types", () => {
 
         @format("ipAddress")
         scalar ipAddress extends string;
-
-        @format("azureLocation")
-        scalar azureLocation extends string;
 
         @format("etag")
         scalar etag extends string;
@@ -196,7 +202,7 @@ describe("typespec-client-generator-core: types", () => {
         }
       `
       );
-      const models = getAllModels(runner.context);
+      const models = getAllModels(runnerWithCore.context);
       for (const property of (models[0] as SdkModelType).properties) {
         strictEqual(
           property.type.kind,
