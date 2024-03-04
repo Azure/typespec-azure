@@ -121,6 +121,7 @@ function addFormatInfo(
       case "uuid":
       case "password":
       case "etag":
+      case "azureLocation":
         propertyType.kind = format;
         break;
       case "url":
@@ -132,9 +133,6 @@ function addFormatInfo(
         break;
       case "ipaddress":
         propertyType.kind = "ipAddress";
-        break;
-      case "azurelocation":
-        propertyType.kind = "azureLocation";
         break;
       default:
         break;
@@ -213,6 +211,7 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "decimal":
     case "plainDate":
     case "plainTime":
+    case "azureLocation":
       return scalar.name;
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
