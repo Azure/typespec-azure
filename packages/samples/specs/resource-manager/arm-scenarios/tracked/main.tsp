@@ -81,8 +81,12 @@ interface Employees {
   delete is ArmResourceDeleteSync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
+
   /** A sample resource action that move employee to different location */
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  /** A sample HEAD operation to check resource existence */
+  checkExistence is ArmResourceCheckExistence<Employee>;
 }
 
 /** Employee move request */

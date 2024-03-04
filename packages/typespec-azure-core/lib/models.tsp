@@ -21,6 +21,7 @@ model Page<Resource extends TypeSpec.Reflection.Model> {
 
   @doc("The link to the next page of items")
   @nextLink
+  @visibility("read")
   nextLink?: ResourceLocation<Resource>;
 }
 
@@ -343,3 +344,14 @@ scalar ipV6Address extends string;
 #suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
 @format("eTag")
 scalar eTag extends string;
+
+/**
+ * Represents an Azure geography region where supported resource providers live.
+ *
+ * @example
+ *
+ * ```
+ * WestUS
+ * ```
+ */
+scalar azureLocation extends string;

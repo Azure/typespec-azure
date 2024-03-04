@@ -1,5 +1,5 @@
 import { Operation, Program, Type } from "@typespec/compiler";
-import { SdkEnumType, SdkModelType } from "./interfaces.js";
+import { SdkBuiltInKinds, SdkEnumType, SdkModelType } from "./interfaces.js";
 
 export function parseEmitterName(emitterName?: string): string {
   if (!emitterName) {
@@ -24,6 +24,7 @@ export interface TCGCContext {
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Set<string>;
+  knownScalars?: Record<string, SdkBuiltInKinds>;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {

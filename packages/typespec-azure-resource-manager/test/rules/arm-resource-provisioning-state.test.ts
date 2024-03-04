@@ -34,7 +34,8 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          provisioningState: FooProvisioningState;
+          @visibility("read")
+          provisioningState?: FooProvisioningState;
         }
 
         enum FooProvisioningState {
@@ -57,7 +58,8 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          provisioningState: FooProvisioningState;
+          @visibility("read")
+          provisioningState?: FooProvisioningState;
         }
 
         union FooProvisioningState {
@@ -98,7 +100,8 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
             }
     
             model FooProperties {
-              provisioningState: State;
+              @visibility("read")
+              provisioningState?: State;
             }
     
             enum StateKV {Succeeded, Failed, Canceled}
@@ -125,7 +128,8 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          provisioningState: string;
+          @visibility("read")
+          provisioningState?: string;
         }
       `
       )
@@ -133,6 +137,71 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
         message:
           "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
+      });
+  });
+
+  it("emit warning if provisioning state is not optional", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+
+        model FooResource is TrackedResource<FooProperties> {
+          @key @segment("foo") name: string;
+        }
+
+        model FooProperties {
+          @visibility("read")
+          provisioningState: ResourceProvisioningState;
+        }
+      `
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+        message: "The provisioningState property must be optional.",
+      });
+  });
+
+  it("emit warning if provisioning doesn't have read visibility", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+
+        model FooResource is TrackedResource<FooProperties> {
+          @key @segment("foo") name: string;
+        }
+
+        model FooProperties {
+          provisioningState?: ResourceProvisioningState;
+        }
+      `
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+        message: "The provisioningState property must have a single read visibility.",
+      });
+  });
+
+  it("emit warning if provisioning more than read visibility", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+
+        model FooResource is TrackedResource<FooProperties> {
+          @key @segment("foo") name: string;
+        }
+
+        model FooProperties {
+          @visibility("read", "update")          
+          provisioningState?: ResourceProvisioningState;
+        }
+      `
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+        message: "The provisioningState property must have a single read visibility.",
       });
   });
 
@@ -149,7 +218,8 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
               }
       
               model FooProperties {
-                provisioningState: FooProvisioningState;
+                @visibility("read")
+                provisioningState?: FooProvisioningState;
               }
 
               enum FooProvisioningState {

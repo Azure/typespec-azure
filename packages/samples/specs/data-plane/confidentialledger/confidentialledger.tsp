@@ -27,7 +27,6 @@ using TypeSpec.OpenAPI;
 )
 @service({
   title: "Confidential Ledger Service",
-  version: "2022-05-13",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @server(

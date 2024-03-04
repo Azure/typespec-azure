@@ -11,6 +11,8 @@ using Azure.ResourceManager;
 
 @service({
   title: "Microsoft.EnvelopeTest",
+})
+@OpenAPI.info({
   version: "2021-09-21-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)

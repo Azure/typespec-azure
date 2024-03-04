@@ -3,7 +3,7 @@ import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  getAboutDisplayName,
+  getAboutDisplayNames,
   getAboutKeywords,
   getAboutLearnMoreDocs,
   getBrowseArgQuery,
@@ -54,27 +54,60 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@about", async () => {
     const aboutTest = `
       @test @about({
-      displayName: "hello",
+      displayNames: {
+        singular: "microsoft portal typespec",
+        plural: "microsoft portal typespecs",
+      },
       keywords: ["a", "c", "b"],
-      learnMoreDocs: ["https://www.azure.com", "https://www.portal.azure.com"],
+      learnMoreDocs: [
+        {
+          "title": "learn Azure",
+          "uri": "https://www.azure.com"
+        },
+        {
+          "title": "learn Azure Portal",
+          "uri": "https://www.portal.azure.com"
+        }
+      ],
       })
       @doc("this is doc for about decorator")`;
     const { Foo } = await runner.compile(createTestSpec(undefined, aboutTest));
-    const displayName = getAboutDisplayName(runner.program, Foo);
+    const displayNames = getAboutDisplayNames(runner.program, Foo);
     const keywords = getAboutKeywords(runner.program, Foo);
     const learnMoreDocs = getAboutLearnMoreDocs(runner.program, Foo);
     strictEqual(Foo.kind, "Model");
-    strictEqual(displayName, "hello");
+    strictEqual(displayNames.singular, "microsoft portal typespec");
+    strictEqual(displayNames.plural, "microsoft portal typespecs");
     deepEqual(keywords, ["a", "c", "b"]);
-    deepEqual(learnMoreDocs, ["https://www.azure.com", "https://www.portal.azure.com"]);
+    deepEqual(learnMoreDocs.length, 2);
+    deepEqual(learnMoreDocs[0], {
+      title: "learn Azure",
+      uri: "https://www.azure.com",
+    });
+    deepEqual(learnMoreDocs[1], {
+      title: "learn Azure Portal",
+      uri: "https://www.portal.azure.com",
+    });
   });
 
   it("@about on non-ARM resource", async () => {
     const aboutTest = `
         @test @about({
-        displayName: "hello",
+        displayNames: {
+          singular: "microsoft portal typespec",
+          plural: "microsoft portal typespecs",
+        },
         keywords: ["a", "c", "b"],
-        learnMoreDocs: ["https://www.azure.com", "https://www.portal.azure.com"],
+        learnMoreDocs: [
+          {
+            "title": "learn Azure",
+            "uri": "https://www.azure.com"
+          },
+          {
+            "title": "learn Azure Portal",
+            "uri": "https://www.portal.azure.com"
+          }
+        ],
       })`;
     const diagnostics = await runner.diagnose(`
         ${aboutTest}
@@ -89,8 +122,20 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@about with learnMoreDocs not starting with https", async () => {
     const aboutTest = `
       @test @about({
-      displayName: "hello",
-      learnMoreDocs: ["www.azure.com", "www.portal.azure.com"],
+      displayNames: {
+        singular: "microsoft portal typespec",
+        plural: "microsoft portal typespecs",
+      },
+      learnMoreDocs: [
+        {
+          "title": "learn Azure",
+          "uri": "www.azure.com"
+        },
+        {
+          "title": "learn Azure Portal",
+          "uri": "www.portal.azure.com"
+        }
+      ],
       })`;
     const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
     expectDiagnostics(diagnostics, [

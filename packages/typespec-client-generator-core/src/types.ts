@@ -15,6 +15,7 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
+  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -71,10 +72,7 @@ import {
   SdkModelType,
   SdkTupleType,
   SdkType,
-  isSdkAzureBuiltInStringKinds,
-  isSdkBuiltInKind,
-  isSdkGenericBuiltInStringKinds,
-  isSdkStringKind,
+  getKnownScalars,
 } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -120,20 +118,14 @@ function addFormatInfo(
   propertyType: SdkType
 ): void {
   const format = getFormat(context.program, type);
-
-  // verify when we are setting the built in kind types that they are the built in kinds
-  let typeNamespaceFullName: string = "";
-  if (type.kind === "ModelProperty" && type.type.kind === "Scalar" && type.type.namespace) {
-    typeNamespaceFullName = getNamespaceFullName(type.type.namespace);
-  } else if (type.kind === "Scalar" && type.namespace) {
-    typeNamespaceFullName = getNamespaceFullName(type.namespace);
+  let namespace: string = "";
+  if (type.kind === "ModelProperty" && type.type.kind === "Scalar") {
+    namespace = type.type.namespace ? getNamespaceFullName(type.type.namespace) : "";
+  } else if (type.kind === "Scalar") {
+    namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
   }
-  if (format && isSdkStringKind(format)) {
-    if (isSdkAzureBuiltInStringKinds(format) && typeNamespaceFullName === "Azure.Core") {
-      propertyType.kind = format;
-    } else if (isSdkGenericBuiltInStringKinds(format) && typeNamespaceFullName === "TypeSpec") {
-      propertyType.kind = format;
-    }
+  if (format && context.knownScalars && context.knownScalars[`${namespace}.${type.name}`]) {
+    propertyType.kind = context.knownScalars[`${namespace}.${type.name}`];
   }
 }
 
@@ -685,6 +677,9 @@ export function getClientTypeWithDiagnostics(
   type: Type,
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
+  if (!context.knownScalars) {
+    context.knownScalars = getKnownScalars();
+  }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
   switch (type.kind) {
@@ -713,6 +708,8 @@ export function getClientTypeWithDiagnostics(
         addEncodeInfo(context, type, baseType);
         addFormatInfo(context, type, baseType);
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
+        const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
+        retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {

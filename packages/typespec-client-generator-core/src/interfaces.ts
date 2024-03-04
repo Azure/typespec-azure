@@ -110,12 +110,6 @@ enum SdkAzureBuiltInStringKindsEnum {
   azureLocation = "azureLocation",
 }
 
-type SdkAzureBuiltInStringKinds = keyof typeof SdkAzureBuiltInStringKindsEnum;
-
-export function isSdkAzureBuiltInStringKinds(kind: string): kind is SdkAzureBuiltInStringKinds {
-  return Object.keys(SdkAzureBuiltInStringKindsEnum).includes(kind);
-}
-
 enum SdkGenericBuiltInStringKindsEnum {
   string = "string",
   password = "password",
@@ -123,18 +117,6 @@ enum SdkGenericBuiltInStringKindsEnum {
   url = "url",
   uri = "uri",
   ipAddress = "ipAddress",
-}
-
-type SdkGenericBuiltInStringKinds = keyof typeof SdkGenericBuiltInStringKindsEnum;
-
-export function isSdkGenericBuiltInStringKinds(kind: string): kind is SdkGenericBuiltInStringKinds {
-  return Object.keys(SdkGenericBuiltInStringKindsEnum).includes(kind);
-}
-
-type SdkStringKinds = SdkGenericBuiltInStringKinds | SdkAzureBuiltInStringKinds;
-
-export function isSdkStringKind(kind: string): kind is SdkStringKinds {
-  return isSdkGenericBuiltInStringKinds(kind) || isSdkAzureBuiltInStringKinds(kind);
 }
 
 enum SdkBuiltInKindsMiscellaneousEnum {
@@ -152,13 +134,27 @@ export type SdkBuiltInKinds =
   | keyof typeof SdkGenericBuiltInStringKindsEnum
   | keyof typeof SdkAzureBuiltInStringKindsEnum;
 
-export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
+export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
+  const retval: Record<string, SdkBuiltInKinds> = {};
+  const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum).concat(Object.keys(SdkIntKindsEnum)).concat(Object.keys(SdkFloatKindsEnum)).concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
+  for (const kind in typespecNamespace) {
+    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    retval[`TypeSpec.${kind}`] = kind;
+  }
+  for (const kind in SdkAzureBuiltInStringKindsEnum) {
+    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    retval[`Azure.Core.${kind}`] = kind;
+  }
+  return retval;
+}
+
+function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   return (
     Object.keys(SdkBuiltInKindsMiscellaneousEnum).includes(kind) ||
     Object.keys(SdkIntKindsEnum).includes(kind) ||
     Object.keys(SdkFloatKindsEnum).includes(kind) ||
-    isSdkGenericBuiltInStringKinds(kind) ||
-    isSdkAzureBuiltInStringKinds(kind)
+    Object.keys(SdkGenericBuiltInStringKindsEnum).includes(kind) ||
+    Object.keys(SdkAzureBuiltInStringKindsEnum).includes(kind)
   );
 }
 
