@@ -22,6 +22,7 @@ export const armPutResponseCodesRule = createRule({
           const operations = [
             resource.operations.lifecycle.createOrUpdate,
             resource.operations.lifecycle.update,
+            ...Object.values(resource.operations.actions),
           ];
           for (const op of operations) {
             if (op === undefined) {
