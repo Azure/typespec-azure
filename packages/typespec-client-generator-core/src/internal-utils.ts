@@ -16,6 +16,7 @@ import {
 import { HttpOperation, getHttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
+  SdkBuiltInKinds,
   SdkEnumType,
   SdkModelPropertyType,
   SdkModelType,
@@ -241,6 +242,7 @@ export interface TCGCContext {
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;
   __api_versions?: string[];
+  knownScalars?: Record<string, SdkBuiltInKinds>;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {

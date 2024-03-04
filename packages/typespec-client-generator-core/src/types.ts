@@ -28,6 +28,7 @@ import {
   getEncode,
   getFormat,
   getKnownValues,
+  getNamespaceFullName,
   getVisibility,
   ignoreDiagnostics,
   isNeverType,
@@ -132,27 +133,21 @@ export function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type)?.toLocaleLowerCase();
+  const format = getFormat(context.program, type);
   if (format) {
     switch (format) {
       case "guid":
       case "uuid":
       case "password":
       case "etag":
+      case "azureLocation":
+      case "armId":
+      case "ipAddress":
         propertyType.kind = format;
         break;
       case "url":
       case "uri":
         propertyType.kind = "url";
-        break;
-      case "armid":
-        propertyType.kind = "armId";
-        break;
-      case "ipaddress":
-        propertyType.kind = "ipAddress";
-        break;
-      case "azurelocation":
-        propertyType.kind = "azureLocation";
         break;
       default:
         break;
@@ -234,6 +229,7 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
     case "decimal":
     case "plainDate":
     case "plainTime":
+    case "azureLocation":
       return scalar.name;
     default:
       throw Error(`Unknown scalar kind ${scalar.name}`);
@@ -732,6 +728,11 @@ export function getClientTypeWithDiagnostics(
   type: Type,
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
+  if (!context.knownScalars) {
+    context.knownScalars = {
+      "Azure.Core.azureLocation": "azureLocation",
+    };
+  }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
   switch (type.kind) {
@@ -760,6 +761,8 @@ export function getClientTypeWithDiagnostics(
         addEncodeInfo(context, type, baseType);
         addFormatInfo(context, type, baseType);
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
+        const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
+        retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
