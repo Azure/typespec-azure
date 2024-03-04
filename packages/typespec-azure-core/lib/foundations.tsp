@@ -251,6 +251,7 @@ model CustomPage<
 
   @doc("The link to the next page of items")
   @nextLink
+  @visibility("read")
   nextLink?: ResourceLocation<Resource>;
 
   // Include custom response fields

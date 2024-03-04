@@ -1,4 +1,6 @@
 import {
+  createDiagnosticCollector,
+  Diagnostic,
   getDeprecationDetails,
   getDoc,
   getEffectiveModelType,
@@ -36,7 +38,7 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import { parseEmitterName, TCGCContext } from "./internal-utils.js";
-import { reportDiagnostic } from "./lib.js";
+import { createDiagnostic, reportDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -282,6 +284,28 @@ export function getCrossLanguageDefinitionId(type: {
     retval = `${getNamespaceFullName(type.namespace!)}.${retval}`;
   }
   return retval;
+}
+
+/**
+ * Helper function return the cross langauge package id for a package
+ */
+export function getCrossLanguagePackageId(context: TCGCContext): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const services = listServices(context.program);
+  if (services.length === 0) return diagnostics.wrap("");
+  const serviceNamespace = getNamespaceFullName(services[0].type);
+  if (services.length > 1) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "multiple-services",
+        target: services[0].type,
+        format: {
+          service: serviceNamespace,
+        },
+      })
+    );
+  }
+  return diagnostics.wrap(serviceNamespace);
 }
 
 /**

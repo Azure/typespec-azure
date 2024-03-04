@@ -47,7 +47,7 @@ for specific scenarios:
     - A high-level description of the bug
     - Expected and Actual Results
     - Repro steps, including any TypeSpec code that you used
-    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](#troubleshooting-vscode-tooling-and-filing-issues)
+    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](./typespec-getting-started.md#troubleshooting-vscode-tooling-and-filing-issues)
 
 ## More Information About TypeSpec
 

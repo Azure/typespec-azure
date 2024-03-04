@@ -21,6 +21,7 @@ model Page<Resource extends TypeSpec.Reflection.Model> {
 
   @doc("The link to the next page of items")
   @nextLink
+  @visibility("read")
   nextLink?: ResourceLocation<Resource>;
 }
 

@@ -9,7 +9,7 @@ You can try TypeSpec on the web without installing anything.
 
 ### Installing TypeSpec core toolset
 
-See https://microsoft.github.io/typespec/introduction/installation
+See https://typespec.io/docs
 
 ## Installing TypeSpec Azure toolsets
 
