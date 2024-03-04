@@ -354,5 +354,4 @@ scalar eTag extends string;
  * WestUS
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
 scalar azureLocation extends string;
