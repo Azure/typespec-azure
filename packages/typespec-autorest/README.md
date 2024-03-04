@@ -141,10 +141,10 @@ Create read-only property schema for lro status
 
 ##### Parameters
 
-| Name      | Type                    | Description                              |
-| --------- | ----------------------- | ---------------------------------------- |
-| pathOrUri | `valueof scalar string` | path or Uri to the example file.         |
-| title     | `valueof scalar string` | name or description of the example file. |
+| Name      | Type             | Description                              |
+| --------- | ---------------- | ---------------------------------------- |
+| pathOrUri | `valueof string` | path or Uri to the example file.         |
+| title     | `valueof string` | name or description of the example file. |
 
 #### `@useRef`
 
@@ -158,10 +158,10 @@ Create read-only property schema for lro status
 
 ##### Target
 
-`union Model | ModelProperty`
+`Model | ModelProperty`
 
 ##### Parameters
 
-| Name    | Type                    | Description                       |
-| ------- | ----------------------- | --------------------------------- |
-| jsonRef | `valueof scalar string` | path or Uri to an OpenAPI schema. |
+| Name    | Type             | Description                       |
+| ------- | ---------------- | --------------------------------- |
+| jsonRef | `valueof string` | path or Uri to an OpenAPI schema. |

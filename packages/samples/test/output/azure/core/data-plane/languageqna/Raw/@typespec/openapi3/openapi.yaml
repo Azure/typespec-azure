@@ -1115,6 +1115,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of ProjectDeployment items
     PagedProjectMetadata:
       type: object
@@ -1130,6 +1131,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of ProjectMetadata items
     PagedQnaSourceRecord:
       type: object
@@ -1145,6 +1147,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of QnaSourceRecord items
     PagedSynonymAsset:
       type: object
@@ -1160,6 +1163,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of SynonymAsset items
     ProjectDeployment:
       type: object

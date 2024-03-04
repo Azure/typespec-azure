@@ -55,7 +55,7 @@ op ArmResourceListByParent<
 > is ArmReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
@@ -81,12 +81,12 @@ op ArmResourceListAtScope<
 > is ArmReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
  * A resource GET operation
- * @template Resource the resource being patched
+ * @template Resource the resource being read
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
@@ -105,12 +105,35 @@ op ArmResourceRead<
 > is ArmReadOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
+>;
+
+/**
+ * Check a resource's existence via HEAD operation
+ * @template Resource the resource being checked
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the read operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("Check for the existence of a {name}", Resource)
+@head
+op ArmResourceCheckExistence<
+  Resource extends ArmResourceBase,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
+  Error extends {} = ErrorResponse
+> is ArmReadOperation<
+  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  Response,
+  Error
 >;
 
 /**
  * A long-running resource CreateOrUpdate (PUT)
- * @template Resource the resource being patched
+ * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -147,7 +170,7 @@ op ArmResourceCreateOrUpdateAsync<
 
 /**
  * DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
- * @template Resource the resource being patched
+ * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
@@ -173,7 +196,7 @@ op ArmResourceCreateOrUpdateSync<
 
 /**
  * Synchronous PUT operation for Azure Resource Manager resources
- * @template Resource the resource being patched
+ * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
@@ -198,7 +221,7 @@ op ArmResourceCreateOrReplaceSync<
 
 /**
  * @dev A long-running resource CreateOrUpdate (PUT)
- * @template Resource the resource being patched
+ * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -412,6 +435,7 @@ op ArmResourceDeleteAsyncBase<
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
  */
+#deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 op ArmResourceDeleteAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
