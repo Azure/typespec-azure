@@ -1905,12 +1905,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "Microsoft.OperationsTest.TestTrackedProperties2": {
