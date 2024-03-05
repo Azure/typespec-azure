@@ -22,6 +22,7 @@ import {
   Tuple,
   Type,
   Union,
+  UnionVariant,
   UsageFlags,
   createDiagnosticCollector,
   getDiscriminator,
@@ -86,6 +87,7 @@ import {
 } from "./public-utils.js";
 
 import { TCGCContext } from "./internal-utils.js";
+import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 
 function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
   return {
@@ -567,16 +569,46 @@ export function getSdkModelWithDiagnostics(
 
 function getSdkEnumValueType(
   context: TCGCContext,
-  type: EnumMember | StringLiteral | NumericLiteral
+  values: IterableIterator<EnumMember> | IterableIterator<UnionEnumVariant<string>> | IterableIterator<UnionEnumVariant<number>>
 ): SdkBuiltInType {
   let kind: "string" | "int32" | "float32" = "string";
-  if (typeof type.value === "number") {
-    kind = intOrFloat(type.value);
+  let type: EnumMember | UnionVariant;
+  for (const value of values) {
+    if ((value as EnumMember).kind) {
+      type = value as EnumMember;
+    } else {
+      type = (value as UnionEnumVariant<string> | UnionEnumVariant<number>).type;
+    }
+
+    if (typeof value.value === "number") {
+      kind = intOrFloat(value.value);
+      if (kind === "float32") {
+        break;
+      }
+    } else if (typeof value.value === "string") {
+      kind = "string";
+      break;
+    }
   }
+
   return {
-    ...getSdkTypeBaseHelper(context, type, kind),
-    encode: kind,
+    ...getSdkTypeBaseHelper(context, type!, kind!),
+    encode: kind!,
   };
+}
+
+function getUnionAsEnumValueType(context: TCGCContext, union: Union): SdkBuiltInType | undefined {
+  const nonNullOptions = getNonNullOptions(context, union);
+  for (const option of nonNullOptions) {
+    if (option.kind === "Union") {
+      const ret = getUnionAsEnumValueType(context, option);
+      if (ret) return ret;
+    } else if (option.kind === "Scalar") {
+      return getClientType(context, option) as SdkBuiltInType;
+    }
+  }
+
+  return undefined;
 }
 
 export function getSdkEnumValue(
@@ -605,7 +637,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       name: getLibraryName(context, type),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: getSdkEnumValueType(context, type.members.values().next().value),
+      valueType: getSdkEnumValueType(context, type.members.values()),
       values: [],
       isFixed: isFixed(context.program, type),
       isFlags: false,
@@ -655,7 +687,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: getSdkEnumValueType(context, type.flattenedMembers.values().next().value),
+      valueType: getUnionAsEnumValueType(context, type.union) ?? getSdkEnumValueType(context, type.flattenedMembers.values()),
       values: [],
       nullable: type.nullable,
       isFixed: !type.open,
@@ -691,7 +723,7 @@ function getKnownValuesEnum(
         name: getLibraryName(context, type),
         description: docWrapper.description,
         details: docWrapper.details,
-        valueType: getSdkEnumValueType(context, knownValues.members.values().next().value),
+        valueType: getSdkEnumValueType(context, knownValues.members.values()),
         values: [],
         isFixed: false,
         isFlags: false,
