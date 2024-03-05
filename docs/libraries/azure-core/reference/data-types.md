@@ -482,6 +482,20 @@ Repeatability Result header options
 union Azure.Core.RepeatabilityResult
 ```
 
+### `azureLocation` {#Azure.Core.azureLocation}
+
+Represents an Azure geography region where supported resource providers live.
+
+```typespec
+scalar Azure.Core.azureLocation
+```
+
+#### Examples
+
+```
+WestUS
+```
+
 ### `eTag` {#Azure.Core.eTag}
 
 The ETag (or entity tag) HTTP response header is an identifier for a specific version of a resource.
