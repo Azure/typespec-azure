@@ -164,7 +164,7 @@ op ArmResourceCreateOrUpdateAsync<
 > is ArmCreateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Resource,
-  ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Response,
   Error
 >;
 
