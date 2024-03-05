@@ -229,14 +229,14 @@ async function bumpCrossSubmoduleDependencies() {
 
     const changelog = [
       "---",
-      `"${project.manifest.name}": ${
-        change === Major ? "major" : change === Minor ? "minor" : "patch"
-      }`,
+      `"changeKind: ${change === Major ? "breaking" : change === Minor ? "feature" : "fix"}"`,
+      `packages:`,
+      `  - "${project.manifest.name}"`,
       "---",
       "Update dependencies.",
     ].join("\n");
 
-    const changelogDir = join(repoRoot, ".changesets");
+    const changelogDir = join(repoRoot, ".chronus/changes");
     mkdirSync(changelogDir, { recursive: true });
 
     if (production) {

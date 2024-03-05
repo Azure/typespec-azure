@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, UsageFlags } from "@typespec/compiler";
+import { Enum, Union, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -12,7 +12,14 @@ import {
   SdkType,
   SdkUnionType,
 } from "../src/interfaces.js";
-import { getAllModels, getSdkEnum, isReadOnly } from "../src/types.js";
+import { isErrorOrChildOfError } from "../src/public-utils.js";
+import {
+  getAllModels,
+  getAllModelsWithDiagnostics,
+  getClientType,
+  getSdkEnum,
+  isReadOnly,
+} from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "./test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
@@ -132,8 +139,17 @@ describe("typespec-client-generator-core: types", () => {
     });
 
     it("format", async function () {
-      await runner.compileWithBuiltInService(
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
         `
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+        @service({})
+        namespace MyService;
+
         @format("guid")
         scalar guid extends string;
 
@@ -151,9 +167,6 @@ describe("typespec-client-generator-core: types", () => {
 
         @format("ipAddress")
         scalar ipAddress extends string;
-
-        @format("azureLocation")
-        scalar azureLocation extends string;
 
         @format("etag")
         scalar etag extends string;
@@ -189,7 +202,7 @@ describe("typespec-client-generator-core: types", () => {
         }
       `
       );
-      const models = getAllModels(runner.context);
+      const models = getAllModels(runnerWithCore.context);
       for (const property of (models[0] as SdkModelType).properties) {
         strictEqual(
           property.type.kind,
@@ -198,6 +211,22 @@ describe("typespec-client-generator-core: types", () => {
             .replace("Property", "")
         );
       }
+    });
+
+    it("unknown format", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          @format("unknown")
+          unknownProp: string;
+        }
+      `
+      );
+      const models = getAllModels(runner.context);
+      strictEqual(models[0].kind, "model");
+      strictEqual(models[0].properties[0].type.kind, "string");
     });
 
     it("known values", async function () {
@@ -223,7 +252,8 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `
       );
-      const models = getAllModels(runner.context);
+      const [models, diagnostics] = getAllModelsWithDiagnostics(runner.context);
+      expectDiagnostics(diagnostics, []);
       const m = models.find((x) => x.name === "TestModel")!;
       const e1 = models.find((x) => x.name === "TestEnum")!;
       const e2 = models.find((x) => x.name === "testScalar")!;
@@ -339,7 +369,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
     });
@@ -355,7 +385,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc3339");
     });
@@ -371,7 +401,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "string");
       strictEqual(sdkType.encode, "rfc7231");
     });
@@ -388,7 +418,7 @@ describe("typespec-client-generator-core: types", () => {
       `
       );
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "datetime");
+      strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
     });
@@ -408,7 +438,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "datetime");
+      strictEqual(sdkType.valueType.kind, "utcDateTime");
       strictEqual(sdkType.valueType.wireType.kind, "int64");
       strictEqual(sdkType.valueType.encode, "unixTimestamp");
     });
@@ -426,7 +456,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "union");
-      strictEqual(sdkType.name, undefined);
+      strictEqual(sdkType.name, "");
       const values = sdkType.values;
       strictEqual(values.length, 2);
       strictEqual(values[0].kind, "string");
@@ -553,6 +583,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkType.name, "PetKind");
       strictEqual(sdkType.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
@@ -719,6 +750,118 @@ describe("typespec-client-generator-core: types", () => {
       );
     });
 
+    it("float extensible", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      enum Floats {
+        a: 1,
+        b: 2.1,
+        c: 3,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: Floats
+      }
+      `);
+
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const sdkType = models.find((x) => x.kind === "enum")! as SdkEnumType;
+      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.name, "Floats");
+      strictEqual(sdkType.valueType.kind, "float32");
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+      deepEqual(
+        values.map((x) => x.name),
+        ["a", "b", "c"]
+      );
+      deepEqual(
+        values.map((x) => x.value),
+        [1, 2.1, 3]
+      );
+    });
+
+    it("union as enum float type", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union Floats {
+        float,
+        a: 1,
+        b: 2,
+        c: 3,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: Floats
+      }
+      `);
+
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const sdkType = models.find((x) => x.kind === "enum")! as SdkEnumType;
+      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.name, "Floats");
+      strictEqual(sdkType.valueType.kind, "float");
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+      deepEqual(
+        values.map((x) => x.name),
+        ["a", "b", "c"]
+      );
+      deepEqual(
+        values.map((x) => x.value),
+        [1, 2, 3]
+      );
+    });
+
+    it("union of union as enum float type", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union BaseEnum {
+        int32,
+        a: 1,
+      }
+      
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union ExtendedEnum {
+        BaseEnum,
+        b: 2,
+        c: 3,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: ExtendedEnum
+      }
+      `);
+
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const sdkType = models.find((x) => x.name === "ExtendedEnum")! as SdkEnumType;
+      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.valueType.kind, "int32");
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+      deepEqual(
+        values.map((x) => x.name),
+        ["a", "b", "c"]
+      );
+      deepEqual(
+        values.map((x) => x.value),
+        [1, 2, 3]
+      );
+    });
+
     it("string fixed", async function () {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
@@ -752,7 +895,7 @@ describe("typespec-client-generator-core: types", () => {
           }
         }
       `);
-      const models = Array.from(getAllModels(runnerWithCore.context));
+      const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 2);
       const sdkType = models.find((x) => x.kind === "enum")! as SdkEnumType;
       strictEqual(sdkType.isFixed, true);
@@ -797,7 +940,7 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].access, "internal");
     });
@@ -822,7 +965,7 @@ describe("typespec-client-generator-core: types", () => {
           }
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const integersEnum = models.find((x) => x.kind === "enum")! as SdkEnumType;
       strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
@@ -841,7 +984,7 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].deprecation, "no longer support");
     });
@@ -867,8 +1010,7 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      const models = Array.from(getAllModels(runner.context));
-      strictEqual(models.length, 1);
+      const models = getAllModels(runner.context);
       strictEqual(models[0].name, "Enum1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
     });
@@ -914,7 +1056,37 @@ describe("typespec-client-generator-core: types", () => {
       await helper("@azure-tools/typespec-csharp", "Enum1", "One");
       await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
     });
+
+    it("union as enum rename", async () => {
+      const { TestUnion } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        namespace N {
+          @test
+          union TestUnion{
+            @clientName("ARename")
+            "A",
+            "B": "B_v",
+            string
+          }
+          op x(body: TestUnion): void;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(N.TestUnion, "TestUnionRename");
+        @@clientName(N.TestUnion.B, "BRename");
+      `
+      )) as { TestUnion: Union };
+
+      const enumType = getClientType(runner.context, TestUnion) as SdkEnumType;
+      strictEqual(enumType.name, "TestUnionRename");
+      strictEqual(enumType.values[0].name, "ARename");
+      strictEqual(enumType.values[1].name, "BRename");
+    });
   });
+
   describe("SdkBodyModelPropertyType", () => {
     it("required", async function () {
       await runner.compileWithBuiltInService(`
@@ -1140,7 +1312,7 @@ describe("typespec-client-generator-core: types", () => {
           op test(@body input: InputModel): OutputModel;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["InputModel", "OutputModel"].sort());
@@ -1157,7 +1329,7 @@ describe("typespec-client-generator-core: types", () => {
           op test(@body input: Record<InnerModel>): void;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["InnerModel"].sort());
@@ -1174,7 +1346,7 @@ describe("typespec-client-generator-core: types", () => {
           op test(@body input: InnerModel[]): void;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["InnerModel"].sort());
@@ -1195,7 +1367,7 @@ describe("typespec-client-generator-core: types", () => {
           op test(@body input: InputModel): void;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["InputModel", "InnerModel"].sort());
@@ -1216,7 +1388,7 @@ describe("typespec-client-generator-core: types", () => {
           op test(@body input: InputModel): void;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["InputModel", "BaseModel"].sort());
@@ -1234,7 +1406,7 @@ describe("typespec-client-generator-core: types", () => {
 
       op test(@body input: DerivedModel): void;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["InputModel", "DerivedModel"].sort());
@@ -1248,7 +1420,7 @@ describe("typespec-client-generator-core: types", () => {
         prop: RecursiveModel
       }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const recursiveModel = models[0];
       strictEqual(recursiveModel.name, "RecursiveModel");
@@ -1292,7 +1464,7 @@ describe("typespec-client-generator-core: types", () => {
       @get
       op getModel(): Fish;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
       const fish = models.find((x) => x.name === "Fish")! as SdkModelType;
       const kindProperty = fish.properties.find(
@@ -1320,7 +1492,7 @@ describe("typespec-client-generator-core: types", () => {
       @get
       op getModel(): Fish;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const fish = models.find((x) => x.name === "Fish")! as SdkModelType;
       const kindProperty = fish.properties.find(
@@ -1352,7 +1524,7 @@ describe("typespec-client-generator-core: types", () => {
       @get
       op getExtensibleModel(): Dog;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 3);
 
       const golden = models.find((x) => x.name === "Golden")! as SdkModelType;
@@ -1374,7 +1546,9 @@ describe("typespec-client-generator-core: types", () => {
     it("union to extensible enum values", async () => {
       await runner.compileWithBuiltInService(`
       union PetKind {
+        @doc("Cat")
         Cat: "cat",
+        @doc("Dog")
         Dog: "dog",
         string,
       }
@@ -1383,7 +1557,7 @@ describe("typespec-client-generator-core: types", () => {
       @put
       op putPet(@body petKind: PetKind): void;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const petKind = models[0] as SdkEnumType;
       strictEqual(petKind.name, "PetKind");
@@ -1397,15 +1571,62 @@ describe("typespec-client-generator-core: types", () => {
 
       const catValue = values.find((x) => x.name === "Cat")!;
       strictEqual(catValue.value, "cat");
+      strictEqual(catValue.description, "Cat");
       strictEqual(catValue.enumType, petKind);
       strictEqual(catValue.valueType, petKind.valueType);
       strictEqual(catValue.kind, "enumvalue");
 
       const dogValue = values.find((x) => x.name === "Dog")!;
       strictEqual(dogValue.value, "dog");
+      strictEqual(dogValue.description, "Dog");
       strictEqual(dogValue.enumType, petKind);
       strictEqual(dogValue.valueType, petKind.valueType);
       strictEqual(dogValue.kind, "enumvalue");
+    });
+
+    it("template variable of anonymous union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      interface GetAndSend<Type> {
+        get(): {
+          prop: Type;
+        };
+      
+        send(prop: Type): void;
+      }
+      
+      @route("/string-extensible")
+      interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 3);
+      const prop = models.find((x) => x.generatedName === "GetResponseProp")! as SdkEnumType;
+      strictEqual(prop.isFixed, false);
+      strictEqual(prop.valueType.kind, "string");
+      const req = models.find((x) => x.generatedName === "SendRequest")! as SdkModelType;
+      const resp = models.find((x) => x.generatedName === "GetResponse")! as SdkModelType;
+      strictEqual(req.properties[0].type, prop);
+      strictEqual(resp.properties[0].type, prop);
+    });
+
+    it("property of anonymous union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      model Pet {
+        kind: string | "cat" | "dog";
+      }
+
+      @route("/extensible-enum")
+      @put
+      op putPet(@body pet: Pet): void;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const pet = models.find((x) => x.name === "Pet")! as SdkModelType;
+      const kind = models.find((x) => x.name === "")!;
+      strictEqual(kind.generatedName, "PetKind");
+      const kindProperty = pet.properties.find(
+        (x) => (x.nameInClient = "kind")
+      )! as SdkBodyModelPropertyType;
+      strictEqual(kindProperty.type, kind);
     });
 
     it("enum discriminator model without base discriminator property", async () => {
@@ -1427,7 +1648,7 @@ describe("typespec-client-generator-core: types", () => {
       @get
       op getExtensibleModel(): Dog;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 3);
 
       const golden = models.find((x) => x.name === "Golden")! as SdkModelType;
@@ -1477,7 +1698,7 @@ describe("typespec-client-generator-core: types", () => {
       @get
       op getModel(): Fish;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
       const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
       strictEqual(shark.properties.length, 2);
@@ -1486,6 +1707,49 @@ describe("typespec-client-generator-core: types", () => {
       )! as SdkBodyModelPropertyType;
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
+    });
+
+    it("union discriminator", async () => {
+      await runner.compileWithBuiltInService(`
+      union KindType {
+        string,
+        shark: "shark",
+        salmon: "salmon"
+      };
+
+      @discriminator("kind")
+      model Fish {
+        age: int32;
+      }
+
+      model Shark extends Fish {
+        kind: KindType.shark;
+        hasFin: boolean;
+      }
+
+      model Salmon extends Fish {
+        kind: KindType.salmon;
+        norweigan: boolean;
+      }
+
+      @get
+      op getModel(): Fish;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 4);
+      const fish = models.find((x) => x.name === "Fish")! as SdkModelType;
+      let kindTypeProperty = fish.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enum");
+      const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
+      strictEqual(shark.discriminatorValue, "shark");
+      kindTypeProperty = shark.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      const salmon = models.find((x) => x.name === "Salmon")! as SdkModelType;
+      kindTypeProperty = salmon.properties.find((x) => x.nameInClient === "kind")!;
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      strictEqual(salmon.discriminatorValue, "salmon");
+      const kindType = models.find((x) => x.name === "KindType")! as SdkEnumType;
+      strictEqual(kindType.isFixed, false);
     });
 
     it("filterOutCoreModels true", async () => {
@@ -1515,7 +1779,7 @@ describe("typespec-client-generator-core: types", () => {
           op createOrUpdate is ResourceCreateOrUpdate<User>;
         }
       `);
-      const models = Array.from(getAllModels(runnerWithCore.context));
+      const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].name, "User");
     });
@@ -1548,7 +1812,7 @@ describe("typespec-client-generator-core: types", () => {
           op createOrUpdate is ResourceCreateOrUpdate<User>;
         }
       `);
-      const models = Array.from(getAllModels(runnerWithCore.context));
+      const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 4);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(modelNames, ["Error", "ErrorResponse", "InnerError", "User"].sort());
@@ -1582,7 +1846,7 @@ describe("typespec-client-generator-core: types", () => {
           op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
         }
       `);
-      const models = Array.from(getAllModels(runnerWithCore.context));
+      const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].name, "User");
     });
@@ -1615,7 +1879,7 @@ describe("typespec-client-generator-core: types", () => {
           op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
         }
       `);
-      const models = Array.from(getAllModels(runnerWithCore.context));
+      const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 6);
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(
@@ -1635,7 +1899,7 @@ describe("typespec-client-generator-core: types", () => {
         @service({})
         @test namespace MyService { }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 0);
     });
     it("no models don't filter core", async () => {
@@ -1643,7 +1907,7 @@ describe("typespec-client-generator-core: types", () => {
         @service({})
         @test namespace MyService { }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 0);
     });
     it("input usage", async () => {
@@ -1653,15 +1917,12 @@ describe("typespec-client-generator-core: types", () => {
         }
         op operation(@body input: InputModel): void;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].usage, UsageFlags.Input);
 
-      strictEqual(
-        Array.from(getAllModels(runner.context, { input: true, output: false })).length,
-        1
-      );
-      strictEqual(Array.from(getAllModels(runner.context, { input: false })).length, 0);
+      strictEqual(getAllModels(runner.context, { input: true, output: false }).length, 1);
+      strictEqual(getAllModels(runner.context, { input: false }).length, 0);
     });
 
     it("output usage", async () => {
@@ -1671,15 +1932,12 @@ describe("typespec-client-generator-core: types", () => {
         }
         op operation(): OutputModel;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].usage, UsageFlags.Output);
 
-      strictEqual(
-        Array.from(getAllModels(runner.context, { input: false, output: true })).length,
-        1
-      );
-      strictEqual(Array.from(getAllModels(runner.context, { output: false })).length, 0);
+      strictEqual(getAllModels(runner.context, { input: false, output: true }).length, 1);
+      strictEqual(getAllModels(runner.context, { output: false }).length, 0);
     });
 
     it("roundtrip usage", async () => {
@@ -1689,22 +1947,13 @@ describe("typespec-client-generator-core: types", () => {
         }
         op operation(@body input: RoundtripModel): RoundtripModel;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
 
-      strictEqual(
-        Array.from(getAllModels(runner.context, { input: false, output: true })).length,
-        1
-      );
-      strictEqual(
-        Array.from(getAllModels(runner.context, { input: true, output: false })).length,
-        1
-      );
-      strictEqual(
-        Array.from(getAllModels(runner.context, { input: false, output: false })).length,
-        0
-      );
+      strictEqual(getAllModels(runner.context, { input: false, output: true }).length, 1);
+      strictEqual(getAllModels(runner.context, { input: true, output: false }).length, 1);
+      strictEqual(getAllModels(runner.context, { input: false, output: false }).length, 0);
     });
 
     it("unnamed model", async () => {
@@ -1717,7 +1966,7 @@ describe("typespec-client-generator-core: types", () => {
           @body body: Test
         ): void;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 3);
       const propreties: string[] = [];
       models.forEach((model) => {
@@ -1739,7 +1988,7 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].access, "internal");
     });
@@ -1796,7 +2045,7 @@ describe("typespec-client-generator-core: types", () => {
           @body body: Test6
         ): void;
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 6);
 
       const Test1 = models.find((x) => x.name === "Test1")!;
@@ -1835,7 +2084,7 @@ describe("typespec-client-generator-core: types", () => {
           prop: string;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 3);
       const AdditionalPropertiesModel = models.find(
         (x) => x.name === "AdditionalPropertiesModel"
@@ -1852,6 +2101,39 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
       strictEqual(NonAdditionalPropertiesModel.additionalProperties, undefined);
     });
+    it("additionalProperties usage", async () => {
+      await runner.compileWithBuiltInService(`
+        @service({})
+        namespace MyService {
+          model AdditionalPropertiesModel extends Record<Test> {
+          }
+  
+          model AdditionalPropertiesModel2 is Record<Test> {
+          }
+
+          model Test {
+          }
+
+          op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+        }
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 3);
+      const AdditionalPropertiesModel = models.find(
+        (x) => x.name === "AdditionalPropertiesModel"
+      )! as SdkModelType;
+      const AdditionalPropertiesModel2 = models.find(
+        (x) => x.name === "AdditionalPropertiesModel2"
+      )! as SdkModelType;
+      const Test = models.find((x) => x.name === "Test")! as SdkModelType;
+      strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel.usage, UsageFlags.Input);
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel2.usage, UsageFlags.Output);
+      strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output);
+    });
     it("crossLanguageDefinitionId", async () => {
       await runner.compile(`
         @service({})
@@ -1865,7 +2147,7 @@ describe("typespec-client-generator-core: types", () => {
           model OutputModel {}
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const inputModel = models.find((x) => x.name === "InputModel")!;
       strictEqual(inputModel.crossLanguageDefinitionId, "MyService.InputModel");
@@ -1911,7 +2193,7 @@ describe("typespec-client-generator-core: types", () => {
           deploymentDateUtc?: utcDateTime;
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 4);
       const catalog = models.find((x) => x.name === "Catalog")! as SdkModelType;
       const deployment = models.find((x) => x.name === "Deployment")! as SdkModelType;
@@ -1930,7 +2212,7 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].deprecation, "no longer support");
     });
@@ -1948,7 +2230,7 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].name, "Model1");
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
@@ -1980,8 +2262,58 @@ describe("typespec-client-generator-core: types", () => {
           }
         }
       `);
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
+    });
+    it("error model", async () => {
+      await runner.compileWithBuiltInService(`
+        @error
+        model ApiError {
+          code: string;
+        }
+
+        op test(): ApiError;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 1);
+      strictEqual(models[0].kind, "model");
+      strictEqual(models[0].isError, true);
+      const rawModel = models[0].__raw!;
+      strictEqual(rawModel.kind, "Model");
+      strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
+    });
+
+    it("error model inheritance", async () => {
+      await runner.compileWithBuiltInService(`
+        model ValidResponse {
+          prop: string;
+        };
+
+        @error
+        model ApiError {
+          code: string
+        };
+
+        model FourHundredError extends ApiError {};
+        model FourZeroFourError extends FourHundredError {};
+        model FiveHundredError extends ApiError {};
+
+        op test(): ValidResponse | FourZeroFourError | FiveHundredError;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 5);
+      const errorModels = models.filter((x) => x.kind === "model" && x.isError);
+      deepStrictEqual(errorModels.map((x) => x.name).sort(), [
+        "ApiError",
+        "FiveHundredError",
+        "FourHundredError",
+        "FourZeroFourError",
+      ]);
+      const validModel = models.filter((x) => x.kind === "model" && !x.isError);
+      deepStrictEqual(
+        validModel.map((x) => x.name),
+        ["ValidResponse"]
+      );
     });
   });
   describe("SdkMultipartFormType", () => {
@@ -1995,7 +2327,7 @@ describe("typespec-client-generator-core: types", () => {
       op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const model = models[0] as SdkModelType;
       strictEqual(model.kind, "model");
@@ -2010,7 +2342,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(profileImage.isMultipartFileInput, true);
     });
     it("multipart conflicting model usage", async function () {
-      const diagnostics = await runner.diagnose(
+      await runner.compile(
         `
         @service({title: "Test Service"}) namespace TestService;
         model MultiPartRequest {
@@ -2022,7 +2354,7 @@ describe("typespec-client-generator-core: types", () => {
         @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
       `
       );
-      getAllModels(runner.context);
+      const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
       });
@@ -2042,7 +2374,7 @@ describe("typespec-client-generator-core: types", () => {
         @post op normalOperation(...B): void;
         `
       );
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const modelA = models.find((x) => x.name === "A")!;
       strictEqual(modelA.kind, "model");
@@ -2079,7 +2411,7 @@ describe("typespec-client-generator-core: types", () => {
         @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
         `
       );
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 3);
     });
 
@@ -2093,7 +2425,7 @@ describe("typespec-client-generator-core: types", () => {
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
         `
       );
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const model = models[0] as SdkModelType;
       strictEqual(model.properties.length, 1);
@@ -2103,7 +2435,7 @@ describe("typespec-client-generator-core: types", () => {
     });
 
     it("multipart with encoding bytes raises error", async function () {
-      const diagnostics = await runner.diagnose(
+      await runner.compile(
         `
         @service({title: "Test Service"}) namespace TestService;
         model EncodedBytesMFD {
@@ -2114,8 +2446,7 @@ describe("typespec-client-generator-core: types", () => {
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
         `
       );
-      getAllModels(runner.context);
-      expectDiagnostics(diagnostics, {
+      expectDiagnostics(getAllModelsWithDiagnostics(runner.context)[1], {
         code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
       });
     });
@@ -2160,7 +2491,7 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      const models = Array.from(getAllModels(runner.context));
+      const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       const scopes = (models[0] as SdkModelType).properties.find(
         (x) => x.nameInClient === "scopes"

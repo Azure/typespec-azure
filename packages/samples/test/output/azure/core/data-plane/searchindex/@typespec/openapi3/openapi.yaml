@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: SearchIndexClient
-  version: 2021-04-30-Preview
+  version: 0.0.0
 tags:
   - name: Documents
 paths:

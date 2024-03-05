@@ -99,6 +99,18 @@ export const $lib = createTypeSpecLibrary({
           "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",
       },
     },
+    "unsupported-kind": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Unsupported kind ${"kind"}`,
+      },
+    },
+    "multiple-services": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
+      },
+    },
   },
 });
 

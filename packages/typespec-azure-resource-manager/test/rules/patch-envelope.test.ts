@@ -66,6 +66,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           @autoRoute
@@ -134,6 +135,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
       }
 
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-patch-model" "Test"

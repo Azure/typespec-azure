@@ -77,6 +77,7 @@ interface TrackedResourceOperations<
  * @template Resource the ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
+#suppress "deprecated" "This should be deprecated in a future release"
 interface ProxyResourceOperations<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>
@@ -97,6 +98,7 @@ interface ProxyResourceOperations<
  * @template Resource the ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  */
+#suppress "deprecated" "This should be deprecated in a future release"
 interface TenantResourceOperations<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model
@@ -114,6 +116,7 @@ interface TenantResourceOperations<
  * @template BaseParameters The http parameters that are part of the request
  * @template PatchModel The model used for PATCH operations
  */
+#suppress "deprecated" "This should be deprecated in a future release"
 interface ResourceInstanceOperations<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model,
@@ -227,6 +230,7 @@ interface ResourceCreateAsync<
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
+#deprecated "This should be deprecated in a future release"
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteAsync<
   Resource extends ArmResource,
@@ -327,6 +331,7 @@ interface ResourceUpdateSync<
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  */
+#suppress "deprecated" "This should be deprecated in a future release"
 interface ExtensionResourceInstanceOperations<
   Resource extends ArmResource,
   Properties extends TypeSpec.Reflection.Model
@@ -366,6 +371,7 @@ alias ResourceUpdate<
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceUpdateSync<Resource, Properties, BaseParameters>;
 
+#suppress "deprecated" "This should be deprecated in a future release"
 alias ResourceDelete<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>
@@ -391,6 +397,7 @@ alias ExtensionResourceUpdate<
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties, ExtensionBaseParameters>;
 
+#suppress "deprecated" "This should be deprecated in a future release"
 alias ExtensionResourceDelete<Resource extends ArmResource> = ResourceDelete<
   Resource,
   ExtensionBaseParameters
@@ -413,6 +420,7 @@ alias TenantResourceCreate<Resource extends ArmResource> = ResourceCreateAsync<
   TenantBaseParameters
 >;
 
+#suppress "deprecated" "This should be deprecated in a future release"
 alias TenantResourceDelete<Resource extends ArmResource> = ResourceDelete<
   Resource,
   TenantBaseParameters
