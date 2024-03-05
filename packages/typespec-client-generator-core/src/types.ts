@@ -86,8 +86,8 @@ import {
   isErrorOrChildOfError,
 } from "./public-utils.js";
 
-import { TCGCContext } from "./internal-utils.js";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
+import { TCGCContext } from "./internal-utils.js";
 
 function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
   return {
@@ -569,7 +569,10 @@ export function getSdkModelWithDiagnostics(
 
 function getSdkEnumValueType(
   context: TCGCContext,
-  values: IterableIterator<EnumMember> | IterableIterator<UnionEnumVariant<string>> | IterableIterator<UnionEnumVariant<number>>
+  values:
+    | IterableIterator<EnumMember>
+    | IterableIterator<UnionEnumVariant<string>>
+    | IterableIterator<UnionEnumVariant<number>>
 ): SdkBuiltInType {
   let kind: "string" | "int32" | "float32" = "string";
   let type: EnumMember | UnionVariant;
@@ -687,7 +690,9 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: getUnionAsEnumValueType(context, type.union) ?? getSdkEnumValueType(context, type.flattenedMembers.values()),
+      valueType:
+        getUnionAsEnumValueType(context, type.union) ??
+        getSdkEnumValueType(context, type.flattenedMembers.values()),
       values: [],
       nullable: type.nullable,
       isFixed: !type.open,
