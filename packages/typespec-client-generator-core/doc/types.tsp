@@ -701,7 +701,7 @@ model SdkFloat32Validation is SdkNumericValidationTemplate<"float32", float32>;
 model SdkFloat64Validation is SdkNumericValidationTemplate<"float64", float64>;
 
 /**
- * Representiation of an SdkClient
+ * Representation of an SdkClient
  *
  * @property name: name of the client
  * @property description: documentation of the client
