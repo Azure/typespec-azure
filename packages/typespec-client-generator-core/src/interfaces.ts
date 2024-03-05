@@ -100,7 +100,7 @@ type SdkStringKinds =
   | "guid"
   | "url"
   | "uuid"
-  | "etag"
+  | "eTag"
   | "armId"
   | "ipAddress"
   | "azureLocation";

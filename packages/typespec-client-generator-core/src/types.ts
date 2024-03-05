@@ -121,7 +121,7 @@ function addFormatInfo(
       case "guid":
       case "uuid":
       case "password":
-      case "etag":
+      case "eTag":
       case "azureLocation":
       case "armId":
       case "ipAddress":
