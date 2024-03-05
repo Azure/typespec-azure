@@ -22,6 +22,7 @@ import {
   Tuple,
   Type,
   Union,
+  UnionVariant,
   UsageFlags,
   createDiagnosticCollector,
   getDiscriminator,
@@ -83,6 +84,8 @@ import {
   SdkTupleType,
   SdkType,
   SdkUnionType,
+  getKnownScalars,
+  isSdkBuiltInKind,
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
@@ -104,6 +107,7 @@ import {
   isErrorOrChildOfError,
 } from "./public-utils.js";
 
+import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { TCGCContext } from "./internal-utils.js";
 
 function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
@@ -133,26 +137,8 @@ export function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type);
-  if (format) {
-    switch (format) {
-      case "guid":
-      case "uuid":
-      case "password":
-      case "etag":
-      case "azureLocation":
-      case "armId":
-      case "ipAddress":
-        propertyType.kind = format;
-        break;
-      case "url":
-      case "uri":
-        propertyType.kind = "url";
-        break;
-      default:
-        break;
-    }
-  }
+  const format = getFormat(context.program, type) ?? "";
+  if (isSdkBuiltInKind(format)) propertyType.kind = format;
 }
 
 /**
@@ -206,34 +192,10 @@ export function addEncodeInfo(
  * @returns the corresponding sdk built in kind
  */
 function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
-  switch (scalar.name) {
-    case "int8":
-    case "int16":
-    case "int32":
-    case "int64":
-    case "uint8":
-    case "uint16":
-    case "uint32":
-    case "uint64":
-    case "numeric":
-    case "integer":
-    case "safeint":
-    case "decimal128":
-    case "bytes":
-    case "float":
-    case "float32":
-    case "float64":
-    case "boolean":
-    case "string":
-    case "url":
-    case "decimal":
-    case "plainDate":
-    case "plainTime":
-    case "azureLocation":
-      return scalar.name;
-    default:
-      throw Error(`Unknown scalar kind ${scalar.name}`);
+  if (isSdkBuiltInKind(scalar.name)) {
+    return scalar.name;
   }
+  throw Error(`Unknown scalar kind ${scalar.name}`);
 }
 
 /**
@@ -249,7 +211,9 @@ export function getSdkBuiltInType(
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
     if (type.kind === "Scalar") {
-      kind = getScalarKind(type);
+      if (isSdkBuiltInKind(type.name)) {
+        kind = getScalarKind(type);
+      }
     }
     return {
       ...getSdkTypeBaseHelper(context, type, kind),
@@ -579,16 +543,49 @@ export function getSdkModelWithDiagnostics(
 
 function getSdkEnumValueType(
   context: TCGCContext,
-  type: EnumMember | StringLiteral | NumericLiteral
+  values:
+    | IterableIterator<EnumMember>
+    | IterableIterator<UnionEnumVariant<string>>
+    | IterableIterator<UnionEnumVariant<number>>
 ): SdkBuiltInType {
   let kind: "string" | "int32" | "float32" = "string";
-  if (typeof type.value === "number") {
-    kind = intOrFloat(type.value);
+  let type: EnumMember | UnionVariant;
+  for (const value of values) {
+    if ((value as EnumMember).kind) {
+      type = value as EnumMember;
+    } else {
+      type = (value as UnionEnumVariant<string> | UnionEnumVariant<number>).type;
+    }
+
+    if (typeof value.value === "number") {
+      kind = intOrFloat(value.value);
+      if (kind === "float32") {
+        break;
+      }
+    } else if (typeof value.value === "string") {
+      kind = "string";
+      break;
+    }
   }
+
   return {
-    ...getSdkTypeBaseHelper(context, type, kind),
-    encode: kind,
+    ...getSdkTypeBaseHelper(context, type!, kind!),
+    encode: kind!,
   };
+}
+
+function getUnionAsEnumValueType(context: TCGCContext, union: Union): SdkBuiltInType | undefined {
+  const nonNullOptions = getNonNullOptions(union);
+  for (const option of nonNullOptions) {
+    if (option.kind === "Union") {
+      const ret = getUnionAsEnumValueType(context, option);
+      if (ret) return ret;
+    } else if (option.kind === "Scalar") {
+      return getClientType(context, option) as SdkBuiltInType;
+    }
+  }
+
+  return undefined;
 }
 
 export function getSdkEnumValue(
@@ -617,7 +614,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       name: getLibraryName(context, type),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: getSdkEnumValueType(context, type.members.values().next().value),
+      valueType: getSdkEnumValueType(context, type.members.values()),
       values: [],
       isFixed: isFixed(context.program, type),
       isFlags: false,
@@ -668,7 +665,9 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: getSdkEnumValueType(context, type.flattenedMembers.values().next().value),
+      valueType:
+        getUnionAsEnumValueType(context, type.union) ??
+        getSdkEnumValueType(context, type.flattenedMembers.values()),
       values: [],
       nullable: type.nullable,
       isFixed: !type.open,
@@ -705,7 +704,7 @@ function getKnownValuesEnum(
         name: getLibraryName(context, type),
         description: docWrapper.description,
         details: docWrapper.details,
-        valueType: getSdkEnumValueType(context, knownValues.members.values().next().value),
+        valueType: getSdkEnumValueType(context, knownValues.members.values()),
         values: [],
         isFixed: false,
         isFlags: false,
@@ -729,9 +728,7 @@ export function getClientTypeWithDiagnostics(
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
   if (!context.knownScalars) {
-    context.knownScalars = {
-      "Azure.Core.azureLocation": "azureLocation",
-    };
+    context.knownScalars = getKnownScalars();
   }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
