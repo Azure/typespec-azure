@@ -72,6 +72,8 @@ import {
   SdkModelType,
   SdkTupleType,
   SdkType,
+  getKnownScalars,
+  isSdkBuiltInKind,
 } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -117,26 +119,8 @@ function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type);
-  if (format) {
-    switch (format) {
-      case "guid":
-      case "uuid":
-      case "password":
-      case "etag":
-      case "azureLocation":
-      case "armId":
-      case "ipAddress":
-        propertyType.kind = format;
-        break;
-      case "url":
-      case "uri":
-        propertyType.kind = "url";
-        break;
-      default:
-        break;
-    }
-  }
+  const format = getFormat(context.program, type) ?? "";
+  if (isSdkBuiltInKind(format)) propertyType.kind = format;
 }
 
 /**
@@ -187,34 +171,10 @@ function addEncodeInfo(
  * @returns the corresponding sdk built in kind
  */
 function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
-  switch (scalar.name) {
-    case "int8":
-    case "int16":
-    case "int32":
-    case "int64":
-    case "uint8":
-    case "uint16":
-    case "uint32":
-    case "uint64":
-    case "numeric":
-    case "integer":
-    case "safeint":
-    case "decimal128":
-    case "bytes":
-    case "float":
-    case "float32":
-    case "float64":
-    case "boolean":
-    case "string":
-    case "url":
-    case "decimal":
-    case "plainDate":
-    case "plainTime":
-    case "azureLocation":
-      return scalar.name;
-    default:
-      throw Error(`Unknown scalar kind ${scalar.name}`);
+  if (isSdkBuiltInKind(scalar.name)) {
+    return scalar.name;
   }
+  throw Error(`Unknown scalar kind ${scalar.name}`);
 }
 
 /**
@@ -230,7 +190,9 @@ export function getSdkBuiltInType(
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
     if (type.kind === "Scalar") {
-      kind = getScalarKind(type);
+      if (isSdkBuiltInKind(type.name)) {
+        kind = getScalarKind(type);
+      }
     }
     return {
       ...getSdkTypeBaseHelper(context, type, kind),
@@ -747,9 +709,7 @@ export function getClientTypeWithDiagnostics(
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
   if (!context.knownScalars) {
-    context.knownScalars = {
-      "Azure.Core.azureLocation": "azureLocation",
-    };
+    context.knownScalars = getKnownScalars();
   }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
