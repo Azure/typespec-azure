@@ -53,7 +53,7 @@
     "@types/node": "~18.11.19",
     "@typespec/eslint-config-typespec": "workspace:~",
     "@typespec/internal-build-utils": "workspace:~",
-    "@typespec/samples": "workspace:~1.0.0",
+    "@typespec/samples": "workspace:~",
     "@vitest/coverage-v8": "^1.2.2",
     "@vitest/ui": "^1.2.2",
     "autorest": "~3.7.1",

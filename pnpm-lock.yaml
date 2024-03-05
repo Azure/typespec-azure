@@ -1555,7 +1555,7 @@ importers:
   packages/e2e-tests:
     devDependencies:
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       dotenv:
         specifier: ~16.4.1
@@ -1567,47 +1567,47 @@ importers:
   packages/samples:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi3
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
     devDependencies:
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/internal-build-utils':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/internal-build-utils
       '@typespec/samples':
-        specifier: workspace:~1.0.0
+        specifier: workspace:~
         version: link:../../core/packages/samples
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -1637,43 +1637,43 @@ importers:
   packages/typespec-autorest:
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/json-schema':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/json-schema
       '@typespec/library-linter':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -1706,31 +1706,31 @@ importers:
         specifier: ~18.11.19
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -1757,37 +1757,37 @@ importers:
   packages/typespec-azure-playground-website:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@emotion/react':
         specifier: ^11.11.3
         version: 11.11.3(@types/react@18.2.55)(react@18.2.0)
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi3
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       '@vitejs/plugin-react':
         specifier: ~4.2.1
@@ -1818,13 +1818,13 @@ importers:
         specifier: ~18.2.19
         version: 18.2.19
       '@typespec/bundler':
-        specifier: workspace:~0.1.1
+        specifier: workspace:~
         version: link:../../core/packages/bundler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/playground':
-        specifier: workspace:~0.2.0
+        specifier: workspace:~
         version: link:../../core/packages/playground
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -1851,46 +1851,46 @@ importers:
   packages/typespec-azure-portal-core:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -1917,40 +1917,40 @@ importers:
   packages/typespec-azure-resource-manager:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -1984,7 +1984,7 @@ importers:
         version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.19
@@ -1993,31 +1993,31 @@ importers:
         specifier: ^0.0.33
         version: 0.0.33
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/library-linter
       '@typespec/prettier-plugin-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/prettier-plugin-typespec
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -2044,44 +2044,44 @@ importers:
   packages/typespec-service-csharp:
     dependencies:
       '@typespec/versioning':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/versioning
       change-case:
         specifier: ~5.4.2
         version: 5.4.2
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
       '@typespec/compiler':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/compiler
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/eslint-plugin':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-plugin-typespec
       '@typespec/http':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: ^1.2.2
@@ -2123,10 +2123,10 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(@types/react@18.2.55)(react@18.2.0)
       '@typespec/playground':
-        specifier: workspace:~0.2.0
+        specifier: workspace:~
         version: link:../../core/packages/playground
       '@typespec/website':
-        specifier: workspace:~1.0.0
+        specifier: workspace:~
         version: link:../../core/packages/website
       clsx:
         specifier: ^2.1.0
@@ -2148,22 +2148,22 @@ importers:
         version: 18.2.0(react@18.2.0)
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-playground-website':
-        specifier: workspace:~1.0.0
+        specifier: workspace:~
         version: link:../typespec-azure-playground-website
       '@azure-tools/typespec-azure-portal-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-portal-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~0.40.0
+        specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@azure-tools/typespec-service-csharp':
-        specifier: workspace:~0.32.0
+        specifier: workspace:~
         version: link:../typespec-service-csharp
       '@docusaurus/module-type-aliases':
         specifier: ^3.1.1
@@ -2181,10 +2181,10 @@ importers:
         specifier: ~18.2.55
         version: 18.2.55
       '@typespec/eslint-config-typespec':
-        specifier: workspace:~0.54.0
+        specifier: workspace:~
         version: link:../../core/packages/eslint-config-typespec
       '@typespec/tspd':
-        specifier: workspace:~0.46.0
+        specifier: workspace:~
         version: link:../../core/packages/tspd
       dotenv:
         specifier: ~16.4.1
