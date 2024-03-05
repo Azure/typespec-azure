@@ -32,7 +32,6 @@
 - @typespec/http@0.53.0
 - @typespec/rest@0.53.0
 
-This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 
 ## 0.38.0
 

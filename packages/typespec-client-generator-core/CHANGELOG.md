@@ -51,7 +51,6 @@
 
 - 1f1864a: fix incorrect linter error for models not directly used in multipart operations
 
-This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 
 ## 0.38.0
 

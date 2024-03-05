@@ -38,7 +38,6 @@
 - 8b072f4: Emit warning if using opendIdConnect http auth scheme
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
 
-This log was last generated on Mon, 29 Jan 2024 22:16:39 GMT and should not be manually modified.
 
 ## 0.38.1
 

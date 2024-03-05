@@ -32,7 +32,6 @@
 - ebfe639: Fix Location resource issue, add mechanism for additional path segments
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
 
-This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 
 ## 0.38.0
 
