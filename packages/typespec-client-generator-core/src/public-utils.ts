@@ -260,8 +260,8 @@ export function getSdkTypeBaseHelper<TKind>(
   return {
     __raw: type,
     nullable: false,
-    deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
+    deprecation: getDeprecationDetails(context.program, type)?.message,
   };
 }
 
