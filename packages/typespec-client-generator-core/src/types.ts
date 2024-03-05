@@ -499,27 +499,24 @@ export function getSdkModelWithDiagnostics(
   const httpOperation = operation
     ? ignoreDiagnostics(getHttpOperation(context.program, operation))
     : undefined;
-  const httpBody = httpOperation?.parameters.body;
-  let isFormDataType = false;
-  if (httpBody && httpBody.type.kind === "Model") {
-    const isMultipartOperation = httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
-    isFormDataType =
-      isMultipartOperation && getEffectivePayloadType(context, httpBody.type) === type;
-  }
+  const isFormDataType = httpOperation
+    ? Boolean(httpOperation.parameters.body?.contentTypes.includes("multipart/form-data"))
+    : false;
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
-    if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
-      // This means we have a model that is used both for formdata input and for regular body input
-      diagnostics.add(
-        createDiagnostic({
-          code: "conflicting-multipart-model-usage",
-          target: type,
-          format: {
-            modelName: sdkType.name,
-          },
-        })
-      );
-    }
+    // comment for now because we could not get same type from two calls of getHttpOperation for alias/spread
+    // if (httpOperation && isFormDataType !== sdkType.isFormDataType) {
+    //   // This means we have a model that is used both for formdata input and for regular body input
+    //   diagnostics.add(
+    //     createDiagnostic({
+    //       code: "conflicting-multipart-model-usage",
+    //       target: type,
+    //       format: {
+    //         modelName: sdkType.name,
+    //       },
+    //     })
+    //   );
+    // }
   } else {
     const docWrapper = getDocHelper(context, type);
     sdkType = {

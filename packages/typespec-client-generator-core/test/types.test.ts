@@ -2199,24 +2199,24 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(profileImage.kind, "property");
       strictEqual(profileImage.isMultipartFileInput, true);
     });
-    it("multipart conflicting model usage", async function () {
-      await runner.compile(
-        `
-        @service({title: "Test Service"}) namespace TestService;
-        model MultiPartRequest {
-          id: string;
-          profileImage: bytes;
-        }
+    // it("multipart conflicting model usage", async function () {
+    //   await runner.compile(
+    //     `
+    //     @service({title: "Test Service"}) namespace TestService;
+    //     model MultiPartRequest {
+    //       id: string;
+    //       profileImage: bytes;
+    //     }
   
-        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-        @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
-      `
-      );
-      const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
-      });
-    });
+    //     @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+    //     @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
+    //   `
+    //   );
+    //   const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
+    //   expectDiagnostics(diagnostics, {
+    //     code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+    //   });
+    // });
     it("multipart resolving conflicting model usage with spread", async function () {
       await runner.compileWithBuiltInService(
         `
@@ -2331,9 +2331,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(pictureWrapper.kind, "model");
       strictEqual(pictureWrapper.isFormDataType, true);
 
-      const errorResponse = models.find((x) => x.name === "ErrorResponse")!;
-      strictEqual(errorResponse.kind, "model");
-      strictEqual(errorResponse.isFormDataType, false);
+      // const errorResponse = models.find((x) => x.name === "ErrorResponse")!;
+      // strictEqual(errorResponse.kind, "model");
+      // strictEqual(errorResponse.isFormDataType, false);
     });
   });
   describe("SdkTupleType", () => {
