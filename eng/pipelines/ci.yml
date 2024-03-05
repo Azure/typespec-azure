@@ -52,8 +52,8 @@ jobs:
         env:
           NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
 
-      - run: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
-        name: Create github releases
+      - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
+        displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)
 
