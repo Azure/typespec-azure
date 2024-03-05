@@ -153,11 +153,11 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
 
 export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   return (
-    Object.keys(SdkBuiltInKindsMiscellaneousEnum).includes(kind) ||
-    Object.keys(SdkIntKindsEnum).includes(kind) ||
-    Object.keys(SdkFloatKindsEnum).includes(kind) ||
-    Object.keys(SdkGenericBuiltInStringKindsEnum).includes(kind) ||
-    Object.keys(SdkAzureBuiltInStringKindsEnum).includes(kind)
+    kind in SdkBuiltInKindsMiscellaneousEnum ||
+    kind in SdkIntKindsEnum ||
+    kind in SdkFloatKindsEnum ||
+    kind in SdkGenericBuiltInStringKindsEnum ||
+    kind in SdkAzureBuiltInStringKindsEnum
   );
 }
 
