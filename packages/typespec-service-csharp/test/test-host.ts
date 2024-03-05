@@ -46,7 +46,7 @@ export async function createCSharpServiceEmitterTestRunner(
 
 export function getStandardService(code: string): string {
   return `
-  @service({title: "Microsoft.Contoso", version: "2023-03-01-preview"})
+  @service({title: "Microsoft.Contoso"})
   @useDependency(Azure.Core.Versions.v1_0_Preview_2)
     namespace Microsoft.Contoso {
       ${code}

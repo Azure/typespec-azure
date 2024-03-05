@@ -19,7 +19,6 @@ using Azure.Core.Traits;
 )
 @service({
   title: "Microsoft Cognitive Language Service - Analyze Text Authoring",
-  version: "202ß2-05-15-preview",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @route("/authoring/analyze-text/")

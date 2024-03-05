@@ -26,7 +26,7 @@ extern dec promotion(target: Model, options: PromotionOptions);
  * Provides a Model marketplace offer information of ARM resource.
  * @param options Property options provides marketplace offer information of the resourceType.
  */
-extern dec marketplaceOffer(target: Model, options: marketplaceOfferOptions);
+extern dec marketplaceOffer(target: Model, options: MarketplaceOfferOptions);
 
 /**
  * Provides a Model Property a display name
@@ -51,7 +51,7 @@ model FilePath {
 }
 
 /** Options for marketplaceOffer */
-model marketplaceOfferOptions {
+model MarketplaceOfferOptions {
   /** Marketplace offer id of a resource */
   id?: string;
 }
@@ -61,18 +61,30 @@ model AboutOptions {
   /** Icon which represent resource */
   icon?: FilePath;
 
-  /** Display name which represent the resource */
-  displayName?: string;
+  /** Display names which represent the resource */
+  displayNames?: DisplayNamesOptions;
 
   /** Comma-separated set of words or phrases which allow users to search for your asset by identifiers. */
   keywords?: string[];
 
   /** Set of links which can help learn more about the resource */
-  learnMoreDocs?: string[];
+  learnMoreDocs?: LearnMoreDocsOptions[];
 }
 
 /** Options for promotion of ARM resource. */
 model PromotionOptions {
   apiVersion: string | EnumMember;
   autoUpdate?: boolean;
+}
+
+/** Options for learnMoreDocs of ARM resources. */
+model LearnMoreDocsOptions {
+  title: string;
+  uri: string;
+}
+
+/** Options for displayNames of ARM resources. */
+model DisplayNamesOptions {
+  singular: string;
+  plural: string;
 }

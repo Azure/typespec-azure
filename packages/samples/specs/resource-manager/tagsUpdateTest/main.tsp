@@ -14,6 +14,8 @@ using Azure.Core;
 @armProviderNamespace("Microsoft.UpdateTests")
 @service({
   title: "Microsoft.UpdateTests",
+})
+@OpenAPI.info({
   version: "2023-03-01-preview",
 })
 @doc("Testing resource update using a Management API")
@@ -139,7 +141,7 @@ interface TestUpdate {
   get is ArmResourceRead<TestUpdateResource>;
   create is ArmResourceCreateOrUpdateAsync<TestUpdateResource>;
   update is ArmTagsPatchSync<TestUpdateResource>;
-  delete is ArmResourceDeleteAsync<TestUpdateResource>;
+  delete is ArmResourceDeleteWithoutOkAsync<TestUpdateResource>;
   listByResourceGroup is ArmResourceListByParent<TestUpdateResource>;
   listBySubscription is ArmListBySubscription<TestUpdateResource>;
 }
@@ -149,7 +151,7 @@ interface TestChildUpdate {
   get is ArmResourceRead<TestUpdateChildResource>;
   create is ArmResourceCreateOrUpdateAsync<TestUpdateChildResource>;
   update is ArmTagsPatchSync<TestUpdateChildResource>;
-  delete is ArmResourceDeleteAsync<TestUpdateChildResource>;
+  delete is ArmResourceDeleteWithoutOkAsync<TestUpdateChildResource>;
   listByResourceGroup is ArmResourceListByParent<TestUpdateChildResource>;
   listBySubscription is ArmListBySubscription<TestUpdateChildResource>;
 }
