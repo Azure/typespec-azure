@@ -1,6 +1,4 @@
 // @ts-check
-import { writeFileSync } from "fs";
-import { join } from "path";
 import pc from "picocolors";
 import { parseArgs } from "util";
 import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
@@ -93,9 +91,6 @@ if (production && (await checkForChangedFiles(repoRoot, undefined, { silent: tru
 log("Bumping cross-submodule dependencies");
 // Determine project versions including any bumps from typespec publish above
 const versions = await getProjectVersions();
-
-// Bump typespec-azure -> typespec dependencies.
-await bumpCrossSubmoduleDependencies();
 
 // Stage typespec-azure publish
 await typespecAzureRun("pnpm", "change", "version");
@@ -203,37 +198,6 @@ async function getProjectVersions() {
   return map;
 }
 
-async function bumpCrossSubmoduleDependencies() {
-  logRegionStart("Bumping cross-submodule dependencies");
-  let changed = false;
-
-  const packages = await listPackages();
-
-  for (const project of packages.filter((x) => !x.dir.startsWith(coreRepoRoot))) {
-    log("Checking if deps needs to be bump for project: ", project.manifest.name);
-
-    const pkgJson = { ...project.manifest };
-
-    const change = bumpDependencies(pkgJson);
-
-    logSuccess(`Project ${project.manifest.name} changed saving package.json.`);
-
-    writeFileSync(join(project.dir, "package.json"), JSON.stringify(pkgJson, undefined, 2) + "\n");
-
-    if (project.manifest.private === false) {
-      continue;
-    }
-
-    changed = true;
-  }
-  logRegionEnd();
-
-  if (changed && production) {
-    await typespecAzureRun("git", "add", "-A");
-    await typespecAzureRun("git", "commit", "-m", "Bump cross-submodule dependencies");
-  }
-}
-
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   await typespecAzureRunWithRetries(3, "pnpm", "install");
   await typespecAzureRunWithOptions(
@@ -254,27 +218,5 @@ async function rebuildAndRegenSamplesToBumpTemplateVersions() {
       "-m",
       "Rebuild and regen samples to bump template versions"
     );
-  }
-}
-
-function bumpDependencies(project) {
-  const dependencyGroups = [
-    [project.dependencies, true],
-    [project.peerDependencies, true],
-    [project.devDependencies, true],
-  ];
-  for (const [dependencies, includeWorkspace] of dependencyGroups.filter(
-    ([x]) => x !== undefined
-  )) {
-    for (const [dependency, oldVersion] of Object.entries(dependencies)) {
-      const newVersion = versions.get(dependency);
-      if (newVersion && `~${newVersion}` !== oldVersion) {
-        if (includeWorkspace) {
-          dependencies[dependency] = `workspace:~${newVersion}`;
-        } else {
-          dependencies[dependency] = `~${newVersion}`;
-        }
-      }
-    }
   }
 }
