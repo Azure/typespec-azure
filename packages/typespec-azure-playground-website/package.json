@@ -36,6 +36,8 @@
     "build-samples": "node ./samples/build.js",
     "build": "npm run build-samples && tsc -p . && vite build 2>&1",
     "start": "npm run -s watch",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
     "watch": "vite --port 5174",
     "e2e": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e",
     "e2e:headed": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e --headed",
@@ -73,9 +75,12 @@
     "@typespec/bundler": "workspace:~",
     "@typespec/eslint-config-typespec": "workspace:~",
     "@typespec/playground": "workspace:~",
+    "@vitest/coverage-v8": "^1.2.2",
+    "@vitest/ui": "^1.2.2",
     "cross-env": "~7.0.3",
     "eslint": "^8.56.0",
     "rimraf": "~5.0.5",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "vitest": "^1.2.2"
   }
 }

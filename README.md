@@ -20,7 +20,7 @@ You can try TypeSpec on the web without installing anything.
 
 ## Getting Started
 
-For TypeSpec language documentation, see https://microsoft.github.io/typespec.
+For TypeSpec language documentation, see https://typespec.io/docs.
 
 If you are team working on Azure, see TypeSpec Azure development documentation https://azure.github.io/typespec-azure. You should pre-install as well `@azure-tools/typespec-azure-core` to define Azure resources, and `@azure-tools/typespec-autorest` to export in Swagger:
 

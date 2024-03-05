@@ -26,7 +26,6 @@ using TypeSpec.OpenAPI;
 )
 @service({
   title: "Microsoft Cognitive Language Service - Question Answering - Authoring",
-  version: "21-10-01",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Azure.QnAMaker;

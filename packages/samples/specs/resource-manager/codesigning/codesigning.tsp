@@ -12,6 +12,8 @@ using TypeSpec.Versioning;
 @armProviderNamespace
 @service({
   title: "CodeSigningManagementClient",
+})
+@OpenAPI.info({
   version: "2020-12-14-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)

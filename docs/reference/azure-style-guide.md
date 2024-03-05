@@ -50,7 +50,7 @@ in Azure TypeSpec definitions.
   Instead, we recommend using supported scalars. Azure-specific scalars include: `eTag`, `ipV4Address`, `ipV6Address` and `uuid`. General
   TypeSpec scalars include: `bytes`, `numeric`, `integer`, `float`, `int64`, `int32`, `int16`, `int8`, `uint64`, `uint32`, `uint16`, `uint8`,
   `safeint`, `float64`, `float32`, `decimal`, `decimal128`, `string`, `plainDate`, `plainTime`, `utcDateTime`, `offsetDateTime`, `duration`,
-  `boolean`, and `url`. For more information, see the document on [Types Relations](https://microsoft.github.io/typespec/language-basics/type-relations)
+  `boolean`, and `url`. For more information, see the document on [Types Relations](https://typespec.io/docs/language-basics/type-relations)
 
 ## Operation Groups
 
