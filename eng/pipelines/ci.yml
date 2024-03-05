@@ -40,14 +40,22 @@ jobs:
 
       - template: ./templates/upload-coverage.yml
 
+      - script: pnpm run pack:all
+        displayName: Pack packages
+
       - pwsh: |
           echo "Updating config"
           pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
           echo "Publishing"
-          pnpm -r --filter='./packages/*' publish --access public --no-git-checks
+          pnpm chronus publish  "./temp/artifacts/*.tgz" --access public  --engine npm --report-summary ./publish-summary.json
         name: Publish
         env:
           NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
+
+      - run: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
+        name: Create github releases
+        env:
+          GITHUB_TOKEN: $(azuresdk-github-pat)
 
       - task: AzureCLI@1
         displayName: "Publish bundled packages to package storage"
