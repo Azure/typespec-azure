@@ -28,7 +28,6 @@ it("Emits a warning for an ARM resource that doesn't specify `@pattern` on the n
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @doc("Name of employee")
         @key("employeeName")
         @path
         @segment("employees")
@@ -69,6 +68,16 @@ it("Does not emit a warning for an ARM resource that specifies `@pattern` on the
       @key("employeeName")
       @path
       @segment("employees")
+      name: string;
+    }
+    
+    @parentResource(Employee)
+    model EmployeeRole is ProxyResource<{}> {
+      @key("roleName")
+      @segment("roles")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
+      @path
+      @visibility("read")
       name: string;
     }`
     )
