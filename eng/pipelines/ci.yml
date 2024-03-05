@@ -57,8 +57,8 @@ jobs:
           cat ./publish-summary.json
         displayName: Log publish summary
 
-      - run: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
-        name: Create github releases
+      - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
+        displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)
 
