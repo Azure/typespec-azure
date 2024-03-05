@@ -14,7 +14,7 @@ getClientType(
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Type` |
 | `operation`? | `Operation` |
 

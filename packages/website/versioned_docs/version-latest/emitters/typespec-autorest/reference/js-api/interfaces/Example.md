@@ -5,7 +5,7 @@ title: "[I] Example"
 ---
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
-| `pathOrUri` | `string` | - |
-| `title` | `string` | - |
+| Property | Type |
+| :------ | :------ |
+| `pathOrUri` | `string` |
+| `title` | `string` |

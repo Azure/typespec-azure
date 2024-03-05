@@ -1,5 +1,21 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.40.0
+
+### Bug Fixes
+
+- [#231](https://github.com/Azure/typespec-azure/pull/231) Azure `Page` type `nextLink` properties are now marked as `readonly`
+- [#258](https://github.com/Azure/typespec-azure/pull/258) Implement code fixes for `no-enum` linter rule
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#341](https://github.com/Azure/typespec-azure/pull/341) Add new `azureLocation` scalar
+
+
 ## 0.39.1
 
 ### Patch Changes

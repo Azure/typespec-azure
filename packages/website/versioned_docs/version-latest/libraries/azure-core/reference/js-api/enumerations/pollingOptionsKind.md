@@ -5,6 +5,6 @@ title: "[E] pollingOptionsKind"
 ---
 ## Enumeration Members
 
-| Member | Value |
+| Enumeration Member | Value |
 | :------ | :------ |
 | `StatusMonitor` | `"statusMonitor"` |

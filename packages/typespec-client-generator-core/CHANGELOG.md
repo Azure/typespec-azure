@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.40.0
+
+### Bug Fixes
+
+- [#305](https://github.com/Azure/typespec-azure/pull/305) getAllModels will return models only used as final envelope results in non-ARM definitions
+- [#335](https://github.com/Azure/typespec-azure/pull/335) unions with only null and another type will not be converted to union
+- [#362](https://github.com/Azure/typespec-azure/pull/362) enhance logic for value type of enum and union as enum
+- [#314](https://github.com/Azure/typespec-azure/pull/314) support @clientName for extensible enum variant
+- [#328](https://github.com/Azure/typespec-azure/pull/328) add support for anonymous union as enum and fix union as enum variant discriminator typing problem
+- [#301](https://github.com/Azure/typespec-azure/pull/301) Add usage calculation for additional properties with model type
+- [#327](https://github.com/Azure/typespec-azure/pull/327) rollback some of the breaking changes for common model types method
+- [#260](https://github.com/Azure/typespec-azure/pull/260) allow models to have a union variant as a discriminator
+- [#286](https://github.com/Azure/typespec-azure/pull/286) don't throw for unknown format
+- [#274](https://github.com/Azure/typespec-azure/pull/274) Update doc for `@access` and `@usage`
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#341](https://github.com/Azure/typespec-azure/pull/341) add support for azureLocation scalar in azure core
+- [#242](https://github.com/Azure/typespec-azure/pull/242) add flattened property onto SdkBodyModelPropertyType
+- [#315](https://github.com/Azure/typespec-azure/pull/315) add validation on import of tcgc and remove duplicate validation warnings
+- [#350](https://github.com/Azure/typespec-azure/pull/350) add helper function getCrossLanguagePackageId. getCrossLanguagePackageId returns a package id that is consistent across languages, allowing emitters to identify that they are generating from the same service tsp
+- [#306](https://github.com/Azure/typespec-azure/pull/306) add getClientTypeWithDiagnostics and getAllModelsWithDiagnostics to get values back with diagnostics
+
+### Breaking Changes
+
+- [#295](https://github.com/Azure/typespec-azure/pull/295) Split datetime type into utcDateTime and offsetDateTime to remain in sync with tsp
+
+
 ## 0.39.2
 
 ### Patch Changes

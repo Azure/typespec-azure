@@ -13,7 +13,7 @@ Return whether a parameter is the Api Version parameter of a client
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | - |
+| `context` | `TCGCContext` | - |
 | `parameter` | `ModelProperty` \| `HttpOperationParameter` |  |
 
 ## Returns

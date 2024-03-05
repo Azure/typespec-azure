@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.40.0
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#337](https://github.com/Azure/typespec-azure/pull/337) Add support for all properties of openapi `info` object on the `@info` decorator
+- [#277](https://github.com/Azure/typespec-azure/pull/277) Support `@flattenProperty` decorator.
+
+
 ## 0.39.2
 
 ### Patch Changes
