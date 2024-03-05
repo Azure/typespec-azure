@@ -713,6 +713,118 @@ describe("typespec-client-generator-core: types", () => {
       );
     });
 
+    it("float extensible", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      enum Floats {
+        a: 1,
+        b: 2.1,
+        c: 3,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: Floats
+      }
+      `);
+
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const sdkType = models.find((x) => x.kind === "enum")! as SdkEnumType;
+      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.name, "Floats");
+      strictEqual(sdkType.valueType.kind, "float32");
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+      deepEqual(
+        values.map((x) => x.name),
+        ["a", "b", "c"]
+      );
+      deepEqual(
+        values.map((x) => x.value),
+        [1, 2.1, 3]
+      );
+    });
+
+    it("union as enum float type", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union Floats {
+        float,
+        a: 1,
+        b: 2,
+        c: 3,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: Floats
+      }
+      `);
+
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const sdkType = models.find((x) => x.kind === "enum")! as SdkEnumType;
+      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.name, "Floats");
+      strictEqual(sdkType.valueType.kind, "float");
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+      deepEqual(
+        values.map((x) => x.name),
+        ["a", "b", "c"]
+      );
+      deepEqual(
+        values.map((x) => x.value),
+        [1, 2, 3]
+      );
+    });
+
+    it("union of union as enum float type", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union BaseEnum {
+        int32,
+        a: 1,
+      }
+      
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union ExtendedEnum {
+        BaseEnum,
+        b: 2,
+        c: 3,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: ExtendedEnum
+      }
+      `);
+
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const sdkType = models.find((x) => x.name === "ExtendedEnum")! as SdkEnumType;
+      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.valueType.kind, "int32");
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+      deepEqual(
+        values.map((x) => x.name),
+        ["a", "b", "c"]
+      );
+      deepEqual(
+        values.map((x) => x.value),
+        [1, 2, 3]
+      );
+    });
+
     it("string fixed", async function () {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
@@ -1433,6 +1545,30 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(dogValue.enumType, petKind);
       strictEqual(dogValue.valueType, petKind.valueType);
       strictEqual(dogValue.kind, "enumvalue");
+    });
+
+    it("template variable of anonymous union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      interface GetAndSend<Type> {
+        get(): {
+          prop: Type;
+        };
+      
+        send(prop: Type): void;
+      }
+      
+      @route("/string-extensible")
+      interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 3);
+      const prop = models.find((x) => x.generatedName === "GetResponseProp")! as SdkEnumType;
+      strictEqual(prop.isFixed, false);
+      strictEqual(prop.valueType.kind, "string");
+      const req = models.find((x) => x.generatedName === "SendRequest")! as SdkModelType;
+      const resp = models.find((x) => x.generatedName === "GetResponse")! as SdkModelType;
+      strictEqual(req.properties[0].type, prop);
+      strictEqual(resp.properties[0].type, prop);
     });
 
     it("property of anonymous union as enum", async () => {
