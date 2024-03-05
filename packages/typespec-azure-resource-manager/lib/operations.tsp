@@ -164,7 +164,7 @@ op ArmResourceCreateOrUpdateAsync<
 > is ArmCreateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Resource,
-  ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Response,
   Error
 >;
 
@@ -592,17 +592,16 @@ op ArmResourceActionNoContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-    void,
-    string
-  >,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
-  ArmAcceptedLroResponse | ArmNoContentResponse<"Action completed successfully.">,
+  ArmAcceptedLroResponse<
+    "Resource operation accepted.",
+    LroHeaders
+  > | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
   Error
