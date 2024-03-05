@@ -36,7 +36,7 @@ import {
 } from "./interfaces.js";
 import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getSdkPackage } from "./package.js";
+import { experimental_getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel } from "./types.js";
 
@@ -485,14 +485,14 @@ export function createSdkContext<
   const sdkContext: SdkContext<TServiceOperation, TOptions> = {
     program: context.program,
     emitContext: context,
-    sdkPackage: undefined!,
+    experimental_sdkPackage: undefined!,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
   };
-  sdkContext.sdkPackage = getSdkPackage(sdkContext);
+  sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
   return sdkContext;
 }
 

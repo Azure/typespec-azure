@@ -800,7 +800,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   return diagnostics.wrap(sdkClientType);
 }
 
-export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
+export function experimental_getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TServiceOperation>
 ): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();

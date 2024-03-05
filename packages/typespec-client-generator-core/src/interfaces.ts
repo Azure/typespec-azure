@@ -25,7 +25,7 @@ export interface SdkContext<
   TOptions extends object = Record<string, any>,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  sdkPackage: SdkPackage<TServiceOperation>;
+  experimental_sdkPackage: SdkPackage<TServiceOperation>;
   __clients?: Map<string, SdkClientType<TServiceOperation>>;
 }
 
