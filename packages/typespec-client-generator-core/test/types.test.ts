@@ -2207,7 +2207,7 @@ describe("typespec-client-generator-core: types", () => {
     //       id: string;
     //       profileImage: bytes;
     //     }
-  
+
     //     @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
     //     @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
     //   `
