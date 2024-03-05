@@ -39,22 +39,16 @@ examples/
 
 To generate the examples you can use [oav](https://github.com/Azure/oav). You can run that on the generated openapi.json file.
 
-1. Generating basic examples and then manually modify the values. It will generate two examples for each operation: one contains minimal properties set, the other contains the maximal properties set. Since the auto-generated examples consist of random values for most types, you need replace them with meaningful values.
+Generating basic examples and then manually modify the values. It will generate two examples for each operation: one contains minimal properties set, the other contains the maximal properties set. Since the auto-generated examples consist of random values for most types, you need replace them with meaningful values.
 
-   ```bash
-   oav generate-examples openapi.json
-   ```
+```bash
+oav generate-examples openapi.json
+```
 
-2. (**Recommended**) Generating high quality examples from API Scenario test. Refer to [API Test section](getstarted/providerhub/step03-api-testing.md). It will validate the API quality and generate Swagger examples from live traffic in API Scenario test.
+Note, latest OAV tool should automatically generate the following. However, if you are generating the examples manually, please ensure you have:
 
-   ```bash
-   oav run <scenario-file> --spec <spec-file> --generateExample
-   ```
-
-   Note, latest OAV tool should automatically generate the following. However, if you are generating the examples manually, please ensure you have:
-
-   - include `title` field and make sure it is descriptive and unique for each operation.
-   - include `operationId`. This is used to match with declared operations in TypeSpec and correctly output in swagger.
+- include `title` field and make sure it is descriptive and unique for each operation.
+- include `operationId`. This is used to match with declared operations in TypeSpec and correctly output in swagger.
 
 :::warn
 The examples are now in the examples directory relative to the output openapi.json. You must now copy them to the examples directory in the project root. The typespec-autorest emitter will then copy them back to the correct location when generating the OpenAPI 2.0.
