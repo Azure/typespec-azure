@@ -16,7 +16,10 @@ describe("typespec-autorestcanonical: info", () => {
   it("set the service version with @service", async () => {
     const res = await openApiFor(
       `
-      @service({version: "1.2.3-test"})
+      @service({
+        #suppress "deprecated" "For test"
+        version: "1.2.3-test"
+      })
       namespace Foo {}
       `
     );
