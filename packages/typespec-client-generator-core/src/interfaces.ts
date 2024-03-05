@@ -79,41 +79,87 @@ export interface SdkBuiltInType extends SdkTypeBase {
   encode: string;
 }
 
-type SdkIntKinds =
-  | "numeric"
-  | "integer"
-  | "safeint"
-  | "int8"
-  | "int16"
-  | "int32"
-  | "int64"
-  | "uint8"
-  | "uint16"
-  | "uint32"
-  | "uint64";
+enum SdkIntKindsEnum {
+  numeric = "numeric",
+  integer = "integer",
+  safeint = "safeint",
+  int8 = "int8",
+  int16 = "int16",
+  int32 = "int32",
+  int64 = "int64",
+  uint8 = "uint8",
+  uint16 = "uint16",
+  uint32 = "uint32",
+  uint64 = "uint64",
+}
 
-type SdkFloatKinds = "float" | "float32" | "float64" | "decimal" | "decimal128";
+enum SdkFloatKindsEnum {
+  float = "float",
+  float32 = "float32",
+  float64 = "float64",
+  decimal = "decimal",
+  decimal128 = "decimal128",
+}
 
-type SdkStringKinds =
-  | "string"
-  | "password"
-  | "guid"
-  | "url"
-  | "uuid"
-  | "eTag"
-  | "armId"
-  | "ipAddress"
-  | "azureLocation";
+enum SdkAzureBuiltInStringKindsEnum {
+  uuid = "uuid",
+  ipV4Address = "ipV4Address",
+  ipV6Address = "ipV6Address",
+  eTag = "eTag",
+  armId = "armId",
+  azureLocation = "azureLocation",
+}
+
+enum SdkGenericBuiltInStringKindsEnum {
+  string = "string",
+  password = "password",
+  guid = "guid",
+  url = "url",
+  uri = "uri",
+  ipAddress = "ipAddress",
+}
+
+enum SdkBuiltInKindsMiscellaneousEnum {
+  bytes = "bytes",
+  boolean = "boolean",
+  plainDate = "plainDate",
+  plainTime = "plainTime",
+  any = "any",
+}
 
 export type SdkBuiltInKinds =
-  | "bytes"
-  | "boolean"
-  | "plainDate"
-  | "plainTime"
-  | "any"
-  | SdkIntKinds
-  | SdkFloatKinds
-  | SdkStringKinds;
+  | keyof typeof SdkBuiltInKindsMiscellaneousEnum
+  | keyof typeof SdkIntKindsEnum
+  | keyof typeof SdkFloatKindsEnum
+  | keyof typeof SdkGenericBuiltInStringKindsEnum
+  | keyof typeof SdkAzureBuiltInStringKindsEnum;
+
+export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
+  const retval: Record<string, SdkBuiltInKinds> = {};
+  const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum)
+    .concat(Object.keys(SdkIntKindsEnum))
+    .concat(Object.keys(SdkFloatKindsEnum))
+    .concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
+  for (const kind of typespecNamespace) {
+    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    retval[`TypeSpec.${kind}`] = kind;
+  }
+  for (const kind in SdkAzureBuiltInStringKindsEnum) {
+    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    retval[`Azure.Core.${kind}`] = kind;
+  }
+  return retval;
+}
+
+export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
+  return (
+    kind in SdkBuiltInKindsMiscellaneousEnum ||
+    kind in SdkIntKindsEnum ||
+    kind in SdkFloatKindsEnum ||
+    kind in SdkGenericBuiltInStringKindsEnum ||
+    kind in SdkAzureBuiltInStringKindsEnum
+  );
+}
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
