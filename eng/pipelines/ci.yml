@@ -5,6 +5,7 @@ trigger:
     include:
       - main
       - release/*
+      - fix/github-release
   paths:
     exclude:
       - docs/release-notes/*.md
@@ -33,85 +34,90 @@ jobs:
       - template: ./templates/install.yml
         parameters:
           nodeVersion: "20.x"
-      - template: ./templates/build.yml
-
-      - script: pnpm run test-official
-        displayName: Test
-
-      - template: ./templates/upload-coverage.yml
-
-      - script: pnpm run pack:all
-        displayName: Pack packages
-
-      - pwsh: |
-          echo "Updating config"
-          pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
-          echo "Publishing"
-          pnpm chronus publish  "./temp/artifacts/*.tgz" --access public  --engine npm --report-summary ./publish-summary.json
-        name: Publish
-        env:
-          NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
-
-      - script: |
-          echo "Publish summary:"
-          cat ./publish-summary.json
-        displayName: Log publish summary
 
       - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
         displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)
 
-      - task: AzureCLI@1
-        displayName: "Publish bundled packages to package storage"
-        inputs:
-          azureSubscription: "Azure SDK Engineering System"
-          scriptLocation: inlineScript
-          inlineScript: node ./eng/scripts/upload-bundler-packages.js
+      # - template: ./templates/build.yml
+      # - script: pnpm run test-official
+      #   displayName: Test
 
-      - task: AzureCLI@1
-        displayName: "Publish Azure playground"
-        inputs:
-          azureSubscription: "Azure SDK Engineering System"
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch ^
-              --destination $web ^
-              --account-name "cadlplayground" ^
-              --destination-path cadl-azure/ ^
-              --source "./packages/typespec-azure-playground-website/dist/" ^
-              --overwrite
+      # - template: ./templates/upload-coverage.yml
 
-  - job: npm_preview
-    timeoutInMinutes: 90
-    dependsOn: npm_stable
-    displayName: Npm publish dev version
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main') # Only publish -dev on main branch.
-    pool:
-      name: azsdk-pool-mms-win-2022-general
-      vmImage: windows-2022
+      # - script: pnpm run pack:all
+      #   displayName: Pack packages
 
-    variables:
-      TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+      # - pwsh: |
+      #     echo "Updating config"
+      #     pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+      #     echo "Publishing"
+      #     pnpm chronus publish  "./temp/artifacts/*.tgz" --access public  --engine npm --report-summary ./publish-summary.json
+      #   name: Publish
+      #   env:
+      #     NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
 
-    steps:
-      - checkout: self
-        submodules: true
+      # - script: |
+      #     echo "Publish summary:"
+      #     cat ./publish-summary.json
+      #   displayName: Log publish summary
 
-      - template: ./templates/install.yml
-        parameters:
-          nodeVersion: "20.x"
+      # - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
+      #   displayName: Create github releases
+      #   env:
+      #     GITHUB_TOKEN: $(azuresdk-github-pat)
 
-      - template: ./templates/build.yml
+      # - task: AzureCLI@1
+      #   displayName: "Publish bundled packages to package storage"
+      #   inputs:
+      #     azureSubscription: "Azure SDK Engineering System"
+      #     scriptLocation: inlineScript
+      #     inlineScript: node ./eng/scripts/upload-bundler-packages.js
 
-      - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
-        displayName: Bump version to prerelease targets
+      # - task: AzureCLI@1
+      #   displayName: "Publish Azure playground"
+      #   inputs:
+      #     azureSubscription: "Azure SDK Engineering System"
+      #     scriptLocation: inlineScript
+      #     inlineScript: |
+      #       az storage blob upload-batch ^
+      #         --destination $web ^
+      #         --account-name "cadlplayground" ^
+      #         --destination-path cadl-azure/ ^
+      #         --source "./packages/typespec-azure-playground-website/dist/" ^
+      #         --overwrite
 
-      - pwsh: |
-          echo "Updating config"
-          pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
-          echo "Publishing"
-          pnpm -r --filter='./packages/*' publish --access public --no-git-checks --tag next
-        name: Publish
-        env:
-          NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
+  # - job: npm_preview
+  #   timeoutInMinutes: 90
+  #   dependsOn: npm_stable
+  #   displayName: Npm publish dev version
+  #   condition: eq(variables['Build.SourceBranch'], 'refs/heads/main') # Only publish -dev on main branch.
+  #   pool:
+  #     name: azsdk-pool-mms-win-2022-general
+  #     vmImage: windows-2022
+
+  #   variables:
+  #     TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+  #   steps:
+  #     - checkout: self
+  #       submodules: true
+
+  #     - template: ./templates/install.yml
+  #       parameters:
+  #         nodeVersion: "20.x"
+
+  #     - template: ./templates/build.yml
+
+  #     - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
+  #       displayName: Bump version to prerelease targets
+
+  #     - pwsh: |
+  #         echo "Updating config"
+  #         pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+  #         echo "Publishing"
+  #         pnpm -r --filter='./packages/*' publish --access public --no-git-checks --tag next
+  #       name: Publish
+  #       env:
+  #         NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
