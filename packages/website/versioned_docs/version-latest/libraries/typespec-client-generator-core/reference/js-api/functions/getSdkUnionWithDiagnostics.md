@@ -1,0 +1,23 @@
+---
+jsApi: true
+title: "[F] getSdkUnionWithDiagnostics"
+
+---
+```ts
+getSdkUnionWithDiagnostics(
+   context, 
+   type, 
+   operation?): [SdkType, readonly Diagnostic[]]
+```
+
+## Parameters
+
+| Parameter | Type |
+| :------ | :------ |
+| `context` | `TCGCContext` |
+| `type` | `Union` |
+| `operation`? | `Operation` |
+
+## Returns
+
+[[`SdkType`](../type-aliases/SdkType.md), readonly `Diagnostic`[]]

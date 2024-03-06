@@ -13,7 +13,7 @@ Return the client object for the given namespace or interface, or undefined if t
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | SdkContext |
+| `context` | `TCGCContext` | TCGCContext |
 | `type` | `Interface` \| `Namespace` | Type to check |
 
 ## Returns

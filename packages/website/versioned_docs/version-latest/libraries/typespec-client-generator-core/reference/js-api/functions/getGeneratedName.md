@@ -16,7 +16,7 @@ Create a name for anonymous model
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |  |
+| `context` | `TCGCContext` |  |
 | `type` | `Model` \| `Union` |  |
 | `operation`? | `Operation` | - |
 

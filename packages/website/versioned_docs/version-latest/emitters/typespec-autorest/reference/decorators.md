@@ -24,10 +24,10 @@ toc_max_heading_level: 3
 
 #### Parameters
 
-| Name      | Type                    | Description                              |
-| --------- | ----------------------- | ---------------------------------------- |
-| pathOrUri | `valueof scalar string` | path or Uri to the example file.         |
-| title     | `valueof scalar string` | name or description of the example file. |
+| Name      | Type             | Description                              |
+| --------- | ---------------- | ---------------------------------------- |
+| pathOrUri | `valueof string` | path or Uri to the example file.         |
+| title     | `valueof string` | name or description of the example file. |
 
 ### `@useRef` {#@Autorest.useRef}
 
@@ -41,10 +41,10 @@ toc_max_heading_level: 3
 
 #### Target
 
-`union Model | ModelProperty`
+`Model | ModelProperty`
 
 #### Parameters
 
-| Name    | Type                    | Description                       |
-| ------- | ----------------------- | --------------------------------- |
-| jsonRef | `valueof scalar string` | path or Uri to an OpenAPI schema. |
+| Name    | Type             | Description                       |
+| ------- | ---------------- | --------------------------------- |
+| jsonRef | `valueof string` | path or Uri to an OpenAPI schema. |

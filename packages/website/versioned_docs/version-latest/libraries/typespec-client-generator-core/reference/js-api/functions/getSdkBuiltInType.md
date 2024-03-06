@@ -13,8 +13,8 @@ Get the sdk built in type for a given typespec type
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | the sdk context |
-| `type` |    \| `StringLiteral`   \| `NumericLiteral`   \| `BooleanLiteral`   \| `Scalar`   \| `IntrinsicType` | the typespec type |
+| `context` | `TCGCContext` | the sdk context |
+| `type` |  \| `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` \| `Scalar` \| `IntrinsicType` | the typespec type |
 
 ## Returns
 

@@ -11,7 +11,7 @@ getAccessOverride(context, entity): AccessFlags | undefined
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `entity` | `Model` \| `Enum` \| `Operation` |
 
 ## Returns

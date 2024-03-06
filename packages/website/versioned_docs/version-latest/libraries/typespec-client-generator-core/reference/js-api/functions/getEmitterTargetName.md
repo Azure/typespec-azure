@@ -11,7 +11,7 @@ getEmitterTargetName(context): string
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 
 ## Returns
 
