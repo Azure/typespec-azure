@@ -31,7 +31,7 @@ jobs:
       - checkout: self
         submodules: true
 
-      - script: npx @chronus/github create-releases --repo azure/typespec-azure --publish-summary ./publish-summary-temp.json
+      - script: npx @chronus/github create-releases --repo azure/typespec-azure --publish-summary ./report-summary-temp.json
         displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)
