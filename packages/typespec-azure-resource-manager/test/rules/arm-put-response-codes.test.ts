@@ -19,7 +19,7 @@ beforeEach(async () => {
   );
 });
 
-it("Emits a warning for synchronous put operation that does not contain the appropriate response codes", async () => {
+it("Emits a warning for put operation that does not contain the appropriate response codes", async () => {
   await tester
     .expect(
       `
@@ -27,8 +27,7 @@ it("Emits a warning for synchronous put operation that does not contain the appr
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
-      model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
+      model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -36,60 +35,88 @@ it("Emits a warning for synchronous put operation that does not contain the appr
         name: string;
       }
       
-      model EmployeeProperties {}
-      
       @armResourceOperations
       interface Employees {
-        @armResourceDelete(Employee)
-        delete(...ApiVersionParameter): {
-          @statusCode _: 200;
+        @put
+        @armResourceCreateOrUpdate(Employee)
+        createOrUpdate(...ApiVersionParameter): {
+          @statusCode _: 207;
           result: boolean;
         }
       }
-    `
+      `
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
-      message:
-        "Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.",
+      code: "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
     });
 });
 
-it("Does not emit a warning for synchronous put operation that contains the appropriate response codes", async () => {
+it("Emits a warning for put action that does not contain the appropriate response codes", async () => {
   await tester
     .expect(
       `
-    @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
-    
-    model Employee is ProxyResource<EmployeeProperties> {
-      @doc("Name of employee")
-      @pattern("^[a-zA-Z0-9-]{3,24}$")
-      @key("employeeName")
-      @path
-      @segment("employees")
-      name: string;
-    }
-    
-    model EmployeeProperties {}
-    
-    @armResourceOperations
-    interface Employees {
-      @armResourceDelete(Employee)
-      delete(...ApiVersionParameter): {
-        @statusCode _: 200;
-        result: boolean;
-      } | {
-        @statusCode _: 204;
-        result: boolean;
-      } | ErrorResponse
-    }`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Employees {
+        @put
+        @armResourceAction(Employee)
+        hire(...ApiVersionParameter): {
+          @statusCode _: 207;
+          result: boolean;
+        }
+      }
+      `
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
+    });
+});
+
+it("Does not emit a warning for put operation that contains the appropriate response codes", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Employees {
+        @put
+        @armResourceCreateOrUpdate(Employee)
+        createOrUpdate(...ApiVersionParameter): {
+          @statusCode _: 200;
+          result: boolean;
+        } | {
+          @statusCode _: 201;
+          result: boolean;
+        } | ErrorResponse;
+      }
+    `
     )
     .toBeValid();
 });
 
-it("Emits a warning for long-running put operation that does not contain the appropriate response codes", async () => {
+it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpdateAsync' template.", async () => {
   await tester
     .expect(
       `
@@ -97,8 +124,7 @@ it("Emits a warning for long-running put operation that does not contain the app
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
-      model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
+      model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -106,23 +132,16 @@ it("Emits a warning for long-running put operation that does not contain the app
         name: string;
       }
       
-      model EmployeeProperties {}
-      
       @armResourceOperations
       interface Employees {
-        #suppress "deprecated" "test"
-        delete is ArmResourceDeleteAsync<Employee>;
+        createOrUpdate is ArmResourceCreateOrUpdateAsync<Employee>;
       }
     `
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
-      message:
-        "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
-    });
+    .toBeValid();
 });
 
-it("Does not emit a warning for long-running put operation that does contains the appropriate response codes", async () => {
+it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrReplaceAsync' template.", async () => {
   await tester
     .expect(
       `
@@ -130,8 +149,7 @@ it("Does not emit a warning for long-running put operation that does contains th
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
-      model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
+      model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -139,18 +157,69 @@ it("Does not emit a warning for long-running put operation that does contains th
         name: string;
       }
       
-      model EmployeeProperties {}
-      
       @armResourceOperations
       interface Employees {
-        #suppress "deprecated" "test"
-        delete is ArmResourceDeleteAsync<Employee>;
+        createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
       }
     `
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
-      message:
-        "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
-    });
+    .toBeValid();
+});
+
+it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrReplaceSync' template.", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Employees {
+        createOrReplace is ArmResourceCreateOrReplaceSync<Employee>;
+      }
+    `
+    )
+    .toBeValid();
+});
+
+it("Does not emit a warning for put action that contains the appropriate response codes", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Employees {
+        @put
+        @armResourceAction(Employee)
+        hire(...ApiVersionParameter): {
+          @statusCode _: 200;
+          result: boolean;
+        } | {
+          @statusCode _: 201;
+          result: boolean;
+        } | ErrorResponse;
+      }
+    `
+    )
+    .toBeValid();
 });
