@@ -2304,24 +2304,24 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(profileImage.kind, "property");
       strictEqual(profileImage.isMultipartFileInput, true);
     });
-    // it("multipart conflicting model usage", async function () {
-    //   await runner.compile(
-    //     `
-    //     @service({title: "Test Service"}) namespace TestService;
-    //     model MultiPartRequest {
-    //       id: string;
-    //       profileImage: bytes;
-    //     }
 
-    //     @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-    //     @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
-    //   `
-    //   );
-    //   const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
-    //   expectDiagnostics(diagnostics, {
-    //     code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
-    //   });
-    // });
+    it.skip("multipart conflicting model usage", async function () {
+      await runner.compile(
+        `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+        }
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+        @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
+      `
+      );
+      const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
+      });
+    });
     it("multipart resolving conflicting model usage with spread", async function () {
       await runner.compileWithBuiltInService(
         `
