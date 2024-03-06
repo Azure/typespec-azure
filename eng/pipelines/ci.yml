@@ -35,7 +35,7 @@ jobs:
         parameters:
           nodeVersion: "20.x"
 
-      - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
+      - script: pnpm chronus-github create-releases --repo azure/typespec-azure --publish-summary ./publish-summary.json
         displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)
