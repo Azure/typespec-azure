@@ -474,15 +474,15 @@ export function listOperationsInOperationGroup(
 }
 
 export function createSdkContext<
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
   TOptions extends Record<string, any> = SdkEmitterOptions,
->(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TServiceOperation, TOptions> {
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  const sdkContext: SdkContext<TServiceOperation, TOptions> = {
+  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     program: context.program,
     emitContext: context,
     experimental_sdkPackage: undefined!,

@@ -15,6 +15,7 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   listServices,
+  resolveEncodedName,
 } from "@typespec/compiler";
 import {
   HttpOperationParameter,
@@ -33,12 +34,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import {
-  TCGCContext,
-  getClientNamespaceStringHelper,
-  getWireName,
-  parseEmitterName,
-} from "./internal-utils.js";
+import { TCGCContext, getClientNamespaceStringHelper, parseEmitterName } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
 /**
@@ -173,6 +169,20 @@ export function getLibraryName(
 
   // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
   return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
+}
+
+/**
+ * Get the serialized name of a type.
+ * @param context
+ * @param type
+ * @returns
+ */
+export function getWireName(context: TCGCContext, type: Type & { name: string }) {
+  // 1. Check if there's an encoded name
+  const encodedName = resolveEncodedName(context.program, type, "application/json");
+  if (encodedName !== type.name) return encodedName;
+  // 2. Check if there's deprecated language projection
+  return getProjectedName(context.program, type, "json") ?? type.name;
 }
 
 /**

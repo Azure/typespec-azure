@@ -21,8 +21,8 @@ import {
 import { TCGCContext } from "./internal-utils.js";
 
 export interface SdkContext<
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
   TOptions extends object = Record<string, any>,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   experimental_sdkPackage: SdkPackage<TServiceOperation>;

@@ -8,10 +8,8 @@ import {
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
-  getProjectedName,
   getSummary,
   ignoreDiagnostics,
-  resolveEncodedName,
 } from "@typespec/compiler";
 import { HttpOperation, getHttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
@@ -204,14 +202,6 @@ export function isAzureCoreModel(t: Type): boolean {
 
 export function isAcceptHeader(param: SdkModelPropertyType): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
-}
-
-export function getWireName(context: TCGCContext, type: Type & { name: string }) {
-  // 1. Check if there's an encoded name
-  const encodedName = resolveEncodedName(context.program, type, "application/json");
-  if (encodedName !== type.name) return encodedName;
-  // 2. Check if there's deprecated language projection
-  return getProjectedName(context.program, type, "json") ?? type.name;
 }
 
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {

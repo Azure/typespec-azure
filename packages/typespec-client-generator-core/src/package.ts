@@ -77,8 +77,8 @@ import {
   getSdkModelPropertyType,
 } from "./types.js";
 
-function getSdkHttpBodyParameters(
-  context: SdkContext<SdkHttpOperation>,
+function getSdkHttpBodyParameters<TOptions extends object>(
+  context: SdkContext<TOptions, SdkHttpOperation>,
   httpOperation: HttpOperation,
   methodParameters: SdkParameter[]
 ): [SdkBodyParameter[], readonly Diagnostic[]] {
@@ -190,14 +190,14 @@ function createContentTypeOrAcceptHeader(
   };
 }
 
-function getSdkHttpOperation(
-  context: SdkContext<SdkHttpOperation>,
+function getSdkHttpOperation<TOptions extends object>(
+  context: SdkContext<TOptions, SdkHttpOperation>,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[]
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const [responses, exceptions] = diagnostics.pipe(
-    getSdkServiceResponseAndExceptions<SdkHttpOperation>(context, httpOperation)
+    getSdkServiceResponseAndExceptions<TOptions, SdkHttpOperation>(context, httpOperation)
   );
   const parameters = httpOperation.parameters.parameters
     .map((x) =>
@@ -267,8 +267,11 @@ function getSdkHttpOperation(
   });
 }
 
-function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkServiceOperation<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation,
   methodParameters: SdkMethodParameter[]
 ): [TServiceOperation, readonly Diagnostic[]] {
@@ -282,25 +285,33 @@ function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   }
   throw new Error("Can't support other service operations yet");
 }
-function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkLroPagingServiceMethod<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation
 ): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkLroServiceMethod<TServiceOperation>(context, operation)),
-    ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation)),
+    ...diagnostics.pipe(getSdkLroServiceMethod<TOptions, TServiceOperation>(context, operation)),
+    ...diagnostics.pipe(getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, operation)),
     kind: "lropaging",
   });
 }
 
-function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkPagingServiceMethod<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const pagedMetadata = getPagedResult(context.program, operation)!;
-  const basic = diagnostics.pipe(getSdkBasicServiceMethod<TServiceOperation>(context, operation));
+  const basic = diagnostics.pipe(
+    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
+  );
   if (pagedMetadata.itemsProperty) {
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type)
@@ -313,7 +324,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TServiceOperation>(
+          getSdkServiceOperation<TOptions, TServiceOperation>(
             context,
             pagedMetadata.nextLinkOperation,
             basic.parameters
@@ -326,14 +337,17 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   });
 }
 
-function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkLroServiceMethod<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const metadata = getLroMetadata(context.program, operation)!;
   const basicServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TServiceOperation>(context, operation)
+    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
   );
 
   basicServiceMethod.response.type = diagnostics.pipe(
@@ -344,7 +358,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
     kind: "lro",
     __raw_lro_metadata: metadata,
     initialOperation: diagnostics.pipe(
-      getSdkServiceOperation<TServiceOperation>(
+      getSdkServiceOperation<TOptions, TServiceOperation>(
         context,
         metadata.operation,
         basicServiceMethod.parameters
@@ -397,8 +411,11 @@ function getSdkMethodResponse(
   };
 }
 
-function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkServiceResponseAndExceptions<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   httpOperation: HttpOperation
 ): [
   [Record<number | string, SdkHttpResponse>, Record<number | string, SdkHttpResponse>],
@@ -463,8 +480,11 @@ function getSdkServiceResponseAndExceptions<TServiceOperation extends SdkService
   return diagnostics.wrap([responses, exceptions]);
 }
 
-function getParameterMappingHelper<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getParameterMappingHelper<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   method: SdkServiceMethod<TServiceOperation>,
   serviceParam: SdkServiceParameter
 ): SdkModelPropertyType[] {
@@ -511,8 +531,11 @@ function getParameterMappingHelper<TServiceOperation extends SdkServiceOperation
   throw new Error("Can't find corresponding parameter");
 }
 
-function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkBasicServiceMethod<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -532,7 +555,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     };
   }
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters)
+    getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
   const response = getSdkMethodResponse(operation, serviceOperation.responses);
   return diagnostics.wrap({
@@ -550,7 +573,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     getParameterMapping: function getParameterMapping(
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
-      return getParameterMappingHelper<TServiceOperation>(context, this, serviceParam);
+      return getParameterMappingHelper<TOptions, TServiceOperation>(context, this, serviceParam);
     },
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
@@ -558,24 +581,30 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   });
 }
 
-function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkServiceMethod<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
   const paging = getPagedResult(context.program, operation);
   if (lro && paging) {
-    return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation);
+    return getSdkLroPagingServiceMethod<TOptions, TServiceOperation>(context, operation);
   } else if (paging) {
-    return getSdkPagingServiceMethod<TServiceOperation>(context, operation);
+    return getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, operation);
   } else if (lro) {
-    return getSdkLroServiceMethod<TServiceOperation>(context, operation);
+    return getSdkLroServiceMethod<TOptions, TServiceOperation>(context, operation);
   }
-  return getSdkBasicServiceMethod<TServiceOperation>(context, operation);
+  return getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation);
 }
 
-function getDefaultSdkEndpointParameter<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getDefaultSdkEndpointParameter<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient,
   serverUrl?: string
 ): SdkEndpointParameter[] {
@@ -619,8 +648,11 @@ interface EndpointAndEndpointParameters {
   hasParameterizedEndpoint: boolean;
 }
 
-function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getEndpointAndEndpointParameters<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient
 ): [EndpointAndEndpointParameters, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -628,21 +660,21 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
   if (servers === undefined) {
     return diagnostics.wrap({
       endpoint: "",
-      properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client),
+      properties: getDefaultSdkEndpointParameter<TOptions, TServiceOperation>(context, client),
       hasParameterizedEndpoint: false,
     });
   }
   if (servers.length > 1) {
     return diagnostics.wrap({
       endpoint: "{endpoint}",
-      properties: getDefaultSdkEndpointParameter<TServiceOperation>(context, client),
+      properties: getDefaultSdkEndpointParameter<TOptions, TServiceOperation>(context, client),
       hasParameterizedEndpoint: true,
     });
   }
   if (servers[0].parameters.size === 0) {
     return diagnostics.wrap({
       endpoint: servers[0].url,
-      properties: getDefaultSdkEndpointParameter<TServiceOperation>(
+      properties: getDefaultSdkEndpointParameter<TOptions, TServiceOperation>(
         context,
         client,
         servers[0].url
@@ -675,10 +707,10 @@ function getEndpointAndEndpointParameters<TServiceOperation extends SdkServiceOp
   });
 }
 
-function getClientDefaultApiVersion<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
-  client: SdkClient
-): string | undefined {
+function getClientDefaultApiVersion<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(context: SdkContext<TOptions, TServiceOperation>, client: SdkClient): string | undefined {
   let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
   if (!defaultVersion) {
     // eslint-disable-next-line deprecation/deprecation
@@ -687,14 +719,17 @@ function getClientDefaultApiVersion<TServiceOperation extends SdkServiceOperatio
   return defaultVersion;
 }
 
-function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkInitializationType<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const credentialParam = getSdkCredentialParameter(context, client);
   const endpointInfo = diagnostics.pipe(
-    getEndpointAndEndpointParameters<TServiceOperation>(context, client)
+    getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
   );
   const properties: SdkParameter[] = endpointInfo.properties;
   if (credentialParam) {
@@ -720,15 +755,17 @@ function getSdkInitializationType<TServiceOperation extends SdkServiceOperation>
   });
 }
 
-function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function getSdkMethods<TOptions extends object, TServiceOperation extends SdkServiceOperation>(
+  context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient,
   group: SdkClient | SdkOperationGroup
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInOperationGroup(context, group)) {
-    retval.push(diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation)));
+    retval.push(
+      diagnostics.pipe(getSdkServiceMethod<TOptions, TServiceOperation>(context, operation))
+    );
   }
   for (const operationGroup of listOperationGroups(context, group)) {
     // We create a client accessor for each operation group
@@ -749,8 +786,11 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   return diagnostics.wrap(retval);
 }
 
-function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>,
+function createSdkClientType<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient,
   operationGroup?: SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
@@ -777,7 +817,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     sdkClientType.methods = sdkClientType.methods.concat(methods);
   } else {
     const endpointInfo = diagnostics.pipe(
-      getEndpointAndEndpointParameters<TServiceOperation>(context, client)
+      getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
     );
     const docWrapper = getDocHelper(context, baseClientType.type);
     sdkClientType = {
@@ -789,7 +829,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
       apiVersions: getAvailableApiVersions(context, client.type),
       nameSpace: getClientNamespaceStringHelper(context, client.service)!,
       initialization: isClient
-        ? diagnostics.pipe(getSdkInitializationType<TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
+        ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
         : undefined,
       endpoint: endpointInfo.endpoint,
       hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
@@ -800,9 +840,10 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   return diagnostics.wrap(sdkClientType);
 }
 
-export function experimental_getSdkPackage<TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TServiceOperation>
-): SdkPackage<TServiceOperation> {
+export function experimental_getSdkPackage<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
   context.__clients = new Map<string, SdkClientType<TServiceOperation>>();

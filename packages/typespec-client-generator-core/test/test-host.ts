@@ -29,7 +29,7 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
 }
 
 export interface SdkTestRunner extends BasicTestRunner {
-  context: SdkContext<SdkHttpOperation, CreateSdkTestRunnerOptions>;
+  context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
@@ -45,7 +45,7 @@ export function createSdkContextTestHelper<
   program: Program,
   options: TOptions,
   emitterName?: string
-): SdkContext<TServiceOperation, TOptions> {
+): SdkContext<TOptions, TServiceOperation> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
     emitterOutputDir: "dummy",
