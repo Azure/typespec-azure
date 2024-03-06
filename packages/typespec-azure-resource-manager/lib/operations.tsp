@@ -154,7 +154,7 @@ op ArmResourceCheckExistence<
 op ArmResourceCreateOrUpdateAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = {},
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -164,7 +164,7 @@ op ArmResourceCreateOrUpdateAsync<
 > is ArmCreateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Resource,
-  ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Response,
   Error
 >;
 
@@ -231,7 +231,7 @@ op ArmResourceCreateOrReplaceSync<
 op ArmResourceCreateOrReplaceAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = {},
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
