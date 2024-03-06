@@ -5,7 +5,6 @@ trigger:
     include:
       - main
       - release/*
-      - fix/github-release
   paths:
     exclude:
       - docs/release-notes/*.md
@@ -36,6 +35,7 @@ jobs:
           nodeVersion: "20.x"
 
       - template: ./templates/build.yml
+
       - script: pnpm run test-official
         displayName: Test
 
