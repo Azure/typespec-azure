@@ -33,8 +33,9 @@ jobs:
 
       - script: npx @chronus/github create-releases --repo azure/typespec-azure --publish-summary ./report-summary-temp.json
         displayName: Create github releases
-        # env:
-        #   GITHUB_TOKEN: "token $(azuresdk-github-pat)"
+        env:
+          # GITHUB_TOKEN: "$(azuresdk-github-pat)"
+          GITHUB_TOKEN: "testinvalid"
 
       # - template: ./templates/install.yml
       #   parameters:
