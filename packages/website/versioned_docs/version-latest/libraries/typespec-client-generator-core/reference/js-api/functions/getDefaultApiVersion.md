@@ -13,7 +13,7 @@ Return the default api version for a versioned service. Will return undefined if
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | - |
+| `context` | `TCGCContext` | - |
 | `serviceNamespace` | `Namespace` |  |
 
 ## Returns

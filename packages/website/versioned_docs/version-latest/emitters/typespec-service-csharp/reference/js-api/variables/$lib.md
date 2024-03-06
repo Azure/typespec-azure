@@ -9,7 +9,7 @@ const $lib: TypeSpecLibrary<Object, CSharpServiceEmitterOptions, never>;
 
 ## Type declaration
 
-| Member | Type | Description |
+| Member | Type | Value |
 | :------ | :------ | :------ |
 | `invalid-identifier` | `Object` | - |
 | `invalid-identifier.default` | `CallableMessage`<[`string`, `string`]\> | - |

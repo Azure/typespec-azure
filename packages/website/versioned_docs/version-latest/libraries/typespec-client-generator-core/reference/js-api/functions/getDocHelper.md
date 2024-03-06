@@ -11,7 +11,7 @@ getDocHelper(context, type): DocWrapper
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Type` |
 
 ## Returns

@@ -11,10 +11,10 @@ Collected data for status monitor polling links
 
 ## Properties
 
-| Property | Type | Description | Inheritance |
-| :------ | :------ | :------ | :------ |
-| `finalResult?` | `Model` \| `IntrinsicType` | The type of the final result after polling completes | [`PollingLocationBase.finalResult`](PollingLocationBase.md) |
-| `info` | `StatusMonitorMetadata` | The status monitor detailed data for control of polling. | - |
-| `kind` | `StatusMonitor` | The kind of status monitor | [`PollingLocationBase.kind`](PollingLocationBase.md) |
-| `pollingModel?` | `Model` \| `IntrinsicType` | The type of the poller | [`PollingLocationBase.pollingModel`](PollingLocationBase.md) |
-| `target` | `ModelProperty` | The model property containing the polling link | [`PollingLocationBase.target`](PollingLocationBase.md) |
+| Property | Type | Description | Overrides | Inherited from |
+| :------ | :------ | :------ | :------ | :------ |
+| `finalResult?` | `Model` \| `IntrinsicType` | The type of the final result after polling completes | [`PollingLocationBase`](PollingLocationBase.md).`finalResult` | [`PollingLocationBase`](PollingLocationBase.md).`finalResult` |
+| `info` | `StatusMonitorMetadata` | The status monitor detailed data for control of polling. | - | - |
+| `kind` | `StatusMonitor` | The kind of status monitor | [`PollingLocationBase`](PollingLocationBase.md).`kind` | [`PollingLocationBase`](PollingLocationBase.md).`kind` |
+| `pollingModel?` | `Model` \| `IntrinsicType` | The type of the poller | [`PollingLocationBase`](PollingLocationBase.md).`pollingModel` | [`PollingLocationBase`](PollingLocationBase.md).`pollingModel` |
+| `target` | `ModelProperty` | The model property containing the polling link | [`PollingLocationBase`](PollingLocationBase.md).`target` | [`PollingLocationBase`](PollingLocationBase.md).`target` |

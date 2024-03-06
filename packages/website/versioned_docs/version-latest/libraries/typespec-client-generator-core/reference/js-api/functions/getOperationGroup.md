@@ -13,7 +13,7 @@ Return the operation group object for the given namespace or interface or undefi
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | SdkContext |
+| `context` | `TCGCContext` | TCGCContext |
 | `type` | `Interface` \| `Namespace` | Type to check |
 
 ## Returns

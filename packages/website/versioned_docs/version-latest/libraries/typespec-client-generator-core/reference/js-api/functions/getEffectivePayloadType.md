@@ -15,7 +15,7 @@ Otherwise the given type is returned unchanged.
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |  |
+| `context` | `TCGCContext` |  |
 | `type` | `Model` |  |
 
 ## Returns

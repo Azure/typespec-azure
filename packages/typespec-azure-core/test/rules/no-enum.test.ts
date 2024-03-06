@@ -45,4 +45,88 @@ describe("typespec-azure-core: no-enum rule", () => {
       )
       .toBeValid();
   });
+
+  describe("codefix", () => {
+    it("codefix simple enum", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            cat, dog
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            "cat", "dog",
+          }
+        `);
+    });
+
+    it("codefix enum with named member", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            Cat: "cat", Dog: "dog",
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            Cat: "cat", Dog: "dog",
+          }
+        `);
+    });
+
+    it("keeps decorators, comments, directives and doc comment between members", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            // cat
+
+            /** cat */
+            @doc("cat")
+            #suppress "cat"
+            cat, 
+            
+            // dog
+
+            /** dog */
+            @doc("dog")
+            #suppress "dog"
+            dog
+
+            // end
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            // cat
+
+            /** cat */
+            @doc("cat")
+            #suppress "cat"
+            "cat", 
+            
+            // dog
+
+            /** dog */
+            @doc("dog")
+            #suppress "dog"
+            "dog",
+
+            // end
+          }
+        `);
+    });
+  });
 });
