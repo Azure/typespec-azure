@@ -50,7 +50,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Tracked Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/dynatrace/main.tsp).
+You can find samples of Tracked Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/dynatrace/main.tsp).
 
 ### Tenant Resources
 
@@ -75,7 +75,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Tenant Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/tenantResource/main.tsp).
+You can find samples of Tenant Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/tenantResource/main.tsp).
 
 ### Extension Resource
 
@@ -98,7 +98,7 @@ model EmployeeResource is ExtensionResource<EmployeeProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Extension Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/tenantResource/main.tsp).
+You can find samples of Extension Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/tenantResource/main.tsp).
 
 ### Child Resource
 
@@ -123,7 +123,7 @@ model JobResource is ProxyResource<JobProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Child Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/dynatrace/main.tsp).
+You can find samples of Child Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/dynatrace/main.tsp).
 
 ### Subscription-based Resource
 
@@ -148,7 +148,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Subscription Resources [in the OperationTemplates sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/operationsTest/opTemplates.tsp).
+You can find samples of Subscription Resources [in the OperationTemplates sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/operationsTest/opTemplates.tsp).
 
 ### Location-based Resource
 
@@ -173,7 +173,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Location Resources [in the OperationTemplates sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/operationsTest/opTemplates.tsp).
+You can find samples of Location Resources [in the OperationTemplates sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/operationsTest/opTemplates.tsp).
 
 ### Singleton Resource
 
@@ -200,7 +200,7 @@ model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
 `@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
 `@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
 
-You can find samples of Singleton Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/packages/samples/resource-manager/dynatrace/main.tsp#L120-L128).
+You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/arm-scenarios/singleton/main.tsp#L29).
 
 ## Designing Resource-specific Properties
 

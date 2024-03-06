@@ -11,7 +11,7 @@ getUsage(context, entity): UsageFlags
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `entity` | `Model` \| `Enum` |
 
 ## Returns

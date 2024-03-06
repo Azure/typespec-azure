@@ -8,7 +8,7 @@ functions may define additional parameters.
 
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
-| `service?` | `Service` | - |
-| `version?` | `string` | - |
+| Property | Type |
+| :------ | :------ |
+| `service?` | `Service` |
+| `version?` | `string` |

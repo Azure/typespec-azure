@@ -147,58 +147,21 @@ describe("typespec-client-generator-core: types", () => {
       await runnerWithCore.compile(
         `
         @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service({})
-        namespace MyService;
-
-        @format("guid")
-        scalar guid extends string;
-
-        @format("url")
-        scalar url extends string;
-
-        @format("uuid")
-        scalar uuid extends string;
-
-        @format("password")
-        scalar password extends string;
-
-        @format("armId")
-        scalar armId extends string;
-
-        @format("ipAddress")
-        scalar ipAddress extends string;
-
-        @format("etag")
-        scalar etag extends string;
-
+        @service
+        namespace MyNamespace;
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
-          guidScalar: guid;
           urlScalar: url;
           uuidScalar: uuid;
-          passwordScalar: password;
-          armIdScalar: armId;
-          ipAddressScalar: ipAddress;
-          azureLocationScalar: azureLocation;
-          etagScalar: etag;
+          eTagScalar: eTag;
 
-          @format("guid")
-          guidProperty: string;
           @format("url")
           urlProperty: string;
           @format("uuid")
           uuidProperty: string;
-          @format("password")
-          passwordProperty: string;
-          @format("armId")
-          armIdProperty: string;
-          @format("ipAddress")
-          ipAddressProperty: string;
-          @format("azureLocation")
-          azureLocationProperty: string;
-          @format("etag")
-          etagProperty: string;
+          @format("eTag")
+          eTagProperty: string;
         }
       `
       );

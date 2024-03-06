@@ -11,7 +11,7 @@ getAllModels(context, options): (SdkModelType | SdkEnumType)[]
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `options` | `GetAllModelsOptions` |
 
 ## Returns

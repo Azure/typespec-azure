@@ -6,7 +6,7 @@ title: "[I] LogicalOperationStep"
 Custom polling
 A step in a logical operation that involves multiple calls
 
-## Extended By
+## Extended by
 
 - [`PollingOperationStep`](PollingOperationStep.md)
 - [`NextOperationLink`](NextOperationLink.md)

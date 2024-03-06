@@ -77,7 +77,7 @@ model SdkBuiltInType extends SdkType {
     | "armId"
     | "ipAddress"
     | "azureLocation"
-    | "etag";
+    | "eTag";
   encode: string;
 }
 

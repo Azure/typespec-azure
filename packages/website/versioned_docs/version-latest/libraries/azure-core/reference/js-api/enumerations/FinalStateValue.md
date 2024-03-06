@@ -8,7 +8,7 @@ long-running-operation-options.final-state-via field
 
 ## Enumeration Members
 
-| Member | Value | Description |
+| Enumeration Member | Value | Description |
 | :------ | :------ | :------ |
 | `azureAsyncOperation` | `"azure-async-operation"` | Poll the Azure-AsyncOperation header |
 | `customLink` | `"custom-link"` | Poll on a header or field other than those above |
