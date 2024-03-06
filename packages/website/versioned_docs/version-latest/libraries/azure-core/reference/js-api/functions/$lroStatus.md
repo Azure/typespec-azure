@@ -12,7 +12,7 @@ $lroStatus(context, entity): void
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `entity` | `ModelProperty` \| `Enum` |
+| `entity` | `ModelProperty` \| `Enum` \| `Union` |
 
 ## Returns
 

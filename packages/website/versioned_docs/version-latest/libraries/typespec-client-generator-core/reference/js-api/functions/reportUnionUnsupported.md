@@ -11,7 +11,7 @@ reportUnionUnsupported(context, type): void
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Union` |
 
 ## Returns

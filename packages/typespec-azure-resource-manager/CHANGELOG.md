@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.40.0
+
+### Bug Fixes
+
+- [#323](https://github.com/Azure/typespec-azure/pull/323) Adding `@visibility("read")` & optional linting rules linting rules for ARM `provisioningState`
+- [#366](https://github.com/Azure/typespec-azure/pull/366) Fix for issue #254 cannot customize response in ARM PUT templates
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#304](https://github.com/Azure/typespec-azure/pull/304) Add `arm-no-record` rule.
+- [#283](https://github.com/Azure/typespec-azure/pull/283) Added `ArmResourceHead` operation template
+- [#298](https://github.com/Azure/typespec-azure/pull/298) ARM: add `arm-delete-response-codes` rule.
+- [#317](https://github.com/Azure/typespec-azure/pull/317) Add ruleset `canonical-versioning` to Azure Resource Manager library.
+
+
 ## 0.39.1
 
 ### Patch Changes
@@ -13,7 +32,6 @@
 - ebfe639: Fix Location resource issue, add mechanism for additional path segments
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
 
-This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
 
 ## 0.38.0
 

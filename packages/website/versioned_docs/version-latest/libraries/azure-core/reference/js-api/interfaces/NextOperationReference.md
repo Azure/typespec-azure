@@ -11,8 +11,8 @@ An operation link to the next operation
 
 ## Properties
 
-| Property | Type | Description | Inheritance |
+| Property | Type | Description | Overrides |
 | :------ | :------ | :------ | :------ |
 | `kind` | `"nextOperationReference"` | - | - |
-| `responseModel` | `Model` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep.responseModel`](LogicalOperationStep.md) |
+| `responseModel` | `Model` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep`](LogicalOperationStep.md).`responseModel` |
 | `target` | [`OperationReference`](OperationReference.md) | Information on how to call the STatusMonitor operation | - |

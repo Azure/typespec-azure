@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.40.0
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#337](https://github.com/Azure/typespec-azure/pull/337) Add support for all properties of openapi `info` object on the `@info` decorator
+- [#277](https://github.com/Azure/typespec-azure/pull/277) Support `@flattenProperty` decorator.
+
+
 ## 0.39.2
 
 ### Patch Changes
@@ -26,7 +38,6 @@
 - 8b072f4: Emit warning if using opendIdConnect http auth scheme
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
 
-This log was last generated on Mon, 29 Jan 2024 22:16:39 GMT and should not be manually modified.
 
 ## 0.38.1
 

@@ -42,5 +42,7 @@ versionPolicies:
       - "@azure-tools/typespec-azure-resource-manager"
       - "@azure-tools/typespec-client-generator-core"
 
+changelog: ["@chronus/github/changelog", { repo: "azure/typespec-azure" }]
+
 ignore:
   - "@typespec/*"
