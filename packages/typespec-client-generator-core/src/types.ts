@@ -32,6 +32,7 @@ import {
   getNamespaceFullName,
   getVisibility,
   ignoreDiagnostics,
+  isErrorModel,
   isNeverType,
   isNullType,
 } from "@typespec/compiler";
@@ -104,7 +105,6 @@ import {
   getGeneratedName,
   getLibraryName,
   getPropertyNames,
-  isErrorOrChildOfError,
 } from "./public-utils.js";
 
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
@@ -529,7 +529,7 @@ export function getSdkModelWithDiagnostics(
       apiVersions: getAvailableApiVersions(context, type),
       isFormDataType:
         isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation),
-      isError: isErrorOrChildOfError(context, type),
+      isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType, operation);
 
