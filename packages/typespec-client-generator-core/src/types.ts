@@ -107,6 +107,7 @@ import {
   isErrorOrChildOfError,
 } from "./public-utils.js";
 
+import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { TCGCContext } from "./internal-utils.js";
 
@@ -641,6 +642,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
+      isVersionEnum: false,
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -695,6 +697,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
       apiVersions: getAvailableApiVersions(context, type.union),
+      isVersionEnum: false,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -731,6 +734,7 @@ function getKnownValuesEnum(
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type),
+        isVersionEnum: false,
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -1440,6 +1444,14 @@ export function getAllModelsWithDiagnostics(
           updateUsageOfModel(context, UsageFlags.Input, sdkModel);
         });
       }
+    }
+    // versioned enums
+    const [_, versionMap] = getVersions(context.program, client.service);
+    if (versionMap && versionMap.getVersions()[0]) {
+      // create sdk enum for versions enum
+      const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
+      sdkVersionsEnum.isVersionEnum = true;
+      updateUsageOfModel(context, UsageFlags.Input, sdkVersionsEnum);
     }
   }
   // update access
