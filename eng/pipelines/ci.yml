@@ -33,6 +33,7 @@ jobs:
       - template: ./templates/install.yml
         parameters:
           nodeVersion: "20.x"
+
       - template: ./templates/build.yml
 
       - script: pnpm run test-official
@@ -57,7 +58,7 @@ jobs:
           cat ./publish-summary.json
         displayName: Log publish summary
 
-      - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary ./publish-summary.json
+      - script: pnpm chronus-github create-releases --repo azure/typespec-azure --publish-summary ./publish-summary.json
         displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)
