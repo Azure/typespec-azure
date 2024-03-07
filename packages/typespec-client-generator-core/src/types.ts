@@ -204,10 +204,11 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
  * @param type the typespec type
  * @returns the corresponding sdk type
  */
-export function getSdkBuiltInType(
+function getSdkBuiltInTypeWithDiagnostics(
   context: TCGCContext,
   type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
-): SdkBuiltInType {
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
     if (type.kind === "Scalar") {
@@ -215,10 +216,10 @@ export function getSdkBuiltInType(
         kind = getScalarKind(type);
       }
     }
-    return {
+    return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
-    };
+    });
   } else if (type.kind === "String" || type.kind === "Boolean" || type.kind === "Number") {
     let kind: SdkBuiltInKinds;
 
@@ -229,12 +230,22 @@ export function getSdkBuiltInType(
     } else {
       kind = intOrFloat(type.value);
     }
-    return {
+    return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
-    };
+    });
   }
-  throw Error(`Unknown kind ${type.kind}`);
+  diagnostics.add(
+    createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
+  );
+  return diagnostics.wrap(getAnyType(context, type));
+}
+
+export function getSdkBuiltInType(
+  context: TCGCContext,
+  type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
+): SdkBuiltInType {
+  return ignoreDiagnostics(getSdkBuiltInTypeWithDiagnostics(context, type));
 }
 
 export function getSdkDurationType(context: TCGCContext, type: Scalar): SdkDurationType {
@@ -358,21 +369,29 @@ export function getSdkUnionWithDiagnostics(
   });
 }
 
-export function getSdkConstant(
+function getSdkConstantWithDiagnostics(
   context: TCGCContext,
   type: StringLiteral | NumericLiteral | BooleanLiteral
-): SdkConstantType {
+): [SdkConstantType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   switch (type.kind) {
     case "Number":
     case "String":
     case "Boolean":
-      const valueType = getSdkBuiltInType(context, type);
-      return {
+      const valueType = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
+      return diagnostics.wrap({
         ...getSdkTypeBaseHelper(context, type, "constant"),
         value: type.value,
         valueType,
-      };
+      });
   }
+}
+
+export function getSdkConstant(
+  context: TCGCContext,
+  type: StringLiteral | NumericLiteral | BooleanLiteral
+): SdkConstantType {
+  return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type));
 }
 
 function addDiscriminatorToModelType(
@@ -736,7 +755,7 @@ export function getClientTypeWithDiagnostics(
     case "String":
     case "Number":
     case "Boolean":
-      retval = getSdkConstant(context, type);
+      retval = diagnostics.pipe(getSdkConstantWithDiagnostics(context, type));
       break;
     case "Tuple":
       retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
@@ -748,7 +767,7 @@ export function getClientTypeWithDiagnostics(
       }
       break;
     case "Intrinsic":
-      retval = getSdkBuiltInType(context, type);
+      retval = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
       break;
     case "Scalar":
       if (!context.program.checker.isStdType(type) && type.kind === "Scalar" && type.baseScalar) {
@@ -774,7 +793,7 @@ export function getClientTypeWithDiagnostics(
         retval = getSdkDurationType(context, type);
         break;
       }
-      const scalarType = getSdkBuiltInType(context, type);
+      const scalarType = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
       // just add default encode, normally encode is on extended scalar and model property
       addEncodeInfo(context, type, scalarType);
       retval = scalarType;
