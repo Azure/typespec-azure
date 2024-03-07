@@ -158,18 +158,29 @@ export function checkIsArmResource(
   target: Model,
   decoratorName: "browse" | "about" | "marketplaceOffer" | "promotion"
 ) {
-  if (
-    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-  ) {
-    reportDiagnostic(program, {
-      code: "not-a-resource",
-      format: {
-        decoratorName: decoratorName,
-      },
-      target,
-    });
-    return false;
+  if (decoratorName === "browse") {
+    if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind)) {
+      reportDiagnostic(program, {
+        code: "not-a-resource",
+        messageId: "browse",
+        target,
+      });
+      return false;
+    }
+  } else {
+    if (
+      getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
+      getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
+    ) {
+      reportDiagnostic(program, {
+        code: "not-a-resource",
+        format: {
+          decoratorName: decoratorName,
+        },
+        target,
+      });
+      return false;
+    }
   }
   return true;
 }
