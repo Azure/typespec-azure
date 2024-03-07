@@ -2329,6 +2329,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw!;
       strictEqual(rawModel.kind, "Model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
     });
 
