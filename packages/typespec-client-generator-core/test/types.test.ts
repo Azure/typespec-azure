@@ -176,6 +176,41 @@ describe("typespec-client-generator-core: types", () => {
       }
     });
 
+    it("etag from core", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        "filter-out-core-models": false,
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(`
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+        @service
+        namespace MyService {
+          @resource("users")
+          @doc("Details about a user.")
+          model User {
+            @key
+            @doc("The user's name.")
+            @visibility("read")
+            name: string;
+
+            ...Azure.Core.EtagProperty;
+          }
+
+          @doc("Gets status.")
+          op getStatus is GetResourceOperationStatus<User>;
+        }
+      `);
+      const models = getAllModels(runnerWithCore.context);
+      const userModel = models.find(
+        (x) => x.kind === "model" && x.name === "User"
+      )! as SdkModelType;
+      strictEqual(userModel.properties.length, 2);
+      const etagProperty = userModel.properties.find((x) => x.nameInClient === "etag")!;
+      strictEqual(etagProperty.type.kind, "eTag");
+    });
+
     it("unknown format", async function () {
       await runner.compileWithBuiltInService(
         `
