@@ -34,7 +34,7 @@ import {
 export function $browse(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
-  checkIsArmResource(program, target, "browse");
+  checkIsArmTrackedResource(program, target, "browse");
   const browseOptionsResult: BrowseOptions = {};
   if (options && options.properties) {
     const query = options.properties.get("argQuery");
@@ -153,34 +153,39 @@ export function getBrowseArgQuery(program: Program, target: Type) {
   return getBrowse(program, target)?.argQuery;
 }
 
+export function checkIsArmTrackedResource(
+  program: Program,
+  target: Model,
+  decoratorName: "browse"
+) {
+  if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind)) {
+    reportDiagnostic(program, {
+      code: "not-a-resource",
+      messageId: decoratorName,
+      target,
+    });
+    return false;
+  }
+  return true;
+}
+
 export function checkIsArmResource(
   program: Program,
   target: Model,
-  decoratorName: "browse" | "about" | "marketplaceOffer" | "promotion"
+  decoratorName: "about" | "marketplaceOffer" | "promotion"
 ) {
-  if (decoratorName === "browse") {
-    if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind)) {
-      reportDiagnostic(program, {
-        code: "not-a-resource",
-        messageId: "browse",
-        target,
-      });
-      return false;
-    }
-  } else {
-    if (
-      getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-      getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-    ) {
-      reportDiagnostic(program, {
-        code: "not-a-resource",
-        format: {
-          decoratorName: decoratorName,
-        },
-        target,
-      });
-      return false;
-    }
+  if (
+    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
+    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
+  ) {
+    reportDiagnostic(program, {
+      code: "not-a-resource",
+      format: {
+        decoratorName: decoratorName,
+      },
+      target,
+    });
+    return false;
   }
   return true;
 }
