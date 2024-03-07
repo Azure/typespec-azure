@@ -1,5 +1,7 @@
 import { Program, createRule } from "@typespec/compiler";
 
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { ArmResourceOperation } from "../operations.js";
 import { getArmResources } from "../resource.js";
 
 /**
@@ -11,35 +13,69 @@ export const armPostResponseCodesRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/post-operation-response-codes",
   description: "Ensure post operations have the appropriate status codes.",
   messages: {
-    sync: `Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.`,
-    async: `Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.`,
+    sync: `Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.`,
+    async: `Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.`,
   },
   create(context) {
+    function validateAsyncPost(op: ArmResourceOperation) {
+      const statusCodes = new Set([
+        ...op.httpOperation.responses.map((r) => r.statusCodes.toString()),
+      ]);
+      // validate that there are 202 and * status codes, and maybe 200
+      const expected =
+        statusCodes.size === 2 ? new Set(["202", "*"]) : new Set(["202", "200", "*"]);
+      if (statusCodes.size !== expected.size || ![...statusCodes].every((v) => expected.has(v))) {
+        context.reportDiagnostic({
+          target: op.operation,
+          messageId: "async",
+        });
+      }
+      // validate that 202 does not have a schema
+      const response202 = op.httpOperation.responses.find((r) => r.statusCodes === 202);
+      if (response202 && response202.type) {
+        context.reportDiagnostic({
+          target: op.operation.returnType,
+          messageId: "async",
+        });
+      }
+    }
+
+    function validateSyncPost(op: ArmResourceOperation) {
+      const allowed = [new Set(["200", "*"]), new Set(["204", "*"])];
+      const statusCodes = new Set([
+        ...op.httpOperation.responses.map((r) => r.statusCodes.toString()),
+      ]);
+      if (
+        !allowed.some(
+          (expected) =>
+            statusCodes.size === expected.size && [...statusCodes].every((v) => expected.has(v))
+        )
+      ) {
+        context.reportDiagnostic({
+          target: op.operation,
+          messageId: "sync",
+        });
+      }
+    }
+
     return {
       root: (program: Program) => {
         const resources = getArmResources(program);
-        const expected = new Set(["200", "201", "*"]);
         for (const resource of resources) {
           const operations = [
             resource.operations.lifecycle.createOrUpdate,
             resource.operations.lifecycle.update,
+            ...Object.values(resource.operations.actions),
           ];
           for (const op of operations) {
-            if (op === undefined) {
+            if (op === undefined || op.httpOperation.verb !== "post") {
               continue;
             }
-            if (op.httpOperation.verb === "post") {
-              const statusCodes = new Set([
-                ...op.httpOperation.responses.map((r) => r.statusCodes.toString()),
-              ]);
-              if (
-                statusCodes.size !== expected.size ||
-                ![...statusCodes].every((v) => expected.has(v))
-              ) {
-                context.reportDiagnostic({
-                  target: op.operation,
-                });
-              }
+            const isAsync = getLroMetadata(context.program, op.operation) !== undefined;
+            if (isAsync) {
+              validateAsyncPost(op);
+            } else {
+              validateSyncPost(op);
             }
           }
         }
