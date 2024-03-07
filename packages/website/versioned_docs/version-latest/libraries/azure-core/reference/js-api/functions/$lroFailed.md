@@ -12,7 +12,7 @@ $lroFailed(context, entity): void
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `entity` | `EnumMember` |
+| `entity` | `EnumMember` \| `UnionVariant` |
 
 ## Returns
 

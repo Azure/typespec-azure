@@ -5,7 +5,7 @@ title: "[E] ResourceBaseType"
 ---
 ## Enumeration Members
 
-| Member | Value |
+| Enumeration Member | Value |
 | :------ | :------ |
 | `Extension` | `"Extension"` |
 | `Location` | `"Location"` |

@@ -10,7 +10,7 @@ TypeSpec can emit the following artifacts for your service:
 - OpenAPI3 specs
 - OpenAPI2 specs, suitable for check-in in to the azure-rest-api-specs repo
 
-For more information on the TypeSpec language and core libraries, see [Getting started with TypeSpec](https://microsoft.github.io/typespec)
+For more information on the TypeSpec language and core libraries, see [Getting started with TypeSpec](https://typespec.io/docs)
 
 ## Setting up TypeSpec and compile first project
 
@@ -28,7 +28,7 @@ There are two simple options for getting TypeSpec up and running in your environ
 
 - Run `tsp compile` in the project folder will compile the TypeSpec project and emit output in `tsp-output` folder.
 
-Once TypeSpec project has been create, the [TypeSpec language tutorial](https://microsoft.github.io/typespec) provides a good overview of the basics of the language.
+Once TypeSpec project has been create, the [TypeSpec language tutorial](https://typespec.io/docs) provides a good overview of the basics of the language.
 
 ## Getting Started for Azure Management Plane Services
 
@@ -41,7 +41,7 @@ Use the resources in this section for creating Azure ARM rest API specs. For Pro
 
 - Documentation
   - [Getting started with TypeSpec for REST APIs](https://github.com/microsoft/typespec/blob/main/README.md#getting-started)
-  - [TypeSpec language tutorial](https://microsoft.github.io/typespec)
+  - [TypeSpec language tutorial](https://typespec.io/docs)
   - [TypeSpec Swagger Cheat Sheet](https://github.com/microsoft/typespec/blob/main/docs/typespec-for-openapi-dev.md)
 - Samples
   - [Petstore Sample using Low-level Http APIs](https://github.com/microsoft/typespec/tree/main/packages/samples/petstore)

@@ -14,7 +14,7 @@ Returns `true` if the enum member represents a "canceled" state.
 | Parameter | Type |
 | :------ | :------ |
 | `program` | `Program` |
-| `entity` | `EnumMember` |
+| `entity` | `EnumMember` \| `UnionVariant` |
 
 ## Returns
 

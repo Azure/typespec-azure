@@ -7,17 +7,17 @@ title: "[F] getSdkUnion"
 getSdkUnion(
    context, 
    type, 
-   operation?): SdkType | undefined
+   operation?): SdkType
 ```
 
 ## Parameters
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Union` |
 | `operation`? | `Operation` |
 
 ## Returns
 
-[`SdkType`](../type-aliases/SdkType.md) \| `undefined`
+[`SdkType`](../type-aliases/SdkType.md)

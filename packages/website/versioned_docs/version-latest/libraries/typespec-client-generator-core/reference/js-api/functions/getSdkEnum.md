@@ -14,7 +14,7 @@ getSdkEnum(
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Enum` |
 | `operation`? | `Operation` |
 

@@ -14,7 +14,7 @@ should not expose them to users
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | SdkContext |
+| `context` | `TCGCContext` | TCGCContext |
 | `entity` | `Model` \| `Enum` \| `Operation` \| `Union` | model / operation that we want to check is internal or not |
 
 ## Returns
