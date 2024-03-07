@@ -1,6 +1,6 @@
 import { ModelProperty } from "@typespec/compiler";
 import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
-import { deepEqual, ok, strictEqual } from "assert";
+import { deepEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAboutDisplayNames,
@@ -42,24 +42,20 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@browse with wrong argQuery file extension", async () => {
     const browseString = createbrowseTestDecorator(`{filePath: "./query.txt"}`);
     const diagnostics = await runner.diagnose(createTestSpec(browseString));
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/invalid-type");
-    ok(
-      diagnostics[0].message.includes(
-        "@browse.argQuery.filePath only allows kql or kml file, current file:"
-      )
-    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalid-type",
+      message: new RegExp("^@browse.argQuery.filePath only allows kql or kml file, current file:"),
+    });
   });
 
   it("@browse with wrong argQuery file string ", async () => {
     const browseString = createbrowseTestDecorator(`"./query.txt"`);
     const diagnostics = await runner.diagnose(createTestSpec(browseString));
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/invalid-type");
-    strictEqual(
-      diagnostics[0].message,
-      "@browse.argQuery only allows literal string query value, current query: ./query.txt"
-    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalid-type",
+      message:
+        "@browse.argQuery only allows literal string query value, current query: ./query.txt",
+    });
   });
 
   it("@browse on non-ARM resource", async () => {
@@ -200,9 +196,10 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
         }
       })`;
     const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/invalid-type");
-    ok(diagnostics[0].message.includes("@about.icon.filePath only allows svg file, current file:"));
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/invalid-type",
+      message: new RegExp("^@about.icon.filePath only allows svg file, current file:"),
+    });
   });
 
   it("@about with icon with file does not exist", async () => {
@@ -213,9 +210,10 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
         }
       })`;
     const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/file-not-found");
-    ok(diagnostics[0].message.includes("cannot find @about file icon from path"));
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/file-not-found",
+      message: new RegExp("^cannot find @about file icon from path"),
+    });
   });
 
   it("@marketplaceOffer.id", async () => {
