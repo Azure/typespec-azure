@@ -1,6 +1,6 @@
 import { ModelProperty } from "@typespec/compiler";
 import { BasicTestRunner, expectDiagnostics } from "@typespec/compiler/testing";
-import { deepEqual, strictEqual } from "assert";
+import { deepEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAboutDisplayNames,
@@ -39,6 +39,29 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
     strictEqual(result, "helloThisISArgQuery");
   });
 
+  it("@browse with wrong argQuery file extension", async () => {
+    const browseString = createbrowseTestDecorator(`{filePath: "./query.txt"}`);
+    const diagnostics = await runner.diagnose(createTestSpec(browseString));
+    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/invalid-type");
+    ok(
+      diagnostics[0].message.includes(
+        "@browse.argQuery.filePath only allows kql or kml file, current file:"
+      )
+    );
+  });
+
+  it("@browse with wrong argQuery file string ", async () => {
+    const browseString = createbrowseTestDecorator(`"./query.txt"`);
+    const diagnostics = await runner.diagnose(createTestSpec(browseString));
+    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/invalid-type");
+    strictEqual(
+      diagnostics[0].message,
+      "@browse.argQuery only allows literal string query value, current query: ./query.txt"
+    );
+  });
+
   it("@browse on non-ARM resource", async () => {
     const browseString = createbrowseTestDecorator(`"helloThisISArgQuery"`);
     const diagnostics = await runner.diagnose(`
@@ -47,7 +70,26 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
       `);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/not-a-resource",
-      message: "@browse can only be applied to TrackedResource and ProxyResource models",
+      message: "@browse can only be applied to TrackedResource models",
+    });
+  });
+
+  it("@browse on proxy ARM resource", async () => {
+    const browseString = createbrowseTestDecorator(`"helloThisISArgQuery"`);
+    const diagnostics = await runner.diagnose(`
+        @armProviderNamespace
+        namespace Microsoft.Foo;
+        ${browseString}
+        model Foo is ProxyResource<{}> {
+          @key("widgetName")
+          @segment("widgets")
+          @path
+          name: string;
+        }
+      `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-portal-core/not-a-resource",
+      message: "@browse can only be applied to TrackedResource models",
     });
   });
 
@@ -148,6 +190,32 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
         message: "@about learnMoreDocs www.portal.azure.com does not start with https://",
       },
     ]);
+  });
+
+  it("@about with icon with wrong file extension", async () => {
+    const aboutTest = `
+      @test @about({
+        icon: {
+          filePath: "./icon.txt"
+        }
+      })`;
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
+    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/invalid-type");
+    ok(diagnostics[0].message.includes("@about.icon.filePath only allows svg file, current file:"));
+  });
+
+  it("@about with icon with file does not exist", async () => {
+    const aboutTest = `
+      @test @about({
+        icon: {
+          filePath: "./fakeicon.svg"
+        }
+      })`;
+    const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
+    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics[0].code, "@azure-tools/typespec-azure-portal-core/file-not-found");
+    ok(diagnostics[0].message.includes("cannot find @about file icon from path"));
   });
 
   it("@marketplaceOffer.id", async () => {
