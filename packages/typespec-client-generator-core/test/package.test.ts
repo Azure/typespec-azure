@@ -1,6 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
-import { deepStrictEqual, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   SdkBodyParameter,
@@ -1769,7 +1769,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParamColor.optional, false);
       strictEqual(methodParamColor.onClient, false);
       strictEqual(methodParamColor.isApiVersionParam, false);
-      strictEqual(methodParamColor.type.kind, "enum");
+      strictEqual(methodParamColor.type.kind, "union");
+      ok(methodParamColor.type.values.filter((x) => x.kind === "constant" && x.value === "red"));
+      ok(methodParamColor.type.values.filter((x) => x.kind === "constant" && x.value === "blue"));
 
       const methodContentTypeParam = method.parameters.find(
         (x) => x.nameInClient === "contentType"

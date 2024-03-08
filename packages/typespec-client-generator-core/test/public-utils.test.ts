@@ -1100,15 +1100,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
-        strictEqual(statusProp.type.kind, "enum");
+        strictEqual(statusProp.type.kind, "union");
         strictEqual(statusProp.type.values.length, 2);
-        const startVal = statusProp.type.values.find((x) => x.name === "start")!;
-        strictEqual(startVal.kind, "enumvalue");
-        strictEqual(startVal.valueType.kind, "string");
-
-        const stopVal = statusProp.type.values.find((x) => x.name === "stop")!;
-        strictEqual(stopVal.kind, "enumvalue");
-        strictEqual(stopVal.valueType.kind, "string");
+        ok(statusProp.type.values.filter((x) => x.kind === "constant" && x.value === "start"));
+        ok(statusProp.type.values.filter((x) => x.kind === "constant" && x.value === "stop"));
+        ok(statusProp.type.values.filter((x) => x.kind === "string"));
       });
 
       it("should handle union of anonymous model", async () => {
@@ -1323,13 +1319,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         `)) as { repeatabilityResult: ModelProperty };
 
         const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
-        strictEqual(stringType.kind, "enum");
-        strictEqual(stringType.values.length, 2);
-        strictEqual(stringType.values[0].kind, "enumvalue");
-        strictEqual(stringType.values[0].value, "accepted");
-        strictEqual(stringType.values[1].kind, "enumvalue");
-        strictEqual(stringType.values[1].value, "rejected");
-        strictEqual(stringType.valueType.kind, "string");
+        strictEqual(stringType.kind, "union");
+        strictEqual(stringType.values.length, 3);
+        ok(stringType.values.find((x) => x.kind === "constant" && x.value === "accepted"));
+        ok(stringType.values.find((x) => x.kind === "constant" && x.value === "rejected"));
+        ok(stringType.values.find((x) => x.kind === "string"));
       });
     });
 

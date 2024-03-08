@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Enum, Model, Union, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepEqual, deepStrictEqual, strictEqual } from "assert";
+import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   SdkArrayType,
@@ -846,19 +846,15 @@ describe("typespec-client-generator-core: types", () => {
       const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
       const modelType = models.find((x) => x.name === "Test")! as SdkModelType;
-      const unionType = modelType.properties[0].type as SdkUnionType;
-      const values = unionType.values;
+      const propType = modelType.properties[0].type;
+      strictEqual(propType.kind, "enum");
+      const values = propType.values;
       strictEqual(values.length, 3);
-      const enumType = values[0] as SdkEnumType;
-      strictEqual(enumType.name, "BaseEnum");
-      strictEqual(enumType.valueType.kind, "int32");
-      strictEqual(enumType.values.length, 1);
-      strictEqual(enumType.values[0].name, "a");
-      strictEqual(enumType.values[0].value, 1);
-      strictEqual(values[1].kind, "constant");
-      strictEqual(values[1].value, 2);
-      strictEqual(values[2].kind, "constant");
-      strictEqual(values[2].value, 3);
+
+      // since these union is named, it gets flattened into one
+      ok(values.find((x) => x.name === "a" && x.value === 1));
+      ok(values.find((x) => x.name === "b" && x.value === 2));
+      ok(values.find((x) => x.name === "c" && x.value === 3));
     });
 
     it("string fixed", async function () {
@@ -1113,23 +1109,18 @@ describe("typespec-client-generator-core: types", () => {
       `
       )) as { Test: Union };
 
-      const unionType = getClientType(runner.context, Test) as SdkUnionType;
+      const unionType = getClientType(runner.context, Test);
+      strictEqual(unionType.kind, "enum");
       strictEqual(unionType.name, "Test");
       strictEqual(unionType.nullable, true);
       const values = unionType.values;
-      const a = values[0] as SdkEnumType;
-      strictEqual(a.name, "A");
-      strictEqual(a.values[0].name, "A1");
-      strictEqual(a.values[1].name, "A2");
-      strictEqual(a.isFixed, true);
-      const b = values[1] as SdkEnumType;
-      strictEqual(b.name, "B");
-      strictEqual(b.values[0].name, "B");
-      strictEqual(b.isFixed, false);
-      const c = values[2] as SdkEnumType;
-      strictEqual(c.name, "C");
-      strictEqual(c.values[0].name, "C");
-      strictEqual(c.isFixed, false);
+      strictEqual(values.length, 4);
+      strictEqual(unionType.isFixed, false);
+      // Since this is named, we're going to flatten them
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "A1" && x.value === "A1"));
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "A2" && x.value === "A2"));
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "B" && x.value === "B"));
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "C" && x.value === "C"));
     });
 
     it("anonymous union as enum with hierarchy", async () => {
@@ -1670,7 +1661,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(dogValue.kind, "enumvalue");
     });
 
-    it("template variable of anonymous union as enum", async () => {
+    it("template variable of anonymous union", async () => {
       await runner.compileWithBuiltInService(`
       interface GetAndSend<Type> {
         get(): {
@@ -1684,14 +1675,18 @@ describe("typespec-client-generator-core: types", () => {
       interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
       `);
       const models = getAllModels(runner.context);
-      strictEqual(models.length, 3);
-      const prop = models.find((x) => x.generatedName === "GetResponseProp")! as SdkEnumType;
-      strictEqual(prop.isFixed, false);
-      strictEqual(prop.valueType.kind, "string");
+      strictEqual(models.length, 2);
       const req = models.find((x) => x.generatedName === "SendRequest")! as SdkModelType;
       const resp = models.find((x) => x.generatedName === "GetResponse")! as SdkModelType;
-      strictEqual(req.properties[0].type, prop);
-      strictEqual(resp.properties[0].type, prop);
+
+      strictEqual(req.properties[0].nameInClient, resp.properties[0].nameInClient);
+      strictEqual(req.properties[0].type.kind, resp.properties[0].type.kind);
+      const prop = req.properties[0].type;
+      strictEqual(prop.kind, "union");
+      strictEqual(prop.values.length, 3);
+      ok(prop.values.find((x) => x.kind === "string"));
+      ok(prop.values.find((x) => x.kind === "constant" && x.value === "b"));
+      ok(prop.values.find((x) => x.kind === "constant" && x.value === "c"));
     });
 
     it("property of anonymous union as enum", async () => {
@@ -1708,13 +1703,17 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const pet = models.find((x) => x.name === "Pet")!;
 
-      const enums = runner.context.experimental_sdkPackage.enums;
-      const kind = enums.find((x) => x.name === "")!;
-      strictEqual(kind.generatedName, "PetKind");
-      const kindProperty = pet.properties.find(
-        (x) => (x.nameInClient = "kind")
-      )! as SdkBodyModelPropertyType;
-      strictEqual(kindProperty.type, kind);
+      // we don't generate an enum in this case
+      strictEqual(runner.context.experimental_sdkPackage.enums.length, 0);
+      strictEqual(pet.properties.length, 1);
+      const kind = pet.properties[0];
+      strictEqual(kind.kind, "property");
+      strictEqual(kind.type.kind, "union");
+      strictEqual(kind.type.values.length, 3);
+
+      ok(kind.type.values.find((x) => x.kind === "string"));
+      ok(kind.type.values.find((x) => x.kind === "constant" && x.value === "cat"));
+      ok(kind.type.values.find((x) => x.kind === "constant" && x.value === "dog"));
     });
 
     it("enum discriminator model without base discriminator property", async () => {
