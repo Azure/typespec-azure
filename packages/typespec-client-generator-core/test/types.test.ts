@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Union, UsageFlags } from "@typespec/compiler";
+import { Enum, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -11,6 +11,7 @@ import {
   SdkModelType,
   SdkType,
   SdkUnionType,
+  UsageFlags,
 } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
@@ -2329,6 +2330,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw!;
       strictEqual(rawModel.kind, "Model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
     });
 
