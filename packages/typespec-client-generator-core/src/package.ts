@@ -3,7 +3,6 @@ import {
   Diagnostic,
   Operation,
   Type,
-  UsageFlags,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
@@ -52,6 +51,7 @@ import {
   SdkServiceParameter,
   SdkServiceResponseHeader,
   SdkType,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
