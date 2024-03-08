@@ -497,6 +497,26 @@ describe("typespec-azure-core: decorators", () => {
         states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
       });
     });
+
+    it("resolve default state from union variant name", async () => {
+      const { DefaultLroStates } = (await runner.compile(`
+        @test
+        @lroStatus
+        union DefaultLroStates {
+          Succeeded: "uSucceeded",
+          Failed: "uFailed",
+          Canceled: "uCancelled",
+          Extra: "uExtra",
+        }
+      `)) as { DefaultLroStates: Model };
+
+      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
+        succeededState: ["Succeeded"],
+        failedState: ["Failed"],
+        canceledState: ["Canceled"],
+        states: ["Succeeded", "Failed", "Canceled", "Extra"],
+      });
+    });
   });
 
   describe("@operationLink", () => {
