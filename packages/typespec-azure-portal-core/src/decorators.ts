@@ -34,7 +34,9 @@ import {
 export function $browse(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
-  checkIsArmTrackedResource(program, target, "browse");
+  if (!checkIsArmTrackedResource(program, target, "browse")) {
+    return;
+  }
   const browseOptionsResult: BrowseOptions = {};
   if (options && options.properties) {
     const query = options.properties.get("argQuery");
