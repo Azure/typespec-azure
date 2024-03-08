@@ -63,7 +63,7 @@ export async function $onValidate(program: Program) {
         });
         return false;
       }
-    } else if (argQuery && typeof argQuery == "string") {
+    } else if (argQuery && typeof argQuery === "string") {
       const fileExtension = getAnyExtensionFromPath(argQuery);
       if (fileExtension !== "") {
         reportDiagnostic(program, {
