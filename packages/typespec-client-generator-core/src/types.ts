@@ -353,9 +353,17 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(clientType);
   }
 
-  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-  if (unionAsEnum) {
-    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  // judge if the union can be converted to enum
+  // need to filter the case that union is composed of union or enum
+  if (
+    ![...type.variants.values()].some((variant) => {
+      return variant.type.kind === "Union" || variant.type.kind === "Enum";
+    })
+  ) {
+    const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+    if (unionAsEnum) {
+      return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+    }
   }
 
   return diagnostics.wrap({

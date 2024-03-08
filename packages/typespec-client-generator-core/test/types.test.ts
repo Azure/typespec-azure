@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Union, UsageFlags } from "@typespec/compiler";
+import { Enum, Model, Union, UsageFlags } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -845,19 +845,20 @@ describe("typespec-client-generator-core: types", () => {
 
       const models = getAllModels(runner.context);
       strictEqual(models.length, 2);
-      const sdkType = models.find((x) => x.name === "ExtendedEnum")! as SdkEnumType;
-      strictEqual(sdkType.isFixed, false);
-      strictEqual(sdkType.valueType.kind, "int32");
-      const values = sdkType.values;
+      const modelType = models.find((x) => x.name === "Test")! as SdkModelType;
+      const unionType = modelType.properties[0].type as SdkUnionType;
+      const values = unionType.values;
       strictEqual(values.length, 3);
-      deepEqual(
-        values.map((x) => x.name),
-        ["a", "b", "c"]
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        [1, 2, 3]
-      );
+      const enumType = values[0] as SdkEnumType;
+      strictEqual(enumType.name, "BaseEnum");
+      strictEqual(enumType.valueType.kind, "int32");
+      strictEqual(enumType.values.length, 1);
+      strictEqual(enumType.values[0].name, "a");
+      strictEqual(enumType.values[0].value, 1);
+      strictEqual(values[1].kind, "constant");
+      strictEqual(values[1].value, 2);
+      strictEqual(values[2].kind, "constant");
+      strictEqual(values[2].value, 3);
     });
 
     it("string fixed", async function () {
@@ -1079,6 +1080,96 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enumType.name, "TestUnionRename");
       strictEqual(enumType.values[0].name, "ARename");
       strictEqual(enumType.values[1].name, "BRename");
+    });
+
+    it("union as enum with hierarchy", async () => {
+      const { Test } = (await runner.compile(
+        `
+        @service({})
+        namespace N {
+          @test
+          union Test{
+            A,
+            B,
+            C,
+            null
+          }
+
+          union A {
+            "A1",
+            "A2",
+          }
+
+          union B {
+            "B",
+            string
+          }
+
+          enum C {
+            "C"
+          }
+          op x(body: Test): void;
+        }
+      `
+      )) as { Test: Union };
+
+      const unionType = getClientType(runner.context, Test) as SdkUnionType;
+      strictEqual(unionType.name, "Test");
+      strictEqual(unionType.nullable, true);
+      const values = unionType.values;
+      const a = values[0] as SdkEnumType;
+      strictEqual(a.name, "A");
+      strictEqual(a.values[0].name, "A1");
+      strictEqual(a.values[1].name, "A2");
+      strictEqual(a.isFixed, true);
+      const b = values[1] as SdkEnumType;
+      strictEqual(b.name, "B");
+      strictEqual(b.values[0].name, "B");
+      strictEqual(b.isFixed, false);
+      const c = values[2] as SdkEnumType;
+      strictEqual(c.name, "C");
+      strictEqual(c.values[0].name, "C");
+      strictEqual(c.isFixed, false);
+    });
+
+    it("anonymous union as enum with hierarchy", async () => {
+      const { Test } = (await runner.compile(
+        `
+        @service({})
+        namespace N {
+          enum LR {
+            left,
+            right,
+          }
+          enum UD {
+            up,
+            down,
+          }
+          
+          @test
+          model Test {
+            color: LR | UD;
+          }
+          op read(@body body: Test): void;
+        }
+      `
+      )) as { Test: Model };
+
+      const modelType = getClientType(runner.context, Test) as SdkModelType;
+      const unionType = modelType.properties[0].type as SdkUnionType;
+      strictEqual(unionType.name, "");
+      strictEqual(unionType.generatedName, "TestColor");
+      const values = unionType.values;
+      const lr = values[0] as SdkEnumType;
+      strictEqual(lr.name, "LR");
+      strictEqual(lr.values[0].name, "left");
+      strictEqual(lr.values[1].name, "right");
+      strictEqual(lr.isFixed, false);
+      const ud = values[1] as SdkEnumType;
+      strictEqual(ud.name, "UD");
+      strictEqual(ud.values[0].name, "up");
+      strictEqual(ud.values[1].name, "down");
+      strictEqual(ud.isFixed, false);
     });
   });
 
