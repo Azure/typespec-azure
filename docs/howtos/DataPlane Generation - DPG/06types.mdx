@@ -1,0 +1,128 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Generated Types
+
+This page documents what type definitions in TypeSpec are generated as in emitted libraries
+
+## Unions
+
+### Named Unions
+
+Named unions will be generated as enums in emitted libraries. If the union includes the base type as a possible value,
+we will generate an open enum. If not, we will generated a closed enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+/**
+ * Open union. Menu items can be added over time
+ */
+union MenuItems {
+    string,
+    burger: "burger",
+    fries: "fries",
+}
+
+/**
+ * Closed union. There are only so many repeatability results.
+ */
+union RepeatabilityResult {
+    accepted: "accepted",
+    rejected: "rejected",
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python treats both open and closed enums as functionally open.
+
+```python
+from enum import Enum
+
+enum MenuItems(str, Enum):
+    BURGER = "burger"
+    FRIES = "fries"
+
+enum RepeatabilityResult(str, Enum):
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+CSharp generates different enums based off of whether they are open or closed.
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+Java generates different enums based off of whether they are open or closed.
+
+```java
+TODO
+```
+
+</TabItem>
+</Tabs>
+
+
+
+### Anonymous Unions
+
+Anonymous unions will *NOT* be generated as enums in emitted libraries. Instead they will be generated as a list of
+possible values.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model ResponseObject {
+    repeatabilityResult: "accepted" | "rejected";
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+```python
+model ResponseObject:
+    repeatability_result: Literal["accepted", "rejected]
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO
+```
+
+</TabItem>
+</Tabs>
