@@ -215,7 +215,8 @@ describe("typespec-client-generator-core: decorators", () => {
         @service({})
         @test namespace MyClient;
 
-        @route("/root1") op atRoot1(): void;        @route("/root2") op atRoot2(): void;
+        @route("/root1") op atRoot1(): void;       
+        @route("/root2") op atRoot2(): void;
 
         @operationGroup
         @test interface MyGroup {
@@ -1525,6 +1526,7 @@ describe("typespec-client-generator-core: decorators", () => {
   describe("@access", () => {
     it("mark an operation as internal", async () => {
       const { test } = (await runner.compile(`
+        @service({title: "Test Service"}) namespace TestService;
         @test
         @access(Access.internal)
         op test(): void;

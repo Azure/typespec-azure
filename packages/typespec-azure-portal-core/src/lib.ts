@@ -9,9 +9,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`cannot find @${"decoratorName"} file ${"propertyName"} from path ${"filePath"}`,
       },
     },
+    "invalid-type": {
+      severity: "error",
+      messages: {
+        iconSvg: paramMessage`@about.icon.filePath only allows svg file, current file: ${"filePath"}`,
+        argQueryFile: paramMessage`@browse.argQuery.filePath only allows kql or kml file, current file: ${"filePath"}`,
+        argQueryString: paramMessage`@browse.argQuery only allows literal string query value, current query: ${"query"}`,
+      },
+    },
     "not-a-resource": {
       severity: "error",
       messages: {
+        browse: `@browse can only be applied to TrackedResource models`,
         default: paramMessage`@${"decoratorName"} can only be applied to TrackedResource and ProxyResource models`,
       },
     },
