@@ -44,7 +44,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
     const diagnostics = await runner.diagnose(createTestSpec(browseString));
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-type",
-      message: new RegExp("^@browse.argQuery.filePath only allows kql or kml file, current file:"),
+      message: /^@browse.argQuery.filePath only allows kql or kml file, current file:/,
     });
   });
 
@@ -198,7 +198,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
     const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-type",
-      message: new RegExp("^@about.icon.filePath only allows svg file, current file:"),
+      message: /^@about.icon.filePath only allows svg file, current file:/,
     });
   });
 
@@ -212,7 +212,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
     const diagnostics = await runner.diagnose(createTestSpec(undefined, aboutTest));
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/file-not-found",
-      message: new RegExp("^cannot find @about file icon from path"),
+      message: /^cannot find @about file icon from path/,
     });
   });
 

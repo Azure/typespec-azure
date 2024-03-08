@@ -1,4 +1,4 @@
-import { ArmResourceKind, getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
+import { getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 import {
   BooleanLiteral,
   CompilerHost,
@@ -158,7 +158,7 @@ export function checkIsArmTrackedResource(
   target: Model,
   decoratorName: "browse"
 ) {
-  if (getArmResourceKind(target) !== ("Tracked" as ArmResourceKind)) {
+  if (getArmResourceKind(target) !== "Tracked") {
     reportDiagnostic(program, {
       code: "not-a-resource",
       messageId: decoratorName,
@@ -174,10 +174,7 @@ export function checkIsArmResource(
   target: Model,
   decoratorName: "about" | "marketplaceOffer" | "promotion"
 ) {
-  if (
-    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-  ) {
+  if (getArmResourceKind(target) !== "Tracked" && getArmResourceKind(target) !== "Proxy") {
     reportDiagnostic(program, {
       code: "not-a-resource",
       format: {
