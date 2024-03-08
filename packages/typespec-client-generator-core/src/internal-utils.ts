@@ -1,4 +1,5 @@
 import {
+  Model,
   ModelProperty,
   Namespace,
   Operation,
@@ -227,7 +228,7 @@ export interface TCGCContext {
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Set<string>;
+  generatedNames?: Map<Union | Model, string>;
   unionsMap?: Map<Union, SdkUnionType>;
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;
