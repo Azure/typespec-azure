@@ -642,7 +642,6 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
-      isVersionEnum: false,
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -697,7 +696,6 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
       apiVersions: getAvailableApiVersions(context, type.union),
-      isVersionEnum: false,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -734,7 +732,6 @@ function getKnownValuesEnum(
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type),
-        isVersionEnum: false,
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -1450,17 +1447,17 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      sdkVersionsEnum.isVersionEnum = true;
-      updateUsageOfModel(context, UsageFlags.Input, sdkVersionsEnum);
+      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
     }
   }
   // update access
   updateAccessOfModel(context);
   let filter = 0;
-  if (options.input) {
+  if (options.input && options.output) {
+    filter = Number.MAX_SAFE_INTEGER;
+  } else if (options.input) {
     filter += UsageFlags.Input;
-  }
-  if (options.output) {
+  } else if (options.output) {
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));

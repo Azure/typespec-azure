@@ -234,7 +234,6 @@ export interface SdkEnumType extends SdkTypeBase {
   access?: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
-  isVersionEnum: boolean;
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -513,4 +512,5 @@ export enum UsageFlags {
   None = 0,
   Input = 1 << 1,
   Output = 1 << 2,
+  Versioning = 1 << 3,
 }
