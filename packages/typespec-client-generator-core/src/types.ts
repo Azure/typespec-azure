@@ -107,6 +107,7 @@ import {
   getPropertyNames,
 } from "./public-utils.js";
 
+import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { TCGCContext } from "./internal-utils.js";
 
@@ -1441,14 +1442,22 @@ export function getAllModelsWithDiagnostics(
         });
       }
     }
+    // versioned enums
+    const [_, versionMap] = getVersions(context.program, client.service);
+    if (versionMap && versionMap.getVersions()[0]) {
+      // create sdk enum for versions enum
+      const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
+      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+    }
   }
   // update access
   updateAccessOfModel(context);
   let filter = 0;
-  if (options.input) {
+  if (options.input && options.output) {
+    filter = Number.MAX_SAFE_INTEGER;
+  } else if (options.input) {
     filter += UsageFlags.Input;
-  }
-  if (options.output) {
+  } else if (options.output) {
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));

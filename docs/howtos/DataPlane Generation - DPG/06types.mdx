@@ -1,0 +1,62 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Generated Types
+
+This page documents what type definitions in TypeSpec are generated as in emitted libraries
+
+## Enums
+
+## Versioning Enums
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v1,
+  v2,
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+```
+# Python does not generate the enum used for versioning
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public enum Versions
+{
+    v1,
+    v2
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum Versions {
+    v1,
+    v2
+}
+```
+
+</TabItem>
+</Tabs>
