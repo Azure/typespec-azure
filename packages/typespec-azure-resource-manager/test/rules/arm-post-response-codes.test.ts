@@ -113,12 +113,15 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
     .toBeValid();
 });
 
-it("Emits a warning for a long-running post operation that does not contain the appropriate response codes", async () => {
+it("Does not emit a warning for a long-running post operation that satisfies the requirements.", async () => {
   await tester
     .expect(
       `
+      using Azure.Core;
+
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -133,23 +136,162 @@ it("Emits a warning for a long-running post operation that does not contain the 
         @path
         name: string;
       }
-
+      
       @armResourceOperations
       interface Widgets {
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-        @post
-        @pollingOperation(Widgets.getStatus)
+        @get getWidget is Azure.Core.StandardResourceOperations.ResourceRead<Widget>;
+      
+        @get getStatus(...KeysOf<Widget>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+      
+        @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
+        @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
         @armResourceAction(Widget)
-        longRunning(...ApiVersionParameter): Widget | {
-          @statusCode statusCode: 201;
-          @header id: string,
-          @header("operation-id") operate: string,
-          @finalLocation @header("Location") location: ResourceLocation<Widget>,
-          @pollingLocation @header("Operation-Location") opLink: string,
-          @lroResult @body body?: Widget
-        }
+        @post create(...KeysOf<Widget>, @body body: Widget): {
+          @statusCode code: "202";
+          @header("x-ms-operation-id") operationId: string;
+        } | {
+          @statusCode code: "200";
+          @header("x-ms-operation-id") operationId: string;
+          @body result: Widget;
+        } | ErrorResponse;
+      }`
+    )
+    .toBeValid();
+});
+
+it("Emits a warning for a long-running post operation that has a 202 response with a schema.", async () => {
+  await tester
+    .expect(
+      `
+      using Azure.Core;
+
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+            
+      model Widget is TrackedResource<{}> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Widgets {
+        @get getWidget is Azure.Core.StandardResourceOperations.ResourceRead<Widget>;
+      
+        @get getStatus(...KeysOf<Widget>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+      
+        @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
+        @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
+        @armResourceAction(Widget)
+        @post create(...KeysOf<Widget>, @body body: Widget): {
+          @statusCode code: "202";
+          @header("x-ms-operation-id") operationId: string;
+          @body body: Widget;
+        } | ErrorResponse;
+      }`
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+      message:
+        "Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.",
+    });
+});
+
+it("Emits a warning for a long-running post operation that has a 200 response with no schema.", async () => {
+  await tester
+    .expect(
+      `
+      using Azure.Core;
+
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+            
+      model Widget is TrackedResource<{}> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Widgets {
+        @get getWidget is Azure.Core.StandardResourceOperations.ResourceRead<Widget>;
+      
+        @get getStatus(...KeysOf<Widget>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+      
+        @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
+        @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
+        @armResourceAction(Widget)
+        @post create(...KeysOf<Widget>, @body body: Widget): {
+          @statusCode code: "202";
+          @header("x-ms-operation-id") operationId: string;
+        } | {
+          @statusCode code: "200";
+          @header("x-ms-operation-id") operationId: string;
+        } | ErrorResponse;
+      }`
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+      message:
+        "Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.",
+    });
+});
+
+it("Emits a warning for a long-running post operation that has invalid response codes.", async () => {
+  await tester
+    .expect(
+      `
+      using Azure.Core;
+
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+            
+      model Widget is TrackedResource<{}> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Widgets {
+        @get getWidget is Azure.Core.StandardResourceOperations.ResourceRead<Widget>;
+      
+        @get getStatus(...KeysOf<Widget>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+      
+        @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
+        @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
+        @armResourceAction(Widget)
+        @post create(...KeysOf<Widget>, @body body: Widget): {
+          @statusCode code: "203";
+          @header("x-ms-operation-id") operationId: string
+        } | ErrorResponse;
       }`
     )
     .toEmitDiagnostics({

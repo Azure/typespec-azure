@@ -1,6 +1,7 @@
 import { Program, createRule } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { HttpOperationBody, HttpOperationResponse } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { getArmResources } from "../resource.js";
 
@@ -17,6 +18,19 @@ export const armPostResponseCodesRule = createRule({
     async: `Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.`,
   },
   create(context) {
+    function getResponseBody(
+      response: HttpOperationResponse | undefined
+    ): HttpOperationBody | undefined {
+      if (response === undefined) return undefined;
+      if (response.responses.length > 1) {
+        throw new Error("Multiple responses are not supported.");
+      }
+      if (response.responses[0].body !== undefined) {
+        return response.responses[0].body;
+      }
+      return undefined;
+    }
+
     function validateAsyncPost(op: ArmResourceOperation) {
       const statusCodes = new Set([
         ...op.httpOperation.responses.map((r) => r.statusCodes.toString()),
@@ -32,7 +46,17 @@ export const armPostResponseCodesRule = createRule({
       }
       // validate that 202 does not have a schema
       const response202 = op.httpOperation.responses.find((r) => r.statusCodes === 202);
-      if (response202 && response202.type) {
+      const body202 = getResponseBody(response202);
+      if (body202 !== undefined) {
+        context.reportDiagnostic({
+          target: op.operation.returnType,
+          messageId: "async",
+        });
+      }
+      // validate that a 200 response does have a schema
+      const response200 = op.httpOperation.responses.find((r) => r.statusCodes === 200);
+      const body200 = getResponseBody(response200);
+      if (response200 && body200 === undefined) {
         context.reportDiagnostic({
           target: op.operation.returnType,
           messageId: "async",
