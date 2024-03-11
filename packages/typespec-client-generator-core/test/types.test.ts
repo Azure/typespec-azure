@@ -11,6 +11,7 @@ import {
   SdkModelType,
   SdkType,
   SdkUnionType,
+  UsageFlags,
 } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {

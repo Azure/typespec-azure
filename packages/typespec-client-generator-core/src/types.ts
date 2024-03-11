@@ -23,7 +23,6 @@ import {
   Type,
   Union,
   UnionVariant,
-  UsageFlags,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
@@ -85,6 +84,7 @@ import {
   SdkTupleType,
   SdkType,
   SdkUnionType,
+  UsageFlags,
   getKnownScalars,
   isSdkBuiltInKind,
 } from "./interfaces.js";
