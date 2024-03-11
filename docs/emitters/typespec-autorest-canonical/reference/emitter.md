@@ -1,16 +1,12 @@
-# @azure-tools/typespec-autorest-canonical
+---
+title: "Emitter usage"
+toc_min_heading_level: 2
+toc_max_heading_level: 3
+---
 
-TypeSpec library for emitting canonical swagger
+# Emitter
 
-## Install
-
-```bash
-npm install @azure-tools/typespec-autorest-canonical
-```
-
-## Emitter
-
-### Usage
+## Usage
 
 1. Via the command line
 
@@ -25,9 +21,9 @@ emit:
   - "@azure-tools/typespec-autorest-canonical"
 ```
 
-### Emitter options
+## Emitter options
 
-#### `output-file`
+### `output-file`
 
 **Type:** `string`
 
@@ -48,40 +44,40 @@ Example: Multiple services
 - `Service1.canonical.openapi.json`
 - `Service2.canonical.openapi.json`
 
-#### `version`
+### `version`
 
 **Type:** `string`
 
-#### `azure-resource-provider-folder`
+### `azure-resource-provider-folder`
 
 **Type:** `string`
 
-#### `arm-types-dir`
+### `arm-types-dir`
 
 **Type:** `string`
 
 Path to the common-types.json file folder. Default: '${project-root}/../../common-types/resource-management'
 
-#### `new-line`
+### `new-line`
 
 **Type:** `"crlf" | "lf"`
 
 Set the newline character for emitting files.
 
-#### `omit-unreachable-types`
+### `omit-unreachable-types`
 
 **Type:** `boolean`
 
 Omit unreachable types. By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.
 
-#### `include-x-typespec-name`
+### `include-x-typespec-name`
 
 **Type:** `"inline-only" | "never"`
 
 If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
 This extension is meant for debugging and should not be depended on.
 
-#### `use-read-only-status-schema`
+### `use-read-only-status-schema`
 
 **Type:** `boolean`
 
