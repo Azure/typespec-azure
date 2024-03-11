@@ -285,10 +285,8 @@ op Operation<
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
 >(
-  ...TraitProperties<
-    Traits & VersionParameterTrait<ApiVersionParameter>,
-    TraitLocation.ApiVersionParameter
-  >,
+  ...TraitProperties<VersionParameterTrait<ApiVersionParameter>, TraitLocation.ApiVersionParameter>,
+  ...TraitProperties<Traits, TraitLocation.Parameters>,
   ...Parameters,
 ): Response | ErrorResponse;
 
