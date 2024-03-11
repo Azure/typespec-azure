@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Fix operation trait not applied correctly in Foundations.Operation
+Fix operation traits not applied correctly in `Foundations.Operation`
