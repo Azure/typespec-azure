@@ -1399,7 +1399,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runnerWithCore.compile(lroCode);
         runnerWithCore.context.filterOutCoreModels = false;
         const models = getAllModels(runnerWithCore.context);
-        strictEqual(models.length, 8);
+        strictEqual(models.length, 9);
         // there should only be one non-core model
         deepStrictEqual(
           models.map((x) => x.name).sort(),
@@ -1412,6 +1412,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             "ErrorResponse",
             "OperationStatus",
             "User",
+            "Versions",
           ].sort()
         );
       });
