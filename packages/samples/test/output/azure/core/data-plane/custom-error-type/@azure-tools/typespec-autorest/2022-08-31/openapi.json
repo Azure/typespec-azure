@@ -394,6 +394,9 @@
             "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
           },
           {
+            "$ref": "#/parameters/Azure.Core.ClientRequestIdHeader"
+          },
+          {
             "name": "widgetName",
             "in": "path",
             "description": "The widget name.",

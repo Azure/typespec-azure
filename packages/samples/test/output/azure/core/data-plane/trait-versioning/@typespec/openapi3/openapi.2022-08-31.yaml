@@ -214,6 +214,7 @@ paths:
       description: Gets status of a Manufacturer operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
         - name: manufacturerId
           in: path
           required: true
@@ -528,6 +529,7 @@ paths:
       description: Gets status of a Widget operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+        - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
         - name: widgetName
           in: path
           required: true

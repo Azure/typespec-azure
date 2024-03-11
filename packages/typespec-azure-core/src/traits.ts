@@ -14,6 +14,7 @@ import {
   Union,
   UnknownType,
 } from "@typespec/compiler";
+import { createRekeyableMap } from "@typespec/compiler/utils";
 import { isHeader, isQueryParam } from "@typespec/http";
 import { $added } from "@typespec/versioning";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -370,6 +371,7 @@ export function $omitTraits(
         // envelope.  We only apply an override if one is set, though.
         const contextsOverride = getTraitContextsOrUndefined(context.program, traitProperty);
         if (
+          getTraitLocation(program, traitProperty)?.name === "ApiVersionParameter" ||
           !checkTraitPropertyMatchContext(
             program,
             traitProperty,
@@ -387,7 +389,19 @@ export function $omitTraits(
           // Copy the contents of the trait property's model type into the
           // target model
           for (const [name, property] of traitProperty.type.properties) {
-            target.properties.set(
+            let newEnvelope: ModelProperty | undefined = target.properties.get(traitEnvelope.name);
+
+            if (newEnvelope === undefined) {
+              newEnvelope = context.program.checker.cloneType<ModelProperty>(traitEnvelope, {
+                name: traitEnvelope.name,
+                sourceProperty: traitEnvelope,
+                type: context.program.checker.cloneType(traitEnvelope.type, {
+                  properties: createRekeyableMap<string, ModelProperty>(),
+                }),
+              });
+              target.properties.set(traitEnvelope.name, newEnvelope);
+            }
+            (newEnvelope.type as Model).properties.set(
               name,
               context.program.checker.cloneType(property, {
                 sourceProperty: property,
