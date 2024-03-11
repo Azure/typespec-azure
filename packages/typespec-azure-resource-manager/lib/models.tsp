@@ -180,7 +180,7 @@ model DefaultProvisioningStateProperty {
 @doc("The managed service identities envelope.")
 model ManagedServiceIdentity {
   @doc("The managed service identities assigned to this resource.")
-  identity?: ManagedIdentityProperties;
+  identity?: ManagedServiceIdentity;
 }
 
 /**
@@ -190,7 +190,7 @@ model ManagedServiceIdentity {
 @doc("Managed identity for services that are constrained to system-assigned managed identities.")
 model ManagedSystemAssignedIdentity {
   @doc("The managed service identities assigned to this resource.")
-  identity?: ManagedSystemIdentityProperties;
+  identity?: SystemAssignedServiceIdentity;
 }
 
 /**

@@ -76,21 +76,21 @@ model ExtensionResourceBase extends ArmResource {}
 /**
  * An internal enum to indicate the resource support for various path types
  */
-enum ResourceHome {
+union ResourceHome {
   @doc("The resource is bound to a tenant")
-  Tenant,
+  Tenant: "Tenant",
 
   @doc("The resource is bound to a subscription")
-  Subscription,
+  Subscription: "Subscription",
 
   @doc("The resource is bound to a location")
-  Location,
+  Location: "Location",
 
   @doc("The resource is bound to a resource group")
-  ResourceGroup,
+  ResourceGroup: "ResourceGroup",
 
   @doc("The resource is bound to an extension")
-  Extension,
+  Extension: "Extension",
 }
 
 /**
@@ -99,26 +99,26 @@ enum ResourceHome {
 @doc("""
 The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
 """)
-enum Origin {
+union Origin {
   @doc("Indicates the operation is initiated by a user.")
-  user,
+  user: "user",
 
   @doc("Indicates the operation is initiated by a system.")
-  system,
+  system: "system",
 
   @doc("Indicates the operation is initiated by a user or system.")
-  `user,system`,
+  `user,system`: "user,system",
 }
 
 /**
- * Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+ * Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
  */
 @doc("""
-Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
 """)
-enum ActionType {
+union ActionType {
   @doc("Actions are for internal-only APIs.")
-  Internal,
+  Internal: "Internal",
 }
 
 /**
@@ -308,20 +308,20 @@ model ArmTagsProperty {
 /**
  * The kind of entity that created the resource.
  */
-// NOTE: This is how the enum is named in types.json
+// NOTE: This is how the extensible enum is named in types.json
 @doc("The kind of entity that created the resource.")
-enum createdByType {
+union createdByType {
   @doc("The entity was created by a user.")
-  User,
+  User: "User",
 
   @doc("The entity was created by an application.")
-  Application,
+  Application: "Application",
 
   @doc("The entity was created by a managed identity.")
-  ManagedIdentity,
+  ManagedIdentity: "ManagedIdentity",
 
   @doc("The entity was created by a key.")
-  Key,
+  Key: "Key",
 }
 
 /**
@@ -357,6 +357,9 @@ model SystemData {
   lastModifiedAt?: plainDate;
 }
 
+/** Alias of ManagedServiceIdentity for back compatability. Please change to ManagedServiceIdentity. */
+alias ManagedIdentityProperties = ManagedServiceIdentity;
+
 /**
  * The properties of the managed service identities assigned to this resource.
  */
@@ -374,7 +377,7 @@ model SystemData {
   "managedidentity.json"
 )
 @doc("The properties of the managed service identities assigned to this resource.")
-model ManagedIdentityProperties {
+model ManagedServiceIdentity {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
@@ -384,11 +387,14 @@ model ManagedIdentityProperties {
   principalId?: string;
 
   @doc("The type of managed identity assigned to this resource.")
-  type: ManagedIdentityType;
+  type: ManagedServiceIdentityType;
 
   @doc("The identities assigned to this resource by the user.")
   userAssignedIdentities?: Record<UserAssignedIdentity>;
 }
+
+/** Alias of SystemAssignedServiceIdentity for back compatability. Please change to SystemAssignedServiceIdentity. */
+alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 
 /**
  * The properties of the service-assigned identity associated with this resource.
@@ -407,7 +413,7 @@ model ManagedIdentityProperties {
   "managedidentity.json"
 )
 @doc("The properties of the service-assigned identity associated with this resource.")
-model ManagedSystemIdentityProperties {
+model SystemAssignedServiceIdentity {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
@@ -417,9 +423,11 @@ model ManagedSystemIdentityProperties {
   principalId?: string;
 
   @doc("The type of managed identity assigned to this resource.")
-  type: ManagedSystemIdentityType;
+  type: SystemAssignedServiceIdentityType;
 }
 
+/** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
+alias ManagedIdentityType = ManagedServiceIdentityType;
 /**
  * A managed identity assigned by the user.
  */
@@ -436,30 +444,33 @@ model UserAssignedIdentity {
  * The kind of managed identity assigned to this resource.
  */
 @doc("The kind of managed identity assigned to this resource.")
-enum ManagedIdentityType {
+union ManagedServiceIdentityType {
   @doc("No managed identity.")
-  None,
+  None: "None",
 
   @doc("System assigned managed identity.")
-  SystemAssigned,
+  SystemAssigned: "SystemAssigned",
 
   @doc("User assigned managed identity.")
-  UserAssigned,
+  UserAssigned: "UserAssigned",
 
   @doc("System and user assigned managed identity.")
   SystemAndUserAssigned: "SystemAssigned, UserAssigned",
 }
 
+/** Alias of SystemAssignedServiceIdentityType for back compatability. Please change to SystemAssignedServiceIdentityType. */
+alias ManagedSystemIdentityType = SystemAssignedServiceIdentityType;
+
 /**
  * The kind of managemed identity assigned to this resource.
  */
 @doc("The kind of managemed identity assigned to this resource.")
-enum ManagedSystemIdentityType {
+union SystemAssignedServiceIdentityType {
   @doc("No managed system identity.")
-  None,
+  None: "None",
 
   @doc("System assigned managed system identity.")
-  SystemAssigned,
+  SystemAssigned: "SystemAssigned",
 }
 
 /**
@@ -592,18 +603,18 @@ model ResourceSkuType {
  * Available service tiers for the SKU.
  */
 @doc("Available service tiers for the SKU.")
-enum SkuTier {
+union SkuTier {
   @doc("The Free service tier.")
-  Free,
+  Free: "Free",
 
   @doc("The Basic service tier.")
-  Basic,
+  Basic: "Basic",
 
   @doc("The Standard service tier.")
-  Standard,
+  Standard: "Standard",
 
   @doc("The Premium service tier.")
-  Premium,
+  Premium: "Premium",
 }
 
 /**
@@ -651,7 +662,7 @@ model Operation {
   origin?: Origin;
 
   @doc("""
-  Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
   """)
   actionType?: ActionType;
 }
@@ -689,12 +700,12 @@ model CheckNameAvailabilityRequest {
  * Possible reasons for a name not being available.
  */
 @doc("Possible reasons for a name not being available.")
-enum CheckNameAvailabilityReason {
+union CheckNameAvailabilityReason {
   @doc("Name is invalid.")
-  Invalid,
+  Invalid: "Invalid",
 
   @doc("Name already exists.")
-  AlreadyExists,
+  AlreadyExists: "AlreadyExists",
 }
 
 /**
