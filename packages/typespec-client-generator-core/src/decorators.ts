@@ -14,7 +14,6 @@ import {
   SyntaxKind,
   Type,
   Union,
-  UsageFlags,
   getNamespaceFullName,
   getProjectedName,
   isService,
@@ -33,6 +32,7 @@ import {
   SdkHttpOperation,
   SdkOperationGroup,
   SdkServiceOperation,
+  UsageFlags,
 } from "./interfaces.js";
 import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";

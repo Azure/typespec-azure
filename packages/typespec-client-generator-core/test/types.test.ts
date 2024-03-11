@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Union, UsageFlags } from "@typespec/compiler";
+import { Enum, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -11,6 +11,7 @@ import {
   SdkModelType,
   SdkType,
   SdkUnionType,
+  UsageFlags,
 } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
