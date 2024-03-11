@@ -263,6 +263,9 @@ namespace Azure.Core.Traits.Private {
     @doc("The diagnostic to be raised when the trait is not present.")
     diagnostic: string;
   }
+
+  @Private.omitTraits(Traits, Contexts)
+  model OmitTraits<Traits extends Model, Contexts = unknown> {}
 }
 
 // These decorators are not meant to be used by TypeSpec authors
@@ -289,6 +292,12 @@ namespace Azure {
           target: Model,
           traitModel: Model,
           traitLocation: EnumMember,
+          traitContexts: EnumMember | Union | unknown
+        );
+
+        extern dec omitTraits(
+          target: Model,
+          traitModel: Model,
           traitContexts: EnumMember | Union | unknown
         );
 

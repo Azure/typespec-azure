@@ -336,6 +336,73 @@ export function $addTraitProperties(
   }
 }
 
+export function $omitTraits(
+  context: DecoratorContext,
+  target: Model,
+  traitModel: Model,
+  traitContexts: EnumMember | Union | UnknownType
+) {
+  // Keep track of all traits applied
+  const appliedTraits = new Set<string>();
+
+  // Search the trait model for all trait property types that satisfy the
+  // criteria for this trait location and context list
+  const { program } = context;
+  for (const [_, traitEnvelope] of traitModel.properties) {
+    // Check whether the envelope property is marked with a traitAdded version
+    // Make sure we're looking at a trait that we haven't already processed
+    const traitName = getSourceTraitName(program, traitEnvelope);
+    if (traitName && !appliedTraits.has(traitName)) {
+      // Extract any applicable constants from the trait envelope
+      const contexts = getTraitContexts(context.program, traitEnvelope);
+
+      // Ensure that the trait envelope is actually a model
+      if (traitEnvelope.type.kind !== "Model") {
+        // The @trait decorator has already raised a diagnostic
+        return;
+      }
+
+      // For each property in the envelope type, check if the property matches
+      // the criteria of the usage site
+      for (const [_, traitProperty] of traitEnvelope.type.properties) {
+        // Each property inside of the trait envelope property's model can have
+        // its own trait contexts which override the contexts of the trait
+        // envelope.  We only apply an override if one is set, though.
+        const contextsOverride = getTraitContextsOrUndefined(context.program, traitProperty);
+        if (
+          !checkTraitPropertyMatchContext(
+            program,
+            traitProperty,
+            contextsOverride ?? contexts,
+            normalizeTraitContexts(program, traitContexts)
+          )
+        ) {
+          if (traitProperty.type.kind !== "Model") {
+            // In the future, TraitType will enable passing non-model types
+            // directly to a location.  Regardless, non-model types can not be
+            // spread into a TraitProperties, so skip it.
+            return;
+          }
+
+          // Copy the contents of the trait property's model type into the
+          // target model
+          for (const [name, property] of traitProperty.type.properties) {
+            target.properties.set(
+              name,
+              context.program.checker.cloneType(property, {
+                sourceProperty: property,
+                model: target,
+              })
+            );
+
+            appliedTraits.add(traitName);
+          }
+        }
+      }
+    }
+  }
+}
+
 function checkTraitPropertyCriteria(
   program: Program,
   property: ModelProperty,
@@ -355,11 +422,32 @@ function checkTraitPropertyCriteria(
   // least one context that matches the trait's contexts.
   return (
     location === expectedLocation &&
-    (traitContexts.length === 0 || !!traitContexts.find((c) => expectedContexts.indexOf(c) > -1))
+    checkTraitPropertyMatchContext(program, property, traitContexts, expectedContexts)
   );
 }
 
-setTypeSpecNamespace("Traits.Private", $addTraitProperties);
+function checkTraitPropertyMatchContext(
+  program: Program,
+  property: ModelProperty,
+  traitContexts: EnumMember[],
+  expectedContexts: EnumMember[]
+): boolean {
+  const location = getTraitLocation(program, property);
+  if (!location) {
+    // Don't error here, the validator will take care of it
+    return false;
+  }
+
+  // Traits and trait usage sites must always specify a location, so check that
+  // first.  After that, check if the trait specifies any contexts.  If not, the
+  // trait applies anywhere.  Otherwise, the location's contexts *must* have at
+  // least one context that matches the trait's contexts.
+  return (
+    traitContexts.length === 0 || !!traitContexts.find((c) => expectedContexts.indexOf(c) > -1)
+  );
+}
+
+setTypeSpecNamespace("Traits.Private", $addTraitProperties, $omitTraits);
 
 // This variable is used globally to ensure that all overridden traits get a
 // unique envelope property name.
