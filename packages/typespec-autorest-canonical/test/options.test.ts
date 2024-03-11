@@ -201,7 +201,7 @@ op test(): void;
     );
     ok(
       versionedRunner.fs.has(
-        resolveVirtualPath("./my-output/arm-folder/TestService/stable/canonical/openapi.json")
+        resolveVirtualPath("./my-output/arm-folder/TestService/canonical/openapi.json")
       )
     );
   });

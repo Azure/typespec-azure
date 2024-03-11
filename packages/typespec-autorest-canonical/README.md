@@ -35,33 +35,18 @@ Name of the output file.
 Output file will interpolate the following values:
 
 - service-name: Name of the service if multiple
-- version: Version of the service if multiple
 - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-- version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
 
-Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/canonical/openapi.json`
+Default: `{azure-resource-provider-folder}/{service-name}/canonical/openapi.json`
 
-Example: Single service no versioning
-
-- `canonical.openapi.json`
-
-Example: Multiple services no versioning
-
-- `Service1.canonical.openapi.json`
-- `Service2.canonical.openapi.json`
-
-Example: Single service with versioning
+Example: Single service
 
 - `canonical.openapi.json`
 
-Example: Multiple service with versioning
+Example: Multiple services
 
 - `Service1.canonical.openapi.json`
 - `Service2.canonical.openapi.json`
-
-#### `version`
-
-**Type:** `string`
 
 #### `azure-resource-provider-folder`
 
