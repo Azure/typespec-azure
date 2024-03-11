@@ -1,4 +1,4 @@
-import { ArmResourceKind, getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
+import { getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 import {
   BooleanLiteral,
   CompilerHost,
@@ -34,7 +34,9 @@ import {
 export function $browse(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
-  checkIsArmResource(program, target, "browse");
+  if (!checkIsArmTrackedResource(program, target, "browse")) {
+    return;
+  }
   const browseOptionsResult: BrowseOptions = {};
   if (options && options.properties) {
     const query = options.properties.get("argQuery");
@@ -153,15 +155,28 @@ export function getBrowseArgQuery(program: Program, target: Type) {
   return getBrowse(program, target)?.argQuery;
 }
 
+export function checkIsArmTrackedResource(
+  program: Program,
+  target: Model,
+  decoratorName: "browse"
+) {
+  if (getArmResourceKind(target) !== "Tracked") {
+    reportDiagnostic(program, {
+      code: "not-a-resource",
+      messageId: decoratorName,
+      target,
+    });
+    return false;
+  }
+  return true;
+}
+
 export function checkIsArmResource(
   program: Program,
   target: Model,
-  decoratorName: "browse" | "about" | "marketplaceOffer" | "promotion"
+  decoratorName: "about" | "marketplaceOffer" | "promotion"
 ) {
-  if (
-    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-  ) {
+  if (getArmResourceKind(target) !== "Tracked" && getArmResourceKind(target) !== "Proxy") {
     reportDiagnostic(program, {
       code: "not-a-resource",
       format: {

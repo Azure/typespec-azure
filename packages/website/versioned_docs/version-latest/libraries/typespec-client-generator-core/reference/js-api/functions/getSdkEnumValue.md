@@ -14,7 +14,7 @@ getSdkEnumValue(
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `enumType` | [`SdkEnumType`](../interfaces/SdkEnumType.md) |
 | `type` | `EnumMember` |
 

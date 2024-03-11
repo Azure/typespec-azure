@@ -14,7 +14,6 @@ import {
   SyntaxKind,
   Type,
   Union,
-  UsageFlags,
   getNamespaceFullName,
   getProjectedName,
   isService,
@@ -30,12 +29,16 @@ import {
   SdkClient,
   SdkContext,
   SdkEmitterOptions,
+  SdkHttpOperation,
   SdkOperationGroup,
+  SdkServiceOperation,
+  UsageFlags,
 } from "./interfaces.js";
-import { TCGCContext, createTCGCContext, parseEmitterName } from "./internal-utils.js";
+import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { experimental_getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
+import { getSdkEnum, getSdkModel } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
@@ -470,24 +473,27 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
-export function createSdkContext<TOptions extends Record<string, any> = SdkEmitterOptions>(
-  context: EmitContext<TOptions>,
-  emitterName?: string
-): SdkContext<TOptions> {
+export function createSdkContext<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  return {
-    ...createTCGCContext(context.program),
+  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
+    program: context.program,
     emitContext: context,
+    experimental_sdkPackage: undefined!,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
   };
+  sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
+  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
@@ -670,9 +676,6 @@ export function isInternal(
   if (entity.kind === "Operation" || found) {
     return found;
   }
-  if (!context.operationModelsMap) {
-    getAllModels(context); // this will populate operationModelsMap
-  }
   const operationModels = context.operationModelsMap!;
   let referredByInternal = false;
   for (const [operation, modelMap] of operationModels) {
@@ -735,9 +738,6 @@ export function getUsageOverride(
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
-  if (!context.modelsMap) {
-    getAllModels(context); // this will populate modelsMap
-  }
   return entity.kind === "Model"
     ? getSdkModel(context, entity).usage
     : getSdkEnum(context, entity).usage;
@@ -775,10 +775,6 @@ export function getAccess(
   const override = getScopedDecoratorData(context, accessKey, entity);
   if (override || entity.kind === "Operation") {
     return override;
-  }
-
-  if (!context.operationModelsMap) {
-    getAllModels(context); // this will populate operationModelsMap
   }
 
   return entity.kind === "Model"

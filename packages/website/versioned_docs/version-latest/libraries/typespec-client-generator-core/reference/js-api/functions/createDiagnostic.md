@@ -9,7 +9,7 @@ createDiagnostic<C, M>(diag): Diagnostic
 
 ## Type parameters
 
-| Parameter |
+| Type parameter |
 | :------ |
 | `C` extends 
   \| `"client-name"`
@@ -26,7 +26,9 @@ createDiagnostic<C, M>(diag): Diagnostic
   \| `"discriminator-not-constant"`
   \| `"discriminator-not-string"`
   \| `"wrong-client-decorator"`
-  \| `"encoding-multipart-bytes"` |
+  \| `"encoding-multipart-bytes"`
+  \| `"unsupported-kind"`
+  \| `"multiple-services"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters

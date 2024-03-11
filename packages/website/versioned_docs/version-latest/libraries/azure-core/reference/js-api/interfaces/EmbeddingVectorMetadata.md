@@ -5,6 +5,6 @@ title: "[I] EmbeddingVectorMetadata"
 ---
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
-| `elementType` | `Type` | - |
+| Property | Type |
+| :------ | :------ |
+| `elementType` | `Type` |

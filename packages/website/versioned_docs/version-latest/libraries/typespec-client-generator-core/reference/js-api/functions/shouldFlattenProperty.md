@@ -13,7 +13,7 @@ Whether a model property should be flattened or not.
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | SdkContext |
+| `context` | `TCGCContext` | TCGCContext |
 | `target` | `ModelProperty` | ModelProperty that we want to check whether it should be flattened or not |
 
 ## Returns

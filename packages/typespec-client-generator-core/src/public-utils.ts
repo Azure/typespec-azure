@@ -1,34 +1,31 @@
 import {
-  createDiagnosticCollector,
   Diagnostic,
-  getDeprecationDetails,
-  getDoc,
-  getEffectiveModelType,
-  getFriendlyName,
-  getNamespaceFullName,
-  getProjectedName,
-  getSummary,
-  ignoreDiagnostics,
   Interface,
-  isErrorModel,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
   Operation,
-  resolveEncodedName,
   Type,
   Union,
+  createDiagnosticCollector,
+  getEffectiveModelType,
+  getFriendlyName,
+  getNamespaceFullName,
+  getProjectedName,
+  ignoreDiagnostics,
+  isErrorModel,
+  listServices,
+  resolveEncodedName,
 } from "@typespec/compiler";
 import {
+  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
   getQueryParamName,
-  HttpOperationParameter,
   isStatusCode,
 } from "@typespec/http";
-import { getVersions, Version } from "@typespec/versioning";
+import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
@@ -37,8 +34,8 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { parseEmitterName, TCGCContext } from "./internal-utils.js";
-import { createDiagnostic, reportDiagnostic } from "./lib.js";
+import { TCGCContext, getClientNamespaceStringHelper, parseEmitterName } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -81,18 +78,7 @@ export function isApiVersion(
  * @returns
  */
 export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  let packageName = context.packageName;
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  const services = listServices(context.program);
-  if (services.length === 0) {
-    return undefined;
-  }
-  return getNamespaceFullName(services[0].type);
+  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
 }
 
 /**
@@ -134,19 +120,6 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
 }
 
 /**
- * Whether a model is an Azure.Core model or not
- * @param t
- * @returns
- */
-export function isAzureCoreModel(t: Type): boolean {
-  return (
-    t.kind === "Model" &&
-    t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
-  );
-}
-
-/**
  *
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
@@ -184,85 +157,32 @@ export function getLibraryName(
 ): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
-  if (emitterSpecificName) return emitterSpecificName;
+  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
   // 2. check if there's a specific name for our language with deprecated @projectedName
   emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
-  if (emitterSpecificName) return emitterSpecificName;
+  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
   // 3. check if there's a client name with deprecated @projectedName
   const clientSpecificName = getProjectedName(context.program, type, "client");
-  if (clientSpecificName) return clientSpecificName;
+  if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
 
   // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
   return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
 }
 
-export function capitalize(name: string): string {
-  return name[0].toUpperCase() + name.slice(1);
-}
-
-export function reportUnionUnsupported(context: TCGCContext, type: Union): void {
-  reportDiagnostic(context.program, { code: "union-unsupported", target: type });
-}
-
-export function intOrFloat(value: number): "int32" | "float32" {
-  return value.toString().indexOf(".") === -1 ? "int32" : "float32";
-}
-
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
-  if (getSummary(context.program, type)) {
-    return {
-      description: getSummary(context.program, type),
-      details: getDoc(context.program, type),
-    };
-  }
-  return {
-    description: getDoc(context.program, type),
-  };
-}
-
+/**
+ * Get the serialized name of a type.
+ * @param context
+ * @param type
+ * @returns
+ */
 export function getWireName(context: TCGCContext, type: Type & { name: string }) {
   // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
   // 2. Check if there's deprecated language projection
   return getProjectedName(context.program, type, "json") ?? type.name;
-}
-
-interface SdkTypeBaseHelper<TKind> {
-  __raw?: Type;
-  nullable: boolean;
-  deprecation?: string;
-  kind: TKind;
-}
-
-/**
- * Helper function to return default values for nullable, encode etc
- * @param type
- */
-export function getSdkTypeBaseHelper<TKind>(
-  context: TCGCContext,
-  type: Type | string,
-  kind: TKind
-): SdkTypeBaseHelper<TKind> {
-  if (typeof type === "string") {
-    return {
-      nullable: false,
-      kind,
-    };
-  }
-  return {
-    __raw: type,
-    nullable: false,
-    kind,
-    deprecation: getDeprecationDetails(context.program, type)?.message,
-  };
 }
 
 /**
@@ -561,6 +481,10 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
   return createName;
 }
 
+/**
+ *
+ * @deprecated This function is deprecated. You should use isErrorModel from the standard TypeSpec library
+ */
 export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
   const errorDecorator = isErrorModel(context.program, model);
   if (errorDecorator) return true;

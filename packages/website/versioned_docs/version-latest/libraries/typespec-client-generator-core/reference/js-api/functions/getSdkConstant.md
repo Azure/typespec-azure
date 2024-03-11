@@ -11,7 +11,7 @@ getSdkConstant(context, type): SdkConstantType
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` |
 
 ## Returns
