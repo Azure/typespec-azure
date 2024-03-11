@@ -65,10 +65,10 @@ model ArmAcceptedResponse<Message extends valueof string = "Resource operation a
 @doc(Description)
 model ArmAcceptedLroResponse<
   Description extends valueof string = "Resource operation accepted.",
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader
 > {
   ...AcceptedResponse;
-  ...Azure.Core.Foundations.RetryAfterHeader;
   ...LroHeaders;
 }
 
@@ -203,10 +203,9 @@ model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundati
 @doc("Resource '{name}' create operation succeeded", Resource)
 model ArmResourceCreatedResponse<
   Resource extends Azure.ResourceManager.Foundations.ArmResource,
-  LroHeaders extends TypeSpec.Reflection.Model = {}
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader
 > {
   ...CreatedResponse;
-  ...Azure.Core.Foundations.RetryAfterHeader;
   ...LroHeaders;
 
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<Resource>)
