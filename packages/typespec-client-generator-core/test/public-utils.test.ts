@@ -1243,10 +1243,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         );
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        // we could not identify the anonymous model from alias spread
-        // bc each time we try to get body, we will get a new type from compiler
-        // so we will keep the empty name
-        ok(models.find((x) => (x as SdkModelType).generatedName === ""));
+        ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
       });
 
       it("anonymous model for body parameter", async () => {
