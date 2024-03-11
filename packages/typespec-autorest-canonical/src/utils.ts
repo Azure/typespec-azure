@@ -13,7 +13,7 @@ import {
 import { getOperationId } from "@typespec/openapi";
 import { pascalCase } from "change-case";
 
-export interface AutorestcanonicalEmitterContext {
+export interface AutorestCanonicalEmitterContext {
   program: Program;
   service: Service;
   version?: string;
@@ -58,7 +58,7 @@ export function shouldInline(program: Program, type: Type): boolean {
  * @param operation Operation
  * @returns Operation ID in this format `<name>` or `<group>_<name>`
  */
-export function resolveOperationId(context: AutorestcanonicalEmitterContext, operation: Operation) {
+export function resolveOperationId(context: AutorestCanonicalEmitterContext, operation: Operation) {
   const { program, getClientName } = context;
   const explicitOperationId = getOperationId(program, operation);
   if (explicitOperationId) {

@@ -1,11 +1,6 @@
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 
-export interface AutorestcanonicalEmitterOptions {
-  /**
-   * @deprecated DO NOT USE. Use built-in emitter-output-dir instead
-   */
-  "output-dir"?: string;
-
+export interface AutorestCanonicalEmitterOptions {
   /**
    * Name of the output file.
    * Output file will interpolate the following values:
@@ -67,16 +62,10 @@ export interface AutorestcanonicalEmitterOptions {
   "use-read-only-status-schema"?: boolean;
 }
 
-const EmitterOptionsSchema: JSONSchemaType<AutorestcanonicalEmitterOptions> = {
+const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
   type: "object",
   additionalProperties: false,
   properties: {
-    "output-dir": {
-      type: "string",
-      nullable: true,
-      deprecated: true,
-      description: "Deprecated DO NOT USE. Use built-in emitter-output-dir instead",
-    },
     "output-file": {
       type: "string",
       nullable: true,
@@ -268,7 +257,7 @@ const libDef = {
     "invalid-format": {
       severity: "warning",
       messages: {
-        default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorestcanonical. It will not be emitted.`,
+        default: paramMessage`'${"schema"}' format '${"format"}' is not supported in AutorestCanonical. It will not be emitted.`,
       },
     },
     "unsupported-auth": {
@@ -280,12 +269,12 @@ const libDef = {
     "unsupported-versioning-decorator": {
       severity: "warning",
       messages: {
-        default: paramMessage`Decorator @${"decorator"} is not supported in Autorestcanonical.`,
+        default: paramMessage`Decorator @${"decorator"} is not supported in AutorestCanonical.`,
       },
     },
   },
   emitter: {
-    options: EmitterOptionsSchema as JSONSchemaType<AutorestcanonicalEmitterOptions>,
+    options: EmitterOptionsSchema as JSONSchemaType<AutorestCanonicalEmitterOptions>,
   },
 } as const;
 

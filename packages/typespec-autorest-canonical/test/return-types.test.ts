@@ -2,7 +2,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import {
-  createAutorestcanonicalTestRunner,
+  createAutorestCanonicalTestRunner,
   ignoreUseStandardOps,
   openApiFor,
 } from "./test-host.js";
@@ -212,7 +212,7 @@ describe("typespec-autorestcanonical: return types", () => {
   });
 
   it("issues diagnostics when there is differrent body types across content types", async () => {
-    const runner = await createAutorestcanonicalTestRunner();
+    const runner = await createAutorestCanonicalTestRunner();
     const diagnostics = await runner.diagnose(
       `
       model Foo {

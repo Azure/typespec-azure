@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { createAutorestcanonicalTestRunner, openApiFor } from "./test-host.js";
+import { createAutorestCanonicalTestRunner, openApiFor } from "./test-host.js";
 
 describe("typespec-autorestcanonical: polymorphic model inheritance with discriminator", () => {
   it("discriminator can be a simple string literal", async () => {
@@ -274,7 +274,7 @@ describe("typespec-autorestcanonical: polymorphic model inheritance with discrim
   });
 
   it("issues diagnostics for errors in a discriminated union", async () => {
-    const runner = await createAutorestcanonicalTestRunner();
+    const runner = await createAutorestCanonicalTestRunner();
     const diagnostics = await runner.diagnose(
       `
       @discriminator("kind")
@@ -329,7 +329,7 @@ describe("typespec-autorestcanonical: polymorphic model inheritance with discrim
   });
 
   it("issues diagnostics for duplicate discriminator values", async () => {
-    const runner = await createAutorestcanonicalTestRunner();
+    const runner = await createAutorestCanonicalTestRunner();
     const diagnostics = await runner.diagnose(
       `
       @discriminator("kind")

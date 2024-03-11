@@ -27,12 +27,6 @@ emit:
 
 ### Emitter options
 
-#### `output-dir`
-
-**Type:** `string`
-
-Deprecated DO NOT USE. Use built-in emitter-output-dir instead
-
 #### `output-file`
 
 **Type:** `string`
@@ -103,29 +97,3 @@ This extension is meant for debugging and should not be depended on.
 **Type:** `boolean`
 
 Create read-only property schema for lro status
-
-## Decorators
-
-### Autorestcanonical
-
-- [`@useRef`](#@useref)
-
-#### `@useRef`
-
-`@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as ARM common types.
-
-`@useRef` can be specified on Models and ModelProperty.
-
-```typespec
-@Autorestcanonical.useRef(jsonRef: valueof string)
-```
-
-##### Target
-
-`union Model | ModelProperty`
-
-##### Parameters
-
-| Name    | Type                    | Description                       |
-| ------- | ----------------------- | --------------------------------- |
-| jsonRef | `valueof scalar string` | path or Uri to an OpenAPI schema. |

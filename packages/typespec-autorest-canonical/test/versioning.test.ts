@@ -182,15 +182,15 @@ describe("typespec-autorestcanonical: versioningtest", () => {
     expectDiagnostics(ignoreUseStandardOps(diagnostics), [
       {
         code: "@azure-tools/typespec-autorest-canonical/unsupported-versioning-decorator",
-        message: "Decorator @returnTypeChangedFrom is not supported in Autorestcanonical.",
+        message: "Decorator @returnTypeChangedFrom is not supported in AutorestCanonical.",
       },
       {
         code: "@azure-tools/typespec-autorest-canonical/unsupported-versioning-decorator",
-        message: "Decorator @renamedFrom is not supported in Autorestcanonical.",
+        message: "Decorator @renamedFrom is not supported in AutorestCanonical.",
       },
       {
         code: "@azure-tools/typespec-autorest-canonical/unsupported-versioning-decorator",
-        message: "Decorator @typeChangedFrom is not supported in Autorestcanonical.",
+        message: "Decorator @typeChangedFrom is not supported in AutorestCanonical.",
       },
     ]);
   });

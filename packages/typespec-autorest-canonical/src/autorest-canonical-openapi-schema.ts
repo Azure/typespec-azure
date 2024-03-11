@@ -1,11 +1,11 @@
-let AutorestcanonicalOpenAPISchema: any;
+let AutorestCanonicalOpenAPISchema: any;
 try {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  AutorestcanonicalOpenAPISchema = (await import("../../schema/dist/schema.js")).default;
+  AutorestCanonicalOpenAPISchema = (await import("../../schema/dist/schema.js")).default;
 } catch {
   const name = "../schema/dist/schema.js";
-  AutorestcanonicalOpenAPISchema = (await import(/* @vite-ignore */ name)).default;
+  AutorestCanonicalOpenAPISchema = (await import(/* @vite-ignore */ name)).default;
 }
 
-export { AutorestcanonicalOpenAPISchema };
+export { AutorestCanonicalOpenAPISchema };

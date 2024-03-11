@@ -128,10 +128,10 @@ import {
   getTypeChangedFrom,
   getVersion,
 } from "@typespec/versioning";
-import { AutorestcanonicalOpenAPISchema } from "./autorest-canonical-openapi-schema.js";
+import { AutorestCanonicalOpenAPISchema } from "./autorest-canonical-openapi-schema.js";
 import { getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
-import { AutorestcanonicalEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
+import { AutorestCanonicalEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2Document,
   OpenAPI2FormDataParameter,
@@ -150,7 +150,7 @@ import {
   PrimitiveItems,
   Refable,
 } from "./types.js";
-import { AutorestcanonicalEmitterContext, resolveOperationId } from "./utils.js";
+import { AutorestCanonicalEmitterContext, resolveOperationId } from "./utils.js";
 
 const defaultOptions = {
   "output-file":
@@ -167,7 +167,7 @@ enum UnsupportedVersioningDecorators {
 
 export const canonicalVersion = "canonical";
 
-export async function $onEmit(context: EmitContext<AutorestcanonicalEmitterOptions>) {
+export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
   const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest-canonical");
   const armTypesDir = interpolatePath(
@@ -177,7 +177,7 @@ export async function $onEmit(context: EmitContext<AutorestcanonicalEmitterOptio
       "emitter-output-dir": context.emitterOutputDir,
     }
   );
-  const options: ResolvedAutorestcanonicalEmitterOptions = {
+  const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
     outputDir: context.emitterOutputDir,
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
@@ -200,7 +200,7 @@ function getEmitterDetails(program: Program): EmitterDetails[] {
   return [{ emitter: "@azure-tools/typespec-autorest-canonical" }];
 }
 
-export interface ResolvedAutorestcanonicalEmitterOptions {
+export interface ResolvedAutorestCanonicalEmitterOptions {
   outputDir: string;
   outputFile: string;
   azureResourceProviderFolder?: string;
@@ -278,7 +278,7 @@ interface ProcessedSchema extends PendingSchema {
 function createOAPIEmitter(
   program: Program,
   tcgcSdkContext: SdkContext,
-  options: ResolvedAutorestcanonicalEmitterOptions
+  options: ResolvedAutorestCanonicalEmitterOptions
 ) {
   const tracer = getTracer(program);
   tracer.trace("options", JSON.stringify(options, null, 2));
@@ -325,7 +325,7 @@ function createOAPIEmitter(
   let outputFile: string;
   let jsonView: ProjectedNameView;
   let clientView: ProjectedNameView;
-  let context: AutorestcanonicalEmitterContext;
+  let context: AutorestCanonicalEmitterContext;
 
   async function emitOpenAPI() {
     const services = listServices(program);
@@ -1218,7 +1218,7 @@ function createOAPIEmitter(
 
   function emitParameters() {
     for (const [property, param] of params) {
-      // Add an extension which tells Autorestcanonical that this is a shared operation
+      // Add an extension which tells AutorestCanonical that this is a shared operation
       // parameter definition
       if (param["x-ms-parameter-location"] === undefined) {
         param["x-ms-parameter-location"] = "method";
@@ -2217,8 +2217,8 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   const unsorted = JSON.parse(JSON.stringify(doc));
   const sorted = sortWithJsonSchema(
     unsorted,
-    AutorestcanonicalOpenAPISchema,
-    "#/$defs/AutorestcanonicalOpenAPISchema"
+    AutorestCanonicalOpenAPISchema,
+    "#/$defs/AutorestCanonicalOpenAPISchema"
   );
   return sorted;
 }
@@ -2227,7 +2227,7 @@ function resolveOutputFile(
   program: Program,
   service: Service,
   multipleServices: boolean,
-  options: ResolvedAutorestcanonicalEmitterOptions,
+  options: ResolvedAutorestCanonicalEmitterOptions,
   version?: string
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;

@@ -6,15 +6,15 @@ import {
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { AutorestcanonicalEmitterOptions } from "../src/lib.js";
+import { AutorestCanonicalEmitterOptions } from "../src/lib.js";
 import { OpenAPI2Document } from "../src/types.js";
-import { createAutorestcanonicalTestRunner, ignoreDiagnostics } from "./test-host.js";
+import { createAutorestCanonicalTestRunner, ignoreDiagnostics } from "./test-host.js";
 
 async function openapiWithOptions(
   code: string,
-  options: AutorestcanonicalEmitterOptions
+  options: AutorestCanonicalEmitterOptions
 ): Promise<OpenAPI2Document> {
-  const runner = await createAutorestcanonicalTestRunner();
+  const runner = await createAutorestCanonicalTestRunner();
 
   const outPath = resolvePath("/openapi.json");
 
@@ -34,13 +34,13 @@ async function openapiWithOptions(
 describe("typespec-autorestcanonical: options", () => {
   let runner: BasicTestRunner;
   beforeEach(async () => {
-    runner = await createAutorestcanonicalTestRunner();
+    runner = await createAutorestCanonicalTestRunner();
   });
 
   describe("'new-line' option", () => {
     async function rawOpenApiFor(
       code: string,
-      options: AutorestcanonicalEmitterOptions
+      options: AutorestCanonicalEmitterOptions
     ): Promise<string> {
       const outPath = resolvePath("/openapi.json");
 
@@ -138,7 +138,7 @@ describe("typespec-autorestcanonical: options", () => {
     });
 
     it("emit to {emitter-output-dir}/{version}/{output-file} if spec contains versioning", async () => {
-      const versionedRunner = await createAutorestcanonicalTestRunner();
+      const versionedRunner = await createAutorestCanonicalTestRunner();
       await versionedRunner.compile(
         `
 @TypeSpec.Versioning.versioned(Versions)
@@ -167,7 +167,7 @@ op test(): void;
     });
 
     it("emit to {emitter-output-dir}/{arm-folder}/{serviceName}/{versionType}/{version}/{output-file} if spec contains azure-resource-provider-folder is passed", async () => {
-      const versionedRunner = await createAutorestcanonicalTestRunner();
+      const versionedRunner = await createAutorestCanonicalTestRunner();
       await versionedRunner.compile(
         `
 @TypeSpec.Versioning.versioned(Versions)

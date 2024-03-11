@@ -6,10 +6,10 @@ import "@typespec/json-schema";
 
 using TypeSpec.JsonSchema;
 
-namespace AutorestcanonicalOpenAPISchema;
+namespace AutorestCanonicalOpenAPISchema;
 
 @jsonSchema
-model AutorestcanonicalOpenAPISchema {
+model AutorestCanonicalOpenAPISchema {
   swagger: "2.0";
   info: Info;
   basePath?: string;

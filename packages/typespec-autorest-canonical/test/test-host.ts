@@ -13,17 +13,17 @@ import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { ok } from "assert";
-import { AutorestcanonicalEmitterOptions } from "../src/lib.js";
-import { AutorestcanonicalTestLibrary } from "../src/testing/index.js";
+import { AutorestCanonicalEmitterOptions } from "../src/lib.js";
+import { AutorestCanonicalTestLibrary } from "../src/testing/index.js";
 import { OpenAPI2Document } from "../src/types.js";
 
-export async function createAutorestcanonicalTestHost() {
+export async function createAutorestCanonicalTestHost() {
   return createTestHost({
     libraries: [
       HttpTestLibrary,
       RestTestLibrary,
       OpenAPITestLibrary,
-      AutorestcanonicalTestLibrary,
+      AutorestCanonicalTestLibrary,
       VersioningTestLibrary,
       AzureCoreTestLibrary,
       TcgcTestLibrary,
@@ -31,23 +31,23 @@ export async function createAutorestcanonicalTestHost() {
   });
 }
 
-export async function createAutorestcanonicalTestRunner(
+export async function createAutorestCanonicalTestRunner(
   host?: TestHost,
-  emitterOptions?: AutorestcanonicalEmitterOptions
+  emitterOptions?: AutorestCanonicalEmitterOptions
 ) {
-  host ??= await createAutorestcanonicalTestHost();
+  host ??= await createAutorestCanonicalTestHost();
   return createTestWrapper(host, {
     autoUsings: [
       "TypeSpec.Versioning",
       "TypeSpec.Http",
       "TypeSpec.Rest",
       "TypeSpec.OpenAPI",
-      "Autorestcanonical",
+      "AutorestCanonical",
       "Azure.Core",
       "Azure.ClientGenerator.Core",
     ],
     compilerOptions: {
-      emitters: { [AutorestcanonicalTestLibrary.name]: { ...emitterOptions } },
+      emitters: { [AutorestCanonicalTestLibrary.name]: { ...emitterOptions } },
       miscOptions: { "disable-linter": true },
     },
   });
@@ -55,9 +55,9 @@ export async function createAutorestcanonicalTestRunner(
 
 export async function emitOpenApiWithDiagnostics(
   code: string,
-  options: AutorestcanonicalEmitterOptions = {}
+  options: AutorestCanonicalEmitterOptions = {}
 ): Promise<[OpenAPI2Document, readonly Diagnostic[]]> {
-  const runner = await createAutorestcanonicalTestRunner();
+  const runner = await createAutorestCanonicalTestRunner();
   const outputFile = resolveVirtualPath("openapi.json");
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
@@ -72,12 +72,12 @@ export async function emitOpenApiWithDiagnostics(
   return [doc, ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"])];
 }
 
-export async function openApiFor(code: string, options: AutorestcanonicalEmitterOptions = {}) {
-  const runner = await createAutorestcanonicalTestRunner();
+export async function openApiFor(code: string, options: AutorestCanonicalEmitterOptions = {}) {
+  const runner = await createAutorestCanonicalTestRunner();
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
     emitters: {
-      [AutorestcanonicalTestLibrary.name]: {
+      [AutorestCanonicalTestLibrary.name]: {
         ...options,
         "emitter-output-dir": resolveVirtualPath("tsp-output"),
       },
@@ -96,9 +96,9 @@ export async function openApiFor(code: string, options: AutorestcanonicalEmitter
 
 export async function diagnoseOpenApiFor(
   code: string,
-  options: AutorestcanonicalEmitterOptions = {}
+  options: AutorestCanonicalEmitterOptions = {}
 ) {
-  const runner = await createAutorestcanonicalTestRunner();
+  const runner = await createAutorestCanonicalTestRunner();
   return await runner.diagnose(code, {
     emitters: {
       "@azure-tools/typespec-autorest-canonical": options as any,

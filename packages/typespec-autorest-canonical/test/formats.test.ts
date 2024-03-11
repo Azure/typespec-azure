@@ -49,7 +49,7 @@ describe("typespec-autorestcanonical: format", () => {
       {
         code: "@azure-tools/typespec-autorest-canonical/invalid-format",
         message:
-          "'string' format 'fake' is not supported in Autorestcanonical. It will not be emitted.",
+          "'string' format 'fake' is not supported in AutorestCanonical. It will not be emitted.",
       },
     ]);
   });

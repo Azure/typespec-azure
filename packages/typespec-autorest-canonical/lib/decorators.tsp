@@ -1,6 +1,6 @@
 using TypeSpec.Reflection;
 
-namespace Autorestcanonical;
+namespace AutorestCanonical;
 
 /**
  * `@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as ARM common types.
@@ -9,4 +9,4 @@ namespace Autorestcanonical;
  *
  * @param jsonRef - path or Uri to an OpenAPI schema.
  */
-extern dec useRef(entity: Model | ModelProperty, jsonRef: valueof string);
+// extern dec useRef(entity: Model | ModelProperty, jsonRef: valueof string);

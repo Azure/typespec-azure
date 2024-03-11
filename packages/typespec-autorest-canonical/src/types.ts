@@ -107,7 +107,7 @@ export interface OpenAPI2Tag extends Extensions {
 export type JsonType = "array" | "boolean" | "integer" | "number" | "object" | "string";
 
 /**
- * Autorestcanonical allows a few properties to be next to $ref of a property.
+ * AutorestCanonical allows a few properties to be next to $ref of a property.
  */
 export type OpenAPI2SchemaRefProperty = Ref<OpenAPI2Schema> &
   Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability"> & {
