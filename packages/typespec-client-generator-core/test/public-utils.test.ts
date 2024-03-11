@@ -777,6 +777,28 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
+    it("template without @friendlyName renaming", async () => {
+      await runner.compileWithBuiltInService(`
+      op GetResourceOperationStatus<
+        Resource extends TypeSpec.Reflection.Model
+      >(): ResourceOperationStatus<Resource>;
+      
+      model ResourceOperationStatus<Resource extends TypeSpec.Reflection.Model> {
+        status: string;
+        resource: Resource;
+      }
+
+      model User {
+        id: string;
+      }
+
+      op getStatus is GetResourceOperationStatus<User>;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
+      ok(model);
+    });
   });
 
   describe("getGeneratedName", () => {
@@ -1404,13 +1426,13 @@ describe("typespec-client-generator-core: public-utils", () => {
         deepStrictEqual(
           models.map((x) => x.name).sort(),
           [
-            "ResourceOperationStatus",
+            "ResourceOperationStatusUserExportedUserError",
             "OperationState",
             "Error",
             "InnerError",
             "ExportedUser",
             "ErrorResponse",
-            "OperationStatus",
+            "OperationStatusExportedUserError",
             "User",
           ].sort()
         );

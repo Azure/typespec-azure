@@ -167,8 +167,16 @@ export function getLibraryName(
   const clientSpecificName = getProjectedName(context.program, type, "client");
   if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
 
-  // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
-  return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
+  // 4. check if there's a friendly name, if so return friendly name
+  const friendlyName = getFriendlyName(context.program, type);
+  if (friendlyName) return friendlyName;
+
+  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
+    return type.name + type.templateMapper.args.map((arg) => (arg as Model).name).join("");
+  }
+
+  return typeof type.name === "string" ? type.name : "";
 }
 
 /**
