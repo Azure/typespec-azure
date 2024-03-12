@@ -365,6 +365,7 @@ scalar azureLocation extends string;
  *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
  * @template AllowedResourceTypes An array of allowed resource types for the resource reference
  */
+@doc("A type definition that refers the id to an Azure Resource Manager resource.")
 @format("arm-id")
 @Azure.Core.Foundations.Private.armResourceIdentifierConfig({
   allowedResources: AllowedResourceTypes,
