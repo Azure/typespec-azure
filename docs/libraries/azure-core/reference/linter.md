@@ -20,8 +20,8 @@ linter:
 
 Available ruleSets:
 
-- [`@azure-tools/typespec-azure-core/all`](#@azure-tools/typespec-azure-core/all)
-- [`@azure-tools/typespec-azure-core/canonical-versioning`](#@azure-tools/typespec-azure-core/canonical-versioning)
+- `@azure-tools/typespec-azure-core/all`
+- `@azure-tools/typespec-azure-core/canonical-versioning`
 
 ## Rules
 
