@@ -25,6 +25,7 @@ import {
   setTypeSpecNamespace,
   StringLiteral,
   Type,
+  typespecTypeToJson,
   Union,
   UnionVariant,
   walkPropertiesInherited,
@@ -1219,6 +1220,50 @@ export function getAsEmbeddingVector(
   return program.stateMap(embeddingVectorKey).get(model);
 }
 
+const armResourceIdentifierConfigKey = createStateSymbol("armResourceIdentifierConfig");
+
+export interface ArmResourceIdentifierConfig {
+  readonly allowedResources: readonly ArmResourceIdentifierAllowedResource[];
+}
+
+export type ArmResourceDeploymentScope =
+  | "Tenant"
+  | "Subscription"
+  | "ResourceGroup"
+  | "ManagementGroup"
+  | "Extension";
+
+export interface ArmResourceIdentifierAllowedResource {
+  /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
+  readonly type: string;
+
+  /**
+   * An array of scopes. If not specified, the default scope is ["ResourceGroup"].
+   * See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes).
+   */
+  readonly scopes?: ArmResourceDeploymentScope[];
+}
+
+/** @internal */
+export function $armResourceIdentifierConfig(
+  context: DecoratorContext,
+  entity: Scalar,
+  config: Type
+) {
+  const [data, diagnostics] = typespecTypeToJson(config, context.getArgumentTarget(0)!);
+  if (data) {
+    context.program.stateMap(armResourceIdentifierConfigKey).set(entity, data);
+  } else {
+    context.program.reportDiagnostics(diagnostics);
+  }
+}
+export function getArmResourceIdentifierConfig(
+  context: DecoratorContext,
+  entity: Scalar
+): ArmResourceIdentifierConfig {
+  return context.program.stateMap(armResourceIdentifierConfigKey).get(entity);
+}
+
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
   "Foundations.Private",
@@ -1227,5 +1272,6 @@ setTypeSpecNamespace(
   $ensureResourceType,
   $needsRoute,
   $ensureVerb,
-  $embeddingVector
+  $embeddingVector,
+  $armResourceIdentifierConfig
 );
