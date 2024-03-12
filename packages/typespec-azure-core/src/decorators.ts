@@ -1253,36 +1253,16 @@ export function $armResourceIdentifierConfig(
   if (config.kind !== "Model") return;
   const prop = config.properties.get("allowedResources");
   if (prop === undefined || prop.type.kind !== "Tuple") return;
-  const allowedResources: ArmResourceIdentifierAllowedResource[] = [];
+  const [data, diagnostics] = typespecTypeToJson<ArmResourceIdentifierConfig>(
+    prop.type,
+    context.getArgumentTarget(0)!
+  );
+  context.program.reportDiagnostics(diagnostics);
 
-  for (const item of prop.type.values) {
-    if (item.kind === "Model") {
-      const typeProp = item.properties.get("type");
-      if (typeProp?.type.kind === "String") {
-        const resource: ArmResourceIdentifierAllowedResource = {
-          type: typeProp.type.value,
-        };
-
-        const scopeProp = item.properties.get("scopes");
-
-        if (scopeProp && !isNeverType(scopeProp.type)) {
-          const [data, diagnostics] = typespecTypeToJson<ArmResourceIdentifierConfig>(
-            scopeProp.type,
-            context.getArgumentTarget(0)!
-          );
-          context.program.reportDiagnostics(diagnostics);
-          if (data) {
-            (resource as any).scopes = data;
-          }
-        }
-
-        allowedResources.push(resource);
-      }
-    }
-  }
-
-  if (allowedResources.length > 0) {
-    context.program.stateMap(armResourceIdentifierConfigKey).set(entity, { allowedResources });
+  if (data) {
+    context.program
+      .stateMap(armResourceIdentifierConfigKey)
+      .set(entity, { allowedResources: data });
   }
 }
 
