@@ -18,6 +18,7 @@ import {
   resolveEncodedName,
 } from "@typespec/compiler";
 import {
+  HttpOperation,
   HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
@@ -309,13 +310,12 @@ function getContextPath(
   root: Operation | Model,
   typeToFind: Model | Union
 ): ContextNode[] {
-  const program = context.program;
   // use visited set to avoid cycle model reference
   const visited: Set<Type> = new Set<Type>();
   let result: ContextNode[];
 
   if (root.kind === "Operation") {
-    const httpOperation = ignoreDiagnostics(getHttpOperation(program, root));
+    const httpOperation = getHttpOperationWithCache(context, root);
 
     if (httpOperation.parameters.body) {
       visited.clear();
@@ -502,4 +502,19 @@ export function isErrorOrChildOfError(context: TCGCContext, model: Model): boole
     baseModel = baseModel.baseModel;
   }
   return false;
+}
+
+export function getHttpOperationWithCache(
+  context: TCGCContext,
+  operation: Operation
+): HttpOperation {
+  if (context.httpOperationCache === undefined) {
+    context.httpOperationCache = new Map<Operation, HttpOperation>();
+  }
+  if (context.httpOperationCache.has(operation)) {
+    return context.httpOperationCache.get(operation)!;
+  }
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+  context.httpOperationCache.set(operation, httpOperation);
+  return httpOperation;
 }
