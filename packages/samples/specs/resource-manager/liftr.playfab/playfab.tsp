@@ -33,7 +33,7 @@ scalar TitleReference
 @doc("A reference to a player database resource.")
 @pattern("\\/subscriptions\\/[a-z0-9\\-]+\\/resourceGroups\\/[^\\/]+\\/providers\\/Microsoft\\.PlayFab\\/playerDatabases\\/[^\\/]+")
 scalar PlayerDatabaseReference
-  extends armResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Playfab/playerDatabases",
     }
