@@ -7,9 +7,8 @@ export interface AutorestCanonicalEmitterOptions {
    *  - service-name: Name of the service if multiple
    *  - version: Version of the service if multiple
    *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-   *  - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
+   * @default `{azure-resource-provider-folder}/{service-name}/{version}/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -54,12 +53,6 @@ export interface AutorestCanonicalEmitterOptions {
    * @default "${project-root}/../../common-types/resource-management"
    */
   "arm-types-dir"?: string;
-
-  /**
-   * Determines whether to transmit the 'readOnly' property to lro status schemas.
-   * @default false
-   */
-  "use-read-only-status-schema"?: boolean;
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
@@ -115,12 +108,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
       description:
         "If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.\nThis extension is meant for debugging and should not be depended on.",
     },
-    "use-read-only-status-schema": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description: "Create read-only property schema for lro status",
-    },
   },
   required: [],
 };
@@ -128,34 +115,10 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
 const libDef = {
   name: "@azure-tools/typespec-autorest-canonical",
   diagnostics: {
-    "security-service-namespace": {
-      severity: "error",
-      messages: {
-        default: "Cannot add security details to a namespace other than the service namespace.",
-      },
-    },
-    "resource-namespace": {
-      severity: "error",
-      messages: {
-        default: "Resource goes on namespace",
-      },
-    },
-    "missing-path-param": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Path contains parameter ${"param"} but wasn't found in given parameters`,
-      },
-    },
     "duplicate-body-types": {
       severity: "error",
       messages: {
         default: "Request has multiple body types",
-      },
-    },
-    "duplicate-header": {
-      severity: "error",
-      messages: {
-        default: paramMessage`The header ${"header"} is defined across multiple content types`,
       },
     },
     "invalid-schema": {
@@ -183,24 +146,6 @@ const libDef = {
       severity: "error",
       messages: {
         default: paramMessage`Invalid type '${"type"}' for a default value`,
-      },
-    },
-    "invalid-property-type-for-collection-format": {
-      severity: "error",
-      messages: {
-        default: "The collectionFormat can only be applied to model property with type 'string[]'.",
-      },
-    },
-    "invalid-collection-format": {
-      severity: "error",
-      messages: {
-        default: "The format should be one of 'csv','ssv','tsv','pipes' and 'multi'.",
-      },
-    },
-    "non-recommended-collection-format": {
-      severity: "warning",
-      messages: {
-        default: "The recommendation of collection format are 'csv' and 'multi'.",
       },
     },
     "invalid-multi-collection-format": {

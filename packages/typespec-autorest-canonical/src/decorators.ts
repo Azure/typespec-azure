@@ -1,4 +1,4 @@
-import { Model, ModelProperty, Program, Service, Type } from "@typespec/compiler";
+import { Program, Service, Type } from "@typespec/compiler";
 import { createStateSymbol } from "./lib.js";
 
 export const namespace = "AutorestCanonical";
@@ -11,15 +11,6 @@ export interface RefProducerParams {
   service?: Service;
   version?: string;
 }
-
-/**
- * A function that can produce a ref path at the time it is requested.
- */
-export type RefProducer = (
-  program: Program,
-  entity: Model | ModelProperty,
-  params: RefProducerParams
-) => string | undefined;
 
 const refTargetsKey = createStateSymbol("autorestcanonical.ref");
 

@@ -1,7 +1,6 @@
 import {
   PagedResultMetadata,
   UnionEnum,
-  extractLroStates,
   getAsEmbeddingVector,
   getLroMetadata,
   getPagedResult,
@@ -184,7 +183,6 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
-    useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
   };
 
   const emitter = createOAPIEmitter(context.program, tcgcSdkContext, options);
@@ -225,11 +223,6 @@ export interface ResolvedAutorestCanonicalEmitterOptions {
    * Arm types dir
    */
   armTypesDir: string;
-
-  /**
-   * readOnly property schema behavior
-   */
-  useReadOnlyStatusSchema?: boolean;
 }
 
 /**
@@ -1373,13 +1366,6 @@ function createOAPIEmitter(
       addXMSEnum(e, schema);
     }
 
-    if (options.useReadOnlyStatusSchema) {
-      const [values, _] = extractLroStates(program, e);
-      if (values !== undefined) {
-        schema.readOnly = true;
-      }
-    }
-
     return schema;
 
     function getEnumMemberType(member: EnumMember): "string" | "number" {
@@ -1426,12 +1412,6 @@ function createOAPIEmitter(
     }
     if (e.nullable) {
       schema["x-nullable"] = true;
-    }
-    if (options.useReadOnlyStatusSchema) {
-      const [values, _] = extractLroStates(program, union);
-      if (values !== undefined) {
-        schema.readOnly = true;
-      }
     }
     return applyIntrinsicDecorators(union, schema);
   }
