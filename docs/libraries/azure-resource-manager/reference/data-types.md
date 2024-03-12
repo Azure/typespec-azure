@@ -1157,8 +1157,8 @@ A type definition that refers the id to an Azure Resource Manager resource.
 
 Sample usage:
 otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+networkId: armResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
+vmIds: armResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
 
 ```typespec
 scalar Azure.ResourceManager.ResourceIdentifier
@@ -1170,8 +1170,8 @@ A type definition that refers the id to an Azure Resource Manager resource.
 
 Sample usage:
 otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+networkId: armResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
+vmIds: armResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
 
 ```typespec
 scalar Azure.ResourceManager.ResourceIdentifier
@@ -1183,8 +1183,8 @@ A type definition that refers the id to an Azure Resource Manager resource.
 
 Sample usage:
 otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+networkId: armResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
+vmIds: armResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
 
 ```typespec
 scalar Azure.ResourceManager.ResourceIdentifier

@@ -1250,18 +1250,48 @@ export function $armResourceIdentifierConfig(
   entity: Scalar,
   config: Type
 ) {
-  const [data, diagnostics] = typespecTypeToJson(config, context.getArgumentTarget(0)!);
-  if (data) {
-    context.program.stateMap(armResourceIdentifierConfigKey).set(entity, data);
-  } else {
-    context.program.reportDiagnostics(diagnostics);
+  if (config.kind !== "Model") return;
+  const prop = config.properties.get("allowedResources");
+  if (prop === undefined || prop.type.kind !== "Tuple") return;
+  const allowedResources: ArmResourceIdentifierAllowedResource[] = [];
+
+  for (const item of prop.type.values) {
+    if (item.kind === "Model") {
+      const typeProp = item.properties.get("type");
+      if (typeProp?.type.kind === "String") {
+        const resource: ArmResourceIdentifierAllowedResource = {
+          type: typeProp.type.value,
+        };
+
+        const scopeProp = item.properties.get("scopes");
+
+        if (scopeProp && !isNeverType(scopeProp.type)) {
+          const [data, diagnostics] = typespecTypeToJson<ArmResourceIdentifierConfig>(
+            scopeProp.type,
+            context.getArgumentTarget(0)!
+          );
+          context.program.reportDiagnostics(diagnostics);
+          if (data) {
+            (resource as any).scopes = data;
+          }
+        }
+
+        allowedResources.push(resource);
+      }
+    }
+  }
+
+  if (allowedResources.length > 0) {
+    context.program.stateMap(armResourceIdentifierConfigKey).set(entity, { allowedResources });
   }
 }
+
+/** Returns the config attached to an armResourceIdentifierScalar */
 export function getArmResourceIdentifierConfig(
-  context: DecoratorContext,
+  program: Program,
   entity: Scalar
 ): ArmResourceIdentifierConfig {
-  return context.program.stateMap(armResourceIdentifierConfigKey).get(entity);
+  return program.stateMap(armResourceIdentifierConfigKey).get(entity);
 }
 
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
