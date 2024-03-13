@@ -1,5 +1,9 @@
 import {
+  AugmentDecoratorStatementNode,
+  DecoratedType,
+  Decorator,
   DecoratorContext,
+  DecoratorExpressionNode,
   DecoratorFunction,
   EmitContext,
   Enum,
@@ -16,6 +20,7 @@ import {
   Union,
   getNamespaceFullName,
   getProjectedName,
+  ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
@@ -818,6 +823,17 @@ export function $clientName(
   value: string,
   scope?: LanguageScopes
 ) {
+  if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+    if (ignoreDiagnostics(context.program.checker.resolveTypeReference((context.decoratorTarget as AugmentDecoratorStatementNode).targetType)) !== entity) {
+      return;
+    }
+  }
+  if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
+    if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+      return;
+    }
+  }
+
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 
