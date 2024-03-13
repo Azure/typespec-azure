@@ -5,7 +5,503 @@ import TabItem from "@theme/TabItem";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
+## Unions
+
+### Standard
+
+For basic unions, all emitters will generate their version of a closed enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union LR {
+  left: "left",
+  right: "right",
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python never generates closed enums by design. We will always permit users to pass in additional values.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Standard Inline
+
+These are unions defined inline at point of usage.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Widget {
+  horizontal: "left" | "right";
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python generates inline unions as a union of literals, not as enums. We also don't generate a closed set of literals
+
+```python
+from typing import Literal
+
+type WidgetHorizontal = Literal["left"] | Literal["right"] | str
+
+model Widget:
+  horizontal: WidgetHorizontal
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Unioned with Base Type
+
+For unions that include the shared base type of entries, each language will generate their version of an open enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union Colors {
+  string,
+  red: "red",
+  blue: "blue",
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python generates our open enums again here.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Colors(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  RED = "red"
+  BLUE = "blue"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Unioned with Base Type Inline
+
+These are unions defined inline at point of usage which include the base type as an option.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Widget {
+  color: "red" | "blue" | string;
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python generates a union of literals again. Since we always generate our typing as open, this will
+look the same as our previous example where we generate an open union of strings.
+
+```python
+from typing import Literal
+
+type WidgetColor = Literal["red"] | Literal["blue"] | str
+
+model Widget:
+  color: WidgetColor
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Extending unions
+
+For unions that include the shared base type of entries, each language will generate their version of an open enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@azure-tools/typespec-azure-resource-manager";
+
+union ProvisioningState {
+  string,
+  inProgress: "inProgress",
+  Azure.ResourceManager.ResourceProvisioningState,
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python generates a single open enum.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class ProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  IN_PROGRESS = "inProgress"
+  SUCCEEDED = "Succeeded"
+  FAILED = "Failed"
+  CANCELED = "Canceled"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Union of Unions
+
+These are unions of unions
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union LR {
+  left: "left"
+  right: "right"
+}
+
+union UD {
+  up: "up"
+  down: "down"
+}
+
+union Orientation {
+  LR,
+  UD,
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Since 
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+  UP = "up"
+  DOWN = "down"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Union of Unions Inline
+
+These are unions of unions
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union LR {
+  left: "left"
+  right: "right"
+}
+
+union UD {
+  up: "up"
+  down: "down"
+}
+
+model Widget {
+  orientation: LR | UD;
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Since this is inline, Python will generate this as a single union of all possible literal values.
+
+```python
+from typing import Literal
+
+type WidgetOrientation = "left" | "right" | "up" | "down" | str
+
+model Widget:
+  orientation: WidgetOrientation
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+### Union with Multiple Base Types
+
+These are unions where the values don't share base types. Languages will only generate an enum if the base type
+of all entries are shared, so languages will generate various kinds of unions here.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Shirt {
+  sizing: 32 | 34 | int32 | "small" | "medium" | string;
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python will generate this as a union of literals since these entries don't share the same type
+
+```python
+from typing import Literal
+
+type ShirtSizing = Literal[32] | Literal[34] | int | Literal["small"] | Literal["medium"] | str
+
+model Shirt:
+  sizing: ShirtSizing
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO;
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO;
+```
+
+</TabItem>
+</Tabs>
+
+
 ## Enums
+
+### Standard
+
+Standard enums will be generated as closed enums.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+enum LR {
+  left,
+  right
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python never generates closed enums by design. We will always permit users to pass in additional values.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO
+```
+
+</TabItem>
+</Tabs>
 
 ### Versioning Enums
 
@@ -56,6 +552,70 @@ public enum Versions {
     v1,
     v2
 }
+```
+
+</TabItem>
+</Tabs>
+
+### Spread
+
+Spreading enums will return the resultant enum as a new single closed enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+enum LR {
+  left,
+  right,
+}
+
+enum UD {
+  up,
+  down,
+}
+
+enum Orientation {
+  ...LR,
+  ...UD,
+}
+```
+
+</TabItem>
+<TabItem value="" label="Python">
+
+Python generates one open enum, because Python never generates an enum as fully closed.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+  UP = "up"
+  DOWN = "down"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO
 ```
 
 </TabItem>
