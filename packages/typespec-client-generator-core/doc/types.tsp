@@ -222,6 +222,7 @@ model SdkUnionType extends SdkType {
  * @property additionalProperties: Model's additional properties type, if no additional properties, then undefined
  * @property discriminatorValue: Value of the discriminator if this is a discriminated subtype. Will be undefined if not.
  * @property discriminatedSubtypes: Mapping of discriminator value to this models discriminated subtypes if there are any.
+ * @property discriminatorProperty: The property that is the discriminator for this model if it's a discriminated subtype. Will be undefined if not.
  * @property baseModel: The base model class of this model type if one exists.
  */
 model SdkModelType extends SdkType {
@@ -236,6 +237,7 @@ model SdkModelType extends SdkType {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
   baseModel?: SdkModelType;
   nameSpace: string;
 }

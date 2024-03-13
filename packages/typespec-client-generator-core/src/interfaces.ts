@@ -274,6 +274,7 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
