@@ -1996,7 +1996,13 @@ describe("typespec-client-generator-core: types", () => {
       const modelNames = models.map((model) => model.name).sort();
       deepStrictEqual(
         modelNames,
-        ["Error", "ErrorResponse", "InnerError", "User", "ResourceOperationStatus"].sort()
+        [
+          "Error",
+          "ErrorResponse",
+          "InnerError",
+          "User",
+          "ResourceOperationStatusUserUserError",
+        ].sort()
       );
       strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
       strictEqual(runnerWithCore.context.experimental_sdkPackage.enums[0].name, "OperationState");
