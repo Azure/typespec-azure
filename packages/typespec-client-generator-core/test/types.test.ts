@@ -1489,6 +1489,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
       strictEqual(kindProperty.__raw, undefined);
+      strictEqual(fish.discriminatorProperty, kindProperty);
       const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
       strictEqual(shark.properties.length, 2);
       const sharktypeProperty = shark.properties.find(
@@ -1496,6 +1497,7 @@ describe("typespec-client-generator-core: types", () => {
       )! as SdkBodyModelPropertyType;
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
+      strictEqual(shark.discriminatorProperty, sharktypeProperty);
     });
 
     it("single discriminated model", async () => {
@@ -1518,6 +1520,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.type.kind, "string");
       strictEqual(kindProperty.__raw, undefined);
       strictEqual(kindProperty.type.__raw, undefined);
+      strictEqual(fish.discriminatorProperty, kindProperty);
     });
 
     it("enum discriminator model", async () => {
@@ -1558,6 +1561,7 @@ describe("typespec-client-generator-core: types", () => {
         (x) => (x as SdkBodyModelPropertyType).serializedName === "kind"
       )! as SdkBodyModelPropertyType;
       strictEqual(dogKindProperty.type, dogKind);
+      strictEqual(dog.discriminatorProperty, dogKindProperty);
     });
 
     it("union to extensible enum values", async () => {
@@ -1759,6 +1763,7 @@ describe("typespec-client-generator-core: types", () => {
       const fish = models.find((x) => x.name === "Fish")!;
       let kindTypeProperty = fish.properties.find((x) => x.nameInClient === "kind")!;
       strictEqual(kindTypeProperty.type.kind, "enum");
+      strictEqual(fish.discriminatorProperty, kindTypeProperty);
       const shark = models.find((x) => x.name === "Shark")!;
       strictEqual(shark.discriminatorValue, "shark");
       kindTypeProperty = shark.properties.find((x) => x.nameInClient === "kind")!;

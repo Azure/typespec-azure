@@ -449,6 +449,7 @@ function addDiscriminatorToModelType(
       const property = model.properties[i];
       if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
         property.discriminator = true;
+        model.discriminatorProperty = property;
         return diagnostics.wrap(undefined);
       }
     }
@@ -479,6 +480,7 @@ function addDiscriminatorToModelType(
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
     });
+    model.discriminatorProperty = model.properties[model.properties.length - 1];
   }
   return diagnostics.wrap(undefined);
 }
