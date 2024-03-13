@@ -23,7 +23,6 @@ import {
   Type,
   Union,
   UnionVariant,
-  UsageFlags,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
@@ -42,7 +41,6 @@ import {
   getAuthentication,
   getHeaderFieldName,
   getHeaderFieldOptions,
-  getHttpOperation,
   getPathParamName,
   getQueryParamName,
   getQueryParamOptions,
@@ -85,6 +83,7 @@ import {
   SdkTupleType,
   SdkType,
   SdkUnionType,
+  UsageFlags,
   getKnownScalars,
   isSdkBuiltInKind,
 } from "./interfaces.js";
@@ -103,10 +102,12 @@ import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
   getGeneratedName,
+  getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
 } from "./public-utils.js";
 
+import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { TCGCContext } from "./internal-utils.js";
 
@@ -485,7 +486,7 @@ function addDiscriminatorToModelType(
 function isOperationBodyType(context: TCGCContext, type: Model, operation?: Operation): boolean {
   if (!isHttpOperation(context, operation)) return false;
   const httpBody = operation
-    ? ignoreDiagnostics(getHttpOperation(context.program, operation)).parameters.body
+    ? getHttpOperationWithCache(context, operation).parameters.body
     : undefined;
   return (
     !!httpBody &&
@@ -1018,7 +1019,7 @@ export function getSdkModelPropertyType(
     // I'm a body model property
     let operationIsMultipart = false;
     if (options.operation) {
-      const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, options.operation));
+      const httpOperation = getHttpOperationWithCache(context, options.operation);
       operationIsMultipart = Boolean(
         httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
       );
@@ -1231,7 +1232,7 @@ function updateTypesFromOperation(
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const program = context.program;
-  const httpOperation = diagnostics.pipe(getHttpOperation(program, operation));
+  const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
     const paramTypes = diagnostics.pipe(checkAndGetClientType(context, param.type, operation));
@@ -1441,14 +1442,22 @@ export function getAllModelsWithDiagnostics(
         });
       }
     }
+    // versioned enums
+    const [_, versionMap] = getVersions(context.program, client.service);
+    if (versionMap && versionMap.getVersions()[0]) {
+      // create sdk enum for versions enum
+      const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
+      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+    }
   }
   // update access
   updateAccessOfModel(context);
   let filter = 0;
-  if (options.input) {
+  if (options.input && options.output) {
+    filter = Number.MAX_SAFE_INTEGER;
+  } else if (options.input) {
     filter += UsageFlags.Input;
-  }
-  if (options.output) {
+  } else if (options.output) {
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));

@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Model, Union, UsageFlags } from "@typespec/compiler";
+import { Enum, Model, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -11,6 +11,7 @@ import {
   SdkModelType,
   SdkType,
   SdkUnionType,
+  UsageFlags,
 } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
@@ -686,6 +687,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.isFixed, false);
       strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
       strictEqual(sdkType.valueType.kind, "string");
+      strictEqual(sdkType.usage & UsageFlags.Versioning, 0); // not a versioning enum
       const values = sdkType.values;
       strictEqual(values.length, 7);
       const nameList = [
@@ -1161,6 +1163,24 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(ud.values[0].name, "up");
       strictEqual(ud.values[1].name, "down");
       strictEqual(ud.isFixed, false);
+    });
+    it("versioned enums", async () => {
+      await runner.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.Versioning);
     });
   });
 

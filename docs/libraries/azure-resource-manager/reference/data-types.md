@@ -37,10 +37,9 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 
 #### Properties
 
-| Name        | Type    | Description                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `202`   | The status code.                                                                                         |
-| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `202` | The status code. |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
 
@@ -142,10 +141,9 @@ model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 
 #### Properties
 
-| Name        | Type    | Description                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `202`   | The status code.                                                                                         |
-| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `202` | The status code. |
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 
@@ -291,11 +289,10 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 #### Properties
 
-| Name        | Type       | Description                                                                                              |
-| ----------- | ---------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `201`      | The status code.                                                                                         |
-| retryAfter? | `int32`    | The Retry-After header can indicate how long the client should wait before polling the operation status. |
-| body        | `Resource` |                                                                                                          |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `201`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
 

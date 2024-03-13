@@ -9,7 +9,6 @@ import {
   Namespace,
   Operation,
   Type,
-  UsageFlags,
 } from "@typespec/compiler";
 import {
   HttpAuth,
@@ -505,3 +504,13 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
+
+/**
+ * This enum represents the different ways a model can be used in a method.
+ */
+export enum UsageFlags {
+  None = 0,
+  Input = 1 << 1,
+  Output = 1 << 2,
+  Versioning = 1 << 3,
+}

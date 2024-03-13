@@ -3,19 +3,12 @@ import {
   Diagnostic,
   Operation,
   Type,
-  UsageFlags,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
   isErrorModel,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  getHeaderFieldName,
-  getHttpOperation,
-  getServers,
-  isContentTypeHeader,
-} from "@typespec/http";
+import { HttpOperation, getHeaderFieldName, getServers, isContentTypeHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -52,6 +45,7 @@ import {
   SdkServiceParameter,
   SdkServiceResponseHeader,
   SdkType,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
@@ -65,6 +59,7 @@ import {
 import {
   getClientNamespaceString,
   getDefaultApiVersion,
+  getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
 } from "./public-utils.js";
@@ -276,7 +271,7 @@ function getSdkServiceOperation<
   methodParameters: SdkMethodParameter[]
 ): [TServiceOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const httpOperation = diagnostics.pipe(getHttpOperation(context.program, operation));
+  const httpOperation = getHttpOperationWithCache(context, operation);
   if (httpOperation) {
     const sdkHttpOperation = diagnostics.pipe(
       getSdkHttpOperation(context, httpOperation, methodParameters)

@@ -10,9 +10,8 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
-  ignoreDiagnostics,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation } from "@typespec/http";
+import { HttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
@@ -23,7 +22,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
-import { isApiVersion } from "./public-utils.js";
+import { getHttpOperationWithCache, isApiVersion } from "./public-utils.js";
 
 /**
  *
@@ -207,7 +206,7 @@ export function isAcceptHeader(param: SdkModelPropertyType): boolean {
 
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
-  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+  const httpOperation = getHttpOperationWithCache(context, operation);
   const httpBody = httpOperation.parameters.body;
   if (httpBody && httpBody.type.kind === "Model") {
     return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
@@ -216,7 +215,7 @@ export function isMultipartOperation(context: TCGCContext, operation?: Operation
 }
 
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
-  return !!obj && obj.kind === "Operation" && !getHttpOperation(context.program, obj)[1].length;
+  return obj?.kind === "Operation" && getHttpOperationWithCache(context, obj) !== undefined;
 }
 export interface TCGCContext {
   program: Program;
@@ -229,6 +228,7 @@ export interface TCGCContext {
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Map<Union | Model, string>;
+  httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;

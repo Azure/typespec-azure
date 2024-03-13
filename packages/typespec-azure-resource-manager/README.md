@@ -24,7 +24,7 @@ linter:
 
 Available ruleSets:
 
-- [`@azure-tools/typespec-azure-resource-manager/all`](#@azure-tools/typespec-azure-resource-manager/all)
+- `@azure-tools/typespec-azure-resource-manager/all`
 
 ### Rules
 
