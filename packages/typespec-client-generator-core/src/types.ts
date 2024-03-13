@@ -351,6 +351,7 @@ export function getSdkUnionWithDiagnostics(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
     clientType.nullable = true;
+    clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }
 
@@ -1309,7 +1310,7 @@ function updateAccessOfModel(context: TCGCContext): void {
       continue;
     }
 
-    const accessOverride = getAccessOverride(context, type as any);
+    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
       sdkType.access = accessOverride;
       continue;
