@@ -658,6 +658,90 @@ describe("typespec-client-generator-core: types", () => {
         }
       }
     });
+
+    it("usage", async function () {
+      await runner.compileWithBuiltInService(`
+      union UnionAsEnum {
+        "A",
+        "B",
+        string,
+      }
+
+      model Foo {
+        prop: string;
+      }
+
+      union NullableUnion {
+        Foo,
+        null
+      }
+
+      model Bar {
+        prop1: UnionAsEnum;
+        prop2: NullableUnion;
+      }
+
+      @access(Access.internal)
+      op func(
+        @body body: Bar
+      ): void;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const foo = models.find((x) => x.name === "Foo")! as SdkModelType;
+      strictEqual(foo.usage, UsageFlags.Input);
+      strictEqual(foo.access, "internal");
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum")! as SdkEnumType;
+      strictEqual(unionAsEnum.usage, UsageFlags.Input);
+      strictEqual(unionAsEnum.access, "internal");
+    });
+
+    it("usage override", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union UnionAsEnum {
+        "A",
+        "B",
+        string,
+      }
+
+      model Foo {
+        prop: string;
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union NullableUnion {
+        Foo,
+        null
+      }
+
+      model Bar {
+        prop1: UnionAsEnum;
+        prop2: NullableUnion;
+      }
+
+      @access(Access.internal)
+      op func(
+        @body body: Bar
+      ): void;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const foo = models.find((x) => x.name === "Foo")! as SdkModelType;
+      strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(foo.access, "public");
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum")! as SdkEnumType;
+      strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(unionAsEnum.access, "public");
+    });
   });
   describe("SdkEnumType", () => {
     it("string extensible", async function () {

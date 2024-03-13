@@ -38,7 +38,7 @@ import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { experimental_getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
@@ -694,7 +694,7 @@ const usageKey = createStateSymbol("usage");
 
 export function $usage(
   context: DecoratorContext,
-  entity: Model | Enum,
+  entity: Model | Enum | Union,
   value: EnumMember | Union,
   scope?: LanguageScopes
 ) {
@@ -732,7 +732,7 @@ export function $usage(
 
 export function getUsageOverride(
   context: TCGCContext,
-  entity: Model | Enum
+  entity: Model | Enum | Union
 ): UsageFlags | undefined {
   return getScopedDecoratorData(context, usageKey, entity);
 }
@@ -747,7 +747,7 @@ const accessKey = createStateSymbol("access");
 
 export function $access(
   context: DecoratorContext,
-  entity: Model | Enum | Operation,
+  entity: Model | Enum | Operation | Union,
   value: EnumMember,
   scope?: LanguageScopes
 ) {
@@ -763,23 +763,32 @@ export function $access(
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation
+  entity: Model | Enum | Operation | Union
 ): AccessFlags | undefined {
   return getScopedDecoratorData(context, accessKey, entity);
 }
 
 export function getAccess(
   context: TCGCContext,
-  entity: Model | Enum | Operation
+  entity: Model | Enum | Operation | Union
 ): AccessFlags | undefined {
   const override = getScopedDecoratorData(context, accessKey, entity);
   if (override || entity.kind === "Operation") {
     return override;
   }
 
-  return entity.kind === "Model"
-    ? getSdkModel(context, entity).access
-    : getSdkEnum(context, entity).access;
+  switch (entity.kind) {
+    case "Model":
+      return getSdkModel(context, entity).access;
+    case "Enum":
+      return getSdkEnum(context, entity).access;
+    case "Union":
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "model") {
+        return type.access;
+      }
+      return undefined;
+  }
 }
 
 const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
