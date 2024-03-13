@@ -658,6 +658,90 @@ describe("typespec-client-generator-core: types", () => {
         }
       }
     });
+
+    it("usage", async function () {
+      await runner.compileWithBuiltInService(`
+      union UnionAsEnum {
+        "A",
+        "B",
+        string,
+      }
+
+      model Foo {
+        prop: string;
+      }
+
+      union NullableUnion {
+        Foo,
+        null
+      }
+
+      model Bar {
+        prop1: UnionAsEnum;
+        prop2: NullableUnion;
+      }
+
+      @access(Access.internal)
+      op func(
+        @body body: Bar
+      ): void;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const foo = models.find((x) => x.name === "Foo")! as SdkModelType;
+      strictEqual(foo.usage, UsageFlags.Input);
+      strictEqual(foo.access, "internal");
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum")! as SdkEnumType;
+      strictEqual(unionAsEnum.usage, UsageFlags.Input);
+      strictEqual(unionAsEnum.access, "internal");
+    });
+
+    it("usage override", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union UnionAsEnum {
+        "A",
+        "B",
+        string,
+      }
+
+      model Foo {
+        prop: string;
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union NullableUnion {
+        Foo,
+        null
+      }
+
+      model Bar {
+        prop1: UnionAsEnum;
+        prop2: NullableUnion;
+      }
+
+      @access(Access.internal)
+      op func(
+        @body body: Bar
+      ): void;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const foo = models.find((x) => x.name === "Foo")! as SdkModelType;
+      strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(foo.access, "public");
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum")! as SdkEnumType;
+      strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(unionAsEnum.access, "public");
+    });
   });
   describe("SdkEnumType", () => {
     it("string extensible", async function () {
@@ -1570,6 +1654,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
       strictEqual(kindProperty.__raw, undefined);
+      strictEqual(fish.discriminatorProperty, kindProperty);
       const shark = models.find((x) => x.name === "Shark")! as SdkModelType;
       strictEqual(shark.properties.length, 2);
       const sharktypeProperty = shark.properties.find(
@@ -1577,6 +1662,7 @@ describe("typespec-client-generator-core: types", () => {
       )! as SdkBodyModelPropertyType;
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
+      strictEqual(shark.discriminatorProperty, sharktypeProperty);
     });
 
     it("single discriminated model", async () => {
@@ -1599,6 +1685,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.type.kind, "string");
       strictEqual(kindProperty.__raw, undefined);
       strictEqual(kindProperty.type.__raw, undefined);
+      strictEqual(fish.discriminatorProperty, kindProperty);
     });
 
     it("enum discriminator model", async () => {
@@ -1639,6 +1726,7 @@ describe("typespec-client-generator-core: types", () => {
         (x) => (x as SdkBodyModelPropertyType).serializedName === "kind"
       )! as SdkBodyModelPropertyType;
       strictEqual(dogKindProperty.type, dogKind);
+      strictEqual(dog.discriminatorProperty, dogKindProperty);
     });
 
     it("union to extensible enum values", async () => {
@@ -1848,6 +1936,7 @@ describe("typespec-client-generator-core: types", () => {
       const fish = models.find((x) => x.name === "Fish")!;
       let kindTypeProperty = fish.properties.find((x) => x.nameInClient === "kind")!;
       strictEqual(kindTypeProperty.type.kind, "enum");
+      strictEqual(fish.discriminatorProperty, kindTypeProperty);
       const shark = models.find((x) => x.name === "Shark")!;
       strictEqual(shark.discriminatorValue, "shark");
       kindTypeProperty = shark.properties.find((x) => x.nameInClient === "kind")!;
