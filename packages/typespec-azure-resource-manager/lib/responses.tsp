@@ -74,8 +74,8 @@ model ArmAcceptedResponse<
 @doc(Description)
 model ArmAcceptedLroResponse<
   Description extends valueof string = "Resource operation accepted.",
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader
 > {
   ...AcceptedResponse;
   ...LroHeaders;
