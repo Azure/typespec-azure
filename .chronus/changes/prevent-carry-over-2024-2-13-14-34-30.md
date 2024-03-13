@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-prevent carry over for @clientName
+prevent carry over for `@clientName`

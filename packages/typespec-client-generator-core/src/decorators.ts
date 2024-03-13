@@ -821,6 +821,8 @@ export function $clientName(
   value: string,
   scope?: LanguageScopes
 ) {
+  // workaround for current lack of functionality in compiler
+  // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
     if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
