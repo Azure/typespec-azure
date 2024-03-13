@@ -115,7 +115,7 @@ interface IndexersApis {
 
     @doc("datasource document identifiers to be reset")
     @body
-    @projectedName("json", "keysOrIds")
+    @encodedName("application/json", "keysOrIds")
     documentKeysOrIds: string[],
 
     @doc("If false, keys or ids will be appended to existing ones. If true, only the keys or ids in this payload will be queued to be re-ingested.")
