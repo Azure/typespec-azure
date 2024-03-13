@@ -108,6 +108,7 @@ describe("typespec-autorest: parameters", () => {
 
       @put
       op test2(
+        #suppress "deprecated" "for testing"
         @projectedName("json", "x-body") @body @doc("my-doc") arg: string): void;
 
       `
