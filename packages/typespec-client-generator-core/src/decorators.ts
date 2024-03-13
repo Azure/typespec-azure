@@ -1,7 +1,5 @@
 import {
   AugmentDecoratorStatementNode,
-  DecoratedType,
-  Decorator,
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
@@ -823,14 +821,22 @@ export function $clientName(
   value: string,
   scope?: LanguageScopes
 ) {
-  if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
-    if (ignoreDiagnostics(context.program.checker.resolveTypeReference((context.decoratorTarget as AugmentDecoratorStatementNode).targetType)) !== entity) {
-      return;
+  if (entity.kind === "Model" || entity.kind === "Operation") {
+    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+      if (
+        ignoreDiagnostics(
+          context.program.checker.resolveTypeReference(
+            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType
+          )
+        ) !== entity
+      ) {
+        return;
+      }
     }
-  }
-  if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
-    if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
-      return;
+    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
+      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+        return;
+      }
     }
   }
 
