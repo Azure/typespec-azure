@@ -357,6 +357,12 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
+            Operation-Location:
+              required: true
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
             Repeatability-Result:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
@@ -367,12 +373,6 @@ paths:
               description: An opaque, globally-unique, client-generated string identifier for the request.
               schema:
                 $ref: '#/components/schemas/Azure.Core.uuid'
-            Operation-Location:
-              required: true
-              description: The location for monitoring the operation state.
-              schema:
-                type: string
-                format: uri
           content:
             application/json:
               schema:
@@ -380,6 +380,12 @@ paths:
         '201':
           description: The request has succeeded and a new resource has been created as a result.
           headers:
+            Operation-Location:
+              required: true
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
             Repeatability-Result:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
@@ -390,12 +396,6 @@ paths:
               description: An opaque, globally-unique, client-generated string identifier for the request.
               schema:
                 $ref: '#/components/schemas/Azure.Core.uuid'
-            Operation-Location:
-              required: true
-              description: The location for monitoring the operation state.
-              schema:
-                type: string
-                format: uri
           content:
             application/json:
               schema:

@@ -598,6 +598,11 @@
               "$ref": "#/definitions/Widget"
             },
             "headers": {
+              "Operation-Location": {
+                "type": "string",
+                "format": "uri",
+                "description": "The location for monitoring the operation state."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -626,11 +631,6 @@
                 "type": "string",
                 "format": "uuid",
                 "description": "An opaque, globally-unique, client-generated string identifier for the request."
-              },
-              "Operation-Location": {
-                "type": "string",
-                "format": "uri",
-                "description": "The location for monitoring the operation state."
               }
             }
           },
@@ -640,6 +640,11 @@
               "$ref": "#/definitions/Widget"
             },
             "headers": {
+              "Operation-Location": {
+                "type": "string",
+                "format": "uri",
+                "description": "The location for monitoring the operation state."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -668,11 +673,6 @@
                 "type": "string",
                 "format": "uuid",
                 "description": "An opaque, globally-unique, client-generated string identifier for the request."
-              },
-              "Operation-Location": {
-                "type": "string",
-                "format": "uri",
-                "description": "The location for monitoring the operation state."
               }
             }
           },

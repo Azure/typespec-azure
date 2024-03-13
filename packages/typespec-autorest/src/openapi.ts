@@ -848,7 +848,7 @@ function createOAPIEmitter(
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
-        for (const [key, value] of Object.entries(data.headers)) {
+        for (const [key, value] of Object.entries(data.headers).sort()) {
           openapiResponse.headers[key] = getResponseHeader(value);
         }
       }

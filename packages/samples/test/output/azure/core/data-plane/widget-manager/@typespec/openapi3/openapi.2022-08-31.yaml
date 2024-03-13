@@ -59,16 +59,16 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            Repeatability-Result:
-              required: false
-              description: Indicates whether the repeatable request was accepted or rejected.
-              schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
               schema:
                 type: string
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -81,16 +81,16 @@ paths:
         '201':
           description: The request has succeeded and a new resource has been created as a result.
           headers:
-            Repeatability-Result:
-              required: false
-              description: Indicates whether the repeatable request was accepted or rejected.
-              schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
               schema:
                 type: string
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -440,27 +440,27 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            Repeatability-Result:
-              required: false
-              description: Indicates whether the repeatable request was accepted or rejected.
-              schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
               schema:
                 type: string
-            x-ms-client-request-id:
-              required: false
-              description: An opaque, globally-unique, client-generated string identifier for the request.
-              schema:
-                $ref: '#/components/schemas/Azure.Core.uuid'
             Operation-Location:
               required: true
               description: The location for monitoring the operation state.
               schema:
                 type: string
                 format: uri
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
           content:
             application/json:
               schema:
@@ -468,27 +468,27 @@ paths:
         '201':
           description: The request has succeeded and a new resource has been created as a result.
           headers:
-            Repeatability-Result:
-              required: false
-              description: Indicates whether the repeatable request was accepted or rejected.
-              schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
               schema:
                 type: string
-            x-ms-client-request-id:
-              required: false
-              description: An opaque, globally-unique, client-generated string identifier for the request.
-              schema:
-                $ref: '#/components/schemas/Azure.Core.uuid'
             Operation-Location:
               required: true
               description: The location for monitoring the operation state.
               schema:
                 type: string
                 format: uri
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
+            x-ms-client-request-id:
+              required: false
+              description: An opaque, globally-unique, client-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
           content:
             application/json:
               schema:
@@ -697,16 +697,16 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            Repeatability-Result:
-              required: false
-              description: Indicates whether the repeatable request was accepted or rejected.
-              schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
               schema:
                 type: string
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -719,16 +719,16 @@ paths:
         '201':
           description: The request has succeeded and a new resource has been created as a result.
           headers:
-            Repeatability-Result:
-              required: false
-              description: Indicates whether the repeatable request was accepted or rejected.
-              schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
               schema:
                 type: string
+            Repeatability-Result:
+              required: false
+              description: Indicates whether the repeatable request was accepted or rejected.
+              schema:
+                $ref: '#/components/schemas/RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -837,6 +837,11 @@ paths:
         '201':
           description: The request has succeeded and a new resource has been created as a result.
           headers:
+            ETag:
+              required: false
+              description: The entity tag for the response.
+              schema:
+                type: string
             Location:
               required: true
               schema:
@@ -847,11 +852,6 @@ paths:
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
                 $ref: '#/components/schemas/RepeatabilityResult'
-            ETag:
-              required: false
-              description: The entity tag for the response.
-              schema:
-                type: string
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
