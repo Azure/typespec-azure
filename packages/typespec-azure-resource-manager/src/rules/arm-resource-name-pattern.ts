@@ -19,9 +19,7 @@ export const armResourceNamePatternRule = createRule({
         const resources = getArmResources(program);
         for (const resource of resources) {
           // find the name property
-          const nameProperty = [...resource.typespecType.properties.values()].find(
-            (p) => p.name === "name"
-          );
+          const nameProperty = resource.typespecType.properties.get("name");
           if (nameProperty !== undefined) {
             const pattern = getPattern(program, nameProperty);
             if (pattern === undefined) {
