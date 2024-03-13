@@ -13,6 +13,7 @@ import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
   getClient,
+  getClientNameOverride,
   getOperationGroup,
   getUsage,
   listClients,
@@ -2348,6 +2349,70 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, {
         code: "decorator-wrong-target",
       });
+    });
+  });
+
+  describe("@clientName", () => {
+    it("carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @clientName("Test1Rename")
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          @clientName("func1Rename")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
+    });
+
+    it("augment carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        @test namespace MyService {
+          @test
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(MyService.Test1, "Test1Rename");
+        @@clientName(MyService.func1, "func1Rename");
+      `
+      )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
     });
   });
 });
