@@ -48,10 +48,6 @@ Example: Multiple services
 - `Service1.canonical.openapi.json`
 - `Service2.canonical.openapi.json`
 
-#### `version`
-
-**Type:** `string`
-
 #### `azure-resource-provider-folder`
 
 **Type:** `string`

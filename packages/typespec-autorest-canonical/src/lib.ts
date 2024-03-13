@@ -79,7 +79,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
         " - `Service2.canonical.openapi.json`",
       ].join("\n"),
     },
-    version: { type: "string", nullable: true },
     "azure-resource-provider-folder": { type: "string", nullable: true },
     "arm-types-dir": {
       type: "string",
