@@ -72,10 +72,14 @@ export function $resourceParameterBaseFor(
 ) {
   const resolvedValues: string[] = [];
   for (const value of values.values) {
-    if (value.kind !== "EnumMember") {
+    // must be enum or string Union. TODO: Once Union extend string support has been added, the condition below can be further constrained.
+    if (value.kind === "EnumMember") {
+      resolvedValues.push(value.name);
+    } else if (value.kind === "UnionVariant" && value.type.kind === "String") {
+      resolvedValues.push(<string>value.name);
+    } else {
       return;
     }
-    resolvedValues.push(value.name);
   }
   context.program.stateMap(ArmStateKeys.armResourceCollection).set(entity, resolvedValues);
 }

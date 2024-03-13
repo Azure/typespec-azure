@@ -357,9 +357,6 @@ model SystemData {
   lastModifiedAt?: plainDate;
 }
 
-/** Alias of ManagedServiceIdentity for back compatability. Please change to ManagedServiceIdentity. */
-alias ManagedIdentityProperties = ManagedServiceIdentity;
-
 /**
  * The properties of the managed service identities assigned to this resource.
  */
@@ -377,7 +374,7 @@ alias ManagedIdentityProperties = ManagedServiceIdentity;
   "managedidentity.json"
 )
 @doc("The properties of the managed service identities assigned to this resource.")
-model ManagedServiceIdentity {
+model ManagedIdentityProperties {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
@@ -392,9 +389,6 @@ model ManagedServiceIdentity {
   @doc("The identities assigned to this resource by the user.")
   userAssignedIdentities?: Record<UserAssignedIdentity>;
 }
-
-/** Alias of SystemAssignedServiceIdentity for back compatability. Please change to SystemAssignedServiceIdentity. */
-alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 
 /**
  * The properties of the service-assigned identity associated with this resource.
@@ -413,7 +407,7 @@ alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
   "managedidentity.json"
 )
 @doc("The properties of the service-assigned identity associated with this resource.")
-model SystemAssignedServiceIdentity {
+model ManagedSystemIdentityProperties {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
