@@ -188,8 +188,9 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            e-tag:
-              required: true
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
               schema:
                 type: string
             last-modified:
@@ -197,9 +198,8 @@ paths:
               schema:
                 type: string
                 format: date
-            sync-token:
-              required: false
-              description: Used to guarantee real-time consistency between requests.
+            e-tag:
+              required: true
               schema:
                 type: string
           content:
@@ -228,16 +228,16 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            last-modified:
-              required: true
-              schema:
-                type: string
-                format: date
             sync-token:
               required: false
               description: Used to guarantee real-time consistency between requests.
               schema:
                 type: string
+            last-modified:
+              required: true
+              schema:
+                type: string
+                format: date
         default:
           description: An unexpected error response.
           content:
@@ -256,8 +256,9 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            e-tag:
-              required: true
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
               schema:
                 type: string
             last-modified:
@@ -265,9 +266,8 @@ paths:
               schema:
                 type: string
                 format: date
-            sync-token:
-              required: false
-              description: Used to guarantee real-time consistency between requests.
+            e-tag:
+              required: true
               schema:
                 type: string
           content:
@@ -318,8 +318,9 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            e-tag:
-              required: true
+            sync-token:
+              required: false
+              description: Used to guarantee real-time consistency between requests.
               schema:
                 type: string
             last-modified:
@@ -327,9 +328,8 @@ paths:
               schema:
                 type: string
                 format: date
-            sync-token:
-              required: false
-              description: Used to guarantee real-time consistency between requests.
+            e-tag:
+              required: true
               schema:
                 type: string
           content:
@@ -370,13 +370,13 @@ paths:
         '200':
           description: The request has succeeded.
           headers:
-            e-tag:
-              required: true
-              schema:
-                type: string
             sync-token:
               required: false
               description: Used to guarantee real-time consistency between requests.
+              schema:
+                type: string
+            e-tag:
+              required: true
               schema:
                 type: string
           content:
