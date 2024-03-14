@@ -106,7 +106,7 @@ describe("typespec-autorest: versioning", () => {
     });
   });
 
-  it("works with models and projectedNames", async () => {
+  it("works with models and projectedNames (LEGACY)", async () => {
     const { v1, v2, v3 } = await openApiFor(
       `
       @versioned(Versions)

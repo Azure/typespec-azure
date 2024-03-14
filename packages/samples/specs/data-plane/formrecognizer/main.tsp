@@ -214,7 +214,6 @@ model InnerError {
   @doc("The error target.")
   target: string;
 
-  @projectedName("csharp", "InnerErrorObject")
   @doc("The inner error details.")
   innerError: InnerError;
 }
