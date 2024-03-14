@@ -5,6 +5,11 @@ import TabItem from "@theme/TabItem";
 
 This page documents how to customize names for client generations in DPG. For an overview of the setup, please visit the setup page.
 
+:::note
+The TypeSpec compiler provide an `@encodedName` decorator that allows changing the name of the property for a given serialization format.
+However in Azure we recommend that you define the property name as the wire name an use the `@clientName` decorator to change the name in the client instead.
+:::
+
 ## Default behaviors
 
 By default, any language code generator will assume the TYPESPEC name is the client. For clarity, generators do not attempt to do any auto-magic rename.
