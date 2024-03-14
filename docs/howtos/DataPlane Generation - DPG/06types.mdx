@@ -53,7 +53,10 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public enum LR {
+   LEFT("left"),
+   RIGHT("right");
+}
 ```
 
 </TabItem>
@@ -104,7 +107,10 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public enum Horizontal {
+   LEFT("left"),
+   RIGHT("right");
+}
 ```
 
 </TabItem>
@@ -157,7 +163,10 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public final class Colors extends ExpandableStringEnum<Colors> {
+    public static final Colors RED = fromString("red");
+    public static final Colors BLUE = fromString("blue");
+}
 ```
 
 </TabItem>
@@ -209,7 +218,10 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public final class Color extends ExpandableStringEnum<Colors> {
+    public static final Color RED = fromString("red");
+    public static final Color BLUE = fromString("blue");
+}
 ```
 
 </TabItem>
@@ -266,7 +278,12 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public final class ProvisioningState extends ExpandableStringEnum<ProvisioningState> {
+    public static final ProvisioningState IN_PROGRESS = fromString("inProgress");
+    public static final ProvisioningState SUCCEEDED = fromString("Succeeded");
+    public static final ProvisioningState FAILED = fromString("Failed");
+    public static final ProvisioningState CANCELED = fromString("Canceled");
+}
 ```
 
 </TabItem>
@@ -329,7 +346,12 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public enum Orientation {
+   LEFT("left"),
+   RIGHT("right"),
+   UP("up"),
+   DOWN("down");
+}
 ```
 
 </TabItem>
@@ -390,7 +412,12 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public enum Orientation {
+   LEFT("left"),
+   RIGHT("right"),
+   UP("up"),
+   DOWN("down");
+}
 ```
 
 </TabItem>
@@ -442,7 +469,9 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO;
+public final class Shirt {
+    private BinaryData sizing;
+}
 ```
 
 </TabItem>
@@ -497,7 +526,10 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO
+public enum LR {
+   LEFT("left"),
+   RIGHT("right");
+}
 ```
 
 </TabItem>
@@ -548,9 +580,9 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-public enum Versions {
-    v1,
-    v2
+public enum ServiceServiceVersions implements ServiceVersion {
+    V1("v1"),
+    V2("v2");
 }
 ```
 
@@ -615,7 +647,12 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO
+public enum Orientation {
+   LEFT("left"),
+   RIGHT("right"),
+   UP("up"),
+   DOWN("down");
+}
 ```
 
 </TabItem>
