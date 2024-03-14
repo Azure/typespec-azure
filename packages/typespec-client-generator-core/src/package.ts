@@ -175,13 +175,15 @@ function createContentTypeOrAcceptHeader(
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
+  // Since these are the created accept and content type header parameters, we don't make them required.
+  // If they are defined as required, we won't enter this code and they will be generated as required
   return {
     type,
     nameInClient,
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,
     onClient: false,
-    optional: false,
+    optional: true,
   };
 }
 
