@@ -351,6 +351,7 @@ export function getSdkUnionWithDiagnostics(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
     clientType.nullable = true;
+    clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }
 
@@ -449,6 +450,7 @@ function addDiscriminatorToModelType(
       const property = model.properties[i];
       if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
         property.discriminator = true;
+        model.discriminatorProperty = property;
         return diagnostics.wrap(undefined);
       }
     }
@@ -479,6 +481,7 @@ function addDiscriminatorToModelType(
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
     });
+    model.discriminatorProperty = model.properties[model.properties.length - 1];
   }
   return diagnostics.wrap(undefined);
 }
@@ -1307,7 +1310,7 @@ function updateAccessOfModel(context: TCGCContext): void {
       continue;
     }
 
-    const accessOverride = getAccessOverride(context, type as any);
+    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
       sdkType.access = accessOverride;
       continue;
