@@ -7,7 +7,7 @@ This page documents how to customize names for client generations in DPG. For an
 
 :::note
 The TypeSpec compiler provide an `@encodedName` decorator that allows changing the name of the property for a given serialization format.
-However in Azure we recommend that you define the property name as the wire name an use the `@clientName` decorator to change the name in the client instead.
+However in Azure we recommend that you define the property name as the value sent on the wire and use the `@clientName` decorator to change the name of the generated property.
 :::
 
 ## Default behaviors
