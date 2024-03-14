@@ -1,0 +1,410 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# TypeSpec Type Representation in TCGC
+
+This page documents what type definitions in TypeSpec would look like when returned by TCGC
+
+## Main TypeSpec Code Example
+
+```typespec
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@useAuth(
+  ApiKeyAuth<ApiKeyLocation.header, "api-key">
+)
+@service({
+  title: "Contoso Widget Manager",
+})
+@server(
+  "{endpoint}/widget",
+  "Contoso Widget APIs",
+  {
+    endpoint: string,
+  }
+)
+namespace Contoso.WidgetManager;
+
+model Widget {
+  @visibility("read", "update")
+  @path
+  id: string;
+
+  weight: int32;
+  color: "red" | "blue";
+}
+
+@error
+model Error {
+  code: int32;
+  message: string;
+}
+
+@route("/widgets")
+@tag("Widgets")
+interface Widgets {
+  @get list(): Widget[] | Error;
+  @get read(@path id: string): Widget | Error;
+  @post create(...Widget): Widget | Error;
+  @patch update(...Widget): Widget | Error;
+  @delete delete(@path id: string): void | Error;
+  @route("{id}/analyze") @post analyze(@path id: string): string | Error;
+}
+```
+
+## SdkContext
+
+`SdkContext` is the context of your SDK emitter. It should be passed throughout all of your . You shouldn't instantialize your own interface, instead you should call `createSdkContext` to create.
+
+### Interface
+
+```ts
+export interface SdkContext<
+  TOptions extends object = Record<string, any>,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+> {
+  // emit context from tsp that is used to create our TCGC Sdk Context
+  emitContext: EmitContext<TOptions>;
+  // representation of the entire package the language emitter should generate
+  sdkPackage: SdkPackage<TServiceOperation>;
+  program: Program;
+  emitterName: string;
+}
+```
+
+### Usage
+
+```ts
+import { EmitContext } from "@typespec/compiler";
+import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+
+export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
+  const sdkContext = createSdkContext(context, "@azure-tools/typespec-python");
+}
+```
+
+## SdkPackage
+
+`SdkPackage` represents the entire package that your language emitter should generate. It synthesizes all of the information language emitters will need to generate the entire package
+
+### Interface
+
+```ts
+export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  rootNamespace: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
+  diagnostics: readonly Diagnostic[];
+}
+```
+
+### Example
+
+```ts
+const sdkPackage = {
+  name: "ContosoWidgetManager",
+  rootNamespace: "Contoso.WidgetManager",
+  clients: [
+    {
+      name: "ContosoWidgetManagerClient",
+      kind: "client",
+      ...
+    }
+  ],
+  models: [
+    {
+      name: "Widget",
+      kind: "model",
+      ...
+    },
+    {
+      name: "Error",
+      kind: "model",
+      ...
+    }
+  ],
+  enums: [],
+  diagnostics: [],
+}
+```
+
+## Usage
+
+```ts
+const sdkPackage = sdkContext.sdkPackage;
+```
+
+## SdkClientType
+
+An `SdkClientType` represents a single client in your package.
+
+There are clients that are instantiable, and you can determine this through the presence of an `.initialization` property. Clients that are instantiable should be exposed to users to instantiate. If they aren't publicly instantiable, then your language emitter should expose them on their parent client without giving users the opporutinity to instantiate them.
+
+### Interface
+
+```ts
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  kind: "client";
+  description?: string;
+  details?: string;
+  // information on how to initialize, if instantiable
+  initialization?: SdkInitializationType;
+  apiVersions: string[];
+  // fully qualified. Compare to sdkPackage.rootNamespace to figure out where to generate
+  nameSpace: string;
+  endpoint: string;
+  hasParameterizedEndpoint: boolean;
+  arm: boolean;
+  methods: SdkMethod<TServiceOperation>[];
+}
+```
+
+### Example
+
+```ts
+const sdkClient = {
+  name: "ContosoWidgetManagerClient";
+  kind: "client";
+  initialization: {
+    name: "WidgetManagerOptions",
+    kind: "model",
+    ...
+  };
+  apiVersions: [],
+  nameSpace: "Contoso.WidgetManager",
+  endpoint: "{endpoint}/widget",
+  hasParameterizedEndpoint: true,
+  arm: false,
+  methods: [
+    {
+      name: "getWidgets",
+      kind: "clientaccessor",
+      response: {
+        name: "Widgets",
+        kind: "client",
+        initialization: undefined,
+        apiVersions: [],
+        nameSpace: "Contoso.WidgetManager",
+        endpoint: "{endpoint}/widget",
+        methods: [
+          {
+            name: "list",
+            kind: "method",
+            ...
+          },
+          {
+            name: "read",
+            kind: "method",
+            ...
+          }
+        ]
+      }
+    }
+  ],
+}
+```
+
+### Usage
+
+```ts
+import { SdkServiceOperation, SdkContext, SdkClientType };
+
+const serializedClients: PythonSdkClientType[] = [];
+
+function serializePythonClient<TServiceOperation extends SdkServiceOperation>(
+  sdkContext: SdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+): PythonSdkClientType {
+  // Map the information from the SdkClientType to your language's interface for a client.
+  // Would recommend that eventually your language's client type interface extends from
+  // SdkClientType, and just adds your language-specific information on top.
+  return {
+    ...client,
+    parameters: serializeInitialization(sdkContext, client, client.initialization),
+    subClients: serializeSubClients(sdkContext, client),
+    methods: client.methods.map(
+      (x) => serializeMethod(sdkContext, client, x)
+    )
+  }
+}
+
+for (const client of sdkPackage.clients) {
+  serializedClients.push(serializePythonClient(sdkContext, client));
+}
+```
+
+## SdkInitializationType
+
+Initialization model for a client, if the client is instantiable.
+
+### Interface
+
+```ts
+export interface SdkInitializationType extends SdkModelType {
+  // properties takes care of all of the initialization info that you will need.
+  properties: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+}
+```
+
+### Example
+
+```ts
+const sdkInitializationType = {
+  name: "WidgetManagerOptions",
+  kind: "model",
+  properties: [
+    {
+      kind: "endpoint",
+      urlEncode: false,
+      onClient: true,
+    },
+    {
+      kind: "credential",
+      type: {
+        kind: "credential",
+        scheme: {
+          kind: "apiKey",
+          in: "header",
+          name: "api-key"
+        }
+      },
+      onClient: true,
+    },
+  ],
+  crossLanguageDefinitionId: "Contoso.WidgetManager.WidgetManagerOptions",
+  apiVersions: [],
+  usage: UsageFlags.Input,
+  access: "public",
+  nullable: false,
+  isFormDataType: false,
+  isError: false,
+}
+
+### Usage
+
+```ts
+function serializeInitialization<TServiceOperation extends SdkServiceOperation>(
+  sdkContext: SdkContext<TServiceOperation>,
+  client: SdkClient<TServiceOperation>
+): PythonSdkParameter[] | undefined {
+  if (!client.initialization) return undefined;
+  return client.initialization.properties.map(
+    (x) => serializeMethodParameter(sdkContext, client, x)
+  )
+}
+```
+
+## SdkMethod
+
+An `SdkMethod` is any of the types of methods that can be a method on a client.
+
+```ts
+export type SdkMethod<
+  TServiceOperation extends SdkServiceOperation
+> =
+  SdkServiceMethod<TServiceOperation> |
+  SdkClientAccessor<TServiceOperation>;
+```
+
+They each extend from the shared `SdkMethodBase`
+
+```ts
+interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+  __raw?: Operation;
+  name: string;
+  access: AccessFlags | undefined;
+  parameters: SdkParameter[];
+  apiVersions: string[];
+  description?: string;
+  details?: string;
+  overloads?: SdkMethod<TServiceOperation>[];
+  overloading?: SdkMethod<TServiceOperation>;
+}
+```
+
+Below we go into each method type
+
+### SdkClientAccessor
+
+A `clientaccessor` method is simply a method on a client that returns another client. The returned client can be instantiable or uninstantiable. If the returned client is instantiable, most likely your `clientaccessor` will be part of the public api surface, so users can instantiate the subclient using your client method. If it is not instantiable, it is up to you how to expose the subclient on your current client for users to access.
+
+#### Interface
+
+```ts
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase<TServiceOperation> {
+    kind: "clientaccessor";
+    response: SdkClientType<TServiceOperation>;
+  }
+```
+
+#### Example
+
+```ts
+const sdkClientAccessor = {
+  name: "getWidgets",
+  kind: "clientaccessor",
+  response: {
+    name: "Widgets",
+    kind: "client",
+    initialization: undefined,
+    ...
+  }
+}
+```
+
+#### Usage
+
+```ts
+function serializeSubClients<TServiceOperation extends SdkServiceOperation>(
+  sdkContext: SdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+): PythonSdkClientType[] {
+  return client.methods.filter(
+    (x) => x.kind === "clientaccessor"
+  ).map(
+    (x) => serializePythonClient(sdkContext, x)
+  );
+}
+```
+
+### SdkServiceMethod
+
+An `SdkServiceMethod` is any service method on a client that calls the service.
+
+The actual service call is a separate property on the method, `.operation`. This way, our service methods are able to abstract away the protocol used to call the service (i.e. `http` or `gRPC`)
+
+All `SdkServiceMethod`s share the following base:
+
+```ts
+interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase<TServiceOperation> {
+    operation: TServiceOperation;
+    // The parameters you generate on the method signature that users will interact with.
+    // These aren't tied to any protocol, so there are no 'header' / 'path' parameters etc.
+    parameters: SdkMethodParameter[];
+    // This maps a given service parameter to the method parameters needed to create the call.
+    // For example, if you have SdkServiceParameter
+    getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
+  }
+```
+
+#### SdkBasicServiceMethod
+
+This models a basic service call that is synchronous server side.
+
+#### SdkPagingServiceMethod
+
+#### SdkLroServiceMethod
+
+#### SdkLroPagingServiceMethod
+
+## Complete Usage Code
+
+```ts
+```
