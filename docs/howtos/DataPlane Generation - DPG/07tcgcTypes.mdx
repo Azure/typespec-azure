@@ -56,7 +56,13 @@ interface Widgets {
 
 ## SdkContext
 
-`SdkContext` is the context of your SDK emitter. It should be passed throughout all of your . You shouldn't instantialize your own interface, instead you should call `createSdkContext` to create.
+`SdkContext` is the context of your SDK emitter.
+
+It is used to persist information across functions. You should never define global constants or variables in your emitter code, because this leads to issues with multiple emitter runs. Instead, all global information should be stored in your context.
+
+You should define your own language-specific `SdkContext` that extends from the one defined in `@azure-tools/typespec-client-generator-core`. This is where you keep your global variables. You should utilize the `createSdkContext` from tcgc.
+You also shouldn't instantialize your own interface, instead you should call `createSdkContext` to create.
+
 
 ### Interface
 
@@ -79,9 +85,21 @@ export interface SdkContext<
 ```ts
 import { EmitContext } from "@typespec/compiler";
 import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { PythonEmitterOptions } from "./lib.js";
+
+interface PythonSdkContext<TServiceOperation extends SdkServiceOperation> extends SdkContext<
+  PythonEmitterOptions,
+  TServiceOperation
+> {
+  __endpointPathParameters: Record<string, Record<string, any>[]>;
+}
+
 
 export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
-  const sdkContext = createSdkContext(context, "@azure-tools/typespec-python");
+  const sdkContext: PythonSdkContext = {
+    ...createSdkContext(context, "@azure-tools/typespec-python"),
+    __endpointPathParameters: {},
+  }
 }
 ```
 
@@ -212,12 +230,12 @@ const sdkClient = {
 ### Usage
 
 ```ts
-import { SdkServiceOperation, SdkContext, SdkClientType };
+import { SdkServiceOperation, SdkClientType } from "@azure-tools/typespec-client-generator-core";
 
 const serializedClients: PythonSdkClientType[] = [];
 
 function serializePythonClient<TServiceOperation extends SdkServiceOperation>(
-  sdkContext: SdkContext<TServiceOperation>,
+  sdkContext: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>,
 ): PythonSdkClientType {
   // Map the information from the SdkClientType to your language's interface for a client.
@@ -228,7 +246,7 @@ function serializePythonClient<TServiceOperation extends SdkServiceOperation>(
     parameters: serializeInitialization(sdkContext, client, client.initialization),
     subClients: serializeSubClients(sdkContext, client),
     methods: client.methods.map(
-      (x) => serializeMethod(sdkContext, client, x)
+      (x) => serializeServiceMethod(sdkContext, client, x)
     )
   }
 }
@@ -289,7 +307,7 @@ const sdkInitializationType = {
 
 ```ts
 function serializeInitialization<TServiceOperation extends SdkServiceOperation>(
-  sdkContext: SdkContext<TServiceOperation>,
+  sdkContext: PythonSdkContext<TServiceOperation>,
   client: SdkClient<TServiceOperation>
 ): PythonSdkParameter[] | undefined {
   if (!client.initialization) return undefined;
@@ -362,7 +380,7 @@ const sdkClientAccessor = {
 
 ```ts
 function serializeSubClients<TServiceOperation extends SdkServiceOperation>(
-  sdkContext: SdkContext<TServiceOperation>,
+  sdkContext: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>,
 ): PythonSdkClientType[] {
   return client.methods.filter(
@@ -394,15 +412,202 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   }
 ```
 
+```ts
+function serializeServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkServiceMethod<TServiceOperation>,
+): PythonSdkServiceMethod {
+  switch (method.kind) {
+    case "basic":
+      return serializeBasicServiceMethod(context, client, method);
+    case "paging":
+      return serializePagingServiceMethod(context, client, method);
+    case "lro":
+      return serializeLroServiceMethod(context, client, method);
+    case "lropaging":
+      return serializeLroPagingServiceMethod(context, client, method);
+  }
+}
+```
+
 #### SdkBasicServiceMethod
 
 This models a basic service call that is synchronous server side.
 
+##### Interface
+
+```ts
+export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation> {
+    kind: "basic";
+  }
+```
+
+##### Usage
+
+```ts
+function serializeBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkBasicServiceMethod<TServiceOperation>,
+): PythonSdkBasicServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    operation: serializeServiceOperation(context, client, method.operation)
+  },
+}
+```
+
 #### SdkPagingServiceMethod
+
+This represents a paging method we will generate on the client. It includes an initial service operation call, and potentially a next link operation as well.
+
+We currently only have paging method support for azure-generated sdks.
+
+##### Interface
+
+```ts
+export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation> extends SdkServiceMethodBase<TServiceOperation> {
+  kind: "paging";
+  // raw paging information returned from getPagedResult
+  __raw_paged_metadata: PagedResultMetadata;
+  // string to get to next link. If undefined, we are doing fake paging
+  nextLinkPath?: string;
+  // service operation if separate requests need to be made for subsequent paging
+  nextLinkOperation?: TServiceOperation;
+}
+```
+
+##### Usage
+
+```ts
+function serializePagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkPagingServiceMethod<TServiceOperation>,
+): PythonSdkBasicServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    operation: serializeServiceOperation(context, client, method),
+    nextLinkOperation: method.nextLinkOperation ? serializeServiceOperation(context, client, method.nextLinkOperation) : undefined,
+  },
+}
+```
 
 #### SdkLroServiceMethod
 
+Represents an LRO method we want to generate on the client.
+
+Only returned for azure-generated sdks
+
+##### Interfaces
+
+```ts
+export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation> extends SdkServiceMethodBase<TServiceOperation> {
+  kind: "lro",
+  // raw LroMetadata returned from azure-core helper function getLroMetadata
+  __raw_lro_metadata: LroMetadata;
+  // initial call to begin LRO polling
+  // thinking of instead making it the regular operation property so we can continue using that property
+  initialOperation: TServiceOperation;
+}
+```
+
+##### Usage
+
+```ts
+function serializeLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkLroServiceMethod<TServiceOperation>,
+): PythonSdkLroServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    initialOperation: serializeServiceOperation(context, client, method),
+  },
+}
+```
+
 #### SdkLroPagingServiceMethod
+
+This is a combination of Lro and paging. We start off with an LRO call to the service, and then the response is returned to us in pages. Also only available for azure-sdks.
+
+##### Interface
+
+```ts
+export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>{
+  kind: "lropaging";
+  __raw_lro_metadata: LroMetadata;
+  initialOperation: SdkServiceOperation;
+  __raw_paged_metadata: PagedResultMetadata;
+  nextLinkPath?: string; // off means fake paging
+  nextLinkOperation?: SdkServiceOperation;
+}
+```
+
+##### Usage
+
+```ts
+function serializeLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkLroPagingServiceMethod<TServiceOperation>,
+): PythonSdkLroPagingServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    operation: serializeServiceOperation(context, client, method),
+    initialOperation: serializeServiceOperation(context, client, method),
+    nextLinkOperation: method.nextLinkOperation ? serializeServiceOperation(context, client, method.nextLinkOperation) : undefined,
+  },
+}
+```
+
+### SdkServiceOperation
+
+One main part of this design is we've decoupled the actual service operation call from the method we generate on our client. This is because we want to abstract away the protocol used to call our service. Additionally, while there is a high level of correlation between the method parameters we intake from SDK users, and the parameters we end up passing the service, it's not one-to-one. We need to serialize the method parameters and additionally, when parameters are spread or grouped together, it requires us to do mapping between which method parameters correspond to which service parameters.
+
+We currently only support HTTP calls to the service.
+
+#### Interface
+
+```ts
+export interface SdkHttpOperation {
+  kind: "http";
+  // raw HTTP operation output from typespec/http
+  __raw: HttpOperation;
+  path: string;
+  verb: HttpVerb;
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  bodyParam: SdkBodyParameter;
+  // mapping of number to SdkHttpResponse for valid responses
+  // we will use a string to represent a status code range
+  responses: Record<number | string, SdkHttpResponse>;
+  exceptions: Record<number | string, SdkHttpResponse>
+}
+```
+
+#### Usage
+
+```ts
+function serializeServiceOperation<TServiceOperation extends SdkServiceOperation>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  operation: TServiceOperation,
+): PythonSdkServiceOperation {
+  switch (operation.kind) {
+    case "http":
+      return serializeHttpServiceOperation(
+        context, client, operation
+      );
+  }
+}
+```
 
 ## Complete Usage Code
 
