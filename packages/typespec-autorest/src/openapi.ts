@@ -1603,6 +1603,7 @@ function createOAPIEmitter(
       case "Boolean":
         return type.value;
       case "Tuple":
+      case "TupleLiteral":
         return type.values.map(getDefaultValue);
       case "EnumMember":
         return type.value ?? type.name;
