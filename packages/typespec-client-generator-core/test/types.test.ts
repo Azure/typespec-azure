@@ -1118,11 +1118,13 @@ describe("typespec-client-generator-core: types", () => {
         const { Enum1 } = (await runner.compile(`
         @service({})
         namespace MyService {
+          #suppress "deprecated" "for testing"
           @test
           @usage(Usage.input | Usage.output)
           @access(Access.public)
           @projectedName("java", "JavaEnum1")
           enum Enum1{
+            #suppress "deprecated" "for testing"
             @projectedName("java", "JavaOne")
             One: "one",
             two,
@@ -1240,6 +1242,7 @@ describe("typespec-client-generator-core: types", () => {
     });
     it("names", async function () {
       await runner.compileWithBuiltInService(`
+        #suppress "deprecated" "for testing"
         @test
         @usage(Usage.input | Usage.output)
         @access(Access.public)
@@ -1249,9 +1252,11 @@ describe("typespec-client-generator-core: types", () => {
           javaWireName: string;
           @projectedName("client", "clientName")
           clientProjectedName: string;
+          #suppress "deprecated" "for testing"
           @projectedName("json", "projectedWireName")
           @encodedName("application/json", "encodedWireName")
           jsonEncodedAndProjectedName: string;
+          #suppress "deprecated" "for testing"
           @projectedName("json", "realWireName")
           jsonProjectedName: string; // deprecated
           regular: string;
