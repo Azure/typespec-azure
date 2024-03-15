@@ -19,6 +19,7 @@ import { operationIdRule } from "./rules/no-operation-id.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
+import { patchBodySchemaRule } from "./rules/patch-body-schema.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatUse } from "./rules/prevent-format.js";
 import { preventMultipleDiscriminator } from "./rules/prevent-multiple-discriminator.js";
@@ -56,6 +57,7 @@ const rules = [
   noResponseBodyRule,
   noRpcPathParamsRule,
   operationIdRule,
+  patchBodySchemaRule,
   preferCsvCollectionFormatRule,
   preventFormatUse,
   preventMultipleDiscriminator,
@@ -102,6 +104,7 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/${preventUnknownType.name}`]: true,
         [`@azure-tools/typespec-azure-core/${recordTypeRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${responseSchemaMultiStatusCodeRule.name}`]: true,
+        [`@azure-tools/typespec-azure-core/${patchBodySchemaRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${propertyNameRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${rpcOperationRequestBodyRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${requireDocumentation.name}`]: true,
