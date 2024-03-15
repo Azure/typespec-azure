@@ -444,6 +444,41 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
   }
 ```
 
+##### Example
+
+```ts
+const sdkBasicServiceMethod = {
+  kind: "basic",
+  __raw?: {
+    // Original Tsp Operation type
+    kind: "Operation",
+  },
+  name: "read",
+  access: "public",
+  apiVersions: [],
+  parameters: [
+    {
+      nameInClient: "id",
+      kind: "method",
+      ...
+    },
+  ],
+  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[],
+  operation: {
+    kind: "http",
+    ...
+  },
+  response: {
+    kind: "method",
+    type: {
+      kind: "model",
+      name: "Widget",
+    }
+  },
+  getResponseMapping(): string | undefined,
+}
+```
+
 ##### Usage
 
 ```ts
@@ -480,6 +515,56 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 }
 ```
 
+##### Example
+
+```tsp
+import "@azure-tools/typespec-azure-core";
+
+using Azure.Core;
+using Azure.Core.Traits;
+
+// Skipping past service definitions
+
+alias Operations = Azure.Core.ResourceOperations<SupportsRepeatableRequests>;
+
+listWidgets is Operations.ResourceList<Widget>;
+```
+
+```ts
+const sdkPagingServiceMethod = {
+  kind: "paging",
+  __raw?: {
+    // Original Tsp Operation type
+    kind: "Operation",
+  },
+  __raw_paged_metadata: {
+    // Raw output from getPagedMetadata
+  }
+  name: "listWidgets",
+  access: "public",
+  apiVersions: [],
+  parameters: [],
+  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[],
+  operation: {
+    kind: "http",
+    ...
+  },
+  response: {
+    kind: "method",
+    type: {
+      kind: "model",
+      name: "Widget",
+    }
+  },
+  getResponseMapping(): string | undefined {
+    // we want to return the `.value` part of the service response to users
+    return "value";
+  },
+  nextLinkPath: "nextLink",
+  nextLinkOperation: undefined,
+}
+```
+
 ##### Usage
 
 ```ts
@@ -513,6 +598,60 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
   // initial call to begin LRO polling
   // thinking of instead making it the regular operation property so we can continue using that property
   initialOperation: TServiceOperation;
+}
+```
+
+#### Example
+
+```tsp
+import "@azure-tools/typespec-azure-core";
+
+using Azure.Core;
+using Azure.Core.Traits;
+
+// Skipping past service definitions
+
+alias Operations = Azure.Core.ResourceOperations<SupportsRepeatableRequests>;
+
+// Operation Status
+/** Gets status of a Widget operation. */
+getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+
+// Widget Operations
+/** Creates or updates a Widget asynchronously */
+@pollingOperation(getWidgetOperationStatus)
+createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+```
+
+```ts
+const sdkPagingServiceMethod = {
+  kind: "paging",
+  __raw?: {
+    // Original Tsp Operation type
+    kind: "Operation",
+  },
+  __raw_lro_metadata: {
+    // Raw output from getLroMetadata
+  }
+  name: "createOrUpdateWidget",
+  access: "public",
+  apiVersions: [],
+  parameters: [],
+  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[],
+  initialOperation: {
+    kind: "http",
+    ...
+  },
+  response: {
+    kind: "method",
+    type: {
+      kind: "model",
+      name: "Widget",
+    }
+  },
+  getResponseMapping(): string | undefined {
+    return "undefined";
+  },
 }
 ```
 
@@ -589,6 +728,39 @@ export interface SdkHttpOperation {
   // we will use a string to represent a status code range
   responses: Record<number | string, SdkHttpResponse>;
   exceptions: Record<number | string, SdkHttpResponse>
+}
+```
+
+#### Example
+
+```ts
+const sdkHttpOperation = {
+  kind: "http",
+  __raw: {
+    // raw HttpOperation from @typespec/http;
+  },
+  path: "/widgets",
+  verb: "get",
+  parameters: [
+    {
+      kind: "path",
+      nameInClient: "id",
+      ...
+    }
+  ],
+  bodyParam: undefined,
+  responses: {
+    200: {
+      kind: "http",
+      ...
+    },
+  },
+  exceptions: {
+    "*": {
+      kind: "http",
+      ...
+    }
+  }
 }
 ```
 
