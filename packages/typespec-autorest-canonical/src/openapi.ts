@@ -128,7 +128,6 @@ import {
   getVersion,
 } from "@typespec/versioning";
 import { AutorestCanonicalOpenAPISchema } from "./autorest-canonical-openapi-schema.js";
-import { getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { AutorestCanonicalEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
@@ -163,6 +162,7 @@ enum UnsupportedVersioningDecorators {
   TypeChangedFrom = "typeChangedFrom",
 }
 
+export const namespace = "AutorestCanonical";
 export const canonicalVersion = "canonical";
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
@@ -850,13 +850,6 @@ function createOAPIEmitter(
   }
 
   function getSchemaOrRef(type: Type, visibility: Visibility): any {
-    const refUrl = getRef(program, type, { version: context.version, service: context.service });
-    if (refUrl) {
-      return {
-        $ref: resolveRef(refUrl),
-      };
-    }
-
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
       return getSchemaForScalar(type);
     }
@@ -942,16 +935,6 @@ function createOAPIEmitter(
       while (property.sourceProperty) {
         property = property.sourceProperty;
       }
-    }
-
-    const refUrl = getRef(program, property, {
-      version: context.version,
-      service: context.service,
-    });
-    if (refUrl) {
-      return {
-        $ref: resolveRef(refUrl),
-      };
     }
 
     const parameter = params.get(property);
