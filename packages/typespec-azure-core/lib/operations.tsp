@@ -32,7 +32,7 @@ op RpcOperation<
 > is Foundations.Operation<
   Parameters & TraitProperties<Traits, TraitLocation.Parameters>,
   Response & TraitProperties<Traits, TraitLocation.Response, TraitContexts>,
-  Traits,
+  OmitTraits<Traits, TraitContexts>,
   ErrorResponse
 >;
 
@@ -62,7 +62,7 @@ op LongRunningRpcOperation<
     ResourceOperationStatus<Response, StatusResult, StatusError> &
     Foundations.LongRunningStatusLocation<StatusResult> &
     TraitProperties<Traits, TraitLocation.Response, TraitContexts>,
-  Traits,
+  OmitTraits<Traits, TraitContexts>,
   ErrorResponse
 >;
 
@@ -117,7 +117,7 @@ interface ResourceOperations<
         TraitLocation.Response,
         TraitContext.Create | TraitContext.Update
       >>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Create | TraitContext.Update>,
     ErrorResponse
   >;
 
@@ -146,7 +146,7 @@ interface ResourceOperations<
         TraitContext.Create | TraitContext.Update
       > &
       Foundations.LongRunningStatusLocation>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Create | TraitContext.Update>,
     ErrorResponse
   >;
 
@@ -181,7 +181,7 @@ interface ResourceOperations<
         TraitLocation.Response,
         TraitContext.Create | TraitContext.Update
       >>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Create | TraitContext.Update>,
     ErrorResponse
   >;
 
@@ -217,7 +217,7 @@ interface ResourceOperations<
         TraitContext.Create | TraitContext.Update
       > &
       Foundations.LongRunningStatusLocation<Resource>>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Create | TraitContext.Update>,
     ErrorResponse
   >;
 
@@ -243,7 +243,7 @@ interface ResourceOperations<
     },
     Foundations.ResourceOkResponse<Resource &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Update>>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Update>,
     ErrorResponse
   >;
 
@@ -264,7 +264,7 @@ interface ResourceOperations<
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Create>,
     Foundations.LocationOfCreatedResourceResponse<Resource> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Create>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Create>,
     ErrorResponse
   >;
 
@@ -285,7 +285,7 @@ interface ResourceOperations<
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Create>,
     Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Create>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Create>,
     ErrorResponse
   >;
 
@@ -304,7 +304,7 @@ interface ResourceOperations<
     TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Read>,
     Resource &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Read>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Read>,
     ErrorResponse
   >;
 
@@ -324,7 +324,7 @@ interface ResourceOperations<
     TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Delete>,
     TypeSpec.Http.NoContentResponse &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Delete>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Delete>,
     ErrorResponse
   >;
 
@@ -345,7 +345,7 @@ interface ResourceOperations<
     Foundations.AcceptedResponse<Foundations.OperationStatus &
       Foundations.LongRunningStatusLocation &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Delete>>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Delete>,
     ErrorResponse
   >;
 
@@ -362,7 +362,7 @@ interface ResourceOperations<
     Resource,
     TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.List>,
     Foundations.CustomPage<Resource, Traits & InterfaceTraits>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.List>,
     ErrorResponse
   >;
 
@@ -387,7 +387,7 @@ interface ResourceOperations<
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Action>,
     Response &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Action>,
     ErrorResponse
   >;
 
@@ -412,7 +412,7 @@ interface ResourceOperations<
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Action>,
     Response &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Action>,
     ErrorResponse
   >;
 
@@ -443,7 +443,7 @@ interface ResourceOperations<
       ResourceOperationStatus<Resource, StatusResult, StatusError> &
       Foundations.LongRunningStatusLocation<StatusResult> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Action>,
     ErrorResponse
   >;
 
@@ -475,7 +475,7 @@ interface ResourceOperations<
       ResourceOperationStatus<Resource, StatusResult, StatusError> &
       Foundations.LongRunningStatusLocation<StatusResult> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
-    Traits & InterfaceTraits,
+    OmitTraits<Traits & InterfaceTraits, TraitContext.Action>,
     ErrorResponse
   >;
 

@@ -344,6 +344,9 @@
             "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
           },
           {
+            "$ref": "#/parameters/Azure.Core.ClientRequestIdHeader"
+          },
+          {
             "name": "manufacturerId",
             "in": "path",
             "description": "The manufacturer's unique ID.",
@@ -800,6 +803,9 @@
         "parameters": [
           {
             "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.Core.ClientRequestIdHeader"
           },
           {
             "name": "widgetName",

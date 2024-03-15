@@ -284,10 +284,8 @@ op Operation<
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
 >(
-  ...TraitProperties<
-    Traits & VersionParameterTrait<ApiVersionParameter>,
-    TraitLocation.ApiVersionParameter
-  >,
+  ...TraitProperties<VersionParameterTrait<ApiVersionParameter>, TraitLocation.ApiVersionParameter>,
+  ...TraitProperties<Traits, TraitLocation.Parameters>,
   ...Parameters,
 ): Response | ErrorResponse;
 
@@ -410,7 +408,7 @@ op NonPagedResourceList<
   Resource,
   TraitProperties<Traits, TraitLocation.Parameters, TraitContext.List>,
   Body<Resource[]> & TraitProperties<Traits, TraitLocation.Response, TraitContext.List>,
-  Traits,
+  OmitTraits<Traits, TraitContext.List>,
   ErrorResponse
 >;
 
@@ -438,6 +436,6 @@ op LongRunningResourceUpdate<
   Foundations.ResourceOkResponse<Resource &
     TraitProperties<Traits, TraitLocation.Response, TraitContext.Update> &
     Foundations.LongRunningStatusLocation<Resource>>,
-  Traits,
+  OmitTraits<Traits, TraitContext.Update>,
   ErrorResponse
 >;
