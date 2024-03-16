@@ -234,7 +234,7 @@ import { SdkServiceOperation, SdkClientType } from "@azure-tools/typespec-client
 
 const serializedClients: PythonSdkClientType[] = [];
 
-function serializePythonClient<TServiceOperation extends SdkServiceOperation>(
+function serializeClient<TServiceOperation extends SdkServiceOperation>(
   sdkContext: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>,
 ): PythonSdkClientType {
@@ -244,15 +244,21 @@ function serializePythonClient<TServiceOperation extends SdkServiceOperation>(
   return {
     ...client,
     parameters: serializeInitialization(sdkContext, client, client.initialization),
-    subClients: serializeSubClients(sdkContext, client),
-    methods: client.methods.map(
+    subClients: client.methods.filter(
+      (x) => x.kind === "clientaccessor"
+    ).map(
+      (x) => serializeClient(sdkContext, x.response)
+    ),
+    methods: client.methods.filter(
+      (x) => x.kind ===  "method"
+    ).map(
       (x) => serializeServiceMethod(sdkContext, client, x)
     )
   }
 }
 
 for (const client of sdkPackage.clients) {
-  serializedClients.push(serializePythonClient(sdkContext, client));
+  serializedClients.push(serializeClient(sdkContext, client));
 }
 ```
 
@@ -373,21 +379,6 @@ const sdkClientAccessor = {
     initialization: undefined,
     ...
   }
-}
-```
-
-#### Usage
-
-```ts
-function serializeSubClients<TServiceOperation extends SdkServiceOperation>(
-  sdkContext: PythonSdkContext<TServiceOperation>,
-  client: SdkClientType<TServiceOperation>,
-): PythonSdkClientType[] {
-  return client.methods.filter(
-    (x) => x.kind === "clientaccessor"
-  ).map(
-    (x) => serializePythonClient(sdkContext, x)
-  );
 }
 ```
 
@@ -568,7 +559,9 @@ const sdkPagingServiceMethod = {
 ##### Usage
 
 ```ts
-function serializePagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
+function serializePagingServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
   context: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>,
   method: SdkPagingServiceMethod<TServiceOperation>,
@@ -658,7 +651,9 @@ const sdkPagingServiceMethod = {
 ##### Usage
 
 ```ts
-function serializeLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
+function serializeLroServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
   context: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>,
   method: SdkLroServiceMethod<TServiceOperation>,
@@ -692,7 +687,9 @@ export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceO
 ##### Usage
 
 ```ts
-function serializeLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
+function serializeLroPagingServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
   context: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>,
   method: SdkLroPagingServiceMethod<TServiceOperation>,
@@ -781,7 +778,280 @@ function serializeServiceOperation<TServiceOperation extends SdkServiceOperation
 }
 ```
 
+## Parameters and Properties
+
+Like the TypeSpec concept of a `ModelProperty`, all properties and parameters are part of the `SdkModelPropertyType`. They all extend from `SdkModelPropertyTypeBase`.
+
+```ts
+export type SdkModelPropertyType =
+  | SdkMethodParameter
+  | SdkEndpointParameter
+  | SdkCredentialParameter
+  | SdkBodyModelPropertyType
+  | SdkQueryParameter
+  | SdkPathParameter
+  | SdkHeaderParameter
+  | SdkBodyParameter;
+```
+
+```ts
+interface SdkModelPropertyTypeBase {
+  __raw?: ModelProperty;
+  type: SdkType;
+  nameInClient: string;
+  description?: string;
+  details?: string;
+  apiVersions: string[];
+  onClient: boolean;
+  // clientDefaultValue only exists for api versions
+  clientDefaultValue?: any;
+  isApiVersionParam: boolean;
+  optional: boolean;
+}
+```
+
+#### Method parameters
+
+These are parameters to client initialization and method son the client. These will be the parameters that SDK users directly use. They will eventually be mapped to 
+
+### SdkEndpointParameter
+
+An `SdkEndpointParameter` represents a parameter to a client's endpoint. If the client is not parameterized, the endpoint parameter represents the entire endpoint input for the client. For parameterized clients, there will be as many `SdkEndpointParameter`s as needed to parameterize the client endpoint.
+
+```ts
+export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
+  kind: "endpoint";
+  urlEncode: boolean;
+  onClient: true;
+  serializedName?: string;
+}
+```
+
+### SdkCredentialParameter
+
+Parameter for credential input to clients.
+
+```ts
+export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
+  kind: "credential";
+  // can be either an SdkCredentialType or a union
+  // of different credential types
+  type: SdkCredentialType | SdkUnionType;
+  onClient: true;
+}
+```
+
+### SdkMethodParameter
+
+Represents a parameter to a client method. Does not have any transport (i.e. HTTP) related information on it. This is solely meant to represent information that we expect sdk users to pass in. We then take care to map the method input and create our request to the service using the information users have inputted.
+
+```ts
+export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
+  kind: "method";
+}
+```
+
+
+
 ## Complete Usage Code
+
+### lib.ts
+
+```ts
+import { SdkServiceOperation, SdkContext } from "@azure-tools/typespec-client-generator-core";
+import { PythonSdkType } from "./interfaces.js";
+
+export interface PythonEmitterOptions {
+  "flavor"?: "azure";
+  ...
+}
+
+export interface PythonSdkContext<
+  TServiceOperation extends SdkServiceOperation
+> extends SdkContext<PythonEmitterOptions, TServiceOperation> {
+  __endpointPathParameters: Record<str, Any>;
+  pythonTypesMap: Record<str, PythonSdkType>;
+}
+```
+
+### emitter.ts
+
+```ts
+import { EmitContext } from "@typespec/compiler";
+import { SdkContext, createSdkContext, SdkClientType } from "@azure-tools/typespec-client-generator-core";
+import { PythonSdkContext } from "./lib.js";
+import {
+  getPythonSdkType
+} from "./types.js";
+import {
+  PythonSdkType,
+  PythonSdkPackage,
+  PythonSdkClientType,
+  PythonSdkServiceMethod,
+} from "./interfaces.js";
+import { serializeServiceMethod } from "./methods.js";
+
+
+function serializeClient<
+  TServiceOperation extends SdkServiceOperation
+>(
+  sdkContext: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>
+): PythonSdkClientType {
+  return {
+    ...client,
+    parameters: client.initialization?.properties.map(
+      (x) => serializeMethodParameter(sdkContext, x)
+    ),
+    subClients: client.methods.filter(
+      (x) => x.kind === "clientaccessor"
+    ).map(
+      (x) => serializeClient(sdkContext, x.response)
+    ),
+    methods: client.methods.filter(
+      (x) => x.kind === "method"
+    ).map(
+      (x) => serializeServiceMethod(sdkContext, client, x)
+    )
+  }
+}
+
+export async function $onEmit(
+  context: EmitContext<PythonEmitterOptions>
+) {
+  const sdkContext: PythonSdkContext = {
+    ...createSdkContext(context, "@azure-tools/typespec-python"),
+    __endpointPathParameters: {},
+  };
+
+  const pythonSdkPackage: PythonSdkPackage = {
+    clients: sdkContext.clients.map(
+      (x) => serializeClient(sdkContext, x)
+    ),
+    rootNamespace: sdkContext.sdkPackage.rootNamespace,
+    models: sdkContext.sdkPackage.models.map(
+      (x) => getPythonSdkType(sdkContext, x)
+    ),
+    enums: sdkContext.sdkPackage.enums.map(
+      (x) => getPythonSdkType(sdkContext, x)
+    )
+  }
+
+  // Serialize the pythonSdkPackage and pass it to your generator
+}
+```
+
+### methods.ts
+
+```ts
+import { 
+  SdkServiceOperation,
+  SdkClientType,
+  SdkServiceMethod,
+  SdkBasicServiceMethod,
+  SdkPagingServiceMethod,
+  SdkLroServiceMethod,
+  SdkLroPagingServiceMethod,
+} from "@azure-tools/typespec-client-generator-core";
+import {
+  PythonSdkBasicServiceMethod,
+  PythonSdkPagingServiceMethod,
+  PythonSdkLroServiceMethod,
+  PythonSdkLroPagingServiceMethod,
+  PythonSdkServiceOperation,
+} from "./interfaces.js";
+import { PythonSdkContext } from "./lib.js";
+
+export function serializeServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
+  sdkContext: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkServiceMethod<TServiceOperation>
+): PythonSdkServiceMethod<TServiceOperation> {
+  switch (method.kind) {
+    case "basic":
+      return serializeBasicServiceMethod(context, client, method);
+    case "paging":
+      return serializePagingServiceMethod(context, client, method);
+    case "lro":
+      return serializeLroServiceMethod(context, client, method);
+    case "lropaging":
+      return serializeLroPagingServiceMethod(context, client, method);
+  }
+}
+
+function serializeBasicServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkBasicServiceMethod<TServiceOperation>,
+): PythonSdkBasicServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    operation: serializeServiceOperation(context, client, method.operation)
+  },
+}
+
+function serializePagingServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkPagingServiceMethod<TServiceOperation>,
+): PythonSdkBasicServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    operation: serializeServiceOperation(context, client, method),
+    nextLinkOperation: method.nextLinkOperation ? serializeServiceOperation(context, client, method.nextLinkOperation) : undefined,
+  },
+}
+
+function serializeLroServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkLroServiceMethod<TServiceOperation>,
+): PythonSdkLroServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    initialOperation: serializeServiceOperation(context, client, method),
+  },
+}
+
+function serializeLroPagingServiceMethod<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkLroPagingServiceMethod<TServiceOperation>,
+): PythonSdkLroPagingServiceMethod<TServiceOperation> {
+  return {
+    ...method,
+    name: camelToSnakeCase(method.name),
+    operation: serializeServiceOperation(context, client, method),
+    initialOperation: serializeServiceOperation(context, client, method),
+    nextLinkOperation: method.nextLinkOperation ? serializeServiceOperation(context, client, method.nextLinkOperation) : undefined,
+  },
+}
+
+function serializeServiceOperation<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>,
+  method: SdkServiceMethod<TServiceOperation>,
+  operation: TServiceOperation
+)
+
+```
+
+### types.ts
 
 ```ts
 ```
