@@ -320,6 +320,8 @@ const sdkInitializationType = {
 ### Usage
 
 ```ts
+import { getSdkModelPropertyType } from "./types.js";
+
 function serializeInitialization<
   TServiceOperation extends PythonSdkServiceOperation
 >(
@@ -328,7 +330,7 @@ function serializeInitialization<
 ): PythonSdkParameter[] | undefined {
   if (!client.initialization) return undefined;
   return client.initialization.properties.map(
-    (x) => serializeMethodParameter(sdkContext, x)
+    (x) => getSdkModelPropertyType(sdkContext, x)
   )
 }
 ```
@@ -413,9 +415,8 @@ interface SdkServiceMethodBase<
     // The parameters you generate on the method signature that users will interact with.
     // These aren't tied to any protocol, so there are no 'header' / 'path' parameters etc.
     parameters: SdkMethodParameter[];
-    // This maps a given service parameter to the method parameters needed to create the call.
-    // For example, if you have SdkServiceParameter
-    getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
+    response: SdkMethodResponse;
+    exception?: SdkMethodResponse;
   }
 ```
 
@@ -471,7 +472,6 @@ const sdkBasicServiceMethod = {
       ...
     },
   ],
-  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[],
   operation: {
     kind: "http",
     ...
@@ -483,7 +483,6 @@ const sdkBasicServiceMethod = {
       name: "Widget",
     }
   },
-  getResponseMapping(): string | undefined,
 }
 ```
 
@@ -553,7 +552,6 @@ const sdkPagingServiceMethod = {
   access: "public",
   apiVersions: [],
   parameters: [],
-  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[],
   operation: {
     kind: "http",
     ...
@@ -563,11 +561,9 @@ const sdkPagingServiceMethod = {
     type: {
       kind: "model",
       name: "Widget",
-    }
-  },
-  getResponseMapping(): string | undefined {
+    },
     // we want to return the `.value` part of the service response to users
-    return "value";
+    pathFromService: "value",
   },
   nextLinkPath: "nextLink",
   nextLinkOperation: undefined,
@@ -647,7 +643,6 @@ const sdkPagingServiceMethod = {
   access: "public",
   apiVersions: [],
   parameters: [],
-  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[],
   initialOperation: {
     kind: "http",
     ...
@@ -658,9 +653,6 @@ const sdkPagingServiceMethod = {
       kind: "model",
       name: "Widget",
     }
-  },
-  getResponseMapping(): string | undefined {
-    return "undefined";
   },
 }
 ```
@@ -831,7 +823,7 @@ interface SdkModelPropertyTypeBase {
 
 These are parameters to client initialization and method son the client. These will be the parameters that SDK users directly use. They will eventually be mapped to 
 
-### SdkEndpointParameter
+##### SdkEndpointParameter
 
 An `SdkEndpointParameter` represents a parameter to a client's endpoint. If the client is not parameterized, the endpoint parameter represents the entire endpoint input for the client. For parameterized clients, there will be as many `SdkEndpointParameter`s as needed to parameterize the client endpoint.
 
@@ -844,7 +836,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
-### SdkCredentialParameter
+##### SdkCredentialParameter
 
 Parameter for credential input to clients.
 
@@ -858,7 +850,7 @@ export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
-### SdkMethodParameter
+##### SdkMethodParameter
 
 Represents a parameter to a client method. Does not have any transport (i.e. HTTP) related information on it. This is solely meant to represent information that we expect sdk users to pass in. We then take care to map the method input and create our request to the service using the information users have inputted.
 
@@ -868,7 +860,58 @@ export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
+#### Properties
 
+##### SdkBodyModelPropertyType
+
+This represents a property on a body model
+
+```ts
+export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
+  kind: "property";
+  discriminator: boolean;
+  serializedName: string;
+  isMultipartFileInput: boolean;
+  visibility: Visibility[];
+  flatten: boolean;
+}
+```
+
+### Usage
+
+We recommend that for usage, you use one single function with switch statements for each kind of property.
+This allows for the circular nature of an `SdkModelPropertyType`.
+
+```
+import { SdkServiceOperation, SdkModelPropertyType } from "@azure-tools/typespec-client-generator-core";
+import { PythonSdkContext } from "./lib.js";
+import { getPythonSdkType } from "./types.js";
+
+export function getSdkModelPropertyType<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  prop: SdkModelPropertyType
+): PythonSdkModelType {
+  const type = getPythonSdkType(context, prop.type)
+  switch (prop.kind) {
+    case "query":
+    case "header"
+    case "path":
+      return {
+        ...prop,
+        correspondingMethodParams: prop.correspondingMethodParams.map(
+          (x) => getSdkModelPropertyType(context, x),
+        )
+      }
+    default:
+      return {
+        ...prop,
+        type,
+      }
+  }
+}
+```
 
 ## Complete Usage Code
 
@@ -898,7 +941,8 @@ import { EmitContext } from "@typespec/compiler";
 import { SdkContext, createSdkContext, SdkClientType } from "@azure-tools/typespec-client-generator-core";
 import { PythonSdkContext } from "./lib.js";
 import {
-  getPythonSdkType
+  getPythonSdkType,
+  getSdkModelPropertyType,
 } from "./types.js";
 import {
   PythonSdkType,
@@ -919,7 +963,7 @@ function serializeClient<
   return {
     ...client,
     parameters: client.initialization?.properties.map(
-      (x) => serializeMethodParameter(sdkContext, x)
+      (x) => getSdkModelPropertyType(sdkContext, x)
     ),
     subClients: client.methods.filter(
       (x) => x.kind === "clientaccessor"
@@ -1077,7 +1121,7 @@ function serializeServiceOperation<
 import { SdkClientType, SdkHttpOperation } from "@azure-tools/typespec-client-generator-core";
 import { PythonSdkContext } from "./lib.js";
 import { PythonSdkHttpOperation, PythonSdkHttpResponse } from "./interfaces.js";
-import { getPythonSdkType } from "./types.js";
+import { getPythonSdkType, getSdkModelPropertyType } from "./types.js";
 
 function serializeHttpServiceOperation(
   context: PythonSdkContext<PythonSdkHttpOperation>,
@@ -1087,29 +1131,18 @@ function serializeHttpServiceOperation(
   return {
     ...operation,
     parameters: operation.parameters.map(
-      (x) => serializeHttpParameter(x)
+      (x) => getSdkModelPropertyType(context, x)
     ),
-    bodyParam: serializeHttpParameter(operation.bodyParam),
+    bodyParam: (
+      operation.bodyParam ?
+      getSdkModelPropertyType(context, operation.bodyParam) : undefined
+    ),
     responses: Object.entries(operation.responses).map(
       ([statusCode, responses]) => serializeHttpResponse(context, method, statusCode, responses)
     ),
     exceptions: Object.entries(operation.exceptions).map(
       ([statusCode, exceptions]) => serializeHttpResponse(context, method, statusCode, exceptions)
     ),
-  }
-
-  function serializeHttpParameter<
-    THttpParameter extends SdkHttpParameter
-  >(
-    context: PythonSdkContext<SdkHttpOperation>,
-    param: THttpParameter | undefined
-  ): THttpParameter | undefined {
-    if (!param) return undefined;
-    return {
-      ...param,
-      name: camelToSnakeCase(name.nameInClient),
-      type: getPythonSdkType(context, param.type),
-    }
   }
 
   function serializeHttpResponse(
@@ -1127,9 +1160,34 @@ function serializeHttpServiceOperation(
 ### types.ts
 
 ```ts
-import { SdkServiceOperation, SdkType, SdkModelType } from "@azure-tools/typespec-client-generator-core";
+import { SdkServiceOperation, SdkType, SdkModelType, SdkModelPropertyType } from "@azure-tools/typespec-client-generator-core";
 import { PythonSdkContext } from "./lib.js";
 import { PythonSdkType, PythonSdkModelType, PythonSdkEnumType } from "./interfaces.js";
+
+export function getSdkModelPropertyType<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  prop: SdkModelPropertyType
+): PythonSdkModelType {
+  const type = getPythonSdkType(context, prop.type)
+  switch (prop.kind) {
+    case "query":
+    case "header"
+    case "path":
+      return {
+        ...prop,
+        correspondingMethodParams: prop.correspondingMethodParams.map(
+          (x) => getSdkModelPropertyType(context, x),
+        )
+      }
+    default:
+      return {
+        ...prop,
+        type,
+      }
+  }
+}
 
 export function getPythonSdkType<
   TServiceOperation extends SdkServiceOperation
