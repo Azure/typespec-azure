@@ -54,6 +54,143 @@ interface Widgets {
 }
 ```
 
+## Overall Hierarchy of Types
+
+This is a rough sketch of the hierarchy. We'll go into more detail for each section, this is just to get an idea of the overall structure.
+
+```ts
+const sdkContext = {
+  sdkPackage: {
+    clients: [
+      {
+        kind: "client",
+        name: "WidgetClient",
+        initialization: {
+          properties: [
+            {
+              kind: "endpoint",
+              ...
+            },
+            {
+              kind: "credential",
+              ...
+            }
+          ]
+        },
+        methods: [
+          {
+            kind: "clientaccessor",
+            response: {
+              name: "WidgetPartsClient",
+              kind: "client",
+              ...
+            }
+          },
+          {
+            kind: "basic",
+            parameters: [
+              {
+                name: "id",
+                kind: "method",
+                type: {
+                  kind: "string",
+                },
+                ...
+              }
+            ],
+            operation: {
+              kind: "http",
+              verb: "get",
+              parameters: [
+                {
+                  name: "id",
+                  kind: "path",
+                  type: {
+                    kind: "string",
+                  },
+                  correspondingMethodParams: [
+                    {
+                      name: "id",
+                      kind: "method",
+                      type: {
+                        kind: "string",
+                      },
+                      ...
+                    }
+                  ]
+                }
+              ],
+              bodyParam: undefined,
+              responses: {
+                200: {
+                  kind: "http",
+                  ...
+                }
+              }
+            },
+            response: {
+              kind: "method",
+              logicalPath: undefined,
+              ...
+            },
+            exception: {
+              kind: "method",
+              ...
+            },
+            ...
+          }
+        ],
+        ...
+      }
+    ],
+    models: [
+      {
+        kind: "model",
+        name: "Widget",
+        properties: [
+          {
+            kind: "path",
+            name: "id",
+            type: {
+              kind: "string",
+            },
+            ...
+          },
+          {
+            kind: "property",
+            name: "color",
+            type: {
+              kind: "enum",
+              isFixed: true,
+              ...
+            },
+            ...
+          }
+        ]
+      }
+    ],
+    enums: [
+      {
+        name: "WidgetColor",
+        generatedName: true,
+        values: [
+          {
+            value: "red",
+            ...
+          },
+          {
+            value: "blue",
+            ...
+          }
+        ]
+      }
+    ],
+    ...
+  },
+  ...
+}
+```
+
 ## SdkContext
 
 `SdkContext` is the context of your SDK emitter.
