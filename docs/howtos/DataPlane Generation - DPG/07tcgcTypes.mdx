@@ -316,6 +316,7 @@ export interface SdkClientType<
   // fully qualified. Compare to sdkPackage.rootNamespace to figure out where to generate
   nameSpace: string;
   endpoint: string;
+  // whether the endpoint params are part of a templatee endpoint or not
   hasParameterizedEndpoint: boolean;
   arm: boolean;
   methods: SdkMethod<TServiceOperation>[];
@@ -455,7 +456,6 @@ const sdkInitializationType = {
   apiVersions: [],
   usage: UsageFlags.Input,
   access: "public",
-  nullable: false,
   isFormDataType: false,
   isError: false,
 }
@@ -470,6 +470,10 @@ Some emitters will create a model and have the client accept the model as option
 ## SdkMethod
 
 An `SdkMethod` is any of the types of methods that can be a method on a client.
+
+There are two main types of an `SdkMethod`: 
+1. `SdkClientAccessor` returns a subclient of the client it's on
+2. `SdkServiceMethod` wraps a service call
 
 ```ts
 export type SdkMethod<
@@ -527,6 +531,29 @@ const sdkClientAccessor = {
     initialization: undefined,
     ...
   }
+}
+```
+
+#### Usage
+
+```ts
+import { SdkServiceOperation, SdkClientType } from "@azure-tools/typespec-client-generator-core";
+import { PythonSdkContext } from "./lib.js";
+import { PythonSdkClientType } from "./interfaces.js";
+
+function getSubClients<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>
+): PythonSdkClientType[] {
+  // we should eventually expose some of these subclient accessors as
+  // a public method on clients one day
+  return client.methods.filter(
+    (x) => x.kind === "clientaccessor"
+  ).map(
+    (x) => serializeClient(sdkContext, x.response)
+  )
 }
 ```
 
@@ -601,7 +628,7 @@ const sdkBasicServiceMethod = {
   apiVersions: [],
   parameters: [
     {
-      nameInClient: "id",
+      name: "id",
       kind: "method",
       ...
     },
@@ -882,7 +909,7 @@ const sdkHttpOperation = {
   parameters: [
     {
       kind: "path",
-      nameInClient: "id",
+      name: "id",
       ...
     }
   ],
@@ -941,7 +968,7 @@ export type SdkModelPropertyType =
 interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
-  nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];
@@ -950,6 +977,7 @@ interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  nullable: boolean;
 }
 ```
 
@@ -991,6 +1019,56 @@ Represents a parameter to a client method. Does not have any transport (i.e. HTT
 ```ts
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
+}
+```
+
+#### SdkQueryParameter
+
+This represents an HTTP query parameter.
+
+```ts
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+
+export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
+  kind: "query";
+  collectionFormat?: CollectionFormat;
+  serializedName: string;
+}
+```
+
+#### SdkHeaderParameter
+
+This is an HTTP header parameter.
+
+```ts
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+
+export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
+  kind: "header";
+  collectionFormat?: CollectionFormat;
+  serializedName: string;
+}
+```
+
+#### SdkPathParameter
+
+```ts
+export interface SdkPathParameter extends SdkModelPropertyTypeBase {
+  kind: "path";
+  urlEncode: boolean;
+  serializedName: string;
+  optional: false;
+}
+```
+
+#### SdkBodyParameter
+
+```ts
+export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
+  kind: "body";
+  optional: boolean;
+  contentTypes: string[];
+  defaultContentType: string;
 }
 ```
 
@@ -1085,6 +1163,7 @@ const sdkPagingMethodResponse = {
     valueType: {
       kind: "model",
       name: "Widget",
+      nullableItems: false,
       ...
     }
   }
@@ -1140,7 +1219,6 @@ interface SdkTypeBase {
   // created by tcgc. Those won't have an original type
   __raw?: Type;
   kind: string;
-  nullable: boolean;
   deprecations?: string;
 }
 ```
@@ -1196,15 +1274,7 @@ interface SdkDurationType extends SdkTypeBase {
 interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
-}
-```
-
-### SdkTupleType
-
-```ts
-interface SdkTupleType extends SdkTypeBase {
-  kind: "tuple";
-  values: SdkType[];
+  nullableItems: boolean;
 }
 ```
 
@@ -1215,6 +1285,7 @@ interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType; // currently can only be string
   valueType: SdkType;
+  nullableItems: boolean;
 }
 ```
 
@@ -1224,12 +1295,13 @@ interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
-  // If it's an anonymous enum, this is the name we generate
-  generatedName?: string;
+  // Determines whether the name was generated or not
+  generatedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
   description?: string;
+  details?: string;
   isFlags: boolean;
   usage: UsageFlags;
   access: AccessFlags;
@@ -1266,8 +1338,9 @@ export interface SdkConstantType extends SdkTypeBase {
 
 ```ts
 export interface SdkUnionType extends SdkTypeBase {
-  name?: string;
-  generatedName?: string;
+  name: string;
+  // determines if the union name was generated or not
+  generatedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -1280,10 +1353,11 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   // purposely can also be header / query params for fidelity with TypeSpec
   properties: SdkModelPropertyType[];
-  name: string;
   isFormDataType: boolean;
   isError: boolean;
-  generatedName?: string;
+  // we will always have a name. generatedName determines if it's generated or not.
+  name: string;
+  generatedName: string;
   description?: string;
   details?: string;
   access?: AccessFlags;
@@ -1492,9 +1566,31 @@ function serializeServiceOperation<
   switch (operation.kind) {
     case "http": {
       return serializeHttpServiceOperation(
-        context, method, operation
+        context, operation
       )
     }
+  }
+}
+
+function serializeHttpServiceOperation(
+  context: PythonSdkContext<SdkHttpOperation>,
+  operation: SdkHttpOperation,
+): PythonSdkHttpOperation {
+  return {
+    ...operation,
+    parameters: operation.parameters.map(
+      (x) => getSdkModelPropertyType(context, x)
+    ),
+    bodyParam: (
+      operation.bodyParam ?
+      getSdkModelPropertyType(context, operation.bodyParam) : undefined
+    ),
+    responses: Object.entries(operation.responses).map(
+      ([statusCode, responses]) => serializeHttpResponse(context, method, statusCode, responses)
+    ),
+    exceptions: Object.entries(operation.exceptions).map(
+      ([statusCode, exceptions]) => serializeHttpResponse(context, method, statusCode, exceptions)
+    ),
   }
 }
 
