@@ -372,7 +372,13 @@ class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public enum Orientation
+{
+  Left,
+  Right,
+  Up,
+  Down
+}
 ```
 
 </TabItem>
@@ -438,7 +444,17 @@ model Widget:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public partial class Widget
+{
+  public WidgetOrientation Orientation;
+}
+public enum WidgetOrientation
+{
+  Left,
+  Right,
+  Up,
+  Down
+}
 ```
 
 </TabItem>
@@ -495,7 +511,10 @@ model Shirt:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public partial class Shirt
+{
+  public BinaryData Shirt;
+}
 ```
 
 </TabItem>
@@ -606,7 +625,7 @@ enum Versions {
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-# CSharp does not generate the enum used for versioning
+// CSharp does not generate the enum used for versioning
 ```
 
 </TabItem>
@@ -673,7 +692,13 @@ class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO
+public enum Orientation
+{
+  Left,
+  Right,
+  Up,
+  Down
+}
 ```
 
 </TabItem>
