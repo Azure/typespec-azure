@@ -43,7 +43,6 @@ import {
   createProjectedNameProgram,
   emitFile,
   getAllTags,
-  getDirectoryPath,
   getDiscriminator,
   getDoc,
   getEncode,
@@ -59,8 +58,6 @@ import {
   getPattern,
   getProperty,
   getPropertyType,
-  getRelativePathFromDirectory,
-  getRootLength,
   getService,
   getSummary,
   getVisibility,
@@ -833,17 +830,6 @@ function createOAPIEmitter(
     delete header.name;
     delete header.required;
     return header;
-  }
-
-  function resolveRef(ref: string) {
-    const absoluteRef = interpolatePath(ref, {
-      "arm-types-dir": options.armTypesDir,
-    });
-
-    if (getRootLength(absoluteRef) === 0) {
-      return absoluteRef; // It is already relative.
-    }
-    return getRelativePathFromDirectory(getDirectoryPath(outputFile), absoluteRef, false);
   }
 
   function getSchemaOrRef(type: Type, visibility: Visibility): any {
