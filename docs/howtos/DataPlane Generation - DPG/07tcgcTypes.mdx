@@ -152,7 +152,7 @@ const sdkPackage = {
 }
 ```
 
-## Usage
+### Usage
 
 ```ts
 const sdkPackage = sdkContext.sdkPackage;
@@ -323,6 +323,7 @@ const sdkInitializationType = {
   isFormDataType: false,
   isError: false,
 }
+```
 
 ### Usage
 
@@ -708,13 +709,13 @@ function serializeLroPagingServiceMethod<
 }
 ```
 
-### SdkServiceOperation
+## SdkServiceOperation
 
 One main part of this design is we've decoupled the actual service operation call from the method we generate on our client. This is because we want to abstract away the protocol used to call our service. Additionally, while there is a high level of correlation between the method parameters we intake from SDK users, and the parameters we end up passing the service, it's not one-to-one. We need to serialize the method parameters and additionally, when parameters are spread or grouped together, it requires us to do mapping between which method parameters correspond to which service parameters.
 
 We currently only support HTTP calls to the service.
 
-#### Interface
+### Interface
 
 ```ts
 export interface SdkHttpOperation {
@@ -732,7 +733,7 @@ export interface SdkHttpOperation {
 }
 ```
 
-#### Example
+### Example
 
 ```ts
 const sdkHttpOperation = {
@@ -765,7 +766,7 @@ const sdkHttpOperation = {
 }
 ```
 
-#### Usage
+### Usage
 
 ```ts
 function serializeServiceOperation<
@@ -816,11 +817,11 @@ interface SdkModelPropertyTypeBase {
 }
 ```
 
-#### Method parameters
+### Method parameters
 
 These are parameters to client initialization and method son the client. These will be the parameters that SDK users directly use. They will eventually be mapped to 
 
-##### SdkEndpointParameter
+#### SdkEndpointParameter
 
 An `SdkEndpointParameter` represents a parameter to a client's endpoint. If the client is not parameterized, the endpoint parameter represents the entire endpoint input for the client. For parameterized clients, there will be as many `SdkEndpointParameter`s as needed to parameterize the client endpoint.
 
@@ -833,7 +834,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
-##### SdkCredentialParameter
+#### SdkCredentialParameter
 
 Parameter for credential input to clients.
 
@@ -847,7 +848,7 @@ export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
-##### SdkMethodParameter
+#### SdkMethodParameter
 
 Represents a parameter to a client method. Does not have any transport (i.e. HTTP) related information on it. This is solely meant to represent information that we expect sdk users to pass in. We then take care to map the method input and create our request to the service using the information users have inputted.
 
@@ -857,9 +858,9 @@ export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
-#### Properties
+### Properties
 
-##### SdkBodyModelPropertyType
+#### SdkBodyModelPropertyType
 
 This represents a property on a body model
 
@@ -911,12 +912,12 @@ export function getSdkModelPropertyType<
 }
 ```
 
-### SdkMethodResponse
+## SdkMethodResponse
 
 This represents the response that our method will ultimately return.
 It is not tied to a transport, like http, it solely represents what we want to return to users
 
-#### Interface
+### Interface
 
 ```ts
 export interface SdkMethodResponse {
@@ -929,7 +930,7 @@ export interface SdkMethodResponse {
 }
 ```
 
-#### Example
+### Example
 
 ```ts
 const sdkMethodResponse = {
@@ -954,7 +955,7 @@ const sdkPagingMethodResponse = {
 }
 ```
 
-#### Usage
+### Usage
 
 ```ts
 import { SdkMethodResponse } from "@azure-tools/typespec-client-generator-core";
@@ -974,11 +975,11 @@ function serializeMethodResponse<
 }
 ```
 
-### SdkHttpResponse
+## SdkHttpResponse
 
 This is the response returned from an HTTP service. The emitters should take care to map it to what the method ultimately returns to end users.
 
-#### Interface
+### Interface
 
 ```ts
 export interface SdkHttpResponse {
@@ -991,7 +992,7 @@ export interface SdkHttpResponse {
 }
 ```
 
-### SdkType
+## SdkType
 
 These are the TCGC versions of each TypeSpec Type. They include information that all emitters want, i.e. their description directly on them.
 
@@ -1008,14 +1009,14 @@ interface SdkTypeBase {
 }
 ```
 
-#### SdkBuiltInType
+### SdkBuiltInType
 
 These are the mappings from the built in scalar TypeSpec types.
 We add `encode` onto these types, telling us how to encode when sending to the service.
 
 There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuiltInKinds`.
 
-##### Interface
+#### Interface
 
 ```ts
 export interface SdkBuiltInType extends SdkTypeBase {
@@ -1024,7 +1025,7 @@ export interface SdkBuiltInType extends SdkTypeBase {
 }
 ```
 
-#### SdkDateTimeType
+### SdkDateTimeType
 
 ```ts
 interface SdkDatetimeTypeBase extends SdkTypeBase {
@@ -1042,7 +1043,7 @@ interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
 }
 ```
 
-#### SdkDurationType
+### SdkDurationType
 
 ```ts
 interface SdkDurationType extends SdkTypeBase {
@@ -1053,7 +1054,7 @@ interface SdkDurationType extends SdkTypeBase {
 }
 ```
 
-#### SdkArrayType
+### SdkArrayType
 
 ```ts
 interface SdkArrayType extends SdkTypeBase {
@@ -1062,7 +1063,7 @@ interface SdkArrayType extends SdkTypeBase {
 }
 ```
 
-#### SdkTupleType
+### SdkTupleType
 
 ```ts
 interface SdkTupleType extends SdkTypeBase {
@@ -1071,7 +1072,7 @@ interface SdkTupleType extends SdkTypeBase {
 }
 ```
 
-#### SdkDictionaryType
+### SdkDictionaryType
 
 ```ts
 interface SdkDictionaryType extends SdkTypeBase {
@@ -1081,7 +1082,7 @@ interface SdkDictionaryType extends SdkTypeBase {
 }
 ```
 
-#### SdkEnumType
+### SdkEnumType
 
 ```ts
 export interface SdkEnumType extends SdkTypeBase {
@@ -1101,7 +1102,7 @@ export interface SdkEnumType extends SdkTypeBase {
 }
 ```
 
-#### SdkEnumValueType
+### SdkEnumValueType
 
 ```ts
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -1115,7 +1116,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
 }
 ```
 
-#### SdkConstantType
+### SdkConstantType
 
 ```ts
 export interface SdkConstantType extends SdkTypeBase {
@@ -1125,7 +1126,7 @@ export interface SdkConstantType extends SdkTypeBase {
 }
 ```
 
-#### SdkUnionType
+### SdkUnionType
 
 ```ts
 export interface SdkUnionType extends SdkTypeBase {
@@ -1136,7 +1137,7 @@ export interface SdkUnionType extends SdkTypeBase {
 }
 ```
 
-#### SdkModelType
+### SdkModelType
 
 ```ts
 export interface SdkModelType extends SdkTypeBase {
