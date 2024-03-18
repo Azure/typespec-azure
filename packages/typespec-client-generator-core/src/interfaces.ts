@@ -25,7 +25,7 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  __clients?: Map<string, SdkClientType<TServiceOperation>>;
+  __clients?: SdkClientType<TServiceOperation>[];
 }
 
 export interface SdkEmitterOptions {
@@ -394,7 +394,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   defaultContentType?: string;
 }
 
-interface SdkServiceOperationBase {}
+interface SdkServiceOperationBase { }
 
 export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
@@ -451,7 +451,7 @@ interface SdkPagingServiceMethodOptions {
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+  SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
@@ -462,14 +462,14 @@ interface SdkLroServiceMethodOptions {
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions {
+  SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+  SdkLroServiceMethodOptions,
+  SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
