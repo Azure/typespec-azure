@@ -25,6 +25,7 @@ it(`@projectedName("json", <>) updates the property name and set "x-ms-client-na
   const res = await oapiForModel(
     "Foo",
     `model Foo {
+      #suppress "deprecated" "for testing"
       @projectedName("json", "xJson")
       x: int32;
     };`
@@ -44,6 +45,7 @@ it(`@projectedName("client", <>) set the "x-ms-client-name" with the original na
   const res = await oapiForModel(
     "Foo",
     `model Foo {
+      #suppress "deprecated" "for testing"
       @projectedName("client", "x")
       xJson: int32;
     };`
@@ -742,27 +744,6 @@ describe("referencing another property as type", () => {
       type: "string",
       format: "uri",
       description: "My doc",
-    });
-  });
-
-  it("decorators on the property should override the value of referenced property", async () => {
-    const res = await oapiForModel(
-      "Bar",
-      `
-      model Foo {
-        @doc("Default doc")
-        name: string;
-      }
-      model Bar {
-        @doc("My doc override")
-        x: Foo.name
-      }`
-    );
-
-    ok(res.defs.Bar, "expected definition named Bar");
-    deepStrictEqual(res.defs.Bar.properties.x, {
-      type: "string",
-      description: "My doc override",
     });
   });
 });

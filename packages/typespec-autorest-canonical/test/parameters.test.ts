@@ -96,7 +96,7 @@ it("description on param override type description", async () => {
   strictEqual(res.paths["/"].get.parameters[0].description, "my-doc");
 });
 
-it("@query/@header/@path names & @projectedName on body parameter are honored", async () => {
+it("@query/@header/@path names & @projectedName on body parameter are honored (LEGACY)", async () => {
   const res = await openApiFor(
     `
     @route("/{x-ms-arg-3}")
@@ -107,6 +107,7 @@ it("@query/@header/@path names & @projectedName on body parameter are honored", 
 
     @put
     op test2(
+      #suppress "deprecated" "for testing"
       @projectedName("json", "x-body") @body @doc("my-doc") arg: string): void;
 
     `

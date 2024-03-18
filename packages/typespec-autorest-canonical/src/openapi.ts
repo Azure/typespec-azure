@@ -168,13 +168,10 @@ export const canonicalVersion = "canonical";
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
   const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest-canonical");
-  const armTypesDir = interpolatePath(
-    resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
-    {
-      "project-root": context.program.projectRoot,
-      "emitter-output-dir": context.emitterOutputDir,
-    }
-  );
+  const armTypesDir = interpolatePath("{project-root}/../../common-types/resource-management", {
+    "project-root": context.program.projectRoot,
+    "emitter-output-dir": context.emitterOutputDir,
+  });
   const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
     outputDir: context.emitterOutputDir,

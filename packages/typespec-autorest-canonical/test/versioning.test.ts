@@ -67,7 +67,7 @@ it("works with models", async () => {
   });
 });
 
-it("works with models and projectedNames", async () => {
+it("works with models and projectedNames (LEGACY)", async () => {
   const v = await openApiFor(
     `
     @versioned(Versions)
@@ -82,11 +82,14 @@ it("works with models and projectedNames", async () => {
         v3
       }
       model Test {
+        #suppress "deprecated" "for testing"
         @projectedName("json", "jsonProp1")
         prop1: string;
+        #suppress "deprecated" "for testing"
         @projectedName("json", "jsonProp2")
         @added(Versions.v2) prop2: string;
         @removed(Versions.v2) prop3: string;
+        #suppress "deprecated" "for testing"
         @projectedName("json", "jsonProp4NewOrNot")
         prop4: string;
         @madeOptional(Versions.v3) prop5?: string;
@@ -99,8 +102,10 @@ it("works with models and projectedNames", async () => {
     namespace MyLibrary {
       enum Versions {A, B, C}
       model Foo {
+        #suppress "deprecated" "for testing"
         @projectedName("json", "jsonProp1")
         prop1: string;
+        #suppress "deprecated" "for testing"
         @projectedName("json", "jsonProp2")
         @added(Versions.B) prop2: string;
         @added(Versions.C) prop3: string;
