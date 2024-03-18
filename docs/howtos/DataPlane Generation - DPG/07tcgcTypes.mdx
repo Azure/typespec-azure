@@ -58,12 +58,6 @@ interface Widgets {
 
 `SdkContext` is the context of your SDK emitter.
 
-It is used to persist information across functions. You should never define global constants or variables in your emitter code, because this leads to issues with multiple emitter runs. Instead, all global information should be stored in your context.
-
-You should define your own language-specific `SdkContext` that extends from the one defined in `@azure-tools/typespec-client-generator-core`. This is where you keep your global variables. You should utilize the `createSdkContext` from tcgc.
-You also shouldn't instantialize your own interface, instead you should call `createSdkContext` to create.
-
-
 ### Interface
 
 ```ts
@@ -81,6 +75,11 @@ export interface SdkContext<
 ```
 
 ### Usage
+
+It is used to persist information across functions. You should never define global constants or variables in your emitter code, because this leads to issues with multiple emitter runs. Instead, all global information should be stored in your context.
+
+You should define your own language-specific `SdkContext` that extends from the one defined in `@azure-tools/typespec-client-generator-core`. This is where you keep your global variables. You should utilize the `createSdkContext` from tcgc.
+You also shouldn't instantialize your own interface, instead you should call `createSdkContext` to create.
 
 ```ts
 import { EmitContext } from "@typespec/compiler";
@@ -237,6 +236,7 @@ const sdkClient = {
 ```ts
 import { SdkClientType } from "@azure-tools/typespec-client-generator-core";
 import { PythonSdkServiceOperation } from "./interfaces.js";
+import { get }
 
 const serializedClients: PythonSdkClientType[] = [];
 
@@ -251,7 +251,14 @@ function serializeClient<
   // SdkClientType, and just adds your language-specific information on top.
   return {
     ...client,
-    parameters: serializeInitialization(sdkContext, client, client.initialization),
+    parameters: (
+      client.initialization ?
+      client.initialization.properties.map(
+        (x) => getSdkModelPropertyType(
+          context, x
+        )
+      ) : undefined
+    ),
     subClients: client.methods.filter(
       (x) => x.kind === "clientaccessor"
     ).map(
@@ -319,21 +326,9 @@ const sdkInitializationType = {
 
 ### Usage
 
-```ts
-import { getSdkModelPropertyType } from "./types.js";
+The usage of this property is more language-dependent.
 
-function serializeInitialization<
-  TServiceOperation extends PythonSdkServiceOperation
->(
-  sdkContext: PythonSdkContext<TServiceOperation>,
-  client: SdkClient<TServiceOperation>
-): PythonSdkParameter[] | undefined {
-  if (!client.initialization) return undefined;
-  return client.initialization.properties.map(
-    (x) => getSdkModelPropertyType(sdkContext, x)
-  )
-}
-```
+Some emitters will create a model and have the client accept the model as options to initialize your client. Others will flatten out the parameters and accept them individually as parameter input.
 
 ## SdkMethod
 
@@ -411,6 +406,8 @@ interface SdkServiceMethodBase<
   TServiceOperation extends SdkServiceOperation
 >
   extends SdkMethodBase<TServiceOperation> {
+    // This represents the operation request we need to send to the service.
+    // This helps abstract away the transport
     operation: TServiceOperation;
     // The parameters you generate on the method signature that users will interact with.
     // These aren't tied to any protocol, so there are no 'header' / 'path' parameters etc.
@@ -900,6 +897,7 @@ export function getSdkModelPropertyType<
     case "path":
       return {
         ...prop,
+        type,
         correspondingMethodParams: prop.correspondingMethodParams.map(
           (x) => getSdkModelPropertyType(context, x),
         )
@@ -1124,8 +1122,8 @@ import { PythonSdkHttpOperation, PythonSdkHttpResponse } from "./interfaces.js";
 import { getPythonSdkType, getSdkModelPropertyType } from "./types.js";
 
 function serializeHttpServiceOperation(
-  context: PythonSdkContext<PythonSdkHttpOperation>,
-  method: SdkServiceMethod<PythonSdkHttpOperation>,
+  context: PythonSdkContext<SdkHttpOperation>,
+  method: SdkServiceMethod<SdkHttpOperation>,
   operation: SdkHttpOperation,
 ): PythonSdkHttpOperation {
   return {
