@@ -258,12 +258,12 @@ op ArmTagsPatchAsync<
   Resource extends ArmResource,
   Properties extends {} = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader<
-      Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-      Resource,
-      string
-    >,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Resource,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {}
 > is ArmCustomPatchAsync<
   Resource,
@@ -325,12 +325,12 @@ op ArmCustomPatchAsync<
   Resource extends ArmResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader<
-      Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-      Resource,
-      string
-    >,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Resource,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
     "Resource update request accepted.",
@@ -442,8 +442,8 @@ op ArmResourceDeleteAsyncBase<
 op ArmResourceDeleteAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
@@ -461,8 +461,8 @@ op ArmResourceDeleteAsync<
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
@@ -539,12 +539,12 @@ op ArmResourceActionAsync<
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader<
-      Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-      Response,
-      string
-    >,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Response,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<
@@ -598,8 +598,8 @@ op ArmResourceActionNoContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<
@@ -627,8 +627,12 @@ op ArmResourceActionNoResponseContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, void, string>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    void,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<
