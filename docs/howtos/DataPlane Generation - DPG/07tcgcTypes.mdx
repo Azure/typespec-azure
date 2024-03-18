@@ -911,6 +911,256 @@ export function getSdkModelPropertyType<
 }
 ```
 
+### SdkMethodResponse
+
+This represents the response that our method will ultimately return.
+It is not tied to a transport, like http, it solely represents what we want to return to users
+
+#### Interface
+
+```ts
+export interface SdkMethodResponse {
+  kind: "method";
+  // the path from the service response to what the method returns.
+  logicalPath?: string;
+  type?: SdkType;
+  description?: string;
+  details?: string;
+}
+```
+
+#### Example
+
+```ts
+const sdkMethodResponse = {
+  kind: "method",
+  logicalPath: undefined,
+  type: {
+    kind: string,
+  },
+}
+
+const sdkPagingMethodResponse = {
+  kind: "method",
+  logicalPath: "value",
+  type: {
+    kind: "array",
+    valueType: {
+      kind: "model",
+      name: "Widget",
+      ...
+    }
+  }
+}
+```
+
+#### Usage
+
+```ts
+import { SdkMethodResponse } from "@azure-tools/typespec-client-generator-core";
+import { PythonSdkContext, PythonSdkMethodResponse } from "./lib.js";
+import { getPythonSdkType } from "./types.js";
+
+function serializeMethodResponse<
+  TServiceOperation extends SdkServiceOperation
+>(
+  context: PythonSdkContext<TServiceOperation>,
+  response: SdkMethodResponse,
+): PythonSdkMethodResponse {
+  return {
+    ...response,
+    type: getPythonSdkType(context, response.type),
+  }
+}
+```
+
+### SdkHttpResponse
+
+This is the response returned from an HTTP service. The emitters should take care to map it to what the method ultimately returns to end users.
+
+#### Interface
+
+```ts
+export interface SdkHttpResponse {
+  kind: "http";
+  headers: SdkServiceResponseHeader[];
+  apiVersions: string[];
+  type?: SdkType;
+  contentTypes: string[];
+  defaultContentType?: string;
+}
+```
+
+### SdkType
+
+These are the TCGC versions of each TypeSpec Type. They include information that all emitters want, i.e. their description directly on them.
+
+They all share this base:
+
+```ts
+interface SdkTypeBase {
+  // the raw TypeSpec type. Some of our types are currently
+  // created by tcgc. Those won't have an original type
+  __raw?: Type;
+  kind: string;
+  nullable: boolean;
+  deprecations?: string;
+}
+```
+
+#### SdkBuiltInType
+
+These are the mappings from the built in scalar TypeSpec types.
+We add `encode` onto these types, telling us how to encode when sending to the service.
+
+There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuiltInKinds`.
+
+##### Interface
+
+```ts
+export interface SdkBuiltInType extends SdkTypeBase {
+  kind: SdkBuiltInKinds;
+  encode: string;
+}
+```
+
+#### SdkDateTimeType
+
+```ts
+interface SdkDatetimeTypeBase extends SdkTypeBase {
+  encode: DateTimeKnownEncoding;
+  // what we send over the wire. Often it's string
+  wireType: SdkBuiltInType;
+}
+
+interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+  kind: "utcDateTime";
+}
+
+interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+  kind: "offsetDateTime";
+}
+```
+
+#### SdkDurationType
+
+```ts
+interface SdkDurationType extends SdkTypeBase {
+  kind: "duration";
+  encode: DurationKnownEncoding;
+  // What we send over the wire. It's usually either a string or a float
+  wireType: SdkBuiltInType;
+}
+```
+
+#### SdkArrayType
+
+```ts
+interface SdkArrayType extends SdkTypeBase {
+  kind: "array";
+  valueType: SdkType;
+}
+```
+
+#### SdkTupleType
+
+```ts
+interface SdkTupleType extends SdkTypeBase {
+  kind: "tuple";
+  values: SdkType[];
+}
+```
+
+#### SdkDictionaryType
+
+```ts
+interface SdkDictionaryType extends SdkTypeBase {
+  kind: "dict";
+  keyType: SdkType; // currently can only be string
+  valueType: SdkType;
+}
+```
+
+#### SdkEnumType
+
+```ts
+export interface SdkEnumType extends SdkTypeBase {
+  kind: "enum";
+  name: string;
+  // If it's an anonymous enum, this is the name we generate
+  generatedName?: string;
+  valueType: SdkBuiltInType;
+  values: SdkEnumValueType[];
+  isFixed: boolean;
+  description?: string;
+  isFlags: boolean;
+  usage: UsageFlags;
+  access: AccessFlags;
+  crossLanguageDefinitionId: string;
+  apiVersions: string[];
+}
+```
+
+#### SdkEnumValueType
+
+```ts
+export interface SdkEnumValueType extends SdkTypeBase {
+  kind: "enumvalue";
+  name: string;
+  value: string | number;
+  enumType: SdkEnumType;
+  valueType: SdkType;
+  description?: string;
+  details?: string;
+}
+```
+
+#### SdkConstantType
+
+```ts
+export interface SdkConstantType extends SdkTypeBase {
+  kind: "constant";
+  value: string | number | boolean | null;
+  valueType: SdkBuiltInType;
+}
+```
+
+#### SdkUnionType
+
+```ts
+export interface SdkUnionType extends SdkTypeBase {
+  name?: string;
+  generatedName?: string;
+  kind: "union";
+  values: SdkType[];
+}
+```
+
+#### SdkModelType
+
+```ts
+export interface SdkModelType extends SdkTypeBase {
+  kind: "model";
+  // purposely can also be header / query params for fidelity with TypeSpec
+  properties: SdkModelPropertyType[];
+  name: string;
+  isFormDataType: boolean;
+  isError: boolean;
+  generatedName?: string;
+  description?: string;
+  details?: string;
+  access?: AccessFlags;
+  usage: UsageFlags;
+  additionalProperties?: SdkType;
+  discriminatorValue?: string;
+  discriminatedSubtypes?: Record<string, SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
+  baseModel?: SdkModelType;
+  crossLanguageDefinitionId: string;
+  apiVersions: string[];
+}
+```
+
 ## Complete Usage Code
 
 ### lib.ts
