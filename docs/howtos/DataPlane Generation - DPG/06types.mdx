@@ -39,8 +39,13 @@ class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public enum LR
+{
+  Left,
+  Right
+}
 ```
+Serialization/deserialization will respect the value defined, in this case it is "left" for `LR.Left` and "right" for `LR.Right` respectively.
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
@@ -93,7 +98,15 @@ model Widget:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public partial class Widget
+{
+  public WidgetHorizontal Horizontal;
+}
+public enum WidgetHorizontal
+{
+  Left,
+  Right
+}
 ```
 
 </TabItem>
@@ -149,7 +162,13 @@ class Colors(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public readonly partial struct Colors : IEquatable<Colors>
+{
+  private const string RedValue = "red";
+  private const string BlueValue = "blue";
+  public static Colors Red { get; } = new Colors(RedValue);
+  public static Colors Blue { get; } = new Colors(BlueValue);
+}
 ```
 
 </TabItem>
@@ -204,7 +223,17 @@ model Widget:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public partial class Widget
+{
+  public WidgetColor Color;
+}
+public readonly partial struct WidgetColor : IEquatable<WidgetColor>
+{
+  private const string RedValue = "red";
+  private const string BlueValue = "blue";
+  public static WidgetColor Red { get; } = new WidgetColor(RedValue);
+  public static WidgetColor Blue { get; } = new WidgetColor(BlueValue);
+}
 ```
 
 </TabItem>
@@ -264,7 +293,18 @@ class ProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO;
+public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
+{
+  private const string SucceededValue = "Succeeded";
+  private const string FailedValue = "Failed";
+  private const string CanceledValue = "Canceled";
+  private const string InProgressValue = "inProgress";
+
+  public static ProvisioningState Succeeded { get; } = new ProvisioningState(SucceededValue);
+  public static ProvisioningState Failed { get; } = new ProvisioningState(FailedValue);
+  public static ProvisioningState Canceled { get; } = new ProvisioningState(CanceledValue);
+  public static ProvisioningState InProgress { get; } = new ProvisioningState(InProgressValue);
+}
 ```
 
 </TabItem>
@@ -512,7 +552,11 @@ class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-TODO
+public enum LR
+{
+  Left,
+  Right
+}
 ```
 
 </TabItem>
@@ -562,11 +606,7 @@ enum Versions {
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-public enum Versions
-{
-    v1,
-    v2
-}
+# CSharp does not generate the enum used for versioning
 ```
 
 </TabItem>
