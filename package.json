@@ -54,5 +54,10 @@
   },
   "dependencies": {
     "picocolors": "~1.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@fluentui/react-theme": "9.1.17"
+    }
   }
 }
