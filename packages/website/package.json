@@ -21,7 +21,7 @@
     "@docusaurus/plugin-content-docs": "~3.1.1",
     "@docusaurus/preset-classic": "^3.1.1",
     "@docusaurus/theme-common": "~3.1.1",
-    "@fluentui/react-components": "~9.46.8",
+    "@fluentui/react-components": "~9.47.0",
     "@mdx-js/react": "^3.0.1",
     "@typespec/playground": "workspace:~",
     "@typespec/website": "workspace:~",
@@ -51,7 +51,7 @@
     "file-loader": "~6.2.0",
     "monaco-editor-webpack-plugin": "~7.1.0",
     "rimraf": "~5.0.5",
-    "typescript": "~5.3.3"
+    "typescript": "~5.4.2"
   },
   "browserslist": {
     "production": [
