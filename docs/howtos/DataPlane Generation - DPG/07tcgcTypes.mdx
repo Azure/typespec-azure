@@ -220,12 +220,11 @@ You also shouldn't instantialize your own interface, instead you should call `cr
 
 ```ts
 import { EmitContext } from "@typespec/compiler";
-import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createSdkContext, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
 import { PythonEmitterOptions } from "./lib.js";
-import { PythonSdkServiceOperation } from "./interfaces.js";
 
 interface PythonSdkContext<
-  TServiceOperation extends PythonSdkServiceOperation
+  TServiceOperation extends SdkServiceOperation
 > extends SdkContext<
   PythonEmitterOptions,
   TServiceOperation
@@ -765,8 +764,8 @@ createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
 ```
 
 ```ts
-const sdkPagingServiceMethod = {
-  kind: "paging",
+const sdkLroServiceMethod = {
+  kind: "lro",
   __raw?: {
     // Original Tsp Operation type
     kind: "Operation",
