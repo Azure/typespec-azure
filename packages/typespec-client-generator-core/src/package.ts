@@ -790,9 +790,6 @@ function createSdkClientType<
   operationGroup?: SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (!context.__clients) {
-    context.__clients = new Map<string, SdkClientType<TServiceOperation>>();
-  }
   const baseClientType = operationGroup ?? client;
   const isClient = baseClientType.kind === "SdkClient";
   const clientName = isClient ? baseClientType.name : baseClientType.type.name;
@@ -804,34 +801,26 @@ function createSdkClientType<
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client, baseClientType));
 
-  // check to see if this client was previously created via a recursive call.
-  // if it was, then fetch it and append any methods that were just created.
-  let sdkClientType: SdkClientType<TServiceOperation>;
-  if (context.__clients.has(clientName)) {
-    sdkClientType = context.__clients.get(clientName)!;
-    sdkClientType.methods = sdkClientType.methods.concat(methods);
-  } else {
-    const endpointInfo = diagnostics.pipe(
-      getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
-    );
-    const docWrapper = getDocHelper(context, baseClientType.type);
-    sdkClientType = {
-      kind: "client",
-      name: clientName,
-      description: docWrapper.description,
-      details: docWrapper.details,
-      methods: methods,
-      apiVersions: getAvailableApiVersions(context, client.type),
-      nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-      initialization: isClient
-        ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
-        : undefined,
-      endpoint: endpointInfo.endpoint,
-      hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
-      arm: client.arm,
-    };
-    context.__clients.set(clientName, sdkClientType);
-  }
+  const endpointInfo = diagnostics.pipe(
+    getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
+  );
+  const docWrapper = getDocHelper(context, baseClientType.type);
+  const sdkClientType: SdkClientType<TServiceOperation> = {
+    kind: "client",
+    name: clientName,
+    description: docWrapper.description,
+    details: docWrapper.details,
+    methods: methods,
+    apiVersions: getAvailableApiVersions(context, client.type),
+    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
+    initialization: isClient
+      ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
+      : undefined,
+    endpoint: endpointInfo.endpoint,
+    hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
+    arm: client.arm,
+  };
+  context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -841,7 +830,7 @@ export function experimental_getSdkPackage<
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
-  context.__clients = new Map<string, SdkClientType<TServiceOperation>>();
+  context.__clients = new Array<SdkClientType<TServiceOperation>>();
   for (const client of listClients(context)) {
     createSdkClientType(context, client);
   }

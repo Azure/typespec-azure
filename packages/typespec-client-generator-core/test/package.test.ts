@@ -539,11 +539,12 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 3);
+      strictEqual(sdkPackage.clients.length, 4);
 
       const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient")!;
       const fooClient = sdkPackage.clients.find((c) => c.name === "Foo")!;
-      const barClient = sdkPackage.clients.find((c) => c.name === "Bar")!;
+      const fooBarClient = sdkPackage.clients.filter((c) => c.name === "Bar")![0];
+      const barClient = sdkPackage.clients.filter((c) => c.name === "Bar")![1];
 
       strictEqual(mainClient.methods.length, 2);
       strictEqual(mainClient.initialization!.properties.length, 1);
@@ -565,18 +566,23 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(fooClient.initialization, undefined);
       strictEqual(fooClient.methods.length, 1);
-      strictEqual(fooClient.methods[0].kind, "clientaccessor");
-      strictEqual(fooClient.methods[0].access, "internal");
-      strictEqual(fooClient.methods[0].name, "getBar");
-      strictEqual(fooClient.methods[0].parameters.length, 0);
-      strictEqual(fooClient.methods[0].response, barClient);
+
+      const fooBarAccessor = fooClient.methods[0];
+      strictEqual(fooBarAccessor.kind, "clientaccessor");
+      strictEqual(fooBarAccessor.access, "internal");
+      strictEqual(fooBarAccessor.name, "getBar");
+      strictEqual(fooBarAccessor.parameters.length, 0);
+      strictEqual(fooBarAccessor.response, fooBarClient);
+
+      strictEqual(fooBarClient.initialization, undefined);
+      strictEqual(fooBarClient.methods.length, 1);
+      strictEqual(fooBarClient.methods[0].kind, "basic");
+      strictEqual(fooBarClient.methods[0].name, "one");
 
       strictEqual(barClient.initialization, undefined);
-      strictEqual(barClient.methods.length, 2);
+      strictEqual(barClient.methods.length, 1);
       strictEqual(barClient.methods[0].kind, "basic");
-      strictEqual(barClient.methods[0].name, "one");
-      strictEqual(barClient.methods[1].kind, "basic");
-      strictEqual(barClient.methods[1].name, "two");
+      strictEqual(barClient.methods[0].name, "two");
     });
 
     function getServiceNoDefaultApiVersion(op: string) {
