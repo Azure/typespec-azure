@@ -23,8 +23,12 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
-import { getHttpOperationWithCache, isApiVersion } from "./public-utils.js";
 import { getUnionAsEnum } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
+import {
+  getCrossLanguageDefinitionId,
+  getHttpOperationWithCache,
+  isApiVersion,
+} from "./public-utils.js";
 
 /**
  *
@@ -254,8 +258,17 @@ export function getNonNullOptions(type: Union): Type[] {
  * @param type 
  * @returns 
  */
-export function isNullable(type: Type | ): boolean {
+export function isNullable(type: Type): boolean {
   if (type.kind !== "Union") return false;
   if (getNonNullOptions(type).length === 1) return true;
   return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
+}
+/**
+ * Use this if you are trying to create a generated name for something without an original TypeSpec type.
+ *
+ * Otherwise, you should use the `getGeneratedName` function.
+ * @param context
+ */
+export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
+  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
 }
