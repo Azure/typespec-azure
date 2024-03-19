@@ -41,6 +41,7 @@ import {
   TypeNameOptions,
   Union,
   UnionVariant,
+  Value,
   compilerAssert,
   createProjectedNameProgram,
   emitFile,
@@ -1594,7 +1595,7 @@ function createOAPIEmitter(
     return getSchemaForType(variant.type, visibility)!;
   }
 
-  function getDefaultValue(type: Type): any {
+  function getDefaultValue(type: Type | Value): any {
     switch (type.kind) {
       case "String":
         return type.value;
