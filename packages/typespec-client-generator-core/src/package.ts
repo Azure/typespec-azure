@@ -319,12 +319,12 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-        getSdkServiceOperation<TOptions, TServiceOperation>(
-          context,
-          pagedMetadata.nextLinkOperation,
-          basic.parameters
+          getSdkServiceOperation<TOptions, TServiceOperation>(
+            context,
+            pagedMetadata.nextLinkOperation,
+            basic.parameters
+          )
         )
-      )
       : undefined,
     getResponseMapping(): string | undefined {
       return pagedMetadata?.itemsSegments?.join(".");
@@ -413,9 +413,9 @@ function getSdkServiceResponseAndExceptions<
   context: SdkContext<TOptions, TServiceOperation>,
   httpOperation: HttpOperation
 ): [
-    [Record<number | string, SdkHttpResponse>, Record<number | string, SdkHttpResponse>],
-    readonly Diagnostic[],
-  ] {
+  [Record<number | string, SdkHttpResponse>, Record<number | string, SdkHttpResponse>],
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: Record<number | string, SdkHttpResponse> = {};
   const exceptions: Record<number | string | "*", SdkHttpResponse> = {};
