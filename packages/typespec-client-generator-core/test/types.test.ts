@@ -1281,18 +1281,24 @@ describe("typespec-client-generator-core: types", () => {
       const jsonEncodedProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "encodedWireName"
       )!;
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
       strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
       // wire name test with deprecated projected
       const jsonProjectedProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "realWireName"
       )!;
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(jsonProjectedProp.nameInClient, "jsonProjectedName");
       strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
       // regular
       const regularProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "regular"
       )!;
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(regularProp.nameInClient, "regular");
       strictEqual(regularProp.name, "regular");
     });
     it("union type", async function () {
@@ -1531,6 +1537,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(recursiveModel.properties.length, 1);
       const prop = recursiveModel.properties[0];
       strictEqual(prop.kind, "property");
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(prop.nameInClient, "prop");
       strictEqual(prop.name, "prop");
       strictEqual(prop.type.kind, "model");
       strictEqual(prop.type.name, "RecursiveModel");
