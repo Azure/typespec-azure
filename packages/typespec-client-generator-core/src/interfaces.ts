@@ -210,6 +210,7 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -221,6 +222,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkEnumType extends SdkTypeBase {

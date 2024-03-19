@@ -293,11 +293,13 @@ export function getSdkArrayOrDictWithDiagnostics(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
           valueType,
+          nullableValues: isNullable(type.indexer.value!),
         });
       } else if (name === "integer") {
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
+          nullableValues: isNullable(type.indexer.value!),
         });
       }
     }

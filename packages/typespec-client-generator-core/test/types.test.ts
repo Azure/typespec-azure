@@ -465,7 +465,10 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
     });
 
     it("record with nullable", async function () {
@@ -481,7 +484,11 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, false);
+      strictEqual(sdkType.nullableValues, true);
     });
 
     it("model with simple union property", async function () {
@@ -577,7 +584,10 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
       strictEqual(sdkType.name, "PetKind");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      const pet = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(pet.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
     });
@@ -604,7 +614,9 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = model.properties[0].type;
       strictEqual(sdkType.kind, "model");
       strictEqual(sdkType.name, "PropertyModel");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      strictEqual(model.properties[0].nullable, true);
     });
 
     it("mix types", async function () {
@@ -635,7 +647,9 @@ describe("typespec-client-generator-core: types", () => {
       const nullableModel = models.find((x) => x.kind === "model" && x.name === "TestNullable");
       ok(nullableModel);
       strictEqual(model.properties[0].type.kind, "union");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.properties[0].type.nullable, false);
+      strictEqual(model.properties[0].nullable, false);
       const unionType = model.properties[0].type;
       strictEqual(unionType.kind, "union");
       for (const v of unionType.values) {
@@ -646,7 +660,9 @@ describe("typespec-client-generator-core: types", () => {
         }
       }
       strictEqual(nullableModel.properties[0].type.kind, "union");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(nullableModel.properties[0].type.nullable, true);
+      strictEqual(nullableModel.properties[0].nullable, true);
       for (const v of nullableModel.properties[0].type.values) {
         if (v.kind === "model") {
           strictEqual(v.name, "ModelType");
