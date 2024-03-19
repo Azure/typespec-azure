@@ -289,7 +289,8 @@ export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
   /**
-   * @deprecated This property is deprecated. Use `.name` instead
+   * @deprecated This property is deprecated. Use `.name` instead.
+   * https://github.com/Azure/typespec-azure/issues/446
    */
   nameInClient: string;
   name: string;
