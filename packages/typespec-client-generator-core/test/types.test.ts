@@ -198,7 +198,7 @@ describe("typespec-client-generator-core: types", () => {
       );
       ok(userModel);
       strictEqual(userModel.properties.length, 2);
-      const etagProperty = userModel.properties.find((x) => x.nameInClient === "etag");
+      const etagProperty = userModel.properties.find((x) => x.name === "etag");
       ok(etagProperty);
       strictEqual(etagProperty.type.kind, "eTag");
     });
@@ -253,9 +253,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(e2.kind, "enum");
       strictEqual(e2.valueType.kind, "string");
       for (const property of m.properties) {
-        if (property.nameInClient === "prop1") {
+        if (property.name === "prop1") {
           strictEqual(property.type, e2);
-        } else if (property.nameInClient === "prop2") {
+        } else if (property.name === "prop2") {
           strictEqual(property.type, e1);
         }
       }
@@ -1264,16 +1264,14 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkModel.name, "JavaTest");
 
       // Java projected name test
-      const javaProjectedProp = sdkModel.properties.find(
-        (x) => x.nameInClient === "javaProjectedName"
-      );
+      const javaProjectedProp = sdkModel.properties.find((x) => x.name === "javaProjectedName");
       ok(javaProjectedProp);
       strictEqual(javaProjectedProp.kind, "property");
       strictEqual(javaProjectedProp.serializedName, "javaWireName");
 
       // client projected name test
 
-      const clientProjectedProp = sdkModel.properties.find((x) => x.nameInClient === "clientName");
+      const clientProjectedProp = sdkModel.properties.find((x) => x.name === "clientName");
       ok(clientProjectedProp);
       strictEqual(clientProjectedProp.kind, "property");
       strictEqual(clientProjectedProp.serializedName, "clientProjectedName");
@@ -1283,21 +1281,27 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "encodedWireName"
       );
       ok(jsonEncodedProp);
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
+      strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
       // wire name test with deprecated projected
       const jsonProjectedProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "realWireName"
       );
       ok(jsonProjectedProp);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(jsonProjectedProp.nameInClient, "jsonProjectedName");
+      strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
       // regular
       const regularProp = sdkModel.properties.find(
         (x) => x.kind === "property" && x.serializedName === "regular"
       );
       ok(regularProp);
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(regularProp.nameInClient, "regular");
+      strictEqual(regularProp.name, "regular");
     });
     it("union type", async function () {
       await runner.compileWithBuiltInService(`
@@ -1536,7 +1540,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(recursiveModel.properties.length, 1);
       const prop = recursiveModel.properties[0];
       strictEqual(prop.kind, "property");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(prop.nameInClient, "prop");
+      strictEqual(prop.name, "prop");
       strictEqual(prop.type.kind, "model");
       strictEqual(prop.type.name, "RecursiveModel");
     });
@@ -1576,7 +1582,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 5);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      const kindProperty = fish.properties.find((x) => x.nameInClient === "kind");
+      const kindProperty = fish.properties.find((x) => x.name === "kind");
       ok(kindProperty);
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
@@ -1586,7 +1592,7 @@ describe("typespec-client-generator-core: types", () => {
       const shark = models.find((x) => x.name === "Shark");
       ok(shark);
       strictEqual(shark.properties.length, 2);
-      const sharktypeProperty = shark.properties.find((x) => x.nameInClient === "sharktype");
+      const sharktypeProperty = shark.properties.find((x) => x.name === "sharktype");
       ok(sharktypeProperty);
       strictEqual(sharktypeProperty.kind, "property");
       strictEqual(sharktypeProperty.discriminator, true);
@@ -1608,7 +1614,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      const kindProperty = fish.properties.find((x) => x.nameInClient === "kind");
+      const kindProperty = fish.properties.find((x) => x.name === "kind");
       ok(kindProperty);
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
@@ -1753,7 +1759,7 @@ describe("typespec-client-generator-core: types", () => {
       const kind = enums.find((x) => x.name === "PetKind");
       ok(pet && kind);
       ok(kind.generatedName);
-      const kindProperty = pet.properties.find((x) => (x.nameInClient = "kind"));
+      const kindProperty = pet.properties.find((x) => (x.name = "kind"));
       ok(kindProperty);
       strictEqual(kindProperty.type, kind);
     });
@@ -1838,7 +1844,7 @@ describe("typespec-client-generator-core: types", () => {
       const shark = models.find((x) => x.name === "Shark");
       ok(shark);
       strictEqual(shark.properties.length, 2);
-      const sharktypeProperty = shark.properties.find((x) => x.nameInClient === "sharktype");
+      const sharktypeProperty = shark.properties.find((x) => x.name === "sharktype");
       ok(sharktypeProperty);
       strictEqual(sharktypeProperty.kind, "property");
       strictEqual(sharktypeProperty.discriminator, true);
@@ -1875,19 +1881,19 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 3);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      let kindTypeProperty = fish.properties.find((x) => x.nameInClient === "kind");
+      let kindTypeProperty = fish.properties.find((x) => x.name === "kind");
       ok(kindTypeProperty);
       strictEqual(kindTypeProperty.type.kind, "enum");
       strictEqual(fish.discriminatorProperty, kindTypeProperty);
       const shark = models.find((x) => x.name === "Shark");
       ok(shark);
       strictEqual(shark.discriminatorValue, "shark");
-      kindTypeProperty = shark.properties.find((x) => x.nameInClient === "kind");
+      kindTypeProperty = shark.properties.find((x) => x.name === "kind");
       ok(kindTypeProperty);
       strictEqual(kindTypeProperty.type.kind, "enumvalue");
       const salmon = models.find((x) => x.name === "Salmon");
       ok(salmon);
-      kindTypeProperty = salmon.properties.find((x) => x.nameInClient === "kind");
+      kindTypeProperty = salmon.properties.find((x) => x.name === "kind");
       ok(kindTypeProperty);
       strictEqual(kindTypeProperty.type.kind, "enumvalue");
       strictEqual(salmon.discriminatorValue, "salmon");
@@ -2152,7 +2158,7 @@ describe("typespec-client-generator-core: types", () => {
       const propreties: string[] = [];
       models.forEach((model) => {
         model.properties.forEach((prop) => {
-          propreties.push(prop.nameInClient);
+          propreties.push(prop.name);
         });
       });
       propreties.sort();
@@ -2536,11 +2542,11 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(model.isFormDataType, true);
       strictEqual(model.name, "MultiPartRequest");
       strictEqual(model.properties.length, 2);
-      const id = model.properties.find((x) => x.nameInClient === "id");
+      const id = model.properties.find((x) => x.name === "id");
       ok(id);
       strictEqual(id.kind, "property");
       strictEqual(id.type.kind, "string");
-      const profileImage = model.properties.find((x) => x.nameInClient === "profileImage");
+      const profileImage = model.properties.find((x) => x.name === "profileImage");
       ok(profileImage);
       strictEqual(profileImage.kind, "property");
       strictEqual(profileImage.isMultipartFileInput, true);
@@ -2700,13 +2706,13 @@ describe("typespec-client-generator-core: types", () => {
 
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
-      const scopes = models[0].properties.find((x) => x.nameInClient === "scopes");
+      const scopes = models[0].properties.find((x) => x.name === "scopes");
       ok(scopes);
       strictEqual(scopes.type.kind, "tuple");
       strictEqual(scopes.type.values[0].kind, "constant");
       strictEqual(scopes.type.values[0].valueType.kind, "string");
       strictEqual(scopes.type.values[0].value, "https://security.microsoft.com/.default");
-      const test = models[0].properties.find((x) => x.nameInClient === "test");
+      const test = models[0].properties.find((x) => x.name === "test");
       ok(test);
       strictEqual(test.type.kind, "tuple");
       strictEqual(test.type.values[0].kind, "int32");
