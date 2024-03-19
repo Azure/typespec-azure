@@ -1022,6 +1022,10 @@ export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
 }
 ```
 
+### Service Parameters
+
+Currently we only support HTTP service parameters.
+
 #### SdkQueryParameter
 
 This represents an HTTP query parameter.
@@ -1033,6 +1037,7 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 ```
 
@@ -1047,6 +1052,7 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 ```
 
@@ -1058,6 +1064,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   serializedName: string;
   optional: false;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 ```
 
@@ -1069,6 +1076,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 ```
 
