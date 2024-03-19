@@ -9,6 +9,8 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
+  ignoreDiagnostics,
+  isNullType,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
@@ -22,6 +24,7 @@ import {
   SdkUnionType,
 } from "./interfaces.js";
 import { getHttpOperationWithCache, isApiVersion } from "./public-utils.js";
+import { getUnionAsEnum } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 
 /**
  *
@@ -240,4 +243,19 @@ export function createTCGCContext(program: Program): TCGCContext {
     program,
     emitterName: "__TCGC_INTERNAL__",
   };
+}
+
+export function getNonNullOptions(type: Union): Type[] {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
+}
+
+/**
+ * Determines if a type is nullable.
+ * @param type 
+ * @returns 
+ */
+export function isNullable(type: Type | ): boolean {
+  if (type.kind !== "Union") return false;
+  if (getNonNullOptions(type).length === 1) return true;
+  return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
 }

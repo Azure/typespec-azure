@@ -33,7 +33,6 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
-  isNullType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -90,11 +89,13 @@ import {
 import {
   getAvailableApiVersions,
   getDocHelper,
+  getNonNullOptions,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
   isHttpOperation,
   isMultipartOperation,
+  isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -325,9 +326,7 @@ export function getSdkTupleWithDiagnostics(
   });
 }
 
-function getNonNullOptions(type: Union): Type[] {
-  return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
-}
+
 
 export function getSdkUnion(context: TCGCContext, type: Union, operation?: Operation): SdkType {
   return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
@@ -350,7 +349,8 @@ export function getSdkUnionWithDiagnostics(
     const clientType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
-    clientType.nullable = true;
+    // eslint-disable-next-line deprecation/deprecation
+    clientType.nullable = isNullable(type);
     clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }

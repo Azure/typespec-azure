@@ -633,6 +633,7 @@ function getDefaultSdkEndpointParameter<
       type: type,
       optional: false,
       isApiVersionParam: false,
+      nullable: false,
     },
   ];
 }

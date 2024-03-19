@@ -72,6 +72,9 @@ export interface SdkOperationGroup {
 interface SdkTypeBase {
   __raw?: Type;
   kind: string;
+  /**
+   * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
+   */
   nullable: boolean;
   deprecation?: string;
 }
@@ -296,6 +299,7 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  nullable: boolean;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
