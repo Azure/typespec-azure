@@ -74,6 +74,7 @@ interface SdkTypeBase {
   kind: string;
   /**
    * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
+   * https://github.com/Azure/typespec-azure/issues/448
    */
   nullable: boolean;
   deprecation?: string;
