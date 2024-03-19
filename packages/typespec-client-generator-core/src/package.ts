@@ -48,6 +48,7 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  createGeneratedName,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
@@ -396,6 +397,8 @@ function getSdkMethodResponse(
       kind: "union",
       values: allResponseBodies,
       nullable,
+      name: createGeneratedName(operation, "UnionResponse"),
+      generatedName: true,
     };
   } else if (responseTypes) {
     type = allResponseBodies[0];
@@ -740,6 +743,7 @@ function getSdkInitializationType<
     kind: "model",
     properties,
     name,
+    generatedName: true,
     access: "public",
     usage: UsageFlags.Input,
     nullable: false,
