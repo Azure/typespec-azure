@@ -34,6 +34,7 @@ import {
   isErrorModel,
   isNeverType,
   isNullType,
+  isValueType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -1165,6 +1166,7 @@ function checkAndGetClientType(
       if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
         effectivePayloadType.templateMapper.args
           .filter((arg) => arg.kind === "Model" && arg.name)
+          .filter((x): x is Type => !isValueType(x))
           .forEach((arg) => {
             retval.push(...diagnostics.pipe(checkAndGetClientType(context, arg, operation)));
           });
