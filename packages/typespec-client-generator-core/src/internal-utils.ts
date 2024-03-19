@@ -14,16 +14,18 @@ import {
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { getUnionAsEnum } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import {
   SdkBuiltInKinds,
   SdkEnumType,
+  SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
   SdkParameter,
+  SdkServiceOperation,
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
-import { getUnionAsEnum } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -253,15 +255,43 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
+function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpResponse>): {
+  allResponseBodies: SdkType[];
+  nonBodyExists: boolean;
+} {
+  const allResponseBodies: SdkType[] = [];
+  let nonBodyExists = false;
+  for (const response of Object.values(responses)) {
+    if (response.type) {
+      allResponseBodies.push(response.type);
+    } else {
+      nonBodyExists = true;
+    }
+  }
+  return { allResponseBodies, nonBodyExists };
+}
+
+export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>): SdkType[] {
+  return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
+}
+
 /**
  * Determines if a type is nullable.
- * @param type 
- * @returns 
+ * @param type
+ * @returns
  */
-export function isNullable(type: Type): boolean {
-  if (type.kind !== "Union") return false;
-  if (getNonNullOptions(type).length === 1) return true;
-  return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
+export function isNullable(type: Type | SdkServiceOperation): boolean {
+  if (type.kind === "Union") {
+    if (getNonNullOptions(type).length < type.variants.size) return true;
+    return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
+  }
+  if (type.kind === "http") {
+    const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(
+      type.responses
+    );
+    return nonBodyExists && allResponseBodies.length > 0;
+  }
+  return false;
 }
 /**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.

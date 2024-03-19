@@ -383,6 +383,7 @@ export interface SdkServiceResponseHeader {
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
+  nullable: boolean;
 }
 
 export interface SdkServiceResponse {

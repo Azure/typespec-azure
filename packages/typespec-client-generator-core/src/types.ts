@@ -327,8 +327,6 @@ export function getSdkTupleWithDiagnostics(
   });
 }
 
-
-
 export function getSdkUnion(context: TCGCContext, type: Union, operation?: Operation): SdkType {
   return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
 }
@@ -368,7 +366,7 @@ export function getSdkUnionWithDiagnostics(
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
-    nullable: nonNullOptions.length < type.variants.size,
+    nullable: isNullable(type),
   });
 }
 
@@ -481,6 +479,7 @@ function addDiscriminatorToModelType(
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
+      nullable: false,
     });
     model.discriminatorProperty = model.properties[model.properties.length - 1];
   }
@@ -942,6 +941,7 @@ export function getSdkCredentialParameter(
     onClient: true,
     optional: false,
     isApiVersionParam: false,
+    nullable: false,
   };
 }
 
@@ -977,6 +977,7 @@ export function getSdkModelPropertyType(
     nameInClient: getPropertyNames(context, type)[0],
     onClient: false,
     optional: type.optional,
+    nullable: isNullable(type.type),
   };
   const program = context.program;
   const headerQueryOptions = {
