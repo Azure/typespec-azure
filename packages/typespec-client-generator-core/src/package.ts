@@ -91,10 +91,12 @@ function getSdkHttpBodyParameters<TOptions extends object>(
     const bodyType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
     );
+    const name = "body";
     return diagnostics.wrap([
       {
         kind: "body",
-        nameInClient: "body",
+        nameInClient: name,
+        name,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
         onClient: false,
@@ -114,7 +116,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
     })
   );
   const methodBodyParameter = methodParameters.find(
-    (x) => x.nameInClient === getPropertyNames(context, tspBody.parameter!)[0]
+    (x) => x.name === getPropertyNames(context, tspBody.parameter!)[0]
   );
   if (body.kind !== "body") throw new Error("blah");
   if (methodBodyParameter) {
@@ -148,7 +150,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
 function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
-  const nameInClient = bodyObject.kind === "body" ? "contentType" : "accept";
+  const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = {
     kind: "string",
     encode: "string",
@@ -164,7 +166,7 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (/json/.test(bodyObject.contentTypes[0]) || nameInClient === "accept")
+    (/json/.test(bodyObject.contentTypes[0]) || name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -177,7 +179,8 @@ function createContentTypeOrAcceptHeader(
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
-    nameInClient,
+    nameInClient: name,
+    name,
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,
     onClient: false,
@@ -243,7 +246,7 @@ function getSdkHttpOperation<TOptions extends object>(
       kind: "header",
       serializedName: "Accept",
     });
-    if (!methodParameters.some((m) => m.nameInClient === "accept")) {
+    if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
         ...acceptBase,
         kind: "method",
@@ -487,9 +490,7 @@ function getParameterMappingHelper<
     if (!context.__api_version_parameter) throw new Error("No api version on the client");
     return [context.__api_version_parameter];
   }
-  const correspondingMethodParameter = method.parameters.find(
-    (x) => x.nameInClient === serviceParam.nameInClient
-  );
+  const correspondingMethodParameter = method.parameters.find((x) => x.name === serviceParam.name);
   if (correspondingMethodParameter) {
     return [correspondingMethodParameter];
   }
@@ -497,8 +498,8 @@ function getParameterMappingHelper<
     if (type.kind !== "model") return false;
     return Array.from(type.properties.values())
       .filter((x) => x.kind === "property")
-      .map((x) => x.nameInClient)
-      .includes(param.nameInClient);
+      .map((x) => x.name)
+      .includes(param.name);
   }
   const serviceParamType = serviceParam.type;
   if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
@@ -517,7 +518,7 @@ function getParameterMappingHelper<
   for (const methodParam of method.parameters) {
     if (methodParam.type.kind === "model") {
       for (const prop of methodParam.type.properties) {
-        if (prop.nameInClient === serviceParam.nameInClient) {
+        if (prop.name === serviceParam.name) {
           return [prop];
         }
       }
@@ -622,10 +623,12 @@ function getDefaultSdkEndpointParameter<
       encode: "string",
     };
   }
+  const name = "endpoint";
   return [
     {
       kind: "endpoint",
-      nameInClient: "endpoint",
+      nameInClient: name,
+      name,
       description: "Service host",
       onClient: true,
       urlEncode: false,

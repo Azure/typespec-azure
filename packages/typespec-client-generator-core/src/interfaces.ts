@@ -288,7 +288,11 @@ export interface SdkCredentialType extends SdkTypeBase {
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
+  /**
+   * @deprecated This property is deprecated. Use `.name` instead
+   */
   nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];
