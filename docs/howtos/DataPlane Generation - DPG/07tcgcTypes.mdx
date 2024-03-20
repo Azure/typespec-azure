@@ -315,10 +315,6 @@ export interface SdkClientType<
   apiVersions: string[];
   // fully qualified. Compare to sdkPackage.rootNamespace to figure out where to generate
   nameSpace: string;
-  endpoint: string;
-  // whether the endpoint params are part of a templatee endpoint or not
-  hasParameterizedEndpoint: boolean;
-  arm: boolean;
   methods: SdkMethod<TServiceOperation>[];
 }
 ```
@@ -336,9 +332,6 @@ const sdkClient = {
   };
   apiVersions: [],
   nameSpace: "Contoso.WidgetManager",
-  endpoint: "{endpoint}/widget",
-  hasParameterizedEndpoint: true,
-  arm: false,
   methods: [
     {
       name: "getWidgets",
@@ -349,7 +342,6 @@ const sdkClient = {
         initialization: undefined,
         apiVersions: [],
         nameSpace: "Contoso.WidgetManager",
-        endpoint: "{endpoint}/widget",
         methods: [
           {
             name: "list",
@@ -436,8 +428,16 @@ const sdkInitializationType = {
   properties: [
     {
       kind: "endpoint",
-      urlEncode: false,
-      onClient: true,
+      serverUrl: "{endpoint}/widget",
+      templateArguments: [
+        {
+          kind: "path",
+          name: "endpoint",
+          type: {
+            kind: "string",
+          }
+        }
+      ]
     },
     {
       kind: "credential",
@@ -995,6 +995,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
+  type: SdkEndpointType
 }
 ```
 
@@ -1400,6 +1401,16 @@ We have the `.access` property on a model etc. as optional, so emitters can choo
 
 ```ts
 export type AccessFlags = "internal" | "public";
+```
+
+### SdkEndpointType
+
+```ts
+export interface SdkEndpointType {
+  kind: "endpoint";
+  baseUrl?: string;
+  templateArguments: SdkPathParameter[];
+}
 ```
 
 ## Complete Usage Code
