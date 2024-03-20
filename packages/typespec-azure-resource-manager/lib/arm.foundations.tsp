@@ -421,6 +421,7 @@ model ManagedSystemIdentityProperties {
 }
 
 /** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
+#deprecated "Please change to ManagedServiceIdentityType." 
 alias ManagedIdentityType = ManagedServiceIdentityType;
 /**
  * A managed identity assigned by the user.
