@@ -1171,7 +1171,7 @@ const sdkPagingMethodResponse = {
     valueType: {
       kind: "model",
       name: "Widget",
-      nullableItems: false,
+      nullableValues: false,
       ...
     }
   }
@@ -1282,7 +1282,7 @@ interface SdkDurationType extends SdkTypeBase {
 interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
-  nullableItems: boolean;
+  nullableValues: boolean;
 }
 ```
 
@@ -1293,7 +1293,7 @@ interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType; // currently can only be string
   valueType: SdkType;
-  nullableItems: boolean;
+  nullableValues: boolean;
 }
 ```
 
