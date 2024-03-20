@@ -470,7 +470,7 @@ function addDiscriminatorToModelType(
       };
     }
     const name = discriminator.propertyName;
-    model.properties.push({
+    model.properties.splice(0, 0, {
       kind: "property",
       optional: false,
       discriminator: true,
@@ -484,7 +484,7 @@ function addDiscriminatorToModelType(
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
     });
-    model.discriminatorProperty = model.properties[model.properties.length - 1];
+    model.discriminatorProperty = model.properties[0];
   }
   return diagnostics.wrap(undefined);
 }
