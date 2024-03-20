@@ -24,16 +24,34 @@ describe("typespec-azure-core: property name conflict", () => {
   });
 
   it("is valid if conflict resolved through @projectedName('csharp', ...)", async () => {
-    await tester.expect(`model Foo { @projectedName("csharp", "bar") foo: string }`).toBeValid();
+    await tester
+      .expect(
+        `model Foo { 
+      #suppress "deprecated" "for testing"
+      @projectedName("csharp", "bar") foo: string
+    }`
+      )
+      .toBeValid();
   });
 
   it("is valid if conflict resolved through @projectedName('client', ...)", async () => {
-    await tester.expect(`model Foo { @projectedName("client", "bar") foo: string }`).toBeValid();
+    await tester
+      .expect(
+        `model Foo { 
+      #suppress "deprecated" "for testing"
+      @projectedName("client", "bar") foo: string
+    }`
+      )
+      .toBeValid();
   });
 
   it("emit warning if conflict not resolved through @projectedName", async () => {
     await tester
-      .expect(`model Foo { @projectedName("python", "bar") foo: string }`)
+      .expect(
+        `model Foo { 
+        #suppress "deprecated" "for testing"
+        @projectedName("python", "bar") foo: string }`
+      )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/property-name-conflict",
         message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @projectedName decorator to rename the property for C#.`,
@@ -42,7 +60,12 @@ describe("typespec-azure-core: property name conflict", () => {
 
   it("emit warning if @projectedName('client', ...) introduces conflict", async () => {
     await tester
-      .expect(`model Foo { @projectedName("client", "foo") bar: string }`)
+      .expect(
+        `model Foo { 
+        #suppress "deprecated" "for testing"
+        @projectedName("client", "foo") bar: string;
+       }`
+      )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/property-name-conflict",
         message: `Use of @projectedName on property 'bar' results in 'bar' having the same name as its enclosing type in C#. Please use a different @projectedName value.`,
@@ -51,7 +74,12 @@ describe("typespec-azure-core: property name conflict", () => {
 
   it("emit warning if @projectedName('csharp', ...) introduces conflict", async () => {
     await tester
-      .expect(`model Foo { @projectedName("csharp", "foo") bar: string }`)
+      .expect(
+        `model Foo { 
+        #suppress "deprecated" "for testing"
+        @projectedName("csharp", "foo") bar: string;
+      }`
+      )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/property-name-conflict",
         message: `Use of @projectedName on property 'bar' results in 'bar' having the same name as its enclosing type in C#. Please use a different @projectedName value.`,
@@ -61,7 +89,10 @@ describe("typespec-azure-core: property name conflict", () => {
   it("is valid if @projectedName('client', ...) causes conflict but @projectedName('csharp', ...) resolves it", async () => {
     await tester
       .expect(
-        `model Foo { @projectedName("client", "foo") @projectedName("csharp", "baz") bar: string }`
+        `model Foo {
+          #suppress "deprecated" "for testing"
+          @projectedName("client", "foo") @projectedName("csharp", "baz") bar: string;
+        }`
       )
       .toBeValid();
   });

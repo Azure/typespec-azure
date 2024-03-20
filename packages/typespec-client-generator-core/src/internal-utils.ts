@@ -22,7 +22,11 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
-import { getHttpOperationWithCache, isApiVersion } from "./public-utils.js";
+import {
+  getCrossLanguageDefinitionId,
+  getHttpOperationWithCache,
+  isApiVersion,
+} from "./public-utils.js";
 
 /**
  *
@@ -241,4 +245,14 @@ export function createTCGCContext(program: Program): TCGCContext {
     program,
     emitterName: "__TCGC_INTERNAL__",
   };
+}
+
+/**
+ * Use this if you are trying to create a generated name for something without an original TypeSpec type.
+ *
+ * Otherwise, you should use the `getGeneratedName` function.
+ * @param context
+ */
+export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
+  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
 }

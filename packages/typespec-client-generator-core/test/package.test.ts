@@ -92,12 +92,15 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.name, "ServiceClientOptions");
       strictEqual(initialization.properties.length, 1);
       const endpointParam = initialization.properties[0];
       strictEqual(endpointParam.kind, "endpoint");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(endpointParam.nameInClient, "endpoint");
+      strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.type.kind, "constant");
@@ -117,7 +120,8 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
       strictEqual(client.endpoint, "http://localhost:3000");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 2);
 
       const endpointParam = initialization.properties.filter(
@@ -129,7 +133,9 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
+      strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
       strictEqual(credentialParam.optional, false);
       strictEqual(credentialParam.type.kind, "credential");
@@ -156,7 +162,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 2);
 
       const endpointParam = initialization.properties.filter(
@@ -168,7 +175,9 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
+      strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
       strictEqual(credentialParam.optional, false);
       strictEqual(credentialParam.type.kind, "credential");
@@ -201,7 +210,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 2);
 
       const endpointParam = initialization.properties.filter(
@@ -213,7 +223,9 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
+      strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
       strictEqual(credentialParam.optional, false);
       strictEqual(credentialParam.type.kind, "union");
@@ -260,7 +272,8 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
       strictEqual(client.endpoint, "{endpointInput}");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 2);
 
       const endpointParam = initialization.properties.filter(
@@ -268,7 +281,9 @@ describe("typespec-client-generator-core: package", () => {
       )[0];
       strictEqual(endpointParam.clientDefaultValue, undefined);
       strictEqual(endpointParam.urlEncode, false);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(endpointParam.nameInClient, "endpointInput");
+      strictEqual(endpointParam.name, "endpointInput");
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.kind, "endpoint");
@@ -277,7 +292,9 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
+      strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
       strictEqual(credentialParam.optional, false);
       strictEqual(credentialParam.type.kind, "credential");
@@ -315,7 +332,8 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
       strictEqual(client.endpoint, "{endpoint}/server/path/multiple/{apiVersion}");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "v1.0");
@@ -327,7 +345,9 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = endpointParams[0];
       strictEqual(endpointParam.clientDefaultValue, undefined);
       strictEqual(endpointParam.urlEncode, false);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(endpointParam.nameInClient, "endpoint");
+      strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.kind, "endpoint");
@@ -335,7 +355,9 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = endpointParams[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
       strictEqual(apiVersionParam.urlEncode, false);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
+      strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.optional, false);
       strictEqual(apiVersionParam.kind, "endpoint");
@@ -344,7 +366,9 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
+      strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
       strictEqual(credentialParam.optional, false);
       strictEqual(credentialParam.type.kind, "credential");
@@ -397,13 +421,16 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
       strictEqual(client.endpoint, "http://localhost:3000");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "2022-12-01-preview");
 
       const apiVersionParam = initialization.properties.filter((p) => p.isApiVersionParam)[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
+      strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.optional, false);
       strictEqual(apiVersionParam.kind, "method");
@@ -457,13 +484,16 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
       strictEqual(client.endpoint, "http://localhost:3000");
-      const initialization = client.initialization!;
+      const initialization = client.initialization;
+      ok(initialization);
       strictEqual(initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 2);
       deepStrictEqual(client.apiVersions, ["2022-12-01-preview", "2022-12-01"]);
 
       const apiVersionParam = initialization.properties.filter((p) => p.isApiVersionParam)[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
+      strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.optional, false);
       strictEqual(apiVersionParam.kind, "method");
@@ -506,12 +536,16 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
 
-      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient")!;
-      const operationGroup = sdkPackage.clients.find((c) => c.name === "MyOperationGroup")!;
+      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+      const operationGroup = sdkPackage.clients.find((c) => c.name === "MyOperationGroup");
+      ok(mainClient && operationGroup);
 
       strictEqual(mainClient.methods.length, 1);
-      strictEqual(mainClient.initialization!.properties.length, 1);
-      strictEqual(mainClient.initialization!.properties[0].nameInClient, "endpoint");
+      ok(mainClient.initialization);
+      strictEqual(mainClient.initialization.properties.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(mainClient.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(mainClient.initialization!.properties[0].name, "endpoint");
 
       const clientAccessor = mainClient.methods[0];
       strictEqual(clientAccessor.kind, "clientaccessor");
@@ -539,15 +573,20 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 3);
+      strictEqual(sdkPackage.clients.length, 4);
 
-      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient")!;
-      const fooClient = sdkPackage.clients.find((c) => c.name === "Foo")!;
-      const barClient = sdkPackage.clients.find((c) => c.name === "Bar")!;
+      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+      const fooClient = sdkPackage.clients.find((c) => c.name === "Foo");
+      const fooBarClient = sdkPackage.clients.filter((c) => c.name === "Bar")![0];
+      const barClient = sdkPackage.clients.filter((c) => c.name === "Bar")![1];
+      ok(mainClient && fooClient && fooBarClient && barClient);
 
       strictEqual(mainClient.methods.length, 2);
-      strictEqual(mainClient.initialization!.properties.length, 1);
-      strictEqual(mainClient.initialization!.properties[0].nameInClient, "endpoint");
+      ok(mainClient.initialization);
+      strictEqual(mainClient.initialization.properties.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(mainClient.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(mainClient.initialization!.properties[0].name, "endpoint");
 
       const fooAccessor = mainClient.methods[0];
       strictEqual(fooAccessor.kind, "clientaccessor");
@@ -565,18 +604,23 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(fooClient.initialization, undefined);
       strictEqual(fooClient.methods.length, 1);
-      strictEqual(fooClient.methods[0].kind, "clientaccessor");
-      strictEqual(fooClient.methods[0].access, "internal");
-      strictEqual(fooClient.methods[0].name, "getBar");
-      strictEqual(fooClient.methods[0].parameters.length, 0);
-      strictEqual(fooClient.methods[0].response, barClient);
+
+      const fooBarAccessor = fooClient.methods[0];
+      strictEqual(fooBarAccessor.kind, "clientaccessor");
+      strictEqual(fooBarAccessor.access, "internal");
+      strictEqual(fooBarAccessor.name, "getBar");
+      strictEqual(fooBarAccessor.parameters.length, 0);
+      strictEqual(fooBarAccessor.response, fooBarClient);
+
+      strictEqual(fooBarClient.initialization, undefined);
+      strictEqual(fooBarClient.methods.length, 1);
+      strictEqual(fooBarClient.methods[0].kind, "basic");
+      strictEqual(fooBarClient.methods[0].name, "one");
 
       strictEqual(barClient.initialization, undefined);
-      strictEqual(barClient.methods.length, 2);
+      strictEqual(barClient.methods.length, 1);
       strictEqual(barClient.methods[0].kind, "basic");
-      strictEqual(barClient.methods[0].name, "one");
-      strictEqual(barClient.methods[1].kind, "basic");
-      strictEqual(barClient.methods[1].name, "two");
+      strictEqual(barClient.methods[0].name, "two");
     });
 
     function getServiceNoDefaultApiVersion(op: string) {
@@ -616,7 +660,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization?.properties.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(client.initialization.properties[0].name, "endpoint");
 
       strictEqual(client.methods.length, 1);
 
@@ -645,9 +691,13 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
 
       strictEqual(client.initialization?.properties.length, 2);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(client.initialization.properties[0].name, "endpoint");
       const clientApiVersionParam = client.initialization.properties[1];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
+      strictEqual(clientApiVersionParam.name, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
       strictEqual(clientApiVersionParam.optional, false);
       strictEqual(clientApiVersionParam.kind, "method");
@@ -719,7 +769,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization?.properties.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(client.initialization.properties[0].name, "endpoint");
 
       const withoutApiVersion = client.methods[0];
       strictEqual(withoutApiVersion.kind, "basic");
@@ -745,10 +797,14 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization?.properties.length, 2);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(client.initialization.properties[0].name, "endpoint");
 
       const clientApiVersionParam = client.initialization.properties[1];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
+      strictEqual(clientApiVersionParam.name, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
       strictEqual(clientApiVersionParam.optional, false);
       strictEqual(clientApiVersionParam.kind, "method");
@@ -790,10 +846,14 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization?.properties.length, 2);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
+      strictEqual(client.initialization.properties[0].name, "endpoint");
 
       const clientApiVersionParam = client.initialization.properties[1];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
+      strictEqual(clientApiVersionParam.name, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
       strictEqual(clientApiVersionParam.optional, false);
       strictEqual(clientApiVersionParam.kind, "method");
@@ -811,7 +871,9 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = withApiVersion.operation.parameters[0];
       strictEqual(apiVersionParam.kind, "path");
       strictEqual(apiVersionParam.serializedName, "apiVersion");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
+      strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.isApiVersionParam, true);
       strictEqual(apiVersionParam.optional, false);
       strictEqual(apiVersionParam.onClient, true);
@@ -835,7 +897,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "path");
+      strictEqual(methodParam.name, "path");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -850,7 +914,9 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "path");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "path");
+      strictEqual(pathParam.name, "path");
       strictEqual(pathParam.optional, false);
       strictEqual(pathParam.onClient, false);
       strictEqual(pathParam.isApiVersionParam, false);
@@ -861,7 +927,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = method.getParameterMapping(pathParam);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(pathParam.name, correspondingMethodParams[0].name);
     });
 
     it("header basic", async () => {
@@ -879,7 +947,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "header");
+      strictEqual(methodParam.name, "header");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -894,7 +964,9 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(headerParam.kind, "header");
       strictEqual(headerParam.serializedName, "header");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(headerParam.nameInClient, "header");
+      strictEqual(headerParam.name, "header");
       strictEqual(headerParam.optional, false);
       strictEqual(headerParam.onClient, false);
       strictEqual(headerParam.isApiVersionParam, false);
@@ -903,7 +975,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = method.getParameterMapping(headerParam);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(headerParam.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(headerParam.name, correspondingMethodParams[0].name);
     });
 
     it("header collection format", async () => {
@@ -938,7 +1012,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "query");
+      strictEqual(methodParam.name, "query");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -952,7 +1028,9 @@ describe("typespec-client-generator-core: package", () => {
       const queryParam = serviceOperation.parameters[0];
       strictEqual(queryParam.kind, "query");
       strictEqual(queryParam.serializedName, "query");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, "query");
+      strictEqual(queryParam.name, "query");
       strictEqual(queryParam.optional, false);
       strictEqual(queryParam.onClient, false);
       strictEqual(queryParam.isApiVersionParam, false);
@@ -961,7 +1039,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = method.getParameterMapping(queryParam);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(queryParam.name, correspondingMethodParams[0].name);
     });
 
     it("query collection format", async () => {
@@ -1000,16 +1080,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodBodyParam = method.parameters.find((x) => x.nameInClient === "body")!;
+      const methodBodyParam = method.parameters.find((x) => x.name === "body");
+      ok(methodBodyParam);
       strictEqual(methodBodyParam.kind, "method");
       strictEqual(methodBodyParam.optional, false);
       strictEqual(methodBodyParam.onClient, false);
       strictEqual(methodBodyParam.isApiVersionParam, false);
       strictEqual(methodBodyParam.type, sdkPackage.models[0]);
 
-      const methodContentTypeParam = method.parameters.find(
-        (x) => x.nameInClient === "contentType"
-      )!;
+      const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(methodContentTypeParam);
       strictEqual(methodContentTypeParam.clientDefaultValue, undefined);
       strictEqual(methodContentTypeParam.type.kind, "constant");
       strictEqual(methodContentTypeParam.onClient, false);
@@ -1027,11 +1107,15 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = method.getParameterMapping(bodyParameter);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(bodyParameter.name, correspondingMethodParams[0].name);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const contentTypeParam = serviceOperation.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(contentTypeParam.nameInClient, "contentType");
+      strictEqual(contentTypeParam.name, "contentType");
       strictEqual(contentTypeParam.serializedName, "Content-Type");
       strictEqual(contentTypeParam.clientDefaultValue, undefined);
       strictEqual(contentTypeParam.onClient, false);
@@ -1061,16 +1145,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodBodyParam = method.parameters.find((x) => x.nameInClient === "body")!;
+      const methodBodyParam = method.parameters.find((x) => x.name === "body");
+      ok(methodBodyParam);
       strictEqual(methodBodyParam.kind, "method");
       strictEqual(methodBodyParam.optional, true);
       strictEqual(methodBodyParam.onClient, false);
       strictEqual(methodBodyParam.isApiVersionParam, false);
       strictEqual(methodBodyParam.type, sdkPackage.models[0]);
 
-      const methodContentTypeParam = method.parameters.find(
-        (x) => x.nameInClient === "contentType"
-      )!;
+      const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(methodContentTypeParam);
       strictEqual(methodContentTypeParam.clientDefaultValue, undefined);
       strictEqual(methodContentTypeParam.type.kind, "constant");
       strictEqual(methodContentTypeParam.onClient, false);
@@ -1088,11 +1172,15 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = method.getParameterMapping(bodyParameter);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(bodyParameter.name, correspondingMethodParams[0].name);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const contentTypeParam = serviceOperation.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(contentTypeParam.nameInClient, "contentType");
+      strictEqual(contentTypeParam.name, "contentType");
       strictEqual(contentTypeParam.serializedName, "Content-Type");
       strictEqual(contentTypeParam.clientDefaultValue, undefined);
       strictEqual(contentTypeParam.onClient, false);
@@ -1120,14 +1208,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodParam = method.parameters.find((x) => x.nameInClient === "key")!;
+      const methodParam = method.parameters.find((x) => x.name === "key");
+      ok(methodParam);
       strictEqual(methodParam.kind, "method");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
       strictEqual(methodParam.type.kind, "string");
 
-      const contentTypeParam = method.parameters.find((x) => x.nameInClient === "contentType")!;
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
       strictEqual(contentTypeParam.clientDefaultValue, undefined);
       strictEqual(contentTypeParam.type.kind, "constant");
       strictEqual(contentTypeParam.onClient, false);
@@ -1145,9 +1235,10 @@ describe("typespec-client-generator-core: package", () => {
       const correspondingMethodParams = method.getParameterMapping(bodyParameter);
       strictEqual(correspondingMethodParams.length, 1);
       strictEqual(
-        bodyParameter.type.properties[0].nameInClient,
-        correspondingMethodParams[0].nameInClient
+        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
+        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
       );
+      strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
     });
 
     it("body alias spread", async () => {
@@ -1168,16 +1259,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodParam = method.parameters.find((x) => x.nameInClient === "name")!;
+      const methodParam = method.parameters.find((x) => x.name === "name");
+      ok(methodParam);
       strictEqual(methodParam.kind, "method");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
       strictEqual(methodParam.type.kind, "string");
 
-      const contentTypeMethodParam = method.parameters.find(
-        (x) => x.nameInClient === "contentType"
-      )!;
+      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethodParam);
       strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
       strictEqual(contentTypeMethodParam.type.kind, "constant");
 
@@ -1191,14 +1282,18 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
       strictEqual(bodyParameter.type.properties.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.type.properties[0].nameInClient, "name");
+      strictEqual(bodyParameter.type.properties[0].name, "name");
 
       const correspondingMethodParams = method.getParameterMapping(bodyParameter);
       strictEqual(correspondingMethodParams.length, 1);
+
       strictEqual(
-        bodyParameter.type.properties[0].nameInClient,
-        correspondingMethodParams[0].nameInClient
+        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
+        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
       );
+      strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
     });
 
     it("parameter grouping", async () => {
@@ -1225,7 +1320,9 @@ describe("typespec-client-generator-core: package", () => {
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "options");
+      strictEqual(methodParam.name, "options");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -1236,28 +1333,34 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(requestOptionsModel.properties.length, 3);
 
       const headerParamProp = requestOptionsModel.properties.find(
-        (x): x is SdkHeaderParameter => x.nameInClient === "header"
-      )!;
-      strictEqual(headerParamProp.kind, "header");
+        (x): x is SdkHeaderParameter => x.kind === "header"
+      );
+      ok(headerParamProp);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(headerParamProp.nameInClient, "header");
+      strictEqual(headerParamProp.name, "header");
       strictEqual(headerParamProp.optional, false);
       strictEqual(headerParamProp.onClient, false);
       strictEqual(headerParamProp.type.kind, "string");
 
       const queryParamProp = requestOptionsModel.properties.find(
-        (x): x is SdkQueryParameter => x.nameInClient === "query"
-      )!;
-      strictEqual(queryParamProp.kind, "query");
+        (x): x is SdkQueryParameter => x.kind === "query"
+      );
+      ok(queryParamProp);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParamProp.nameInClient, "query");
+      strictEqual(queryParamProp.name, "query");
       strictEqual(queryParamProp.optional, false);
       strictEqual(queryParamProp.onClient, false);
       strictEqual(queryParamProp.type.kind, "string");
 
       const bodyParamProp = requestOptionsModel.properties.find(
-        (x): x is SdkBodyParameter => x.nameInClient === "body"
-      )!;
-      strictEqual(bodyParamProp.kind, "body");
+        (x): x is SdkBodyParameter => x.kind === "body"
+      );
+      ok(bodyParamProp);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParamProp.nameInClient, "body");
+      strictEqual(bodyParamProp.name, "body");
       strictEqual(bodyParamProp.optional, false);
       strictEqual(bodyParamProp.onClient, false);
       strictEqual(bodyParamProp.type.kind, "string");
@@ -1266,7 +1369,9 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[1];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "contentType");
+      strictEqual(methodParam.name, "contentType");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -1278,7 +1383,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(serviceOperation.bodyParams.length, 1);
       const correspondingBodyParams = method.getParameterMapping(serviceOperation.bodyParams[0]);
       strictEqual(correspondingBodyParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingBodyParams[0].nameInClient, bodyParamProp.nameInClient);
+      strictEqual(correspondingBodyParams[0].name, bodyParamProp.name);
 
       const parameters = serviceOperation.parameters;
       strictEqual(parameters.length, 3);
@@ -1287,17 +1394,23 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParams.length, 2);
       let correspondingHeaderParams = method.getParameterMapping(headerParams[0]);
       strictEqual(correspondingHeaderParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingHeaderParams[0].nameInClient, headerParamProp.nameInClient);
+      strictEqual(correspondingHeaderParams[0].name, headerParamProp.name);
 
       correspondingHeaderParams = method.getParameterMapping(headerParams[1]);
       strictEqual(correspondingHeaderParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingHeaderParams[0].nameInClient, "contentType");
+      strictEqual(correspondingHeaderParams[0].name, "contentType");
 
       const queryParams = parameters.filter((x): x is SdkQueryParameter => x.kind === "query");
       strictEqual(queryParams.length, 1);
       const correspondingQueryParams = method.getParameterMapping(queryParams[0]);
       strictEqual(correspondingQueryParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingQueryParams[0].nameInClient, queryParamProp.nameInClient);
+      strictEqual(correspondingQueryParams[0].name, queryParamProp.name);
     });
 
     it("content type", async () => {
@@ -1313,7 +1426,9 @@ describe("typespec-client-generator-core: package", () => {
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "body");
+      strictEqual(methodParam.name, "body");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -1321,7 +1436,9 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[1];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "contentType");
+      strictEqual(methodParam.name, "contentType");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -1334,12 +1451,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(serviceOperation.bodyParams.length, 1);
       const correspondingBodyParams = method.getParameterMapping(serviceOperation.bodyParams[0]);
       strictEqual(correspondingBodyParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingBodyParams[0].nameInClient, "body");
+      strictEqual(correspondingBodyParams[0].name, "body");
 
       strictEqual(serviceOperation.parameters.length, 1);
       const correspondingHeaderParams = method.getParameterMapping(serviceOperation.parameters[0]);
       strictEqual(correspondingHeaderParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingHeaderParams[0].nameInClient, "contentType");
+      strictEqual(correspondingHeaderParams[0].name, "contentType");
     });
     it("ensure content type is a constant if only one possibility", async () => {
       await runner.compileWithBuiltInService(`
@@ -1353,11 +1474,15 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.parameters.length, 2);
       const methodBodyParam = method.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodBodyParam.nameInClient, "body");
+      strictEqual(methodBodyParam.name, "body");
       strictEqual(methodBodyParam.type, sdkPackage.models[0]);
 
       const methodContentTypeParam = method.parameters[1];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodContentTypeParam.nameInClient, "contentType");
+      strictEqual(methodContentTypeParam.name, "contentType");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 1);
@@ -1370,7 +1495,9 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(serviceOperation.parameters.length, 1);
       const serviceContentTypeParam = serviceOperation.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceContentTypeParam.nameInClient, "contentType");
+      strictEqual(serviceContentTypeParam.name, "contentType");
       strictEqual(serviceContentTypeParam.serializedName, "Content-Type");
       strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
       strictEqual(serviceContentTypeParam.type.kind, "constant");
@@ -1394,12 +1521,16 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.parameters.length, 1);
       const methodAcceptParam = method.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodAcceptParam.nameInClient, "accept");
+      strictEqual(methodAcceptParam.name, "accept");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.parameters.length, 1);
       const serviceContentTypeParam = serviceOperation.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceContentTypeParam.nameInClient, "accept");
+      strictEqual(serviceContentTypeParam.name, "accept");
       strictEqual(serviceContentTypeParam.serializedName, "Accept");
       strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
       strictEqual(serviceContentTypeParam.type.kind, "constant");
@@ -1433,12 +1564,16 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.parameters.length, 1);
       const methodAcceptParam = method.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodAcceptParam.nameInClient, "accept");
+      strictEqual(methodAcceptParam.name, "accept");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.parameters.length, 1);
       const serviceContentTypeParam = serviceOperation.parameters[0];
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceContentTypeParam.nameInClient, "accept");
+      strictEqual(serviceContentTypeParam.name, "accept");
       strictEqual(serviceContentTypeParam.serializedName, "Accept");
       strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
       strictEqual(serviceContentTypeParam.type.kind, "constant");
@@ -1484,8 +1619,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const errorResponse = method.operation.exceptions["*"];
       strictEqual(errorResponse.kind, "http");
-      strictEqual(errorResponse.type!.kind, "model");
-      strictEqual(errorResponse.type!, sdkPackage.models[0]);
+      ok(errorResponse.type);
+      strictEqual(errorResponse.type.kind, "model");
+      strictEqual(errorResponse.type, sdkPackage.models[0]);
 
       strictEqual(method.response.type, undefined);
       strictEqual(method.getResponseMapping(), undefined);
@@ -1527,14 +1663,15 @@ describe("typespec-client-generator-core: package", () => {
 
       const errorResponse = method.operation.exceptions["*"];
       strictEqual(errorResponse.kind, "http");
-      strictEqual(errorResponse.type!.kind, "model");
+      ok(errorResponse.type);
+      strictEqual(errorResponse.type.kind, "model");
       strictEqual(
-        errorResponse.type!,
+        errorResponse.type,
         sdkPackage.models.find((x) => x.name === "Error")
       );
 
       strictEqual(method.response.kind, "method");
-      const methodResponseType = method.response.type!;
+      const methodResponseType = method.response.type;
       strictEqual(methodResponseType, createResponse.type);
       strictEqual(method.getResponseMapping(), undefined);
     });
@@ -1574,7 +1711,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.getResponseMapping(), undefined);
 
       strictEqual(method.response.kind, "method");
-      const methodResponseType = method.response.type!;
+      const methodResponseType = method.response.type;
+      ok(methodResponseType);
       strictEqual(
         methodResponseType,
         sdkPackage.models.find((x) => x.name === "Widget")
@@ -1649,13 +1787,15 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 5);
       deepStrictEqual(
-        method.parameters.map((x) => x.nameInClient),
+        method.parameters.map((x) => x.name),
         ["id", "weight", "color", "contentType", "accept"]
       );
 
       const bodyParameter = method.operation.bodyParams[0];
       strictEqual(bodyParameter.kind, "body");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.nameInClient, "body");
+      strictEqual(bodyParameter.name, "body");
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
@@ -1669,27 +1809,29 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParams.length, 2);
       const contentTypeOperationParam = headerParams.find(
         (x) => x.serializedName === "Content-Type"
-      )!;
+      );
+      ok(contentTypeOperationParam);
       strictEqual(contentTypeOperationParam.clientDefaultValue, undefined);
       strictEqual(contentTypeOperationParam.onClient, false);
       strictEqual(contentTypeOperationParam.optional, false);
 
-      const contentTypeMethodParam = method.parameters.find(
-        (x) => x.nameInClient === "contentType"
-      )!;
+      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethodParam);
       strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
       strictEqual(contentTypeMethodParam.onClient, false);
       strictEqual(contentTypeMethodParam.optional, false);
 
       strictEqual(method.getParameterMapping(contentTypeOperationParam)[0], contentTypeMethodParam);
 
-      const acceptOperationParam = headerParams.find((x) => x.serializedName === "Accept")!;
+      const acceptOperationParam = headerParams.find((x) => x.serializedName === "Accept");
+      ok(acceptOperationParam);
       strictEqual(acceptOperationParam.clientDefaultValue, undefined);
       strictEqual(acceptOperationParam.clientDefaultValue, undefined);
       strictEqual(acceptOperationParam.onClient, false);
       strictEqual(acceptOperationParam.optional, false);
 
-      const acceptMethodParam = method.parameters.find((x) => x.nameInClient === "accept")!;
+      const acceptMethodParam = method.parameters.find((x) => x.name === "accept");
+      ok(acceptMethodParam);
       strictEqual(acceptMethodParam.clientDefaultValue, undefined);
       strictEqual(acceptMethodParam.onClient, false);
       strictEqual(acceptMethodParam.optional, false);
@@ -1705,23 +1847,28 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodIdParam = method.parameters.find((x) => x.nameInClient === "id")!;
+      const methodIdParam = method.parameters.find((x) => x.name === "id");
+      ok(methodIdParam);
       strictEqual(methodIdParam.kind, "method");
       strictEqual(methodIdParam.optional, false);
       strictEqual(methodIdParam.onClient, false);
       strictEqual(methodIdParam.isApiVersionParam, false);
       strictEqual(methodIdParam.type.kind, "string");
 
-      const methodAcceptParam = method.parameters.find((x) => x.nameInClient === "accept")!;
+      const methodAcceptParam = method.parameters.find((x) => x.name === "accept");
+      ok(methodAcceptParam);
       strictEqual(methodAcceptParam.clientDefaultValue, undefined);
 
       const serviceOperation = method.operation;
 
       strictEqual(serviceOperation.parameters.length, 2);
-      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path")!;
+      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path");
+      ok(pathParam);
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "id");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "id");
+      strictEqual(pathParam.name, "id");
       strictEqual(pathParam.optional, false);
       strictEqual(pathParam.onClient, false);
       strictEqual(pathParam.isApiVersionParam, false);
@@ -1729,14 +1876,17 @@ describe("typespec-client-generator-core: package", () => {
 
       const operationAcceptParam = serviceOperation.parameters.find(
         (x) => x.kind === "header" && x.serializedName === "Accept"
-      )!;
+      );
+      ok(operationAcceptParam);
       strictEqual(operationAcceptParam.clientDefaultValue, undefined);
 
       strictEqual(method.getParameterMapping(operationAcceptParam)[0], methodAcceptParam);
 
       const correspondingMethodParams = method.getParameterMapping(pathParam);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(pathParam.name, correspondingMethodParams[0].name);
     });
     it("vanilla widget update", async () => {
       await compileVanillaWidgetService(runner, "@patch update(...Widget): Widget | Error;");
@@ -1749,7 +1899,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParamId = method.parameters[0];
       strictEqual(methodParamId.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParamId.nameInClient, "id");
+      strictEqual(methodParamId.name, "id");
       strictEqual(methodParamId.optional, false);
       strictEqual(methodParamId.onClient, false);
       strictEqual(methodParamId.isApiVersionParam, false);
@@ -1757,7 +1909,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParamWeight = method.parameters[1];
       strictEqual(methodParamWeight.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParamWeight.nameInClient, "weight");
+      strictEqual(methodParamWeight.name, "weight");
       strictEqual(methodParamWeight.optional, false);
       strictEqual(methodParamWeight.onClient, false);
       strictEqual(methodParamWeight.isApiVersionParam, false);
@@ -1765,7 +1919,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParamColor = method.parameters[2];
       strictEqual(methodParamColor.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParamColor.nameInClient, "color");
+      strictEqual(methodParamColor.name, "color");
       strictEqual(methodParamColor.optional, false);
       strictEqual(methodParamColor.onClient, false);
       strictEqual(methodParamColor.isApiVersionParam, false);
@@ -1773,22 +1929,25 @@ describe("typespec-client-generator-core: package", () => {
       ok(methodParamColor.type.values.filter((x) => x.kind === "constant" && x.value === "red"));
       ok(methodParamColor.type.values.filter((x) => x.kind === "constant" && x.value === "blue"));
 
-      const methodContentTypeParam = method.parameters.find(
-        (x) => x.nameInClient === "contentType"
-      )!;
+      const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(methodContentTypeParam);
       strictEqual(methodContentTypeParam.clientDefaultValue, undefined);
       strictEqual(methodContentTypeParam.optional, false);
 
-      const methodAcceptParam = method.parameters.find((x) => x.nameInClient === "accept")!;
+      const methodAcceptParam = method.parameters.find((x) => x.name === "accept");
+      ok(methodAcceptParam);
       strictEqual(methodAcceptParam.clientDefaultValue, undefined);
       strictEqual(methodAcceptParam.optional, false);
 
       const serviceOperation = method.operation;
 
-      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path")!;
+      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path");
+      ok(pathParam);
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "id");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "id");
+      strictEqual(pathParam.name, "id");
       strictEqual(pathParam.optional, false);
       strictEqual(pathParam.onClient, false);
       strictEqual(pathParam.isApiVersionParam, false);
@@ -1810,20 +1969,22 @@ describe("typespec-client-generator-core: package", () => {
       );
       const operationContentTypeParam = headerParams.find(
         (x) => x.serializedName === "Content-Type"
-      )!;
+      );
+      ok(operationContentTypeParam);
       strictEqual(operationContentTypeParam.clientDefaultValue, undefined);
       strictEqual(operationContentTypeParam.optional, false);
 
-      const operationAcceptParam = headerParams.find((x) => x.serializedName === "Accept")!;
+      const operationAcceptParam = headerParams.find((x) => x.serializedName === "Accept");
+      ok(operationAcceptParam);
       strictEqual(operationAcceptParam.clientDefaultValue, undefined);
       strictEqual(operationAcceptParam.optional, false);
 
       const correspondingMethodParams = method
         .getParameterMapping(bodyParameter)
-        .map((x) => x.nameInClient);
+        .map((x) => x.name);
       deepStrictEqual(correspondingMethodParams, ["weight", "color"]);
       deepStrictEqual(
-        bodyParameter.type.properties.map((p) => p.nameInClient),
+        bodyParameter.type.properties.map((p) => p.name),
         ["id", "weight", "color"]
       );
 
@@ -1841,7 +2002,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "id");
+      strictEqual(methodParam.name, "id");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
@@ -1849,10 +2012,13 @@ describe("typespec-client-generator-core: package", () => {
 
       const serviceOperation = method.operation;
 
-      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path")!;
+      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path");
+      ok(pathParam);
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "id");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "id");
+      strictEqual(pathParam.name, "id");
       strictEqual(pathParam.optional, false);
       strictEqual(pathParam.onClient, false);
       strictEqual(pathParam.isApiVersionParam, false);
@@ -1860,7 +2026,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = method.getParameterMapping(pathParam);
       strictEqual(correspondingMethodParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
+      strictEqual(pathParam.name, correspondingMethodParams[0].name);
     });
     it("vanilla widget list", async () => {
       await compileVanillaWidgetService(runner, "@get list(): Widget[] | Error;");
@@ -2082,7 +2250,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.parameters.length, 7);
 
       // TODO: what should we do with eTags and client request id?
-      const methodWidgetName = method.parameters.find((p) => p.nameInClient === "widgetName")!;
+      const methodWidgetName = method.parameters.find((p) => p.name === "widgetName");
+      ok(methodWidgetName);
       strictEqual(methodWidgetName.kind, "method");
       strictEqual(methodWidgetName.isApiVersionParam, false);
       deepStrictEqual(methodWidgetName.apiVersions, ["2022-08-30"]);
@@ -2091,26 +2260,34 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.operation.parameters.length, 8);
 
-      const pathParam = method.operation.parameters.find((x) => x.kind === "path")!;
+      const pathParam = method.operation.parameters.find((x) => x.kind === "path");
+      ok(pathParam);
       strictEqual(pathParam.kind, "path");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "widgetName");
+      strictEqual(pathParam.name, "widgetName");
       strictEqual(pathParam.serializedName, "widgetName");
       strictEqual(pathParam.onClient, false);
       strictEqual(method.getParameterMapping(pathParam).length, 1);
       strictEqual(method.getParameterMapping(pathParam)[0], methodWidgetName);
 
-      const queryParam = method.operation.parameters.find((x) => x.kind === "query")!;
+      const queryParam = method.operation.parameters.find((x) => x.kind === "query");
+      ok(queryParam);
       strictEqual(queryParam.isApiVersionParam, true);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, "apiVersion");
+      strictEqual(queryParam.name, "apiVersion");
       strictEqual(queryParam.serializedName, "api-version");
       strictEqual(queryParam.onClient, true);
       strictEqual(method.getParameterMapping(queryParam).length, 1);
+      ok(parentClient.initialization);
       strictEqual(
         method.getParameterMapping(queryParam)[0],
-        parentClient.initialization!.properties.find((x) => x.isApiVersionParam)
+        parentClient.initialization.properties.find((x) => x.isApiVersionParam)
       );
 
-      const methodAcceptParam = method.parameters.find((x) => x.nameInClient === "accept")!;
+      const methodAcceptParam = method.parameters.find((x) => x.name === "accept");
+      ok(methodAcceptParam);
       strictEqual(methodAcceptParam.clientDefaultValue, undefined);
       strictEqual(methodAcceptParam.onClient, false);
       strictEqual(methodAcceptParam.optional, false);
@@ -2120,14 +2297,15 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(headerParams.length, 6);
 
-      const operationAcceptParam = headerParams.find((x) => x.serializedName === "Accept")!;
+      const operationAcceptParam = headerParams.find((x) => x.serializedName === "Accept");
+      ok(operationAcceptParam);
       strictEqual(operationAcceptParam.clientDefaultValue, undefined);
       strictEqual(operationAcceptParam.onClient, false);
       strictEqual(operationAcceptParam.optional, false);
       strictEqual(method.getParameterMapping(operationAcceptParam)[0], methodAcceptParam);
 
       strictEqual(
-        method.parameters.some((x) => x.nameInClient === "contentType"),
+        method.parameters.some((x) => x.name === "contentType"),
         false
       );
       strictEqual(
@@ -2159,26 +2337,30 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(client.methods.length, 2);
 
       // TEST GET STATUS
-      const getStatus = client.methods.find((x) => x.name === "getWidgetOperationStatus")!;
+      const getStatus = client.methods.find((x) => x.name === "getWidgetOperationStatus");
+      ok(getStatus);
       strictEqual(getStatus.name, "getWidgetOperationStatus");
       strictEqual(getStatus.kind, "basic");
       strictEqual(getStatus.parameters.length, 3);
 
-      const methodWidgetName = getStatus.parameters.find((p) => p.nameInClient === "widgetName")!;
+      const methodWidgetName = getStatus.parameters.find((p) => p.name === "widgetName");
+      ok(methodWidgetName);
       strictEqual(methodWidgetName.kind, "method");
       strictEqual(methodWidgetName.isApiVersionParam, false);
       deepStrictEqual(methodWidgetName.apiVersions, ["2022-08-30"]);
       strictEqual(methodWidgetName.onClient, false);
       strictEqual(methodWidgetName.optional, false);
 
-      const methodOperationId = getStatus.parameters.find((p) => p.nameInClient === "operationId")!;
+      const methodOperationId = getStatus.parameters.find((p) => p.name === "operationId");
+      ok(methodOperationId);
       strictEqual(methodOperationId.kind, "method");
       strictEqual(methodOperationId.isApiVersionParam, false);
       deepStrictEqual(methodOperationId.apiVersions, ["2022-08-30"]);
       strictEqual(methodOperationId.onClient, false);
       strictEqual(methodOperationId.optional, false);
 
-      const methodAcceptParam = getStatus.parameters.find((x) => x.nameInClient === "accept")!;
+      const methodAcceptParam = getStatus.parameters.find((x) => x.name === "accept");
+      ok(methodAcceptParam);
       strictEqual(methodAcceptParam.clientDefaultValue, undefined);
       strictEqual(methodAcceptParam.onClient, false);
       strictEqual(methodAcceptParam.optional, false);
@@ -2190,7 +2372,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const pathParam1 = pathParams[0];
       strictEqual(pathParam1.kind, "path");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam1.nameInClient, "widgetName");
+      strictEqual(pathParam1.name, "widgetName");
       strictEqual(pathParam1.serializedName, "widgetName");
       strictEqual(pathParam1.onClient, false);
       strictEqual(getStatus.getParameterMapping(pathParam1).length, 1);
@@ -2198,41 +2382,51 @@ describe("typespec-client-generator-core: package", () => {
 
       const pathParam2 = pathParams[1];
       strictEqual(pathParam2.kind, "path");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam2.nameInClient, "operationId");
+      strictEqual(pathParam2.name, "operationId");
       strictEqual(pathParam2.serializedName, "operationId");
       strictEqual(pathParam2.onClient, false);
       strictEqual(getStatus.getParameterMapping(pathParam2).length, 1);
       strictEqual(getStatus.getParameterMapping(pathParam2)[0], methodOperationId);
 
-      const apiVersionParam = getStatus.operation.parameters.find((x) => x.kind === "query")!;
+      const apiVersionParam = getStatus.operation.parameters.find((x) => x.kind === "query");
+      ok(apiVersionParam);
       strictEqual(apiVersionParam.isApiVersionParam, true);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
+      strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.serializedName, "api-version");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(getStatus.getParameterMapping(apiVersionParam).length, 1);
+      ok(parentClient.initialization);
       strictEqual(
         getStatus.getParameterMapping(apiVersionParam)[0],
-        parentClient.initialization!.properties.find((x) => x.isApiVersionParam)
+        parentClient.initialization.properties.find((x) => x.isApiVersionParam)
       );
 
-      const operationAcceptParam = getStatus.operation.parameters.find((x) => x.kind === "header")!;
+      const operationAcceptParam = getStatus.operation.parameters.find((x) => x.kind === "header");
+      ok(operationAcceptParam);
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(operationAcceptParam.nameInClient, "accept");
+      strictEqual(operationAcceptParam.name, "accept");
       strictEqual(operationAcceptParam.clientDefaultValue, undefined);
       strictEqual(operationAcceptParam.onClient, false);
       strictEqual(operationAcceptParam.optional, false);
       strictEqual(getStatus.getParameterMapping(operationAcceptParam)[0], methodAcceptParam);
 
-      const widgetModel = sdkPackage.models.find((x) => x.name === "Widget")!;
+      const widgetModel = sdkPackage.models.find((x) => x.name === "Widget");
 
       // TEST POLLING
-      const createOrUpdate = client.methods.find((x) => x.name === "createOrUpdateWidget")!;
+      const createOrUpdate = client.methods.find((x) => x.name === "createOrUpdateWidget");
+      ok(createOrUpdate);
       strictEqual(createOrUpdate.kind, "lro");
       strictEqual(
-        createOrUpdate.parameters.find((x) => x.nameInClient === "apiVersion"),
+        createOrUpdate.parameters.find((x) => x.name === "apiVersion"),
         undefined
       );
       deepStrictEqual(
-        createOrUpdate.parameters.map((x) => x.nameInClient),
+        createOrUpdate.parameters.map((x) => x.name),
         [
           "widgetName",
           "contentType",
@@ -2254,7 +2448,7 @@ describe("typespec-client-generator-core: package", () => {
         (x): x is SdkHeaderParameter => x.kind === "header"
       );
       deepStrictEqual(
-        headerParams.map((x) => x.nameInClient),
+        headerParams.map((x) => x.name),
         [
           "contentType",
           "repeatabilityRequestId",
@@ -2268,16 +2462,16 @@ describe("typespec-client-generator-core: package", () => {
         ]
       );
       strictEqual(headerParams.length, 9);
-      strictEqual(
-        serviceOperation.parameters.find((x) => x.kind === "path")!.serializedName,
-        "widgetName"
-      );
-      strictEqual(
-        serviceOperation.parameters.find((x) => x.kind === "query")!.serializedName,
-        "api-version"
-      );
+      const pathParam = serviceOperation.parameters.find((x) => x.kind === "path");
+      ok(pathParam);
+      strictEqual(pathParam.serializedName, "widgetName");
+      const queryParam = serviceOperation.parameters.find((x) => x.kind === "query");
+      ok(queryParam);
+      strictEqual(queryParam.serializedName, "api-version");
       strictEqual(serviceOperation.bodyParams.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceOperation.bodyParams[0].nameInClient, "resource");
+      strictEqual(serviceOperation.bodyParams[0].name, "resource");
       strictEqual(serviceOperation.bodyParams[0].type, widgetModel);
 
       strictEqual(Object.keys(serviceOperation.responses).length, 2);
@@ -2303,11 +2497,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const exception = serviceOperation.exceptions["*"];
       strictEqual(exception.kind, "http");
-      strictEqual(exception.type!.kind, "model");
-      strictEqual(
-        exception.type!.crossLanguageDefinitionId,
-        "Azure.Core.Foundations.ErrorResponse"
-      );
+      ok(exception.type);
+      strictEqual(exception.type.kind, "model");
+      strictEqual(exception.type.crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
       // we shouldn't generate this model
       strictEqual(
         sdkPackage.models.find(
@@ -2338,7 +2530,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 2);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.models[0].name, "Manufacturer");
-      const widgetClient = sdkPackage.clients.find((c) => c.name === "Widgets")!;
+      const widgetClient = sdkPackage.clients.find((c) => c.name === "Widgets");
+      ok(widgetClient);
       strictEqual(widgetClient.initialization, undefined);
       strictEqual(widgetClient.methods.length, 1);
       const listManufacturers = widgetClient.methods[0];
@@ -2347,10 +2540,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(listManufacturers.kind, "paging");
       strictEqual(listManufacturers.parameters.length, 2);
       deepStrictEqual(
-        listManufacturers.parameters.map((x) => x.nameInClient),
+        listManufacturers.parameters.map((x) => x.name),
         ["clientRequestId", "accept"]
       );
-      const methodResponse = listManufacturers.response.type!;
+      const methodResponse = listManufacturers.response.type;
+      ok(methodResponse);
       strictEqual(methodResponse.kind, "array");
       deepStrictEqual(methodResponse.valueType, sdkPackage.models[0]);
 
@@ -2359,22 +2553,25 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operation.verb, "get");
       strictEqual(operation.parameters.length, 3);
 
-      const apiVersion = operation.parameters.find((x) => x.isApiVersionParam)!;
+      const apiVersion = operation.parameters.find((x) => x.isApiVersionParam);
+      ok(apiVersion);
       strictEqual(apiVersion.kind, "query");
+      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersion.nameInClient, "apiVersion");
+      strictEqual(apiVersion.name, "apiVersion");
       strictEqual(apiVersion.serializedName, "api-version");
       strictEqual(apiVersion.onClient, true);
 
-      const clientRequestId = operation.parameters.find(
-        (x) => x.nameInClient === "clientRequestId"
-      )!;
+      const clientRequestId = operation.parameters.find((x) => x.name === "clientRequestId");
+      ok(clientRequestId);
       strictEqual(clientRequestId.kind, "header");
       deepStrictEqual(
         listManufacturers.getParameterMapping(clientRequestId)[0],
         listManufacturers.parameters[0]
       );
 
-      const accept = operation.parameters.find((x) => x.nameInClient === "accept")!;
+      const accept = operation.parameters.find((x) => x.name === "accept");
+      ok(accept);
       strictEqual(accept.kind, "header");
       deepStrictEqual(
         listManufacturers.getParameterMapping(accept)[0],
@@ -2384,25 +2581,29 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(Object.keys(operation.responses).length, 1);
       const response200 = operation.responses[200];
       strictEqual(response200.kind, "http");
-      const pagingModel = response200.type!;
+      const pagingModel = response200.type;
+      ok(pagingModel);
       strictEqual(pagingModel.kind, "model");
       strictEqual(pagingModel.name, "PagedManufacturer");
       strictEqual(pagingModel.properties.length, 3);
 
-      const valueProperty = pagingModel.properties.find((x) => x.nameInClient === "value")!;
+      const valueProperty = pagingModel.properties.find((x) => x.name === "value");
+      ok(valueProperty);
       strictEqual(valueProperty.kind, "property");
       strictEqual(valueProperty.type.kind, "array");
       strictEqual(valueProperty.type.valueType, sdkPackage.models[0]);
 
-      const nextLinkProperty = pagingModel.properties.find((x) => x.nameInClient === "nextLink")!;
+      const nextLinkProperty = pagingModel.properties.find((x) => x.name === "nextLink");
+      ok(nextLinkProperty);
       strictEqual(nextLinkProperty.kind, "property");
       strictEqual(nextLinkProperty.type.kind, "url");
       strictEqual(nextLinkProperty.serializedName, "nextLink");
       strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
       const clientRequestIdProperty = pagingModel.properties.find(
-        (x) => x.nameInClient === "clientRequestId"
-      )!;
+        (x) => x.name === "clientRequestId"
+      );
+      ok(clientRequestIdProperty);
       strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
