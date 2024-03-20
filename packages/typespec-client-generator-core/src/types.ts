@@ -420,7 +420,7 @@ function addDiscriminatorToModelType(
                 createDiagnostic({
                   code: "discriminator-not-constant",
                   target: type,
-                  format: { discriminator: property.nameInClient },
+                  format: { discriminator: property.name },
                 })
               );
             } else if (typeof property.type.value !== "string") {
@@ -429,7 +429,7 @@ function addDiscriminatorToModelType(
                   code: "discriminator-not-string",
                   target: type,
                   format: {
-                    discriminator: property.nameInClient,
+                    discriminator: property.name,
                     discriminatorValue: String(property.type.value),
                   },
                 })
@@ -469,13 +469,15 @@ function addDiscriminatorToModelType(
         encode: "string",
       };
     }
+    const name = discriminator.propertyName;
     model.properties.push({
       kind: "property",
       optional: false,
       discriminator: true,
       serializedName: discriminator.propertyName,
       type: discriminatorType!,
-      nameInClient: discriminator.propertyName,
+      nameInClient: name,
+      name,
       onClient: false,
       apiVersions: getAvailableApiVersions(context, type),
       isApiVersionParam: false,
@@ -934,10 +936,12 @@ export function getSdkCredentialParameter(
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
+  const name = "credential";
   return {
     type: getSdkCredentialType(client, auth),
     kind: "credential",
-    nameInClient: "credential",
+    nameInClient: name,
+    name,
     description: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service),
     onClient: true,
@@ -970,13 +974,15 @@ export function getSdkModelPropertyType(
     propertyType = getSdkEnum(context, knownValues, options.operation);
   }
   const docWrapper = getDocHelper(context, type);
+  const name = getPropertyNames(context, type)[0];
   const base = {
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
     apiVersions: getAvailableApiVersions(context, type),
     type: propertyType,
-    nameInClient: getPropertyNames(context, type)[0],
+    nameInClient: name,
+    name,
     onClient: false,
     optional: type.optional,
     nullable: isNullable(type.type),
