@@ -17,9 +17,9 @@ A list of REST API operations supported by an Azure Resource Provider. It contai
 model OperationListResult is Azure.Core.Page<Operation>;
 
 /**
- * Base model that defines common properties for all ARM resources.
+ * Base model that defines common properties for all Azure Resource Manager resources.
  */
-@doc("Common properties for all ARM resources.")
+@doc("Common properties for all Azure Resource Manager resources.")
 model ArmResource extends ArmResourceBase {
   @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
   @visibility("read")
@@ -295,11 +295,11 @@ model ErrorAdditionalInfo {
 }
 
 /**
- * Standard type definition for ARM Tags property.
+ * Standard type definition for Azure Resource Manager Tags property.
  *
  * It is included in the TrackedResource template definition.
  */
-@doc("The ARM Resource tags.")
+@doc("The Azure Resource Manager Resource tags.")
 model ArmTagsProperty {
   @doc("Resource tags.")
   tags?: Record<string>;
@@ -636,7 +636,7 @@ model Operation {
   name?: string;
 
   @doc("""
-  Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for ARM/control-plane operations.
+  Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
   """)
   @visibility("read")
   isDataAction?: boolean;
@@ -750,4 +750,48 @@ op checkNameAvailability<
   @doc("The CheckAvailability request")
   @body
   body: Request,
+): Response | ErrorResponse;
+
+/**
+ * @dev The base template for Azure Resource Manager GET and HEAD Operations.
+ * @param Parameters The parameter object for the operation.
+ * @param Response The response or union of responses for success.
+ * @param ErrorResponse The error response.
+ */
+op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse extends {}>(
+  ...Parameters,
+): Response | ErrorResponse;
+
+/**
+ * @dev The base template for Azure Resource Manager PUT Operations.
+ * @param HttpParameters The parameter object for the operation.
+ * @param BodyParameter The body parameter
+ * @param Response The response or union of responses for success.
+ * @param ErrorResponse The error response.
+ */
+op ArmCreateOperation<
+  HttpParameters extends {},
+  BodyParameter extends {},
+  Response extends {},
+  ErrorResponse extends {}
+>(
+  ...HttpParameters,
+  @doc("Resource create parameters.") @body resource: BodyParameter,
+): Response | ErrorResponse;
+
+/**
+ * @dev The base template for Azure Resource Manager PATCH Operations.
+ * @param HttpParameters The parameter object for the operation.
+ * @param BodyParameter The body parameter
+ * @param Response The response or union of responses for success.
+ * @param ErrorResponse The error response.
+ */
+op ArmUpdateOperation<
+  HttpParameters extends {},
+  BodyParameter extends {},
+  Response extends {},
+  ErrorResponse extends {}
+>(
+  ...HttpParameters,
+  @doc("The resource properties to be updated.") @body properties: BodyParameter,
 ): Response | ErrorResponse;

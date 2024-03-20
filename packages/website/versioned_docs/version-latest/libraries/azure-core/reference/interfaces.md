@@ -58,7 +58,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: 
 Create or update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -73,7 +73,7 @@ op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, cont
 Long-running resource create or update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -88,7 +88,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: s
 Resource update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -364,7 +364,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature to create or update a resource.
 
 ```typespec
-op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -502,7 +502,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to create or update a resource.
 
 ```typespec
-op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -596,7 +596,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to update a resource.
 
 ```typespec
-op Azure.Core.ResourceUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -666,7 +666,7 @@ op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.F
 Long-running operation that updates a resource.
 
 ```typespec
-op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentType: application/merge-patch+json, resource: Resource): (anonymous model) | ErrorResponse
+op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | ErrorResponse
 ```
 
 #### Template Parameters

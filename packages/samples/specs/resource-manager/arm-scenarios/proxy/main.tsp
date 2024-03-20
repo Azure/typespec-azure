@@ -85,6 +85,9 @@ interface Employees {
   listBySubscription is ArmListBySubscription<Employee>;
   /** A sample resource action that move employee to different location */
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  /** A sample HEAD operation to check resource existence */
+  checkExistence is ArmResourceCheckExistence<Employee>;
 }
 
 /** Employee move request */
@@ -122,11 +125,11 @@ model Dependent is ProxyResource<DependentProperties> {
   name: string;
 }
 
-/** Depedent properties */
+/** Dependent properties */
 model DependentProperties {
-  /** Age of depedent */
+  /** Age of dependent */
   age: int32;
 
-  /** Gender of depedent */
+  /** Gender of dependent */
   gender: string;
 }

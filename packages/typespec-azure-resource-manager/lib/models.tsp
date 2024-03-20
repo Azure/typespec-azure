@@ -1,6 +1,7 @@
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
+using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 
@@ -10,7 +11,7 @@ namespace Azure.ResourceManager;
 /**
  * Concrete tracked resource types can be created by aliasing this type using a specific property type.
  *
- * See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
@@ -26,7 +27,7 @@ model TrackedResource<Properties extends {}> extends TrackedResourceBase {
 /**
  * Concrete proxy resource types can be created by aliasing this type using a specific property type.
  *
- * See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
@@ -42,7 +43,7 @@ model ProxyResource<Properties extends {}> extends ProxyResourceBase {
 /**
  * Concrete extension resource types can be created by aliasing this type using a specific property type.
  *
- * See more details on [different ARM resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
  */
 @extensionResource
@@ -86,10 +87,10 @@ model ProviderNamespace<Resource extends {}> {
 }
 //#endregion
 
-//#region Common ARM type definitions
+//#region Common Azure Resource Manager type definitions
 
 /**
- * A type definition that refers the id to an ARM resource.
+ * A type definition that refers the id to an Azure Resource Manager resource.
  *
  * Sample usage:
  *   otherArmId: ResourceIdentifier;
@@ -97,7 +98,7 @@ model ProviderNamespace<Resource extends {}> {
  *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
  * @template AllowedResourceTypes An array of allowed resource types for the resource reference
  */
-@doc("A type definition that refers the id to an ARM resource.")
+@doc("A type definition that refers the id to an Azure Resource Manager resource.")
 @format("arm-id")
 @OpenAPI.extension(
   "x-ms-arm-id-details",
@@ -109,10 +110,10 @@ scalar ResourceIdentifier<AllowedResourceTypes extends ResourceIdentifierAllowed
   extends string;
 
 /**
- * Used in ResourceIdentifier definition to represent a particular type of ARM resource, enabling constraints based on resource type.
+ * Used in ResourceIdentifier definition to represent a particular type of Azure Resource Manager resource, enabling constraints based on resource type.
  * See [link](https://github.com/Azure/autorest/tree/main/docs/extensions#schema)
  */
-@doc("Optional definition represents a particular type of ARM resource which can be referred to by a ResourceIdentifier.")
+@doc("Optional definition represents a particular type of Azure Resource Manager resource which can be referred to by a ResourceIdentifier.")
 model ResourceIdentifierAllowedResource {
   @doc("The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.")
   type: string;
@@ -169,11 +170,12 @@ enum ResourceProvisioningState {
 @doc("Contains a default provisioningState property to be spread into resource property types")
 model DefaultProvisioningStateProperty {
   @doc("The provisioning state of the resource.")
-  provisioningState: ResourceProvisioningState;
+  @visibility("read")
+  provisioningState?: ResourceProvisioningState;
 }
 
 /**
- * Standard ARM definition of ManagedServiceIdentity
+ * Standard Azure Resource Manager definition of ManagedServiceIdentity
  */
 @doc("The managed service identities envelope.")
 model ManagedServiceIdentity {
@@ -182,7 +184,7 @@ model ManagedServiceIdentity {
 }
 
 /**
- * Standard ARM definition of ManagedServiceIdentity for services
+ * Standard Azure Resource Manager definition of ManagedServiceIdentity for services
  * that only support system-defined identities
  */
 @doc("Managed identity for services that are constrained to system-assigned managed identities.")

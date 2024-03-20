@@ -13,7 +13,11 @@ Helper function to return cross language definition id for a type
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `type` | `Model` \| `Scalar` \| `Enum` \| `Operation` |  |
+| `type` | `Object` |  |
+| `type.interface`? | `Interface` | - |
+| `type.kind` | `string` | - |
+| `type.name` | `string` | - |
+| `type.namespace`? | `Namespace` | - |
 
 ## Returns
 

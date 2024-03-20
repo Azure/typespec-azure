@@ -1,8 +1,54 @@
 # Change Log - @azure-tools/typespec-autorest
 
-This log was last generated on Wed, 24 Jan 2024 05:47:18 GMT and should not be manually modified.
+## 0.40.0
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#337](https://github.com/Azure/typespec-azure/pull/337) Add support for all properties of openapi `info` object on the `@info` decorator
+- [#277](https://github.com/Azure/typespec-azure/pull/277) Support `@flattenProperty` decorator.
+
+
+## 0.39.2
+
+### Patch Changes
+
+- 9baadd2: `readonly` was not added when `use-read-only-status-schema` is set to `true` for union types.
+- 9baadd2: Fix `UnionType | null` would be inlined instead of referencing `UnionType`
+
+## 0.39.1
+
+### Patch Changes
+
+- b5fa501: Support default value for union properties
+- b5fa501: Fix: Description being ignored on unions
+
+## 0.39.0
+
+### Minor Changes
+
+- a1a2be7: Respect `@clientName` decorator from `@azure-rest/typespec-client-generator-core` library where `@projectedName("client")` used to work.
+
+### Patch Changes
+
+- 2f6bbc4: Fix: Inline enums properties with default values as `default` is not allowed next to `$ref`
+- 8b072f4: Emit warning if using opendIdConnect http auth scheme
+- 148eee4: Update references to ARM, Add template customization parameters, add migration docs
+
+
+## 0.38.1
+
+Mon, 29 Jan 2024 22:16:39 GMT
+
+### Patches
+
+- Fix: Autorest emitter should generated format: decimal
 
 ## 0.38.0
+
 Wed, 24 Jan 2024 05:47:18 GMT
 
 ### Minor changes
@@ -15,6 +61,7 @@ Wed, 24 Jan 2024 05:47:18 GMT
 - Update dependencies
 
 ## 0.37.2
+
 Thu, 14 Dec 2023 01:19:27 GMT
 
 ### Patches
@@ -22,6 +69,7 @@ Thu, 14 Dec 2023 01:19:27 GMT
 - Fix: Multipart property of type `bytes[]` is now treated as multiple file parts
 
 ## 0.37.1
+
 Mon, 11 Dec 2023 18:44:34 GMT
 
 ### Patches
@@ -29,6 +77,7 @@ Mon, 11 Dec 2023 18:44:34 GMT
 - Fix: enums created from named unions will keep have the union name carry over to `x-ms-enum.name`
 
 ## 0.37.0
+
 Wed, 06 Dec 2023 19:47:28 GMT
 
 ### Minor changes
@@ -44,6 +93,7 @@ Wed, 06 Dec 2023 19:47:28 GMT
 - Added support for string templates
 
 ## 0.36.1
+
 Tue, 14 Nov 2023 20:35:54 GMT
 
 ### Patches
@@ -53,6 +103,7 @@ Tue, 14 Nov 2023 20:35:54 GMT
 - Fix: Multipart with json part will now produce `type: string` and report a warning as json parts are not supported in swagger 2.0.
 
 ## 0.36.0
+
 Wed, 08 Nov 2023 00:11:02 GMT
 
 ### Minor changes
@@ -67,6 +118,7 @@ Wed, 08 Nov 2023 00:11:02 GMT
 - **BREAKING CHANGE** Minimum node version increased to 18
 
 ## 0.35.2
+
 Tue, 31 Oct 2023 19:47:30 GMT
 
 ### Patches
@@ -77,6 +129,7 @@ Tue, 31 Oct 2023 19:47:30 GMT
 - Fix: `x-ms-paths` implicit disambiguation would create invalid parameter. Instead `_overload` dummy parameter is always added.
 
 ## 0.35.1
+
 Sat, 28 Oct 2023 15:59:07 GMT
 
 ### Patches
@@ -84,6 +137,7 @@ Sat, 28 Oct 2023 15:59:07 GMT
 - Allow automatic disambiguation of x-ms-paths when signatures don't differ by query params.
 
 ## 0.35.0
+
 Wed, 11 Oct 2023 23:51:36 GMT
 
 ### Minor changes
@@ -98,6 +152,7 @@ Wed, 11 Oct 2023 23:51:36 GMT
 - Add support for status code ranges
 
 ## 0.34.0
+
 Tue, 12 Sep 2023 21:49:08 GMT
 
 ### Minor changes
@@ -114,6 +169,7 @@ Tue, 12 Sep 2023 21:49:08 GMT
 - Fix issue where properties with "create" visibility did not appear when using the CreateOrUpdate PATCH-based template.
 
 ## 0.33.0
+
 Tue, 08 Aug 2023 22:32:22 GMT
 
 ### Minor changes
@@ -128,6 +184,7 @@ Tue, 08 Aug 2023 22:32:22 GMT
 - Add support for `@info` decorator providing the ability to specify the additional fields from openapi info object.
 
 ## 0.32.0
+
 Tue, 11 Jul 2023 22:06:14 GMT
 
 ### Minor changes
@@ -147,6 +204,7 @@ Tue, 11 Jul 2023 22:06:14 GMT
 - Update dependencies
 
 ## 0.31.0
+
 Tue, 06 Jun 2023 22:44:32 GMT
 
 ### Minor changes
@@ -169,6 +227,7 @@ Tue, 06 Jun 2023 22:44:32 GMT
 - Updated decorators to use `valueof`
 
 ## 0.30.1
+
 Sat, 20 May 2023 01:52:45 GMT
 
 ### Patches
@@ -176,6 +235,7 @@ Sat, 20 May 2023 01:52:45 GMT
 - Fix: `arm-types-dir` using absolute reference(e.g. using `{project-root}` would resolve path with extra `../`
 
 ## 0.30.0
+
 Wed, 10 May 2023 21:24:14 GMT
 
 ### Minor changes
@@ -185,11 +245,12 @@ Wed, 10 May 2023 21:24:14 GMT
 ### Updates
 
 - **Added** new option `arm-types-dir` used to specify the directory for the common arm common types
--  Respect `client` projection target to resolve `operationId` and `x-ms-client-name`
+- Respect `client` projection target to resolve `operationId` and `x-ms-client-name`
 - Add support for `@encode` decorator
 - Cleanup deprecated items
 
 ## 0.29.0
+
 Tue, 11 Apr 2023 18:49:21 GMT
 
 ### Minor changes
@@ -206,6 +267,7 @@ Tue, 11 Apr 2023 18:49:21 GMT
 - Uptake changes to dateTime types
 
 ## 0.28.0
+
 Mon, 13 Mar 2023 21:30:57 GMT
 
 ### Minor changes
@@ -217,6 +279,7 @@ Mon, 13 Mar 2023 21:30:57 GMT
 - Avoid Read suffix in schemas split by visibility.
 
 ## 0.27.0
+
 Fri, 03 Mar 2023 19:59:30 GMT
 
 ### Minor changes
@@ -234,6 +297,7 @@ Fri, 03 Mar 2023 19:59:30 GMT
 - Rename to TypeSpec
 
 ## 0.26.0
+
 Tue, 07 Feb 2023 21:56:32 GMT
 
 ### Minor changes
@@ -249,6 +313,7 @@ Tue, 07 Feb 2023 21:56:32 GMT
 - Fix issues when multiple copies of library are loaded.
 
 ## 0.25.0
+
 Fri, 13 Jan 2023 00:05:37 GMT
 
 ### Minor changes
@@ -261,6 +326,7 @@ Fri, 13 Jan 2023 00:05:37 GMT
 - Generate recursive update schemas with optional properties for resource update operation
 
 ## 0.24.0
+
 Wed, 07 Dec 2022 17:21:53 GMT
 
 ### Breaking changes
@@ -287,6 +353,7 @@ Wed, 07 Dec 2022 17:21:53 GMT
 - Update dependencies
 
 ## 0.22.0
+
 Sat, 12 Nov 2022 00:14:23 GMT
 
 ### Minor changes
@@ -304,6 +371,7 @@ Sat, 12 Nov 2022 00:14:23 GMT
 - Fix: @extension on a model is intrinsic types are being applied
 
 ## 0.21.0
+
 Wed, 12 Oct 2022 21:12:48 GMT
 
 ### Minor changes
@@ -315,7 +383,7 @@ Wed, 12 Oct 2022 21:12:48 GMT
 - Emitted swagger document include all types under the service namespace unless `omit-unreachable-types` option is set.
 - Add support for `@minItems` and `@maxItems` decorators
 - Update dependencies.
-- Uptake move of  `@discriminator` into compiler
+- Uptake move of `@discriminator` into compiler
 - Apply changes to rest library
 - Update info logging to use new tracing engine
 
@@ -325,13 +393,14 @@ Wed, 12 Oct 2022 21:12:48 GMT
 - Exclude properties of type `never` when emitting model schemas
 
 ## 0.20.0
+
 Thu, 08 Sep 2022 01:05:13 GMT
 
 ### Minor changes
 
 - Uptake changes to http service authentication oauth2 scopes.
 - Add support for projected names. Using json projection to differentiate x-ms-client-name.
-- string literal as constant enum 
+- string literal as constant enum
 - Update dependencies.
 - React to Type suffix removal
 - Uptake change to enum members map type
@@ -343,6 +412,7 @@ Thu, 08 Sep 2022 01:05:13 GMT
 - emit x-ms-error-response when @error applies
 
 ## 0.19.0
+
 Thu, 11 Aug 2022 19:05:47 GMT
 
 ### Minor changes
@@ -375,6 +445,7 @@ Thu, 11 Aug 2022 19:05:47 GMT
 - update readme.md with decorator information
 
 ## 0.18.0
+
 Fri, 08 Jul 2022 23:23:14 GMT
 
 ### Minor changes
@@ -390,6 +461,7 @@ Fri, 08 Jul 2022 23:23:14 GMT
 - Inline parameters spread from anonymous model
 
 ## 0.17.0
+
 Mon, 13 Jun 2022 23:42:46 GMT
 
 ### Minor changes
@@ -411,6 +483,7 @@ Mon, 13 Jun 2022 23:42:46 GMT
 - Upgrade to TS4.7
 
 ## 0.16.0
+
 Fri, 06 May 2022 17:20:15 GMT
 
 ### Minor changes
@@ -434,6 +507,7 @@ Fri, 06 May 2022 17:20:15 GMT
 - URI-encode refs
 
 ## 0.15.0
+
 Thu, 31 Mar 2022 17:11:06 GMT
 
 ### Minor changes
@@ -448,6 +522,7 @@ Thu, 31 Mar 2022 17:11:06 GMT
 - add support for x-ms-identifier
 
 ## 0.14.0
+
 Wed, 09 Mar 2022 17:42:26 GMT
 
 ### Minor changes
@@ -465,6 +540,7 @@ Wed, 09 Mar 2022 17:42:26 GMT
 - Fix issue where parameter definitions were being duplicated unnecessarily
 
 ## 0.13.0
+
 Tue, 15 Feb 2022 22:35:13 GMT
 
 ### Minor changes
@@ -478,6 +554,7 @@ Tue, 15 Feb 2022 22:35:13 GMT
 - Add support for separate `@summary` from `@doc`
 
 ## 0.12.0
+
 Fri, 11 Feb 2022 06:13:30 GMT
 
 ### Minor changes
@@ -489,6 +566,7 @@ Fri, 11 Feb 2022 06:13:30 GMT
 - Bump dependency versions
 
 ## 0.11.0
+
 Fri, 04 Feb 2022 18:01:35 GMT
 
 ### Minor changes
@@ -514,6 +592,7 @@ Fri, 04 Feb 2022 18:01:35 GMT
 - Add cadl-autorest support for safeint
 
 ## 0.10.0
+
 Thu, 16 Dec 2021 08:03:03 GMT
 
 ### Minor changes
@@ -526,6 +605,7 @@ Thu, 16 Dec 2021 08:03:03 GMT
 - Adjust emitter to support new @route model
 
 ## 0.9.2
+
 Wed, 01 Dec 2021 22:56:37 GMT
 
 ### Patches
@@ -533,6 +613,7 @@ Wed, 01 Dec 2021 22:56:37 GMT
 - Fix mapping of update method name to HTTP verb
 
 ## 0.9.1
+
 Thu, 18 Nov 2021 13:58:37 GMT
 
 ### Patches
@@ -540,6 +621,7 @@ Thu, 18 Nov 2021 13:58:37 GMT
 - Respond to new API changes in @cadl-lang/rest
 
 ## 0.9.0
+
 Thu, 11 Nov 2021 21:46:47 GMT
 
 ### Minor changes
@@ -551,6 +633,7 @@ Thu, 11 Nov 2021 21:46:47 GMT
 - Define response body for primitive response type
 
 ## 0.8.1
+
 Thu, 28 Oct 2021 21:20:34 GMT
 
 ### Patches
@@ -560,6 +643,7 @@ Thu, 28 Oct 2021 21:20:34 GMT
 - Sort paths and definitions in cadl-autorest OpenAPI output files
 
 ## 0.8.0
+
 Fri, 15 Oct 2021 21:33:37 GMT
 
 ### Minor changes
@@ -567,6 +651,7 @@ Fri, 15 Oct 2021 21:33:37 GMT
 - **Added** Support for server default
 
 ## 0.7.0
+
 Fri, 17 Sep 2021 00:49:37 GMT
 
 ### Minor changes
@@ -579,6 +664,7 @@ Fri, 17 Sep 2021 00:49:37 GMT
 - Support for emitting `bytes` and new number types
 
 ## 0.6.0
+
 Sat, 21 Aug 2021 00:04:02 GMT
 
 ### Minor changes
@@ -590,6 +676,7 @@ Sat, 21 Aug 2021 00:04:02 GMT
 - Allow x-ms-pageable in non-list operations (POST)
 
 ## 0.5.1
+
 Fri, 13 Aug 2021 19:10:21 GMT
 
 ### Patches
@@ -597,6 +684,7 @@ Fri, 13 Aug 2021 19:10:21 GMT
 - Fixes for retaining state over multiple compilations, allowing lro extensions, minimizing produces/consumes usage, removing empty response schema, fixes for dictionaries with complex value types
 
 ## 0.5.0
+
 Tue, 10 Aug 2021 20:23:04 GMT
 
 ### Minor changes
@@ -604,11 +692,13 @@ Tue, 10 Aug 2021 20:23:04 GMT
 - Rename package to @azure-tools/cadl-autorest
 
 ## 0.4.1
+
 Mon, 09 Aug 2021 21:14:12 GMT
 
 _Version update only_
 
 ## 0.4.0
+
 Mon, 02 Aug 2021 18:17:00 GMT
 
 ### Minor changes
@@ -616,6 +706,7 @@ Mon, 02 Aug 2021 18:17:00 GMT
 - Rename ADL to Cadl
 
 ## 0.3.2
+
 Wed, 28 Jul 2021 19:40:06 GMT
 
 ### Patches
@@ -623,6 +714,7 @@ Wed, 28 Jul 2021 19:40:06 GMT
 - Fix swagger generation bugs for empty schema and support host property
 
 ## 0.3.1
+
 Fri, 09 Jul 2021 20:21:06 GMT
 
 ### Patches
@@ -631,6 +723,7 @@ Fri, 09 Jul 2021 20:21:06 GMT
 - Absorb base templated model instance into derived type's schema definition when it's the only base type
 
 ## 0.3.0
+
 Thu, 24 Jun 2021 03:57:43 GMT
 
 ### Minor changes
@@ -642,11 +735,13 @@ Thu, 24 Jun 2021 03:57:43 GMT
 - Fix decorator application to OpenAPI output when the target is a model property or operation parameter
 
 ## 0.2.1
+
 Tue, 18 May 2021 23:43:31 GMT
 
 _Version update only_
 
 ## 0.2.0
+
 Thu, 06 May 2021 14:56:01 GMT
 
 ### Minor changes
@@ -658,10 +753,10 @@ Thu, 06 May 2021 14:56:01 GMT
 - Replace several internal compiler errors with diagnostics
 
 ## 0.1.2
+
 Tue, 20 Apr 2021 15:23:29 GMT
 
 ### Patches
 
 - Trim base service namespace from parameter definition names
 - Use new virtual file to emit output
-

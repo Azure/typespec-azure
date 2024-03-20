@@ -1,8 +1,59 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-This log was last generated on Wed, 24 Jan 2024 05:47:19 GMT and should not be manually modified.
+## 0.40.0
+
+### Bug Fixes
+
+- [#305](https://github.com/Azure/typespec-azure/pull/305) getAllModels will return models only used as final envelope results in non-ARM definitions
+- [#335](https://github.com/Azure/typespec-azure/pull/335) unions with only null and another type will not be converted to union
+- [#362](https://github.com/Azure/typespec-azure/pull/362) enhance logic for value type of enum and union as enum
+- [#314](https://github.com/Azure/typespec-azure/pull/314) support @clientName for extensible enum variant
+- [#328](https://github.com/Azure/typespec-azure/pull/328) add support for anonymous union as enum and fix union as enum variant discriminator typing problem
+- [#301](https://github.com/Azure/typespec-azure/pull/301) Add usage calculation for additional properties with model type
+- [#327](https://github.com/Azure/typespec-azure/pull/327) rollback some of the breaking changes for common model types method
+- [#260](https://github.com/Azure/typespec-azure/pull/260) allow models to have a union variant as a discriminator
+- [#286](https://github.com/Azure/typespec-azure/pull/286) don't throw for unknown format
+- [#274](https://github.com/Azure/typespec-azure/pull/274) Update doc for `@access` and `@usage`
+
+### Bump dependencies
+
+- [#243](https://github.com/Azure/typespec-azure/pull/243) Update dependencies
+
+### Features
+
+- [#341](https://github.com/Azure/typespec-azure/pull/341) add support for azureLocation scalar in azure core
+- [#242](https://github.com/Azure/typespec-azure/pull/242) add flattened property onto SdkBodyModelPropertyType
+- [#315](https://github.com/Azure/typespec-azure/pull/315) add validation on import of tcgc and remove duplicate validation warnings
+- [#350](https://github.com/Azure/typespec-azure/pull/350) add helper function getCrossLanguagePackageId. getCrossLanguagePackageId returns a package id that is consistent across languages, allowing emitters to identify that they are generating from the same service tsp
+- [#306](https://github.com/Azure/typespec-azure/pull/306) add getClientTypeWithDiagnostics and getAllModelsWithDiagnostics to get values back with diagnostics
+
+### Breaking Changes
+
+- [#295](https://github.com/Azure/typespec-azure/pull/295) Split datetime type into utcDateTime and offsetDateTime to remain in sync with tsp
+
+
+## 0.39.2
+
+### Patch Changes
+
+- Handle enums inside a union of literals
+
+## 0.39.0
+
+### Minor Changes
+
+- 3f98132: Add new `MultipartFile` type
+- c07c189: error out if user tries to encode bytes in multipart input
+- acfb045: Add support for creating an `enum` from a `union` declaration
+- 3997779: tcgc will return the raw tsp types to emitters, instead of doing more conversion
+
+### Patch Changes
+
+- 1f1864a: fix incorrect linter error for models not directly used in multipart operations
+
 
 ## 0.38.0
+
 Wed, 24 Jan 2024 05:47:19 GMT
 
 ### Minor changes
@@ -22,6 +73,7 @@ Wed, 24 Jan 2024 05:47:19 GMT
 - Update dependencies
 
 ## 0.37.0
+
 Wed, 06 Dec 2023 19:47:28 GMT
 
 ### Minor changes
@@ -38,6 +90,7 @@ Wed, 06 Dec 2023 19:47:28 GMT
 - Support scope for protocolAPI and convenientAPI
 
 ## 0.36.1
+
 Tue, 28 Nov 2023 23:33:07 GMT
 
 ### Patches
@@ -45,6 +98,7 @@ Tue, 28 Nov 2023 23:33:07 GMT
 - ~add scope to protocolApi, convenient
 
 ## 0.36.0
+
 Wed, 08 Nov 2023 00:11:02 GMT
 
 ### Minor changes
@@ -62,6 +116,7 @@ Wed, 08 Nov 2023 00:11:02 GMT
 - **BREAKING CHANGE** Minimum node version increased to 18
 
 ## 0.35.0
+
 Wed, 11 Oct 2023 23:51:36 GMT
 
 ### Updates
@@ -81,6 +136,7 @@ Wed, 11 Oct 2023 23:51:36 GMT
 - Uptake changes to http libraries with status code ranges
 
 ## 0.34.0
+
 Tue, 12 Sep 2023 21:49:08 GMT
 
 ### Minor changes
@@ -95,11 +151,12 @@ Tue, 12 Sep 2023 21:49:08 GMT
 - deduplicate models in map
 - fix enum discriminator type for base class
 - add getAllModels
-- make __raw optional
+- make \_\_raw optional
 - Add tuple type support
 - Add @usage and @access decorators.
 
 ## 0.33.0
+
 Tue, 08 Aug 2023 22:32:23 GMT
 
 ### Minor changes
@@ -112,6 +169,7 @@ Tue, 08 Aug 2023 22:32:23 GMT
 - Fix the `getEmitterTargetName` function to use the real name of the emitter
 
 ## 0.32.0
+
 Tue, 11 Jul 2023 22:06:14 GMT
 
 ### Minor changes
@@ -125,6 +183,7 @@ Tue, 11 Jul 2023 22:06:14 GMT
 - Update dependencies
 
 ## 0.31.0
+
 Tue, 06 Jun 2023 22:44:32 GMT
 
 ### Minor changes
@@ -141,6 +200,7 @@ Tue, 06 Jun 2023 22:44:32 GMT
 - Updated decorators to use `valueof`
 
 ## 0.30.0
+
 Wed, 10 May 2023 21:24:14 GMT
 
 ### Minor changes
@@ -160,6 +220,7 @@ Wed, 10 May 2023 21:24:14 GMT
 - remove support for zonedDateTime
 
 ## 0.29.0
+
 Tue, 11 Apr 2023 18:49:21 GMT
 
 ### Minor changes
@@ -178,6 +239,7 @@ Tue, 11 Apr 2023 18:49:21 GMT
 - Uptake changes to datetime types
 
 ## 0.28.0
+
 Mon, 13 Mar 2023 21:30:57 GMT
 
 ### Minor changes
@@ -189,6 +251,7 @@ Mon, 13 Mar 2023 21:30:57 GMT
 - correct regex for language emitters
 
 ## 0.27.0
+
 Fri, 03 Mar 2023 19:59:30 GMT
 
 ### Minor changes
@@ -206,6 +269,7 @@ Fri, 03 Mar 2023 19:59:30 GMT
 - Rename to TypeSpec
 
 ## 0.26.0
+
 Tue, 07 Feb 2023 21:56:32 GMT
 
 ### Minor changes
@@ -220,7 +284,7 @@ Tue, 07 Feb 2023 21:56:32 GMT
 
 - Add getPropertyNames
 - add extern dec docs
-- cadl-dpg, isApiVersion, support identify api version defined as host parameter in @server 
+- cadl-dpg, isApiVersion, support identify api version defined as host parameter in @server
 - add clientFormat decorator
 - Add decorators @include and @exclude
 - add @internal decorator
@@ -229,6 +293,7 @@ Tue, 07 Feb 2023 21:56:32 GMT
 - switch all exposed cadl-dpg functions to input context
 
 ## 0.25.0
+
 Fri, 13 Jan 2023 00:05:37 GMT
 
 ### Minor changes
@@ -244,6 +309,7 @@ Fri, 13 Jan 2023 00:05:37 GMT
 - Add protocolAPI/convenientAPI
 
 ## 0.24.0
+
 Wed, 07 Dec 2022 17:21:54 GMT
 
 ### Minor changes
@@ -256,6 +322,7 @@ Wed, 07 Dec 2022 17:21:54 GMT
 - Update dependencies
 
 ## 0.3.0
+
 Sat, 12 Nov 2022 00:14:23 GMT
 
 ### Minor changes
@@ -273,6 +340,7 @@ Sat, 12 Nov 2022 00:14:23 GMT
 - add utils file, fix tests
 
 ## 0.2.0
+
 Mon, 24 Oct 2022 21:57:17 GMT
 
 ### Minor changes
@@ -280,4 +348,3 @@ Mon, 24 Oct 2022 21:57:17 GMT
 - Add `@client` and `@operationGroup` decorators
 - @client defined under a service namespace will resolve the service automatically
 - listOperationsInOperationGroup will not resolve operations nested under another @client
-

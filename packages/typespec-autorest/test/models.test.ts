@@ -26,6 +26,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @projectedName("json", "xJson")
         x: int32;
       };`
@@ -42,7 +43,42 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @projectedName("client", "x")
+        xJson: int32;
+      };`
+    );
+
+    expect(res.defs.Foo).toMatchObject({
+      properties: {
+        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
+      },
+    });
+  });
+
+  it(`@clientName(<>) set the "x-ms-client-name" with the original name`, async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `model Foo {
+        @clientName("x")
+        xJson: int32;
+      };`
+    );
+
+    expect(res.defs.Foo).toMatchObject({
+      properties: {
+        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
+      },
+    });
+  });
+
+  it(`@clientName(<>) wins over @projectedName("client", <>)`, async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `model Foo {
+        #suppress "deprecated" "for testing"
+        @clientName("x")
+        @projectedName("client", "y")
         xJson: int32;
       };`
     );
@@ -74,6 +110,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @encodedName("application/json", "xJson")
         @projectedName("json", "projectedJson")
         x: int32;
@@ -240,7 +277,7 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
-  it("specify default value on enum property", async () => {
+  it("specify default value on enum property inline the enum", async () => {
     const res = await oapiForModel(
       "Foo",
       `
@@ -254,15 +291,55 @@ describe("typespec-autorest: model definitions", () => {
       }
       `
     );
-
-    ok(res.isRef);
-    ok(res.defs.Foo, "expected definition named Foo");
-    ok(res.defs.MyEnum, "expected definition named MyEnum");
     deepStrictEqual(res.defs.Foo, {
       type: "object",
       properties: {
         optionalEnum: {
-          $ref: "#/definitions/MyEnum",
+          type: "string",
+          enum: ["a-value", "b"],
+          "x-ms-enum": {
+            name: "MyEnum",
+            modelAsString: true,
+            values: [
+              { name: "a", value: "a-value" },
+              { name: "b", value: "b" },
+            ],
+          },
+          default: "a-value",
+        },
+      },
+    });
+  });
+
+  it("specify default value on union with variant", async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `
+      model Foo {
+        optionalUnion?: MyUnion = MyUnion.a;
+      };
+      
+      union MyUnion {
+        a: "a-value",
+        b: "b-value",
+      }
+      `
+    );
+
+    deepStrictEqual(res.defs.Foo, {
+      type: "object",
+      properties: {
+        optionalUnion: {
+          type: "string",
+          enum: ["a-value", "b-value"],
+          "x-ms-enum": {
+            values: [
+              { name: "a", value: "a-value" },
+              { name: "b", value: "b-value" },
+            ],
+            modelAsString: false,
+            name: "MyUnion",
+          },
           default: "a-value",
         },
       },
@@ -589,6 +666,68 @@ describe("typespec-autorest: model definitions", () => {
           },
         },
         required: ["name"],
+      });
+    });
+
+    it("defines nullable enum", async () => {
+      const res = await oapiForModel(
+        "Pet",
+        `
+      enum PetKind { dog, cat }
+      model Pet {
+        kind: PetKind | null;
+      };
+      `
+      );
+      ok(res.isRef);
+      deepStrictEqual(res.defs.Pet, {
+        type: "object",
+        properties: {
+          kind: {
+            $ref: "#/definitions/PetKind",
+            "x-nullable": true,
+          },
+        },
+        required: ["kind"],
+      });
+      deepStrictEqual(res.defs.PetKind, {
+        type: "string",
+        enum: ["dog", "cat"],
+        "x-ms-enum": {
+          modelAsString: true,
+          name: "PetKind",
+        },
+      });
+    });
+
+    it("defines nullable union", async () => {
+      const res = await oapiForModel(
+        "Pet",
+        `
+      union PetKind { "dog", "cat" }
+      model Pet {
+        kind: PetKind | null;
+      };
+      `
+      );
+      ok(res.isRef);
+      deepStrictEqual(res.defs.Pet, {
+        type: "object",
+        properties: {
+          kind: {
+            $ref: "#/definitions/PetKind",
+            "x-nullable": true,
+          },
+        },
+        required: ["kind"],
+      });
+      deepStrictEqual(res.defs.PetKind, {
+        type: "string",
+        enum: ["dog", "cat"],
+        "x-ms-enum": {
+          modelAsString: false,
+          name: "PetKind",
+        },
       });
     });
   });

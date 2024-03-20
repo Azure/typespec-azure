@@ -27,7 +27,17 @@ npm install @azure-tools/typespec-client-generator-core
 
 #### `@access`
 
-Set access for operations, models and enums. All models that are only used in operations with access "internal" will be implicitly set to access "internal".
+Set explicit access for operations, models and enums.
+When setting access for models,
+the access info wll not be propagated to models' properties, base models or sub models.
+When setting access for an operation,
+it will influence the access info for models/enums that are used by this operation.
+Models/enums that are used in any operations with `@access(Access.public)` will be implicitly set to access "public"
+Models/enums that are only used in operations with `@access(Access.internal)` will be implicitly set to access "internal".
+This influence will be propagated to models' properties, parent models, discriminated sub models.
+But this influence will be override by `@usage` decorator on models/enums directly.
+If an operation/model/enum has no `@access` decorator and is not influenced by any operation with `@access` decorator,
+the access result is undefined.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -35,24 +45,123 @@ Set access for operations, models and enums. All models that are only used in op
 
 ##### Target
 
-`union Model | Operation | Enum`
+`Model | Operation | Enum | Union`
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `EnumMember`            | The access info you want to set for this model or operation.                                                  |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember`     | The access info you want to set for this model or operation.                                                  |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
+###### Set access
+
 ```typespec
+// Access.internal
 @access(Access.internal)
 model ModelToHide {
 prop: valueof string
 }
+// Access.internal
 @access(Access.internal)
 op test: void;
+```
+
+###### Access propagation
+
+```typespec
+// Access.internal
+@discriminator("kind")
+model Fish {
+  age: int32;
+}
+
+// Access.internal
+@discriminator("sharktype")
+model Shark extends Fish {
+  kind: "shark";
+  origin: Origin;
+}
+
+// Access.internal
+model Salmon extends Fish {
+  kind: "salmon";
+}
+
+// Access.internal
+model SawShark extends Shark {
+  sharktype: "saw";
+}
+
+// Access.internal
+model Origin {
+  country: string;
+  city: string;
+  manufacture: string;
+}
+
+// Access.internal
+@get
+@access(Access.internal)
+op getModel(): Fish;
+```
+
+###### Access influence from operation
+
+```typespec
+// Access.internal
+model Test1 {}
+
+// Access.internal
+@access(Access.internal)
+@route("/func1")
+op func1(@body body: Test1): void;
+
+// undefined
+model Test2 {}
+
+// undefined
+@route("/func2")
+op func2(@body body: Test2): void;
+
+// Access.public
+model Test3 {}
+
+// Access.public
+@access(Access.public)
+@route("/func3")
+op func3(@body body: Test3): void;
+
+// undefined
+model Test4 {}
+
+// Access.internal
+@access(Access.internal)
+@route("/func4")
+op func4(@body body: Test4): void;
+
+// undefined
+@route("/func5")
+op func5(@body body: Test4): void;
+
+// Access.public
+model Test5 {}
+
+// Access.internal
+@access(Access.internal)
+@route("/func6")
+op func6(@body body: Test5): void;
+
+// undefined
+@route("/func7")
+op func7(@body body: Test5): void;
+
+// Access.public
+@access(Access.public)
+@route("/func8")
+op func8(@body body: Test5): void;
 ```
 
 #### `@client`
@@ -65,14 +174,14 @@ Create a ClientGenerator.Core client out of a namespace or interface
 
 ##### Target
 
-`union Namespace | Interface`
+`Namespace | Interface`
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `model {}`              | Optional configuration for the service.                                                                       |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| value | `{}`             | Optional configuration for the service.                                                                       |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -109,11 +218,13 @@ interface MyInterface {}
 
 #### `@clientFormat`
 
+DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
+
 Can be used to explain the client type that the current TYPESPEC
 type should map to.
 
 ```typespec
-@Azure.ClientGenerator.Core.clientFormat(value: valueof unixtime | iso8601 | rfc1123 | seconds)
+@Azure.ClientGenerator.Core.clientFormat(value: valueof "unixtime" | "iso8601" | "rfc1123" | "seconds")
 ```
 
 ##### Target
@@ -122,9 +233,9 @@ type should map to.
 
 ##### Parameters
 
-| Name  | Type                                                      | Description                 |
-| ----- | --------------------------------------------------------- | --------------------------- |
-| value | `valueof union unixtime \| iso8601 \| rfc1123 \| seconds` | The client format to apply. |
+| Name  | Type                                                        | Description                 |
+| ----- | ----------------------------------------------------------- | --------------------------- |
+| value | `valueof "unixtime" \| "iso8601" \| "rfc1123" \| "seconds"` | The client format to apply. |
 
 ##### Examples
 
@@ -145,14 +256,14 @@ Changes the name of a method, parameter, property, or model generated in the cli
 
 ##### Target
 
-`(intrinsic) unknown`
+`unknown`
 
 ##### Parameters
 
-| Name   | Type                    | Description                                                                                                   |
-| ------ | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| rename | `valueof scalar string` | The rename you want applied to the object                                                                     |
-| scope  | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name   | Type             | Description                                                                                                   |
+| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object                                                                     |
+| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -183,10 +294,10 @@ Whether you want to generate an operation as a convenient operation.
 
 ##### Parameters
 
-| Name  | Type                     | Description                                                                                                   |
-| ----- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| value | `valueof scalar boolean` | Whether to generate the operation as convenience method or not.                                               |
-| scope | `valueof scalar string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type              | Description                                                                                                   |
+| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` | Whether to generate the operation as convenience method or not.                                               |
+| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -196,6 +307,8 @@ op test: void;
 ```
 
 #### `@exclude`
+
+DEPRECATED: Use `@usage` and `@access` decorator instead.
 
 Whether to exclude a model from generation for specific languages. By default we generate
 all models that are included in operations.
@@ -210,9 +323,9 @@ all models that are included in operations.
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -237,9 +350,9 @@ Set whether a model property should be flattened or not.
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -252,6 +365,8 @@ model Bar {}
 ```
 
 #### `@include`
+
+DEPRECATED: Use `@usage` and `@access` decorator instead.
 
 Whether to include a model in generation for specific languages. By default we generate
 all models that are included in operations.
@@ -266,9 +381,9 @@ all models that are included in operations.
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -280,6 +395,8 @@ model ModelToInclude {
 ```
 
 #### `@internal`
+
+DEPRECATED: Use `@access` decorator instead.
 
 Whether to mark an operation as internal for specific languages,
 meaning it should not be exposed to end SDK users
@@ -294,9 +411,9 @@ meaning it should not be exposed to end SDK users
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -315,13 +432,13 @@ Create a ClientGenerator.Core operation group out of a namespace or interface
 
 ##### Target
 
-`union Namespace | Interface`
+`Namespace | Interface`
 
 ##### Parameters
 
-| Name  | Type                    | Description                                                                                                   |
-| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof scalar string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -344,10 +461,10 @@ Whether you want to generate an operation as a protocol operation.
 
 ##### Parameters
 
-| Name  | Type                     | Description                                                                                                   |
-| ----- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| value | `valueof scalar boolean` | Whether to generate the operation as protocol or not.                                                         |
-| scope | `valueof scalar string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type              | Description                                                                                                   |
+| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` | Whether to generate the operation as protocol or not.                                                         |
+| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
@@ -358,8 +475,18 @@ op test: void;
 
 #### `@usage`
 
-Expand usage for models/enums. A model's default usage info is always calculated by the operations that use it.
-You could use this decorator to expand the default usage info. (e.g. append Usage.input by
+Expand usage for models/enums.
+A model/enum's default usage info is always calculated by the operations that use it.
+You could use this decorator to expand the default usage info.
+For example, with operation definition `op test(): OutputModel`,
+the model `OutputModel` has default usage `Usage.output`.
+After adding decorator `@@usage(OutputModel, Usage.input)`,
+the final usage result for `OutputModel` is `Usage.input | Usage.output`.
+The calculation of default usage info for models will be propagated to models' properties,
+parent models, discriminated sub models.
+But the expanded usage from `@usage` decorator will not be propagated.
+If you want to do any customization for the usage of a model,
+you need to take care of all related models/enums.
 
 ```typespec
 @Azure.ClientGenerator.Core.usage(value: EnumMember | Union, scope?: valueof string)
@@ -367,20 +494,63 @@ You could use this decorator to expand the default usage info. (e.g. append Usag
 
 ##### Target
 
-`union Model | Enum`
+`Model | Enum | Union`
 
 ##### Parameters
 
-| Name  | Type                        | Description                                                                                                   |
-| ----- | --------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `union EnumMember \| Union` | The usage info you want to set for this model.                                                                |
-| scope | `valueof scalar string`     | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type                  | Description                                                                                                   |
+| ----- | --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember \| Union` | The usage info you want to set for this model.                                                                |
+| scope | `valueof string`      | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
 
+###### Expand usage for model
+
 ```typespec
-@usage(Usage.input | Usage.output)
-model InputAndOutPutModel {
+op test(): OutputModel;
+
+// usage result for `OutputModel` is `Usage.input | Usage.output`
+@usage(Usage.input)
+model OutputModel {
   prop: string;
 }
+```
+
+###### Propagation of usage
+
+```typespec
+// Usage.output
+@discriminator("kind")
+model Fish {
+  age: int32;
+}
+
+// Usage.input | Usage.output
+@discriminator("sharktype")
+@usage(Usage.input)
+model Shark extends Fish {
+  kind: "shark";
+  origin: Origin;
+}
+
+// Usage.output
+model Salmon extends Fish {
+  kind: "salmon";
+}
+
+// Usage.output
+model SawShark extends Shark {
+  sharktype: "saw";
+}
+
+// Usage.output
+model Origin {
+  country: string;
+  city: string;
+  manufacture: string;
+}
+
+@get
+op getModel(): Fish;
 ```

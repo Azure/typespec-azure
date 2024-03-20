@@ -26,7 +26,6 @@ using TypeSpec.OpenAPI;
 )
 @service({
   title: "Microsoft Cognitive Language Service - Question Answering - Authoring",
-  version: "21-10-01",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Azure.QnAMaker;
@@ -44,7 +43,6 @@ model ApiKey {
 
 @doc("Collection of error types")
 model Errors {
-  @projectedName("csharp", "ErrorItems")
   @doc("The error list.")
   errors: Azure.Core.Foundations.Error[];
 }
@@ -222,7 +220,6 @@ namespace QuestionAnsweringProjects {
     JobMetadata
   >;
 
-  // TODO: ok resonse code is incorrect
   @post
   @doc("Update Active Learning feedback.")
   @action("feedback")

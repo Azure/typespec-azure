@@ -8,9 +8,9 @@ Provides the names of terminal long-running operation states plus any
 
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
-| `canceledState` | `string`[] | - |
-| `failedState` | `string`[] | - |
-| `states` | `string`[] | - |
-| `succeededState` | `string`[] | - |
+| Property | Type |
+| :------ | :------ |
+| `canceledState` | `string`[] |
+| `failedState` | `string`[] |
+| `states` | `string`[] |
+| `succeededState` | `string`[] |

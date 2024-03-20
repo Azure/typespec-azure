@@ -28,25 +28,25 @@ namespace Azure {
      * Identifies an Enum or ModelProperty as containing long-running operation
      * status.
      */
-    extern dec lroStatus(entity: Enum | ModelProperty);
+    extern dec lroStatus(entity: Enum | Union | ModelProperty);
 
     /**
      * Used for custom StatusMonitor implementation.
      * Identifies an EnumMember as a long-running "Succeeded" terminal state.
      */
-    extern dec lroSucceeded(entity: EnumMember);
+    extern dec lroSucceeded(entity: EnumMember | UnionVariant);
 
     /**
      * Used for custom StatusMonitor implementation.
      * Identifies an EnumMember as a long-running "Canceled" terminal state.
      */
-    extern dec lroCanceled(entity: EnumMember);
+    extern dec lroCanceled(entity: EnumMember | UnionVariant);
 
     /**
      * Used for custom StatusMonitor implementation.
      * Identifies an enum member as a long-running "Failed" terminal state.
      */
-    extern dec lroFailed(entity: EnumMember);
+    extern dec lroFailed(entity: EnumMember | UnionVariant);
 
     /**
      * Used for custom StatusMonitor implementation.

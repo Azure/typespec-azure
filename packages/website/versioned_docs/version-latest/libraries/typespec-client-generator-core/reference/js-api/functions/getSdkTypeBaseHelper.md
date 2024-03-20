@@ -7,14 +7,14 @@ title: "[F] getSdkTypeBaseHelper"
 getSdkTypeBaseHelper<TKind>(
    context, 
    type, 
-kind): DefaultSdkTypeBase<TKind>
+kind): SdkTypeBaseHelper<TKind>
 ```
 
 Helper function to return default values for nullable, encode etc
 
 ## Type parameters
 
-| Parameter |
+| Type parameter |
 | :------ |
 | `TKind` |
 
@@ -22,10 +22,10 @@ Helper function to return default values for nullable, encode etc
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | - |
-| `type` | `Type` |  |
+| `context` | `TCGCContext` | - |
+| `type` | `string` \| `Type` |  |
 | `kind` | `TKind` | - |
 
 ## Returns
 
-`DefaultSdkTypeBase`<`TKind`\>
+`SdkTypeBaseHelper`<`TKind`\>

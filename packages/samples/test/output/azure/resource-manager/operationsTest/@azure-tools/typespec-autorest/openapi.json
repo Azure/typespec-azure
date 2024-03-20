@@ -102,7 +102,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionResource2ListResult"
             }
@@ -143,7 +143,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionResource2"
             }
@@ -188,7 +188,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'TestExtensionResource2' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionResource2"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestExtensionResource2' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/TestExtensionResource2"
             }
@@ -233,7 +239,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionResource2"
             }
@@ -272,7 +278,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -307,7 +313,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionChild2ListResult"
             }
@@ -355,7 +361,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionChild2"
             }
@@ -407,7 +413,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'TestExtensionChild2' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestExtensionChild2"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestExtensionChild2' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/TestExtensionChild2"
             }
@@ -459,7 +471,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionChild2"
             }
@@ -505,7 +517,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -533,7 +545,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionResourceListResult"
             }
@@ -574,7 +586,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionResource"
             }
@@ -681,7 +693,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionResource"
             }
@@ -722,19 +734,19 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -773,7 +785,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionChildListResult"
             }
@@ -821,7 +833,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestExtensionChild"
             }
@@ -938,19 +950,19 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -987,7 +999,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MyOpStatus"
             }
@@ -1015,7 +1027,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "../../../../../../../specs/resource-manager/common-types/v3/types.json#/definitions/OperationListResult"
             }
@@ -1046,7 +1058,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantResource2ListResult"
             }
@@ -1084,7 +1096,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantResource2"
             }
@@ -1126,7 +1138,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'TestTenantResource2' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTenantResource2"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTenantResource2' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/TestTenantResource2"
             }
@@ -1168,7 +1186,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantResource2"
             }
@@ -1204,7 +1222,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -1236,7 +1254,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantChile2ListResult"
             }
@@ -1281,7 +1299,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantChile2"
             }
@@ -1330,7 +1348,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'TestTenantChile2' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTenantChile2"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTenantChile2' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/TestTenantChile2"
             }
@@ -1379,7 +1403,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantChile2"
             }
@@ -1422,7 +1446,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -1447,7 +1471,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantResourceListResult"
             }
@@ -1485,7 +1509,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantResource"
             }
@@ -1586,7 +1610,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantResource"
             }
@@ -1624,19 +1648,19 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -1672,7 +1696,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantChileListResult"
             }
@@ -1717,7 +1741,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTenantChile"
             }
@@ -1828,19 +1852,19 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -1875,7 +1899,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationResourceListResult"
             }
@@ -1919,7 +1943,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationResource"
             }
@@ -1967,7 +1991,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'LocationResource' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/LocationResource"
+            }
+          },
+          "201": {
+            "description": "Resource 'LocationResource' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/LocationResource"
             }
@@ -2015,7 +2045,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationResource"
             }
@@ -2057,7 +2087,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -2095,7 +2125,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationChildListResult"
             }
@@ -2146,7 +2176,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationChild"
             }
@@ -2201,7 +2231,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'LocationChild' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/LocationChild"
+            }
+          },
+          "201": {
+            "description": "Resource 'LocationChild' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/LocationChild"
             }
@@ -2256,7 +2292,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationChild"
             }
@@ -2305,7 +2341,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -2361,14 +2397,14 @@
           "202": {
             "description": "Resource operation accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -2431,7 +2467,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationMungeChildResult"
             }
@@ -2439,14 +2475,14 @@
           "202": {
             "description": "Resource operation accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -2546,7 +2582,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/LocationMungeResult"
             }
@@ -2585,7 +2621,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/MySubOpStatus"
             }
@@ -2616,7 +2652,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource2ListResult"
             }
@@ -2650,7 +2686,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResourceListResult"
             }
@@ -2687,7 +2723,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource2ListResult"
             }
@@ -2731,7 +2767,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource2"
             }
@@ -2779,7 +2815,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'TestTrackedResource2' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedResource2"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTrackedResource2' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource2"
             }
@@ -2827,7 +2869,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource2"
             }
@@ -2869,7 +2911,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -2907,7 +2949,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedChild2ListResult"
             }
@@ -2958,7 +3000,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedChild2"
             }
@@ -3013,7 +3055,13 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Resource 'TestTrackedChild2' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/TestTrackedChild2"
+            }
+          },
+          "201": {
+            "description": "Resource 'TestTrackedChild2' create operation succeeded",
             "schema": {
               "$ref": "#/definitions/TestTrackedChild2"
             }
@@ -3068,7 +3116,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedChild2"
             }
@@ -3117,7 +3165,7 @@
             "description": "Resource deleted successfully."
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -3148,7 +3196,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResourceListResult"
             }
@@ -3192,7 +3240,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource"
             }
@@ -3305,7 +3353,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedResource"
             }
@@ -3349,19 +3397,19 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -3403,7 +3451,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedChildListResult"
             }
@@ -3454,7 +3502,7 @@
         ],
         "responses": {
           "200": {
-            "description": "ARM operation completed successfully.",
+            "description": "Azure operation completed successfully.",
             "schema": {
               "$ref": "#/definitions/TestTrackedChild"
             }
@@ -3577,19 +3625,19 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
           "204": {
-            "description": "Resource deleted successfully."
+            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -3729,12 +3777,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "ExtensionChildProperties2": {
@@ -3747,12 +3795,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "LocationChild": {
@@ -3789,7 +3837,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -3802,7 +3851,8 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         },
         "color": {
           "type": "string",
@@ -3810,7 +3860,6 @@
         }
       },
       "required": [
-        "provisioningState",
         "color"
       ]
     },
@@ -3828,10 +3877,6 @@
       "type": "object",
       "description": "The updatable properties of the LocationChild.",
       "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
-        },
         "color": {
           "type": "string",
           "description": "The color of the location"
@@ -3896,7 +3941,8 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         },
         "color": {
           "type": "string",
@@ -3904,7 +3950,6 @@
         }
       },
       "required": [
-        "provisioningState",
         "color"
       ]
     },
@@ -3942,7 +3987,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -3963,10 +4009,6 @@
       "type": "object",
       "description": "The updatable properties of the LocationResource.",
       "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
-        },
         "color": {
           "type": "string",
           "description": "The color of the location"
@@ -3975,7 +4017,7 @@
     },
     "MyOpStatus": {
       "type": "object",
-      "description": "Standard ARM operation status response",
+      "description": "Standard Azure Resource Manager operation status response",
       "properties": {
         "status": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
@@ -4021,7 +4063,7 @@
     },
     "MySubOpStatus": {
       "type": "object",
-      "description": "Standard ARM operation status response",
+      "description": "Standard Azure Resource Manager operation status response",
       "properties": {
         "status": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
@@ -4075,12 +4117,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "TenantChildProperties2": {
@@ -4093,12 +4135,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "TestExtensionChild": {
@@ -4155,7 +4197,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4179,10 +4222,6 @@
         "flavor": {
           "type": "string",
           "description": "The flavor of the extension child"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -4200,7 +4239,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4209,7 +4249,7 @@
     },
     "TestExtensionProperties": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource",
+      "description": "rp-specific properties for the resource",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4297,7 +4337,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4343,7 +4384,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4429,7 +4471,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4471,7 +4514,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4480,7 +4524,7 @@
     },
     "TestTenantProperties": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource",
+      "description": "rp-specific properties for the resource",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4498,7 +4542,7 @@
     },
     "TestTenantProperties2": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource",
+      "description": "rp-specific properties for the resource",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4566,7 +4610,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4608,7 +4653,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4694,7 +4740,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4718,10 +4765,6 @@
         "flavor": {
           "type": "string",
           "description": "The flavor of the tracked child"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -4739,7 +4782,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4768,7 +4812,7 @@
     },
     "TestTrackedProperties2": {
       "type": "object",
-      "description": "rp-specific proeprties for the resource with all envelope properties",
+      "description": "rp-specific properties for the resource with all envelope properties",
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/EnvelopeProvisioningState",
@@ -4838,7 +4882,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4891,7 +4936,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4921,12 +4967,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "TrackedChildProperties2": {
@@ -4939,12 +4985,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     }
   },

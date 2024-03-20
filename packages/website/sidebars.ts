@@ -96,6 +96,7 @@ const sidebars: SidebarsConfig = {
           "Azure.ClientGenerator.Core",
           false
         ),
+        createLibraryReferenceStructure("libraries", "azure-portal-core", "Azure.Portal", false),
       ],
     },
     {

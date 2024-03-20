@@ -14,7 +14,7 @@ on whether additional serialization information is provided or needed
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | the Sdk Context |
+| `context` | `TCGCContext` | the Sdk Context |
 | `entity` | `ModelProperty` | the entity whose client format we are going to get |
 
 ## Returns

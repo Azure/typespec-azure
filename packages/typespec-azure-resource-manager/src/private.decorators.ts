@@ -24,6 +24,7 @@ import {
   ResourceBaseType,
   getArmResourceKind,
   getResourceBaseType,
+  isArmVirtualResource,
   resolveResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -130,8 +131,9 @@ function resolveCommonTypesVersion(
     // If the service is versioned, extract the common-types version from the
     // service version enum
     if (params.version && versionMap) {
-      const versionEnumMember = versionMap.getVersions().find((x) => x.value === params.version)
-        ?.enumMember;
+      const versionEnumMember = versionMap
+        .getVersions()
+        .find((x) => x.value === params.version)?.enumMember;
       if (versionEnumMember) {
         selectedVersion = getArmCommonTypesVersion(program, versionEnumMember);
       }
@@ -472,7 +474,8 @@ export function $armResourceInternal(
     return;
   }
 
-  const kind = getArmResourceKind(resourceType);
+  let kind = getArmResourceKind(resourceType);
+  if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",

@@ -1,45 +1,31 @@
+import { LroMetadata, PagedResultMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
+  Diagnostic,
   DurationKnownEncoding,
   EmitContext,
   Interface,
   ModelProperty,
   Namespace,
   Operation,
-  Program,
   Type,
-  UsageFlags,
 } from "@typespec/compiler";
 import {
+  HttpAuth,
   HttpOperation,
-  HttpOperationParameters,
   HttpOperationResponse,
-  HttpStatusCodes,
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import { TCGCContext } from "./internal-utils.js";
 
-export type SdkParameterLocation =
-  | "endpointPath"
-  | "header"
-  | "query"
-  | "path"
-  | "body"
-  | "unknown";
-export type SdkParameterImplementation = "Client" | "Method";
-
-export interface SdkContext<TOptions extends object = Record<string, any>> {
-  program: Program;
+export interface SdkContext<
+  TOptions extends object = Record<string, any>,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+> extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  emitterName: string;
-  generateProtocolMethods: boolean;
-  generateConvenienceMethods: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Set<string>;
-  arm?: boolean;
+  experimental_sdkPackage: SdkPackage<TServiceOperation>;
+  __clients?: SdkClientType<TServiceOperation>[];
 }
 
 export interface SdkEmitterOptions {
@@ -56,6 +42,24 @@ export interface SdkClient {
   type: Namespace | Interface;
   arm: boolean;
   crossLanguageDefinitionId: string;
+}
+
+export interface SdkInitializationType extends SdkModelType {
+  properties: SdkParameter[];
+}
+
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+  kind: "client";
+  name: string;
+  description?: string;
+  details?: string;
+  initialization?: SdkInitializationType;
+  methods: SdkMethod<TServiceOperation>[];
+  apiVersions: string[];
+  nameSpace: string; // fully qualified
+  endpoint: string;
+  hasParameterizedEndpoint: boolean;
+  arm: boolean;
 }
 
 export interface SdkOperationGroup {
@@ -83,34 +87,95 @@ export type SdkType =
   | SdkEnumValueType
   | SdkConstantType
   | SdkUnionType
-  | SdkModelType;
+  | SdkModelType
+  | SdkCredentialType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
 }
 
+enum SdkIntKindsEnum {
+  numeric = "numeric",
+  integer = "integer",
+  safeint = "safeint",
+  int8 = "int8",
+  int16 = "int16",
+  int32 = "int32",
+  int64 = "int64",
+  uint8 = "uint8",
+  uint16 = "uint16",
+  uint32 = "uint32",
+  uint64 = "uint64",
+}
+
+enum SdkFloatKindsEnum {
+  float = "float",
+  float32 = "float32",
+  float64 = "float64",
+  decimal = "decimal",
+  decimal128 = "decimal128",
+}
+
+enum SdkAzureBuiltInStringKindsEnum {
+  uuid = "uuid",
+  ipV4Address = "ipV4Address",
+  ipV6Address = "ipV6Address",
+  eTag = "eTag",
+  armId = "armId",
+  azureLocation = "azureLocation",
+}
+
+enum SdkGenericBuiltInStringKindsEnum {
+  string = "string",
+  password = "password",
+  guid = "guid",
+  url = "url",
+  uri = "uri",
+  ipAddress = "ipAddress",
+}
+
+enum SdkBuiltInKindsMiscellaneousEnum {
+  bytes = "bytes",
+  boolean = "boolean",
+  plainDate = "plainDate",
+  plainTime = "plainTime",
+  any = "any",
+}
+
 export type SdkBuiltInKinds =
-  | "bytes"
-  | "boolean"
-  | "date"
-  | "time"
-  | "any"
-  | "int32"
-  | "int64"
-  | "float32"
-  | "float64"
-  | "decimal"
-  | "decimal128"
-  | "string"
-  | "guid"
-  | "url"
-  | "uuid"
-  | "password"
-  | "armId"
-  | "ipAddress"
-  | "azureLocation"
-  | "etag";
+  | keyof typeof SdkBuiltInKindsMiscellaneousEnum
+  | keyof typeof SdkIntKindsEnum
+  | keyof typeof SdkFloatKindsEnum
+  | keyof typeof SdkGenericBuiltInStringKindsEnum
+  | keyof typeof SdkAzureBuiltInStringKindsEnum;
+
+export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
+  const retval: Record<string, SdkBuiltInKinds> = {};
+  const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum)
+    .concat(Object.keys(SdkIntKindsEnum))
+    .concat(Object.keys(SdkFloatKindsEnum))
+    .concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
+  for (const kind of typespecNamespace) {
+    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    retval[`TypeSpec.${kind}`] = kind;
+  }
+  for (const kind in SdkAzureBuiltInStringKindsEnum) {
+    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    retval[`Azure.Core.${kind}`] = kind;
+  }
+  return retval;
+}
+
+export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
+  return (
+    kind in SdkBuiltInKindsMiscellaneousEnum ||
+    kind in SdkIntKindsEnum ||
+    kind in SdkFloatKindsEnum ||
+    kind in SdkGenericBuiltInStringKindsEnum ||
+    kind in SdkAzureBuiltInStringKindsEnum
+  );
+}
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
@@ -118,11 +183,20 @@ export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKn
   return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-export interface SdkDatetimeType extends SdkTypeBase {
-  kind: "datetime";
+interface SdkDatetimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
+
+interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+  kind: "utcDateTime";
+}
+
+interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+  kind: "offsetDateTime";
+}
+
+export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
@@ -149,6 +223,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
+  generatedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -156,8 +231,9 @@ export interface SdkEnumType extends SdkTypeBase {
   details?: string;
   isFlags: boolean;
   usage: UsageFlags;
-  access: AccessFlags | undefined;
+  access?: AccessFlags;
   crossLanguageDefinitionId: string;
+  apiVersions: string[];
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -176,8 +252,8 @@ export interface SdkConstantType extends SdkTypeBase {
 }
 
 export interface SdkUnionType extends SdkTypeBase {
-  name?: string;
-  generatedName?: string;
+  name: string;
+  generatedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -188,173 +264,259 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
-  generatedName?: string;
+  isFormDataType: boolean;
+  isError: boolean;
+  generatedName: boolean;
   description?: string;
   details?: string;
-  access: AccessFlags | undefined;
+  access?: AccessFlags;
   usage: UsageFlags;
-  additionalProperties: SdkType | undefined;
+  additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
+  apiVersions: string[];
+}
+
+export interface SdkCredentialType extends SdkTypeBase {
+  kind: "credential";
+  scheme: HttpAuth;
 }
 
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
+  /**
+   * @deprecated This property is deprecated. Use `.name` instead.
+   * https://github.com/Azure/typespec-azure/issues/446
+   */
   nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];
+  onClient: boolean;
+  clientDefaultValue?: any;
+  isApiVersionParam: boolean;
   optional: boolean;
+}
+
+export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
+  kind: "endpoint";
+  urlEncode: boolean;
+  onClient: true;
+  serializedName?: string;
+}
+
+export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
+  kind: "credential";
+  type: SdkCredentialType | SdkUnionType; // union of credentials
+  onClient: true;
 }
 
 export type SdkModelPropertyType =
   | SdkBodyModelPropertyType
-  | SdkHeaderParameter
+  | SdkParameter
+  | SdkEndpointParameter
+  | SdkCredentialParameter
   | SdkQueryParameter
   | SdkPathParameter
-  | SdkBodyParameter;
+  | SdkBodyParameter
+  | SdkHeaderParameter;
 
 export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
   serializedName: string;
+  isMultipartFileInput: boolean;
   visibility?: Visibility[];
+  flatten: boolean;
 }
 
-type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
 
-interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
+export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
 }
 
-interface SdkQueryParameter extends SdkModelPropertyTypeBase {
+export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
 }
 
-interface SdkPathParameter extends SdkModelPropertyTypeBase {
+export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
   urlEncode: boolean;
-  validation: SdkValidation;
   serializedName: string;
   optional: false;
 }
 
-interface SdkBodyParameter extends SdkModelPropertyTypeBase {
+export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
 }
 
-interface SdkOperationParameters {
-  __raw?: HttpOperationParameters;
-  parameters: (SdkQueryParameter | SdkHeaderParameter | SdkPathParameter)[];
-  body?: SdkBodyParameter;
+export type SdkHttpParameter =
+  | SdkQueryParameter
+  | SdkPathParameter
+  | SdkBodyParameter
+  | SdkHeaderParameter;
+
+export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
+  kind: "method";
 }
 
-interface SdkResponseHeader {
-  __raw?: ModelProperty;
+export interface SdkServiceResponseHeader {
+  __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
+  description?: string;
+  details?: string;
 }
 
-interface SdkResponse {
-  __raw?: HttpOperationResponse;
-  statusCodes: HttpStatusCodes[];
-  type: SdkType;
-  doc: string;
-  headers: SdkResponseHeader[];
+export interface SdkMethodResponse {
+  kind: "method";
+  type?: SdkType;
 }
 
-interface SdkOperationBase<TOperation> {
-  __raw?: HttpOperation;
+export interface SdkServiceResponse {
+  type?: SdkType;
+  headers: SdkServiceResponseHeader[];
+  apiVersions: string[];
+}
+
+export interface SdkHttpResponse extends SdkServiceResponse {
+  __raw: HttpOperationResponse;
+  kind: "http";
+  contentTypes?: string[];
+  defaultContentType?: string;
+}
+
+interface SdkServiceOperationBase {}
+
+export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
+
+export interface SdkHttpOperation extends SdkServiceOperationBase {
+  __raw: HttpOperation;
+  kind: "http";
   path: string;
-  access: AccessFlags;
   verb: HttpVerb;
-  parameters: SdkOperationParameters;
-  responses: SdkResponse[];
-  exceptions: SdkResponse[];
-  overloads?: TOperation[];
-  overloading?: TOperation;
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
+  responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
+  exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
 }
 
-interface SdkBasicOperation extends SdkOperationBase<SdkBasicOperation> {
+/**
+ * We eventually will include other kinds of service operations, i.e. grpc. For now, it's just Http.
+ */
+
+export type SdkServiceOperation = SdkHttpOperation;
+export type SdkServiceParameter = SdkHttpParameter;
+
+interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+  __raw?: Operation;
+  name: string;
+  access: AccessFlags | undefined;
+  parameters: SdkParameter[];
+  apiVersions: string[];
+  description?: string;
+  details?: string;
+  overloads?: SdkMethod<TServiceOperation>[];
+  overloading?: SdkMethod<TServiceOperation>;
+}
+
+interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase<TServiceOperation> {
+  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
+  operation: TServiceOperation;
+  parameters: SdkMethodParameter[];
+  getResponseMapping(): string | undefined; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
+  response: SdkMethodResponse;
+  exception?: SdkMethodResponse;
+}
+
+export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation> {
   kind: "basic";
 }
 
-interface SdkPagingOperationOptions {
-  itemsPath: string;
-  itemType: SdkType;
-  nextLinkPath: string;
+interface SdkPagingServiceMethodOptions {
+  __raw_paged_metadata: PagedResultMetadata;
+  nextLinkPath?: string; // off means fake paging
+  nextLinkOperation?: SdkServiceOperation;
 }
 
-interface SdkPagingOperation
-  extends SdkOperationBase<SdkPagingOperation>,
-    SdkPagingOperationOptions {
+export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
-interface SdkLroOperationOptions {
-  initialOperation: SdkBasicOperation;
+interface SdkLroServiceMethodOptions {
+  __raw_lro_metadata: LroMetadata;
+  initialOperation: SdkServiceOperation;
 }
 
-interface SdkLroOperation extends SdkOperationBase<SdkLroOperation>, SdkLroOperationOptions {
+export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
-interface SdkLroPagingOperation
-  extends SdkOperationBase<SdkLroPagingOperation>,
-    SdkPagingOperationOptions,
-    SdkLroOperationOptions {
+export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkLroServiceMethodOptions,
+    SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
-export type SdkOperation =
-  | SdkBasicOperation
-  | SdkPagingOperation
-  | SdkLroOperation
-  | SdkLroPagingOperation;
+export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
+  | SdkBasicServiceMethod<TServiceOperation>
+  | SdkPagingServiceMethod<TServiceOperation>
+  | SdkLroServiceMethod<TServiceOperation>
+  | SdkLroPagingServiceMethod<TServiceOperation>
+  | SdkLroPagingServiceMethod<TServiceOperation>;
 
-export type SdkValidation =
-  | SdkStringValidation
-  | SdkInt32Validation
-  | SdkInt64Validation
-  | SdkFloat32Validation
-  | SdkFloat64Validation;
-
-interface SdkStringValidation {
-  kind: "string";
-  pattern?: string;
-  minLength?: number;
-  maxLength?: number;
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase<TServiceOperation> {
+  kind: "clientaccessor";
+  response: SdkClientType<TServiceOperation>;
 }
 
-interface SdkNumericValidationBase {
-  minValue?: number;
-  maxValue?: number;
+export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
+  | SdkServiceMethod<TServiceOperation>
+  | SdkPagingServiceMethod<TServiceOperation>
+  | SdkLroServiceMethod<TServiceOperation>
+  | SdkLroPagingServiceMethod<TServiceOperation>
+  | SdkClientAccessor<TServiceOperation>;
+
+export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  rootNamespace: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
+  diagnostics: readonly Diagnostic[];
 }
 
-interface SdkInt32Validation extends SdkNumericValidationBase {
-  kind: "int32";
-}
-
-interface SdkInt64Validation extends SdkNumericValidationBase {
-  kind: "int64";
-}
-
-interface SdkFloat32Validation extends SdkNumericValidationBase {
-  kind: "float32";
-}
-
-interface SdkFloat64Validation extends SdkNumericValidationBase {
-  kind: "float64";
-}
+export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
+
+/**
+ * This enum represents the different ways a model can be used in a method.
+ */
+export enum UsageFlags {
+  None = 0,
+  Input = 1 << 1,
+  Output = 1 << 2,
+  Versioning = 1 << 3,
+}

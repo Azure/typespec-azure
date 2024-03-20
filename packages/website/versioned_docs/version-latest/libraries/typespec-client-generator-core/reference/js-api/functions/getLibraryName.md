@@ -20,8 +20,8 @@ Returns name in the following order of priority
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |  |
-| `type` |    \| `Model`   \| `ModelProperty`   \| `Enum`   \| `EnumMember`   \| `Operation` |  |
+| `context` | `TCGCContext` |  |
+| `type` | `Type` & `Object` |  |
 
 ## Returns
 

@@ -9,7 +9,7 @@ reportDiagnostic<C, M>(program, diag): void
 
 ## Type parameters
 
-| Parameter |
+| Type parameter |
 | :------ |
 | `C` extends 
   \| `"client-name"`
@@ -22,9 +22,13 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"access"`
   \| `"invalid-usage"`
   \| `"invalid-encode"`
+  \| `"conflicting-multipart-model-usage"`
   \| `"discriminator-not-constant"`
   \| `"discriminator-not-string"`
-  \| `"wrong-client-decorator"` |
+  \| `"wrong-client-decorator"`
+  \| `"encoding-multipart-bytes"`
+  \| `"unsupported-kind"`
+  \| `"multiple-services"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters

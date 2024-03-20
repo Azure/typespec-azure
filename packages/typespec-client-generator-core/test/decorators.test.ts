@@ -2,28 +2,29 @@ import {
   Enum,
   Interface,
   Model,
-  ModelProperty,
   Namespace,
   Operation,
   UsageFlags,
+  ignoreDiagnostics,
 } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
   getClient,
+  getClientNameOverride,
   getOperationGroup,
   getUsage,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
-  shouldFlattenProperty,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
 import { SdkOperationGroup } from "../src/interfaces.js";
-import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
+import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
+import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: decorators", () => {
@@ -215,7 +216,8 @@ describe("typespec-client-generator-core: decorators", () => {
         @service({})
         @test namespace MyClient;
 
-        @route("/root1") op atRoot1(): void;        @route("/root2") op atRoot2(): void;
+        @route("/root1") op atRoot1(): void;       
+        @route("/root2") op atRoot2(): void;
 
         @operationGroup
         @test interface MyGroup {
@@ -313,6 +315,24 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { one: Operation };
 
       strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+    });
+
+    it("crossLanguagePackageId", async () => {
+      await runner.compile(`
+        @client({name: "MyPackageClient"})
+        @service({})
+        namespace My.Package.Namespace;
+
+        namespace SubNamespace {
+          interface Widgets {
+            @test op one(): void;
+          }
+        }
+      `);
+      strictEqual(
+        ignoreDiagnostics(getCrossLanguagePackageId(runner.context)),
+        "My.Package.Namespace"
+      );
     });
 
     it("@operationGroup with scope", async () => {
@@ -834,11 +854,12 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
 
-    it("nested namespace and interface", async () => {
+    it("nested namespace and interface with naming change", async () => {
       await runner.compile(`
         @service({})
         namespace Test1Client {
           @route("/b")
+          @clientName("BRename")
           namespace B {
             op x(): void;
 
@@ -863,7 +884,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(b);
       strictEqual(b.subOperationGroups?.length, 1);
       strictEqual(listOperationGroups(runner.context, b).length, 1);
-      strictEqual(b.groupPath, "Test1Client.B");
+      strictEqual(b.groupPath, "Test1Client.BRename");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
         ["x"]
@@ -873,7 +894,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(c);
       strictEqual(c.subOperationGroups, undefined);
       strictEqual(listOperationGroups(runner.context, c).length, 0);
-      strictEqual(c.groupPath, "Test1Client.B.C");
+      strictEqual(c.groupPath, "Test1Client.BRename.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
         ["y"]
@@ -1506,6 +1527,7 @@ describe("typespec-client-generator-core: decorators", () => {
   describe("@access", () => {
     it("mark an operation as internal", async () => {
       const { test } = (await runner.compile(`
+        @service({title: "Test Service"}) namespace TestService;
         @test
         @access(Access.internal)
         op test(): void;
@@ -2230,32 +2252,32 @@ describe("typespec-client-generator-core: decorators", () => {
 
   describe("@flattenProperty", () => {
     it("marks a model property to be flattened with suppression of deprecation warning", async () => {
-      const { Model1 } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Model1{
-            #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-            @flattenProperty
-            child: Model2;
-          }
-
-          @test
-          model Model2{}
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model1): void;
+      await runner.compileWithBuiltInService(`
+        model Model1{
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @flattenProperty
+          child: Model2;
         }
-      `)) as { Model1: Model };
 
-      const childProperty = Model1.properties.get("child");
-      notStrictEqual(childProperty, undefined);
-      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), true);
+        @test
+        model Model2{}
+
+        @test
+        @route("/func1")
+        op func1(@body body: Model1): void;
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const model1 = models.find((x) => x.name === "Model1")!;
+      strictEqual(model1.kind, "model");
+      strictEqual(model1.properties.length, 1);
+      const childProperty = model1.properties[0];
+      strictEqual(childProperty.kind, "property");
+      strictEqual(childProperty.flatten, true);
     });
 
     it("doesn't mark a un-flattened model property", async () => {
-      const { Model1 } = (await runner.compile(`
+      await runner.compile(`
         @service({})
         @test namespace MyService {
           @test
@@ -2270,11 +2292,15 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/func1")
           op func1(@body body: Model1): void;
         }
-      `)) as { Model1: Model };
-
-      const childProperty = Model1.properties.get("child");
-      notStrictEqual(childProperty, undefined);
-      strictEqual(shouldFlattenProperty(runner.context, childProperty as ModelProperty), false);
+      `);
+      const models = getAllModels(runner.context);
+      strictEqual(models.length, 2);
+      const model1 = models.find((x) => x.name === "Model1")!;
+      strictEqual(model1.kind, "model");
+      strictEqual(model1.properties.length, 1);
+      const childProperty = model1.properties[0];
+      strictEqual(childProperty.kind, "property");
+      strictEqual(childProperty.flatten, false);
     });
 
     it("throws deprecation warning if not suppressed", async () => {
@@ -2323,6 +2349,70 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, {
         code: "decorator-wrong-target",
       });
+    });
+  });
+
+  describe("@clientName", () => {
+    it("carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @clientName("Test1Rename")
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          @clientName("func1Rename")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
+    });
+
+    it("augment carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        @test namespace MyService {
+          @test
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(MyService.Test1, "Test1Rename");
+        @@clientName(MyService.func1, "func1Rename");
+      `
+      )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
     });
   });
 });

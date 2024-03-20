@@ -67,6 +67,13 @@ export const $lib = createTypeSpecLibrary({
         wrongType: paramMessage`Encoding '${"encoding"}' cannot be used on type '${"type"}'`,
       },
     },
+    "conflicting-multipart-model-usage": {
+      severity: "error",
+      messages: {
+        default: "Invalid encoding",
+        wrongType: paramMessage`Model '${"modelName"}' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model ${"modelName"}FormData' extends ${"modelName"} {}`,
+      },
+    },
     "discriminator-not-constant": {
       severity: "error",
       messages: {
@@ -83,6 +90,25 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
+      },
+    },
+    "encoding-multipart-bytes": {
+      severity: "error",
+      messages: {
+        default:
+          "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",
+      },
+    },
+    "unsupported-kind": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Unsupported kind ${"kind"}`,
+      },
+    },
+    "multiple-services": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
       },
     },
   },

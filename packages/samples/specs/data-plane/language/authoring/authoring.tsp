@@ -19,7 +19,6 @@ using Azure.Core.Traits;
 )
 @service({
   title: "Microsoft Cognitive Language Service - Analyze Text Authoring",
-  version: "202ß2-05-15-preview",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @route("/authoring/analyze-text/")
@@ -206,7 +205,6 @@ model SupportedLanguages is Azure.Core.Page<SupportedLanguage>;
 
 @doc("Represents a training config version.")
 model TrainingConfigVersion {
-  @projectedName("csharp", "version")
   @doc("Represents the version of the config.")
   trainingConfigVersion: string;
 
@@ -272,9 +270,8 @@ interface Projects {
   >;
 
   #suppress "@azure-tools/typespec-azure-core/long-running-polling-operation-required" "This operation does not follow the standard long-running operation pattern."
-  // NOTE: `import` is a reserved keyword
   @doc("Triggers a job to export a project's data.")
-  importx is Operations.ResourceAction<
+  `import` is Operations.ResourceAction<
     Project,
     ExportedProject,
     TypeSpec.Http.AcceptedResponse & Foundations.LongRunningStatusLocation

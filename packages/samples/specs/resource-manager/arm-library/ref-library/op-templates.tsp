@@ -26,14 +26,14 @@ model TestTrackedResource2 is TrackedResource<TestTrackedProperties2> {
 @armResourceOperations(TestTrackedResource2)
 interface Tracked2Operations {
   get is ArmResourceRead<TestTrackedResource2>;
-  create is ArmResourceCreateOrUpdateSync<TestTrackedResource2>;
+  create is ArmResourceCreateOrReplaceSync<TestTrackedResource2>;
   update is ArmResourcePatchSync<TestTrackedResource2, TestTrackedProperties2>;
   delete is ArmResourceDeleteSync<TestTrackedResource2>;
   listByResourceGroup is ArmResourceListByParent<TestTrackedResource2>;
   listBySubscription is ArmListBySubscription<TestTrackedResource2>;
 }
 
-@doc("rp-specific proeprties for the resource with all envelope properties")
+@doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties2 {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: ResourceProvisioningState;

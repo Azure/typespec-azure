@@ -8,6 +8,7 @@ import {
   BooleanLiteral,
   BytesKnownEncoding,
   DateTimeKnownEncoding,
+  Diagnostic,
   DurationKnownEncoding,
   Enum,
   EnumMember,
@@ -21,26 +22,35 @@ import {
   Tuple,
   Type,
   Union,
-  UsageFlags,
+  UnionVariant,
+  createDiagnosticCollector,
   getDiscriminator,
   getEncode,
   getFormat,
   getKnownValues,
+  getNamespaceFullName,
   getVisibility,
   ignoreDiagnostics,
+  isErrorModel,
   isNeverType,
   isNullType,
 } from "@typespec/compiler";
 import {
+  Authentication,
   Visibility,
-  getHttpOperation,
+  getAuthentication,
+  getHeaderFieldName,
+  getHeaderFieldOptions,
+  getPathParamName,
+  getQueryParamName,
+  getQueryParamOptions,
   getServers,
+  isBody,
   isHeader,
   isPathParam,
   isQueryParam,
   isStatusCode,
 } from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   getAccessOverride,
   getUsageOverride,
@@ -50,39 +60,66 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldFlattenProperty,
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
+  CollectionFormat,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
   SdkBuiltInType,
+  SdkClient,
   SdkConstantType,
-  SdkContext,
+  SdkCredentialParameter,
+  SdkCredentialType,
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
-  SdkModelPropertyTypeBase,
+  SdkModelPropertyType,
   SdkModelType,
   SdkTupleType,
   SdkType,
+  SdkUnionType,
+  UsageFlags,
+  getKnownScalars,
+  isSdkBuiltInKind,
 } from "./interfaces.js";
-import { reportDiagnostic } from "./lib.js";
 import {
-  getCrossLanguageDefinitionId,
+  createGeneratedName,
+  getAvailableApiVersions,
   getDocHelper,
-  getEffectivePayloadType,
-  getGeneratedName,
-  getLibraryName,
-  getPropertyNames,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
+  isHttpOperation,
+  isMultipartOperation,
+  updateWithApiVersionInformation,
+} from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
+import {
+  getCrossLanguageDefinitionId,
+  getEffectivePayloadType,
+  getGeneratedName,
+  getHttpOperationWithCache,
+  getLibraryName,
+  getPropertyNames,
 } from "./public-utils.js";
 
-function getEncodeHelper(context: SdkContext, type: Type, kind: string): string {
+import { getVersions } from "@typespec/versioning";
+import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
+import { TCGCContext } from "./internal-utils.js";
+
+function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
+  return {
+    ...getSdkTypeBaseHelper(context, type, "any"),
+    encode: getEncodeHelper(context, type, "any"),
+  };
+}
+
+function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
     return getEncode(context.program, type)?.encoding || kind;
   }
@@ -97,37 +134,13 @@ function getEncodeHelper(context: SdkContext, type: Type, kind: string): string 
  * @param type the original typespec type. Used to grab the format decorator off of
  * @param propertyType the type of the property, i.e. the internal type that we add the format info onto
  */
-function addFormatInfo(
-  context: SdkContext,
+export function addFormatInfo(
+  context: TCGCContext,
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const format = getFormat(context.program, type)?.toLocaleLowerCase();
-  if (format) {
-    switch (format) {
-      case "guid":
-      case "uuid":
-      case "password":
-      case "etag":
-        propertyType.kind = format;
-        break;
-      case "url":
-      case "uri":
-        propertyType.kind = "url";
-        break;
-      case "armid":
-        propertyType.kind = "armId";
-        break;
-      case "ipaddress":
-        propertyType.kind = "ipAddress";
-        break;
-      case "azurelocation":
-        propertyType.kind = "azureLocation";
-        break;
-      default:
-        throw Error(`Unknown format ${format}`);
-    }
-  }
+  const format = getFormat(context.program, type) ?? "";
+  if (isSdkBuiltInKind(format)) propertyType.kind = format;
 }
 
 /**
@@ -138,21 +151,27 @@ function addFormatInfo(
  * @param type the original typespec type. Used to grab the encoding decorator off of
  * @param propertyType the type of the property, i.e. the internal type that we add the encoding info onto
  */
-function addEncodeInfo(
-  context: SdkContext,
+export function addEncodeInfo(
+  context: TCGCContext,
   type: ModelProperty | Scalar,
-  propertyType: SdkType
-): void {
+  propertyType: SdkType,
+  defaultContentType?: string
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const encodeData = getEncode(context.program, type);
   if (propertyType.kind === "duration") {
-    if (!encodeData) return;
+    if (!encodeData) return diagnostics.wrap(undefined);
     propertyType.encode = encodeData.encoding as DurationKnownEncoding;
-    propertyType.wireType = getClientType(context, encodeData.type) as SdkBuiltInType;
+    propertyType.wireType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, encodeData.type)
+    ) as SdkBuiltInType;
   }
-  if (propertyType.kind === "datetime") {
+  if (propertyType.kind === "utcDateTime" || propertyType.kind === "offsetDateTime") {
     if (encodeData) {
       propertyType.encode = encodeData.encoding as DateTimeKnownEncoding;
-      propertyType.wireType = getClientType(context, encodeData.type) as SdkBuiltInType;
+      propertyType.wireType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, encodeData.type)
+      ) as SdkBuiltInType;
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
       propertyType.encode = "rfc7231";
     }
@@ -160,10 +179,13 @@ function addEncodeInfo(
   if (propertyType.kind === "bytes") {
     if (encodeData) {
       propertyType.encode = encodeData.encoding as BytesKnownEncoding;
-    } else {
+    } else if (!defaultContentType || defaultContentType === "application/json") {
       propertyType.encode = "base64";
+    } else {
+      propertyType.encode = "bytes";
     }
   }
+  return diagnostics.wrap(undefined);
 }
 
 /**
@@ -172,39 +194,10 @@ function addEncodeInfo(
  * @returns the corresponding sdk built in kind
  */
 function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
-  switch (scalar.name) {
-    case "int8":
-    case "int16":
-    case "int32":
-    case "uint8":
-    case "uint16":
-    case "uint32":
-    case "numeric":
-    case "integer":
-      return "int32";
-    case "safeint":
-    case "uint64":
-    case "int64":
-      return "int64";
-    case "plainDate":
-      return "date";
-    case "plainTime":
-      return "time";
-    case "float":
-      return "float32";
-    case "decimal128":
-      return "decimal128";
-    case "bytes":
-    case "float32":
-    case "float64":
-    case "boolean":
-    case "string":
-    case "url":
-    case "decimal":
-      return scalar.name;
-    default:
-      throw Error(`Unknown scalar kind ${scalar.name}`);
+  if (isSdkBuiltInKind(scalar.name)) {
+    return scalar.name;
   }
+  throw Error(`Unknown scalar kind ${scalar.name}`);
 }
 
 /**
@@ -213,19 +206,22 @@ function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
  * @param type the typespec type
  * @returns the corresponding sdk type
  */
-export function getSdkBuiltInType(
-  context: SdkContext,
+function getSdkBuiltInTypeWithDiagnostics(
+  context: TCGCContext,
   type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
-): SdkBuiltInType {
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
     if (type.kind === "Scalar") {
-      kind = getScalarKind(type);
+      if (isSdkBuiltInKind(type.name)) {
+        kind = getScalarKind(type);
+      }
     }
-    return {
+    return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
-    };
+    });
   } else if (type.kind === "String" || type.kind === "Boolean" || type.kind === "Number") {
     let kind: SdkBuiltInKinds;
 
@@ -236,26 +232,25 @@ export function getSdkBuiltInType(
     } else {
       kind = intOrFloat(type.value);
     }
-    return {
+    return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
-    };
+    });
   }
-  throw Error(`Unknown kind ${type.kind}`);
+  diagnostics.add(
+    createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
+  );
+  return diagnostics.wrap(getAnyType(context, type));
 }
 
-export function getSdkDatetimeType(context: SdkContext, type: Scalar): SdkDatetimeType {
-  // we don't get encode info until we get to the property / parameter level
-  // so we insert the default. Later in properties, we will check
-  // for encoding info and override accordingly
-  return {
-    ...getSdkTypeBaseHelper(context, type, "datetime"),
-    encode: "rfc3339",
-    wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
-  };
+export function getSdkBuiltInType(
+  context: TCGCContext,
+  type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
+): SdkBuiltInType {
+  return ignoreDiagnostics(getSdkBuiltInTypeWithDiagnostics(context, type));
 }
 
-export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurationType {
+export function getSdkDurationType(context: TCGCContext, type: Scalar): SdkDurationType {
   // we don't get encode info until we get to the property / parameter level
   // so we insert the default. Later in properties, we will check
   // for encoding info and override accordingly
@@ -267,119 +262,178 @@ export function getSdkDurationType(context: SdkContext, type: Scalar): SdkDurati
 }
 
 export function getSdkArrayOrDict(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   operation?: Operation
 ): (SdkDictionaryType | SdkArrayType) | undefined {
+  return ignoreDiagnostics(getSdkArrayOrDictWithDiagnostics(context, type, operation));
+}
+
+export function getSdkArrayOrDictWithDiagnostics(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
+): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (type.indexer !== undefined) {
     if (!isNeverType(type.indexer.key)) {
-      const valueType = getClientType(context, type.indexer.value!, operation);
+      const valueType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.indexer.value!, operation)
+      );
       const name = type.indexer.key.name;
       if (name === "string") {
         // model MyModel is Record<> {} should be model with additional properties
         if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
-          return undefined;
+          return diagnostics.wrap(undefined);
         }
-        return {
+        return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "dict"),
-          keyType: getClientType(context, type.indexer.key, operation),
+          keyType: diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, type.indexer.key, operation)
+          ),
           valueType,
-        };
+        });
       } else if (name === "integer") {
-        return {
+        return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
-        };
+        });
       }
     }
   }
-  return undefined;
+  return diagnostics.wrap(undefined);
 }
 
-export function getSdkTuple(context: SdkContext, type: Tuple, operation?: Operation): SdkTupleType {
-  return {
+export function getSdkTuple(
+  context: TCGCContext,
+  type: Tuple,
+  operation?: Operation
+): SdkTupleType {
+  return ignoreDiagnostics(getSdkTupleWithDiagnostics(context, type, operation));
+}
+
+export function getSdkTupleWithDiagnostics(
+  context: TCGCContext,
+  type: Tuple,
+  operation?: Operation
+): [SdkTupleType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "tuple"),
-    values: type.values.map((x) => getClientType(context, x, operation)),
-  };
+    values: type.values.map((x) =>
+      diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
+    ),
+  });
 }
 
-function getNonNullOptions(context: SdkContext, type: Union): Type[] {
+function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-export function getSdkUnion(
-  context: SdkContext,
+export function getSdkUnion(context: TCGCContext, type: Union, operation?: Operation): SdkType {
+  return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
+}
+
+export function getSdkUnionWithDiagnostics(
+  context: TCGCContext,
   type: Union,
   operation?: Operation
-): SdkType | undefined {
-  const nonNullOptions = getNonNullOptions(context, type);
+): [SdkType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const nonNullOptions = getNonNullOptions(type);
   if (nonNullOptions.length === 0) {
-    reportDiagnostic(context.program, { code: "union-null", target: type });
-    return;
+    diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
+    return diagnostics.wrap(getAnyType(context, type));
   }
 
   // change to a simple logic: only convert to normal type if the union is type | null, otherwise, return all the union types
   if (nonNullOptions.length === 1) {
-    const clientType = getClientType(context, nonNullOptions[0], operation);
+    const clientType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
+    );
     clientType.nullable = true;
-    return clientType;
+    clientType.__raw = type;
+    return diagnostics.wrap(clientType);
   }
-  return {
+
+  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+  if (unionAsEnum) {
+    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  }
+
+  return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
-    name: type.name,
-    generatedName: type.name ? undefined : getGeneratedName(context, type),
-    values: nonNullOptions.map((x) => getClientType(context, x, operation)),
+    name: getLibraryName(context, type) || getGeneratedName(context, type),
+    generatedName: !type.name,
+    values: nonNullOptions.map((x) =>
+      diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
+    ),
     nullable: nonNullOptions.length < type.variants.size,
-  };
+  });
 }
 
-export function getSdkConstant(
-  context: SdkContext,
+function getSdkConstantWithDiagnostics(
+  context: TCGCContext,
   type: StringLiteral | NumericLiteral | BooleanLiteral
-): SdkConstantType {
+): [SdkConstantType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   switch (type.kind) {
     case "Number":
     case "String":
     case "Boolean":
-      const valueType = getSdkBuiltInType(context, type);
-      return {
+      const valueType = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
+      return diagnostics.wrap({
         ...getSdkTypeBaseHelper(context, type, "constant"),
         value: type.value,
         valueType,
-      };
+      });
   }
 }
 
+export function getSdkConstant(
+  context: TCGCContext,
+  type: StringLiteral | NumericLiteral | BooleanLiteral
+): SdkConstantType {
+  return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type));
+}
+
 function addDiscriminatorToModelType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   model: SdkModelType,
   operation?: Operation
-): void {
+): [undefined, readonly Diagnostic[]] {
   const discriminator = getDiscriminator(context.program, type);
+  const diagnostics = createDiagnosticCollector();
   if (discriminator) {
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
-      const childModelSdkType = getSdkModel(context, childModel, operation);
+      const childModelSdkType = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, childModel, operation)
+      );
       updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.serializedName === discriminator?.propertyName) {
             if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
-              reportDiagnostic(context.program, {
-                code: "discriminator-not-constant",
-                target: type,
-                format: { discriminator: property.nameInClient },
-              });
+              diagnostics.add(
+                createDiagnostic({
+                  code: "discriminator-not-constant",
+                  target: type,
+                  format: { discriminator: property.name },
+                })
+              );
             } else if (typeof property.type.value !== "string") {
-              reportDiagnostic(context.program, {
-                code: "discriminator-not-string",
-                target: type,
-                format: {
-                  discriminator: property.nameInClient,
-                  discriminatorValue: String(property.type.value),
-                },
-              });
+              diagnostics.add(
+                createDiagnostic({
+                  code: "discriminator-not-string",
+                  target: type,
+                  format: {
+                    discriminator: property.name,
+                    discriminatorValue: String(property.type.value),
+                  },
+                })
+              );
             } else {
               childModelSdkType.discriminatorValue = property.type.value;
               property.discriminator = true;
@@ -397,7 +451,8 @@ function addDiscriminatorToModelType(
       const property = model.properties[i];
       if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
         property.discriminator = true;
-        return;
+        model.discriminatorProperty = property;
+        return diagnostics.wrap(undefined);
       }
     }
     let discriminatorType: SdkType;
@@ -405,11 +460,7 @@ function addDiscriminatorToModelType(
       if (discriminatorProperty.type.kind === "constant") {
         discriminatorType = { ...discriminatorProperty.type.valueType };
       } else if (discriminatorProperty.type.kind === "enumvalue") {
-        discriminatorType = getSdkEnum(
-          context,
-          (discriminatorProperty.type.__raw as EnumMember).enum,
-          operation
-        );
+        discriminatorType = discriminatorProperty.type.enumType;
       }
     } else {
       discriminatorType = {
@@ -418,29 +469,63 @@ function addDiscriminatorToModelType(
         encode: "string",
       };
     }
+    const name = discriminator.propertyName;
     model.properties.push({
       kind: "property",
       optional: false,
       discriminator: true,
       serializedName: discriminator.propertyName,
       type: discriminatorType!,
-      nameInClient: discriminator.propertyName,
-      apiVersions: getAvailableApiVersions(context, model.__raw!),
+      nameInClient: name,
+      name,
+      onClient: false,
+      apiVersions: getAvailableApiVersions(context, type),
+      isApiVersionParam: false,
+      isMultipartFileInput: false, // discriminator property cannot be a file
+      flatten: false, // discriminator properties can not be flattened
     });
+    model.discriminatorProperty = model.properties[model.properties.length - 1];
   }
+  return diagnostics.wrap(undefined);
 }
 
-export function getSdkModel(context: SdkContext, type: Model, operation?: Operation): SdkModelType {
+function isOperationBodyType(context: TCGCContext, type: Model, operation?: Operation): boolean {
+  if (!isHttpOperation(context, operation)) return false;
+  const httpBody = operation
+    ? getHttpOperationWithCache(context, operation).parameters.body
+    : undefined;
+  return (
+    !!httpBody &&
+    httpBody.type.kind === "Model" &&
+    getEffectivePayloadType(context, httpBody.type) === type
+  );
+}
+
+export function getSdkModel(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
+): SdkModelType {
+  return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
+}
+
+export function getSdkModelWithDiagnostics(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
+): [SdkModelType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
+
   if (sdkType) {
     updateModelsMap(context, type, sdkType, operation);
   } else {
     const docWrapper = getDocHelper(context, type);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
-      name: getLibraryName(context, type),
-      generatedName: type.name === "" ? getGeneratedName(context, type) : undefined,
+      name: getLibraryName(context, type) || getGeneratedName(context, type),
+      generatedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
       properties: [],
@@ -448,23 +533,25 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      apiVersions: getAvailableApiVersions(context, type),
+      isFormDataType:
+        isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation),
+      isError: isErrorModel(context.program, type),
     };
-
     updateModelsMap(context, type, sdkType, operation);
+
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
-      sdkType.additionalProperties = getClientType(
-        context,
-        type.sourceModel!.indexer!.value!,
-        operation
+      sdkType.additionalProperties = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.sourceModel!.indexer!.value!, operation)
       );
     }
     if (type.baseModel) {
       sdkType.baseModel = context.modelsMap?.get(type.baseModel) as SdkModelType | undefined;
       if (sdkType.baseModel === undefined) {
-        const baseModel = getClientType(context, type.baseModel, operation) as
-          | SdkDictionaryType
-          | SdkModelType;
+        const baseModel = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, type.baseModel, operation)
+        ) as SdkDictionaryType | SdkModelType;
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
           sdkType.additionalProperties = baseModel.valueType;
@@ -474,28 +561,61 @@ export function getSdkModel(context: SdkContext, type: Model, operation?: Operat
         }
       }
     }
-    addPropertiesToModelType(context, type, sdkType, operation);
-    addDiscriminatorToModelType(context, type, sdkType, operation);
+    diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
+    diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType, operation));
   }
-  return sdkType;
+  return diagnostics.wrap(sdkType);
 }
 
 function getSdkEnumValueType(
-  context: SdkContext,
-  type: EnumMember | StringLiteral | NumericLiteral
+  context: TCGCContext,
+  values:
+    | IterableIterator<EnumMember>
+    | IterableIterator<UnionEnumVariant<string>>
+    | IterableIterator<UnionEnumVariant<number>>
 ): SdkBuiltInType {
   let kind: "string" | "int32" | "float32" = "string";
-  if (typeof type.value === "number") {
-    kind = intOrFloat(type.value);
+  let type: EnumMember | UnionVariant;
+  for (const value of values) {
+    if ((value as EnumMember).kind) {
+      type = value as EnumMember;
+    } else {
+      type = (value as UnionEnumVariant<string> | UnionEnumVariant<number>).type;
+    }
+
+    if (typeof value.value === "number") {
+      kind = intOrFloat(value.value);
+      if (kind === "float32") {
+        break;
+      }
+    } else if (typeof value.value === "string") {
+      kind = "string";
+      break;
+    }
   }
+
   return {
-    ...getSdkTypeBaseHelper(context, type, kind),
-    encode: kind,
+    ...getSdkTypeBaseHelper(context, type!, kind!),
+    encode: kind!,
   };
 }
 
+function getUnionAsEnumValueType(context: TCGCContext, union: Union): SdkBuiltInType | undefined {
+  const nonNullOptions = getNonNullOptions(union);
+  for (const option of nonNullOptions) {
+    if (option.kind === "Union") {
+      const ret = getUnionAsEnumValueType(context, option);
+      if (ret) return ret;
+    } else if (option.kind === "Scalar") {
+      return getClientType(context, option) as SdkBuiltInType;
+    }
+  }
+
+  return undefined;
+}
+
 export function getSdkEnumValue(
-  context: SdkContext,
+  context: TCGCContext,
   enumType: SdkEnumType,
   type: EnumMember
 ): SdkEnumValueType {
@@ -511,22 +631,24 @@ export function getSdkEnumValue(
   };
 }
 
-export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operation): SdkEnumType {
+export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operation): SdkEnumType {
   let sdkType = context.modelsMap?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
     const docWrapper = getDocHelper(context, type);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
+      generatedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: getSdkEnumValueType(context, type.members.values().next().value),
+      valueType: getSdkEnumValueType(context, type.members.values()),
       values: [],
       isFixed: isFixed(context.program, type),
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      apiVersions: getAvailableApiVersions(context, type),
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -537,16 +659,17 @@ export function getSdkEnum(context: SdkContext, type: Enum, operation?: Operatio
 }
 
 function getSdkUnionEnumValues(
-  context: SdkContext,
+  context: TCGCContext,
   type: UnionEnum,
   enumType: SdkEnumType
 ): SdkEnumValueType[] {
   const values: SdkEnumValueType[] = [];
-  for (const [name, member] of type.flattenedMembers.entries()) {
-    const docWrapper = getDocHelper(context, member.variant);
+  for (const member of type.flattenedMembers.values()) {
+    const docWrapper = getDocHelper(context, member.type);
+    const name = getLibraryName(context, member.type);
     values.push({
       kind: "enumvalue",
-      name: typeof name === "string" ? name : `${member.value}`,
+      name: name ? name : `${member.value}`,
       description: docWrapper.description,
       details: docWrapper.details,
       value: member.value,
@@ -558,24 +681,28 @@ function getSdkUnionEnumValues(
   return values;
 }
 
-function getSdkUnionEnum(context: SdkContext, type: UnionEnum, operation?: Operation) {
+function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
     const union = type.union as Union & { name: string };
     const docWrapper = getDocHelper(context, union);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
-      name: getLibraryName(context, type.union),
+      name: getLibraryName(context, type.union) || getGeneratedName(context, type.union),
+      generatedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: { ...getSdkTypeBaseHelper(context, type.kind, "string"), encode: "string" },
+      valueType:
+        getUnionAsEnumValueType(context, type.union) ??
+        getSdkEnumValueType(context, type.flattenedMembers.values()),
       values: [],
-      nullable: false,
+      nullable: type.nullable,
       isFixed: !type.open,
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
+      apiVersions: getAvailableApiVersions(context, type.union),
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -584,7 +711,7 @@ function getSdkUnionEnum(context: SdkContext, type: UnionEnum, operation?: Opera
 }
 
 function getKnownValuesEnum(
-  context: SdkContext,
+  context: TCGCContext,
   type: Scalar | ModelProperty,
   operation?: Operation
 ): SdkEnumType | undefined {
@@ -601,16 +728,18 @@ function getKnownValuesEnum(
       const docWrapper = getDocHelper(context, type);
       sdkType = {
         ...getSdkTypeBaseHelper(context, type, "enum"),
-        name: type.name,
+        name: getLibraryName(context, type),
+        generatedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
-        valueType: getSdkEnumValueType(context, knownValues.members.values().next().value),
+        valueType: getSdkEnumValueType(context, knownValues.members.values()),
         values: [],
         isFixed: false,
         isFlags: false,
         usage: UsageFlags.None, // We will add usage as we loop through the operations
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+        apiVersions: getAvailableApiVersions(context, type),
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -621,68 +750,102 @@ function getKnownValuesEnum(
   }
 }
 
-export function getClientType(context: SdkContext, type: Type, operation?: Operation): SdkType {
+export function getClientTypeWithDiagnostics(
+  context: TCGCContext,
+  type: Type,
+  operation?: Operation
+): [SdkType, readonly Diagnostic[]] {
+  if (!context.knownScalars) {
+    context.knownScalars = getKnownScalars();
+  }
+  const diagnostics = createDiagnosticCollector();
+  let retval: SdkType | undefined = undefined;
   switch (type.kind) {
     case "String":
     case "Number":
     case "Boolean":
-      return getSdkConstant(context, type);
+      retval = diagnostics.pipe(getSdkConstantWithDiagnostics(context, type));
+      break;
     case "Tuple":
-      return getSdkTuple(context, type, operation);
+      retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
+      break;
     case "Model":
-      const dictOrList = getSdkArrayOrDict(context, type, operation);
-      if (dictOrList === undefined) {
-        return getSdkModel(context, type, operation);
+      retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
+      if (retval === undefined) {
+        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
       }
-      return dictOrList;
+      break;
     case "Intrinsic":
-      return getSdkBuiltInType(context, type);
+      retval = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
+      break;
     case "Scalar":
       if (!context.program.checker.isStdType(type) && type.kind === "Scalar" && type.baseScalar) {
-        const baseType = getClientType(context, type.baseScalar, operation);
+        const baseType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, type.baseScalar, operation)
+        );
         addEncodeInfo(context, type, baseType);
         addFormatInfo(context, type, baseType);
-        return getKnownValuesEnum(context, type, operation) ?? baseType;
+        retval = getKnownValuesEnum(context, type, operation) ?? baseType;
+        const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
+        retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
+        break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
-        return getSdkDatetimeType(context, type);
+        retval = {
+          ...getSdkTypeBaseHelper(context, type, type.name),
+          encode: "rfc3339",
+          wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
+        } as SdkDatetimeType;
+        break;
       }
       if (type.name === "duration") {
-        return getSdkDurationType(context, type);
+        retval = getSdkDurationType(context, type);
+        break;
       }
-      const scalarType = getSdkBuiltInType(context, type);
+      const scalarType = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
       // just add default encode, normally encode is on extended scalar and model property
       addEncodeInfo(context, type, scalarType);
-      return scalarType;
+      retval = scalarType;
+      break;
     case "Enum":
-      return getSdkEnum(context, type, operation);
+      retval = getSdkEnum(context, type, operation);
+      break;
     case "Union":
-      // start off with just handling nullable type
-      const unionAsEnum = ignoreDiagnostics(getUnionAsEnum(type));
-      if (unionAsEnum && type.name) {
-        return getSdkUnionEnum(context, unionAsEnum, operation);
-      }
-      const union = getSdkUnion(context, type, operation);
-      if (union === undefined) {
-        throw Error(`Error encountered during generation, view diagnostic logs`);
-      }
-      return union;
+      retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
+      break;
     case "ModelProperty":
-      const innerType = getClientType(context, type.type, operation);
-      addEncodeInfo(context, type, innerType);
+      const innerType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.type, operation)
+      );
+      diagnostics.pipe(addEncodeInfo(context, type, innerType));
       addFormatInfo(context, type, innerType);
-      return getKnownValuesEnum(context, type, operation) ?? innerType;
+      retval = getKnownValuesEnum(context, type, operation) ?? innerType;
+      break;
     case "UnionVariant":
-      return {
-        ...getSdkTypeBaseHelper(context, type, "any"),
-        encode: getEncodeHelper(context, type, "any"),
-      };
+      const unionType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.union, operation)
+      );
+      if (unionType.kind === "enum") {
+        retval = unionType.values.find((x) => x.name === getLibraryName(context, type))!;
+      } else {
+        retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      }
+      break;
     case "EnumMember":
       const enumType = getSdkEnum(context, type.enum, operation);
-      return getSdkEnumValue(context, enumType, type);
+      retval = getSdkEnumValue(context, enumType, type);
+      break;
     default:
-      throw Error(`Not supported ${type.kind}`);
+      retval = getAnyType(context, type);
+      diagnostics.add(
+        createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
+      );
   }
+  return diagnostics.wrap(retval);
+}
+
+export function getClientType(context: TCGCContext, type: Type, operation?: Operation): SdkType {
+  return ignoreDiagnostics(getClientTypeWithDiagnostics(context, type, operation));
 }
 
 export function isReadOnly(property: SdkBodyModelPropertyType) {
@@ -696,23 +859,23 @@ export function isReadOnly(property: SdkBodyModelPropertyType) {
   return false;
 }
 
-function getSdkVisibility(context: SdkContext, type: ModelProperty): Visibility[] | undefined {
+function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility[] | undefined {
   const visibility = getVisibility(context.program, type);
   if (visibility) {
-    const result = [];
-    if (visibility?.includes("read")) {
+    const result: Visibility[] = [];
+    if (visibility.includes("read")) {
       result.push(Visibility.Read);
     }
-    if (visibility?.includes("create")) {
+    if (visibility.includes("create")) {
       result.push(Visibility.Create);
     }
-    if (visibility?.includes("update")) {
+    if (visibility.includes("update")) {
       result.push(Visibility.Update);
     }
-    if (visibility?.includes("delete")) {
+    if (visibility.includes("delete")) {
       result.push(Visibility.Delete);
     }
-    if (visibility?.includes("query")) {
+    if (visibility.includes("query")) {
       result.push(Visibility.Query);
     }
     return result;
@@ -720,97 +883,220 @@ function getSdkVisibility(context: SdkContext, type: ModelProperty): Visibility[
   return undefined;
 }
 
-function getAvailableApiVersions(context: SdkContext, type: Type): string[] {
-  const allVersions = getVersions(context.program, type)[1]?.getVersions() ?? [];
-  const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
-  const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
-  let added: boolean = addedOnVersions.length ? false : true;
-  let addedCounter = 0;
-  let removeCounter = 0;
-  const retval: string[] = [];
-  for (const version of allVersions) {
-    if (addedCounter < addedOnVersions.length && version.value === addedOnVersions[addedCounter]) {
-      added = true;
-      addedCounter++;
-    }
-    if (
-      removeCounter < removedOnVersions.length &&
-      version.value === removedOnVersions[removeCounter]
-    ) {
-      added = false;
-      removeCounter++;
-    }
-    if (added) retval.push(version.value);
+function getCollectionFormat(
+  context: TCGCContext,
+  type: ModelProperty
+): CollectionFormat | undefined {
+  const program = context.program;
+  const tspCollectionFormat = (
+    isQueryParam(program, type)
+      ? getQueryParamOptions(program, type)
+      : isHeader(program, type)
+        ? getHeaderFieldOptions(program, type)
+        : undefined
+  )?.format;
+  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
+    return undefined;
   }
-  return retval;
+  return tspCollectionFormat;
 }
 
-function getSdkModelPropertyType(
-  context: SdkContext,
+function getSdkCredentialType(
+  client: SdkClient,
+  authentication: Authentication
+): SdkCredentialType | SdkUnionType {
+  const credentialTypes: SdkCredentialType[] = [];
+  for (const option of authentication.options) {
+    for (const scheme of option.schemes) {
+      credentialTypes.push({
+        __raw: client.service,
+        kind: "credential",
+        scheme: scheme,
+        nullable: false,
+      });
+    }
+  }
+  if (credentialTypes.length > 1) {
+    return {
+      __raw: client.service,
+      kind: "union",
+      values: credentialTypes,
+      nullable: false,
+      name: createGeneratedName(client.service, "CredentialUnion"),
+      generatedName: false,
+    };
+  }
+  return credentialTypes[0];
+}
+
+export function getSdkCredentialParameter(
+  context: TCGCContext,
+  client: SdkClient
+): SdkCredentialParameter | undefined {
+  const auth = getAuthentication(context.program, client.service);
+  if (!auth) return undefined;
+  const name = "credential";
+  return {
+    type: getSdkCredentialType(client, auth),
+    kind: "credential",
+    nameInClient: name,
+    name,
+    description: "Credential used to authenticate requests to the service.",
+    apiVersions: getAvailableApiVersions(context, client.service),
+    onClient: true,
+    optional: false,
+    isApiVersionParam: false,
+  };
+}
+
+interface GetSdkModelPropertyTypeOptions {
+  isEndpointParam?: boolean;
+  operation?: Operation;
+  isMethodParameter?: boolean;
+  defaultContentType?: string;
+}
+
+export function getSdkModelPropertyType(
+  context: TCGCContext,
   type: ModelProperty,
-  operation?: Operation
-): SdkModelPropertyTypeBase {
-  let propertyType = getClientType(context, type.type, operation);
-  addEncodeInfo(context, type, propertyType);
+  options: GetSdkModelPropertyTypeOptions = {}
+): [SdkModelPropertyType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  let propertyType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, type.type, options.operation)
+  );
+  diagnostics.pipe(addEncodeInfo(context, type, propertyType, options.defaultContentType));
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
-    propertyType = getSdkEnum(context, knownValues, operation);
+    propertyType = getSdkEnum(context, knownValues, options.operation);
   }
   const docWrapper = getDocHelper(context, type);
-  return {
+  const name = getPropertyNames(context, type)[0];
+  const base = {
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
     apiVersions: getAvailableApiVersions(context, type),
     type: propertyType,
-    nameInClient: getPropertyNames(context, type)[0],
+    nameInClient: name,
+    name,
+    onClient: false,
     optional: type.optional,
   };
-}
-
-function getSdkBodyModelPropertyType(
-  context: SdkContext,
-  type: ModelProperty,
-  operation?: Operation
-): SdkBodyModelPropertyType {
-  return {
-    ...getSdkModelPropertyType(context, type, operation),
-    kind: "property",
+  const program = context.program;
+  const headerQueryOptions = {
+    ...base,
     optional: type.optional,
-    visibility: getSdkVisibility(context, type),
-    discriminator: false,
-    serializedName: getPropertyNames(context, type)[1],
+    collectionFormat: getCollectionFormat(context, type),
   };
+  if (options.isMethodParameter) {
+    return diagnostics.wrap({
+      ...base,
+      kind: "method",
+      ...updateWithApiVersionInformation(context, type),
+      optional: type.optional,
+    });
+  } else if (isPathParam(program, type) || options.isEndpointParam) {
+    return diagnostics.wrap({
+      ...base,
+      kind: "path",
+      urlEncode: true,
+      serializedName: getPathParamName(program, type),
+      ...updateWithApiVersionInformation(context, type),
+      optional: false,
+    });
+  } else if (isHeader(program, type)) {
+    return diagnostics.wrap({
+      ...headerQueryOptions,
+      kind: "header",
+      serializedName: getHeaderFieldName(program, type),
+      ...updateWithApiVersionInformation(context, type),
+    });
+  } else if (isQueryParam(program, type)) {
+    return diagnostics.wrap({
+      ...headerQueryOptions,
+      kind: "query",
+      serializedName: getQueryParamName(program, type),
+      ...updateWithApiVersionInformation(context, type),
+    });
+  } else if (isBody(program, type)) {
+    return diagnostics.wrap({
+      ...base,
+      kind: "body",
+      contentTypes: ["application/json"], // will update when we get to the operation level
+      defaultContentType: "application/json", // will update when we get to the operation level
+      ...updateWithApiVersionInformation(context, type),
+      optional: type.optional,
+    });
+  } else {
+    // I'm a body model property
+    let operationIsMultipart = false;
+    if (options.operation) {
+      const httpOperation = getHttpOperationWithCache(context, options.operation);
+      operationIsMultipart = Boolean(
+        httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+      );
+    }
+    // Currently we only recognize bytes and list of bytes as potential file inputs
+    const isBytesInput =
+      base.type.kind === "bytes" ||
+      (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+    if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "encoding-multipart-bytes",
+          target: type,
+        })
+      );
+    }
+    return diagnostics.wrap({
+      ...base,
+      kind: "property",
+      optional: type.optional,
+      visibility: getSdkVisibility(context, type),
+      discriminator: false,
+      serializedName: getPropertyNames(context, type)[1],
+      isMultipartFileInput: isBytesInput && operationIsMultipart,
+      flatten: shouldFlattenProperty(context, type),
+      ...updateWithApiVersionInformation(context, type),
+    });
+  }
 }
 
 function addPropertiesToModelType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Model,
   sdkType: SdkType,
   operation?: Operation
-): void {
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   for (const property of type.properties.values()) {
     if (
       isStatusCode(context.program, property) ||
       isNeverType(property.type) ||
-      isHeader(context.program, property) ||
-      isQueryParam(context.program, property) ||
-      isPathParam(context.program, property) ||
       sdkType.kind !== "model"
     ) {
       continue;
     }
-    const clientProperty = getSdkBodyModelPropertyType(context, property, operation);
+    const clientProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, property, { operation: operation })
+    );
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
       sdkType.properties = [clientProperty];
     }
   }
+  return diagnostics.wrap(undefined);
 }
 
-function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, operation?: Operation) {
+function updateModelsMap(
+  context: TCGCContext,
+  type: Type,
+  sdkType: SdkType,
+  operation?: Operation
+) {
   if (sdkType.kind !== "model" && sdkType.kind !== "enum") {
     return;
   }
@@ -836,6 +1122,7 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
     } else {
       context.operationModelsMap.set(operation, new Map([[type, sdkType]]));
     }
+    // TODO: it seems duplicate calculation, need to optimize later
     if (sdkType.kind === "model") {
       for (const prop of sdkType.properties) {
         if (prop.type.kind === "model" || prop.type.kind === "enum") {
@@ -858,6 +1145,14 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
       if (sdkType.baseModel) {
         updateModelsMap(context, sdkType.baseModel.__raw as any, sdkType.baseModel, operation);
       }
+      if (sdkType.additionalProperties) {
+        updateModelsMap(
+          context,
+          sdkType.additionalProperties.__raw as any,
+          sdkType.additionalProperties,
+          operation
+        );
+      }
       if (sdkType.discriminatedSubtypes) {
         for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
           updateModelsMap(context, subtype.__raw as any, subtype, operation);
@@ -868,34 +1163,49 @@ function updateModelsMap(context: SdkContext, type: Type, sdkType: SdkType, oper
 }
 
 function checkAndGetClientType(
-  context: SdkContext,
+  context: TCGCContext,
   type: Type,
   operation?: Operation
-): SdkType | undefined {
+): [SdkType[], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const retval: SdkType[] = [];
   if (type.kind === "Model") {
-    if (isExclude(context, type)) return; // eslint-disable-line deprecation/deprecation
+    if (isExclude(context, type)) return diagnostics.wrap([]); // eslint-disable-line deprecation/deprecation
     const effectivePayloadType = getEffectivePayloadType(context, type);
-    if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) return;
+    if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
+      if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
+        effectivePayloadType.templateMapper.args
+          .filter((arg) => arg.kind === "Model" && arg.name)
+          .forEach((arg) => {
+            retval.push(...diagnostics.pipe(checkAndGetClientType(context, arg, operation)));
+          });
+        return diagnostics.wrap(retval);
+      } else {
+        return diagnostics.wrap([]);
+      }
+    }
   }
-  return getClientType(context, type, operation); // this will update the models map / simple types map
+  const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type, operation));
+  return diagnostics.wrap([clientType]);
 }
 
 function updateUsageOfModel(
-  context: SdkContext,
-  type: SdkType,
+  context: TCGCContext,
   usage: UsageFlags,
+  type?: SdkType,
   seenModelNames?: Set<SdkType>
 ): void {
+  if (!type || !["model", "enum", "array", "dict", "union"].includes(type.kind)) return undefined;
   if (seenModelNames === undefined) {
     seenModelNames = new Set<SdkType>();
   }
   if (type.kind === "model" && seenModelNames.has(type)) return; // avoid circular references
   if (type.kind === "array" || type.kind === "dict") {
-    return updateUsageOfModel(context, type.valueType, usage, seenModelNames);
+    return updateUsageOfModel(context, usage, type.valueType, seenModelNames);
   }
   if (type.kind === "union") {
     for (const unionType of type.values) {
-      updateUsageOfModel(context, unionType, usage, seenModelNames);
+      updateUsageOfModel(context, usage, unionType, seenModelNames);
     }
     return;
   }
@@ -915,63 +1225,95 @@ function updateUsageOfModel(
     type.baseModel.usage |= usage;
   }
   if (type.baseModel) {
-    updateUsageOfModel(context, type.baseModel, usage, seenModelNames);
+    updateUsageOfModel(context, usage, type.baseModel, seenModelNames);
   }
   if (type.discriminatedSubtypes) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
-      updateUsageOfModel(context, discriminatedSubtype, usage, seenModelNames);
+      updateUsageOfModel(context, usage, discriminatedSubtype, seenModelNames);
     }
   }
+  if (type.additionalProperties) {
+    updateUsageOfModel(context, usage, type.additionalProperties, seenModelNames);
+  }
   for (const property of type.properties) {
-    updateUsageOfModel(context, property.type, usage, seenModelNames);
+    updateUsageOfModel(context, usage, property.type, seenModelNames);
   }
 }
 
-function updateTypesFromOperation(context: SdkContext, operation: Operation): void {
+function updateTypesFromOperation(
+  context: TCGCContext,
+  operation: Operation
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const program = context.program;
-  const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
-  for (const param of httpOperation.parameters.parameters) {
-    checkAndGetClientType(context, param.param.type, operation);
-  }
+  const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
+  for (const param of operation.parameters.properties.values()) {
+    const paramTypes = diagnostics.pipe(checkAndGetClientType(context, param.type, operation));
+    if (generateConvenient) {
+      paramTypes.forEach((paramType) => {
+        updateUsageOfModel(context, UsageFlags.Input, paramType);
+      });
+    }
+  }
+  for (const param of httpOperation.parameters.parameters) {
+    const paramTypes = diagnostics.pipe(
+      checkAndGetClientType(context, param.param.type, operation)
+    );
+    if (generateConvenient) {
+      paramTypes.forEach((paramType) => {
+        updateUsageOfModel(context, UsageFlags.Input, paramType);
+      });
+    }
+  }
   if (httpOperation.parameters.body) {
-    const body = checkAndGetClientType(context, httpOperation.parameters.body.type, operation);
-    if (
-      body &&
-      ["model", "enum", "array", "dict", "union"].includes(body.kind) &&
-      generateConvenient
-    ) {
-      updateUsageOfModel(context, body, UsageFlags.Input);
+    const bodies = diagnostics.pipe(
+      checkAndGetClientType(context, httpOperation.parameters.body.type, operation)
+    );
+    if (generateConvenient) {
+      bodies.forEach((body) => {
+        updateUsageOfModel(context, UsageFlags.Input, body);
+      });
     }
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type) {
-        const responseBody = checkAndGetClientType(context, innerResponse.body.type, operation);
-        if (
-          responseBody &&
-          ["model", "enum", "array", "dict", "union"].includes(responseBody.kind) &&
-          generateConvenient
-        ) {
-          updateUsageOfModel(context, responseBody, UsageFlags.Output);
+        const responseBodies = diagnostics.pipe(
+          checkAndGetClientType(context, innerResponse.body.type, operation)
+        );
+        if (generateConvenient) {
+          responseBodies.forEach((responseBody) => {
+            updateUsageOfModel(context, UsageFlags.Output, responseBody);
+          });
         }
       }
     }
   }
   const lroMetaData = getLroMetadata(program, operation);
-  if (lroMetaData) {
-    const logicalResult = checkAndGetClientType(context, lroMetaData.logicalResult, operation);
-    if (
-      logicalResult &&
-      ["model", "enum", "array", "dict", "union"].includes(logicalResult.kind) &&
-      generateConvenient
-    ) {
-      updateUsageOfModel(context, logicalResult, UsageFlags.Output);
+  if (lroMetaData && generateConvenient) {
+    const logicalResults = diagnostics.pipe(
+      checkAndGetClientType(context, lroMetaData.logicalResult, operation)
+    );
+    logicalResults.forEach((logicalResult) => {
+      updateUsageOfModel(context, UsageFlags.Output, logicalResult);
+    });
+
+    if (!context.arm) {
+      // TODO: currently skipping adding of envelopeResult due to arm error
+      // https://github.com/Azure/typespec-azure/issues/311
+      const envelopeResults = diagnostics.pipe(
+        checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+      );
+      envelopeResults.forEach((envelopeResult) => {
+        updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+      });
     }
   }
+  return diagnostics.wrap(undefined);
 }
 
-function updateAccessOfModel(context: SdkContext): void {
+function updateAccessOfModel(context: TCGCContext): void {
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
     const internal = isInternal(context, type as any); // eslint-disable-line deprecation/deprecation
     if (internal) {
@@ -979,7 +1321,7 @@ function updateAccessOfModel(context: SdkContext): void {
       continue;
     }
 
-    const accessOverride = getAccessOverride(context, type as any);
+    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
       sdkType.access = accessOverride;
       continue;
@@ -1012,26 +1354,60 @@ interface GetAllModelsOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(context: SdkContext, type: Model | Enum) {
+function handleServiceOrphanType(context: TCGCContext, type: Model | Enum) {
+  const diagnostics = createDiagnosticCollector();
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
-    const sdkModel = checkAndGetClientType(context, type);
-    if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-      updateUsageOfModel(context, sdkModel, UsageFlags.Input | UsageFlags.Output);
-    }
+    const sdkModels = diagnostics.pipe(checkAndGetClientType(context, type));
+    sdkModels.forEach((sdkModel) => {
+      updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkModel);
+    });
   }
   if (getAccessOverride(context, type) !== undefined) {
-    const sdkModel = checkAndGetClientType(context, type);
-    if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-      updateUsageOfModel(context, sdkModel, UsageFlags.None);
-    }
+    const sdkModels = diagnostics.pipe(checkAndGetClientType(context, type));
+    sdkModels
+      .filter((sdkModel) => ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind))
+      .forEach((sdkModel) => {
+        updateUsageOfModel(context, UsageFlags.None, sdkModel);
+      });
   }
 }
 
-export function getAllModels(
-  context: SdkContext,
+function verifyNoConflictingMultipartModelUsage(
+  context: TCGCContext
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  for (const [operation, modelMap] of context.operationModelsMap!) {
+    for (const [type, sdkType] of modelMap.entries()) {
+      if (
+        sdkType.kind === "model" &&
+        sdkType.isFormDataType !== isMultipartOperation(context, operation)
+      ) {
+        // This means we have a model that is used both for formdata input and for regular body input
+        diagnostics.add(
+          createDiagnostic({
+            code: "conflicting-multipart-model-usage",
+            target: type,
+            format: {
+              modelName: sdkType.name,
+            },
+          })
+        );
+      }
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
+function modelChecks(context: TCGCContext): [void, readonly Diagnostic[]] {
+  return verifyNoConflictingMultipartModelUsage(context);
+}
+
+export function getAllModelsWithDiagnostics(
+  context: TCGCContext,
   options: GetAllModelsOptions = {}
-): (SdkModelType | SdkEnumType)[] {
+): [(SdkModelType | SdkEnumType)[], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const defaultOptions = {
     input: true,
     output: true,
@@ -1040,20 +1416,23 @@ export function getAllModels(
   if (context.modelsMap === undefined) {
     context.modelsMap = new Map<Type, SdkModelType | SdkEnumType>();
   }
+  if (context.unionsMap === undefined) {
+    context.unionsMap = new Map<Union, SdkUnionType>();
+  }
   if (context.operationModelsMap === undefined) {
     context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
   }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
-      updateTypesFromOperation(context, operation);
+      diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
     const ogs = listOperationGroups(context, client);
     while (ogs.length) {
       const operationGroup = ogs.pop();
       for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         // operations on operation groups
-        updateTypesFromOperation(context, operation);
+        diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
       if (operationGroup?.subOperationGroups) {
         ogs.push(...operationGroup.subOperationGroups);
@@ -1071,21 +1450,40 @@ export function getAllModels(
     const servers = getServers(context.program, client.service);
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
-        const sdkModel = checkAndGetClientType(context, param);
-        if (sdkModel && ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind)) {
-          updateUsageOfModel(context, sdkModel, UsageFlags.Input);
-        }
+        const sdkModels = diagnostics.pipe(checkAndGetClientType(context, param));
+        sdkModels.forEach((sdkModel) => {
+          updateUsageOfModel(context, UsageFlags.Input, sdkModel);
+        });
       }
+    }
+    // versioned enums
+    const [_, versionMap] = getVersions(context.program, client.service);
+    if (versionMap && versionMap.getVersions()[0]) {
+      // create sdk enum for versions enum
+      const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
+      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
     }
   }
   // update access
   updateAccessOfModel(context);
   let filter = 0;
-  if (options.input) {
+  if (options.input && options.output) {
+    filter = Number.MAX_SAFE_INTEGER;
+  } else if (options.input) {
     filter += UsageFlags.Input;
-  }
-  if (options.output) {
+  } else if (options.output) {
     filter += UsageFlags.Output;
   }
-  return [...context.modelsMap.values()].filter((t) => (t.usage & filter) > 0);
+  diagnostics.pipe(modelChecks(context));
+  return diagnostics.wrap([...context.modelsMap.values()].filter((t) => (t.usage & filter) > 0));
+}
+
+export function getAllModels(
+  context: TCGCContext,
+  options: GetAllModelsOptions = {}
+): (SdkModelType | SdkEnumType)[] {
+  // we currently don't return diagnostics even though we keep track of them
+  // when we move to the new sdk type ecosystem completely, we'll expose
+  // diagnostics as a separate property on the TCGCContext
+  return ignoreDiagnostics(getAllModelsWithDiagnostics(context, options));
 }

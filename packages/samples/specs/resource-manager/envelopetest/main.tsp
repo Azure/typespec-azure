@@ -11,6 +11,8 @@ using Azure.ResourceManager;
 
 @service({
   title: "Microsoft.EnvelopeTest",
+})
+@OpenAPI.info({
   version: "2021-09-21-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -38,7 +40,7 @@ model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
 interface AllProperties
   extends TrackedResourceOperations<AllPropertiesResource, AllPropertiesProperties> {}
 
-@doc("rp-specific proeprties for the resource with all envelope properties")
+@doc("rp-specific properties for the resource with all envelope properties")
 model AllPropertiesProperties {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: EnvelopeProvisioningState;

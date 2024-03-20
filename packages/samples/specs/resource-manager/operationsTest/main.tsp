@@ -12,6 +12,8 @@ using Azure.ResourceManager;
 
 @service({
   title: "Microsoft.OperationsTest",
+})
+@OpenAPI.info({
   version: "2022-11-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -93,7 +95,7 @@ interface TenantOperations
   extends ProxyResourceOperations<TestTenantResource>,
     ResourceUpdate<TestTenantResource, TestTenantProperties> {}
 
-@doc("rp-specific proeprties for the resource")
+@doc("rp-specific properties for the resource")
 model TestTenantProperties {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: EnvelopeProvisioningState;
@@ -137,7 +139,7 @@ interface ExtensionOperations
   extends ProxyResourceOperations<TestExtensionResource>,
     ResourceUpdate<TestExtensionResource, TestExtensionProperties> {}
 
-@doc("rp-specific proeprties for the resource")
+@doc("rp-specific properties for the resource")
 model TestExtensionProperties {
   @doc("The status of the last operation performed on this resource.")
   provisioningState: EnvelopeProvisioningState;

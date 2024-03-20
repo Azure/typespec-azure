@@ -1,5 +1,13 @@
-import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  Enum,
+  Model,
+  createRule,
+  getProperty,
+  getVisibility,
+  paramMessage,
+} from "@typespec/compiler";
 
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import { getArmResource } from "../resource.js";
 import { getSourceProperty } from "./utils.js";
 
@@ -9,8 +17,10 @@ export const armResourceProvisioningStateRule = createRule({
   description: "Check for properly configured provisioningState property.",
   messages: {
     default:
-      "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
+      "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
     missingValues: paramMessage`The "@knownValues" decorator for provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${"missingValues"}].`,
+    missingReadOnlyVisibility: "The provisioningState property must have a single read visibility.",
+    mustBeOptional: "The provisioningState property must be optional.",
   },
   create(context) {
     return {
@@ -31,9 +41,10 @@ export const armResourceProvisioningStateRule = createRule({
           });
         } else {
           provisioning = getSourceProperty(provisioning);
+
           const provisioningType = provisioning.type;
           switch (provisioningType.kind) {
-            case "Enum":
+            case "Enum": {
               const enumType = provisioningType as Enum;
               const missing: string[] = [];
               if (!enumType.members.get("Succeeded")) {
@@ -53,10 +64,58 @@ export const armResourceProvisioningStateRule = createRule({
                 });
               }
               break;
+            }
+            case "Union": {
+              const [unionAsEnum] = getUnionAsEnum(provisioningType);
+              if (unionAsEnum === undefined) {
+                context.reportDiagnostic({
+                  target: resourceProperties,
+                });
+                break;
+              }
+              const missing: string[] = [];
+              if (!unionAsEnum.flattenedMembers.get("Succeeded")) {
+                missing.push("Succeeded");
+              }
+              if (!unionAsEnum.flattenedMembers.get("Canceled")) {
+                missing.push("Canceled");
+              }
+              if (!unionAsEnum.flattenedMembers.get("Failed")) {
+                missing.push("Failed");
+              }
+              if (missing.length > 0) {
+                context.reportDiagnostic({
+                  messageId: "missingValues",
+                  format: { missingValues: missing.join(", ") },
+                  target: provisioningType,
+                });
+              }
+              break;
+            }
+
             default:
               context.reportDiagnostic({
                 target: provisioning,
               });
+          }
+
+          // validate provisioning state is optional
+          if (provisioning.optional !== true) {
+            context.reportDiagnostic({
+              messageId: "mustBeOptional",
+              target: provisioning,
+            });
+          }
+
+          // validate it must has a read only visibility
+          const visibilities = getVisibility(context.program, provisioning);
+          if (
+            !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "read")
+          ) {
+            context.reportDiagnostic({
+              messageId: "missingReadOnlyVisibility",
+              target: provisioning,
+            });
           }
         }
       },

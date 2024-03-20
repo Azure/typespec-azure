@@ -13,7 +13,7 @@ Check a namespace or interface is an operation group.
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | SdkContext |
+| `context` | `TCGCContext` | TCGCContext |
 | `type` | `Interface` \| `Namespace` | Type to check |
 
 ## Returns

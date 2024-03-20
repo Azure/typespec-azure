@@ -11,7 +11,6 @@ using Azure.Core;
 @useAuth(AadOauth2Auth<["https://cognitiveservices.azure.com/.default"]>)
 @service({
   title: "Form Recognizer",
-  version: "2021-09-30-preview",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_1)
 @doc("Extracts content, layout, and structured data from documents.")
@@ -215,7 +214,6 @@ model InnerError {
   @doc("The error target.")
   target: string;
 
-  @projectedName("csharp", "InnerErrorObject")
   @doc("The inner error details.")
   innerError: InnerError;
 }
@@ -250,7 +248,7 @@ enum AnalyzeResultOperationStatus {
   notStarted,
 
   @doc("Operation is running.")
-  runnning,
+  running,
 
   @doc("Operation has failed.")
   failed,

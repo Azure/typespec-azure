@@ -50,8 +50,10 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`@armResourceOperations`](./decorators.md#@Azure.ResourceManager.armResourceOperations)
 - [`@armResourceRead`](./decorators.md#@Azure.ResourceManager.armResourceRead)
 - [`@armResourceUpdate`](./decorators.md#@Azure.ResourceManager.armResourceUpdate)
+- [`@armVirtualResource`](./decorators.md#@Azure.ResourceManager.armVirtualResource)
 - [`@extensionResource`](./decorators.md#@Azure.ResourceManager.extensionResource)
 - [`@locationResource`](./decorators.md#@Azure.ResourceManager.locationResource)
+- [`@resourceBaseType`](./decorators.md#@Azure.ResourceManager.resourceBaseType)
 - [`@resourceGroupResource`](./decorators.md#@Azure.ResourceManager.resourceGroupResource)
 - [`@singleton`](./decorators.md#@Azure.ResourceManager.singleton)
 - [`@subscriptionResource`](./decorators.md#@Azure.ResourceManager.subscriptionResource)
@@ -92,6 +94,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ArmResourceActionNoContentSync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionNoContentSync)
 - [`ArmResourceActionNoResponseContentAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync)
 - [`ArmResourceActionSync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionSync)
+- [`ArmResourceCheckExistence`](./interfaces.md#Azure.ResourceManager.ArmResourceCheckExistence)
 - [`ArmResourceCreateOrReplaceAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync)
 - [`ArmResourceCreateOrReplaceSync`](./interfaces.md#Azure.ResourceManager.ArmResourceCreateOrReplaceSync)
 - [`ArmResourceCreateOrUpdateAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceCreateOrUpdateAsync)
@@ -122,11 +125,14 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ArmDeleteAcceptedResponse`](./data-types.md#Azure.ResourceManager.ArmDeleteAcceptedResponse)
 - [`ArmDeletedNoContentResponse`](./data-types.md#Azure.ResourceManager.ArmDeletedNoContentResponse)
 - [`ArmDeletedResponse`](./data-types.md#Azure.ResourceManager.ArmDeletedResponse)
+- [`ArmLocationResource`](./data-types.md#Azure.ResourceManager.ArmLocationResource)
 - [`ArmLroLocationHeader`](./data-types.md#Azure.ResourceManager.ArmLroLocationHeader)
 - [`ArmNoContentResponse`](./data-types.md#Azure.ResourceManager.ArmNoContentResponse)
 - [`ArmOperationStatus`](./data-types.md#Azure.ResourceManager.ArmOperationStatus)
 - [`ArmResourceCreatedResponse`](./data-types.md#Azure.ResourceManager.ArmResourceCreatedResponse)
 - [`ArmResourceCreatedSyncResponse`](./data-types.md#Azure.ResourceManager.ArmResourceCreatedSyncResponse)
+- [`ArmResourceExistsResponse`](./data-types.md#Azure.ResourceManager.ArmResourceExistsResponse)
+- [`ArmResourceNotFoundResponse`](./data-types.md#Azure.ResourceManager.ArmResourceNotFoundResponse)
 - [`ArmResourceUpdatedResponse`](./data-types.md#Azure.ResourceManager.ArmResourceUpdatedResponse)
 - [`ArmResponse`](./data-types.md#Azure.ResourceManager.ArmResponse)
 - [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CustomerManagedKeyEncryption)
@@ -155,6 +161,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`PrivateLinkServiceConnectionState`](./data-types.md#Azure.ResourceManager.PrivateLinkServiceConnectionState)
 - [`ProviderNamespace`](./data-types.md#Azure.ResourceManager.ProviderNamespace)
 - [`ProxyResource`](./data-types.md#Azure.ResourceManager.ProxyResource)
+- [`ResourceGroupLocationResource`](./data-types.md#Azure.ResourceManager.ResourceGroupLocationResource)
 - [`ResourceGroupParameter`](./data-types.md#Azure.ResourceManager.ResourceGroupParameter)
 - [`ResourceIdentifierAllowedResource`](./data-types.md#Azure.ResourceManager.ResourceIdentifierAllowedResource)
 - [`ResourceInstanceParameters`](./data-types.md#Azure.ResourceManager.ResourceInstanceParameters)
@@ -175,6 +182,9 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 
 ### Operations
 
+- [`ArmCreateOperation`](./interfaces.md#Azure.ResourceManager.Foundations.ArmCreateOperation)
+- [`ArmReadOperation`](./interfaces.md#Azure.ResourceManager.Foundations.ArmReadOperation)
+- [`ArmUpdateOperation`](./interfaces.md#Azure.ResourceManager.Foundations.ArmUpdateOperation)
 - [`checkNameAvailability`](./interfaces.md#Azure.ResourceManager.Foundations.checkNameAvailability)
 
 ### Models

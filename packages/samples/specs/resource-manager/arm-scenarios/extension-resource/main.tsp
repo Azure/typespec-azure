@@ -74,4 +74,7 @@ interface RoleAssignments {
   update is ArmResourcePatchSync<RoleAssignment, RoleAssignmentProperties>;
   delete is ArmResourceDeleteSync<RoleAssignment>;
   list is ArmResourceListByParent<RoleAssignment>;
+
+  /** A sample HEAD operation to check resource existence */
+  checkExistence is ArmResourceCheckExistence<RoleAssignment>;
 }

@@ -1,6 +1,8 @@
 import "@typespec/http";
 import "@typespec/rest";
 
+// cspell:ignore adls adlsgen
+
 import "./dataIdentity.model.tsp";
 import "./dataPolicy.model.tsp";
 
@@ -44,15 +46,15 @@ model SearchIndexerDataSource {
 
 model SearchResourceEncryptionKey {
   @doc("The name of your Azure Key Vault key to be used to encrypt your data at rest.")
-  @projectedName("json", "keyVaultKeyName")
+  @encodedName("application/json", "keyVaultKeyName")
   keyName: string;
 
   @doc("The version of your Azure Key Vault key to be used to encrypt your data at rest.")
-  @projectedName("json", "keyVaultKeyVersion")
+  @encodedName("application/json", "keyVaultKeyVersion")
   keyVersion: string;
 
   @doc("The URI of your Azure Key Vault, also referred to as DNS name, that contains the key to be used to encrypt your data at rest. An example URI might be https://my-keyvault-name.vault.azure.net.")
-  @projectedName("json", "keyVaultUri")
+  @encodedName("application/json", "keyVaultUri")
   vaultUri: string;
 
   @doc("Optional Azure Active Directory credentials used for accessing your Azure Key Vault. Not required if using managed identity instead.")
@@ -415,13 +417,13 @@ model IndexerExecutionResult {
   warnings: SearchIndexerWarning[];
 
   @doc("The number of items that were processed during this indexer execution. This includes both successfully processed items and items where indexing was attempted but failed.")
-  @projectedName("json", "itemsProcessed")
+  @encodedName("application/json", "itemsProcessed")
   @visibility("read")
   itemCount: int32;
 
   @doc("The number of items that failed to be indexed during this indexer execution.")
   @visibility("read")
-  @projectedName("json", "itemsFailed")
+  @encodedName("application/json", "itemsFailed")
   failedItemCount: int32;
 
   @doc("Change tracking state with which an indexer execution started.")

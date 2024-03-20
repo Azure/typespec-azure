@@ -20,7 +20,7 @@ model SearchIndexerSkillset {
   skills: SearchIndexerSkill[];
 
   @doc("Details about cognitive services to be used when running skills.")
-  @projectedName("json", "cognitiveServices")
+  @encodedName("application/json", "cognitiveServices")
   cognitiveServicesAccount?: CognitiveServicesAccount;
 
   @doc("Definition of additional projections to azure blob, table, or files, of enriched data.")
@@ -100,7 +100,7 @@ model OcrSkill extends SearchIndexerSkill {
   defaultLanguageCode?: OcrSkillLanguage;
 
   @doc("A value indicating to turn orientation detection on or not. Default is false.")
-  @projectedName("json", "detectOrientation")
+  @encodedName("application/json", "detectOrientation")
   shouldDetectOrientation?: boolean = false;
 
   @doc("Defines the sequence of characters to use between the lines of text recognized by the OCR skill. The default value is \"space\".")

@@ -1,6 +1,6 @@
 ---
 jsApi: true
-title: "[P] JS Api"
+title: "[P] JS API"
 
 ---
 ## Enumerations
@@ -25,6 +25,7 @@ title: "[P] JS Api"
 ## Variables
 
 - [$lib](variables/$lib.md)
+- [$linter](variables/$linter.md)
 - [namespace](variables/namespace.md)
 
 ## Functions
@@ -42,8 +43,10 @@ title: "[P] JS Api"
 - [$armResourceOperations](functions/$armResourceOperations.md)
 - [$armResourceRead](functions/$armResourceRead.md)
 - [$armResourceUpdate](functions/$armResourceUpdate.md)
+- [$armVirtualResource](functions/$armVirtualResource.md)
 - [$extensionResource](functions/$extensionResource.md)
 - [$locationResource](functions/$locationResource.md)
+- [$resourceBaseType](functions/$resourceBaseType.md)
 - [$resourceGroupResource](functions/$resourceGroupResource.md)
 - [$singleton](functions/$singleton.md)
 - [$subscriptionResource](functions/$subscriptionResource.md)
@@ -62,6 +65,7 @@ title: "[P] JS Api"
 - [isArmCollectionAction](functions/isArmCollectionAction.md)
 - [isArmCommonType](functions/isArmCommonType.md)
 - [isArmLibraryNamespace](functions/isArmLibraryNamespace.md)
+- [isArmVirtualResource](functions/isArmVirtualResource.md)
 - [isSingletonResource](functions/isSingletonResource.md)
 - [resolveResourceBaseType](functions/resolveResourceBaseType.md)
 - [resolveResourceOperations](functions/resolveResourceOperations.md)

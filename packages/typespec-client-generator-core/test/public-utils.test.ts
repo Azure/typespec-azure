@@ -1,19 +1,19 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,
   ModelProperty,
   Operation,
-  Union,
   ignoreDiagnostics,
   listServices,
 } from "@typespec/compiler";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEmitterOptions, SdkModelType, SdkUnionType } from "../src/interfaces.js";
+import { SdkEmitterOptions } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
   getDefaultApiVersion,
-  getDocHelper,
   getLibraryName,
   getPropertyNames,
   isApiVersion,
@@ -182,7 +182,6 @@ describe("typespec-client-generator-core: public-utils", () => {
       await runner.compile(`
         @service({
           title: "ApiVersion",
-          version: "1.0.0",
         })
         @server(
           "{endpoint}/{ApiVersion}",
@@ -204,7 +203,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       const server = getServers(runner.context.program, serviceNamespace)?.[0];
       const hostParam = server?.parameters.get("ApiVersion");
 
-      ok(isApiVersion(runner.context, hostParam!));
+      ok(hostParam && isApiVersion(runner.context, hostParam));
     });
   });
   describe("getClientNamespaceString", () => {
@@ -334,7 +333,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
-        deepStrictEqual(getPropertyNames(runner.context, MyModel.properties.get("wasMadeFor")!), [
+        const wasMadeFor = MyModel.properties.get("wasMadeFor");
+        ok(wasMadeFor);
+        deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
           expectedLibraryName,
           "wasMadeFor",
         ]);
@@ -357,7 +358,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
-        deepStrictEqual(getPropertyNames(runner.context, MyModel.properties.get("wasMadeFor")!), [
+        const wasMadeFor = MyModel.properties.get("wasMadeFor");
+        ok(wasMadeFor);
+        deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
           expectedLibraryName,
           "wasMadeFor",
         ]);
@@ -377,7 +380,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
-        deepStrictEqual(getPropertyNames(runner.context, MyModel.properties.get("wasMadeFor")!), [
+        const wasMadeFor = MyModel.properties.get("wasMadeFor");
+        ok(wasMadeFor);
+        deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
           "NameForAllLanguage",
           "wasMadeFor",
         ]);
@@ -397,10 +402,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
-        deepStrictEqual(getPropertyNames(runner.context, MyModel.properties.get("wasMadeFor")!), [
-          "wasMadeFor",
-          "madeFor",
-        ]);
+        const wasMadeFor = MyModel.properties.get("wasMadeFor");
+        ok(wasMadeFor);
+        deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), ["wasMadeFor", "madeFor"]);
       }
       await helper("@azure-tools/typespec-csharp");
       await helper("@azure-tools/typespec-java");
@@ -421,7 +425,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
-        deepStrictEqual(getPropertyNames(runner.context, MyModel.properties.get("wasMadeFor")!), [
+        const wasMadeFor = MyModel.properties.get("wasMadeFor");
+        ok(wasMadeFor);
+        deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
           expectedLibraryName,
           "madeFor",
         ]);
@@ -443,10 +449,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           wasMadeFor?: string;
         }
       `)) as { MyModel: Model };
-        deepStrictEqual(getPropertyNames(runner.context, MyModel.properties.get("wasMadeFor")!), [
-          "propName",
-          "madeFor",
-        ]);
+        const wasMadeFor = MyModel.properties.get("wasMadeFor");
+        ok(wasMadeFor);
+        deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), ["propName", "madeFor"]);
       }
 
       await helper("@azure-tools/typespec-csharp");
@@ -777,77 +782,60 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
+    it("template without @friendlyName renaming", async () => {
+      await runner.compileWithBuiltInService(`
+      op GetResourceOperationStatus<
+        Resource extends TypeSpec.Reflection.Model
+      >(): ResourceOperationStatus<Resource>;
+      
+      model ResourceOperationStatus<Resource extends TypeSpec.Reflection.Model> {
+        status: string;
+        resource: Resource;
+      }
+
+      model User {
+        id: string;
+      }
+
+      op getStatus is GetResourceOperationStatus<User>;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
+      ok(model);
+    });
   });
 
-  describe("getDocHelper", () => {
-    it("no doc or summary", async () => {
-      const { func } = (await runner.compile(`
-        @test op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, undefined);
-      strictEqual(docHelper.details, undefined);
-    });
-    it("just doc", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @doc("This is a description")
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, "This is a description");
-      strictEqual(docHelper.details, undefined);
-    });
-    it("just summary", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @summary("This is a summary")
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, "This is a summary");
-      strictEqual(docHelper.details, undefined);
-    });
-    it("doc and summary", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @doc("This is a description")
-        @summary("This is a summary")
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, "This is a summary");
-      strictEqual(docHelper.details, "This is a description");
-    });
-  });
   describe("getGeneratedName", () => {
     describe("simple anonymous model", () => {
       it("should handle anonymous model used by operation body", async () => {
         await runner.compileWithBuiltInService(`
         op test(@body body: {name: string}): void;
       `);
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        strictEqual((models[0] as SdkModelType).generatedName, "TestRequest");
+        strictEqual(models[0].name, "TestRequest");
+        ok(models[0].generatedName);
       });
 
       it("should handle anonymous model used by operation response", async () => {
         await runner.compileWithBuiltInService(`
           op test(): {name: string};
         `);
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        strictEqual((models[0] as SdkModelType).generatedName, "TestResponse");
+        strictEqual(models[0].name, "TestResponse");
+        ok(models[0].generatedName);
       });
 
       it("should handle anonymous model in both body and response", async () => {
         await runner.compileWithBuiltInService(`
           op test(@body body: {name: string}): {name: string};
         `);
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
-        ok(models.find((x) => (x as SdkModelType).generatedName === "TestResponse"));
+        ok(models.find((x) => x.name === "TestRequest" && x.generatedName));
+        ok(models.find((x) => x.name === "TestResponse" && x.generatedName));
       });
 
       it("should handle anonymous model used by operation response's model", async () => {
@@ -859,9 +847,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
           op test(): A;
         `);
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
+        ok(models.find((x) => x.name === "APForA" && x.generatedName));
       });
 
       it("should handle anonymous model used by operation body's model", async () => {
@@ -872,13 +860,13 @@ describe("typespec-client-generator-core: public-utils", () => {
               name: string;
             };
           }
-  
+
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
+        ok(models.find((x) => x.name === "APForA" && x.generatedName));
       });
 
       it("should handle anonymous model used by both input and output", async () => {
@@ -889,13 +877,13 @@ describe("typespec-client-generator-core: public-utils", () => {
               name: string;
             };
           }
-  
+
           op test(@body body: A): A;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
+        ok(models.find((x) => x.name === "APForA" && x.generatedName));
       });
     });
 
@@ -909,9 +897,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "AMember"));
+        ok(models.find((x) => x.name === "AMember" && x.generatedName));
       });
 
       it("should handle anonymous model array used by operation body", async () => {
@@ -920,9 +908,10 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: {name: string}[]): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        strictEqual((models[0] as SdkModelType).generatedName, "TestRequest");
+        strictEqual(models[0].name, "TestRequest");
+        ok(models[0].generatedName);
       });
 
       it("should handle anonymous model dictionary used by operation body", async () => {
@@ -931,9 +920,10 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: Record<{name: string}>): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        strictEqual((models[0] as SdkModelType).generatedName, "TestRequest");
+        strictEqual(models[0].name, "TestRequest");
+        ok(models[0].generatedName);
       });
 
       it("should handle anonymous model dictionary used by model", async () => {
@@ -945,10 +935,10 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "AMember"));
-        ok(models.find((x) => (x as SdkModelType).generatedName === "AMemberName"));
+        ok(models.find((x) => x.name === "AMember" && x.generatedName));
+        ok(models.find((x) => x.name === "AMemberName" && x.generatedName));
       });
     });
     describe("anonymous model in base or derived model", () => {
@@ -966,9 +956,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "BPForB"));
+        ok(models.find((x) => x.name === "BPForB" && x.generatedName));
       });
 
       it("should handle anonymous model used by derived model", async () => {
@@ -996,10 +986,10 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: Fish): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 5);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "SharkPForShark"));
-        ok(models.find((x) => (x as SdkModelType).generatedName === "SalmonPForSalmon"));
+        ok(models.find((x) => x.name === "SharkPForShark" && x.generatedName));
+        ok(models.find((x) => x.name === "SalmonPForSalmon" && x.generatedName));
       });
     });
     describe("recursively handle anonymous model", () => {
@@ -1015,13 +1005,13 @@ describe("typespec-client-generator-core: public-utils", () => {
               name: string
             };
           }
-  
+
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "BPForB"));
+        ok(models.find((x) => x.name === "BPForB" && x.generatedName));
       });
 
       it("should handle model A -> model B -> model C -> anonymous model case", async () => {
@@ -1040,13 +1030,13 @@ describe("typespec-client-generator-core: public-utils", () => {
               name: string
             };
           }
-  
+
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 4);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "CP1ForC"));
+        ok(models.find((x) => x.name === "CP1ForC" && x.generatedName));
       });
 
       it("should handle cyclic model reference", async () => {
@@ -1062,13 +1052,13 @@ describe("typespec-client-generator-core: public-utils", () => {
               name: string;
             };
           }
-  
+
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "BP2ForB"));
+        ok(models.find((x) => x.name === "BP2ForB" && x.generatedName));
       });
 
       it("should recursively handle array of anonymous model", async () => {
@@ -1081,14 +1071,14 @@ describe("typespec-client-generator-core: public-utils", () => {
               };
             }[];
           }
-  
+
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForAPForAnonymousModel"));
+        ok(models.find((x) => x.name === "APForA" && x.generatedName));
+        ok(models.find((x) => x.name === "APForAPForAnonymousModel" && x.generatedName));
       });
 
       it("should recursively handle dict of anonymous model", async () => {
@@ -1100,10 +1090,10 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForA"));
-        ok(models.find((x) => (x as SdkModelType).generatedName === "APForAName"));
+        ok(models.find((x) => x.name === "APForA" && x.generatedName));
+        ok(models.find((x) => x.name === "APForAName" && x.generatedName));
       });
 
       it("model property of union with anonymous model", async () => {
@@ -1117,9 +1107,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "AB"));
+        ok(models.find((x) => x.name === "AB" && x.generatedName));
       });
     });
 
@@ -1133,26 +1123,25 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
-          .generatedName;
-        strictEqual(unionName, "AStatus");
+        const unionEnum = models[0].properties[0].type;
+        strictEqual(unionEnum.kind, "enum");
+        strictEqual(unionEnum.name, "AStatus");
+        ok(unionEnum.generatedName);
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
-        strictEqual(statusProp.type.kind, "union");
+        strictEqual(statusProp.type.kind, "enum");
         strictEqual(statusProp.type.values.length, 2);
-        const startVal = statusProp.type.values.find(
-          (x) => x.kind === "constant" && x.value === "start"
-        )!;
-        strictEqual(startVal.kind, "constant");
+        const startVal = statusProp.type.values.find((x) => x.name === "start");
+        ok(startVal);
+        strictEqual(startVal.kind, "enumvalue");
         strictEqual(startVal.valueType.kind, "string");
 
-        const stopVal = statusProp.type.values.find(
-          (x) => x.kind === "constant" && x.value === "stop"
-        )!;
-        strictEqual(stopVal.kind, "constant");
+        const stopVal = statusProp.type.values.find((x) => x.name === "stop");
+        ok(stopVal);
+        strictEqual(stopVal.kind, "enumvalue");
         strictEqual(stopVal.valueType.kind, "string");
       });
 
@@ -1169,14 +1158,23 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
+        const diagnostics = runner.context.experimental_sdkPackage.diagnostics;
         strictEqual(models.length, 4);
-        const union = (models[0] as SdkModelType).properties[0].type as SdkUnionType;
-        strictEqual(union.generatedName, "AItems");
-        const model1 = union.values[0] as SdkModelType;
-        strictEqual(model1.generatedName, "AItems1");
-        const model2 = union.values[1] as SdkModelType;
-        strictEqual(model2.generatedName, "AItems2");
+        const union = models[0].properties[0].type;
+        strictEqual(union.kind, "union");
+        strictEqual(union.name, "AItems");
+        ok(union.generatedName);
+        const model1 = union.values[0];
+        strictEqual(model1.kind, "model");
+        strictEqual(model1.name, "AItems1");
+        ok(model1.generatedName);
+        const model2 = union.values[1];
+        strictEqual(model2.kind, "model");
+        strictEqual(model2.name, "AItems2");
+        ok(model2.generatedName);
+        const diagnostic = { code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind" };
+        expectDiagnostics(diagnostics, [diagnostic, diagnostic, diagnostic]);
       });
 
       it("should handle union together with anonymous model", async () => {
@@ -1188,13 +1186,14 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
-        const test1 = models.find((x) => (x as SdkModelType).generatedName === "AChoice")!;
+        const test1 = models.find((x) => x.name === "AChoice" && x.generatedName);
         ok(test1);
-        const unionName = ((test1 as SdkModelType).properties[0].type as SdkUnionType)
-          .generatedName;
-        strictEqual(unionName, "AChoiceStatus");
+        strictEqual(test1.properties[0].type.kind, "enum");
+        const unionEnum = test1.properties[0].type;
+        strictEqual(unionEnum.name, "AChoiceStatus");
+        ok(unionEnum.generatedName);
       });
     });
 
@@ -1224,9 +1223,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op op3(@body body: B): boolean;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 3);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "BPForB"));
+        ok(models.find((x) => x.name === "BPForB" && x.generatedName));
       });
     });
 
@@ -1243,12 +1242,12 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        strictEqual(
-          ((models[0] as SdkModelType).properties[0].type as SdkModelType).generatedName,
-          "APForA"
-        );
+        const propType = models[0].properties[0].type;
+        strictEqual(propType.kind, "model");
+        strictEqual(propType.name, "APForA");
+        ok(propType.generatedName);
       });
 
       it("union", async () => {
@@ -1261,11 +1260,12 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        const unionName = ((models[0] as SdkModelType).properties[0].type as SdkUnionType)
-          .generatedName;
-        strictEqual(unionName, "AStatus");
+        const unionEnum = models[0].properties[0].type;
+        strictEqual(unionEnum.kind, "enum");
+        strictEqual(unionEnum.name, "AStatus");
+        ok(unionEnum.generatedName);
       });
     });
 
@@ -1283,12 +1283,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(...RequestParameter): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        // we could not identify the anonymous model from alias spread
-        // bc each time we try to get body, we will get a new type from compiler
-        // so we will keep the empty name
-        ok(models.find((x) => (x as SdkModelType).generatedName === ""));
+        ok(models.find((x) => x.name === "TestRequest" && x.generatedName));
       });
 
       it("anonymous model for body parameter", async () => {
@@ -1297,9 +1294,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(foo: string, bar: string): void;
         `
         );
-        const models = getAllModels(runner.context);
+        const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
-        ok(models.find((x) => (x as SdkModelType).generatedName === "TestRequest"));
+        ok(models.find((x) => x.name === "TestRequest" && x.generatedName));
       });
 
       it("anonymous union in response header", async () => {
@@ -1318,11 +1315,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
-        strictEqual(
-          (union as SdkUnionType).generatedName,
-          "ResponseWithAnonymousUnionRepeatabilityResult"
-        );
+        strictEqual(repeatabilityResult.type.kind, "Union");
+        const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
+        strictEqual(unionEnum.kind, "enum");
+        strictEqual(unionEnum.name, "ResponseWithAnonymousUnionRepeatabilityResult");
+        ok(unionEnum.generatedName);
       });
 
       it("anonymous union in request header", async () => {
@@ -1341,11 +1338,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const union = getSdkUnion(runner.context, repeatabilityResult.type as Union);
-        strictEqual(
-          (union as SdkUnionType).generatedName,
-          "RequestParameterWithAnonymousUnionRepeatabilityResult"
-        );
+        strictEqual(repeatabilityResult.type.kind, "Union");
+        const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
+        strictEqual(unionEnum.kind, "enum");
+        strictEqual(unionEnum.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
+        ok(unionEnum.generatedName);
       });
 
       it("anonymous union with base type", async () => {
@@ -1364,14 +1361,100 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { repeatabilityResult: ModelProperty };
 
-        const stringType = getSdkUnion(runner.context, repeatabilityResult.type as Union)!;
-        strictEqual(stringType.kind, "union");
-        strictEqual(stringType.values.length, 3);
-        strictEqual(stringType.values[0].kind, "constant");
+        strictEqual(repeatabilityResult.type.kind, "Union");
+        const stringType = getSdkUnion(runner.context, repeatabilityResult.type);
+        strictEqual(stringType.kind, "enum");
+        strictEqual(stringType.values.length, 2);
+        strictEqual(stringType.values[0].kind, "enumvalue");
         strictEqual(stringType.values[0].value, "accepted");
-        strictEqual(stringType.values[1].kind, "constant");
+        strictEqual(stringType.values[1].kind, "enumvalue");
         strictEqual(stringType.values[1].value, "rejected");
-        strictEqual(stringType.values[2].kind, "string");
+        strictEqual(stringType.valueType.kind, "string");
+      });
+    });
+
+    describe("getLroMetadata", () => {
+      const lroCode = `
+      @versioned(Versions)
+      @service({title: "Test Service"})
+      namespace TestService;
+      alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
+      NoRepeatableRequests &
+      NoClientRequestId>;
+
+      @doc("The API version.")
+      enum Versions {
+        @doc("The 2022-12-01-preview version.")
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+        v2022_12_01_preview: "2022-12-01-preview",
+      }
+
+      @resource("users")
+      @doc("Details about a user.")
+      model User {
+      @key
+      @visibility("read")
+      @doc("The name of user.")
+      name: string;
+
+      @doc("The role of user")
+      role: string;
+      }
+
+      @doc("The parameters for exporting a user.")
+      model UserExportParams {
+      @query
+      @doc("The format of the data.")
+      format: string;
+      }
+
+      @doc("The exported user data.")
+      model ExportedUser {
+      @doc("The name of user.")
+      name: string;
+
+      @doc("The exported URI.")
+      resourceUri: string;
+      }
+
+      op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+    `;
+      it("filter-out-core-models true", async () => {
+        const runnerWithCore = await createSdkTestRunner({
+          librariesToAdd: [AzureCoreTestLibrary],
+          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+          emitterName: "@azure-tools/typespec-java",
+        });
+        await runnerWithCore.compile(lroCode);
+        const models = runnerWithCore.context.experimental_sdkPackage.models;
+        strictEqual(models.length, 2);
+        deepStrictEqual(models.map((x) => x.name).sort(), ["ExportedUser", "User"].sort());
+      });
+      it("filter-out-core-models false", async () => {
+        const runnerWithCore = await createSdkTestRunner({
+          librariesToAdd: [AzureCoreTestLibrary],
+          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+          emitterName: "@azure-tools/typespec-java",
+        });
+        await runnerWithCore.compile(lroCode);
+        runnerWithCore.context.filterOutCoreModels = false;
+        const models = getAllModels(runnerWithCore.context);
+        strictEqual(models.length, 9);
+        // there should only be one non-core model
+        deepStrictEqual(
+          models.map((x) => x.name).sort(),
+          [
+            "ResourceOperationStatusUserExportedUserError",
+            "OperationState",
+            "Error",
+            "InnerError",
+            "ExportedUser",
+            "ErrorResponse",
+            "OperationStatusExportedUserError",
+            "User",
+            "Versions",
+          ].sort()
+        );
       });
     });
   });

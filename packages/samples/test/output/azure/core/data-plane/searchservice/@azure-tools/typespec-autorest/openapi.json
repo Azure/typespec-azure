@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Search Service",
-    "version": "2021-04-30-Preview",
+    "version": "0000-00-00",
     "description": "Client that can be used to manage and query indexes and documents, as well as manage other resources, on a search service.",
     "x-typespec-generated": [
       {
@@ -68,7 +68,7 @@
         "tags": [
           "DataSources"
         ],
-        "description": "Lists all indexe data sources available for a search service.",
+        "description": "Lists all indexes data sources available for a search service.",
         "parameters": [
           {
             "$ref": "#/parameters/SelectParameter"
@@ -2322,7 +2322,7 @@
     },
     "EdgeNGramTokenizer": {
       "type": "object",
-      "description": "Tokenizes the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.",
+      "description": "Tokenize the input from an edge into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.",
       "properties": {
         "minGram": {
           "type": "integer",
@@ -4230,7 +4230,7 @@
           {
             "name": "EdgeNGram",
             "value": "edgeNGram",
-            "description": "Tokenizes the input from an edge into n-grams of the given size(s). See https://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/EdgeNGramTokenizer.html"
+            "description": "Tokenize the input from an edge into n-grams of the given size(s). See https://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/EdgeNGramTokenizer.html"
           },
           {
             "name": "Keyword",
@@ -4260,7 +4260,7 @@
           {
             "name": "NGram",
             "value": "nGram",
-            "description": "Tokenizes the input into n-grams of the given size(s). See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/NGramTokenizer.html"
+            "description": "Tokenize the input into n-grams of the given size(s). See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ngram/NGramTokenizer.html"
           },
           {
             "name": "PathHierarchy",
@@ -4280,7 +4280,7 @@
           {
             "name": "UaxUrlEmail",
             "value": "uax_url_email",
-            "description": "Tokenizes urls and emails as one token. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/UAX29URLEmailTokenizer.html"
+            "description": "Tokenize urls and emails as one token. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/UAX29URLEmailTokenizer.html"
           },
           {
             "name": "Whitespace",
@@ -5146,7 +5146,7 @@
     },
     "NGramTokenizer": {
       "type": "object",
-      "description": "Tokenizes the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.",
+      "description": "Tokenize the input into n-grams of the given size(s). This tokenizer is implemented using Apache Lucene.",
       "properties": {
         "minGram": {
           "type": "integer",
@@ -8019,7 +8019,7 @@
     },
     "UaxUrlEmailTokenizer": {
       "type": "object",
-      "description": "Tokenizes urls and emails as one token. This tokenizer is implemented using Apache Lucene.",
+      "description": "Tokenize urls and emails as one token. This tokenizer is implemented using Apache Lucene.",
       "properties": {
         "maxTokenLength": {
           "type": "integer",
