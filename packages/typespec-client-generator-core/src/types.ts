@@ -88,6 +88,7 @@ import {
   isSdkBuiltInKind,
 } from "./interfaces.js";
 import {
+  createGeneratedName,
   getAvailableApiVersions,
   getDocHelper,
   getSdkTypeBaseHelper,
@@ -351,6 +352,7 @@ export function getSdkUnionWithDiagnostics(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
     clientType.nullable = true;
+    clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }
 
@@ -361,8 +363,8 @@ export function getSdkUnionWithDiagnostics(
 
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
-    name: getLibraryName(context, type),
-    generatedName: type.name ? undefined : getGeneratedName(context, type),
+    name: getLibraryName(context, type) || getGeneratedName(context, type),
+    generatedName: !type.name,
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
@@ -418,7 +420,7 @@ function addDiscriminatorToModelType(
                 createDiagnostic({
                   code: "discriminator-not-constant",
                   target: type,
-                  format: { discriminator: property.nameInClient },
+                  format: { discriminator: property.name },
                 })
               );
             } else if (typeof property.type.value !== "string") {
@@ -427,7 +429,7 @@ function addDiscriminatorToModelType(
                   code: "discriminator-not-string",
                   target: type,
                   format: {
-                    discriminator: property.nameInClient,
+                    discriminator: property.name,
                     discriminatorValue: String(property.type.value),
                   },
                 })
@@ -449,6 +451,7 @@ function addDiscriminatorToModelType(
       const property = model.properties[i];
       if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
         property.discriminator = true;
+        model.discriminatorProperty = property;
         return diagnostics.wrap(undefined);
       }
     }
@@ -466,19 +469,22 @@ function addDiscriminatorToModelType(
         encode: "string",
       };
     }
-    model.properties.push({
+    const name = discriminator.propertyName;
+    model.properties.splice(0, 0, {
       kind: "property",
       optional: false,
       discriminator: true,
       serializedName: discriminator.propertyName,
       type: discriminatorType!,
-      nameInClient: discriminator.propertyName,
+      nameInClient: name,
+      name,
       onClient: false,
       apiVersions: getAvailableApiVersions(context, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
     });
+    model.discriminatorProperty = model.properties[0];
   }
   return diagnostics.wrap(undefined);
 }
@@ -518,8 +524,8 @@ export function getSdkModelWithDiagnostics(
     const docWrapper = getDocHelper(context, type);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
-      name: getLibraryName(context, type),
-      generatedName: type.name === "" ? getGeneratedName(context, type) : undefined,
+      name: getLibraryName(context, type) || getGeneratedName(context, type),
+      generatedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
       properties: [],
@@ -632,6 +638,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
+      generatedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
       valueType: getSdkEnumValueType(context, type.members.values()),
@@ -681,8 +688,8 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
     const docWrapper = getDocHelper(context, union);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
-      name: getLibraryName(context, type.union),
-      generatedName: type.union.name ? undefined : getGeneratedName(context, type.union),
+      name: getLibraryName(context, type.union) || getGeneratedName(context, type.union),
+      generatedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
       valueType:
@@ -722,6 +729,7 @@ function getKnownValuesEnum(
       sdkType = {
         ...getSdkTypeBaseHelper(context, type, "enum"),
         name: getLibraryName(context, type),
+        generatedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
         valueType: getSdkEnumValueType(context, knownValues.members.values()),
@@ -914,6 +922,8 @@ function getSdkCredentialType(
       kind: "union",
       values: credentialTypes,
       nullable: false,
+      name: createGeneratedName(client.service, "CredentialUnion"),
+      generatedName: false,
     };
   }
   return credentialTypes[0];
@@ -925,10 +935,12 @@ export function getSdkCredentialParameter(
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
+  const name = "credential";
   return {
     type: getSdkCredentialType(client, auth),
     kind: "credential",
-    nameInClient: "credential",
+    nameInClient: name,
+    name,
     description: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service),
     onClient: true,
@@ -960,13 +972,15 @@ export function getSdkModelPropertyType(
     propertyType = getSdkEnum(context, knownValues, options.operation);
   }
   const docWrapper = getDocHelper(context, type);
+  const name = getPropertyNames(context, type)[0];
   const base = {
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
     apiVersions: getAvailableApiVersions(context, type),
     type: propertyType,
-    nameInClient: getPropertyNames(context, type)[0],
+    nameInClient: name,
+    name,
     onClient: false,
     optional: type.optional,
   };
@@ -1307,7 +1321,7 @@ function updateAccessOfModel(context: TCGCContext): void {
       continue;
     }
 
-    const accessOverride = getAccessOverride(context, type as any);
+    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
       sdkType.access = accessOverride;
       continue;

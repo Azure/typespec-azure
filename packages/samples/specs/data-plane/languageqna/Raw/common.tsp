@@ -84,7 +84,6 @@ model AssetKindParameter {
 
 @doc("The language property definition.")
 model Language {
-  @projectedName("csharp", "LanguageCode")
   @doc("Language of the text records. This is BCP-47 representation of a language. For example, use \"en\" for English; \"es\" for Spanish etc. If not set, use \"en\" for English as default.")
   language?: string;
 }

@@ -25,7 +25,7 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  __clients?: Map<string, SdkClientType<TServiceOperation>>;
+  __clients?: SdkClientType<TServiceOperation>[];
 }
 
 export interface SdkEmitterOptions {
@@ -223,7 +223,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
-  generatedName?: string;
+  generatedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -252,8 +252,8 @@ export interface SdkConstantType extends SdkTypeBase {
 }
 
 export interface SdkUnionType extends SdkTypeBase {
-  name?: string;
-  generatedName?: string;
+  name: string;
+  generatedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -266,7 +266,7 @@ export interface SdkModelType extends SdkTypeBase {
   name: string;
   isFormDataType: boolean;
   isError: boolean;
-  generatedName?: string;
+  generatedName: boolean;
   description?: string;
   details?: string;
   access?: AccessFlags;
@@ -274,6 +274,7 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
@@ -287,7 +288,12 @@ export interface SdkCredentialType extends SdkTypeBase {
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
+  /**
+   * @deprecated This property is deprecated. Use `.name` instead.
+   * https://github.com/Azure/typespec-azure/issues/446
+   */
   nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];

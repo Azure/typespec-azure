@@ -1299,7 +1299,7 @@ model CommonGramTokenFilter extends TokenFilter {
   ignoreCase?: boolean = false;
 
   @doc("A value that indicates whether the token filter is in query mode. When in query mode, the token filter generates bigrams and then removes common words and single terms followed by a common word. Default is false.")
-  @projectedName("json", "queryMode")
+  @encodedName("application/json", "queryMode")
   useQueryMode?: boolean;
 }
 
@@ -1379,7 +1379,7 @@ model KeepTokenFilter extends TokenFilter {
   keepWords: string[];
 
   @doc("A value indicating whether to lower case all words first. Default is false.")
-  @projectedName("json", "keepWordsCase")
+  @encodedName("application/json", "keepWordsCase")
   lowerCaseKeepWords?: boolean = false;
 }
 
@@ -1400,12 +1400,12 @@ model LengthTokenFilter extends TokenFilter {
 
   @doc("The minimum length in characters. Default is 0. Maximum is 300. Must be less than the value of max.")
   @maxValue(300)
-  @projectedName("json", "min")
+  @encodedName("application/json", "min")
   minLength?: int32 = 0;
 
   @doc("The maximum  length in characters. Default is 0. Maximum is 300. Must be less than the value of max.")
   @maxValue(300)
-  @projectedName("json", "max")
+  @encodedName("application/json", "max")
   maxLength?: int32 = 300;
 }
 
