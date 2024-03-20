@@ -1380,6 +1380,28 @@ export interface SdkModelType extends SdkTypeBase {
 }
 ```
 
+### UsageFlags
+
+```ts
+export enum UsageFlags {
+  None = 0,
+  Input = 1 << 1,
+  Output = 1 << 2,
+  Versioning = 1 << 3,
+  Patch = 1 << 4,
+  FormData = 1 << 5,
+  Error = 1 << 6,
+}
+```
+
+### AccessFlags
+
+We have the `.access` property on a model etc. as optional, so emitters can choose what to default to.
+
+```ts
+export type AccessFlags = "internal" | "public";
+```
+
 ## Complete Usage Code
 
 ### lib.ts
