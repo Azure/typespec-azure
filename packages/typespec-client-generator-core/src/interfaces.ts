@@ -386,6 +386,7 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
+  nullable: boolean;
 }
 
 export interface SdkMethodResponse {
@@ -398,6 +399,7 @@ export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
+  nullable: boolean;
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {

@@ -491,6 +491,26 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.nullableValues, true);
     });
 
+    it("array with nullable", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          name: (float32 | null)[];
+        }
+      `);
+
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "array");
+      const elementType = sdkType.valueType;
+      strictEqual(elementType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(elementType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, false);
+      strictEqual(sdkType.nullableValues, true);
+    });
+
     it("model with simple union property", async function () {
       await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)

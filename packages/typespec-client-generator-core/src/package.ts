@@ -443,6 +443,7 @@ function getSdkServiceResponseAndExceptions<
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
+          nullable: isNullable(header.type),
         });
       }
       if (innerResponse.body) {
@@ -464,6 +465,7 @@ function getSdkServiceResponseAndExceptions<
         ? "application/json"
         : contentTypes[0],
       apiVersions: getAvailableApiVersions(context, httpOperation.operation),
+      nullable: body ? isNullable(body) : true,
     };
     let statusCode: number | string = "";
     if (typeof response.statusCodes === "number" || response.statusCodes === "*") {

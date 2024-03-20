@@ -1,3 +1,4 @@
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   ModelProperty,
   Namespace,
@@ -14,7 +15,6 @@ import {
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getUnionAsEnum } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import {
   SdkBuiltInKinds,
   SdkEnumType,
@@ -263,6 +263,9 @@ function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpR
   let nonBodyExists = false;
   for (const response of Object.values(responses)) {
     if (response.type) {
+      if (response.nullable) {
+        nonBodyExists = true;
+      }
       allResponseBodies.push(response.type);
     } else {
       nonBodyExists = true;
@@ -286,10 +289,7 @@ export function isNullable(type: Type | SdkServiceOperation): boolean {
     return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
   }
   if (type.kind === "http") {
-    const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(
-      type.responses
-    );
-    return nonBodyExists && allResponseBodies.length > 0;
+    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
   }
   return false;
 }
