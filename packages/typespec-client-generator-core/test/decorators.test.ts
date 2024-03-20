@@ -2261,7 +2261,7 @@ describe("typespec-client-generator-core: decorators", () => {
           op putModel(@body body: Fish): void;
         }
       `)) as { Fish: Model };
-      
+
       const usage = getUsage(runner.context, Fish);
       strictEqual(usage, UsageFlags.Patch);
       strictEqual(usage & UsageFlags.Input, 0);
