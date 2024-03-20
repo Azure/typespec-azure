@@ -76,7 +76,7 @@ export function $resourceParameterBaseFor(
     if (value.kind === "EnumMember") {
       resolvedValues.push(value.name);
     } else if (value.kind === "UnionVariant" && value.type.kind === "String") {
-      resolvedValues.push(<string>value.name);
+      resolvedValues.push(String(value.name));
     } else {
       return;
     }
