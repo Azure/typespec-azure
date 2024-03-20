@@ -1557,7 +1557,6 @@ describe("typespec-client-generator-core: types", () => {
       @discriminator("sharktype")
       model Shark extends Fish {
         kind: "shark";
-        sharktype: string;
       }
 
       model Salmon extends Fish {
@@ -1582,8 +1581,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 5);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      const kindProperty = fish.properties.find((x) => x.name === "kind");
+      const kindProperty = fish.properties[0];
       ok(kindProperty);
+      strictEqual(kindProperty.name, "kind");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -1592,8 +1592,9 @@ describe("typespec-client-generator-core: types", () => {
       const shark = models.find((x) => x.name === "Shark");
       ok(shark);
       strictEqual(shark.properties.length, 2);
-      const sharktypeProperty = shark.properties.find((x) => x.name === "sharktype");
+      const sharktypeProperty = shark.properties[0];
       ok(sharktypeProperty);
+      strictEqual(sharktypeProperty.name, "sharktype");
       strictEqual(sharktypeProperty.kind, "property");
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
@@ -1614,8 +1615,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      const kindProperty = fish.properties.find((x) => x.name === "kind");
+      const kindProperty = fish.properties[0];
       ok(kindProperty);
+      strictEqual(kindProperty.name, "kind");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -1801,9 +1803,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
       const dogKind = runner.context.experimental_sdkPackage.enums[0];
 
-      const dogKindProperty = dog.properties.find(
-        (x) => x.kind === "property" && x.serializedName === "kind"
-      );
+      const dogKindProperty = dog.properties[0];
       ok(dogKindProperty);
       strictEqual(dogKindProperty.type, dogKind);
     });
