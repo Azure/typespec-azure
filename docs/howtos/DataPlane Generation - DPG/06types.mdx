@@ -51,7 +51,7 @@ Serialization/deserialization will respect the value defined, in this case it is
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type LR = "left" | "right";
 ```
 
 </TabItem>
@@ -113,7 +113,9 @@ public enum WidgetHorizontal
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export interface Widget {
+    "horizontal": "left" | "right";
+}
 ```
 
 </TabItem>
@@ -175,7 +177,7 @@ public readonly partial struct Colors : IEquatable<Colors>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type Colors = string | "red" | "blue";
 ```
 
 </TabItem>
@@ -240,7 +242,9 @@ public readonly partial struct WidgetColor : IEquatable<WidgetColor>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export interface Widget {
+    "color": "red" | "blue" | string;
+}
 ```
 
 </TabItem>
@@ -311,7 +315,7 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type ProvisioningState = string | "inProgress" | "Succeeded" | "Failed" | "Canceled";
 ```
 
 </TabItem>
@@ -338,12 +342,12 @@ These are unions of unions
 
 ```typespec
 union LR {
-  left: "left"
+  left: "left",
   right: "right"
 }
 
 union UD {
-  up: "up"
+  up: "up",
   down: "down"
 }
 
@@ -385,7 +389,9 @@ public enum Orientation
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type LR = "left" | "right";
+export type UD = "up" | "down";
+export type Orientation = LR | UD;
 ```
 
 </TabItem>
@@ -461,7 +467,12 @@ public enum WidgetOrientation
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export interface Widget {
+    "orientation": LR | UD;
+}
+
+export type LR = "left" | "right";
+export type UD = "up" | "down";
 ```
 
 </TabItem>
@@ -521,7 +532,9 @@ public partial class Shirt
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export interface Shirt {
+    "sizing": 32 | 34 | number | "small" | "medium" | string;
+}
 ```
 
 </TabItem>
@@ -582,7 +595,7 @@ public enum LR
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type LR = "left" | "right";
 ```
 
 </TabItem>
@@ -632,7 +645,7 @@ enum Versions {
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+// JS does not generate the enum used for versioning
 ```
 
 </TabItem>
@@ -705,7 +718,7 @@ public enum Orientation
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type Orientation = "left" | "right" | "up" | "down";
 ```
 
 </TabItem>
