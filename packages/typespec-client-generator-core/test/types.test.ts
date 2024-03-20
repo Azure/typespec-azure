@@ -3,7 +3,7 @@ import { Enum, Model, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkArrayType, SdkBodyModelPropertyType, SdkType, UsageFlags } from "../src/interfaces.js";
+import { SdkArrayType, SdkBodyModelPropertyType, SdkEnumType, SdkModelType, SdkType, SdkUnionType, UsageFlags } from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
   getAllModels,
