@@ -27,7 +27,6 @@ npm install -g @azure-tools/typespec-client-generator-cli
     tsp-client convert --swagger-readme [path to readme.md] --arm
     ```
 
-
 - Review generated TypeSpec
 - Layout [the TypeSpec project folders appropriately](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
 - Leverage standard `tspconfig.yaml` ([Template projects](https://github.com/microsoft/typespec/tree/main/eng/feeds)) and make appropriate output file name changes.
