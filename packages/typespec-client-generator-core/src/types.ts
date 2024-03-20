@@ -522,6 +522,12 @@ export function getSdkModelWithDiagnostics(
     updateModelsMap(context, type, sdkType, operation);
   } else {
     const docWrapper = getDocHelper(context, type);
+    const isFormDataType =
+      isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
+    let usage: UsageFlags = UsageFlags.None;
+    if (isFormDataType) {
+      usage |= UsageFlags.FormData;
+    }
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
@@ -531,11 +537,10 @@ export function getSdkModelWithDiagnostics(
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: undefined, // dummy value since we need to update models map before we can set this
-      usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
+      usage, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
-      isFormDataType:
-        isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation),
+      isFormDataType,
       isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType, operation);
@@ -1379,10 +1384,8 @@ function verifyNoConflictingMultipartModelUsage(
   const diagnostics = createDiagnosticCollector();
   for (const [operation, modelMap] of context.operationModelsMap!) {
     for (const [type, sdkType] of modelMap.entries()) {
-      if (
-        sdkType.kind === "model" &&
-        sdkType.isFormDataType !== isMultipartOperation(context, operation)
-      ) {
+      const isFormDataType = (sdkType.usage & UsageFlags.FormData) > 0;
+      if (sdkType.kind === "model" && isFormDataType !== isMultipartOperation(context, operation)) {
         // This means we have a model that is used both for formdata input and for regular body input
         diagnostics.add(
           createDiagnostic({
