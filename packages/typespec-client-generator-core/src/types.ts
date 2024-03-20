@@ -1248,11 +1248,12 @@ function updateTypesFromOperation(
   const program = context.program;
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
+  const inputUsage = httpOperation.verb === "patch" ? UsageFlags.Patch : UsageFlags.Input;
   for (const param of operation.parameters.properties.values()) {
     const paramTypes = diagnostics.pipe(checkAndGetClientType(context, param.type, operation));
     if (generateConvenient) {
       paramTypes.forEach((paramType) => {
-        updateUsageOfModel(context, UsageFlags.Input, paramType);
+        updateUsageOfModel(context, inputUsage, paramType);
       });
     }
   }
@@ -1262,7 +1263,7 @@ function updateTypesFromOperation(
     );
     if (generateConvenient) {
       paramTypes.forEach((paramType) => {
-        updateUsageOfModel(context, UsageFlags.Input, paramType);
+        updateUsageOfModel(context, inputUsage, paramType);
       });
     }
   }
@@ -1272,7 +1273,7 @@ function updateTypesFromOperation(
     );
     if (generateConvenient) {
       bodies.forEach((body) => {
-        updateUsageOfModel(context, UsageFlags.Input, body);
+        updateUsageOfModel(context, inputUsage, body);
       });
     }
   }

@@ -519,4 +519,5 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   Versioning = 1 << 3,
+  Patch = 1 << 4,
 }

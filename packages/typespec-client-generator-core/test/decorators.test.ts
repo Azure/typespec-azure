@@ -4,7 +4,6 @@ import {
   Model,
   Namespace,
   Operation,
-  UsageFlags,
   ignoreDiagnostics,
 } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
@@ -22,7 +21,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkOperationGroup } from "../src/interfaces.js";
+import { SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -2247,6 +2246,25 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { Dog: Model };
 
       strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
+    });
+
+    it("patch usage", async () => {
+      const { Fish } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model Fish {
+            age: int32;
+          }
+
+          @patch
+          op putModel(@body body: Fish): void;
+        }
+      `)) as { Fish: Model };
+      
+      const usage = getUsage(runner.context, Fish);
+      strictEqual(usage, UsageFlags.Patch);
+      strictEqual(usage & UsageFlags.Input, 0);
     });
   });
 
