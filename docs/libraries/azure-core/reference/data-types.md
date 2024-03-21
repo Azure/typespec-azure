@@ -414,10 +414,10 @@ model Azure.Core.StatusMonitorOptions
 
 #### Properties
 
-| Name           | Type                         | Description                                                                             |
-| -------------- | ---------------------------- | --------------------------------------------------------------------------------------- |
-| kind           | `"statusMonitor"`            | The kind of polling options                                                             |
-| finalProperty? | `ModelProperty \| ErrorType` | A reference to or name of the property of the status monitor that contains the response |
+| Name           | Type                      | Description                                                                             |
+| -------------- | ------------------------- | --------------------------------------------------------------------------------------- |
+| kind           | `"statusMonitor"`         | The kind of polling options                                                             |
+| finalProperty? | `ModelProperty \| string` | A reference to or name of the property of the status monitor that contains the response |
 
 ### `StatusMonitorPollingOptions` {#Azure.Core.StatusMonitorPollingOptions}
 

@@ -18,6 +18,7 @@ import {
   getNamespaceFullName,
   getService,
   isErrorModel,
+  isValueOnly,
 } from "@typespec/compiler";
 import {
   CodeTypeEmitter,
@@ -300,9 +301,10 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       const [typeName, typeDefault] = this.#findPropertyType(property);
       const doc = getDoc(this.emitter.getProgram(), property);
       //const attributes = getAttributes(this.emitter.getProgram(), property);
-      const defaultValue = property.default
-        ? code`${this.emitter.emitType(property.default)}`
-        : typeDefault;
+      const defaultValue =
+        property.default && !isValueOnly(property.default)
+          ? code`${this.emitter.emitType(property.default)}`
+          : typeDefault;
       return this.emitter.result.rawCode(code`
       ${doc ? `${formatComment(doc)}` : ""}
       [JsonProperty("${property.name}")]
@@ -466,6 +468,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       for (const arg of model.templateMapper!.args) {
         if (
           arg.kind !== "Intrinsic" &&
+          !isValueOnly(arg) &&
           (arg.kind !== "Model" ||
             (arg.name !== "" && arg.name !== "Error" && arg.name !== "AcceptedResponse"))
         ) {
@@ -526,9 +529,10 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         NameCasingType.Parameter
       );
       const [emittedType, emittedDefault] = this.#findPropertyType(parameter);
-      const defaultValue = parameter.default
-        ? code`${this.emitter.emitType(parameter.default)}`
-        : emittedDefault;
+      const defaultValue =
+        parameter.default && !isValueOnly(parameter.default)
+          ? code`${this.emitter.emitType(parameter.default)}`
+          : emittedDefault;
       return this.emitter.result.rawCode(
         code`${emittedType} ${emittedName}${defaultValue === undefined ? "" : ` = ${defaultValue}`}`
       );
@@ -738,6 +742,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           parameter.kind !== "Tuple"
       );
       for (const parameter of args) {
+        if (isValueOnly(parameter)) continue;
         i++;
         params.push(code`${this.emitter.emitTypeReference(parameter)}`);
         if (i < args.length) {

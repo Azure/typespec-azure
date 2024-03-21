@@ -122,7 +122,7 @@ model ResourceIdentifierAllowedResource {
     An array of scopes. If not specified, the default scope is ["ResourceGroup"].
     See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). 
     """)
-  scopes?: string[] = [];
+  scopes?: string[] = #[];
 }
 
 /**
