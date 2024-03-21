@@ -769,7 +769,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
       strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
       const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.isFixed, true);
       strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
       strictEqual(sdkType.valueType.kind, "string");
       strictEqual(sdkType.usage & UsageFlags.Versioning, 0); // not a versioning enum
@@ -820,7 +820,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
       strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
       const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.isFixed, true);
       strictEqual(sdkType.name, "Integers");
       strictEqual(sdkType.valueType.kind, "int32");
       const values = sdkType.values;
@@ -854,7 +854,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = runner.context.experimental_sdkPackage.enums[0];
       ok(sdkType);
-      strictEqual(sdkType.isFixed, false);
+      strictEqual(sdkType.isFixed, true);
       strictEqual(sdkType.name, "Floats");
       strictEqual(sdkType.valueType.kind, "float32");
       const values = sdkType.values;
