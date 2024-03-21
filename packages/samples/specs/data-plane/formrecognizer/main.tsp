@@ -12,7 +12,7 @@ using Azure.Core;
 @service({
   title: "Form Recognizer",
 })
-@useDependency(Azure.Core.Versions.v1_0_Preview_1)
+@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Extracts content, layout, and structured data from documents.")
 namespace Azure.FormRecognizer;
 
