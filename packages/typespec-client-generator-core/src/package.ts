@@ -49,12 +49,14 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
+  getAllResponseBodies,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
   getHashForType,
   getSdkTypeBaseHelper,
   isAcceptHeader,
+  isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import {
@@ -107,6 +109,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
         apiVersions: getAvailableApiVersions(context, tspBody.type),
         type: bodyType,
         optional: false,
+        nullable: isNullable(tspBody.type),
       },
     ]);
   }
@@ -186,6 +189,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: false,
+    nullable: false,
   };
 }
 
@@ -376,21 +380,15 @@ function getSdkLroServiceMethod<
 
 function getSdkMethodResponse(
   operation: Operation,
-  responses: Record<number, SdkHttpResponse>
+  sdkOperation: SdkServiceOperation
 ): SdkMethodResponse {
+  const responses = sdkOperation.responses;
   // TODO: put head as bool here
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
   const headers: SdkServiceResponseHeader[] = [];
   for (const response of Object.values(responses)) {
     headers.push(...response.headers);
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
   }
-  const nullable = nonBodyExists && allResponseBodies.length > 0;
+  const allResponseBodies = getAllResponseBodies(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (responseTypes.size > 1) {
@@ -399,7 +397,7 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable,
+      nullable: isNullable(sdkOperation),
       name: createGeneratedName(operation, "UnionResponse"),
       generatedName: true,
     };
@@ -409,6 +407,7 @@ function getSdkMethodResponse(
   return {
     kind: "method",
     type,
+    nullable: isNullable(sdkOperation),
   };
 }
 
@@ -444,6 +443,7 @@ function getSdkServiceResponseAndExceptions<
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
+          nullable: isNullable(header.type),
         });
       }
       if (innerResponse.body) {
@@ -465,6 +465,7 @@ function getSdkServiceResponseAndExceptions<
         ? "application/json"
         : contentTypes[0],
       apiVersions: getAvailableApiVersions(context, httpOperation.operation),
+      nullable: body ? isNullable(body) : true,
     };
     let statusCode: number | string = "";
     if (typeof response.statusCodes === "number" || response.statusCodes === "*") {
@@ -556,7 +557,7 @@ function getSdkBasicServiceMethod<
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
-  const response = getSdkMethodResponse(operation, serviceOperation.responses);
+  const response = getSdkMethodResponse(operation, serviceOperation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
@@ -639,6 +640,7 @@ function getDefaultSdkEndpointParameter<
       type: type,
       optional: false,
       isApiVersionParam: false,
+      nullable: false,
     },
   ];
 }

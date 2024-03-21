@@ -465,7 +465,10 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
     });
 
     it("record with nullable", async function () {
@@ -481,7 +484,31 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, false);
+      strictEqual(sdkType.nullableValues, true);
+    });
+
+    it("array with nullable", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          name: (float32 | null)[];
+        }
+      `);
+
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "array");
+      const elementType = sdkType.valueType;
+      strictEqual(elementType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(elementType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, false);
+      strictEqual(sdkType.nullableValues, true);
     });
 
     it("model with simple union property", async function () {
@@ -577,7 +604,10 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
       strictEqual(sdkType.name, "PetKind");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      const pet = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(pet.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
     });
@@ -604,7 +634,9 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = model.properties[0].type;
       strictEqual(sdkType.kind, "model");
       strictEqual(sdkType.name, "PropertyModel");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      strictEqual(model.properties[0].nullable, true);
     });
 
     it("mix types", async function () {
@@ -635,7 +667,9 @@ describe("typespec-client-generator-core: types", () => {
       const nullableModel = models.find((x) => x.kind === "model" && x.name === "TestNullable");
       ok(nullableModel);
       strictEqual(model.properties[0].type.kind, "union");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.properties[0].type.nullable, false);
+      strictEqual(model.properties[0].nullable, false);
       const unionType = model.properties[0].type;
       strictEqual(unionType.kind, "union");
       for (const v of unionType.values) {
@@ -646,7 +680,9 @@ describe("typespec-client-generator-core: types", () => {
         }
       }
       strictEqual(nullableModel.properties[0].type.kind, "union");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(nullableModel.properties[0].type.nullable, true);
+      strictEqual(nullableModel.properties[0].nullable, true);
       for (const v of nullableModel.properties[0].type.values) {
         if (v.kind === "model") {
           strictEqual(v.name, "ModelType");
@@ -1557,7 +1593,6 @@ describe("typespec-client-generator-core: types", () => {
       @discriminator("sharktype")
       model Shark extends Fish {
         kind: "shark";
-        sharktype: string;
       }
 
       model Salmon extends Fish {
@@ -1582,8 +1617,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 5);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      const kindProperty = fish.properties.find((x) => x.name === "kind");
+      const kindProperty = fish.properties[0];
       ok(kindProperty);
+      strictEqual(kindProperty.name, "kind");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -1592,8 +1628,9 @@ describe("typespec-client-generator-core: types", () => {
       const shark = models.find((x) => x.name === "Shark");
       ok(shark);
       strictEqual(shark.properties.length, 2);
-      const sharktypeProperty = shark.properties.find((x) => x.name === "sharktype");
+      const sharktypeProperty = shark.properties[0];
       ok(sharktypeProperty);
+      strictEqual(sharktypeProperty.name, "sharktype");
       strictEqual(sharktypeProperty.kind, "property");
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
@@ -1614,8 +1651,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const fish = models.find((x) => x.name === "Fish");
       ok(fish);
-      const kindProperty = fish.properties.find((x) => x.name === "kind");
+      const kindProperty = fish.properties[0];
       ok(kindProperty);
+      strictEqual(kindProperty.name, "kind");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -1801,9 +1839,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
       const dogKind = runner.context.experimental_sdkPackage.enums[0];
 
-      const dogKindProperty = dog.properties.find(
-        (x) => x.kind === "property" && x.serializedName === "kind"
-      );
+      const dogKindProperty = dog.properties[0];
       ok(dogKindProperty);
       strictEqual(dogKindProperty.type, dogKind);
     });
