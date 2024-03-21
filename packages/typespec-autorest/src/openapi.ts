@@ -6,7 +6,6 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
-  isFixed,
 } from "@azure-tools/typespec-azure-core";
 import {
   SdkContext,
@@ -2030,7 +2029,7 @@ function createOAPIEmitter(
     } else if (type.kind === "Enum") {
       schema["x-ms-enum"] = {
         name: type.name,
-        modelAsString: isFixed(program, type) ? false : true,
+        modelAsString: true,
       };
 
       const values = [];
