@@ -6,7 +6,7 @@ export const propertyNameRule = createRule({
   description: "Avoid naming conflicts between a property and a model of the same name.",
   severity: "warning",
   messages: {
-    default: paramMessage`Property '${"propertyName"}' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName decorator to rename the property for C#.`,
+    default: paramMessage`Property '${"propertyName"}' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
   },
   create(context) {
     return {
