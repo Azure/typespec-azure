@@ -102,10 +102,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.nameInClient, "endpoint");
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.onClient, true);
-      strictEqual(endpointParam.optional, false);
-      strictEqual(endpointParam.type.kind, "constant");
-      strictEqual(endpointParam.type.value, "http://localhost:3000");
+      strictEqual(endpointParam.optional, true);
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
       strictEqual(endpointParam.urlEncode, false);
+      strictEqual(endpointParam.type.templateArguments.length, 0);
     });
 
     it("initialization default endpoint with apikey auth", async () => {
@@ -119,7 +120,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.endpoint, "http://localhost:3000");
       const initialization = client.initialization;
       ok(initialization);
       strictEqual(initialization.properties.length, 2);
@@ -127,8 +127,9 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
-      strictEqual(endpointParam.type.kind, "constant");
-      strictEqual(endpointParam.type.value, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
+      strictEqual(endpointParam.type.templateArguments.length, 0);
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -169,8 +170,9 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
-      strictEqual(endpointParam.type.kind, "constant");
-      strictEqual(endpointParam.type.value, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
+      strictEqual(endpointParam.type.templateArguments.length, 0);
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -217,8 +219,8 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
-      strictEqual(endpointParam.type.kind, "constant");
-      strictEqual(endpointParam.type.value, "http://localhost:3000");
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -271,7 +273,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.endpoint, "{endpointInput}");
       const initialization = client.initialization;
       ok(initialization);
       strictEqual(initialization.properties.length, 2);
@@ -282,12 +283,21 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.clientDefaultValue, undefined);
       strictEqual(endpointParam.urlEncode, false);
       //eslint-disable-next-line deprecation/deprecation
-      strictEqual(endpointParam.nameInClient, "endpointInput");
-      strictEqual(endpointParam.name, "endpointInput");
+      strictEqual(endpointParam.nameInClient, "endpoint");
+      strictEqual(endpointParam.name, "endpoint");
+      strictEqual(endpointParam.type.kind, "endpoint");
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.kind, "endpoint");
-      strictEqual(endpointParam.description, "Testserver endpoint");
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.name, "endpointInput");
+      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.optional, false);
+      strictEqual(templateArg.onClient, true);
+      strictEqual(templateArg.clientDefaultValue, undefined);
+      strictEqual(templateArg.description, "Testserver endpoint");
 
       const credentialParam = initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -331,17 +341,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.endpoint, "{endpoint}/server/path/multiple/{apiVersion}");
       const initialization = client.initialization;
       ok(initialization);
-      strictEqual(initialization.properties.length, 3);
+      strictEqual(initialization.properties.length, 2);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "v1.0");
 
       const endpointParams = initialization.properties.filter(
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       );
-      strictEqual(endpointParams.length, 2);
+      strictEqual(endpointParams.length, 1);
       const endpointParam = endpointParams[0];
       strictEqual(endpointParam.clientDefaultValue, undefined);
       strictEqual(endpointParam.urlEncode, false);
@@ -352,20 +361,32 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.kind, "endpoint");
 
-      const apiVersionParam = endpointParams[1];
+      const endpointParamType = endpointParam.type;
+      strictEqual(endpointParamType.kind, "endpoint");
+      strictEqual(endpointParamType.serverUrl, "{endpoint}/server/path/multiple/{apiVersion}");
+
+      strictEqual(endpointParamType.templateArguments.length, 2);
+      const endpointTemplateArg = endpointParamType.templateArguments[0];
+      strictEqual(endpointTemplateArg.name, "endpoint");
+      strictEqual(endpointTemplateArg.onClient, true);
+      strictEqual(endpointTemplateArg.optional, false);
+      strictEqual(endpointTemplateArg.kind, "path");
+
+      const apiVersionParam = endpointParamType.templateArguments[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-      strictEqual(apiVersionParam.urlEncode, false);
+      strictEqual(apiVersionParam.urlEncode, true);
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.optional, false);
-      strictEqual(apiVersionParam.kind, "endpoint");
+      strictEqual(apiVersionParam.kind, "path");
       deepStrictEqual(client.apiVersions, ["v1.0"]);
 
-      const credentialParam = initialization.properties.filter(
+      const credentialParam = initialization.properties.find(
         (p): p is SdkCredentialParameter => p.kind === "credential"
-      )[0];
+      );
+      ok(credentialParam);
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
       strictEqual(credentialParam.name, "credential");
@@ -420,12 +441,20 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.endpoint, "http://localhost:3000");
       const initialization = client.initialization;
       ok(initialization);
       strictEqual(initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "2022-12-01-preview");
+
+      const endpointParam = initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpointParam);
+      strictEqual(endpointParam.name, "endpoint");
+      strictEqual(endpointParam.kind, "endpoint");
+      strictEqual(endpointParam.optional, true);
+      strictEqual(endpointParam.onClient, true);
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
 
       const apiVersionParam = initialization.properties.filter((p) => p.isApiVersionParam)[0];
       //eslint-disable-next-line deprecation/deprecation
@@ -483,12 +512,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.endpoint, "http://localhost:3000");
       const initialization = client.initialization;
       ok(initialization);
       strictEqual(initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 2);
       deepStrictEqual(client.apiVersions, ["2022-12-01-preview", "2022-12-01"]);
+
+      const endpointParam = initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpointParam);
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
 
       const apiVersionParam = initialization.properties.filter((p) => p.isApiVersionParam)[0];
       //eslint-disable-next-line deprecation/deprecation
