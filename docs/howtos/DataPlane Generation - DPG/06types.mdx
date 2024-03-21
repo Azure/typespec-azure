@@ -315,7 +315,9 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-export type ProvisioningState = string | "inProgress" | "Succeeded" | "Failed" | "Canceled";
+export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
+// NOTE: extensible enum design may change in JS
+export type ProvisioningState = string | "inProgress" | ResourceProvisioningState;
 ```
 
 </TabItem>
