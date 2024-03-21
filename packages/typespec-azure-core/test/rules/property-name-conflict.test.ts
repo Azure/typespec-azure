@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { propertyNameRule } from "../../src/rules/property-name-conflict.js";
+import { propertyNameRule } from "../../src/rules/property-naming.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 let runner: BasicTestRunner;
