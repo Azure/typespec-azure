@@ -87,6 +87,30 @@ describe("typespec-azure-core: no-enum rule", () => {
         `);
     });
 
+    it("keeps new lines", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            /** cat doc */
+            cat,
+            /** dog doc */
+            dog
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            /** cat doc */
+            cat: "cat",
+            /** dog doc */
+            dog: "dog",
+          }
+        `);
+    });
+
     it("codefix enum with named member", async () => {
       await tester
         .expect(

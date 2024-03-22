@@ -133,7 +133,7 @@ function getNodeAnnotations(node: Node): string {
   }
 
   for (let i = endOfTrivia; i < node.end; i++) {
-    if (source[i] === " ") {
+    if (source[i] === " " || source[i] === "\n") {
       endOfTrivia = i + 1;
     } else {
       break;
