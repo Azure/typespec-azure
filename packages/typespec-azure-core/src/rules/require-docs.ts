@@ -12,7 +12,7 @@ export const requireDocumentation = createRule({
   description: "Require documentation over enums, models, and operations.",
   severity: "warning",
   messages: {
-    default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, please use decorator @doc to add it.`,
+    default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
   },
   create(context) {
     return {
