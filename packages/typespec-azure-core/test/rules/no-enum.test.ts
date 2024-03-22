@@ -31,6 +31,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         },
       ]);
   });
+
   it("allows the version enum", async () => {
     await tester
       .expect(
@@ -44,6 +45,27 @@ describe("typespec-azure-core: no-enum rule", () => {
         `
       )
       .toBeValid();
+  });
+
+  it("emit warning about other enums in versioned service", async () => {
+    await tester
+      .expect(
+        `       
+        @service
+        @versioned(Versions)
+        namespace Foo; 
+        enum Versions {
+          v1, v2
+        }
+
+        enum Bar { a,  b}
+        `
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-enum",
+        },
+      ]);
   });
 
   describe("codefix", () => {
