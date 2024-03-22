@@ -26,6 +26,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @projectedName("json", "xJson")
         x: int32;
       };`
@@ -42,6 +43,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @projectedName("client", "x")
         xJson: int32;
       };`
@@ -74,6 +76,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @clientName("x")
         @projectedName("client", "y")
         xJson: int32;
@@ -107,6 +110,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `model Foo {
+        #suppress "deprecated" "for testing"
         @encodedName("application/json", "xJson")
         @projectedName("json", "projectedJson")
         x: int32;

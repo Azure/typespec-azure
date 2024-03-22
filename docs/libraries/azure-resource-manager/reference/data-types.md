@@ -44,21 +44,21 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
 
 ```typespec
-model Azure.ResourceManager.ArmAcceptedResponse<Message>
+model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 ```
 
 #### Template Parameters
 
-| Name    | Description                                                                        |
-| ------- | ---------------------------------------------------------------------------------- |
-| Message | The description of the response status (defaults to `Resource operation accepted`) |
+| Name         | Description                                                                        |
+| ------------ | ---------------------------------------------------------------------------------- |
+| Message      | The description of the response status (defaults to `Resource operation accepted`) |
+| ExtraHeaders | Additional headers in the response. Default includes Retry-After header            |
 
 #### Properties
 
-| Name        | Type    | Description                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `202`   | The status code.                                                                                         |
-| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `202` | The status code. |
 
 ### `ArmAsyncOperationHeader` {#Azure.ResourceManager.ArmAsyncOperationHeader}
 
@@ -110,22 +110,22 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 The Azure Resource Manager 201 response for a resource
 
 ```typespec
-model Azure.ResourceManager.ArmCreatedResponse<ResponseBody>
+model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 ```
 
 #### Template Parameters
 
-| Name         | Description                       |
-| ------------ | --------------------------------- |
-| ResponseBody | The contents of the response body |
+| Name         | Description                                                             |
+| ------------ | ----------------------------------------------------------------------- |
+| ResponseBody | The contents of the response body                                       |
+| ExtraHeaders | Additional headers in the response. Default includes Retry-After header |
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `201`          | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
-| body        | `ResponseBody` | The body type of the operation request or response.                                                      |
+| Name       | Type           | Description                                         |
+| ---------- | -------------- | --------------------------------------------------- |
+| statusCode | `201`          | The status code.                                    |
+| body       | `ResponseBody` | The body type of the operation request or response. |
 
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 

@@ -205,7 +205,6 @@ model SupportedLanguages is Azure.Core.Page<SupportedLanguage>;
 
 @doc("Represents a training config version.")
 model TrainingConfigVersion {
-  @projectedName("csharp", "version")
   @doc("Represents the version of the config.")
   trainingConfigVersion: string;
 

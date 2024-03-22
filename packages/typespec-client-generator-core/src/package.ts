@@ -48,12 +48,15 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  createGeneratedName,
+  getAllResponseBodies,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
   getHashForType,
   getSdkTypeBaseHelper,
   isAcceptHeader,
+  isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import {
@@ -91,10 +94,12 @@ function getSdkHttpBodyParameters<TOptions extends object>(
     const bodyType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
     );
+    const name = "body";
     return diagnostics.wrap([
       {
         kind: "body",
-        nameInClient: "body",
+        nameInClient: name,
+        name,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
         onClient: false,
@@ -104,6 +109,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
         apiVersions: getAvailableApiVersions(context, tspBody.type),
         type: bodyType,
         optional: false,
+        nullable: isNullable(tspBody.type),
       },
     ]);
   }
@@ -114,7 +120,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
     })
   );
   const methodBodyParameter = methodParameters.find(
-    (x) => x.nameInClient === getPropertyNames(context, tspBody.parameter!)[0]
+    (x) => x.name === getPropertyNames(context, tspBody.parameter!)[0]
   );
   if (body.kind !== "body") throw new Error("blah");
   if (methodBodyParameter) {
@@ -148,7 +154,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
 function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
-  const nameInClient = bodyObject.kind === "body" ? "contentType" : "accept";
+  const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = {
     kind: "string",
     encode: "string",
@@ -164,7 +170,7 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (/json/.test(bodyObject.contentTypes[0]) || nameInClient === "accept")
+    (/json/.test(bodyObject.contentTypes[0]) || name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -177,11 +183,13 @@ function createContentTypeOrAcceptHeader(
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
-    nameInClient,
+    nameInClient: name,
+    name,
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,
     onClient: false,
     optional: false,
+    nullable: false,
   };
 }
 
@@ -243,7 +251,7 @@ function getSdkHttpOperation<TOptions extends object>(
       kind: "header",
       serializedName: "Accept",
     });
-    if (!methodParameters.some((m) => m.nameInClient === "accept")) {
+    if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
         ...acceptBase,
         kind: "method",
@@ -372,21 +380,15 @@ function getSdkLroServiceMethod<
 
 function getSdkMethodResponse(
   operation: Operation,
-  responses: Record<number, SdkHttpResponse>
+  sdkOperation: SdkServiceOperation
 ): SdkMethodResponse {
+  const responses = sdkOperation.responses;
   // TODO: put head as bool here
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
   const headers: SdkServiceResponseHeader[] = [];
   for (const response of Object.values(responses)) {
     headers.push(...response.headers);
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
   }
-  const nullable = nonBodyExists && allResponseBodies.length > 0;
+  const allResponseBodies = getAllResponseBodies(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (responseTypes.size > 1) {
@@ -395,7 +397,9 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable,
+      nullable: isNullable(sdkOperation),
+      name: createGeneratedName(operation, "UnionResponse"),
+      generatedName: true,
     };
   } else if (responseTypes) {
     type = allResponseBodies[0];
@@ -403,6 +407,7 @@ function getSdkMethodResponse(
   return {
     kind: "method",
     type,
+    nullable: isNullable(sdkOperation),
   };
 }
 
@@ -438,6 +443,7 @@ function getSdkServiceResponseAndExceptions<
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
+          nullable: isNullable(header.type),
         });
       }
       if (innerResponse.body) {
@@ -459,6 +465,7 @@ function getSdkServiceResponseAndExceptions<
         ? "application/json"
         : contentTypes[0],
       apiVersions: getAvailableApiVersions(context, httpOperation.operation),
+      nullable: body ? isNullable(body) : true,
     };
     let statusCode: number | string = "";
     if (typeof response.statusCodes === "number" || response.statusCodes === "*") {
@@ -487,9 +494,7 @@ function getParameterMappingHelper<
     if (!context.__api_version_parameter) throw new Error("No api version on the client");
     return [context.__api_version_parameter];
   }
-  const correspondingMethodParameter = method.parameters.find(
-    (x) => x.nameInClient === serviceParam.nameInClient
-  );
+  const correspondingMethodParameter = method.parameters.find((x) => x.name === serviceParam.name);
   if (correspondingMethodParameter) {
     return [correspondingMethodParameter];
   }
@@ -497,8 +502,8 @@ function getParameterMappingHelper<
     if (type.kind !== "model") return false;
     return Array.from(type.properties.values())
       .filter((x) => x.kind === "property")
-      .map((x) => x.nameInClient)
-      .includes(param.nameInClient);
+      .map((x) => x.name)
+      .includes(param.name);
   }
   const serviceParamType = serviceParam.type;
   if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
@@ -517,7 +522,7 @@ function getParameterMappingHelper<
   for (const methodParam of method.parameters) {
     if (methodParam.type.kind === "model") {
       for (const prop of methodParam.type.properties) {
-        if (prop.nameInClient === serviceParam.nameInClient) {
+        if (prop.name === serviceParam.name) {
           return [prop];
         }
       }
@@ -552,7 +557,7 @@ function getSdkBasicServiceMethod<
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
-  const response = getSdkMethodResponse(operation, serviceOperation.responses);
+  const response = getSdkMethodResponse(operation, serviceOperation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
@@ -622,10 +627,12 @@ function getDefaultSdkEndpointParameter<
       encode: "string",
     };
   }
+  const name = "endpoint";
   return [
     {
       kind: "endpoint",
-      nameInClient: "endpoint",
+      nameInClient: name,
+      name,
       description: "Service host",
       onClient: true,
       urlEncode: false,
@@ -633,6 +640,7 @@ function getDefaultSdkEndpointParameter<
       type: type,
       optional: false,
       isApiVersionParam: false,
+      nullable: false,
     },
   ];
 }
@@ -740,6 +748,7 @@ function getSdkInitializationType<
     kind: "model",
     properties,
     name,
+    generatedName: true,
     access: "public",
     usage: UsageFlags.Input,
     nullable: false,
@@ -790,9 +799,6 @@ function createSdkClientType<
   operationGroup?: SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (!context.__clients) {
-    context.__clients = new Map<string, SdkClientType<TServiceOperation>>();
-  }
   const baseClientType = operationGroup ?? client;
   const isClient = baseClientType.kind === "SdkClient";
   const clientName = isClient ? baseClientType.name : baseClientType.type.name;
@@ -804,34 +810,26 @@ function createSdkClientType<
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client, baseClientType));
 
-  // check to see if this client was previously created via a recursive call.
-  // if it was, then fetch it and append any methods that were just created.
-  let sdkClientType: SdkClientType<TServiceOperation>;
-  if (context.__clients.has(clientName)) {
-    sdkClientType = context.__clients.get(clientName)!;
-    sdkClientType.methods = sdkClientType.methods.concat(methods);
-  } else {
-    const endpointInfo = diagnostics.pipe(
-      getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
-    );
-    const docWrapper = getDocHelper(context, baseClientType.type);
-    sdkClientType = {
-      kind: "client",
-      name: clientName,
-      description: docWrapper.description,
-      details: docWrapper.details,
-      methods: methods,
-      apiVersions: getAvailableApiVersions(context, client.type),
-      nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-      initialization: isClient
-        ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
-        : undefined,
-      endpoint: endpointInfo.endpoint,
-      hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
-      arm: client.arm,
-    };
-    context.__clients.set(clientName, sdkClientType);
-  }
+  const endpointInfo = diagnostics.pipe(
+    getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
+  );
+  const docWrapper = getDocHelper(context, baseClientType.type);
+  const sdkClientType: SdkClientType<TServiceOperation> = {
+    kind: "client",
+    name: clientName,
+    description: docWrapper.description,
+    details: docWrapper.details,
+    methods: methods,
+    apiVersions: getAvailableApiVersions(context, client.type),
+    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
+    initialization: isClient
+      ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
+      : undefined,
+    endpoint: endpointInfo.endpoint,
+    hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
+    arm: client.arm,
+  };
+  context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -841,7 +839,7 @@ export function experimental_getSdkPackage<
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
-  context.__clients = new Map<string, SdkClientType<TServiceOperation>>();
+  context.__clients = new Array<SdkClientType<TServiceOperation>>();
   for (const client of listClients(context)) {
     createSdkClientType(context, client);
   }

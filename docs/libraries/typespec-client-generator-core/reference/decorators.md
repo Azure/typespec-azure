@@ -28,7 +28,7 @@ the access result is undefined.
 
 #### Target
 
-`Model | Operation | Enum`
+`Model | Operation | Enum | Union`
 
 #### Parameters
 
@@ -201,6 +201,8 @@ interface MyInterface {}
 
 ### `@clientFormat` {#@Azure.ClientGenerator.Core.clientFormat}
 
+DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
+
 Can be used to explain the client type that the current TYPESPEC
 type should map to.
 
@@ -289,6 +291,8 @@ op test: void;
 
 ### `@exclude` {#@Azure.ClientGenerator.Core.exclude}
 
+DEPRECATED: Use `@usage` and `@access` decorator instead.
+
 Whether to exclude a model from generation for specific languages. By default we generate
 all models that are included in operations.
 
@@ -345,6 +349,8 @@ model Bar {}
 
 ### `@include` {#@Azure.ClientGenerator.Core.include}
 
+DEPRECATED: Use `@usage` and `@access` decorator instead.
+
 Whether to include a model in generation for specific languages. By default we generate
 all models that are included in operations.
 
@@ -372,6 +378,8 @@ model ModelToInclude {
 ```
 
 ### `@internal` {#@Azure.ClientGenerator.Core.internal}
+
+DEPRECATED: Use `@access` decorator instead.
 
 Whether to mark an operation as internal for specific languages,
 meaning it should not be exposed to end SDK users
@@ -469,7 +477,7 @@ you need to take care of all related models/enums.
 
 #### Target
 
-`Model | Enum`
+`Model | Enum | Union`
 
 #### Parameters
 
