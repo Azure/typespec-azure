@@ -1405,13 +1405,13 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(lr.isUnionAsEnum, false);
       strictEqual(lr.values[0].name, "left");
       strictEqual(lr.values[1].name, "right");
-      strictEqual(lr.isFixed, false);
+      strictEqual(lr.isFixed, true);
       const ud = values[1] as SdkEnumType;
       strictEqual(ud.name, "UD");
       strictEqual(ud.isUnionAsEnum, false);
       strictEqual(ud.values[0].name, "up");
       strictEqual(ud.values[1].name, "down");
-      strictEqual(ud.isFixed, false);
+      strictEqual(ud.isFixed, true);
     });
 
     it("versioned enums", async () => {
