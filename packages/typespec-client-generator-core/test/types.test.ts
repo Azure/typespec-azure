@@ -2506,6 +2506,7 @@ describe("typespec-client-generator-core: types", () => {
       const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw;
       ok(rawModel);
@@ -2546,6 +2547,7 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
+      // eslint-disable-next-line deprecation/deprecation
       const errorModels = models.filter((x) => x.kind === "model" && x.isError);
       deepStrictEqual(errorModels.map((x) => x.name).sort(), [
         "ApiError",
@@ -2553,6 +2555,7 @@ describe("typespec-client-generator-core: types", () => {
         "FourHundredError",
         "FourZeroFourError",
       ]);
+      // eslint-disable-next-line deprecation/deprecation
       const validModel = models.filter((x) => x.kind === "model" && !x.isError);
       deepStrictEqual(
         validModel.map((x) => x.name),
