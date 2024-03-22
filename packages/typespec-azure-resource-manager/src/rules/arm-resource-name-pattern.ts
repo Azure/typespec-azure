@@ -11,7 +11,7 @@ export const armResourceNamePatternRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name-pattern",
   description: "The resource name parameter should be defined with a 'pattern' restriction.",
   messages: {
-    default: `The resource name parameter should be defined with a 'pattern' restriction.`,
+    default: `The resource name parameter should be defined with a 'pattern' restriction.  Decorate the "name" property in the resource definition using the @pattern decorator, with a regular expression indicating the allowed characters in the resource name.`,
   },
   create(context) {
     return {
