@@ -89,7 +89,7 @@ import {
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
-  isFormDataType,
+  isMultipartFormData,
   isMultipartOperation,
   isNullable,
   updateWithApiVersionInformation,
@@ -518,7 +518,7 @@ export function getSdkModelWithDiagnostics(
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
-      isFormDataType: isFormDataType(context, type, operation),
+      isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType, operation);
@@ -1259,7 +1259,7 @@ function updateTypesFromOperation(
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
     }
-    if (isFormDataType(context, httpBody.type, operation)) {
+    if (isMultipartFormData(context, httpBody.type, operation)) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.MultipartFormData, body);
       });
@@ -1368,8 +1368,11 @@ function verifyNoConflictingMultipartModelUsage(
   const diagnostics = createDiagnosticCollector();
   for (const [operation, modelMap] of context.operationModelsMap!) {
     for (const [type, sdkType] of modelMap.entries()) {
-      const isFormDataType = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
-      if (sdkType.kind === "model" && isFormDataType !== isMultipartOperation(context, operation)) {
+      const isMultipartFormData = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
+      if (
+        sdkType.kind === "model" &&
+        isMultipartFormData !== isMultipartOperation(context, operation)
+      ) {
         // This means we have a model that is used both for formdata input and for regular body input
         diagnostics.add(
           createDiagnostic({

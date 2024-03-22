@@ -532,5 +532,6 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   Versioning = 1 << 3,
+  // Input will also be set when MultipartFormData is set
   MultipartFormData = 1 << 5,
 }

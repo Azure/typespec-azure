@@ -317,6 +317,10 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
   );
 }
 
-export function isFormDataType(context: TCGCContext, type: Type, operation?: Operation): boolean {
+export function isMultipartFormData(
+  context: TCGCContext,
+  type: Type,
+  operation?: Operation
+): boolean {
   return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
 }
