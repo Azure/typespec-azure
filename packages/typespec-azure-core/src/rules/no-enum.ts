@@ -23,9 +23,11 @@ export const noEnumRule = createRule({
   create(context) {
     return {
       enum: (en: Enum) => {
-        if (getVersionsForEnum(context.program, en).length > 0) {
+        const [_, versions] = getVersionsForEnum(context.program, en);
+        if (versions !== undefined && versions.getVersions()[0].enumMember.enum === en) {
           return;
         }
+
         context.reportDiagnostic({
           format: { enumName: en.name },
           target: en,
