@@ -82,7 +82,31 @@ describe("typespec-azure-core: no-enum rule", () => {
           union PetKind {
             string,
 
-            "cat", "dog",
+            cat: "cat", dog: "dog",
+          }
+        `);
+    });
+
+    it("keeps new lines", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            /** cat doc */
+            cat,
+            /** dog doc */
+            dog
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            /** cat doc */
+            cat: "cat",
+            /** dog doc */
+            dog: "dog",
           }
         `);
     });
@@ -137,14 +161,14 @@ describe("typespec-azure-core: no-enum rule", () => {
             /** cat */
             @doc("cat")
             #suppress "cat"
-            "cat", 
+            cat: "cat", 
             
             // dog
 
             /** dog */
             @doc("dog")
             #suppress "dog"
-            "dog",
+            dog: "dog",
 
             // end
           }
