@@ -173,24 +173,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
 const libDef = {
   name: "@azure-tools/typespec-autorest",
   diagnostics: {
-    "security-service-namespace": {
-      severity: "error",
-      messages: {
-        default: "Cannot add security details to a namespace other than the service namespace.",
-      },
-    },
-    "resource-namespace": {
-      severity: "error",
-      messages: {
-        default: "Resource goes on namespace",
-      },
-    },
-    "missing-path-param": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Path contains parameter ${"param"} but wasn't found in given parameters`,
-      },
-    },
     "duplicate-body-types": {
       severity: "error",
       messages: {
@@ -240,24 +222,6 @@ const libDef = {
       severity: "error",
       messages: {
         default: paramMessage`Invalid type '${"type"}' for a default value`,
-      },
-    },
-    "invalid-property-type-for-collection-format": {
-      severity: "error",
-      messages: {
-        default: "The collectionFormat can only be applied to model property with type 'string[]'.",
-      },
-    },
-    "invalid-collection-format": {
-      severity: "error",
-      messages: {
-        default: "The format should be one of 'csv','ssv','tsv','pipes' and 'multi'.",
-      },
-    },
-    "non-recommended-collection-format": {
-      severity: "warning",
-      messages: {
-        default: "The recommendation of collection format are 'csv' and 'multi'.",
       },
     },
     "invalid-multi-collection-format": {

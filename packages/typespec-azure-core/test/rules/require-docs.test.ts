@@ -36,7 +36,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
     it("on model", async () =>
       await checkDocRequired(
         "┆model Foo {}",
-        "The Model named 'Foo' should have a documentation or description, please use decorator @doc to add it."
+        "The Model named 'Foo' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on model property", async () =>
@@ -44,25 +44,25 @@ describe("typespec-azure-core: documentation-required rule", () => {
         `@doc("Abc") model Foo {
           ┆x: string;
         }`,
-        "The ModelProperty named 'x' should have a documentation or description, please use decorator @doc to add it."
+        "The ModelProperty named 'x' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on operation", async () =>
       await checkDocRequired(
         `┆op read(): void;`,
-        "The Operation named 'read' should have a documentation or description, please use decorator @doc to add it."
+        "The Operation named 'read' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on property", async () =>
       await checkDocRequired(
         `@doc("op doc") op read(┆param1: string): void;`,
-        "The ModelProperty named 'param1' should have a documentation or description, please use decorator @doc to add it."
+        "The ModelProperty named 'param1' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on enum", async () => {
       await checkDocRequired(
         "┆enum Foo {}",
-        "The Enum named 'Foo' should have a documentation or description, please use decorator @doc to add it."
+        "The Enum named 'Foo' should have a documentation or description, use doc comment /** */ to provide it."
       );
     });
 
@@ -71,7 +71,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
         `@doc(".") enum Foo {
           ┆Bar,
         }`,
-        "The EnumMember named 'Bar' should have a documentation or description, please use decorator @doc to add it."
+        "The EnumMember named 'Bar' should have a documentation or description, use doc comment /** */ to provide it."
       );
     });
   });
