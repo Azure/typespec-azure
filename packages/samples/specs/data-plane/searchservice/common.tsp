@@ -74,7 +74,7 @@ model SearchCreatedResponse<ResponseBody> {
 }
 
 model ETag {
-  @projectedName("json", "@odata.etag")
+  @encodedName("application/json", "@odata.etag")
   @doc("The ETag of the resource.")
   eTag: string;
 }

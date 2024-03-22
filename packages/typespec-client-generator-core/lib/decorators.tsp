@@ -92,6 +92,8 @@ extern dec client(target: Namespace | Interface, value?: {}, scope?: valueof str
 extern dec operationGroup(target: Namespace | Interface, scope?: valueof string);
 
 /**
+ * DEPRECATED: Use `@usage` and `@access` decorator instead.
+ *
  * Whether to exclude a model from generation for specific languages. By default we generate
  * all models that are included in operations.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
@@ -108,6 +110,8 @@ extern dec operationGroup(target: Namespace | Interface, scope?: valueof string)
 extern dec exclude(target: Model, scope?: valueof string);
 
 /**
+ * DEPRECATED: Use `@usage` and `@access` decorator instead.
+ *
  * Whether to include a model in generation for specific languages. By default we generate
  * all models that are included in operations.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
@@ -126,6 +130,8 @@ extern dec include(target: Model, scope?: valueof string);
 alias ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
 
 /**
+ * DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
+ *
  * Can be used to explain the client type that the current TYPESPEC
  * type should map to.
  * @param value The client format to apply.
@@ -137,10 +143,12 @@ alias ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
  * }
  * ```
  */
-#deprecated "@clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/core` instead."
+#deprecated "@clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead."
 extern dec clientFormat(target: ModelProperty, value: valueof ClientFormat);
 
 /**
+ * DEPRECATED: Use `@access` decorator instead.
+ *
  * Whether to mark an operation as internal for specific languages,
  * meaning it should not be exposed to end SDK users
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
@@ -233,7 +241,7 @@ enum Usage {
  * op getModel(): Fish;
  * ```
  */
-extern dec usage(target: Model | Enum, value: EnumMember | Union, scope?: valueof string);
+extern dec usage(target: Model | Enum | Union, value: EnumMember | Union, scope?: valueof string);
 
 /**
  * Access value.
@@ -389,7 +397,11 @@ enum Access {
  * ): void;
  * ```
  */
-extern dec access(target: Model | Operation | Enum, value: EnumMember, scope?: valueof string);
+extern dec access(
+  target: Model | Operation | Enum | Union,
+  value: EnumMember,
+  scope?: valueof string
+);
 
 /**
  * Set whether a model property should be flattened or not.

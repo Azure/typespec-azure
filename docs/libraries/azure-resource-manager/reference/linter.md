@@ -20,7 +20,7 @@ linter:
 
 Available ruleSets:
 
-- [`@azure-tools/typespec-azure-resource-manager/all`](#@azure-tools/typespec-azure-resource-manager/all)
+- `@azure-tools/typespec-azure-resource-manager/all`
 
 ## Rules
 
@@ -29,6 +29,8 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](/libraries/azure-resource-manager/rules/no-record.md)                                             | Don't use Record types for ARM resources.                                          |
 | `@azure-tools/typespec-azure-resource-manager/arm-common-types-version`                                                                                          | Specify the ARM common-types version using @armCommonTypesVersion.                 |
 | [`@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes`](/libraries/azure-resource-manager/rules/delete-operation-response-codes.md) | Ensure delete operations have the appropriate status codes.                        |
+| [`@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes`](/libraries/azure-resource-manager/rules/put-operation-response-codes.md)       | Ensure put operations have the appropriate status codes.                           |
+| [`@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes`](/libraries/azure-resource-manager/rules/post-operation-response-codes.md)     | Ensure post operations have the appropriate status codes.                          |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment`                                                                                    | `@armResourceAction` should not be used with `@segment`.                           |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property`                                                                                   | Warn about duplicate properties in resources.                                      |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property`                                                                            | Check for invalid resource envelope properties.                                    |
