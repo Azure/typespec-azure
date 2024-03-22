@@ -28,6 +28,7 @@ import {
 } from "./interfaces.js";
 import {
   getCrossLanguageDefinitionId,
+  getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -301,4 +302,21 @@ export function isNullable(type: Type | SdkServiceOperation): boolean {
  */
 export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
   return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
+}
+
+function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
+  if (type.kind !== "Model") return false;
+  if (!isHttpOperation(context, operation)) return false;
+  const httpBody = operation
+    ? getHttpOperationWithCache(context, operation).parameters.body
+    : undefined;
+  return (
+    !!httpBody &&
+    httpBody.type.kind === "Model" &&
+    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+  );
+}
+
+export function isFormDataType(context: TCGCContext, type: Type, operation?: Operation): boolean {
+  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
 }

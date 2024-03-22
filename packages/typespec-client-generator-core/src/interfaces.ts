@@ -271,7 +271,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.FormData nad the `.usage` property on this model
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData nad the `.usage` property on this model
    */
   isFormDataType: boolean;
   isError: boolean;
@@ -532,5 +532,5 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   Versioning = 1 << 3,
-  FormData = 1 << 5,
+  MultipartFormData = 1 << 5,
 }
