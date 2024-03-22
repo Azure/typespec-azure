@@ -40,6 +40,9 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
+  /**
+   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
+   */
   arm: boolean;
   crossLanguageDefinitionId: string;
 }
@@ -57,6 +60,9 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
+  /**
+   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
+   */
   arm: boolean;
 }
 
