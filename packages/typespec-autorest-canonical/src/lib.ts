@@ -186,7 +186,7 @@ const libDef = {
     "unsupported-auth": {
       severity: "warning",
       messages: {
-        default: paramMessage`Authentication "${"authType"}" is not a known authentication by the openapi3 emitter, it will be ignored.`,
+        default: paramMessage`Authentication "${"authType"}" is not a known authentication by the AutorestCanonical emitter, it will be ignored.`,
       },
     },
     "unsupported-versioning-decorator": {
