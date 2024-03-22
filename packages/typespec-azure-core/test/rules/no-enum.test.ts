@@ -60,7 +60,7 @@ describe("typespec-azure-core: no-enum rule", () => {
           union PetKind {
             string,
 
-            "cat", "dog",
+            cat: "cat", dog: "dog",
           }
         `);
     });
@@ -115,14 +115,14 @@ describe("typespec-azure-core: no-enum rule", () => {
             /** cat */
             @doc("cat")
             #suppress "cat"
-            "cat", 
+            cat: "cat", 
             
             // dog
 
             /** dog */
             @doc("dog")
             #suppress "dog"
-            "dog",
+            dog: "dog",
 
             // end
           }

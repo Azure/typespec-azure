@@ -48,7 +48,7 @@ function createEnumToExtensibleUnionCodeFix(en: Enum): CodeFix {
                 ? node.value.value
                 : `"${node.value.value}"`
             }`
-          : `"${node.id.sv}"`;
+          : `${node.id.sv}: "${node.id.sv}"`;
     }
   }
 
