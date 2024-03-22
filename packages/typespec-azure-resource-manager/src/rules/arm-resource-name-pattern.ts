@@ -8,7 +8,6 @@ import {
   getSourceLocation,
 } from "@typespec/compiler";
 
-import { isWhiteSpace } from "../../../../core/packages/compiler/src/core/charcode.js";
 import { getArmResources } from "../resource.js";
 
 // TODO: Replace this with a reusable implementation from the compiler package when implemented.
@@ -31,7 +30,7 @@ function findLineStartAndIndent(location: SourceLocation): { lineStart: number; 
   let pos = location.pos;
   let indent = 0;
   while (pos > 0 && text[pos - 1] !== "\n") {
-    if (isWhiteSpace(text.charCodeAt(pos - 1))) {
+    if ([" ", "\t", "\n"].includes(text[pos - 1])) {
       indent++;
     } else {
       indent = 0;
