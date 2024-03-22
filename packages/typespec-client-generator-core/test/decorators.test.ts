@@ -2249,22 +2249,34 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("patch usage", async () => {
-      const { Fish } = (await runner.compile(`
+      const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
         @service({})
         @test namespace MyService {
           @test
-          model Fish {
+          model PatchModel {
             age: int32;
           }
 
-          @patch
-          op putModel(@body body: Fish): void;
-        }
-      `)) as { Fish: Model };
+          @test
+          model JsonMergePatchModel {
+            prop: string
+          }
 
-      const usage = getUsage(runner.context, Fish);
-      strictEqual(usage, UsageFlags.Patch);
-      strictEqual(usage & UsageFlags.Input, 0);
+          @patch
+          @route("/patch")
+          op patchModel(@body body: PatchModel): void;
+
+          @patch
+          @route("/jsonMergePatch")
+          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/json-merge-patch"): void;
+        }
+      `)) as { PatchModel: Model; JsonMergePatchModel: Model };
+
+      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
+      strictEqual(
+        getUsage(runner.context, JsonMergePatchModel),
+        UsageFlags.JsonMergePatch | UsageFlags.Input
+      );
     });
   });
 
