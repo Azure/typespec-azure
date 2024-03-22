@@ -31,8 +31,7 @@ using Azure.Core;
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
-@fixed
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @doc("Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context in producing autocomplete terms.")
 enum AutocompleteMode {
   @doc("Only one term is suggested. If the query has two terms, only the last term is completed. For example, if the input is 'washington medic', the suggested terms could include 'medicaid', 'medicare', and 'medicine'.")
@@ -46,7 +45,9 @@ enum AutocompleteMode {
 }
 
 @doc("This parameter is only valid if the query type is 'semantic'. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character '|' followed by the 'count-<number of answers>' option after the answers parameter value, such as 'extractive|count-3'. Default count is 1.")
-enum QueryAnswerType {
+union QueryAnswerType {
+  string,
+
   @doc("Do not return answers for the query.")
   None: "none",
 
@@ -55,7 +56,9 @@ enum QueryAnswerType {
 }
 
 @doc("This parameter is only valid if the query type is 'semantic'. If set, the query returns captions extracted from key passages in the highest ranked documents. When s is set to 'extractive', highlighting is enabled by default, and can be configured by appending the pipe character '|' followed by the 'highlight-<true/false>' option, such as 'extractive|highlight-true'. Defaults to 'None'.")
-enum QueryCaptionType {
+union QueryCaptionType {
+  string,
+
   @doc("Do not return captions for the query.")
   None: "none",
 
@@ -64,7 +67,9 @@ enum QueryCaptionType {
 }
 
 @doc("The language of the query.")
-enum QueryLanguage {
+union QueryLanguage {
+  string,
+
   @doc("Query language not specified.")
   None: "none",
 
@@ -283,7 +288,9 @@ enum QueryLanguage {
 }
 
 @doc("Improve search recall by spell-correcting individual search query terms.")
-enum QuerySpellerType {
+union QuerySpellerType {
+  string,
+
   @doc("Speller not enabled.")
   None: "none",
 
@@ -291,8 +298,7 @@ enum QuerySpellerType {
   Lexicon: "lexicon",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
-@fixed
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @doc("Specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax and 'semantic' if query syntax is not needed.")
 enum QueryType {
   @doc("Uses the simple query syntax for searches. Search text is interpreted using a simple query language that allows for symbols such as +, * and \"\". Queries are evaluated across all searchable fields by default, unless the searchFields parameter is specified.")
@@ -305,8 +311,7 @@ enum QueryType {
   Semantic: "semantic",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
-@fixed
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @doc("Index action type")
 enum IndexActionType {
   @doc("Inserts the document into the index if it is new and updates it if it exists. All fields are replaced in the update case.")
@@ -322,8 +327,7 @@ enum IndexActionType {
   Delete: "delete",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
-@fixed
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @doc("Specifies whether any or all of the search terms must be matched in order to count the document as a match.")
 enum SearchMode {
   @doc("Any of the search terms must be matched in order to count the document as a match.")
@@ -333,8 +337,7 @@ enum SearchMode {
   All: "all",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
-@fixed
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @doc("A value that specifies whether we want to calculate scoring statistics (such as document frequency) globally for more consistent scoring, or locally, for lower latency. The default is 'local'. Use 'global' to aggregate scoring statistics globally before scoring. Using global scoring statistics can increase latency of search queries.")
 enum ScoringStatistics {
   @doc("The scoring statistics will be calculated locally for lower latency.")

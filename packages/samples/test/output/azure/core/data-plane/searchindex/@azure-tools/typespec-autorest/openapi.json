@@ -151,7 +151,7 @@
             ],
             "x-ms-enum": {
               "name": "QueryType",
-              "modelAsString": false,
+              "modelAsString": true,
               "values": [
                 {
                   "name": "Simple",
@@ -721,7 +721,7 @@
             ],
             "x-ms-enum": {
               "name": "SearchMode",
-              "modelAsString": false,
+              "modelAsString": true,
               "values": [
                 {
                   "name": "Any",
@@ -748,7 +748,7 @@
             ],
             "x-ms-enum": {
               "name": "ScoringStatistics",
-              "modelAsString": false,
+              "modelAsString": true,
               "values": [
                 {
                   "name": "Local",
@@ -925,7 +925,7 @@
             ],
             "x-ms-enum": {
               "name": "AutocompleteMode",
-              "modelAsString": false,
+              "modelAsString": true,
               "values": [
                 {
                   "name": "OneTerm",
@@ -1420,7 +1420,7 @@
       ],
       "x-ms-enum": {
         "name": "AutocompleteMode",
-        "modelAsString": false,
+        "modelAsString": true,
         "values": [
           {
             "name": "OneTerm",
@@ -1571,7 +1571,7 @@
       ],
       "x-ms-enum": {
         "name": "IndexActionType",
-        "modelAsString": false,
+        "modelAsString": true,
         "values": [
           {
             "name": "Upload",
@@ -2192,7 +2192,7 @@
       ],
       "x-ms-enum": {
         "name": "QueryType",
-        "modelAsString": false,
+        "modelAsString": true,
         "values": [
           {
             "name": "Simple",
@@ -2221,7 +2221,7 @@
       ],
       "x-ms-enum": {
         "name": "ScoringStatistics",
-        "modelAsString": false,
+        "modelAsString": true,
         "values": [
           {
             "name": "Local",
@@ -2340,7 +2340,7 @@
       ],
       "x-ms-enum": {
         "name": "SearchMode",
-        "modelAsString": false,
+        "modelAsString": true,
         "values": [
           {
             "name": "Any",
