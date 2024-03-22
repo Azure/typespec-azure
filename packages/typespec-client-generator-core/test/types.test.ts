@@ -819,7 +819,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.isFixed, true);
       strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
       strictEqual(sdkType.valueType.kind, "string");
-      strictEqual(sdkType.usage & UsageFlags.Versioning, 0); // not a versioning enum
+      strictEqual(sdkType.usage & UsageFlags.ApiVersionEnum, 0); // not a versioning enum
       strictEqual(sdkType.isUnionAsEnum, false);
       const values = sdkType.values;
       strictEqual(values.length, 7);
@@ -1430,7 +1430,7 @@ describe("typespec-client-generator-core: types", () => {
       const enums = runner.context.experimental_sdkPackage.enums;
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
-      strictEqual(enums[0].usage, UsageFlags.Versioning);
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     });
   });
 
