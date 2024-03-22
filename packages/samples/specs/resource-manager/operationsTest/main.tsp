@@ -172,9 +172,10 @@ interface ExtensionChildOperations extends ProxyResourceOperations<TestExtension
 
 @Azure.Core.lroStatus
 @doc("The set of provisioning state values")
-enum EnvelopeProvisioningState {
-  ...ResourceProvisioningState,
+union EnvelopeProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Working")
-  Working,
+  Working: "Working",
 }

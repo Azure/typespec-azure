@@ -32,6 +32,7 @@ using TypeSpec.Http;
 using TypeSpec.OpenAPI;
 
 #suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
+@fixed
 @doc("Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context in producing autocomplete terms.")
 enum AutocompleteMode {
   @doc("Only one term is suggested. If the query has two terms, only the last term is completed. For example, if the input is 'washington medic', the suggested terms could include 'medicaid', 'medicare', and 'medicine'.")
@@ -299,6 +300,7 @@ union QuerySpellerType {
 }
 
 #suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
+@fixed
 @doc("Specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax and 'semantic' if query syntax is not needed.")
 enum QueryType {
   @doc("Uses the simple query syntax for searches. Search text is interpreted using a simple query language that allows for symbols such as +, * and \"\". Queries are evaluated across all searchable fields by default, unless the searchFields parameter is specified.")
@@ -312,6 +314,7 @@ enum QueryType {
 }
 
 #suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
+@fixed
 @doc("Index action type")
 enum IndexActionType {
   @doc("Inserts the document into the index if it is new and updates it if it exists. All fields are replaced in the update case.")
@@ -328,6 +331,7 @@ enum IndexActionType {
 }
 
 #suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
+@fixed
 @doc("Specifies whether any or all of the search terms must be matched in order to count the document as a match.")
 enum SearchMode {
   @doc("Any of the search terms must be matched in order to count the document as a match.")
@@ -338,6 +342,7 @@ enum SearchMode {
 }
 
 #suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
+@fixed
 @doc("A value that specifies whether we want to calculate scoring statistics (such as document frequency) globally for more consistent scoring, or locally, for lower latency. The default is 'local'. Use 'global' to aggregate scoring statistics globally before scoring. Using global scoring statistics can increase latency of search queries.")
 enum ScoringStatistics {
   @doc("The scoring statistics will be calculated locally for lower latency.")
