@@ -54,11 +54,7 @@ import {
   getDocHelper,
   getHashForType,
   isAcceptHeader,
-<<<<<<< HEAD
-=======
   isNullable,
-  updateWithApiVersionInformation,
->>>>>>> e004ce95f2b624b37c207f04e447bd77af63ab6a
 } from "./internal-utils.js";
 import {
   getClientNamespaceString,
