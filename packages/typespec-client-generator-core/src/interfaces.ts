@@ -534,6 +534,6 @@ export enum UsageFlags {
   None = 0,
   Input = 1 << 1,
   Output = 1 << 2,
-  Versioning = 1 << 3,
+  ApiVersionEnum = 1 << 3,
   JsonMergePatch = 1 << 4,
 }
