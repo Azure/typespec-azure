@@ -33,6 +33,7 @@ export interface SdkEmitterOptions {
   "generate-convenience-methods"?: boolean;
   "filter-out-core-models"?: boolean;
   "package-name"?: string;
+  "flatten-union-as-enum"?: boolean;
 }
 
 export interface SdkClient {
@@ -239,6 +240,7 @@ export interface SdkEnumType extends SdkTypeBase {
   access?: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  isUnionAsEnum: boolean;
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
