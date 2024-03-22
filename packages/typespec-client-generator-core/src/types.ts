@@ -1338,14 +1338,18 @@ function updateTypesFromOperation(
       });
     }
   }
-  if (httpOperation.parameters.body) {
-    const bodies = diagnostics.pipe(
-      checkAndGetClientType(context, httpOperation.parameters.body.type, operation)
-    );
+  const httpBody = httpOperation.parameters.body;
+  if (httpBody) {
+    const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
+      if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        bodies.forEach((body) => {
+          updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
+        });
+      }
     }
   }
   for (const response of httpOperation.responses) {
@@ -1533,7 +1537,7 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+      updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }
   // update access
