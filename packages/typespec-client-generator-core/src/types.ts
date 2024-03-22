@@ -1338,14 +1338,18 @@ function updateTypesFromOperation(
       });
     }
   }
-  if (httpOperation.parameters.body) {
-    const bodies = diagnostics.pipe(
-      checkAndGetClientType(context, httpOperation.parameters.body.type, operation)
-    );
+  const httpBody = httpOperation.parameters.body;
+  if (httpBody) {
+    const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
+      if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        bodies.forEach((body) => {
+          updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
+        });
+      }
     }
   }
   for (const response of httpOperation.responses) {
