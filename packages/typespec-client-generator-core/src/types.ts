@@ -1459,7 +1459,7 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+      updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }
   // update access
