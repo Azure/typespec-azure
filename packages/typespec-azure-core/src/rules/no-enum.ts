@@ -23,9 +23,11 @@ export const noEnumRule = createRule({
   create(context) {
     return {
       enum: (en: Enum) => {
-        if (getVersionsForEnum(context.program, en).length > 0) {
+        const [_, versions] = getVersionsForEnum(context.program, en);
+        if (versions !== undefined && versions.getVersions()[0].enumMember.enum === en) {
           return;
         }
+
         context.reportDiagnostic({
           format: { enumName: en.name },
           target: en,
@@ -48,7 +50,7 @@ function createEnumToExtensibleUnionCodeFix(en: Enum): CodeFix {
                 ? node.value.value
                 : `"${node.value.value}"`
             }`
-          : `"${node.id.sv}"`;
+          : `${node.id.sv}: "${node.id.sv}"`;
     }
   }
 
@@ -131,7 +133,7 @@ function getNodeAnnotations(node: Node): string {
   }
 
   for (let i = endOfTrivia; i < node.end; i++) {
-    if (source[i] === " ") {
+    if (source[i] === " " || source[i] === "\n") {
       endOfTrivia = i + 1;
     } else {
       break;

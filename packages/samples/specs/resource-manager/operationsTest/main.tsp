@@ -17,7 +17,7 @@ using Azure.ResourceManager;
   version: "2022-11-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@useDependency(Azure.Core.Versions.v1_0_Preview_1)
+@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @armProviderNamespace
 namespace Microsoft.OperationsTest;
 
