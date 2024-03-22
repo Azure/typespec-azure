@@ -272,6 +272,9 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isFormDataType: boolean;
+  /**
+   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
+   */
   isError: boolean;
   generatedName: boolean;
   description?: string;
