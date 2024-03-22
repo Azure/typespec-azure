@@ -43,7 +43,6 @@ model ApiKey {
 
 @doc("Collection of error types")
 model Errors {
-  @projectedName("csharp", "ErrorItems")
   @doc("The error list.")
   errors: Azure.Core.Foundations.Error[];
 }

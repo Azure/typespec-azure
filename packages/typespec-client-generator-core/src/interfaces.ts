@@ -25,7 +25,7 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  __clients?: Map<string, SdkClientType<TServiceOperation>>;
+  __clients?: SdkClientType<TServiceOperation>[];
 }
 
 export interface SdkEmitterOptions {
@@ -72,6 +72,10 @@ export interface SdkOperationGroup {
 interface SdkTypeBase {
   __raw?: Type;
   kind: string;
+  /**
+   * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
+   * https://github.com/Azure/typespec-azure/issues/448
+   */
   nullable: boolean;
   deprecation?: string;
 }
@@ -207,6 +211,7 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -218,12 +223,13 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
-  generatedName?: string;
+  generatedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -252,8 +258,8 @@ export interface SdkConstantType extends SdkTypeBase {
 }
 
 export interface SdkUnionType extends SdkTypeBase {
-  name?: string;
-  generatedName?: string;
+  name: string;
+  generatedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -266,7 +272,7 @@ export interface SdkModelType extends SdkTypeBase {
   name: string;
   isFormDataType: boolean;
   isError: boolean;
-  generatedName?: string;
+  generatedName: boolean;
   description?: string;
   details?: string;
   access?: AccessFlags;
@@ -274,6 +280,7 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
@@ -287,7 +294,12 @@ export interface SdkCredentialType extends SdkTypeBase {
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
+  /**
+   * @deprecated This property is deprecated. Use `.name` instead.
+   * https://github.com/Azure/typespec-azure/issues/446
+   */
   nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];
@@ -295,6 +307,7 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  nullable: boolean;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
@@ -373,17 +386,20 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
+  nullable: boolean;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
+  nullable: boolean;
 }
 
 export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
+  nullable: boolean;
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {

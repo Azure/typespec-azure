@@ -15,30 +15,28 @@ jobs:
     strategy:
       matrix:
         # Node 18
-        "Linux - Node 18.x - Dotnet 6":
+        "Linux - Node 18.x":
           pool: azsdk-pool-mms-ubuntu-2004-general
           imageName: ubuntu-20.04
-          nodeVersion: "18.x"
-          dotnetVersion: 6.0.x
-
-        "Windows - Node 18.x - Dotnet 6":
+          nodeVersion: 18.x
+          dotnetVersion: 8.0.x
+        "Windows - Node 18.x":
           pool: azsdk-pool-mms-win-2022-general
           imageName: windows-2022
-          nodeVersion: "18.x"
-          dotnetVersion: 6.0.x
+          nodeVersion: 18.x
+          dotnetVersion: 8.0.x
 
         # Node 20
         "Linux - Node 20.x":
           pool: azsdk-pool-mms-ubuntu-2004-general
           imageName: ubuntu-20.04
-          nodeVersion: "20.x"
-          dotnetVersion: 6.0.x
-
+          nodeVersion: 20.x
+          dotnetVersion: 8.0.x
         "Windows - Node 20.x":
           pool: azsdk-pool-mms-win-2022-general
           imageName: windows-2022
-          nodeVersion: "20.x"
-          dotnetVersion: 6.0.x
+          nodeVersion: 20.x
+          dotnetVersion: 8.0.x
 
     pool:
       name: $(pool)
