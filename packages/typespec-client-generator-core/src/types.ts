@@ -1,9 +1,4 @@
-import {
-  UnionEnum,
-  getLroMetadata,
-  getUnionAsEnum,
-  isFixed,
-} from "@azure-tools/typespec-azure-core";
+import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   BytesKnownEncoding,
@@ -654,7 +649,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       details: docWrapper.details,
       valueType: getSdkEnumValueType(context, type.members.values()),
       values: [],
-      isFixed: isFixed(context.program, type),
+      isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
