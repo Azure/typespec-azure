@@ -904,6 +904,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
       strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.nullable, false);
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 0);
@@ -922,6 +923,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(pathParam.isApiVersionParam, false);
       strictEqual(pathParam.type.kind, "string");
       strictEqual(pathParam.urlEncode, true);
+      strictEqual(pathParam.nullable, false);
       strictEqual(method.response.kind, "method");
       strictEqual(method.response.type, undefined);
 
@@ -930,6 +932,23 @@ describe("typespec-client-generator-core: package", () => {
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(pathParam.name, correspondingMethodParams[0].name);
+    });
+
+    it("path basic with null", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service({})
+      namespace My.Service;
+
+      op myOp(@path path: string | null): void;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      const methodParam = method.parameters[0];
+      strictEqual(methodParam.nullable, true);
+
+      const serviceOperation = method.operation;
+      const pathParam = serviceOperation.parameters[0];
+      strictEqual(pathParam.nullable, true);
     });
 
     it("header basic", async () => {
@@ -954,6 +973,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
       strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.nullable, false);
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 0);
@@ -972,12 +992,30 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParam.isApiVersionParam, false);
       strictEqual(headerParam.type.kind, "string");
       strictEqual(headerParam.collectionFormat, undefined);
+      strictEqual(headerParam.nullable, false);
 
       const correspondingMethodParams = method.getParameterMapping(headerParam);
       strictEqual(correspondingMethodParams.length, 1);
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(headerParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(headerParam.name, correspondingMethodParams[0].name);
+    });
+
+    it("header basic with null", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service({})
+      namespace My.Service;
+
+      op myOp(@header header: string | null): void;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      const methodParam = method.parameters[0];
+      strictEqual(methodParam.nullable, true);
+
+      const serviceOperation = method.operation;
+      const headerParam = serviceOperation.parameters[0];
+      strictEqual(headerParam.nullable, true);
     });
 
     it("header collection format", async () => {
@@ -1019,6 +1057,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
       strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.nullable, false);
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 0);
@@ -1036,12 +1075,30 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(queryParam.isApiVersionParam, false);
       strictEqual(queryParam.type.kind, "string");
       strictEqual(queryParam.collectionFormat, undefined);
+      strictEqual(queryParam.nullable, false);
 
       const correspondingMethodParams = method.getParameterMapping(queryParam);
       strictEqual(correspondingMethodParams.length, 1);
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(queryParam.name, correspondingMethodParams[0].name);
+    });
+
+    it("query basic with null", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service({})
+      namespace My.Service;
+
+      op myOp(@query query: string | null): void;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      const methodParam = method.parameters[0];
+      strictEqual(methodParam.nullable, true);
+
+      const serviceOperation = method.operation;
+      const queryParam = serviceOperation.parameters[0];
+      strictEqual(queryParam.nullable, true);
     });
 
     it("query collection format", async () => {
@@ -1087,6 +1144,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodBodyParam.onClient, false);
       strictEqual(methodBodyParam.isApiVersionParam, false);
       strictEqual(methodBodyParam.type, sdkPackage.models[0]);
+      strictEqual(methodBodyParam.nullable, false);
 
       const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(methodContentTypeParam);
@@ -1104,6 +1162,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.nullable, false);
 
       const correspondingMethodParams = method.getParameterMapping(bodyParameter);
       strictEqual(correspondingMethodParams.length, 1);
@@ -1124,6 +1183,28 @@ describe("typespec-client-generator-core: package", () => {
       const correspondingContentTypeMethodParams = method.getParameterMapping(contentTypeParam);
       strictEqual(correspondingContentTypeMethodParams.length, 1);
       strictEqual(correspondingContentTypeMethodParams[0], methodContentTypeParam);
+    });
+
+    it("body basic with null", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+
+        model Input {
+          key: string;
+        }
+
+        op myOp(@body body: Input | null): void;
+        `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      const methodBodyParam = method.parameters.find((x) => x.name === "body");
+      ok(methodBodyParam);
+      strictEqual(methodBodyParam.nullable, true);
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParams[0];
+      strictEqual(bodyParameter.nullable, true);
     });
 
     it("body optional", async () => {
@@ -1704,6 +1785,8 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(createResponse.headers.length, 1);
       strictEqual(createResponse.headers[0].serializedName, "id");
+      strictEqual(createResponse.headers[0].nullable, false);
+      strictEqual(createResponse.nullable, false);
       strictEqual(
         createResponse.type,
         sdkPackage.models.find((x) => x.name === "Widget")
@@ -1711,6 +1794,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.getResponseMapping(), undefined);
 
       strictEqual(method.response.kind, "method");
+      strictEqual(method.response.nullable, false);
       const methodResponseType = method.response.type;
       ok(methodResponseType);
       strictEqual(
@@ -1720,6 +1804,51 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponseType.properties.length, 2);
       strictEqual(methodResponseType.properties.filter((x) => x.kind === "header").length, 1);
     });
+
+    it("Headers and body with null", async () => {
+      await runner.compileWithBuiltInService(
+        `
+      model Widget {
+        weight: int32;
+      }
+
+      op operation(): {@header id: string | null, @body body: Widget | null};
+      `
+      );
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      const serviceResponses = method.operation.responses;
+
+      const createResponse = serviceResponses[200];
+      strictEqual(createResponse.headers[0].nullable, true);
+      strictEqual(createResponse.nullable, true);
+
+      strictEqual(method.response.nullable, true);
+    });
+
+    it("OkResponse with NoContentResponse", async () => {
+      await runner.compileWithBuiltInService(
+        `
+      model Widget {
+        weight: int32;
+      }
+
+      op operation(): Widget | NoContentResponse;
+      `
+      );
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      const serviceResponses = method.operation.responses;
+
+      const okResponse = serviceResponses[200];
+      strictEqual(okResponse.nullable, false);
+
+      const noContentResponse = serviceResponses[204];
+      strictEqual(noContentResponse.nullable, true);
+
+      strictEqual(method.response.nullable, true);
+    });
+
     it("NoContentResponse", async () => {
       await runner.compileWithBuiltInService(
         `
@@ -1730,6 +1859,7 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "delete");
+      strictEqual(method.response.nullable, true);
       const serviceResponses = method.operation.responses;
       strictEqual(Object.keys(serviceResponses).length, 1);
 
@@ -1737,6 +1867,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
       strictEqual(voidResponse.headers.length, 0);
+      strictEqual(voidResponse.nullable, true);
 
       strictEqual(method.response.type, undefined);
       strictEqual(method.getResponseMapping(), undefined);

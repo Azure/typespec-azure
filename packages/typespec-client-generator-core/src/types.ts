@@ -33,7 +33,6 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
-  isNullType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -91,11 +90,13 @@ import {
   createGeneratedName,
   getAvailableApiVersions,
   getDocHelper,
+  getNonNullOptions,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
   isHttpOperation,
   isMultipartOperation,
+  isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -292,11 +293,13 @@ export function getSdkArrayOrDictWithDiagnostics(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
           valueType,
+          nullableValues: isNullable(type.indexer.value!),
         });
       } else if (name === "integer") {
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
+          nullableValues: isNullable(type.indexer.value!),
         });
       }
     }
@@ -326,10 +329,6 @@ export function getSdkTupleWithDiagnostics(
   });
 }
 
-function getNonNullOptions(type: Union): Type[] {
-  return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
-}
-
 export function getSdkUnion(context: TCGCContext, type: Union, operation?: Operation): SdkType {
   return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
 }
@@ -351,7 +350,8 @@ export function getSdkUnionWithDiagnostics(
     const clientType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
-    clientType.nullable = true;
+    // eslint-disable-next-line deprecation/deprecation
+    clientType.nullable = isNullable(type);
     clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }
@@ -368,7 +368,7 @@ export function getSdkUnionWithDiagnostics(
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
-    nullable: nonNullOptions.length < type.variants.size,
+    nullable: isNullable(type),
   });
 }
 
@@ -483,6 +483,7 @@ function addDiscriminatorToModelType(
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
+      nullable: false,
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -946,6 +947,7 @@ export function getSdkCredentialParameter(
     onClient: true,
     optional: false,
     isApiVersionParam: false,
+    nullable: false,
   };
 }
 
@@ -983,6 +985,7 @@ export function getSdkModelPropertyType(
     name,
     onClient: false,
     optional: type.optional,
+    nullable: isNullable(type.type),
   };
   const program = context.program;
   const headerQueryOptions = {
