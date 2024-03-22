@@ -34,6 +34,6 @@ namespace Azure.ResourceManager;
 @doc("Supported versions of Azure.ResourceManager building blocks.")
 enum Versions {
   @doc("Version 1.0-preview.1")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v1_0_Preview_1: "1.0-preview.1",
 }
