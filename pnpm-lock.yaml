@@ -1703,6 +1703,72 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(@types/node@18.11.19)(@vitest/ui@1.4.0)
 
+  packages/typespec-autorest-canonical:
+    devDependencies:
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:~
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:~
+        version: link:../typespec-client-generator-core
+      '@types/node':
+        specifier: ~18.11.19
+        version: 18.11.19
+      '@typespec/compiler':
+        specifier: workspace:~
+        version: link:../../core/packages/compiler
+      '@typespec/eslint-config-typespec':
+        specifier: workspace:~
+        version: link:../../core/packages/eslint-config-typespec
+      '@typespec/eslint-plugin':
+        specifier: workspace:~
+        version: link:../../core/packages/eslint-plugin-typespec
+      '@typespec/http':
+        specifier: workspace:~
+        version: link:../../core/packages/http
+      '@typespec/json-schema':
+        specifier: workspace:~
+        version: link:../../core/packages/json-schema
+      '@typespec/library-linter':
+        specifier: workspace:~
+        version: link:../../core/packages/library-linter
+      '@typespec/openapi':
+        specifier: workspace:~
+        version: link:../../core/packages/openapi
+      '@typespec/rest':
+        specifier: workspace:~
+        version: link:../../core/packages/rest
+      '@typespec/tspd':
+        specifier: workspace:~
+        version: link:../../core/packages/tspd
+      '@typespec/versioning':
+        specifier: workspace:~
+        version: link:../../core/packages/versioning
+      '@vitest/coverage-v8':
+        specifier: ^1.4.0
+        version: 1.4.0(vitest@1.4.0)
+      '@vitest/ui':
+        specifier: ^1.4.0
+        version: 1.4.0(vitest@1.4.0)
+      c8:
+        specifier: ^9.1.0
+        version: 9.1.0
+      change-case:
+        specifier: ~5.4.3
+        version: 5.4.3
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      rimraf:
+        specifier: ~5.0.5
+        version: 5.0.5
+      typescript:
+        specifier: ~5.4.2
+        version: 5.4.2
+      vitest:
+        specifier: ^1.4.0
+        version: 1.4.0(@types/node@18.11.19)(@vitest/ui@1.4.0)
+
   packages/typespec-azure-core:
     devDependencies:
       '@types/node':

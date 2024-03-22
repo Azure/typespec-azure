@@ -70,10 +70,13 @@ import {
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
+  SdkEndpointParameter,
+  SdkEndpointType,
   SdkEnumType,
   SdkEnumValueType,
   SdkModelPropertyType,
   SdkModelType,
+  SdkPathParameter,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -996,10 +999,18 @@ export function getSdkModelPropertyType(
       optional: type.optional,
     });
   } else if (isPathParam(program, type) || options.isEndpointParam) {
+    // we don't url encode if the type can be assigned to url
+    const urlEncode = !ignoreDiagnostics(
+      program.checker.isTypeAssignableTo(
+        type.type.projectionBase ?? type.type,
+        program.checker.getStdType("url"),
+        type.type
+      )
+    );
     return diagnostics.wrap({
       ...base,
       kind: "path",
-      urlEncode: true,
+      urlEncode,
       serializedName: getPathParamName(program, type),
       ...updateWithApiVersionInformation(context, type),
       optional: false,
@@ -1060,6 +1071,69 @@ export function getSdkModelPropertyType(
       ...updateWithApiVersionInformation(context, type),
     });
   }
+}
+
+export function getSdkEndpointParameter(
+  context: TCGCContext,
+  client: SdkClient
+): [SdkEndpointParameter, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const servers = getServers(context.program, client.service);
+  let type: SdkEndpointType;
+  let optional: boolean = false;
+  if (servers === undefined || servers.length > 1) {
+    // if there is no defined server url, or if there are more than one
+    // we will return a mandatory endpoint parameter in initialization
+    type = {
+      kind: "endpoint",
+      nullable: false,
+      templateArguments: [],
+    };
+  } else {
+    // this means we have one server
+    const templateArguments: SdkPathParameter[] = [];
+    type = {
+      kind: "endpoint",
+      nullable: false,
+      serverUrl: servers[0].url,
+      templateArguments,
+    };
+    for (const param of servers[0].parameters.values()) {
+      const sdkParam = diagnostics.pipe(
+        getSdkModelPropertyType(context, param, { isEndpointParam: true })
+      );
+      if (sdkParam.kind === "path") {
+        templateArguments.push(sdkParam);
+        sdkParam.description = sdkParam.description ?? servers[0].description;
+        sdkParam.onClient = true;
+      } else {
+        diagnostics.add(
+          createDiagnostic({
+            code: "server-param-not-path",
+            target: param,
+            format: {
+              templateArgumentName: sdkParam.name,
+              templateArgumentType: sdkParam.kind,
+            },
+          })
+        );
+      }
+    }
+    optional = !!servers[0].url.length && templateArguments.every((param) => param.optional);
+  }
+  return diagnostics.wrap({
+    kind: "endpoint",
+    type,
+    nameInClient: "endpoint",
+    name: "endpoint",
+    description: "Service host",
+    onClient: true,
+    urlEncode: false,
+    apiVersions: getAvailableApiVersions(context, client.service),
+    optional,
+    isApiVersionParam: false,
+    nullable: false,
+  });
 }
 
 function addPropertiesToModelType(
@@ -1459,7 +1533,7 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+      updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }
   // update access
