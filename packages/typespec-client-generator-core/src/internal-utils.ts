@@ -287,7 +287,7 @@ export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>)
 export function isNullable(type: Type | SdkServiceOperation): boolean {
   if (type.kind === "Union") {
     if (getNonNullOptions(type).length < type.variants.size) return true;
-    return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
+    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
   }
   if (type.kind === "http") {
     return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
@@ -310,10 +310,10 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
   const httpBody = operation
     ? getHttpOperationWithCache(context, operation).parameters.body
     : undefined;
-  return (
-    !!httpBody &&
-    httpBody.type.kind === "Model" &&
-    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+  return Boolean(
+    httpBody &&
+      httpBody.type.kind === "Model" &&
+      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 
