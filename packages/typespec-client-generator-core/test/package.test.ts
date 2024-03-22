@@ -2056,9 +2056,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodParamColor.optional, false);
       strictEqual(methodParamColor.onClient, false);
       strictEqual(methodParamColor.isApiVersionParam, false);
-      strictEqual(methodParamColor.type.kind, "union");
-      ok(methodParamColor.type.values.filter((x) => x.kind === "constant" && x.value === "red"));
-      ok(methodParamColor.type.values.filter((x) => x.kind === "constant" && x.value === "blue"));
+      strictEqual(methodParamColor.type.kind, "enum");
+      strictEqual(methodParamColor.type.values[0].value, "red");
+      strictEqual(methodParamColor.type.values[0].valueType.kind, "string");
+      strictEqual(methodParamColor.type.values[1].value, "blue");
+      strictEqual(methodParamColor.type.values[1].valueType.kind, "string");
 
       const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(methodContentTypeParam);

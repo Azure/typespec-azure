@@ -10,7 +10,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkConstantType, SdkEmitterOptions } from "../src/interfaces.js";
+import { SdkEmitterOptions } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
   getDefaultApiVersion,
@@ -1132,14 +1132,14 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
-        strictEqual(statusProp.type.kind, "union");
+        strictEqual(statusProp.type.kind, "enum");
         strictEqual(statusProp.type.values.length, 2);
-        const startVal = statusProp.type.values.find((x) => (x as SdkConstantType).value === "start");
+        const startVal = statusProp.type.values.find((x) => x.name === "start");
         ok(startVal);
         strictEqual(startVal.kind, "enumvalue");
         strictEqual(startVal.valueType.kind, "string");
 
-        const stopVal = statusProp.type.values.find((x) => (x as SdkConstantType).value === "stop");
+        const stopVal = statusProp.type.values.find((x) => x.name === "stop");
         ok(stopVal);
         strictEqual(stopVal.kind, "enumvalue");
         strictEqual(stopVal.valueType.kind, "string");

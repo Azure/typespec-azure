@@ -233,6 +233,7 @@ export interface TCGCContext {
   generateConvenienceMethods?: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
+  flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;

@@ -7,9 +7,9 @@ This page documents what type definitions in TypeSpec are generated as in emitte
 
 ## Unions
 
-### Standard
+### Union of literals with same type
 
-For basic unions, all emitters will generate their version of a closed enum.
+All emitters will generate their version of a closed enum.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -22,9 +22,37 @@ union LR {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
 
-Python never generates closed enums by design. We will always permit users to pass in additional values.
+```json
+{
+  "kind": "enum",
+  "name": "LR",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python never generates closed enum by design. We will always permit users to pass in additional values.
 
 ```python
 from enum import Enum
@@ -45,6 +73,7 @@ public enum LR
   Right
 }
 ```
+
 Serialization/deserialization will respect the value defined, in this case it is "left" for `LR.Left` and "right" for `LR.Right` respectively.
 
 </TabItem>
@@ -67,9 +96,9 @@ public enum LR {
 </TabItem>
 </Tabs>
 
-### Standard Inline
+### Inline union of literals with same type
 
-These are unions defined inline at point of usage.
+This is union defined inline at point of usage.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -81,17 +110,43 @@ model Widget {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
 
-Python generates inline unions as a union of literals, not as enums. We also don't generate a closed set of literals
+```json
+{
+  "kind": "enum",
+  "name": "WidgetHorizontals",
+  "generatedName": true,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates this as a union of literals, not as enum. We also don't generate a closed set of literals.
 
 ```python
-from typing import Literal
-
-type WidgetHorizontal = Literal["left"] | Literal["right"] | str
+from typing import Literal, Union
 
 model Widget:
-  horizontal: WidgetHorizontal
+  horizontal: Union[Literal["left"] | Literal["right"] | str]
 ```
 
 </TabItem>
@@ -114,7 +169,7 @@ public enum WidgetHorizontal
 
 ```typescript
 export interface Widget {
-    "horizontal": "left" | "right";
+  horizontal: "left" | "right";
 }
 ```
 
@@ -131,9 +186,9 @@ public enum WidgetHorizontal {
 </TabItem>
 </Tabs>
 
-### Unioned with Base Type
+### Union of basic type and literals of that type
 
-For unions that include the shared base type of entries, each language will generate their version of an open enum.
+Each language will generate their version of an open enum.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -147,9 +202,37 @@ union Colors {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
 
-Python generates our open enums again here.
+```json
+{
+  "kind": "enum",
+  "name": "Colors",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "red",
+      "value": "red"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "blue",
+      "value": "blue"
+    }
+  ],
+  "isFixed": false,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates open enum again here.
 
 ```python
 from enum import Enum
@@ -193,9 +276,9 @@ public final class Colors extends ExpandableStringEnum<Colors> {
 </TabItem>
 </Tabs>
 
-### Unioned with Base Type Inline
+### Inline union of basic type and literals of that type
 
-These are unions defined inline at point of usage which include the base type as an option.
+This is union defined inline at point of usage which include the base type as an option.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -207,18 +290,44 @@ model Widget {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "WidgetColors",
+  "generatedName": true,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "red",
+      "value": "red"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "blue",
+      "value": "blue"
+    }
+  ],
+  "isFixed": false,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
 
 Python generates a union of literals again. Since we always generate our typing as open, this will
 look the same as our previous example where we generate an open union of strings.
 
 ```python
-from typing import Literal
-
-type WidgetColor = Literal["red"] | Literal["blue"] | str
+from typing import Literal, Union
 
 model Widget:
-  color: WidgetColor
+  color: Union[Literal["red"] | Literal["blue"] | str]
 ```
 
 </TabItem>
@@ -243,7 +352,7 @@ public readonly partial struct WidgetColor : IEquatable<WidgetColor>
 
 ```typescript
 export interface Widget {
-    "color": "red" | "blue" | string;
+  color: "red" | "blue" | string;
 }
 ```
 
@@ -260,9 +369,7 @@ public final class WidgetColor extends ExpandableStringEnum<Colors> {
 </TabItem>
 </Tabs>
 
-### Extending unions
-
-For unions that include the shared base type of entries, each language will generate their version of an open enum.
+### Union of other union/enum, basic type and literals of that type
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -272,13 +379,101 @@ import "@azure-tools/typespec-azure-resource-manager";
 
 union ProvisioningState {
   string,
-  inProgress: "inProgress",
+  "InProgress",
   Azure.ResourceManager.ResourceProvisioningState,
 }
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
+For union of other union or enum. TCGC will do the flatten according to the flag.
+
+With `flatten-union-as-enum` flagged `true`:
+```json
+{
+  "kind": "enum",
+  "name": "ProvisioningState",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "InProgress",
+      "value": "InProgress"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "Succeeded",
+      "value": "Succeeded"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "Failed",
+      "value": "Failed"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "Canceled",
+      "value": "Canceled"
+    }
+  ],
+  "isFixed": false,
+  "isUnionAsEnum": true,
+}
+
+With `flatten-union-as-enum` flagged `false`:
+
+```json
+{
+  "kind": "union",
+  "name": "ProvisioningState",
+  "generatedName": false,
+  "values": [
+    {
+      "kind": "string"
+    },
+    {
+      "kind": "constant",
+      "value": "InProgress",
+      "valueType": {
+        "kind": "string"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "ResourceProvisioningState",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "Succeeded",
+          "value": "Succeeded"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "Failed",
+          "value": "Failed"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "Canceled",
+          "value": "Canceled"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": false
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
 
 Python generates a single open enum.
 
@@ -335,9 +530,7 @@ public final class ProvisioningState extends ExpandableStringEnum<ProvisioningSt
 </TabItem>
 </Tabs>
 
-### Union of Unions
-
-These are unions of unions
+### Union of other unions of literals with same type
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -345,12 +538,12 @@ These are unions of unions
 ```typespec
 union LR {
   left: "left",
-  right: "right"
+  right: "right",
 }
 
 union UD {
   up: "up",
-  down: "down"
+  down: "down",
 }
 
 union Orientation {
@@ -360,9 +553,103 @@ union Orientation {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
+For union of other union or enum. TCGC will do the flatten according to the flag.
 
-Since 
+With `flatten-union-as-enum` flagged `true`:
+```json
+{
+  "kind": "enum",
+  "name": "Orientation",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "up",
+      "value": "up"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "down",
+      "value": "down"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true,
+}
+
+With `flatten-union-as-enum` flagged `false`:
+
+```json
+{
+  "kind": "union",
+  "name": "Orientation",
+  "generatedName": false,
+  "values": [
+    {
+      "kind": "enum",
+      "name": "LR",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "left",
+          "value": "left"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "right",
+          "value": "right"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    },
+    {
+      "kind": "enum",
+      "name": "UD",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "up",
+          "value": "up"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "down",
+          "value": "down"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
 ```python
 from enum import Enum
 from corehttp.utils import CaseInsensitiveEnumMeta
@@ -411,22 +698,20 @@ public enum Orientation {
 </TabItem>
 </Tabs>
 
-### Union of Unions Inline
-
-These are unions of unions
+### Inline union of other unions of literals with same type
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
 union LR {
-  left: "left"
-  right: "right"
+  left: "left",
+  right: "right",
 }
 
 union UD {
-  up: "up"
-  down: "down"
+  up: "up",
+  down: "down",
 }
 
 model Widget {
@@ -435,7 +720,102 @@ model Widget {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
+For union of other union or enum. TCGC will do the flatten according to the flag.
+
+With `flatten-union-as-enum` flagged `true`:
+```json
+{
+  "kind": "enum",
+  "name": "WidgetOrientations",
+  "generatedName": true,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "up",
+      "value": "up"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "down",
+      "value": "down"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true,
+}
+
+With `flatten-union-as-enum` flagged `false`:
+
+```json
+{
+  "kind": "union",
+  "name": "WidgetOrientations",
+  "generatedName": true,
+  "values": [
+    {
+      "kind": "enum",
+      "name": "LR",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "left",
+          "value": "left"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "right",
+          "value": "right"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    },
+    {
+      "kind": "enum",
+      "name": "UD",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "up",
+          "value": "up"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "down",
+          "value": "down"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
 
 Since this is inline, Python will generate this as a single union of all possible literal values.
 
@@ -470,7 +850,7 @@ public enum WidgetOrientation
 
 ```typescript
 export interface Widget {
-    "orientation": LR | UD;
+  orientation: LR | UD;
 }
 
 export type LR = "left" | "right";
@@ -492,10 +872,9 @@ public enum WidgetOrientation {
 </TabItem>
 </Tabs>
 
-### Union with Multiple Base Types
+### Union with multiple types
 
-These are unions where the values don't share base types. Languages will only generate an enum if the base type
-of all entries are shared, so languages will generate various kinds of unions here.
+These are unions where the values don't share same type.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -507,9 +886,53 @@ model Shirt {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
 
-Python will generate this as a union of literals since these entries don't share the same type
+```json
+{
+  "kind": "union",
+  "name": "ShirtSizings",
+  "generatedName": true,
+  "values": [
+    {
+      "kind": "constant",
+      "value": 32,
+      "valueType": {
+        "kind": "int32"
+      }
+    },
+    {
+      "kind": "constant",
+      "value": 34,
+      "valueType": {
+        "kind": "int32"
+      }
+    },
+    {
+      "kind": "constant",
+      "value": "small",
+      "valueType": {
+        "kind": "string"
+      }
+    },
+    {
+      "kind": "constant",
+      "value": "medium",
+      "valueType": {
+        "kind": "string"
+      }
+    },
+    {
+      "kind": "string"
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python will generate this as a union since these entries don't share the same type
 
 ```python
 from typing import Literal
@@ -535,7 +958,7 @@ public partial class Shirt
 
 ```typescript
 export interface Shirt {
-    "sizing": 32 | 34 | number | "small" | "medium" | string;
+  sizing: 32 | 34 | number | "small" | "medium" | string;
 }
 ```
 
@@ -551,7 +974,6 @@ public final class Shirt {
 </TabItem>
 </Tabs>
 
-
 ## Enums
 
 ### Standard
@@ -564,12 +986,40 @@ Standard enums will be generated as closed enums.
 ```typespec
 enum LR {
   left,
-  right
+  right,
 }
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "LR",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
 
 Python never generates closed enums by design. We will always permit users to pass in additional values.
 
@@ -626,6 +1076,35 @@ namespace My.Service;
 enum Versions {
   v1,
   v2,
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "Versions",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "v1",
+      "value": "v1"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "v2",
+      "value": "v2"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": false,
+  "usage": 8
 }
 ```
 
@@ -688,7 +1167,45 @@ enum Orientation {
 ```
 
 </TabItem>
-<TabItem value="" label="Python">
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "Orientation",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "up",
+      "value": "up"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "down",
+      "value": "down"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
 
 Python generates one open enum, because Python never generates an enum as fully closed.
 

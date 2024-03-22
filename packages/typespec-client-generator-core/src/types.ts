@@ -356,9 +356,19 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(clientType);
   }
 
-  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-  if (unionAsEnum && type.name) {
-    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  // judge if the union can be converted to enum
+  // if language does not need flatten union as enum
+  // need to filter the case that union is composed of union or enum
+  if (
+    context.flattenUnionAsEnum ||
+    ![...type.variants.values()].some((variant) => {
+      return variant.type.kind === "Union" || variant.type.kind === "Enum";
+    })
+  ) {
+    const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+    if (unionAsEnum) {
+      return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+    }
   }
 
   return diagnostics.wrap({
@@ -650,6 +660,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
+      isUnionAsEnum: false,
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -704,6 +715,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
       apiVersions: getAvailableApiVersions(context, type.union),
+      isUnionAsEnum: true,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -741,6 +753,7 @@ function getKnownValuesEnum(
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type),
+        isUnionAsEnum: false,
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
