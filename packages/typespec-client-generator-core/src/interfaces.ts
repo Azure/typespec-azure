@@ -57,8 +57,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
-  endpoint: string;
-  hasParameterizedEndpoint: boolean;
   arm: boolean;
 }
 
@@ -92,7 +90,8 @@ export type SdkType =
   | SdkConstantType
   | SdkUnionType
   | SdkModelType
-  | SdkCredentialType;
+  | SdkCredentialType
+  | SdkEndpointType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -291,6 +290,12 @@ export interface SdkCredentialType extends SdkTypeBase {
   scheme: HttpAuth;
 }
 
+export interface SdkEndpointType extends SdkTypeBase {
+  kind: "endpoint";
+  serverUrl?: string;
+  templateArguments: SdkPathParameter[];
+}
+
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
@@ -315,6 +320,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
+  type: SdkEndpointType;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
@@ -528,5 +534,6 @@ export enum UsageFlags {
   None = 0,
   Input = 1 << 1,
   Output = 1 << 2,
-  Versioning = 1 << 3,
+  ApiVersionEnum = 1 << 3,
+  JsonMergePatch = 1 << 4,
 }
