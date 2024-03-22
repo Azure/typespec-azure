@@ -54,6 +54,37 @@ it("Emits a warning for an ARM resource that doesn't specify `@pattern` on the n
     ]);
 });
 
+it("Allows codefix when ARM resource name is missing pattern.", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+    `
+    )
+    .applyCodeFix("add-pattern-decorator").toEqual(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @pattern(/^[a-zA-Z0-9-]+$/)
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+    `);
+});
+
 it("Does not emit a warning for an ARM resource that specifies `@pattern` on the name", async () => {
   await tester
     .expect(
