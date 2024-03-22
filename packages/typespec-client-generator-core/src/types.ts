@@ -1271,7 +1271,7 @@ function updateTypesFromOperation(
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
-      if (httpBody.contentTypes.includes("application/json-merge-patch")) {
+      if (httpBody.contentTypes.includes("application/merge-patch+json")) {
         bodies.forEach((body) => {
           updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
         });

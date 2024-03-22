@@ -2268,7 +2268,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
           @patch
           @route("/jsonMergePatch")
-          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/json-merge-patch"): void;
+          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
         }
       `)) as { PatchModel: Model; JsonMergePatchModel: Model };
 
