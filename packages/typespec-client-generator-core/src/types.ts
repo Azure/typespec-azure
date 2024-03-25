@@ -1,9 +1,4 @@
-import {
-  UnionEnum,
-  getLroMetadata,
-  getUnionAsEnum,
-  isFixed,
-} from "@azure-tools/typespec-azure-core";
+import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   BytesKnownEncoding,
@@ -33,7 +28,6 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
-  isNullType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -76,10 +70,13 @@ import {
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
+  SdkEndpointParameter,
+  SdkEndpointType,
   SdkEnumType,
   SdkEnumValueType,
   SdkModelPropertyType,
   SdkModelType,
+  SdkPathParameter,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -91,11 +88,13 @@ import {
   createGeneratedName,
   getAvailableApiVersions,
   getDocHelper,
+  getNonNullOptions,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
   isHttpOperation,
   isMultipartOperation,
+  isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -292,11 +291,13 @@ export function getSdkArrayOrDictWithDiagnostics(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
           valueType,
+          nullableValues: isNullable(type.indexer.value!),
         });
       } else if (name === "integer") {
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
+          nullableValues: isNullable(type.indexer.value!),
         });
       }
     }
@@ -326,10 +327,6 @@ export function getSdkTupleWithDiagnostics(
   });
 }
 
-function getNonNullOptions(type: Union): Type[] {
-  return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
-}
-
 export function getSdkUnion(context: TCGCContext, type: Union, operation?: Operation): SdkType {
   return ignoreDiagnostics(getSdkUnionWithDiagnostics(context, type, operation));
 }
@@ -351,14 +348,25 @@ export function getSdkUnionWithDiagnostics(
     const clientType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
-    clientType.nullable = true;
+    // eslint-disable-next-line deprecation/deprecation
+    clientType.nullable = isNullable(type);
     clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }
 
-  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-  if (unionAsEnum) {
-    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  // judge if the union can be converted to enum
+  // if language does not need flatten union as enum
+  // need to filter the case that union is composed of union or enum
+  if (
+    context.flattenUnionAsEnum ||
+    ![...type.variants.values()].some((variant) => {
+      return variant.type.kind === "Union" || variant.type.kind === "Enum";
+    })
+  ) {
+    const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+    if (unionAsEnum) {
+      return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+    }
   }
 
   return diagnostics.wrap({
@@ -368,7 +376,7 @@ export function getSdkUnionWithDiagnostics(
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
-    nullable: nonNullOptions.length < type.variants.size,
+    nullable: isNullable(type),
   });
 }
 
@@ -483,6 +491,7 @@ function addDiscriminatorToModelType(
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
+      nullable: false,
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -643,12 +652,13 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       details: docWrapper.details,
       valueType: getSdkEnumValueType(context, type.members.values()),
       values: [],
-      isFixed: isFixed(context.program, type),
+      isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
+      isUnionAsEnum: false,
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -703,6 +713,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
       apiVersions: getAvailableApiVersions(context, type.union),
+      isUnionAsEnum: true,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -740,6 +751,7 @@ function getKnownValuesEnum(
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type),
+        isUnionAsEnum: false,
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -946,6 +958,7 @@ export function getSdkCredentialParameter(
     onClient: true,
     optional: false,
     isApiVersionParam: false,
+    nullable: false,
   };
 }
 
@@ -983,6 +996,7 @@ export function getSdkModelPropertyType(
     name,
     onClient: false,
     optional: type.optional,
+    nullable: isNullable(type.type),
   };
   const program = context.program;
   const headerQueryOptions = {
@@ -998,10 +1012,18 @@ export function getSdkModelPropertyType(
       optional: type.optional,
     });
   } else if (isPathParam(program, type) || options.isEndpointParam) {
+    // we don't url encode if the type can be assigned to url
+    const urlEncode = !ignoreDiagnostics(
+      program.checker.isTypeAssignableTo(
+        type.type.projectionBase ?? type.type,
+        program.checker.getStdType("url"),
+        type.type
+      )
+    );
     return diagnostics.wrap({
       ...base,
       kind: "path",
-      urlEncode: true,
+      urlEncode,
       serializedName: getPathParamName(program, type),
       ...updateWithApiVersionInformation(context, type),
       optional: false,
@@ -1062,6 +1084,69 @@ export function getSdkModelPropertyType(
       ...updateWithApiVersionInformation(context, type),
     });
   }
+}
+
+export function getSdkEndpointParameter(
+  context: TCGCContext,
+  client: SdkClient
+): [SdkEndpointParameter, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const servers = getServers(context.program, client.service);
+  let type: SdkEndpointType;
+  let optional: boolean = false;
+  if (servers === undefined || servers.length > 1) {
+    // if there is no defined server url, or if there are more than one
+    // we will return a mandatory endpoint parameter in initialization
+    type = {
+      kind: "endpoint",
+      nullable: false,
+      templateArguments: [],
+    };
+  } else {
+    // this means we have one server
+    const templateArguments: SdkPathParameter[] = [];
+    type = {
+      kind: "endpoint",
+      nullable: false,
+      serverUrl: servers[0].url,
+      templateArguments,
+    };
+    for (const param of servers[0].parameters.values()) {
+      const sdkParam = diagnostics.pipe(
+        getSdkModelPropertyType(context, param, { isEndpointParam: true })
+      );
+      if (sdkParam.kind === "path") {
+        templateArguments.push(sdkParam);
+        sdkParam.description = sdkParam.description ?? servers[0].description;
+        sdkParam.onClient = true;
+      } else {
+        diagnostics.add(
+          createDiagnostic({
+            code: "server-param-not-path",
+            target: param,
+            format: {
+              templateArgumentName: sdkParam.name,
+              templateArgumentType: sdkParam.kind,
+            },
+          })
+        );
+      }
+    }
+    optional = !!servers[0].url.length && templateArguments.every((param) => param.optional);
+  }
+  return diagnostics.wrap({
+    kind: "endpoint",
+    type,
+    nameInClient: "endpoint",
+    name: "endpoint",
+    description: "Service host",
+    onClient: true,
+    urlEncode: false,
+    apiVersions: getAvailableApiVersions(context, client.service),
+    optional,
+    isApiVersionParam: false,
+    nullable: false,
+  });
 }
 
 function addPropertiesToModelType(
@@ -1266,14 +1351,18 @@ function updateTypesFromOperation(
       });
     }
   }
-  if (httpOperation.parameters.body) {
-    const bodies = diagnostics.pipe(
-      checkAndGetClientType(context, httpOperation.parameters.body.type, operation)
-    );
+  const httpBody = httpOperation.parameters.body;
+  if (httpBody) {
+    const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
+      if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        bodies.forEach((body) => {
+          updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
+        });
+      }
     }
   }
   for (const response of httpOperation.responses) {
@@ -1461,7 +1550,7 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+      updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }
   // update access

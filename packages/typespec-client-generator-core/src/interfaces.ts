@@ -33,6 +33,7 @@ export interface SdkEmitterOptions {
   "generate-convenience-methods"?: boolean;
   "filter-out-core-models"?: boolean;
   "package-name"?: string;
+  "flatten-union-as-enum"?: boolean;
 }
 
 export interface SdkClient {
@@ -57,8 +58,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
-  endpoint: string;
-  hasParameterizedEndpoint: boolean;
   arm: boolean;
 }
 
@@ -72,6 +71,10 @@ export interface SdkOperationGroup {
 interface SdkTypeBase {
   __raw?: Type;
   kind: string;
+  /**
+   * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
+   * https://github.com/Azure/typespec-azure/issues/448
+   */
   nullable: boolean;
   deprecation?: string;
 }
@@ -88,7 +91,8 @@ export type SdkType =
   | SdkConstantType
   | SdkUnionType
   | SdkModelType
-  | SdkCredentialType;
+  | SdkCredentialType
+  | SdkEndpointType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -207,6 +211,7 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -218,6 +223,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
@@ -234,6 +240,7 @@ export interface SdkEnumType extends SdkTypeBase {
   access?: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  isUnionAsEnum: boolean;
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -265,6 +272,9 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isFormDataType: boolean;
+  /**
+   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
+   */
   isError: boolean;
   generatedName: boolean;
   description?: string;
@@ -285,6 +295,12 @@ export interface SdkCredentialType extends SdkTypeBase {
   scheme: HttpAuth;
 }
 
+export interface SdkEndpointType extends SdkTypeBase {
+  kind: "endpoint";
+  serverUrl?: string;
+  templateArguments: SdkPathParameter[];
+}
+
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
@@ -301,6 +317,7 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  nullable: boolean;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
@@ -308,6 +325,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
+  type: SdkEndpointType;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
@@ -379,17 +397,20 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
+  nullable: boolean;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
+  nullable: boolean;
 }
 
 export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
+  nullable: boolean;
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {
@@ -518,5 +539,6 @@ export enum UsageFlags {
   None = 0,
   Input = 1 << 1,
   Output = 1 << 2,
-  Versioning = 1 << 3,
+  ApiVersionEnum = 1 << 3,
+  JsonMergePatch = 1 << 4,
 }

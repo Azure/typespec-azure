@@ -8,7 +8,7 @@ import {
   getService,
   isErrorModel,
 } from "@typespec/compiler";
-import { HttpOperation, getHeaderFieldName, getServers, isContentTypeHeader } from "@typespec/http";
+import { HttpOperation, getHeaderFieldName, isContentTypeHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -21,7 +21,6 @@ import {
   SdkClient,
   SdkClientType,
   SdkContext,
-  SdkEndpointParameter,
   SdkEnumType,
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -49,13 +48,13 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
+  getAllResponseBodies,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
   getHashForType,
-  getSdkTypeBaseHelper,
   isAcceptHeader,
-  updateWithApiVersionInformation,
+  isNullable,
 } from "./internal-utils.js";
 import {
   getClientNamespaceString,
@@ -70,6 +69,7 @@ import {
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
+  getSdkEndpointParameter,
   getSdkModelPropertyType,
 } from "./types.js";
 
@@ -107,6 +107,7 @@ function getSdkHttpBodyParameters<TOptions extends object>(
         apiVersions: getAvailableApiVersions(context, tspBody.type),
         type: bodyType,
         optional: false,
+        nullable: isNullable(tspBody.type),
       },
     ]);
   }
@@ -186,6 +187,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: false,
+    nullable: false,
   };
 }
 
@@ -376,21 +378,15 @@ function getSdkLroServiceMethod<
 
 function getSdkMethodResponse(
   operation: Operation,
-  responses: Record<number, SdkHttpResponse>
+  sdkOperation: SdkServiceOperation
 ): SdkMethodResponse {
+  const responses = sdkOperation.responses;
   // TODO: put head as bool here
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
   const headers: SdkServiceResponseHeader[] = [];
   for (const response of Object.values(responses)) {
     headers.push(...response.headers);
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
   }
-  const nullable = nonBodyExists && allResponseBodies.length > 0;
+  const allResponseBodies = getAllResponseBodies(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (responseTypes.size > 1) {
@@ -399,7 +395,7 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable,
+      nullable: isNullable(sdkOperation),
       name: createGeneratedName(operation, "UnionResponse"),
       generatedName: true,
     };
@@ -409,6 +405,7 @@ function getSdkMethodResponse(
   return {
     kind: "method",
     type,
+    nullable: isNullable(sdkOperation),
   };
 }
 
@@ -444,6 +441,7 @@ function getSdkServiceResponseAndExceptions<
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
+          nullable: isNullable(header.type),
         });
       }
       if (innerResponse.body) {
@@ -465,6 +463,7 @@ function getSdkServiceResponseAndExceptions<
         ? "application/json"
         : contentTypes[0],
       apiVersions: getAvailableApiVersions(context, httpOperation.operation),
+      nullable: body ? isNullable(body) : true,
     };
     let statusCode: number | string = "";
     if (typeof response.statusCodes === "number" || response.statusCodes === "*") {
@@ -556,7 +555,7 @@ function getSdkBasicServiceMethod<
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
-  const response = getSdkMethodResponse(operation, serviceOperation.responses);
+  const response = getSdkMethodResponse(operation, serviceOperation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
@@ -599,115 +598,6 @@ function getSdkServiceMethod<
   return getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation);
 }
 
-function getDefaultSdkEndpointParameter<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient,
-  serverUrl?: string
-): SdkEndpointParameter[] {
-  let type: SdkType;
-  if (serverUrl) {
-    // this is a fixed endpoint so we model it as a constant type
-    type = {
-      ...getSdkTypeBaseHelper(context, client.service, "constant"),
-      value: serverUrl,
-      valueType: {
-        kind: "string",
-        encode: "string",
-        nullable: false,
-      },
-    };
-  } else {
-    // this is a parameterized endpoint
-    type = {
-      ...getSdkTypeBaseHelper(context, client.service, "string"),
-      encode: "string",
-    };
-  }
-  const name = "endpoint";
-  return [
-    {
-      kind: "endpoint",
-      nameInClient: name,
-      name,
-      description: "Service host",
-      onClient: true,
-      urlEncode: false,
-      apiVersions: getAvailableApiVersions(context, client.type),
-      type: type,
-      optional: false,
-      isApiVersionParam: false,
-    },
-  ];
-}
-
-interface EndpointAndEndpointParameters {
-  endpoint: string;
-  properties: SdkEndpointParameter[];
-  hasParameterizedEndpoint: boolean;
-}
-
-function getEndpointAndEndpointParameters<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient
-): [EndpointAndEndpointParameters, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const servers = getServers(context.program, client.service);
-  if (servers === undefined) {
-    return diagnostics.wrap({
-      endpoint: "",
-      properties: getDefaultSdkEndpointParameter<TOptions, TServiceOperation>(context, client),
-      hasParameterizedEndpoint: false,
-    });
-  }
-  if (servers.length > 1) {
-    return diagnostics.wrap({
-      endpoint: "{endpoint}",
-      properties: getDefaultSdkEndpointParameter<TOptions, TServiceOperation>(context, client),
-      hasParameterizedEndpoint: true,
-    });
-  }
-  if (servers[0].parameters.size === 0) {
-    return diagnostics.wrap({
-      endpoint: servers[0].url,
-      properties: getDefaultSdkEndpointParameter<TOptions, TServiceOperation>(
-        context,
-        client,
-        servers[0].url
-      ),
-      hasParameterizedEndpoint: false,
-    });
-  }
-  const properties: SdkEndpointParameter[] = [];
-  for (const param of servers[0].parameters.values()) {
-    const sdkParam = diagnostics.pipe(
-      getSdkModelPropertyType(context, param, { isEndpointParam: true })
-    );
-    if (sdkParam.kind !== "path") {
-      throw new Error("blah");
-    }
-    properties.push({
-      ...sdkParam,
-      kind: "endpoint",
-      urlEncode: false,
-      optional: false,
-      ...updateWithApiVersionInformation(context, param),
-      onClient: true,
-      description: sdkParam.description ?? servers[0].description,
-    });
-  }
-  return diagnostics.wrap({
-    endpoint: servers[0].url,
-    properties,
-    hasParameterizedEndpoint: true,
-  });
-}
-
 function getClientDefaultApiVersion<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
@@ -729,10 +619,9 @@ function getSdkInitializationType<
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const credentialParam = getSdkCredentialParameter(context, client);
-  const endpointInfo = diagnostics.pipe(
-    getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
-  );
-  const properties: SdkParameter[] = endpointInfo.properties;
+  const properties: SdkParameter[] = [
+    diagnostics.pipe(getSdkEndpointParameter(context, client)), // there will always be an endpoint parameter
+  ];
   if (credentialParam) {
     properties.push(credentialParam);
   }
@@ -807,10 +696,6 @@ function createSdkClientType<
 
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client, baseClientType));
-
-  const endpointInfo = diagnostics.pipe(
-    getEndpointAndEndpointParameters<TOptions, TServiceOperation>(context, client)
-  );
   const docWrapper = getDocHelper(context, baseClientType.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
@@ -823,8 +708,6 @@ function createSdkClientType<
     initialization: isClient
       ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
       : undefined,
-    endpoint: endpointInfo.endpoint,
-    hasParameterizedEndpoint: endpointInfo.hasParameterizedEndpoint,
     arm: client.arm,
   };
   context.__clients!.push(sdkClientType);

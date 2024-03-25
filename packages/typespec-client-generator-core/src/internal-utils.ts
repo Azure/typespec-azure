@@ -1,4 +1,6 @@
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  Model,
   ModelProperty,
   Namespace,
   Operation,
@@ -9,15 +11,19 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
+  ignoreDiagnostics,
+  isNullType,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
   SdkEnumType,
+  SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
   SdkParameter,
+  SdkServiceOperation,
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
@@ -227,11 +233,12 @@ export interface TCGCContext {
   generateConvenienceMethods?: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
+  flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  generatedNames?: Map<Union | Model, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  generatedNames?: Set<string>;
   unionsMap?: Map<Union, SdkUnionType>;
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;
@@ -246,6 +253,48 @@ export function createTCGCContext(program: Program): TCGCContext {
   };
 }
 
+export function getNonNullOptions(type: Union): Type[] {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
+}
+
+function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpResponse>): {
+  allResponseBodies: SdkType[];
+  nonBodyExists: boolean;
+} {
+  const allResponseBodies: SdkType[] = [];
+  let nonBodyExists = false;
+  for (const response of Object.values(responses)) {
+    if (response.type) {
+      if (response.nullable) {
+        nonBodyExists = true;
+      }
+      allResponseBodies.push(response.type);
+    } else {
+      nonBodyExists = true;
+    }
+  }
+  return { allResponseBodies, nonBodyExists };
+}
+
+export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>): SdkType[] {
+  return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
+}
+
+/**
+ * Determines if a type is nullable.
+ * @param type
+ * @returns
+ */
+export function isNullable(type: Type | SdkServiceOperation): boolean {
+  if (type.kind === "Union") {
+    if (getNonNullOptions(type).length < type.variants.size) return true;
+    return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
+  }
+  if (type.kind === "http") {
+    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
+  }
+  return false;
+}
 /**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
