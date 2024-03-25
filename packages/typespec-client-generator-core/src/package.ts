@@ -707,6 +707,7 @@ function createSdkClientType<
     initialization: isClient
       ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
       : undefined,
+    // eslint-disable-next-line deprecation/deprecation
     arm: client.arm,
   };
   context.__clients!.push(sdkClientType);

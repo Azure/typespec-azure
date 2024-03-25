@@ -39,21 +39,22 @@ model Errors {
   errors: Error[];
 }
 
-enum ErrorCode {
-  InvalidRequest,
-  InvalidArgument,
-  Unauthorized,
-  Forbidden,
-  NotFound,
-  ProjectNotFound,
-  OperationNotFound,
-  AzureCognitiveSearchNotFound,
-  AzureCognitiveSearchIndexNotFound,
-  TooManyRequests,
-  AzureCognitiveSearchThrottling,
-  AzureCognitiveSearchIndexLimitReached,
-  InternalServerError,
-  ServiceUnavailable,
+union ErrorCode {
+  string,
+  InvalidRequest: "InvalidRequest",
+  InvalidArgument: "InvalidArgument",
+  Unauthorized: "Unauthorized",
+  Forbidden: "Forbidden",
+  NotFound: "NotFound",
+  ProjectNotFound: "ProjectNotFound",
+  OperationNotFound: "OperationNotFound",
+  AzureCognitiveSearchNotFound: "AzureCognitiveSearchNotFound",
+  AzureCognitiveSearchIndexNotFound: "AzureCognitiveSearchIndexNotFound",
+  TooManyRequests: "TooManyRequests",
+  AzureCognitiveSearchThrottling: "AzureCognitiveSearchThrottling",
+  AzureCognitiveSearchIndexLimitReached: "AzureCognitiveSearchIndexLimitReached",
+  InternalServerError: "InternalServerError",
+  ServiceUnavailable: "ServiceUnavailable",
 }
 
 model ApiVersionParameter {
@@ -120,13 +121,15 @@ alias LROResponse = (AcceptedResponse & {
 
 // Common models
 
-enum ImportExportFormat {
+union ImportExportFormat {
+  string,
+
   @doc("Export or Import QnA assets in JSON format")
-  json,
+  json: "json",
 
   @doc("Export or Import knowledge base replica including all assets and metadata in Excel format.")
-  tsv,
+  tsv: "tsv",
 
   @doc("Export or Import knowledge base replica including all assets and metadata in Tsv format.")
-  excel,
+  excel: "excel",
 }
