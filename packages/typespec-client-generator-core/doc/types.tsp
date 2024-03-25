@@ -531,8 +531,6 @@ alias SdkServiceParameter = SdkQueryServiceParameter | SdkHeaderServiceParameter
  * @property parameters: Parameters object for the method
  * @property description: Description of the operation
  * @property details: Optional details of the operation
- * @property overloads: Any overloads of this method
- * @property overloading: The method that this method overloads
  */
 @discriminator("kind")
 model SdkMethod {
@@ -541,8 +539,6 @@ model SdkMethod {
   parameters: SdkMethodParameter[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod[];
-  overloading?: SdkMethod;
 }
 
 /**

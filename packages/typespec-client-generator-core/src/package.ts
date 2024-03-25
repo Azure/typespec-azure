@@ -564,7 +564,6 @@ function getSdkBasicServiceMethod<
     parameters: methodParameters.filter((x) => !x.isApiVersionParam),
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
-    overloads: [],
     operation: serviceOperation,
     response,
     apiVersions: getAvailableApiVersions(context, operation),
