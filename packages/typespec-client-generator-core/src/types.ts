@@ -92,7 +92,7 @@ import {
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
-  isHttpOperation,
+  isMultipartFormData,
   isMultipartOperation,
   isNullable,
   updateWithApiVersionInformation,
@@ -498,18 +498,6 @@ function addDiscriminatorToModelType(
   return diagnostics.wrap(undefined);
 }
 
-function isOperationBodyType(context: TCGCContext, type: Model, operation?: Operation): boolean {
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return (
-    !!httpBody &&
-    httpBody.type.kind === "Model" &&
-    getEffectivePayloadType(context, httpBody.type) === type
-  );
-}
-
 export function getSdkModel(
   context: TCGCContext,
   type: Model,
@@ -543,8 +531,7 @@ export function getSdkModelWithDiagnostics(
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
-      isFormDataType:
-        isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation),
+      isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType, operation);
@@ -1364,6 +1351,11 @@ function updateTypesFromOperation(
         });
       }
     }
+    if (isMultipartFormData(context, httpBody.type, operation)) {
+      bodies.forEach((body) => {
+        updateUsageOfModel(context, UsageFlags.MultipartFormData, body);
+      });
+    }
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
@@ -1468,9 +1460,10 @@ function verifyNoConflictingMultipartModelUsage(
   const diagnostics = createDiagnosticCollector();
   for (const [operation, modelMap] of context.operationModelsMap!) {
     for (const [type, sdkType] of modelMap.entries()) {
+      const isMultipartFormData = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
       if (
         sdkType.kind === "model" &&
-        sdkType.isFormDataType !== isMultipartOperation(context, operation)
+        isMultipartFormData !== isMultipartOperation(context, operation)
       ) {
         // This means we have a model that is used both for formdata input and for regular body input
         diagnostics.add(
