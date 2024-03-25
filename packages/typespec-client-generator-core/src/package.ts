@@ -615,7 +615,7 @@ function getSdkInitializationType<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const credentialParam = getSdkCredentialParameter(context, client);
@@ -628,7 +628,8 @@ function getSdkInitializationType<
   if (context.__api_version_parameter) {
     properties.push(context.__api_version_parameter);
   }
-  const name = `${client.name.split(".").at(-1)}Options`;
+  const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
+  const name = `${namePrefix.split(".").at(-1)}Options`;
   return diagnostics.wrap({
     __raw: client.service,
     description: "Initialization class for the client",

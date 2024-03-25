@@ -372,6 +372,7 @@ export function getOperationGroup(
         type,
         groupPath: buildOperationGroupPath(context, type),
         service,
+
       };
     }
     if (
