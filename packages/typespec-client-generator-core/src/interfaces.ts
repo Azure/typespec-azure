@@ -66,6 +66,7 @@ export interface SdkOperationGroup {
   type: Namespace | Interface;
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
+  service: Namespace;
 }
 
 interface SdkTypeBase {

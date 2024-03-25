@@ -189,7 +189,12 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const groups = listOperationGroups(runner.context, getClient(runner.context, MyClient)!);
       deepStrictEqual(groups, [
-        { kind: "SdkOperationGroup", type: MyGroup, groupPath: "MyClient.MyGroup" },
+        {
+          kind: "SdkOperationGroup",
+          type: MyGroup,
+          groupPath: "MyClient.MyGroup",
+          service: MyClient,
+        },
       ]);
     });
 
@@ -205,7 +210,12 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const groups = listOperationGroups(runner.context, getClient(runner.context, MyClient)!);
       deepStrictEqual(groups, [
-        { kind: "SdkOperationGroup", type: MyGroup, groupPath: "MyClient.MyGroup" },
+        {
+          kind: "SdkOperationGroup",
+          type: MyGroup,
+          groupPath: "MyClient.MyGroup",
+          service: MyClient,
+        },
       ]);
     });
 
@@ -512,30 +522,35 @@ describe("typespec-client-generator-core: decorators", () => {
         kind: "SdkOperationGroup",
         type: AG,
         groupPath: "AClient.AG",
+        service: A,
       };
 
       const aag: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AAG,
         groupPath: "AClient.AA.AAG",
+        service: A,
       };
 
       const aabGroup1: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AABGroup1,
         groupPath: "AClient.AA.AAB.AABGroup1",
+        service: A,
       };
 
       const aabGroup2: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AABGroup2,
         groupPath: "AClient.AA.AAB.AABGroup2",
+        service: A,
       };
 
       const aaa: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AAA,
         groupPath: "AClient.AA.AAA",
+        service: A,
       };
 
       const aab: SdkOperationGroup = {
@@ -543,6 +558,7 @@ describe("typespec-client-generator-core: decorators", () => {
         type: AAB,
         subOperationGroups: [aabGroup1, aabGroup2],
         groupPath: "AClient.AA.AAB",
+        service: A,
       };
 
       const aa: SdkOperationGroup = {
@@ -550,6 +566,7 @@ describe("typespec-client-generator-core: decorators", () => {
         type: AA,
         subOperationGroups: [aaa, aab, aag],
         groupPath: "AClient.AA",
+        service: A,
       };
 
       const client = getClient(runner.context, A);
@@ -690,7 +707,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("interface without operation", async () => {
-      const { MyGroup } = (await runner.compile(`
+      const { MyGroup, MyClient } = (await runner.compile(`
         @service({})
         @test namespace MyClient;
 
@@ -698,12 +715,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @test interface MyGroup {
         }
-      `)) as { MyGroup: Interface };
+      `)) as { MyGroup: Interface; MyClient: Namespace };
 
       deepStrictEqual(getOperationGroup(runner.context, MyGroup), {
         kind: "SdkOperationGroup",
         type: MyGroup,
         groupPath: "MyClient.MyGroup",
+        service: MyClient,
       });
 
       const clients = listClients(runner.context);
