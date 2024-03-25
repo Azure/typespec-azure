@@ -1432,6 +1432,37 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     });
+
+    it("usage propagation for enum value", async () => {
+      await runner.compile(
+        `
+        @service({})
+        namespace N {
+          enum LR {
+            left,
+            right,
+          }
+          union UD {
+            up: "up",
+            down: "down",
+          }
+          
+          @test
+          model Test {
+            prop1: LR.left;
+            prop2: UD.up;
+          }
+          op read(@body body: Test): void;
+        }
+      `
+      );
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 2);
+      strictEqual(enums[0].name, "LR");
+      strictEqual(enums[0].usage, UsageFlags.Input);
+      strictEqual(enums[1].name, "UD");
+      strictEqual(enums[1].usage, UsageFlags.Input);
+    });
   });
 
   describe("SdkBodyModelPropertyType", () => {
@@ -2719,6 +2750,7 @@ describe("typespec-client-generator-core: types", () => {
       const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw;
       ok(rawModel);
@@ -2759,6 +2791,7 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
+      // eslint-disable-next-line deprecation/deprecation
       const errorModels = models.filter((x) => x.kind === "model" && x.isError);
       deepStrictEqual(errorModels.map((x) => x.name).sort(), [
         "ApiError",
@@ -2766,6 +2799,7 @@ describe("typespec-client-generator-core: types", () => {
         "FourHundredError",
         "FourZeroFourError",
       ]);
+      // eslint-disable-next-line deprecation/deprecation
       const validModel = models.filter((x) => x.kind === "model" && !x.isError);
       deepStrictEqual(
         validModel.map((x) => x.name),
@@ -2788,7 +2822,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const model = models[0];
       strictEqual(model.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.isFormDataType, true);
+      ok((model.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(model.name, "MultiPartRequest");
       strictEqual(model.properties.length, 2);
       const id = model.properties.find((x) => x.name === "id");
@@ -2838,7 +2874,9 @@ describe("typespec-client-generator-core: types", () => {
       const modelA = models.find((x) => x.name === "A");
       ok(modelA);
       strictEqual(modelA.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelA.isFormDataType, true);
+      ok((modelA.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(modelA.properties.length, 1);
       const modelAProp = modelA.properties[0];
       strictEqual(modelAProp.kind, "property");
@@ -2847,7 +2885,9 @@ describe("typespec-client-generator-core: types", () => {
       const modelB = models.find((x) => x.name === "B");
       ok(modelB);
       strictEqual(modelB.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelB.isFormDataType, false);
+      ok((modelB.usage & UsageFlags.MultipartFormData) === 0);
       strictEqual(modelB.properties.length, 1);
       strictEqual(modelB.properties[0].type.kind, "bytes");
     });
@@ -2932,12 +2972,16 @@ describe("typespec-client-generator-core: types", () => {
 
       const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
       ok(pictureWrapper);
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(pictureWrapper.isFormDataType, true);
+      ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
       const errorResponse = models.find((x) => x.name === "ErrorResponse");
       ok(errorResponse);
       strictEqual(errorResponse.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(errorResponse.isFormDataType, false);
+      ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
     });
   });
   describe("SdkTupleType", () => {

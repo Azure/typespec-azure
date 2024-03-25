@@ -524,12 +524,12 @@ export function $convenientAPI(
 
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
-  return value ?? !!context.generateProtocolMethods;
+  return value ?? Boolean(context.generateProtocolMethods);
 }
 
 export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, convenientAPIKey, entity);
-  return value ?? !!context.generateConvenienceMethods;
+  return value ?? Boolean(context.generateConvenienceMethods);
 }
 
 const excludeKey = createStateSymbol("exclude");

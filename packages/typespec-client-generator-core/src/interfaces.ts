@@ -277,7 +277,13 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
+  /**
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData nad the `.usage` property on this model
+   */
   isFormDataType: boolean;
+  /**
+   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
+   */
   isError: boolean;
   generatedName: boolean;
   description?: string;
@@ -543,5 +549,8 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
+  // Input will also be set when JsonMergePatch is set
   JsonMergePatch = 1 << 4,
+  // Input will also be set when MultipartFormData is set
+  MultipartFormData = 1 << 5,
 }
