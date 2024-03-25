@@ -931,7 +931,7 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient | SdkOperationGroup
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
