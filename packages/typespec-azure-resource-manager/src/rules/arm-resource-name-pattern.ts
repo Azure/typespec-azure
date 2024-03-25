@@ -20,7 +20,7 @@ function createPatternCodeFix(diagnosticTarget: DiagnosticTarget) {
       const location = getSourceLocation(diagnosticTarget);
       const { lineStart, indent } = findLineStartAndIndent(location);
       const updatedLocation = { ...location, pos: lineStart };
-      return context.prependText(updatedLocation, `${indent}@pattern(/^[a-zA-Z0-9-]+$/)\n`);
+      return context.prependText(updatedLocation, `${indent}@pattern(/^[a-zA-Z0-9-]{3,24}$/)\n`);
     },
   });
 }

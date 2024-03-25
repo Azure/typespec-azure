@@ -76,7 +76,7 @@ it("Allows codefix when ARM resource name is missing pattern.", async () => {
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern(/^[a-zA-Z0-9-]+$/)
+        @pattern(/^[a-zA-Z0-9-]{3,24}$/)
         @key("employeeName")
         @path
         @segment("employees")
