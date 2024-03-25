@@ -494,6 +494,7 @@ export function createSdkContext<
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
+    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
   };
   sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
   return sdkContext;
@@ -523,12 +524,12 @@ export function $convenientAPI(
 
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
-  return value ?? !!context.generateProtocolMethods;
+  return value ?? Boolean(context.generateProtocolMethods);
 }
 
 export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, convenientAPIKey, entity);
-  return value ?? !!context.generateConvenienceMethods;
+  return value ?? Boolean(context.generateConvenienceMethods);
 }
 
 const excludeKey = createStateSymbol("exclude");
