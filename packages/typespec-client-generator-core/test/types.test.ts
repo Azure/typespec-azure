@@ -1432,6 +1432,37 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     });
+
+    it("usage propagation for enum value", async () => {
+      await runner.compile(
+        `
+        @service({})
+        namespace N {
+          enum LR {
+            left,
+            right,
+          }
+          union UD {
+            up: "up",
+            down: "down",
+          }
+          
+          @test
+          model Test {
+            prop1: LR.left;
+            prop2: UD.up;
+          }
+          op read(@body body: Test): void;
+        }
+      `
+      );
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 2);
+      strictEqual(enums[0].name, "LR");
+      strictEqual(enums[0].usage, UsageFlags.Input);
+      strictEqual(enums[1].name, "UD");
+      strictEqual(enums[1].usage, UsageFlags.Input);
+    });
   });
 
   describe("SdkBodyModelPropertyType", () => {
