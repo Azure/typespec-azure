@@ -354,9 +354,19 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(clientType);
   }
 
-  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-  if (unionAsEnum) {
-    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  // judge if the union can be converted to enum
+  // if language does not need flatten union as enum
+  // need to filter the case that union is composed of union or enum
+  if (
+    context.flattenUnionAsEnum ||
+    ![...type.variants.values()].some((variant) => {
+      return variant.type.kind === "Union" || variant.type.kind === "Enum";
+    })
+  ) {
+    const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+    if (unionAsEnum) {
+      return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+    }
   }
 
   return diagnostics.wrap({
@@ -635,6 +645,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
+      isUnionAsEnum: false,
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -689,6 +700,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
       apiVersions: getAvailableApiVersions(context, type.union),
+      isUnionAsEnum: true,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -726,6 +738,7 @@ function getKnownValuesEnum(
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type),
+        isUnionAsEnum: false,
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -1332,6 +1345,11 @@ function updateTypesFromOperation(
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
+      if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        bodies.forEach((body) => {
+          updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
+        });
+      }
     }
     if (isMultipartFormData(context, httpBody.type, operation)) {
       bodies.forEach((body) => {
@@ -1525,7 +1543,7 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      updateUsageOfModel(context, UsageFlags.Versioning, sdkVersionsEnum);
+      updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }
   // update access

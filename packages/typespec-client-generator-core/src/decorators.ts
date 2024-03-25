@@ -494,6 +494,7 @@ export function createSdkContext<
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
+    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
   };
   sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
   return sdkContext;

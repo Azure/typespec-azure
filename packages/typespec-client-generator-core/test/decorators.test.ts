@@ -4,7 +4,6 @@ import {
   Model,
   Namespace,
   Operation,
-  UsageFlags,
   ignoreDiagnostics,
 } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
@@ -22,7 +21,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkOperationGroup } from "../src/interfaces.js";
+import { SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -2247,6 +2246,37 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { Dog: Model };
 
       strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
+    });
+
+    it("patch usage", async () => {
+      const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model PatchModel {
+            age: int32;
+          }
+
+          @test
+          model JsonMergePatchModel {
+            prop: string
+          }
+
+          @patch
+          @route("/patch")
+          op patchModel(@body body: PatchModel): void;
+
+          @patch
+          @route("/jsonMergePatch")
+          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
+        }
+      `)) as { PatchModel: Model; JsonMergePatchModel: Model };
+
+      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
+      strictEqual(
+        getUsage(runner.context, JsonMergePatchModel),
+        UsageFlags.JsonMergePatch | UsageFlags.Input
+      );
     });
   });
 

@@ -1,5 +1,6 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  Model,
   ModelProperty,
   Namespace,
   Operation,
@@ -233,11 +234,12 @@ export interface TCGCContext {
   generateConvenienceMethods?: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
+  flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  generatedNames?: Map<Union | Model, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  generatedNames?: Set<string>;
   unionsMap?: Map<Union, SdkUnionType>;
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;
