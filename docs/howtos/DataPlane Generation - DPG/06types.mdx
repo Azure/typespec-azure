@@ -320,8 +320,7 @@ model Widget {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python generates a union of literals again. Since we always generate our typing as open, this will
-look the same as our previous example where we generate an open union of strings.
+Python generates a union of literals again.
 
 ```python
 from typing import Literal, Union
@@ -390,7 +389,7 @@ For union of other union or enum. TCGC will do the flatten according to the flag
 
 With `flatten-union-as-enum` flagged `true`:
 
-````json
+```json
 {
   "kind": "enum",
   "name": "ProvisioningState",
@@ -423,6 +422,7 @@ With `flatten-union-as-enum` flagged `true`:
   "isFixed": false,
   "isUnionAsEnum": true,
 }
+```
 
 With `flatten-union-as-enum` flagged `false`:
 
@@ -471,7 +471,7 @@ With `flatten-union-as-enum` flagged `false`:
     }
   ]
 }
-````
+```
 
 </TabItem>
 <TabItem value="python" label="Python">
@@ -483,7 +483,7 @@ from enum import Enum
 from corehttp.utils import CaseInsensitiveEnumMeta
 
 class ProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
-  IN_PROGRESS = "inProgress"
+  INPRPGRESS = "InProgress"
   SUCCEEDED = "Succeeded"
   FAILED = "Failed"
   CANCELED = "Canceled"
@@ -498,7 +498,7 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
   private const string SucceededValue = "Succeeded";
   private const string FailedValue = "Failed";
   private const string CanceledValue = "Canceled";
-  private const string InProgressValue = "inProgress";
+  private const string InProgressValue = "InProgress";
 
   public static ProvisioningState Succeeded { get; } = new ProvisioningState(SucceededValue);
   public static ProvisioningState Failed { get; } = new ProvisioningState(FailedValue);
@@ -513,7 +513,7 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
 ```typescript
 export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
 // NOTE: extensible enum design may change in JS
-export type ProvisioningState = string | "inProgress" | ResourceProvisioningState;
+export type ProvisioningState = string | "InProgress" | ResourceProvisioningState;
 ```
 
 </TabItem>
@@ -521,7 +521,7 @@ export type ProvisioningState = string | "inProgress" | ResourceProvisioningStat
 
 ```java
 public final class ProvisioningState extends ExpandableStringEnum<ProvisioningState> {
-    public static final ProvisioningState IN_PROGRESS = fromString("inProgress");
+    public static final ProvisioningState INPROGRESS = fromString("InProgress");
     public static final ProvisioningState SUCCEEDED = fromString("Succeeded");
     public static final ProvisioningState FAILED = fromString("Failed");
     public static final ProvisioningState CANCELED = fromString("Canceled");
@@ -559,7 +559,7 @@ For union of other union or enum. TCGC will do the flatten according to the flag
 
 With `flatten-union-as-enum` flagged `true`:
 
-````json
+```json
 {
   "kind": "enum",
   "name": "Orientation",
@@ -592,6 +592,7 @@ With `flatten-union-as-enum` flagged `true`:
   "isFixed": true,
   "isUnionAsEnum": true,
 }
+```
 
 With `flatten-union-as-enum` flagged `false`:
 
@@ -647,7 +648,7 @@ With `flatten-union-as-enum` flagged `false`:
     }
   ]
 }
-````
+```
 
 </TabItem>
 <TabItem value="python" label="Python">
@@ -727,7 +728,7 @@ For union of other union or enum. TCGC will do the flatten according to the flag
 
 With `flatten-union-as-enum` flagged `true`:
 
-````json
+```json
 {
   "kind": "enum",
   "name": "WidgetOrientations",
@@ -760,6 +761,7 @@ With `flatten-union-as-enum` flagged `true`:
   "isFixed": true,
   "isUnionAsEnum": true,
 }
+```
 
 With `flatten-union-as-enum` flagged `false`:
 
@@ -815,7 +817,7 @@ With `flatten-union-as-enum` flagged `false`:
     }
   ]
 }
-````
+```
 
 </TabItem>
 <TabItem value="python" label="Python">
