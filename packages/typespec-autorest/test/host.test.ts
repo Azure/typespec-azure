@@ -125,7 +125,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
           required: true,
           type: "string",
           enum: ["westus", "eastus"],
-          "x-ms-enum": { modelAsString: true, name: "Region" },
+          "x-ms-enum": { modelAsString: false, name: "Region" },
         },
       ],
     });

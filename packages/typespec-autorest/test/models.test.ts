@@ -299,7 +299,7 @@ describe("typespec-autorest: model definitions", () => {
           enum: ["a-value", "b"],
           "x-ms-enum": {
             name: "MyEnum",
-            modelAsString: true,
+            modelAsString: false,
             values: [
               { name: "a", value: "a-value" },
               { name: "b", value: "b" },
@@ -694,7 +694,7 @@ describe("typespec-autorest: model definitions", () => {
         type: "string",
         enum: ["dog", "cat"],
         "x-ms-enum": {
-          modelAsString: true,
+          modelAsString: false,
           name: "PetKind",
         },
       });
