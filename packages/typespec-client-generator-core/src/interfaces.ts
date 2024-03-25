@@ -451,7 +451,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+interface SdkMethodBase {
   __raw?: Operation;
   name: string;
   access: AccessFlags | undefined;
@@ -459,12 +459,10 @@ interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   apiVersions: string[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod<TServiceOperation>[];
-  overloading?: SdkMethod<TServiceOperation>;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+  extends SdkMethodBase {
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
@@ -515,8 +513,7 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }
