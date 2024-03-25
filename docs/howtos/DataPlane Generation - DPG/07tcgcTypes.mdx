@@ -69,7 +69,17 @@ const sdkContext = {
           properties: [
             {
               kind: "endpoint",
-              ...
+              type: {
+                kind: "endpoint",
+                serverUrl: "{endpoint}/widget",
+                templateArguments: [
+                  {
+                    name: "endpoint",
+                    kind: "path",
+                    ...
+                  }
+                ]
+              }
             },
             {
               kind: "credential",
@@ -229,14 +239,14 @@ interface PythonSdkContext<
   PythonEmitterOptions,
   TServiceOperation
 > {
-  __endpointPathParameters: Record<string, Record<string, any>[]>;
+  ClientMap: Map<SdkClientType, PythonSdkClientType>;
 }
 
 
 export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
   const sdkContext: PythonSdkContext = {
     ...createSdkContext(context, "@azure-tools/typespec-python"),
-    __endpointPathParameters: {},
+    ClientMap: new Map<sdkClientType, PythonSdkClientType>(),
   }
 }
 ```
@@ -298,7 +308,7 @@ const sdkPackage = sdkContext.sdkPackage;
 
 An `SdkClientType` represents a single client in your package.
 
-There are clients that are instantiable, and you can determine this through the presence of an `.initialization` property. Clients that are instantiable should be exposed to users to instantiate. If they aren't publicly instantiable, then your language emitter should expose them on their parent client without giving users the opporutinity to instantiate them.
+All clients will have an `initialization` property. Whether that property's access is `internal` or `public` will determine whether your client is publicly initializable or not.
 
 ### Interface
 
@@ -310,8 +320,7 @@ export interface SdkClientType<
   kind: "client";
   description?: string;
   details?: string;
-  // information on how to initialize, if instantiable
-  initialization?: SdkInitializationType;
+  initialization: SdkInitializationType;
   apiVersions: string[];
   // fully qualified. Compare to sdkPackage.rootNamespace to figure out where to generate
   nameSpace: string;
@@ -328,6 +337,7 @@ const sdkClient = {
   initialization: {
     name: "WidgetManagerOptions",
     kind: "model",
+    access: "public",
     ...
   };
   apiVersions: [],
@@ -339,7 +349,10 @@ const sdkClient = {
       response: {
         name: "Widgets",
         kind: "client",
-        initialization: undefined,
+        initialization: {
+          kind: "model",
+          access: "internal",
+        },
         apiVersions: [],
         nameSpace: "Contoso.WidgetManager",
         methods: [
@@ -378,27 +391,23 @@ function serializeClient<
   // Map the information from the SdkClientType to your language's interface for a client.
   // Would recommend that eventually your language's client type interface extends from
   // SdkClientType, and just adds your language-specific information on top.
-  return {
+  const pythonClient = {
     ...client,
-    parameters: (
-      client.initialization ?
-      client.initialization.properties.map(
+    parameters: (client.initialization.properties.map(
         (x) => getSdkModelPropertyType(
           context, x
         )
       ) : undefined
     ),
-    subClients: client.methods.filter(
-      (x) => x.kind === "clientaccessor"
-    ).map(
-      (x) => serializeClient(sdkContext, x.response)
-    ),
     methods: client.methods.filter(
       (x) => x.kind ===  "method"
     ).map(
       (x) => serializeServiceMethod(sdkContext, x)
-    )
+    ),
+    subclients: [],
   }
+  sdkContext.ClientMap.set(client, pythonClient)
+  return pythonClient
 }
 
 for (const client of sdkPackage.clients) {
@@ -408,7 +417,7 @@ for (const client of sdkPackage.clients) {
 
 ## SdkInitializationType
 
-Initialization model for a client, if the client is instantiable.
+Initialization model for a client. Whether it's `access` is `public` or `internal` tells you whether the client is publicly instantiable.
 
 ### Interface
 
@@ -536,24 +545,28 @@ const sdkClientAccessor = {
 
 #### Usage
 
+Our strong recommendation is you build up a list of clients by iterating through `sdkPackage.clients` first, and to *not* recurse into creating the subclients.
+Only once you've processed each client, then you go through and link clients to their subclients. Not doing recursion prevents confusion over where you are in the call chain.
+
 ```ts
 import { SdkServiceOperation, SdkClientType } from "@azure-tools/typespec-client-generator-core";
 import { PythonSdkContext } from "./lib.js";
 import { PythonSdkClientType } from "./interfaces.js";
 
-function getSubClients<
-  TServiceOperation extends SdkServiceOperation
+function linkSubClients<
+  TServiceOperation extends PythonSdkServiceOperation
 >(
-  context: PythonSdkContext<TServiceOperation>,
-  client: SdkClientType<TServiceOperation>
-): PythonSdkClientType[] {
-  // we should eventually expose some of these subclient accessors as
-  // a public method on clients one day
-  return client.methods.filter(
-    (x) => x.kind === "clientaccessor"
-  ).map(
-    (x) => serializeClient(sdkContext, x.response)
-  )
+  sdkContext: PythonSdkContext<TServiceOperation>,
+): void {
+  for (const client of sdkContext.clients) {
+    client.subclients = client.methods.filter(
+      (x) => x.kind === "clientaccessor"
+    ).map(
+      (x) => x.returnType
+    ).map(
+      (x) => sdkContext.ClientMap.get(x)
+    )
+  }
 }
 ```
 
@@ -764,7 +777,7 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
   __raw_lro_metadata: LroMetadata;
   // initial call to begin LRO polling
   // thinking of instead making it the regular operation property so we can continue using that property
-  initialOperation: TServiceOperation;
+  operation: TServiceOperation;
 }
 ```
 
@@ -804,7 +817,7 @@ const sdkLroServiceMethod = {
   access: "public",
   apiVersions: [],
   parameters: [],
-  initialOperation: {
+  operation: {
     kind: "http",
     ...
   },
@@ -830,7 +843,7 @@ function serializeLroServiceMethod<
   return {
     ...method,
     name: camelToSnakeCase(method.name),
-    initialOperation: serializeServiceOperation(context, method),
+    operation: serializeServiceOperation(context, method),
   },
 }
 ```
@@ -846,7 +859,8 @@ export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceO
   extends SdkServiceMethodBase<TServiceOperation>{
   kind: "lropaging";
   __raw_lro_metadata: LroMetadata;
-  initialOperation: SdkServiceOperation;
+  // initial call to start LRO
+  operation: SdkServiceOperation;
   __raw_paged_metadata: PagedResultMetadata;
   nextLinkPath?: string; // off means fake paging
   nextLinkOperation?: SdkServiceOperation;
@@ -866,7 +880,6 @@ function serializeLroPagingServiceMethod<
     ...method,
     name: camelToSnakeCase(method.name),
     operation: serializeServiceOperation(context, method, method.operation),
-    initialOperation: serializeServiceOperation(context, method, method.operation),
     nextLinkOperation: method.nextLinkOperation ? serializeServiceOperation(context, method, method.nextLinkOperation) : undefined,
   },
 }
@@ -889,10 +902,10 @@ export interface SdkHttpOperation {
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam: SdkBodyParameter;
-  // mapping of number to SdkHttpResponse for valid responses
-  // we will use a string to represent a status code range
-  responses: Record<number | string, SdkHttpResponse>;
-  exceptions: Record<number | string, SdkHttpResponse>
+  // mapping of status codes to SdkHttpResponse for valid responses
+  // HttpStatusCodeRange can represent either a single status code or a range.
+  responses: Map<HttpStatusCodeRange, SdkHttpResponse>;
+  exceptions: Map<HttpStatusCodeRange, SdkHttpResponse>
 }
 ```
 
@@ -1203,9 +1216,16 @@ function serializeMethodResponse<
 
 This is the response returned from an HTTP service. The emitters should take care to map it to what the method ultimately returns to end users.
 
+Each response is mapped to an `HttpStatusCodeRange` on the `SdkHttpOperation` interface.
+
 ### Interface
 
 ```ts
+interface HttpStatusCodeRange {
+  start: number; // inclusive start. If there's only start, then it's just a single value.
+  end?: number; // exclusive end. If it's a range, end is present, otherwise it's undefined.
+}
+
 export interface SdkHttpResponse {
   kind: "http";
   headers: SdkServiceResponseHeader[];
@@ -1388,10 +1408,9 @@ export enum UsageFlags {
   None = 0,
   Input = 1 << 1,
   Output = 1 << 2,
-  Versioning = 1 << 3,
-  Patch = 1 << 4,
-  FormData = 1 << 5,
-  Error = 1 << 6,
+  ApiVersionEnum = 1 << 3,
+  JsonMergePatch = 1 << 4,
+  MultipartFormData = 1 << 5,
 }
 ```
 
@@ -1453,31 +1472,6 @@ import {
 } from "./interfaces.js";
 import { serializeServiceMethod } from "./methods.js";
 
-
-function serializeClient<
-  TServiceOperation extends PythonSdkServiceOperation
->(
-  sdkContext: PythonSdkContext<TServiceOperation>,
-  client: SdkClientType<TServiceOperation>
-): PythonSdkClientType {
-  return {
-    ...client,
-    parameters: client.initialization?.properties.map(
-      (x) => getSdkModelPropertyType(sdkContext, x)
-    ),
-    subClients: client.methods.filter(
-      (x) => x.kind === "clientaccessor"
-    ).map(
-      (x) => serializeClient(sdkContext, x.response)
-    ),
-    methods: client.methods.filter(
-      (x) => x.kind === "method"
-    ).map(
-      (x) => serializeServiceMethod(sdkContext, x)
-    )
-  }
-}
-
 export async function $onEmit(
   context: EmitContext<PythonEmitterOptions>
 ) {
@@ -1499,7 +1493,52 @@ export async function $onEmit(
     )
   }
 
+  linkSubClients(sdkContext)
+
   // Serialize the pythonSdkPackage and pass it to your generator
+}
+
+function serializeClient<
+  TServiceOperation extends PythonSdkServiceOperation
+>(
+  sdkContext: PythonSdkContext<TServiceOperation>,
+  client: SdkClientType<TServiceOperation>
+): PythonSdkClientType {
+  const pythonClient = {
+    ...client,
+    parameters: client.initialization?.properties.map(
+      (x) => getSdkModelPropertyType(sdkContext, x)
+    ),
+    subClients: client.methods.filter(
+      (x) => x.kind === "clientaccessor"
+    ).map(
+      (x) => serializeClient(sdkContext, x.response)
+    ),
+    methods: client.methods.filter(
+      (x) => x.kind === "method"
+    ).map(
+      (x) => serializeServiceMethod(sdkContext, x)
+    ),
+    subclients: [],
+  }
+  sdkContext,ClientMap.set(client, pythonClient);
+  return pythonClient;
+}
+
+function linkSubClients<
+  TServiceOperation extends PythonSdkServiceOperation
+>(
+  sdkContext: PythonSdkContext<TServiceOperation>,
+): void {
+  for (const client of sdkContext.clients) {
+    client.subclients = client.methods.filter(
+      (x) => x.kind === "clientaccessor"
+    ).map(
+      (x) => x.returnType
+    ).map(
+      (x) => sdkContext.ClientMap.get(x)
+    )
+  }
 }
 ```
 
@@ -1578,7 +1617,7 @@ function serializeLroServiceMethod<
   return {
     ...method,
     name: camelToSnakeCase(method.name),
-    initialOperation: serializeServiceOperation(context, method, method.operation),
+    operation: serializeServiceOperation(context, method, method.operation),
   },
 }
 
@@ -1592,7 +1631,6 @@ function serializeLroPagingServiceMethod<
     ...method,
     name: camelToSnakeCase(method.name),
     operation: serializeServiceOperation(context, method, method.operation),
-    initialOperation: serializeServiceOperation(context, method, method.initialOperation),
     nextLinkOperation: method.nextLinkOperation ? serializeServiceOperation(context, method, method.nextLinkOperation) : undefined,
   },
 }
