@@ -1,5 +1,6 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  Model,
   ModelProperty,
   Namespace,
   Operation,
@@ -28,6 +29,7 @@ import {
 } from "./interfaces.js";
 import {
   getCrossLanguageDefinitionId,
+  getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -232,11 +234,12 @@ export interface TCGCContext {
   generateConvenienceMethods?: boolean;
   filterOutCoreModels?: boolean;
   packageName?: string;
+  flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  generatedNames?: Map<Union | Model, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  generatedNames?: Set<string>;
   unionsMap?: Map<Union, SdkUnionType>;
   __api_version_parameter?: SdkParameter;
   __api_version_client_default_value?: string;
@@ -286,7 +289,7 @@ export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>)
 export function isNullable(type: Type | SdkServiceOperation): boolean {
   if (type.kind === "Union") {
     if (getNonNullOptions(type).length < type.variants.size) return true;
-    return !!ignoreDiagnostics(getUnionAsEnum(type))?.nullable;
+    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
   }
   if (type.kind === "http") {
     return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
@@ -301,4 +304,25 @@ export function isNullable(type: Type | SdkServiceOperation): boolean {
  */
 export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
   return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
+}
+
+function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
+  if (type.kind !== "Model") return false;
+  if (!isHttpOperation(context, operation)) return false;
+  const httpBody = operation
+    ? getHttpOperationWithCache(context, operation).parameters.body
+    : undefined;
+  return Boolean(
+    httpBody &&
+      httpBody.type.kind === "Model" &&
+      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+  );
+}
+
+export function isMultipartFormData(
+  context: TCGCContext,
+  type: Type,
+  operation?: Operation
+): boolean {
+  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
 }

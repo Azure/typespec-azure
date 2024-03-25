@@ -92,7 +92,7 @@ import {
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
-  isHttpOperation,
+  isMultipartFormData,
   isMultipartOperation,
   isNullable,
   updateWithApiVersionInformation,
@@ -354,9 +354,19 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(clientType);
   }
 
-  const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-  if (unionAsEnum) {
-    return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+  // judge if the union can be converted to enum
+  // if language does not need flatten union as enum
+  // need to filter the case that union is composed of union or enum
+  if (
+    context.flattenUnionAsEnum ||
+    ![...type.variants.values()].some((variant) => {
+      return variant.type.kind === "Union" || variant.type.kind === "Enum";
+    })
+  ) {
+    const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+    if (unionAsEnum) {
+      return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
+    }
   }
 
   return diagnostics.wrap({
@@ -488,18 +498,6 @@ function addDiscriminatorToModelType(
   return diagnostics.wrap(undefined);
 }
 
-function isOperationBodyType(context: TCGCContext, type: Model, operation?: Operation): boolean {
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return (
-    !!httpBody &&
-    httpBody.type.kind === "Model" &&
-    getEffectivePayloadType(context, httpBody.type) === type
-  );
-}
-
 export function getSdkModel(
   context: TCGCContext,
   type: Model,
@@ -533,8 +531,7 @@ export function getSdkModelWithDiagnostics(
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
-      isFormDataType:
-        isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation),
+      isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType, operation);
@@ -648,6 +645,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type),
+      isUnionAsEnum: false,
     };
     for (const member of type.members.values()) {
       sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -702,6 +700,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
       apiVersions: getAvailableApiVersions(context, type.union),
+      isUnionAsEnum: true,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
   }
@@ -739,6 +738,7 @@ function getKnownValuesEnum(
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type),
+        isUnionAsEnum: false,
       };
       for (const member of knownValues.members.values()) {
         sdkType.values.push(getSdkEnumValue(context, sdkType, member));
@@ -1267,7 +1267,8 @@ function updateUsageOfModel(
   type?: SdkType,
   seenModelNames?: Set<SdkType>
 ): void {
-  if (!type || !["model", "enum", "array", "dict", "union"].includes(type.kind)) return undefined;
+  if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
+    return;
   if (seenModelNames === undefined) {
     seenModelNames = new Set<SdkType>();
   }
@@ -1279,6 +1280,10 @@ function updateUsageOfModel(
     for (const unionType of type.values) {
       updateUsageOfModel(context, usage, unionType, seenModelNames);
     }
+    return;
+  }
+  if (type.kind === "enumvalue") {
+    updateUsageOfModel(context, usage, type.enumType, seenModelNames);
     return;
   }
   if (type.kind !== "model" && type.kind !== "enum") return;
@@ -1338,13 +1343,22 @@ function updateTypesFromOperation(
       });
     }
   }
-  if (httpOperation.parameters.body) {
-    const bodies = diagnostics.pipe(
-      checkAndGetClientType(context, httpOperation.parameters.body.type, operation)
-    );
+  const httpBody = httpOperation.parameters.body;
+  if (httpBody) {
+    const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.Input, body);
+      });
+      if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        bodies.forEach((body) => {
+          updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
+        });
+      }
+    }
+    if (isMultipartFormData(context, httpBody.type, operation)) {
+      bodies.forEach((body) => {
+        updateUsageOfModel(context, UsageFlags.MultipartFormData, body);
       });
     }
   }
@@ -1451,9 +1465,10 @@ function verifyNoConflictingMultipartModelUsage(
   const diagnostics = createDiagnosticCollector();
   for (const [operation, modelMap] of context.operationModelsMap!) {
     for (const [type, sdkType] of modelMap.entries()) {
+      const isMultipartFormData = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
       if (
         sdkType.kind === "model" &&
-        sdkType.isFormDataType !== isMultipartOperation(context, operation)
+        isMultipartFormData !== isMultipartOperation(context, operation)
       ) {
         // This means we have a model that is used both for formdata input and for regular body input
         diagnostics.add(
