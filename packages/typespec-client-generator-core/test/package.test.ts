@@ -231,6 +231,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(credentialParam.onClient, true);
       strictEqual(credentialParam.optional, false);
       strictEqual(credentialParam.type.kind, "union");
+      strictEqual(credentialParam.type.name, "ServiceCredentialUnion");
+      strictEqual(credentialParam.type.generatedName, true);
       strictEqual(credentialParam.type.values.length, 2);
       const schemes = credentialParam.type.values
         .filter((v): v is SdkCredentialType => v.kind === "credential")
