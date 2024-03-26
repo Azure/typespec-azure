@@ -303,7 +303,6 @@ model fileSchema {
   example?: unknown;
 }
 
-@extension("x-ordering", Json<"keep">)
 model Headers is Record<Header>;
 
 alias CollectionFormat = "csv" | "ssv" | "tsv" | "pipes";

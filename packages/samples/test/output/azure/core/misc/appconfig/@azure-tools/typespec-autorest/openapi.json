@@ -322,16 +322,16 @@
               "$ref": "#/definitions/KeyValue"
             },
             "headers": {
-              "sync-token": {
-                "type": "string",
-                "description": "Used to guarantee real-time consistency between requests."
+              "e-tag": {
+                "type": "string"
               },
               "last-modified": {
                 "type": "string",
                 "format": "date"
               },
-              "e-tag": {
-                "type": "string"
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
               }
             }
           },
@@ -388,16 +388,16 @@
               "$ref": "#/definitions/KeyValue"
             },
             "headers": {
-              "sync-token": {
-                "type": "string",
-                "description": "Used to guarantee real-time consistency between requests."
+              "e-tag": {
+                "type": "string"
               },
               "last-modified": {
                 "type": "string",
                 "format": "date"
               },
-              "e-tag": {
-                "type": "string"
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
               }
             }
           },
@@ -458,16 +458,16 @@
               "$ref": "#/definitions/KeyValue"
             },
             "headers": {
-              "sync-token": {
-                "type": "string",
-                "description": "Used to guarantee real-time consistency between requests."
+              "e-tag": {
+                "type": "string"
               },
               "last-modified": {
                 "type": "string",
                 "format": "date"
               },
-              "e-tag": {
-                "type": "string"
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
               }
             }
           },
@@ -515,12 +515,12 @@
               "$ref": "#/definitions/KeyValue"
             },
             "headers": {
+              "e-tag": {
+                "type": "string"
+              },
               "sync-token": {
                 "type": "string",
                 "description": "Used to guarantee real-time consistency between requests."
-              },
-              "e-tag": {
-                "type": "string"
               }
             }
           },
@@ -568,13 +568,13 @@
           "200": {
             "description": "The request has succeeded.",
             "headers": {
-              "sync-token": {
-                "type": "string",
-                "description": "Used to guarantee real-time consistency between requests."
-              },
               "last-modified": {
                 "type": "string",
                 "format": "date"
+              },
+              "sync-token": {
+                "type": "string",
+                "description": "Used to guarantee real-time consistency between requests."
               }
             }
           },
