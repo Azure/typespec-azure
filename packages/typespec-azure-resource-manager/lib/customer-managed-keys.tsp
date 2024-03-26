@@ -11,7 +11,7 @@ union InfrastructureEncryption {
   @doc("Encryption is disabled")
   Disabled: "disabled",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 
@@ -29,7 +29,7 @@ union KeyEncryptionKeyIdentity {
   @doc("Delegated identity")
   DelegatedResourceIdentity: "delegatedResourceIdentity",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 

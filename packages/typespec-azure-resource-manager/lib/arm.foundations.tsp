@@ -109,7 +109,7 @@ union Origin {
   @doc("Indicates the operation is initiated by a user or system.")
   `user,system`: "user,system",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 
@@ -123,7 +123,7 @@ union ActionType {
   @doc("Actions are for internal-only APIs.")
   Internal: "Internal",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 
@@ -329,7 +329,7 @@ union createdByType {
   @doc("The entity was created by a key.")
   Key: "Key",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 
@@ -460,7 +460,7 @@ union ManagedServiceIdentityType {
   @doc("System and user assigned managed identity.")
   SystemAndUserAssigned: "SystemAssigned, UserAssigned",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 
@@ -478,7 +478,7 @@ union SystemAssignedServiceIdentityType {
   @doc("System assigned managed system identity.")
   SystemAssigned: "SystemAssigned",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 
@@ -716,7 +716,7 @@ union CheckNameAvailabilityReason {
   @doc("Name already exists.")
   AlreadyExists: "AlreadyExists",
 
-  @doc("Open enum modelAsString")
+  @doc("modelAsString=true")
   string,
 }
 

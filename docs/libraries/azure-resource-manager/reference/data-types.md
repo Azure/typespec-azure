@@ -1833,6 +1833,22 @@ model Azure.ResourceManager.Foundations.UserAssignedIdentity
 | clientId?    | `string` | The active directory client identifier for this principal. |
 | principalId? | `string` | The active directory identifier for this principal.        |
 
+### `ResourceHome` {#Azure.ResourceManager.Foundations.ResourceHome}
+
+An internal enum to indicate the resource support for various path types
+
+```typespec
+enum Azure.ResourceManager.Foundations.ResourceHome
+```
+
+### `SkuTier` {#Azure.ResourceManager.Foundations.SkuTier}
+
+Available service tiers for the SKU.
+
+```typespec
+enum Azure.ResourceManager.Foundations.SkuTier
+```
+
 ### `ActionType` {#Azure.ResourceManager.Foundations.ActionType}
 
 Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
@@ -1871,22 +1887,6 @@ The intended executor of the operation; as in Resource Based Access Control (RBA
 
 ```typespec
 union Azure.ResourceManager.Foundations.Origin
-```
-
-### `ResourceHome` {#Azure.ResourceManager.Foundations.ResourceHome}
-
-An internal enum to indicate the resource support for various path types
-
-```typespec
-union Azure.ResourceManager.Foundations.ResourceHome
-```
-
-### `SkuTier` {#Azure.ResourceManager.Foundations.SkuTier}
-
-Available service tiers for the SKU.
-
-```typespec
-union Azure.ResourceManager.Foundations.SkuTier
 ```
 
 ### `SystemAssignedServiceIdentityType` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType}
