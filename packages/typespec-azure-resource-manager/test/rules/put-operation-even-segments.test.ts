@@ -24,6 +24,7 @@ it("Emits a warning for put operations that don't have an even number of path se
     .expect(
       `
       @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
 
       model Employee is ProxyResource<{}> {
@@ -34,26 +35,56 @@ it("Emits a warning for put operations that don't have an even number of path se
         name: string;
       }
 
-
       @armResourceOperations
       interface Operations {
         @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee")
         @armResourceUpdate(Employee)
-        @put operation1(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string): void;  
+        @put operation1(@path subscriptionId: string, @path resourceGroupName: string): void;
+
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees")
+        @armResourceUpdate(Employee)
+        @put operation2(@path subscriptionId: string, @path resourceGroupName: string): void;
+
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/Contact")
+        @armResourceUpdate(Employee)
+        @put operation3(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string): void;
+
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/addContactName")
+        @armResourceUpdate(Employee)
+        @put operation4(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string): void;
+
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/{contactName}/addContact")
+        @armResourceUpdate(Employee)
+        @put operation5(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string, @path contactName: string): void;
+
+        @route("{resourceUri}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/{contactName}/addContact")
+        @armResourceUpdate(Employee)
+        @put operation6(@path resourceUri: string, @path employeeName: string, @path contactName: string): void;
       }
-      // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music"
-      // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music/Songs"
-      // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music/Songs/{songName}/Artist"
-      // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music/Songs/{songName}/Artist/addArtistName"
-      // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music/Songs/{songName}/Artist/{artistName}/addSong"
-      // "{resourceUri}/providers/Microsoft.Music/Songs/{songName}/Artist/{artistName}/addSong"
       // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music/Songs/{songName}/providers/Microsoft.Album/Albums"
       // "/providers/Microsoft.Music/Songs/{songName}/Artist/{artistName}/addSong"
       // "/providers/Microsoft.Music/Songs"      `
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
-    });
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+    ]);
 });
 
 it("Does not emit a warning for put operations that have an even number of path segments", async () => {
