@@ -104,9 +104,10 @@ describe("typespec-autorest: OpenAPI output should be determinstic", () => {
       op read(): {@statusCode _: 200, content: string, headers: Headers};
       `
     );
-    strictEqual(Object.keys(res.paths["/"].get.responses["200"].headers).length, 3);
-    strictEqual(Object.keys(res.paths["/"].get.responses["200"].headers)[0], "a");
-    strictEqual(Object.keys(res.paths["/"].get.responses["200"].headers)[1], "b");
-    strictEqual(Object.keys(res.paths["/"].get.responses["200"].headers)[2], "c");
+    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), [
+      "a",
+      "b",
+      "c"
+    ]);
   });
 });
