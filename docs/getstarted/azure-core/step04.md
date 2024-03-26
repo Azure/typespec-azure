@@ -1,10 +1,10 @@
-# 4. Defining Your First Resource
+# 4. Defining your first resource
 
 In the context of your service, a "resource" is a fundamental entity that your service manages. For our `WidgetService`, the most basic entity we need is a `Widget`. 
 
 To create a `Widget`, we need to define a `model` and annotate it with the `@resource` decorator. 
 
-## Code Implementation
+## Code implementation
 
 After the top-level `namespace` declaration, add the following lines:
 
@@ -22,7 +22,7 @@ model Widget {
 }
 ```
 
-## Code Explanation
+## Code explanation
 
 Here are some important points about the code:
 
