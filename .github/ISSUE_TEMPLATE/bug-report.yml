@@ -1,5 +1,5 @@
 name: 🐞 Bug Report
-about: Report bugs or unexpected behaviors of TypeSpec Azure
+description: Report bugs or unexpected behaviors of TypeSpec Azure
 title: "[Bug]: "
 labels: ["bug"]
 
