@@ -8,6 +8,7 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
+  HttpStatusCodeRange,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getPathParamName,
@@ -54,11 +55,11 @@ export function getSdkHttpOperation(
   methodParameters: SdkMethodParameter[]
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const [responses, exceptions] = diagnostics.pipe(
+  const {responses, exceptions} = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation)
   );
-  const responsesWithBodies = Object.values(responses)
-    .concat(Object.values(exceptions))
+  const responsesWithBodies = [...responses.values()]
+    .concat([...exceptions.values()])
     .filter((r) => r.type);
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0])
@@ -321,12 +322,15 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-  [Record<number | string, SdkHttpResponse>, Record<number | string, SdkHttpResponse>],
+  {
+    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  },
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
-  const responses: Record<number | string, SdkHttpResponse> = {};
-  const exceptions: Record<number | string | "*", SdkHttpResponse> = {};
+  const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
+  const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -370,19 +374,13 @@ function getSdkHttpResponseAndExceptions(
       apiVersions: getAvailableApiVersions(context, httpOperation.operation),
       nullable: body ? isNullable(body) : true,
     };
-    let statusCode: number | string = "";
-    if (typeof response.statusCodes === "number" || response.statusCodes === "*") {
-      statusCode = response.statusCodes;
+    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+      exceptions.set(response.statusCodes, sdkResponse);
     } else {
-      statusCode = `${response.statusCodes.start}-${response.statusCodes.end}`;
-    }
-    if (statusCode === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions[statusCode] = sdkResponse;
-    } else {
-      responses[statusCode] = sdkResponse;
+      responses.set(response.statusCodes, sdkResponse);
     }
   }
-  return diagnostics.wrap([responses, exceptions]);
+  return diagnostics.wrap({ responses, exceptions });
 }
 
 export function getCorrespondingMethodParams(

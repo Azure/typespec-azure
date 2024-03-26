@@ -14,7 +14,7 @@ import {
   ignoreDiagnostics,
   isNullType,
 } from "@typespec/compiler";
-import { HttpOperation } from "@typespec/http";
+import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
@@ -258,13 +258,15 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpResponse>): {
+function getAllResponseBodiesAndNonBodyExists(
+  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
+): {
   allResponseBodies: SdkType[];
   nonBodyExists: boolean;
 } {
   const allResponseBodies: SdkType[] = [];
   let nonBodyExists = false;
-  for (const response of Object.values(responses)) {
+  for (const response of responses.values()) {
     if (response.type) {
       if (response.nullable) {
         nonBodyExists = true;
@@ -277,7 +279,9 @@ function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpR
   return { allResponseBodies, nonBodyExists };
 }
 
-export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>): SdkType[] {
+export function getAllResponseBodies(
+  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
+): SdkType[] {
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
