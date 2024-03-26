@@ -33,6 +33,9 @@ body:
       label: Checklist
       description: Before submitting the issue, please make sure you do the following
       options:
+        - label: Follow our [Code of Conduct](https://github.com/azure/typespec-azure/blob/main/CODE_OF_CONDUCT.md)
+          required: true
+
         - label: Check that this issue is about the Azure libraries for typespec. For bug in the typespec language or core libraries file it in the [TypeSpec repo](https://github.com/Microsoft/TypeSpec/issues/new/choose)
           required: true
 

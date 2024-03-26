@@ -19,13 +19,13 @@ body:
       label: Checklist
       description: Before submitting the issue, please make sure you do the following
       options:
-        - label: Follow our [Code of Conduct](https://github.com/microsoft/typespec/blob/main/CODE_OF_CONDUCT.md)
+        - label: Follow our [Code of Conduct](https://github.com/azure/typespec-azure/blob/main/CODE_OF_CONDUCT.md)
           required: true
 
         - label: Check that this issue is about the Azure libraries for typespec. For feature request in the typespec language or core libraries file it in the [TypeSpec repo](https://github.com/Microsoft/TypeSpec/issues/new/choose)
           required: true
 
-        - label: Read the [docs](https://typespec.io/docs/).
+        - label: Read the [docs](https://azure.github.io/typespec-azure/).
           required: true
 
         - label: Check that there isn't already an issue that request the same feature to avoid creating a duplicate.
