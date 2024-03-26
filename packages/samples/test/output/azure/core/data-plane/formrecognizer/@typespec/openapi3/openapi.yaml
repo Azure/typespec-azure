@@ -574,12 +574,18 @@ components:
           description: Document analysis result.
       description: Status and result of the analyze operation.
     AnalyzeResultOperationStatus:
-      type: string
-      enum:
-        - notStarted
-        - running
-        - failed
-        - succeeded
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - notStarted
+            - running
+            - failed
+            - succeeded
+            - running
+            - failed
+            - succeeded
+            - canceled
       description: Operation status.
     AuthorizeCopyRequest:
       type: object
@@ -913,19 +919,21 @@ components:
           description: Bounding regions covering the field.
       description: An object representing the content and location of a field value.
     DocumentFieldType:
-      type: string
-      enum:
-        - string
-        - date
-        - time
-        - phoneNumber
-        - number
-        - integer
-        - selectionMark
-        - countryRegion
-        - signature
-        - array
-        - object
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - string
+            - date
+            - time
+            - phoneNumber
+            - number
+            - integer
+            - selectionMark
+            - countryRegion
+            - signature
+            - array
+            - object
       description: Semantic data type of the field value.
     DocumentKeyValueElement:
       type: object
@@ -1071,10 +1079,12 @@ components:
           description: Confidence of correctly extracting the selection mark.
       description: A selection mark object representing check boxes, radio buttons, and other elements indicating a selection.
     DocumentSignatureType:
-      type: string
-      enum:
-        - signed
-        - unsigned
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - signed
+            - unsigned
       description: Presence of signature.
     DocumentSpan:
       type: object
@@ -1187,13 +1197,15 @@ components:
           description: Location of the table cell in the reading order concatenated content.
       description: An object representing the location and content of a table cell.
     DocumentTableCellKind:
-      type: string
-      enum:
-        - content
-        - rowHeader
-        - columnHeader
-        - stubHead
-        - description
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - content
+            - rowHeader
+            - columnHeader
+            - stubHead
+            - description
       description: Table cell kind.
     DocumentWord:
       type: object
@@ -1296,10 +1308,12 @@ components:
           description: The inner error details.
       description: The inner details of an error.
     LengthUnit:
-      type: string
-      enum:
-        - pixel
-        - inch
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - pixel
+            - inch
       description: The unit used by the width, height, and boundingBox properties. For images, the unit is "pixel". For PDF, the unit is "inch".
     ModelDescription:
       type: string
@@ -1371,20 +1385,27 @@ components:
           description: URL of the resource targeted by this operation.
       description: Operation info.
     OperationKind:
-      type: string
-      enum:
-        - documentModelBuild
-        - documentModelCompose
-        - documentModelCopyTo
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - documentModelBuild
+            - documentModelCompose
+            - documentModelCopyTo
       description: Type of operation
     OperationStatus:
-      type: string
-      enum:
-        - notStarted
-        - running
-        - failed
-        - succeeded
-        - canceled
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - notStarted
+            - running
+            - failed
+            - succeeded
+            - running
+            - failed
+            - succeeded
+            - canceled
       description: Operation status.
     PagedModelSummary:
       type: object
@@ -1419,17 +1440,21 @@ components:
           readOnly: true
       description: Paged collection of OperationInfo items
     SelectionMarkState:
-      type: string
-      enum:
-        - selected
-        - unselected
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - selected
+            - unselected
       description: State of the selection mark.
     StringIndexType:
-      type: string
-      enum:
-        - textElements
-        - unicodeCodePoint
-        - utf16CodeUnit
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - textElements
+            - unicodeCodePoint
+            - utf16CodeUnit
       description: Method used to compute string offset and length.
   securitySchemes:
     AadOauth2Auth:

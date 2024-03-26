@@ -1,9 +1,17 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Union } from "@typespec/compiler";
+import { Enum, Model, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkArrayType, SdkBodyModelPropertyType, SdkType, UsageFlags } from "../src/interfaces.js";
+import {
+  SdkArrayType,
+  SdkBodyModelPropertyType,
+  SdkEnumType,
+  SdkModelType,
+  SdkType,
+  SdkUnionType,
+  UsageFlags,
+} from "../src/interfaces.js";
 import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
   getAllModels,
@@ -249,8 +257,10 @@ describe("typespec-client-generator-core: types", () => {
       const e2 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "testScalar");
       ok(m && e1 && e2);
       strictEqual(e1.kind, "enum");
+      strictEqual(e1.isUnionAsEnum, false);
       strictEqual(e1.valueType.kind, "string");
       strictEqual(e2.kind, "enum");
+      strictEqual(e2.isUnionAsEnum, false);
       strictEqual(e2.valueType.kind, "string");
       for (const property of m.properties) {
         if (property.name === "prop1") {
@@ -603,6 +613,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkType.isUnionAsEnum, false);
       strictEqual(sdkType.name, "PetKind");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
@@ -808,7 +819,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.isFixed, true);
       strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
       strictEqual(sdkType.valueType.kind, "string");
-      strictEqual(sdkType.usage & UsageFlags.Versioning, 0); // not a versioning enum
+      strictEqual(sdkType.usage & UsageFlags.ApiVersionEnum, 0); // not a versioning enum
+      strictEqual(sdkType.isUnionAsEnum, false);
       const values = sdkType.values;
       strictEqual(values.length, 7);
       const nameList = [
@@ -968,14 +980,11 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.valueType.kind, "int32");
       const values = sdkType.values;
       strictEqual(values.length, 3);
-      deepEqual(
-        values.map((x) => x.name),
-        ["a", "b", "c"]
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        [1, 2, 3]
-      );
+
+      // since these union is named, it gets flattened into one
+      ok(values.find((x) => x.name === "a" && x.value === 1));
+      ok(values.find((x) => x.name === "b" && x.value === 2));
+      ok(values.find((x) => x.name === "c" && x.value === 3));
     });
 
     it("string fixed", async function () {
@@ -1198,8 +1207,211 @@ describe("typespec-client-generator-core: types", () => {
       const enumType = getClientType(runner.context, TestUnion);
       strictEqual(enumType.kind, "enum");
       strictEqual(enumType.name, "TestUnionRename");
+      strictEqual(enumType.isUnionAsEnum, true);
       strictEqual(enumType.values[0].name, "ARename");
       strictEqual(enumType.values[1].name, "BRename");
+    });
+
+    it("union as enum with hierarchy", async () => {
+      const { Test } = (await runner.compile(
+        `
+        @service({})
+        namespace N {
+          @test
+          union Test{
+            A,
+            B,
+            C,
+            null
+          }
+
+          union A {
+            "A1",
+            "A2",
+          }
+
+          union B {
+            "B",
+            string
+          }
+
+          enum C {
+            "C"
+          }
+          op x(body: Test): void;
+        }
+      `
+      )) as { Test: Union };
+
+      const enumType = getClientType(runner.context, Test);
+      strictEqual(enumType.kind, "enum");
+      strictEqual(enumType.name, "Test");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(enumType.nullable, true);
+      strictEqual(enumType.isUnionAsEnum, true);
+      const values = enumType.values;
+      strictEqual(values.length, 4);
+      strictEqual(enumType.isFixed, false);
+
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "A1" && x.value === "A1"));
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "A2" && x.value === "A2"));
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "B" && x.value === "B"));
+      ok(values.find((x) => x.kind === "enumvalue" && x.name === "C" && x.value === "C"));
+    });
+
+    it("union as enum with hierarchy without flatten", async () => {
+      runner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+        "flatten-union-as-enum": false,
+      });
+      const { Test } = (await runner.compile(
+        `
+        @service({})
+        namespace N {
+          @test
+          union Test{
+            A,
+            B,
+            C,
+            null
+          }
+
+          union A {
+            "A1",
+            "A2",
+          }
+
+          union B {
+            "B",
+            string
+          }
+
+          enum C {
+            "C"
+          }
+          op x(body: Test): void;
+        }
+      `
+      )) as { Test: Union };
+
+      const unionType = getClientType(runner.context, Test);
+      strictEqual(unionType.kind, "union");
+      strictEqual(unionType.name, "Test");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(unionType.nullable, true);
+      const values = unionType.values;
+      strictEqual(values.length, 3);
+      const a = values[0] as SdkEnumType;
+      strictEqual(a.name, "A");
+      strictEqual(a.kind, "enum");
+      strictEqual(a.isUnionAsEnum, true);
+      strictEqual(a.values[0].name, "A1");
+      strictEqual(a.values[0].value, "A1");
+      strictEqual(a.values[1].name, "A2");
+      strictEqual(a.values[1].value, "A2");
+
+      const b = values[1] as SdkEnumType;
+      strictEqual(b.name, "B");
+      strictEqual(b.kind, "enum");
+      strictEqual(b.isUnionAsEnum, true);
+      strictEqual(b.values[0].name, "B");
+      strictEqual(b.values[0].value, "B");
+
+      const c = values[2] as SdkEnumType;
+      strictEqual(c.name, "C");
+      strictEqual(c.kind, "enum");
+      strictEqual(c.isUnionAsEnum, false);
+      strictEqual(c.values[0].name, "C");
+      strictEqual(c.values[0].value, "C");
+    });
+
+    it("anonymous union as enum with hierarchy", async () => {
+      const { Test } = (await runner.compile(
+        `
+        @service({})
+        namespace N {
+          enum LR {
+            left,
+            right,
+          }
+          enum UD {
+            up,
+            down,
+          }
+          
+          @test
+          model Test {
+            color: LR | UD;
+          }
+          op read(@body body: Test): void;
+        }
+      `
+      )) as { Test: Model };
+
+      const modelType = getClientType(runner.context, Test) as SdkModelType;
+      const enumType = modelType.properties[0].type as SdkEnumType;
+      strictEqual(enumType.name, "TestColor");
+      strictEqual(enumType.generatedName, true);
+      strictEqual(enumType.isUnionAsEnum, true);
+      const values = enumType.values;
+      strictEqual(values[0].name, "left");
+      strictEqual(values[0].value, "left");
+      strictEqual(values[0].valueType.kind, "string");
+      strictEqual(values[1].name, "right");
+      strictEqual(values[1].value, "right");
+      strictEqual(values[1].valueType.kind, "string");
+      strictEqual(values[2].name, "up");
+      strictEqual(values[2].value, "up");
+      strictEqual(values[2].valueType.kind, "string");
+      strictEqual(values[3].name, "down");
+      strictEqual(values[3].value, "down");
+      strictEqual(values[3].valueType.kind, "string");
+    });
+
+    it("anonymous union as enum with hierarchy without flatten", async () => {
+      runner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+        "flatten-union-as-enum": false,
+      });
+      const { Test } = (await runner.compile(
+        `
+        @service({})
+        namespace N {
+          enum LR {
+            left,
+            right,
+          }
+          enum UD {
+            up,
+            down,
+          }
+          
+          @test
+          model Test {
+            color: LR | UD;
+          }
+          op read(@body body: Test): void;
+        }
+      `
+      )) as { Test: Model };
+
+      const modelType = getClientType(runner.context, Test) as SdkModelType;
+      const unionType = modelType.properties[0].type as SdkUnionType;
+      strictEqual(unionType.name, "TestColor");
+      strictEqual(unionType.generatedName, true);
+      const values = unionType.values;
+      const lr = values[0] as SdkEnumType;
+      strictEqual(lr.name, "LR");
+      strictEqual(lr.isUnionAsEnum, false);
+      strictEqual(lr.values[0].name, "left");
+      strictEqual(lr.values[1].name, "right");
+      strictEqual(lr.isFixed, true);
+      const ud = values[1] as SdkEnumType;
+      strictEqual(ud.name, "UD");
+      strictEqual(ud.isUnionAsEnum, false);
+      strictEqual(ud.values[0].name, "up");
+      strictEqual(ud.values[1].name, "down");
+      strictEqual(ud.isFixed, true);
     });
 
     it("versioned enums", async () => {
@@ -1218,7 +1430,38 @@ describe("typespec-client-generator-core: types", () => {
       const enums = runner.context.experimental_sdkPackage.enums;
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
-      strictEqual(enums[0].usage, UsageFlags.Versioning);
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+    });
+
+    it("usage propagation for enum value", async () => {
+      await runner.compile(
+        `
+        @service({})
+        namespace N {
+          enum LR {
+            left,
+            right,
+          }
+          union UD {
+            up: "up",
+            down: "down",
+          }
+          
+          @test
+          model Test {
+            prop1: LR.left;
+            prop2: UD.up;
+          }
+          op read(@body body: Test): void;
+        }
+      `
+      );
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 2);
+      strictEqual(enums[0].name, "LR");
+      strictEqual(enums[0].usage, UsageFlags.Input);
+      strictEqual(enums[1].name, "UD");
+      strictEqual(enums[1].usage, UsageFlags.Input);
     });
   });
 
@@ -1751,7 +1994,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(dogValue.kind, "enumvalue");
     });
 
-    it("template variable of anonymous union as enum", async () => {
+    it("template variable of anonymous union", async () => {
       await runner.compileWithBuiltInService(`
       interface GetAndSend<Type> {
         get(): {
@@ -1920,6 +2163,7 @@ describe("typespec-client-generator-core: types", () => {
       let kindTypeProperty = fish.properties.find((x) => x.name === "kind");
       ok(kindTypeProperty);
       strictEqual(kindTypeProperty.type.kind, "enum");
+      strictEqual(kindTypeProperty.type.isUnionAsEnum, true);
       strictEqual(fish.discriminatorProperty, kindTypeProperty);
       const shark = models.find((x) => x.name === "Shark");
       ok(shark);
@@ -2506,6 +2750,7 @@ describe("typespec-client-generator-core: types", () => {
       const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw;
       ok(rawModel);
@@ -2546,6 +2791,7 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
+      // eslint-disable-next-line deprecation/deprecation
       const errorModels = models.filter((x) => x.kind === "model" && x.isError);
       deepStrictEqual(errorModels.map((x) => x.name).sort(), [
         "ApiError",
@@ -2553,6 +2799,7 @@ describe("typespec-client-generator-core: types", () => {
         "FourHundredError",
         "FourZeroFourError",
       ]);
+      // eslint-disable-next-line deprecation/deprecation
       const validModel = models.filter((x) => x.kind === "model" && !x.isError);
       deepStrictEqual(
         validModel.map((x) => x.name),
@@ -2575,7 +2822,9 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const model = models[0];
       strictEqual(model.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.isFormDataType, true);
+      ok((model.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(model.name, "MultiPartRequest");
       strictEqual(model.properties.length, 2);
       const id = model.properties.find((x) => x.name === "id");
@@ -2625,7 +2874,9 @@ describe("typespec-client-generator-core: types", () => {
       const modelA = models.find((x) => x.name === "A");
       ok(modelA);
       strictEqual(modelA.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelA.isFormDataType, true);
+      ok((modelA.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(modelA.properties.length, 1);
       const modelAProp = modelA.properties[0];
       strictEqual(modelAProp.kind, "property");
@@ -2634,7 +2885,9 @@ describe("typespec-client-generator-core: types", () => {
       const modelB = models.find((x) => x.name === "B");
       ok(modelB);
       strictEqual(modelB.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelB.isFormDataType, false);
+      ok((modelB.usage & UsageFlags.MultipartFormData) === 0);
       strictEqual(modelB.properties.length, 1);
       strictEqual(modelB.properties[0].type.kind, "bytes");
     });
@@ -2719,12 +2972,16 @@ describe("typespec-client-generator-core: types", () => {
 
       const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
       ok(pictureWrapper);
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(pictureWrapper.isFormDataType, true);
+      ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
       const errorResponse = models.find((x) => x.name === "ErrorResponse");
       ok(errorResponse);
       strictEqual(errorResponse.kind, "model");
+      // eslint-disable-next-line deprecation/deprecation
       strictEqual(errorResponse.isFormDataType, false);
+      ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
     });
   });
   describe("SdkTupleType", () => {

@@ -149,6 +149,7 @@ model SdkDictionaryType extends SdkType {
  * @property access: Access level of the enum
  * @property usage: Usage cases for the enum. Used to filter when people only want input or output enums
  * @property summary: Summary of an enum
+ * @property isUnionAsEnum: Whether the enum is converted from TypeSpec union type
  */
 model SdkEnumType extends SdkType {
   kind: "enum";
@@ -163,6 +164,7 @@ model SdkEnumType extends SdkType {
   usage: UsageFlags;
   summary: string;
   nameSpace: string;
+  isUnionAsEnum: boolean;
 }
 
 /**
@@ -529,8 +531,6 @@ alias SdkServiceParameter = SdkQueryServiceParameter | SdkHeaderServiceParameter
  * @property parameters: Parameters object for the method
  * @property description: Description of the operation
  * @property details: Optional details of the operation
- * @property overloads: Any overloads of this method
- * @property overloading: The method that this method overloads
  */
 @discriminator("kind")
 model SdkMethod {
@@ -539,8 +539,6 @@ model SdkMethod {
   parameters: SdkMethodParameter[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod[];
-  overloading?: SdkMethod;
 }
 
 /**

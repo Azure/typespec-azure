@@ -33,6 +33,7 @@ export interface SdkEmitterOptions {
   "generate-convenience-methods"?: boolean;
   "filter-out-core-models"?: boolean;
   "package-name"?: string;
+  "flatten-union-as-enum"?: boolean;
 }
 
 export interface SdkClient {
@@ -40,6 +41,9 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
+  /**
+   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
+   */
   arm: boolean;
   crossLanguageDefinitionId: string;
 }
@@ -57,8 +61,9 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
-  endpoint: string;
-  hasParameterizedEndpoint: boolean;
+  /**
+   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
+   */
   arm: boolean;
 }
 
@@ -92,7 +97,8 @@ export type SdkType =
   | SdkConstantType
   | SdkUnionType
   | SdkModelType
-  | SdkCredentialType;
+  | SdkCredentialType
+  | SdkEndpointType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -240,6 +246,7 @@ export interface SdkEnumType extends SdkTypeBase {
   access?: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  isUnionAsEnum: boolean;
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -270,7 +277,13 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
+  /**
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData nad the `.usage` property on this model
+   */
   isFormDataType: boolean;
+  /**
+   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
+   */
   isError: boolean;
   generatedName: boolean;
   description?: string;
@@ -289,6 +302,12 @@ export interface SdkModelType extends SdkTypeBase {
 export interface SdkCredentialType extends SdkTypeBase {
   kind: "credential";
   scheme: HttpAuth;
+}
+
+export interface SdkEndpointType extends SdkTypeBase {
+  kind: "endpoint";
+  serverUrl?: string;
+  templateArguments: SdkPathParameter[];
 }
 
 export interface SdkModelPropertyTypeBase {
@@ -315,6 +334,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
+  type: SdkEndpointType;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
@@ -431,7 +451,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+interface SdkMethodBase {
   __raw?: Operation;
   name: string;
   access: AccessFlags | undefined;
@@ -439,12 +459,10 @@ interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   apiVersions: string[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod<TServiceOperation>[];
-  overloading?: SdkMethod<TServiceOperation>;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+  extends SdkMethodBase {
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
@@ -495,8 +513,7 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }
@@ -528,5 +545,9 @@ export enum UsageFlags {
   None = 0,
   Input = 1 << 1,
   Output = 1 << 2,
-  Versioning = 1 << 3,
+  ApiVersionEnum = 1 << 3,
+  // Input will also be set when JsonMergePatch is set
+  JsonMergePatch = 1 << 4,
+  // Input will also be set when MultipartFormData is set
+  MultipartFormData = 1 << 5,
 }

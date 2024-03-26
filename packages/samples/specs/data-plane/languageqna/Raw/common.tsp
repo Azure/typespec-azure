@@ -8,48 +8,50 @@ using TypeSpec.OpenAPI;
 // namespace Azure.QnAMaker.Common;
 
 @doc("The set of possible error codes.")
-enum ErrorCode {
+union ErrorCode {
+  string,
+
   @doc("Invalid request")
-  InvalidRequest,
+  InvalidRequest: "InvalidRequest",
 
   @doc("Invalid argument")
-  InvalidArgument,
+  InvalidArgument: "InvalidArgument",
 
   @doc("Unauthorized")
-  Unauthorized,
+  Unauthorized: "Unauthorized",
 
   @doc("Forbidden")
-  Forbidden,
+  Forbidden: "Forbidden",
 
   @doc("Not found")
-  NotFound,
+  NotFound: "NotFound",
 
   @doc("Project not found")
-  ProjectNotFound,
+  ProjectNotFound: "ProjectNotFound",
 
   @doc("Operation not found")
-  OperationNotFound,
+  OperationNotFound: "OperationNotFound",
 
   @doc("Azure Cognitive Search not found")
-  AzureCognitiveSearchNotFound,
+  AzureCognitiveSearchNotFound: "AzureCognitiveSearchNotFound",
 
   @doc("Azure Cognitive Search index not found")
-  AzureCognitiveSearchIndexNotFound,
+  AzureCognitiveSearchIndexNotFound: "AzureCognitiveSearchIndexNotFound",
 
   @doc("Too many requests")
-  TooManyRequests,
+  TooManyRequests: "TooManyRequests",
 
   @doc("Azure Cognitive Search throttling")
-  AzureCognitiveSearchThrottling,
+  AzureCognitiveSearchThrottling: "AzureCognitiveSearchThrottling",
 
   @doc("Azure Cognitive Search index limit reached")
-  AzureCognitiveSearchIndexLimitReached,
+  AzureCognitiveSearchIndexLimitReached: "AzureCognitiveSearchIndexLimitReached",
 
   @doc("Internal server error")
-  InternalServerError,
+  InternalServerError: "InternalServerError",
 
   @doc("Service unavailable")
-  ServiceUnavailable,
+  ServiceUnavailable: "ServiceUnavailable",
 }
 
 @doc("The projectName parameter definition.")
@@ -89,13 +91,15 @@ model Language {
 }
 
 @doc("The format of an import or export operation.")
-enum ImportExportFormat {
+union ImportExportFormat {
+  string,
+
   @doc("Export or Import QnA assets in JSON format")
-  json,
+  json: "json",
 
   @doc("Export or Import knowledge base replica including all assets and metadata in Excel format.")
-  tsv,
+  tsv: "tsv",
 
   @doc("Export or Import knowledge base replica including all assets and metadata in Tsv format.")
-  excel,
+  excel: "excel",
 }
