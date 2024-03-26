@@ -54,11 +54,12 @@ model AllPropertiesProperties {
 
 @Azure.Core.lroStatus
 @doc("Envelope provisioning state")
-enum SystemEnvelopeProvisioningState {
-  ...ResourceProvisioningState,
+union SystemEnvelopeProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Working")
-  Working,
+  Working: "Working",
 }
 
 @armResourceOperations

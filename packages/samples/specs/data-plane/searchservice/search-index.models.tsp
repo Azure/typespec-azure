@@ -100,7 +100,9 @@ model SearchField {
 }
 
 @doc("Defines the data type of a field in a search index.")
-enum SearchFieldDataType {
+union SearchFieldDataType {
+  string,
+
   @doc("Indicates that a field contains a string.")
   String: "Edm.String",
 
@@ -127,7 +129,9 @@ enum SearchFieldDataType {
 }
 
 @doc("Defines the names of all text analyzers supported by Azure Cognitive Search.")
-enum LexicalAnalyzerName {
+union LexicalAnalyzerName {
+  string,
+
   @doc("Microsoft analyzer for Arabic.")
   ArMicrosoft: "ar.microsoft",
 
@@ -508,7 +512,9 @@ model TagScoringParameters {
 }
 
 @doc("Defines the function used to interpolate score boosting across a range of documents.")
-enum ScoringFunctionInterpolation {
+union ScoringFunctionInterpolation {
+  string,
+
   @doc("Boosts scores by a linearly decreasing amount. This is the default interpolation for scoring functions.")
   Linear: "linear",
 
@@ -523,7 +529,9 @@ enum ScoringFunctionInterpolation {
 }
 
 @doc("Defines the aggregation function used to combine the results of all the scoring functions in a scoring profile.")
-enum ScoringFunctionAggregation {
+union ScoringFunctionAggregation {
+  string,
+
   @doc("Boost scores by the sum of all scoring function results.")
   Sum: "sum",
 
@@ -562,7 +570,9 @@ model Suggester {
 }
 
 @doc("A value indicating the capabilities of the suggester.")
-enum SuggesterSearchMode {
+union SuggesterSearchMode {
+  string,
+
   @doc("Matches consecutive whole terms and prefixes in a field. For example, for the field 'The fastest brown fox', the queries 'fast' and 'fastest brow' would both match.")
   AnalyzingInfixMatching: "analyzingInfixMatching",
 }
@@ -626,7 +636,9 @@ model StopAnalyzer extends LexicalAnalyzer {
 }
 
 @doc("Defines the names of all tokenizers supported by Azure Cognitive Search.")
-enum LexicalTokenizerName {
+union LexicalTokenizerName {
+  string,
+
   @doc("Grammar-based tokenizer that is suitable for processing most European-language documents. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/standard/ClassicTokenizer.html")
   Classic: "classic",
 
@@ -668,7 +680,9 @@ enum LexicalTokenizerName {
 }
 
 @doc("Defines the names of all token filters supported by Azure Cognitive Search.")
-enum TokenFilterName {
+union TokenFilterName {
+  string,
+
   @doc("A token filter that applies the Arabic normalizer to normalize the orthography. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/ar/ArabicNormalizationFilter.html")
   ArabicNormalization: "arabic_normalization",
 
@@ -773,13 +787,17 @@ enum TokenFilterName {
 }
 
 @doc("Defines the names of all character filters supported by Azure Cognitive Search.")
-enum CharFilterName {
+union CharFilterName {
+  string,
+
   @doc("A character filter that attempts to strip out HTML constructs. See https://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/charfilter/HTMLStripCharFilter.html")
   HtmlStrip: "html_strip",
 }
 
 @doc("Defines flags that can be combined to control how regular expressions are used in the pattern analyzer and pattern tokenizer.")
-enum RegexFlags {
+union RegexFlags {
+  string,
+
   @doc("Enables canonical equivalence.")
   CanonEq: "CANON_EQ",
 
@@ -838,7 +856,9 @@ model EdgeNGramTokenizer extends LexicalTokenizer {
 }
 
 @doc("Represents classes of characters on which a token filter can operate.")
-enum TokenCharacterKind {
+union TokenCharacterKind {
+  string,
+
   @doc("Keeps letters in tokens.")
   Letter: "letter",
 
@@ -888,7 +908,9 @@ model MicrosoftLanguageTokenizer extends LexicalTokenizer {
 }
 
 @doc("Lists the languages supported by the Microsoft language tokenizer.")
-enum MicrosoftTokenizerLanguage {
+union MicrosoftTokenizerLanguage {
+  string,
+
   @doc("Selects the Microsoft tokenizer for Arabic.")
   Arabic: "arabic",
 
@@ -1038,7 +1060,9 @@ model MicrosoftLanguageStemmingTokenizer extends LexicalTokenizer {
 }
 
 @doc("Lists the languages supported by the Microsoft language stemming  tokenizer.")
-enum MicrosoftStemmingTokenizerLanguage {
+union MicrosoftStemmingTokenizerLanguage {
+  string,
+
   @doc("Selects the Microsoft stemming tokenizer for Bangla.")
   Bangla: "bangla",
 
@@ -1263,7 +1287,9 @@ model AsciiFoldingTokenFilter extends TokenFilter {
 }
 
 @doc("Scripts that can be ignored by CjkBigramTokenFilter.")
-enum CjkBigramTokenFilterScripts {
+union CjkBigramTokenFilterScripts {
+  string,
+
   @doc("Ignore Han script when forming bigrams of CJK terms.")
   Han: "han",
 
@@ -1327,7 +1353,9 @@ model DictionaryDecompounderTokenFilter extends TokenFilter {
 }
 
 @doc("Specifies which side of the input an n-gram should be generated from.")
-enum EdgeNGramTokenFilterSide {
+union EdgeNGramTokenFilterSide {
+  string,
+
   @doc("Specifies that the n-gram should be generated from the front of the input.")
   Front: "front",
 
@@ -1563,7 +1591,9 @@ model CustomNormalizer extends LexicalNormalizer {
 }
 
 @doc("Defines the names of all text normalizers supported by Azure Cognitive Search.")
-enum LexicalNormalizerName {
+union LexicalNormalizerName {
+  string,
+
   @doc("Converts alphabetic, numeric, and symbolic Unicode characters which are not in the first 127 ASCII characters (the \"Basic Latin\" Unicode block) into their ASCII equivalents, if such equivalents exist. See http://lucene.apache.org/core/4_10_3/analyzers-common/org/apache/lucene/analysis/miscellaneous/ASCIIFoldingFilter.html")
   Asciifolding: "asciifolding",
 

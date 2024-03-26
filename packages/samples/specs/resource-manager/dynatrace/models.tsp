@@ -29,48 +29,58 @@ scalar MediumString extends string;
 scalar SecureString extends string;
 
 @doc("Indicates whether metrics are being sent.")
-enum SendingMetricsStatus {
+union SendingMetricsStatus {
+  string,
+
   @doc("Metrics are enabled.")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("Metrics are disabled.")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 @doc("Indicates whether logs are being sent.")
-enum SendingLogsStatus {
+union SendingLogsStatus {
+  string,
+
   @doc("Logs are enabled.")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("Logs are disabled.")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 @doc("Indicates whether AAD logs are being sent.")
-enum SendAadLogsStatus {
+union SendAadLogsStatus {
+  string,
+
   @doc("AAD logs are enabled.")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("AAD logs are disabled.")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 @doc("Indicates whether activity logs are being sent.")
-enum SendActivityLogsStatus {
+union SendActivityLogsStatus {
+  string,
+
   @doc("Activity logs are enabled.")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("Activity logs are disabled.")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 @doc("Indicates whether subscription logs are being sent.")
-enum SendSubscriptionLogsStatus {
+union SendSubscriptionLogsStatus {
+  string,
+
   @doc("Subscription logs are enabled.")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("Subscription logs are disabled.")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 // Why is this not represented as a subResource? How are monitored resources added?
@@ -197,53 +207,60 @@ model EnvironmentInfo {
 
 @doc("Provisioning state of the monitoring resource")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("The resource provisioning has been accepted.")
-  Accepted,
+  Accepted: "Accepted",
 
   @doc("The resource is being created.")
-  Creating,
+  Creating: "Creating",
 
   @doc("The resource is being updated.")
-  Updating,
+  Updating: "Updating",
 
   @doc("The resource is being deleted.")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("The resource has been deleted.")
-  Deleted,
+  Deleted: "Deleted",
 
   @doc("The resource status is unspecified.")
-  NotSpecified,
+  NotSpecified: "NotSpecified",
 }
 
 @doc("Flag specifying if the resource monitoring is enabled or disabled.")
-enum MonitoringStatus {
+union MonitoringStatus {
+  string,
+
   @doc("Monitoring enabled")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("Monitoring disabled")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 @doc("Flag specifying the Marketplace Subscription Status of the resource. If payment is not made in time, the resource will go in Suspended state.")
-enum MarketplaceSubscriptionStatus {
+union MarketplaceSubscriptionStatus {
+  string,
+
   @doc("Subscription is active")
-  Active,
+  Active: "Active",
 
   @doc("Subscription is suspended")
-  Suspended,
+  Suspended: "Suspended",
 }
 
 @doc("Liftr resource category")
-enum LiftrResourceCategories {
+union LiftrResourceCategories {
+  string,
+
   @doc("Unknown")
-  Unknown,
+  Unknown: "Unknown",
 
   @doc("Monitor logs")
-  MonitorLogs,
+  MonitorLogs: "MonitorLogs",
 }
 
 @doc("User info.")
@@ -322,12 +339,14 @@ model FilteringTag {
 }
 
 @doc("Valid actions for a filtering tag. Exclusion takes priority over inclusion.")
-enum TagAction {
+union TagAction {
+  string,
+
   @doc("Include tag")
-  Include,
+  Include: "Include",
 
   @doc("Exclude tag")
-  Exclude,
+  Exclude: "Exclude",
 }
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "This is an existing service."
@@ -352,12 +371,14 @@ model VMResources {
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "This is an existing service."
 @doc("Various states of the updating vm extension on resource")
-enum VMHostUpdateState {
+union VMHostUpdateState {
+  string,
+
   @doc("Extension is being installed")
-  Install,
+  Install: "Install",
 
   @doc("Extension is being deleted")
-  Delete,
+  Delete: "Delete",
 }
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "This is an existing service."
@@ -383,18 +404,20 @@ model VMHostUpdateRequest {
 }
 
 @doc("Various states of the SSO resource")
-enum SingleSignOnStates {
+union SingleSignOnStates {
+  string,
+
   @doc("Initial state")
-  Initial,
+  Initial: "Initial",
 
   @doc("SSO is enabled")
-  Enable,
+  Enable: "Enable",
 
   @doc("SSO is disabled")
-  Disable,
+  Disable: "Disable",
 
   @doc("Existing SSO authentication")
-  Existing,
+  Existing: "Existing",
 }
 
 @doc("The details of a DynaTrace single sign-on.")

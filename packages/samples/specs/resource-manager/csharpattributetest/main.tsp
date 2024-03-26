@@ -48,9 +48,10 @@ model CustomAttributesProperties {
 
 @Azure.Core.lroStatus
 @doc("Envelope provisioning state.")
-enum EnvelopeProvisioningState {
-  ...ResourceProvisioningState,
+union EnvelopeProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Working state.")
-  Working,
+  Working: "Working",
 }

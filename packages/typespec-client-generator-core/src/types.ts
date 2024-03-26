@@ -1267,7 +1267,8 @@ function updateUsageOfModel(
   type?: SdkType,
   seenModelNames?: Set<SdkType>
 ): void {
-  if (!type || !["model", "enum", "array", "dict", "union"].includes(type.kind)) return undefined;
+  if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
+    return;
   if (seenModelNames === undefined) {
     seenModelNames = new Set<SdkType>();
   }
@@ -1279,6 +1280,10 @@ function updateUsageOfModel(
     for (const unionType of type.values) {
       updateUsageOfModel(context, usage, unionType, seenModelNames);
     }
+    return;
+  }
+  if (type.kind === "enumvalue") {
+    updateUsageOfModel(context, usage, type.enumType, seenModelNames);
     return;
   }
   if (type.kind !== "model" && type.kind !== "enum") return;
