@@ -37,9 +37,8 @@ it("Emits a warning for put operation that does not contain the appropriate resp
       
       @armResourceOperations
       interface Employees {
-        @put
         @armResourceCreateOrUpdate(Employee)
-        createOrUpdate(...ApiVersionParameter): {
+        @put createOrUpdate(...ApiVersionParameter): {
           @statusCode _: 207;
           result: boolean;
         }

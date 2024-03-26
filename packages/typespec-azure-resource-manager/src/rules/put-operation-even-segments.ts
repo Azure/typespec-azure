@@ -23,14 +23,15 @@ export const putOperationEvenSegmentsRule = createRule({
               continue;
             }
             if (op.httpOperation.verb === "put") {
-              const segments = op.httpOperation.pathSegments;
-              console.log(segments);
-              context.reportDiagnostic({
-                target: op.operation,
-                format: {
-                  resourceName: resource.name,
-                },
-              });
+              const segments = op.httpOperation.path.split("/").filter((x) => x !== "");
+              if (segments.length % 2 !== 0) {
+                context.reportDiagnostic({
+                  target: op.operation,
+                  format: {
+                    resourceName: resource.name,
+                  },
+                });
+              }
             }
           }
         }
