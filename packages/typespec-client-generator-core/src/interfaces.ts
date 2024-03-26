@@ -368,12 +368,14 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
@@ -381,6 +383,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   serializedName: string;
   optional: false;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -388,6 +391,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export type SdkHttpParameter =
@@ -439,7 +443,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
-  bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
+  bodyParam?: SdkBodyParameter; // array for cases like urlencoded / multipart
   responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
   exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
 }
@@ -463,6 +467,10 @@ interface SdkMethodBase {
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
+  /**
+   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+   * @param serviceParam
+   */
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];

@@ -33,16 +33,8 @@ import {
   Authentication,
   Visibility,
   getAuthentication,
-  getHeaderFieldName,
-  getHeaderFieldOptions,
-  getPathParamName,
-  getQueryParamName,
-  getQueryParamOptions,
   getServers,
-  isBody,
   isHeader,
-  isPathParam,
-  isQueryParam,
   isStatusCode,
 } from "@typespec/http";
 import {
@@ -58,7 +50,6 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
-  CollectionFormat,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
@@ -70,13 +61,11 @@ import {
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
-  SdkEndpointParameter,
-  SdkEndpointType,
   SdkEnumType,
   SdkEnumValueType,
   SdkModelPropertyType,
+  SdkModelPropertyTypeBase,
   SdkModelType,
-  SdkPathParameter,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -109,6 +98,7 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { TCGCContext } from "./internal-utils.js";
 
 function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
@@ -882,24 +872,6 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
   return undefined;
 }
 
-function getCollectionFormat(
-  context: TCGCContext,
-  type: ModelProperty
-): CollectionFormat | undefined {
-  const program = context.program;
-  const tspCollectionFormat = (
-    isQueryParam(program, type)
-      ? getQueryParamOptions(program, type)
-      : isHeader(program, type)
-        ? getHeaderFieldOptions(program, type)
-        : undefined
-  )?.format;
-  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
-    return undefined;
-  }
-  return tspCollectionFormat;
-}
-
 function getSdkCredentialType(
   client: SdkClient,
   authentication: Authentication
@@ -949,31 +921,22 @@ export function getSdkCredentialParameter(
   };
 }
 
-interface GetSdkModelPropertyTypeOptions {
-  isEndpointParam?: boolean;
-  operation?: Operation;
-  isMethodParameter?: boolean;
-  defaultContentType?: string;
-}
-
-export function getSdkModelPropertyType(
+export function getSdkModelPropertyTypeBase(
   context: TCGCContext,
   type: ModelProperty,
-  options: GetSdkModelPropertyTypeOptions = {}
-): [SdkModelPropertyType, readonly Diagnostic[]] {
+  operation?: Operation
+): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let propertyType = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, type.type, options.operation)
-  );
-  diagnostics.pipe(addEncodeInfo(context, type, propertyType, options.defaultContentType));
+  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+  diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
-    propertyType = getSdkEnum(context, knownValues, options.operation);
+    propertyType = getSdkEnum(context, knownValues, operation);
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
-  const base = {
+  return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
@@ -981,158 +944,51 @@ export function getSdkModelPropertyType(
     type: propertyType,
     nameInClient: name,
     name,
-    onClient: false,
     optional: type.optional,
     nullable: isNullable(type.type),
-  };
-  const program = context.program;
-  const headerQueryOptions = {
-    ...base,
-    optional: type.optional,
-    collectionFormat: getCollectionFormat(context, type),
-  };
-  if (options.isMethodParameter) {
-    return diagnostics.wrap({
-      ...base,
-      kind: "method",
-      ...updateWithApiVersionInformation(context, type),
-      optional: type.optional,
-    });
-  } else if (isPathParam(program, type) || options.isEndpointParam) {
-    // we don't url encode if the type can be assigned to url
-    const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(
-        type.type.projectionBase ?? type.type,
-        program.checker.getStdType("url"),
-        type.type
-      )
-    );
-    return diagnostics.wrap({
-      ...base,
-      kind: "path",
-      urlEncode,
-      serializedName: getPathParamName(program, type),
-      ...updateWithApiVersionInformation(context, type),
-      optional: false,
-    });
-  } else if (isHeader(program, type)) {
-    return diagnostics.wrap({
-      ...headerQueryOptions,
-      kind: "header",
-      serializedName: getHeaderFieldName(program, type),
-      ...updateWithApiVersionInformation(context, type),
-    });
-  } else if (isQueryParam(program, type)) {
-    return diagnostics.wrap({
-      ...headerQueryOptions,
-      kind: "query",
-      serializedName: getQueryParamName(program, type),
-      ...updateWithApiVersionInformation(context, type),
-    });
-  } else if (isBody(program, type)) {
-    return diagnostics.wrap({
-      ...base,
-      kind: "body",
-      contentTypes: ["application/json"], // will update when we get to the operation level
-      defaultContentType: "application/json", // will update when we get to the operation level
-      ...updateWithApiVersionInformation(context, type),
-      optional: type.optional,
-    });
-  } else {
-    // I'm a body model property
-    let operationIsMultipart = false;
-    if (options.operation) {
-      const httpOperation = getHttpOperationWithCache(context, options.operation);
-      operationIsMultipart = Boolean(
-        httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
-      );
-    }
-    // Currently we only recognize bytes and list of bytes as potential file inputs
-    const isBytesInput =
-      base.type.kind === "bytes" ||
-      (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-    if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "encoding-multipart-bytes",
-          target: type,
-        })
-      );
-    }
-    return diagnostics.wrap({
-      ...base,
-      kind: "property",
-      optional: type.optional,
-      visibility: getSdkVisibility(context, type),
-      discriminator: false,
-      serializedName: getPropertyNames(context, type)[1],
-      isMultipartFileInput: isBytesInput && operationIsMultipart,
-      flatten: shouldFlattenProperty(context, type),
-      ...updateWithApiVersionInformation(context, type),
-    });
-  }
+    ...updateWithApiVersionInformation(context, type),
+  });
 }
 
-export function getSdkEndpointParameter(
+export function getSdkModelPropertyType(
   context: TCGCContext,
-  client: SdkClient
-): [SdkEndpointParameter, readonly Diagnostic[]] {
+  type: ModelProperty,
+  operation?: Operation
+): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const servers = getServers(context.program, client.service);
-  let type: SdkEndpointType;
-  let optional: boolean = false;
-  if (servers === undefined || servers.length > 1) {
-    // if there is no defined server url, or if there are more than one
-    // we will return a mandatory endpoint parameter in initialization
-    type = {
-      kind: "endpoint",
-      nullable: false,
-      templateArguments: [],
-    };
-  } else {
-    // this means we have one server
-    const templateArguments: SdkPathParameter[] = [];
-    type = {
-      kind: "endpoint",
-      nullable: false,
-      serverUrl: servers[0].url,
-      templateArguments,
-    };
-    for (const param of servers[0].parameters.values()) {
-      const sdkParam = diagnostics.pipe(
-        getSdkModelPropertyType(context, param, { isEndpointParam: true })
-      );
-      if (sdkParam.kind === "path") {
-        templateArguments.push(sdkParam);
-        sdkParam.description = sdkParam.description ?? servers[0].description;
-        sdkParam.onClient = true;
-      } else {
-        diagnostics.add(
-          createDiagnostic({
-            code: "server-param-not-path",
-            target: param,
-            format: {
-              templateArgumentName: sdkParam.name,
-              templateArgumentType: sdkParam.kind,
-            },
-          })
-        );
-      }
-    }
-    optional = !!servers[0].url.length && templateArguments.every((param) => param.optional);
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type);
+  // I'm a body model property
+  let operationIsMultipart = false;
+  if (operation) {
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+  }
+  // Currently we only recognize bytes and list of bytes as potential file inputs
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "encoding-multipart-bytes",
+        target: type,
+      })
+    );
   }
   return diagnostics.wrap({
-    kind: "endpoint",
-    type,
-    nameInClient: "endpoint",
-    name: "endpoint",
-    description: "Service host",
-    onClient: true,
-    urlEncode: false,
-    apiVersions: getAvailableApiVersions(context, client.service),
-    optional,
-    isApiVersionParam: false,
-    nullable: false,
+    ...base,
+    kind: "property",
+    optional: type.optional,
+    visibility: getSdkVisibility(context, type),
+    discriminator: false,
+    serializedName: getPropertyNames(context, type)[1],
+    isMultipartFileInput: isBytesInput && operationIsMultipart,
+    flatten: shouldFlattenProperty(context, type),
+    ...updateWithApiVersionInformation(context, type),
   });
 }
 
@@ -1151,9 +1007,7 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, property, { operation: operation })
-    );
+    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
