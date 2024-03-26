@@ -26,20 +26,21 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @Azure.Core.lroStatus
 @doc("Provisioning state")
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Provisioning")
-  Provisioning,
+  Provisioning: "Provisioning",
 
   @doc("Updating")
-  Updating,
+  Updating: "Updating",
 
   @doc("Deleting")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("Accepted")
-  Accepted,
+  Accepted: "Accepted",
 }
 
 @doc("Access Point Gateway")
@@ -72,18 +73,20 @@ model TestCustomUpdateResource is TrackedResource<TestCustomUpdateProperties> {
 }
 
 @doc("Cluster Classification Levels")
-enum ClassificationLevel {
+union ClassificationLevel {
+  string,
+
   @doc("Collateral")
-  Collateral,
+  Collateral: "Collateral",
 
   @doc("SAR")
-  Sar,
+  Sar: "Sar",
 
   @doc("SCI")
-  Sci,
+  Sci: "Sci",
 
   @doc("SCI/SAR")
-  SciSar,
+  SciSar: "SciSar",
 }
 
 @doc("Access Point Gateway Properties.")
