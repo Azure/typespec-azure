@@ -10,6 +10,9 @@ union InfrastructureEncryption {
 
   @doc("Encryption is disabled")
   Disabled: "disabled",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
@@ -25,6 +28,9 @@ union KeyEncryptionKeyIdentity {
 
   @doc("Delegated identity")
   DelegatedResourceIdentity: "delegatedResourceIdentity",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 @doc("Customer-managed key encryption properties for the resource.")

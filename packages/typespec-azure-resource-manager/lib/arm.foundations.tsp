@@ -76,21 +76,21 @@ model ExtensionResourceBase extends ArmResource {}
 /**
  * An internal enum to indicate the resource support for various path types
  */
-union ResourceHome {
+enum ResourceHome {
   @doc("The resource is bound to a tenant")
-  Tenant: "Tenant",
+  Tenant,
 
   @doc("The resource is bound to a subscription")
-  Subscription: "Subscription",
+  Subscription,
 
   @doc("The resource is bound to a location")
-  Location: "Location",
+  Location,
 
   @doc("The resource is bound to a resource group")
-  ResourceGroup: "ResourceGroup",
+  ResourceGroup,
 
   @doc("The resource is bound to an extension")
-  Extension: "Extension",
+  Extension,
 }
 
 /**
@@ -108,6 +108,9 @@ union Origin {
 
   @doc("Indicates the operation is initiated by a user or system.")
   `user,system`: "user,system",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /**
@@ -119,6 +122,9 @@ Extensible enum. Indicates the action type. "Internal" refers to actions that ar
 union ActionType {
   @doc("Actions are for internal-only APIs.")
   Internal: "Internal",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /**
@@ -322,6 +328,9 @@ union createdByType {
 
   @doc("The entity was created by a key.")
   Key: "Key",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /**
@@ -450,6 +459,9 @@ union ManagedServiceIdentityType {
 
   @doc("System and user assigned managed identity.")
   SystemAndUserAssigned: "SystemAssigned, UserAssigned",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /** Alias of SystemAssignedServiceIdentityType for back compatability. Please change to SystemAssignedServiceIdentityType. */
@@ -465,6 +477,9 @@ union SystemAssignedServiceIdentityType {
 
   @doc("System assigned managed system identity.")
   SystemAssigned: "SystemAssigned",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /**
@@ -597,18 +612,18 @@ model ResourceSkuType {
  * Available service tiers for the SKU.
  */
 @doc("Available service tiers for the SKU.")
-union SkuTier {
+enum SkuTier {
   @doc("The Free service tier.")
-  Free: "Free",
+  Free,
 
   @doc("The Basic service tier.")
-  Basic: "Basic",
+  Basic,
 
   @doc("The Standard service tier.")
-  Standard: "Standard",
+  Standard,
 
   @doc("The Premium service tier.")
-  Premium: "Premium",
+  Premium,
 }
 
 /**
@@ -700,6 +715,9 @@ union CheckNameAvailabilityReason {
 
   @doc("Name already exists.")
   AlreadyExists: "AlreadyExists",
+
+  @doc("Open enum modelAsString")
+  string,
 }
 
 /**
