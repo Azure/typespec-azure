@@ -21,8 +21,8 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 In this example:
 
-1. `ServiceTraits` is defined as the intersection of three trait model types. Learn more about interface-level service traits [here](https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step09#applying-traits-to-all-resource-operations).
-2. `Operations` is defined as the instantiation of `Azure.Core.ResourceOperations` with the trait type you defined.
+1. `ServiceTraits` is defined as the intersection of three trait model types available in `Azure.Core`. Learn more about interface-level service traits [here](https://azure.github.io/typespec-azure/docs/libraries/azure-core/reference/data-types).
+2. `Operations` is defined as the instantiation of `Azure.Core.ResourceOperations` with the service trait types you defined.
 
 > **Note:** The name `Operations` is used for convenience, but you might define multiple aliases of `ResourceOperation` for a single service to apply different customizations for some operations. You might choose a more explicit name like `StandardOperations`.
 
