@@ -55,7 +55,7 @@ export function getSdkHttpOperation(
   methodParameters: SdkMethodParameter[]
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const {responses, exceptions} = diagnostics.pipe(
+  const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation)
   );
   const responsesWithBodies = [...responses.values()]
