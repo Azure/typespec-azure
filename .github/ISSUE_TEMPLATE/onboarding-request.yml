@@ -1,0 +1,55 @@
+name: Onboarding request
+description: One time onboarding form to help TypeSpec team to provide better support.
+title: "[Onboarding] {ProviderName} {ARM|Data-plane} "
+labels: ["onboarding"]
+
+body:
+  - type: input
+    id: contact-dev
+    attributes:
+      label: Service Team Contacts (Dev)
+
+  - type: input
+    id: contact-pm
+    attributes:
+      label: Service Team Contacts (PM)
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Tell us what stage you are currently at with TypeSpec for your API definition
+      options:
+        - Just heard about TypeSpec, tell me more.
+        - Started modeling with TypeSpec.
+        - Dogfooding with TypeSpec.
+        - Going Private Preview with TypeSpec.
+        - Going for Public Preview with TypeSpec.
+        - We are live.
+
+  - type: textarea
+    id: next-millestone
+    attributes:
+      label: What's your next milestone (Private Preview | Public Preview, target date, etc.)
+
+  - type: input
+    id: repo-link
+    attributes:
+      label: Link to your repo if available
+
+  - type: textarea
+    id: next-millestone
+    attributes:
+      label: Additional notes or questions
+      description: Add any other context or questions here.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Follow our [Code of Conduct](https://github.com/azure/typespec-azure/blob/main/CODE_OF_CONDUCT.md)
+          required: true
+
+        - label: Please update issue title with provider name and select ARM or Data-plane.
+          required: true
