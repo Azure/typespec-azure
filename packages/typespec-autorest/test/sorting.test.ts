@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from "assert";
+import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { sortOpenAPIDocument } from "../src/openapi.js";
 import { openApiFor } from "./test-host.js";
@@ -89,11 +89,7 @@ describe("typespec-autorest: OpenAPI output should be determinstic", () => {
       op read(): {@statusCode _: 200, content: string, headers: Headers};
       `
     );
-    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), [
-      "a",
-      "b",
-      "c"
-    ]);
+    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
   });
 
   it("header not in lexical order", async () => {
@@ -105,10 +101,6 @@ describe("typespec-autorest: OpenAPI output should be determinstic", () => {
       op read(): {@statusCode _: 200, content: string, headers: Headers};
       `
     );
-    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), [
-      "a",
-      "b",
-      "c"
-    ]);
+    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
   });
 });
