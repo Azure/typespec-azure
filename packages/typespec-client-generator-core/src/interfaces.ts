@@ -14,6 +14,7 @@ import {
   HttpAuth,
   HttpOperation,
   HttpOperationResponse,
+  HttpStatusCodeRange,
   HttpVerb,
   Visibility,
 } from "@typespec/http";
@@ -57,7 +58,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkInitializationType;
+  initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
@@ -72,6 +73,7 @@ export interface SdkOperationGroup {
   type: Namespace | Interface;
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
+  service: Namespace;
 }
 
 interface SdkTypeBase {
@@ -440,8 +442,8 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
-  responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
-  exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
+  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
 }
 
 /**

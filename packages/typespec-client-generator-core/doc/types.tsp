@@ -717,7 +717,7 @@ model SdkClientType {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkModelType;
+  initialization: SdkModelType;
   methods: SdkMethod[];
 
   // TODO: we have groups of clients (for example, network client is a grouping of resource clients).

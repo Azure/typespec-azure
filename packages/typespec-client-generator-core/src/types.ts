@@ -76,6 +76,7 @@ import {
   SdkEnumValueType,
   SdkModelPropertyType,
   SdkModelType,
+  SdkOperationGroup,
   SdkPathParameter,
   SdkTupleType,
   SdkType,
@@ -901,7 +902,7 @@ function getCollectionFormat(
 }
 
 function getSdkCredentialType(
-  client: SdkClient,
+  client: SdkClient | SdkOperationGroup,
   authentication: Authentication
 ): SdkCredentialType | SdkUnionType {
   const credentialTypes: SdkCredentialType[] = [];
@@ -930,7 +931,7 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
@@ -1075,7 +1076,7 @@ export function getSdkModelPropertyType(
 
 export function getSdkEndpointParameter(
   context: TCGCContext,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const servers = getServers(context.program, client.service);

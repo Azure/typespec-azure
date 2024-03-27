@@ -8,7 +8,12 @@ import {
   getService,
   isErrorModel,
 } from "@typespec/compiler";
-import { HttpOperation, getHeaderFieldName, isContentTypeHeader } from "@typespec/http";
+import {
+  HttpOperation,
+  HttpStatusCodeRange,
+  getHeaderFieldName,
+  isContentTypeHeader,
+} from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -197,7 +202,7 @@ function getSdkHttpOperation<TOptions extends object>(
   methodParameters: SdkMethodParameter[]
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const [responses, exceptions] = diagnostics.pipe(
+  const { responses, exceptions } = diagnostics.pipe(
     getSdkServiceResponseAndExceptions<TOptions, SdkHttpOperation>(context, httpOperation)
   );
   const parameters = httpOperation.parameters.parameters
@@ -236,8 +241,8 @@ function getSdkHttpOperation<TOptions extends object>(
       });
     }
   }
-  const responsesWithBodies = Object.values(responses)
-    .concat(Object.values(exceptions))
+  const responsesWithBodies = [...responses.values()]
+    .concat([...exceptions.values()])
     .filter((r) => r.type);
   if (responsesWithBodies.length > 0 && !headerParams.some((h) => isAcceptHeader(h))) {
     // Always have an accept header if we're returning any response with a body
@@ -416,12 +421,15 @@ function getSdkServiceResponseAndExceptions<
   context: SdkContext<TOptions, TServiceOperation>,
   httpOperation: HttpOperation
 ): [
-  [Record<number | string, SdkHttpResponse>, Record<number | string, SdkHttpResponse>],
+  {
+    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  },
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
-  const responses: Record<number | string, SdkHttpResponse> = {};
-  const exceptions: Record<number | string | "*", SdkHttpResponse> = {};
+  const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
+  const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -465,19 +473,13 @@ function getSdkServiceResponseAndExceptions<
       apiVersions: getAvailableApiVersions(context, httpOperation.operation),
       nullable: body ? isNullable(body) : true,
     };
-    let statusCode: number | string = "";
-    if (typeof response.statusCodes === "number" || response.statusCodes === "*") {
-      statusCode = response.statusCodes;
+    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+      exceptions.set(response.statusCodes, sdkResponse);
     } else {
-      statusCode = `${response.statusCodes.start}-${response.statusCodes.end}`;
-    }
-    if (statusCode === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions[statusCode] = sdkResponse;
-    } else {
-      responses[statusCode] = sdkResponse;
+      responses.set(response.statusCodes, sdkResponse);
     }
   }
-  return diagnostics.wrap([responses, exceptions]);
+  return diagnostics.wrap({ responses, exceptions });
 }
 
 function getParameterMappingHelper<
@@ -600,7 +602,10 @@ function getSdkServiceMethod<
 function getClientDefaultApiVersion<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
->(context: SdkContext<TOptions, TServiceOperation>, client: SdkClient): string | undefined {
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup
+): string | undefined {
   let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
   if (!defaultVersion) {
     // eslint-disable-next-line deprecation/deprecation
@@ -614,7 +619,7 @@ function getSdkInitializationType<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const credentialParam = getSdkCredentialParameter(context, client);
@@ -627,7 +632,8 @@ function getSdkInitializationType<
   if (context.__api_version_parameter) {
     properties.push(context.__api_version_parameter);
   }
-  const name = `${client.name.split(".").at(-1)}Options`;
+  const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
+  const name = `${namePrefix.split(".").at(-1)}Options`;
   return diagnostics.wrap({
     __raw: client.service,
     description: "Initialization class for the client",
@@ -635,7 +641,7 @@ function getSdkInitializationType<
     properties,
     name,
     generatedName: true,
-    access: "public",
+    access: client.kind === "SdkClient" ? "public" : "internal",
     usage: UsageFlags.Input,
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
@@ -647,21 +653,18 @@ function getSdkInitializationType<
 
 function getSdkMethods<TOptions extends object, TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient,
-  group: SdkClient | SdkOperationGroup
+  client: SdkClient | SdkOperationGroup
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInOperationGroup(context, group)) {
+  for (const operation of listOperationsInOperationGroup(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TOptions, TServiceOperation>(context, operation))
     );
   }
-  for (const operationGroup of listOperationGroups(context, group)) {
+  for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
-    const operationGroupClient = diagnostics.pipe(
-      createSdkClientType(context, client, operationGroup)
-    );
+    const operationGroupClient = diagnostics.pipe(createSdkClientType(context, operationGroup));
     retval.push({
       kind: "clientaccessor",
       parameters: [],
@@ -681,21 +684,19 @@ function createSdkClientType<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient,
-  operationGroup?: SdkOperationGroup
+  client: SdkClient | SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const baseClientType = operationGroup ?? client;
-  const isClient = baseClientType.kind === "SdkClient";
-  const clientName = isClient ? baseClientType.name : baseClientType.type.name;
+  const isClient = client.kind === "SdkClient";
+  const clientName = isClient ? client.name : client.type.name;
   context.__api_versions = resolveVersions(context.program, client.service)
     .filter((x) => x.rootVersion)
     .map((x) => x.rootVersion!.value);
   context.__api_version_client_default_value = getClientDefaultApiVersion(context, client);
 
   // NOTE: getSdkMethods recursively calls createSdkClientType
-  const methods = diagnostics.pipe(getSdkMethods(context, client, baseClientType));
-  const docWrapper = getDocHelper(context, baseClientType.type);
+  const methods = diagnostics.pipe(getSdkMethods(context, client));
+  const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
     name: clientName,
@@ -704,11 +705,11 @@ function createSdkClientType<
     methods: methods,
     apiVersions: getAvailableApiVersions(context, client.type),
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    initialization: isClient
-      ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
-      : undefined,
+    initialization: diagnostics.pipe(
+      getSdkInitializationType<TOptions, TServiceOperation>(context, client)
+    ), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
-    arm: client.arm,
+    arm: client.kind === "SdkClient" ? client.arm : false,
   };
   context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
