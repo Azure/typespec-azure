@@ -363,7 +363,7 @@ function getSdkLroServiceMethod<
     ...basicServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata,
-    initialOperation: diagnostics.pipe(
+    operation: diagnostics.pipe(
       getSdkServiceOperation<TOptions, TServiceOperation>(
         context,
         metadata.operation,
