@@ -1,22 +1,29 @@
-jobs:
-  - job: e2e
-    pool:
-      name: azsdk-pool-mms-ubuntu-2004-general
-      vmImage: ubuntu-20.04
+extends:
+  template: /eng/pipelines/templates/1es-redirect.yml
+  parameters:
+    stages:
+      - stage: e2e
 
-    variables:
-      TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
-      TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+        jobs:
+          - job: e2e
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+              
+            variables:
+              TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
 
-    steps:
-      - checkout: self
-        submodules: true
+            steps:
+              - checkout: self
+                submodules: true
 
-      - template: ./templates/install.yml
+              - template: /eng/pipelines/templates/install.yml@self
 
-      - template: ./templates/build.yml
-        parameters:
-          nodeVersion: "20.x"
+              - template: /eng/pipelines/templates/build.yml@self
+                parameters:
+                  nodeVersion: "20.x"
 
-      - script: node packages/e2e-tests/e2e-tests.mjs
-        displayName: Run E2E tests
+              - script: node packages/e2e-tests/e2e-tests.mjs
+                displayName: Run E2E tests

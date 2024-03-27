@@ -3,55 +3,78 @@ pr:
   - main
   - release/*
 
-variables:
-  - template: templates/variables/globals.yml
-
-jobs:
-  - job: Build_And_Test
+extends:
+  template: /eng/pipelines/templates/1es-redirect.yml
+  parameters:
     variables:
-      TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
-      TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+      - template: /eng/pipelines/templates/variables/globals.yml@self
+    stages:
+      - stage: Build_And_Test
+        jobs:
+          - job: Build_And_Test_Linux
+            variables:
+              TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
 
-    strategy:
-      matrix:
-        # Node 18
-        "Linux - Node 18.x":
-          pool: azsdk-pool-mms-ubuntu-2004-general
-          imageName: ubuntu-20.04
-          nodeVersion: 18.x
-          dotnetVersion: 8.0.x
-        "Windows - Node 18.x":
-          pool: azsdk-pool-mms-win-2022-general
-          imageName: windows-2022
-          nodeVersion: 18.x
-          dotnetVersion: 8.0.x
+            strategy:
+              matrix:
+                "Node 18.x":
+                  nodeVersion: "18.x"
+                "Node 20.x":
+                  nodeVersion: "20.x"
 
-        # Node 20
-        "Linux - Node 20.x":
-          pool: azsdk-pool-mms-ubuntu-2004-general
-          imageName: ubuntu-20.04
-          nodeVersion: 20.x
-          dotnetVersion: 8.0.x
-        "Windows - Node 20.x":
-          pool: azsdk-pool-mms-win-2022-general
-          imageName: windows-2022
-          nodeVersion: 20.x
-          dotnetVersion: 8.0.x
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
 
-    pool:
-      name: $(pool)
-      vmImage: $(imageName)
+            steps:
+              - template: /eng/pipelines/jobs/build-and-test.yml@self
+                parameters:
+                  nodeVersion: $(nodeVersion)
+                  dotnetVersion: 8.0.x
+                  osName: linux
 
-    steps:
-      - template: ./jobs/build-and-test.yml
-        parameters:
-          nodeVersion: $(nodeVersion)
-          dotnetVersion: $(dotnetVersion)
-          poolName: $(pool)
+              - template: /eng/pipelines/templates/swagger-checks.yml@self
+                parameters:
+                  nodeVersion: $(nodeVersion)
 
-      - template: ./templates/swagger-checks.yml
-        parameters:
-          nodeVersion: $(nodeVersion)
+          - job: Build_And_Test_Windows
+            variables:
+              TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
 
-  - template: e2e-job.yml
-  - template: jobs/publish-artifacts.yml
+            strategy:
+              matrix:
+                "Node 18.x":
+                  nodeVersion: "18.x"
+                "Node 20.x":
+                  nodeVersion: "20.x"
+
+            pool:
+              name: $(WINDOWSPOOL)
+              image: $(WINDOWSVMIMAGE)
+              os: windows
+
+            steps:
+              - template: /eng/pipelines/jobs/build-and-test.yml@self
+                parameters:
+                  nodeVersion: $(nodeVersion)
+                  dotnetVersion: 8.0.x
+                  osName: windows
+
+              - template: /eng/pipelines/templates/swagger-checks.yml@self
+                parameters:
+                  nodeVersion: $(nodeVersion)
+
+          - job: Consistency_Check
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+
+            steps:
+              - template: /eng/pipelines/jobs/pull-request-consistency.yml@self
+
+          - template: /eng/pipelines/e2e-job.yml@self
+          - template: /eng/pipelines/jobs/publish-artifacts.yml@self
