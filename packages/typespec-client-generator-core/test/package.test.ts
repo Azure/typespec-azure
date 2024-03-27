@@ -932,7 +932,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 0);
-      strictEqual(serviceOperation.exceptions["*"], undefined);
+      strictEqual(serviceOperation.exceptions.get("*"), undefined);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const pathParam = serviceOperation.parameters[0];
@@ -1001,7 +1001,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 0);
-      strictEqual(serviceOperation.exceptions["*"], undefined);
+      strictEqual(serviceOperation.exceptions.get("*"), undefined);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const headerParam = serviceOperation.parameters[0];
@@ -1085,7 +1085,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.bodyParams.length, 0);
-      strictEqual(serviceOperation.exceptions["*"], undefined);
+      strictEqual(serviceOperation.exceptions.get("*"), undefined);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const queryParam = serviceOperation.parameters[0];
@@ -1642,8 +1642,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(serviceContentTypeParam.type.value, "application/json");
       strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
 
-      strictEqual(Object.keys(serviceOperation.responses).length, 1);
-      const response = serviceOperation.responses[200];
+      strictEqual(serviceOperation.responses.size, 1);
+      const response = serviceOperation.responses.get(200);
+      ok(response);
       strictEqual(response.kind, "http");
       strictEqual(response.type, sdkPackage.models[0]);
       strictEqual(response.contentTypes?.length, 1);
@@ -1685,8 +1686,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(serviceContentTypeParam.type.value, "image/png");
       strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
 
-      strictEqual(Object.keys(serviceOperation.responses).length, 1);
-      const response = serviceOperation.responses[200];
+      strictEqual(serviceOperation.responses.size, 1);
+      const response = serviceOperation.responses.get(200);
+      ok(response);
       strictEqual(response.kind, "http");
       strictEqual(sdkPackage.models.length, 0);
       strictEqual(response.contentTypes?.length, 1);
@@ -1715,14 +1717,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "delete");
       const serviceResponses = method.operation.responses;
-      strictEqual(Object.keys(serviceResponses).length, 1);
+      strictEqual(serviceResponses.size, 1);
 
-      const voidResponse = serviceResponses[204];
+      const voidResponse = serviceResponses.get(204);
+      ok(voidResponse);
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
       strictEqual(voidResponse.headers.length, 0);
 
-      const errorResponse = method.operation.exceptions["*"];
+      const errorResponse = method.operation.exceptions.get("*");
+      ok(errorResponse);
       strictEqual(errorResponse.kind, "http");
       ok(errorResponse.type);
       strictEqual(errorResponse.type.kind, "model");
@@ -1756,9 +1760,10 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 2);
       strictEqual(method.name, "create");
       const serviceResponses = method.operation.responses;
-      strictEqual(Object.keys(serviceResponses).length, 1);
+      strictEqual(serviceResponses.size, 1);
 
-      const createResponse = serviceResponses[200];
+      const createResponse = serviceResponses.get(200);
+      ok(createResponse);
       strictEqual(createResponse.kind, "http");
       strictEqual(
         createResponse.type,
@@ -1766,7 +1771,8 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(createResponse.headers.length, 0);
 
-      const errorResponse = method.operation.exceptions["*"];
+      const errorResponse = method.operation.exceptions.get("*");
+      ok(errorResponse);
       strictEqual(errorResponse.kind, "http");
       ok(errorResponse.type);
       strictEqual(errorResponse.type.kind, "model");
@@ -1797,11 +1803,12 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "operation");
       const serviceResponses = method.operation.responses;
-      strictEqual(Object.keys(serviceResponses).length, 1);
+      strictEqual(serviceResponses.size, 1);
 
       strictEqual(method.parameters.length, 1);
 
-      const createResponse = serviceResponses[200];
+      const createResponse = serviceResponses.get(200);
+      ok(createResponse);
       strictEqual(createResponse.kind, "http");
       strictEqual(
         createResponse.type,
@@ -1843,7 +1850,8 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       const serviceResponses = method.operation.responses;
 
-      const createResponse = serviceResponses[200];
+      const createResponse = serviceResponses.get(200);
+      ok(createResponse);
       strictEqual(createResponse.headers[0].nullable, true);
       strictEqual(createResponse.nullable, true);
 
@@ -1864,10 +1872,12 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       const serviceResponses = method.operation.responses;
 
-      const okResponse = serviceResponses[200];
+      const okResponse = serviceResponses.get(200);
+      ok(okResponse);
       strictEqual(okResponse.nullable, false);
 
-      const noContentResponse = serviceResponses[204];
+      const noContentResponse = serviceResponses.get(204);
+      ok(noContentResponse);
       strictEqual(noContentResponse.nullable, true);
 
       strictEqual(method.response.nullable, true);
@@ -1885,9 +1895,10 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.response.nullable, true);
       const serviceResponses = method.operation.responses;
-      strictEqual(Object.keys(serviceResponses).length, 1);
+      strictEqual(serviceResponses.size, 1);
 
-      const voidResponse = serviceResponses[204];
+      const voidResponse = serviceResponses.get(204);
+      ok(voidResponse);
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
       strictEqual(voidResponse.headers.length, 0);
@@ -2636,28 +2647,31 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(serviceOperation.bodyParams[0].name, "resource");
       strictEqual(serviceOperation.bodyParams[0].type, widgetModel);
 
-      strictEqual(Object.keys(serviceOperation.responses).length, 2);
+      strictEqual(serviceOperation.responses.size, 2);
       const responseHeaders = [
         "Repeatability-Result",
         "ETag",
         "x-ms-client-request-id",
         "Operation-Location",
       ];
-      const response200 = serviceOperation.responses[200];
+      const response200 = serviceOperation.responses.get(200);
+      ok(response200);
       deepStrictEqual(
         response200.headers.map((x) => x.serializedName),
         responseHeaders
       );
       strictEqual(response200.type, widgetModel);
 
-      const response201 = serviceOperation.responses[201];
+      const response201 = serviceOperation.responses.get(201);
+      ok(response201);
       deepStrictEqual(
         response201.headers.map((x) => x.serializedName),
         responseHeaders
       );
       strictEqual(response201.type, widgetModel);
 
-      const exception = serviceOperation.exceptions["*"];
+      const exception = serviceOperation.exceptions.get("*");
+      ok(exception);
       strictEqual(exception.kind, "http");
       ok(exception.type);
       strictEqual(exception.type.kind, "model");
@@ -2741,8 +2755,9 @@ describe("typespec-client-generator-core: package", () => {
         listManufacturers.parameters[1]
       );
 
-      strictEqual(Object.keys(operation.responses).length, 1);
-      const response200 = operation.responses[200];
+      strictEqual(operation.responses.size, 1);
+      const response200 = operation.responses.get(200);
+      ok(response200);
       strictEqual(response200.kind, "http");
       const pagingModel = response200.type;
       ok(pagingModel);
