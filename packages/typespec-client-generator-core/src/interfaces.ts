@@ -58,7 +58,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkInitializationType;
+  initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
@@ -73,6 +73,7 @@ export interface SdkOperationGroup {
   type: Namespace | Interface;
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
+  service: Namespace;
 }
 
 interface SdkTypeBase {

@@ -66,6 +66,7 @@ import {
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
+  SdkOperationGroup,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -873,7 +874,7 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
 }
 
 function getSdkCredentialType(
-  client: SdkClient,
+  client: SdkClient | SdkOperationGroup,
   authentication: Authentication
 ): SdkCredentialType | SdkUnionType {
   const credentialTypes: SdkCredentialType[] = [];
@@ -902,7 +903,7 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
