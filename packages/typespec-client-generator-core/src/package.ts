@@ -4,6 +4,7 @@ import {
   ModelProperty,
   Operation,
   createDiagnosticCollector,
+  getEffectiveModelType,
   getNamespaceFullName,
   getService,
 } from "@typespec/compiler";
@@ -64,6 +65,7 @@ import {
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
+  getSdkModel,
   getSdkModelPropertyType,
 } from "./types.js";
 
@@ -216,10 +218,12 @@ function getSdkBasicServiceMethod<
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // when we spread, all of the inputtable properties of our model get flattened onto the method
+  
   const methodParameters = Array.from(operation.parameters.properties.values())
-    .map((x) => diagnostics.pipe(getSdkMethodParameter(context, x)))
-    .filter((x): x is SdkMethodParameter => x.kind === "method");
+    .map((x) => diagnostics.pipe(getSdkServiceMethodParameter(context, operation, x)))
+    .filter((x): x is SdkMethodParameter => x.kind === "method").filter((value, index, self) => 
+    self.findIndex(v => v.type === value.type) === index
+    );
   // if there's an api version parameter, we want to bubble it up to the client
   // we don't want it on the method level, but we will keep it on the service operation level
   const apiVersionParam = methodParameters.find((x) => x.isApiVersionParam);
@@ -328,11 +332,27 @@ function getSdkInitializationType<
   });
 }
 
-function getSdkMethodParameter(
+function getSdkServiceMethodParameter(
   context: TCGCContext,
+  operation: Operation,
   type: ModelProperty
 ): [SdkMethodParameter, readonly Diagnostic[]] {
+  // we want to see if the property is spread from a named model or not.
+  // if it is spread from a named model, we want to actually just return the named model as a single input parameter.
+  // we remove duplicates returned by getSdkServiceMethodParameter in getSdkServicMethod
   const diagnostics = createDiagnosticCollector();
+  // when we spread, all of the inputtable properties of our model get flattened onto the method
+  const tspParameters = Array.from(operation.parameters.properties.values())
+  let isSpreadOfNamedModel: boolean = false; // whether the parameters are spread
+  const sourceModel = tspParameters[0]?.sourceProperty?.model;
+  if (sourceModel) {
+    const sdkSourceModel = diagnostics.pipe(getClientTypeWithDiagnostics(context, sourceModel));
+    isSpreadOfNamedModel = sdkSourceModel.kind === "model" && !sdkSourceModel.generatedName;
+    if (isSpreadOfNamedModel) {
+      type.type = sourceModel;
+      type.name = sourceModel.name.charAt(0).toLowerCase() + sourceModel.name.slice(1);;
+    }
+  }
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkModelPropertyType(context, type)),
     kind: "method",

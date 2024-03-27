@@ -123,10 +123,17 @@ function getSdkHttpParameters(
       if (getParamResponse.kind !== "body") throw new Error("blah");
       retval.bodyParam = getParamResponse;
     } else {
+      const type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+      )
+      let name = "body";
+      if (type.kind === "model") {
+        name = type.name[0].toLowerCase() + type.name.slice(1);
+      }
       retval.bodyParam = {
         kind: "body",
-        name: "body",
-        nameInClient: "body",
+        name,
+        nameInClient: name,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
         onClient: false,
@@ -134,9 +141,7 @@ function getSdkHttpParameters(
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
         apiVersions: getAvailableApiVersions(context, tspBody.type),
-        type: diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-        ),
+        type,
         optional: false,
         nullable: isNullable(tspBody.type),
         correspondingMethodParams,

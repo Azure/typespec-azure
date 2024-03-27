@@ -1347,6 +1347,7 @@ describe("typespec-client-generator-core: package", () => {
 
         model Input {
           key: string;
+          value: string;
         }
 
         op myOp(...Input): void;
@@ -1357,13 +1358,20 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodParam = method.parameters.find((x) => x.name === "key");
+      const modelInput = sdkPackage.models[0];
+      strictEqual(modelInput.name, "Input");
+      strictEqual(modelInput.properties.length, 2);
+      ok(modelInput.properties.find(x => x.name === "key"))
+      ok(modelInput.properties.find(x => x.name === "value"))
+
+      const methodParam = method.parameters.find((x) => x.name === "input");
       ok(methodParam);
       strictEqual(methodParam.kind, "method");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.type.kind, "model");
+      deepStrictEqual(methodParam.type, sdkPackage.models[0]);
 
       const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(contentTypeParam);
@@ -1385,10 +1393,9 @@ describe("typespec-client-generator-core: package", () => {
       const correspondingMethodParams = bodyParameter.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
       strictEqual(
-        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
-        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
+        bodyParameter.name,
+        correspondingMethodParams[0].name
       );
-      strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
     });
 
     it("body alias spread", async () => {
