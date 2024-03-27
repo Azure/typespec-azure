@@ -9,7 +9,7 @@ reportDiagnostic<C, M>(program, diag): void
 
 ## Type parameters
 
-| Parameter |
+| Type parameter |
 | :------ |
 | `C` extends `"invalid-identifier"` \| `"missing-type-parent"` \| `"no-numeric"` \| `"unrecognized-scalar"` |
 | `M` extends `string` \| `number` \| `symbol` |

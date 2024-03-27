@@ -10,7 +10,12 @@ import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { createSdkContext } from "../src/decorators.js";
-import { SdkContext, SdkEmitterOptions } from "../src/interfaces.js";
+import {
+  SdkContext,
+  SdkEmitterOptions,
+  SdkHttpOperation,
+  SdkServiceOperation,
+} from "../src/interfaces.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 
 export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}) {
@@ -24,7 +29,7 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
 }
 
 export interface SdkTestRunner extends BasicTestRunner {
-  context: SdkContext<CreateSdkTestRunnerOptions>;
+  context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
@@ -33,11 +38,14 @@ export interface SdkTestRunner extends BasicTestRunner {
   ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
 }
 
-export function createSdkContextTestHelper<TOptions extends object = CreateSdkTestRunnerOptions>(
+export function createSdkContextTestHelper<
+  TOptions extends object = CreateSdkTestRunnerOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
   program: Program,
   options: TOptions,
   emitterName?: string
-): SdkContext<TOptions> {
+): SdkContext<TOptions, TServiceOperation> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
     emitterOutputDir: "dummy",
@@ -51,6 +59,7 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
   emitterName?: string;
   librariesToAdd?: TypeSpecTestLibrary[];
   autoUsings?: string[];
+  packageName?: string;
 }
 
 export async function createSdkTestRunner(
@@ -172,4 +181,9 @@ export async function createSdkTestRunner(
 export async function createTcgcTestRunnerForEmitter(emitterName: string): Promise<SdkTestRunner> {
   const runner = await createSdkTestRunner({ emitterName });
   return runner;
+}
+
+export function removeRawFromType<TType extends object>(type: TType): TType {
+  const { __raw, ...rest } = type as any;
+  return rest;
 }

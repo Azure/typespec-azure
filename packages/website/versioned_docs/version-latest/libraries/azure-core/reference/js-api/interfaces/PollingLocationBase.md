@@ -5,7 +5,7 @@ title: "[I] PollingLocationBase"
 ---
 The abstract type for polling control information
 
-## Extended By
+## Extended by
 
 - [`StatusMonitorPollingLocationInfo`](StatusMonitorPollingLocationInfo.md)
 

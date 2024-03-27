@@ -13,6 +13,8 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.ServiceLinker provider",
+})
+@OpenAPI.info({
   version: "2021-01-01-privatepreview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -58,18 +60,20 @@ model LinkerProperties {
 }
 
 @doc("The kind of authentication used for this linker.")
-enum AuthType {
+union AuthType {
+  string,
+
   @doc("System assigned identity")
-  systemAssignedIdentity,
+  systemAssignedIdentity: "systemAssignedIdentity",
 
   @doc("User assigned identity")
-  userAssignedIdentity,
+  userAssignedIdentity: "userAssignedIdentity",
 
   @doc("Service principal")
-  servicePrincipal,
+  servicePrincipal: "servicePrincipal",
 
   @doc("Secret")
-  secret,
+  secret: "secret",
 }
 
 @doc("The abstract base model for all authentication types.") // discriminator: authType
@@ -121,15 +125,17 @@ model SourceConfiguration {
 }
 
 @doc("The kind of source configuration used in a particular instance.")
-enum SourceConfigurationType {
+union SourceConfigurationType {
+  string,
+
   @doc("App settings")
-  appSettings,
+  appSettings: "appSettings",
 
   @doc("Connection settings")
-  connectionSettings,
+  connectionSettings: "connectionSettings",
 
   @doc("Service bindings")
-  serviceBindings,
+  serviceBindings: "serviceBindings",
 }
 
 @doc("Configurations for source resource, include appSettings, connectionString and serviceBindings")
@@ -140,12 +146,14 @@ model SourceConfigurationResult {
 }
 
 @doc("State of the linker resource.")
-enum LinkerStatus {
+union LinkerStatus {
+  string,
+
   @doc("Healthy")
-  Healthy,
+  Healthy: "Healthy",
 
   @doc("Not healthy")
-  `Not healthy`,
+  `Not healthy`: "Not healthy",
 }
 
 @doc("Details of validation.")

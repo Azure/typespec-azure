@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Confidential Ledger Service
-  version: 2022-05-13
+  version: 0.0.0
 tags: []
 paths:
   /app/collections:
@@ -491,10 +491,12 @@ components:
           readOnly: true
       description: Details about a ledger entry.
     LedgerQueryState:
-      type: string
-      enum:
-        - Loading
-        - Ready
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - Loading
+            - Ready
       description: State of a ledger query.
     LedgerUser:
       type: object
@@ -521,11 +523,13 @@ components:
           description: The user's assigned role.
       description: Details about a Confidential ledger user.
     LedgerUserRole:
-      type: string
-      enum:
-        - Administrator
-        - Contributor
-        - Reader
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - Administrator
+            - Contributor
+            - Reader
       description: Represents an assignable role.
     PagedLedgerEntries:
       type: object
@@ -574,10 +578,12 @@ components:
           description: The transaction ID.
       description: A receipt certifying the transaction at the specified id.
     TransactionState:
-      type: string
-      enum:
-        - Committed
-        - Pending
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - Committed
+            - Pending
       description: Represents the state of the transaction.
     TransactionStatus:
       type: object

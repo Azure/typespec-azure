@@ -9,7 +9,7 @@ reportDiagnostic<C, M>(program, diag): void
 
 ## Type parameters
 
-| Parameter |
+| Type parameter |
 | :------ |
 | `C` extends 
   \| `"client-name"`
@@ -26,7 +26,9 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"discriminator-not-constant"`
   \| `"discriminator-not-string"`
   \| `"wrong-client-decorator"`
-  \| `"encoding-multipart-bytes"` |
+  \| `"encoding-multipart-bytes"`
+  \| `"unsupported-kind"`
+  \| `"multiple-services"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters

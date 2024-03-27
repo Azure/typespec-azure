@@ -6,21 +6,31 @@ export interface FilePath {
 
 export interface AboutOptions {
   icon?: FilePath;
-  displayName?: string;
+  displayNames?: DisplayNamesOptions;
   description?: string;
   keywords?: string[];
-  learnMoreDocs?: string[];
+  learnMoreDocs?: LearnMoreDocsOptions[];
 }
 
 export interface BrowseOptions {
   argQuery?: string | FilePath;
 }
 
-export interface marketplaceOfferOptions {
+export interface MarketplaceOfferOptions {
   id?: string;
 }
 
 export interface PromotionOptions {
   readonly apiVersion: string | EnumMember;
   readonly autoUpdate?: boolean;
+}
+
+export interface LearnMoreDocsOptions {
+  title: string;
+  uri: string;
+}
+
+export interface DisplayNamesOptions {
+  singular: string;
+  plural: string;
 }

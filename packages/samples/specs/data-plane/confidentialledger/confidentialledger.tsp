@@ -27,7 +27,6 @@ using TypeSpec.OpenAPI;
 )
 @service({
   title: "Confidential Ledger Service",
-  version: "2022-05-13",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @server(
@@ -88,15 +87,17 @@ model LedgerEntry {
 
 // TODO: No way to set "x-ms-enum.name" right now
 @doc("Represents an assignable role.")
-enum LedgerUserRole {
+union LedgerUserRole {
+  string,
+
   @doc("The administrator role.")
-  Administrator,
+  Administrator: "Administrator",
 
   @doc("The contributor role.")
-  Contributor,
+  Contributor: "Contributor",
 
   @doc("The reader role.")
-  Reader,
+  Reader: "Reader",
 }
 
 @resource("users")
@@ -119,12 +120,14 @@ model ReceiptContents {
 
 // TODO: No way to set "x-ms-enum.name" right now
 @doc("State of a ledger query.")
-enum LedgerQueryState {
+union LedgerQueryState {
+  string,
+
   @doc("The query is still loading.")
-  Loading,
+  Loading: "Loading",
 
   @doc("The query is ready.")
-  Ready,
+  Ready: "Ready",
 }
 
 @doc("A receipt certifying the transaction at the specified id.")
@@ -141,12 +144,14 @@ model TransactionReceipt {
 
 // TODO: No way to set "x-ms-enum.name" right now
 @doc("Represents the state of the transaction.")
-enum TransactionState {
+union TransactionState {
+  string,
+
   @doc("The transaction is committed.")
-  Committed,
+  Committed: "Committed",
 
   @doc("The transaction is pending.")
-  Pending,
+  Pending: "Pending",
 }
 
 @doc("Response returned to a query for the transaction status.")

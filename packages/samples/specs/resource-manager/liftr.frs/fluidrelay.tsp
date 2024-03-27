@@ -12,6 +12,8 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Azure Fluid Relay",
+})
+@OpenAPI.info({
   version: "2021-03-12-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -73,8 +75,9 @@ model FluidRelayServerProperties {
 
 @doc("Provisioning states for FluidRelay RP")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 }
 
 @doc("The Fluid Relay Service endpoints for this server.")
@@ -100,12 +103,14 @@ model FluidRelayServerKeys {
 }
 
 @doc("The keys that are defined fro a FluidRelay Service.")
-enum KeyName {
+union KeyName {
+  string,
+
   @doc("Key 1")
-  key1,
+  key1: "key1",
 
   @doc("Key 2")
-  key2,
+  key2: "key2",
 }
 
 @doc("Specifies which key should be generated.")

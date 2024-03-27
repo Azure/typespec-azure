@@ -22,15 +22,16 @@ model ArmResponse<ResponseBody> {
 /**
  * The Azure Resource Manager 201 response for a resource
  * @template ResponseBody The contents of the response body
+ * @template ExtraHeaders Additional headers in the response. Default includes Retry-After header
  */
 @doc("Azure create operation completed successfully.")
-model ArmCreatedResponse<ResponseBody> {
+model ArmCreatedResponse<
+  ResponseBody,
+  ExtraHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader
+> {
   ...CreatedResponse;
-  ...Azure.Core.Foundations.RetryAfterHeader;
-
-  @doc("The body type of the operation request or response.")
-  @bodyRoot
-  body: ResponseBody;
+  ...ExtraHeaders;
+  ...Body<ResponseBody>;
 }
 
 /**
@@ -45,7 +46,8 @@ model ArmDeletedResponse {
  * @dev The response for asynchronous Azure Resource Manager delete ACCEPTED
  * @template LroHeaders Optional.  Allows overriding the Lro headers returned in the response.
  */
-model ArmDeleteAcceptedLroResponse<LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader>
+model ArmDeleteAcceptedLroResponse<LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+  Azure.Core.Foundations.RetryAfterHeader>
   is ArmAcceptedLroResponse<"Resource deletion accepted.", LroHeaders>;
 
 /**
@@ -56,11 +58,15 @@ model ArmDeleteAcceptedResponse is ArmAcceptedResponse<"Resource deletion accept
 /**
  * @dev The standard ACCEPTED response
  * @template Message The description of the response status (defaults to `Resource operation accepted`)
+ * @template ExtraHeaders Additional headers in the response. Default includes Retry-After header
  */
 @doc(Message)
-model ArmAcceptedResponse<Message extends valueof string = "Resource operation accepted."> {
+model ArmAcceptedResponse<
+  Message extends valueof string = "Resource operation accepted.",
+  ExtraHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader
+> {
   ...AcceptedResponse;
-  ...Azure.Core.Foundations.RetryAfterHeader;
+  ...ExtraHeaders;
 }
 
 /**
@@ -71,10 +77,10 @@ model ArmAcceptedResponse<Message extends valueof string = "Resource operation a
 @doc(Description)
 model ArmAcceptedLroResponse<
   Description extends valueof string = "Resource operation accepted.",
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader
 > {
   ...AcceptedResponse;
-  ...Azure.Core.Foundations.RetryAfterHeader;
   ...LroHeaders;
 }
 
@@ -209,10 +215,9 @@ model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundati
 @doc("Resource '{name}' create operation succeeded", Resource)
 model ArmResourceCreatedResponse<
   Resource extends Azure.ResourceManager.Foundations.ArmResource,
-  LroHeaders extends TypeSpec.Reflection.Model = {}
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader
 > {
   ...CreatedResponse;
-  ...Azure.Core.Foundations.RetryAfterHeader;
   ...LroHeaders;
 
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<Resource>)
@@ -245,4 +250,20 @@ model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foun
 model ErrorResponse {
   @doc("The error object.")
   error?: ErrorDetail;
+}
+
+/**
+ * @dev Resource exists response
+ */
+@doc("The Azure resource exists")
+model ArmResourceExistsResponse {
+  ...NoContentResponse;
+}
+
+/**
+ * @dev Resource is not found response
+ */
+@doc("The Azure resource is not found")
+model ArmResourceNotFoundResponse {
+  ...NotFoundResponse;
 }

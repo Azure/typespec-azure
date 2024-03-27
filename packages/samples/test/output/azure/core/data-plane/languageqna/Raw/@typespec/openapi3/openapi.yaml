@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Microsoft Cognitive Language Service - Question Answering - Authoring
-  version: 21-10-01
+  version: 0.0.0
 tags: []
 paths:
   /query-knowledgebases/projects:
@@ -1020,11 +1020,13 @@ components:
           description: Unique ID of the QnA.
       description: A feedback record.
     ImportExportFormat:
-      type: string
-      enum:
-        - json
-        - tsv
-        - excel
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - json
+            - tsv
+            - excel
       description: The format of an import or export operation.
     JobMetadata:
       type: object
@@ -1091,15 +1093,17 @@ components:
           description: The error list.
       description: Job state represents the job metadata and any errors
     JobStatus:
-      type: string
-      enum:
-        - notStarted
-        - running
-        - succeeded
-        - failed
-        - cancelled
-        - cancelling
-        - partiallyCompleted
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - notStarted
+            - running
+            - succeeded
+            - failed
+            - cancelled
+            - cancelling
+            - partiallyCompleted
       description: The job status.
     PagedProjectDeployment:
       type: object
@@ -1115,6 +1119,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of ProjectDeployment items
     PagedProjectMetadata:
       type: object
@@ -1130,6 +1135,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of ProjectMetadata items
     PagedQnaSourceRecord:
       type: object
@@ -1145,6 +1151,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of QnaSourceRecord items
     PagedSynonymAsset:
       type: object
@@ -1160,6 +1167,7 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
+          readOnly: true
       description: Paged collection of SynonymAsset items
     ProjectDeployment:
       type: object
@@ -1330,10 +1338,12 @@ components:
         value:
           $ref: '#/components/schemas/QnaRecordUpdate'
     QnaSourceKind:
-      type: string
-      enum:
-        - file
-        - url
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - file
+            - url
       description: Supported source types.
     QnaSourceMetadata:
       type: object
@@ -1422,9 +1432,11 @@ components:
         value:
           $ref: '#/components/schemas/QnaSourceRecordUpdate'
     SourceContentStructureKind:
-      type: string
-      enum:
-        - unstructured
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - unstructured
       description: Content structure type for sources.
     SuggestedQuestion:
       type: object
@@ -1497,11 +1509,13 @@ components:
           description: Collection of word alterations.
       description: Collection of synonyms.
     UpdateOperationKind:
-      type: string
-      enum:
-        - add
-        - delete
-        - replace
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - add
+            - delete
+            - replace
       description: The kind of an update operation.
     UpdateQnaSourceRecord:
       type: object

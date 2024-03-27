@@ -11,7 +11,7 @@ shouldGenerateConvenient(context, entity): boolean
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `entity` | `Operation` |
 
 ## Returns

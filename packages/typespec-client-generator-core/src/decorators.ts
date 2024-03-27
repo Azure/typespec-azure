@@ -1,5 +1,7 @@
 import {
+  AugmentDecoratorStatementNode,
   DecoratorContext,
+  DecoratorExpressionNode,
   DecoratorFunction,
   EmitContext,
   Enum,
@@ -14,9 +16,9 @@ import {
   SyntaxKind,
   Type,
   Union,
-  UsageFlags,
   getNamespaceFullName,
   getProjectedName,
+  ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
@@ -30,12 +32,16 @@ import {
   SdkClient,
   SdkContext,
   SdkEmitterOptions,
+  SdkHttpOperation,
   SdkOperationGroup,
+  SdkServiceOperation,
+  UsageFlags,
 } from "./interfaces.js";
-import { TCGCContext, createTCGCContext, parseEmitterName } from "./internal-utils.js";
+import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { experimental_getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getAllModels, getSdkEnum, getSdkModel } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
@@ -470,24 +476,28 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
-export function createSdkContext<TOptions extends Record<string, any> = SdkEmitterOptions>(
-  context: EmitContext<TOptions>,
-  emitterName?: string
-): SdkContext<TOptions> {
+export function createSdkContext<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  return {
-    ...createTCGCContext(context.program),
+  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
+    program: context.program,
     emitContext: context,
+    experimental_sdkPackage: undefined!,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
+    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
   };
+  sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
+  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
@@ -514,12 +524,12 @@ export function $convenientAPI(
 
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
-  return value ?? !!context.generateProtocolMethods;
+  return value ?? Boolean(context.generateProtocolMethods);
 }
 
 export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, convenientAPIKey, entity);
-  return value ?? !!context.generateConvenienceMethods;
+  return value ?? Boolean(context.generateConvenienceMethods);
 }
 
 const excludeKey = createStateSymbol("exclude");
@@ -670,9 +680,6 @@ export function isInternal(
   if (entity.kind === "Operation" || found) {
     return found;
   }
-  if (!context.operationModelsMap) {
-    getAllModels(context); // this will populate operationModelsMap
-  }
   const operationModels = context.operationModelsMap!;
   let referredByInternal = false;
   for (const [operation, modelMap] of operationModels) {
@@ -691,7 +698,7 @@ const usageKey = createStateSymbol("usage");
 
 export function $usage(
   context: DecoratorContext,
-  entity: Model | Enum,
+  entity: Model | Enum | Union,
   value: EnumMember | Union,
   scope?: LanguageScopes
 ) {
@@ -729,15 +736,12 @@ export function $usage(
 
 export function getUsageOverride(
   context: TCGCContext,
-  entity: Model | Enum
+  entity: Model | Enum | Union
 ): UsageFlags | undefined {
   return getScopedDecoratorData(context, usageKey, entity);
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
-  if (!context.modelsMap) {
-    getAllModels(context); // this will populate modelsMap
-  }
   return entity.kind === "Model"
     ? getSdkModel(context, entity).usage
     : getSdkEnum(context, entity).usage;
@@ -747,7 +751,7 @@ const accessKey = createStateSymbol("access");
 
 export function $access(
   context: DecoratorContext,
-  entity: Model | Enum | Operation,
+  entity: Model | Enum | Operation | Union,
   value: EnumMember,
   scope?: LanguageScopes
 ) {
@@ -763,27 +767,32 @@ export function $access(
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation
+  entity: Model | Enum | Operation | Union
 ): AccessFlags | undefined {
   return getScopedDecoratorData(context, accessKey, entity);
 }
 
 export function getAccess(
   context: TCGCContext,
-  entity: Model | Enum | Operation
+  entity: Model | Enum | Operation | Union
 ): AccessFlags | undefined {
   const override = getScopedDecoratorData(context, accessKey, entity);
   if (override || entity.kind === "Operation") {
     return override;
   }
 
-  if (!context.operationModelsMap) {
-    getAllModels(context); // this will populate operationModelsMap
+  switch (entity.kind) {
+    case "Model":
+      return getSdkModel(context, entity).access;
+    case "Enum":
+      return getSdkEnum(context, entity).access;
+    case "Union":
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "model") {
+        return type.access;
+      }
+      return undefined;
   }
-
-  return entity.kind === "Model"
-    ? getSdkModel(context, entity).access
-    : getSdkEnum(context, entity).access;
 }
 
 const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
@@ -822,6 +831,27 @@ export function $clientName(
   value: string,
   scope?: LanguageScopes
 ) {
+  // workaround for current lack of functionality in compiler
+  // https://github.com/microsoft/typespec/issues/2717
+  if (entity.kind === "Model" || entity.kind === "Operation") {
+    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+      if (
+        ignoreDiagnostics(
+          context.program.checker.resolveTypeReference(
+            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType
+          )
+        ) !== entity
+      ) {
+        return;
+      }
+    }
+    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
+      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+        return;
+      }
+    }
+  }
+
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 

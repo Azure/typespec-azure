@@ -12,6 +12,8 @@ using TypeSpec.Versioning;
 @armProviderNamespace
 @service({
   title: "CodeSigningManagementClient",
+})
+@OpenAPI.info({
   version: "2020-12-14-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -57,54 +59,61 @@ model CodeSignAccountPatch {
 }
 
 @doc("Current verification information.")
-enum VerificationStatus {
+union VerificationStatus {
+  string,
+
   @doc("Verification is completed.")
-  Completed,
+  Completed: "Completed",
 
   @doc("Verification is in progress.")
-  InProgress,
+  InProgress: "InProgress",
 
   @doc("Verification is not completed.")
-  NotCompleted,
+  NotCompleted: "NotCompleted",
 }
 
 @doc("The rotation policy for the profile.")
-enum RotationPolicy {
+union RotationPolicy {
+  string,
+
   @doc("Monthly rotation policy.")
-  Monthly,
+  Monthly: "Monthly",
 }
 
 @doc("The type of the profile.")
-enum ProfileType {
+union ProfileType {
+  string,
+
   @doc("Test profile.")
-  Test,
+  Test: "Test",
 
   @doc("Trial profile.")
-  Trial,
+  Trial: "Trial",
 
   @doc("Private trust profile.")
-  PrivateTrust,
+  PrivateTrust: "PrivateTrust",
 
   @doc("Public trust profile.")
-  PublicTrust,
+  PublicTrust: "PublicTrust",
 }
 
 @doc("The status of the current operation.")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("The resource is being provisioned.")
-  Provisioning,
+  Provisioning: "Provisioning",
 
   @doc("The resource is updating.")
-  Updating,
+  Updating: "Updating",
 
   @doc("The resource is being deleted.")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("The resource create request has been accepted.")
-  Accepted,
+  Accepted: "Accepted",
 }
 
 @parentResource(CodeSignAccount)

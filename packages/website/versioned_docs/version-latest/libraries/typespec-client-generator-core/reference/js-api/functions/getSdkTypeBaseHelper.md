@@ -14,7 +14,7 @@ Helper function to return default values for nullable, encode etc
 
 ## Type parameters
 
-| Parameter |
+| Type parameter |
 | :------ |
 | `TKind` |
 
@@ -22,7 +22,7 @@ Helper function to return default values for nullable, encode etc
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> | - |
+| `context` | `TCGCContext` | - |
 | `type` | `string` \| `Type` |  |
 | `kind` | `TKind` | - |
 

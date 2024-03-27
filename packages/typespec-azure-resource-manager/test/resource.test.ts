@@ -1,6 +1,6 @@
 import { Diagnostic, Model } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
@@ -81,7 +81,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("allows overriding armProviderNamespace", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test", version: "2022-03-01-preview"})
+      @service({title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test {
@@ -129,7 +129,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about ProxyResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test", version: "2022-03-01-preview"})
+      @service({title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test;
@@ -291,6 +291,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
       
       @armResourceOperations
+      #suppress "deprecated" "test"
       interface Foos extends ResourceCreate<FooResource>,ResourceRead<FooResource>,ResourceDelete<FooResource> {}
 
       @doc("Bar properties")
@@ -702,6 +703,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         weight: safeint;
       }
       
+      #suppress "deprecated" "test"
       interface Flanges
         extends TenantResourceCreate<Flange>,
           TenantResourceDelete<Flange>,
@@ -1020,6 +1022,74 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           );
         });
       });
+    });
+  });
+
+  it("emits correct paths for ArmResourceHead operation", async () => {
+    const openApi = await openApiFor(`
+        @armProviderNamespace
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Contoso;
+        @doc("Widget resource")
+        model Widget is ProxyResource<WidgetProperties> {
+          @doc("The name of the widget")
+          @key("widgetName")
+          @segment("widgets")
+          @path
+          @visibility("read")
+          name: string;
+        }
+        @doc("The properties of a widget")
+        model WidgetProperties {
+          @doc("The spin of the widget")
+          @knownValues(SpinValues)
+          spin?: string;
+        }
+        enum SpinValues {
+          up,
+          down,
+        }
+        interface Widgets extends Operations {
+          checkExist is ArmResourceCheckExistence<Widget>;
+        }
+    `);
+    const headOperation =
+      openApi.paths[
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
+      ].head;
+    ok(headOperation);
+    deepEqual(headOperation, {
+      operationId: "Widgets_CheckExist",
+      description: "Check for the existence of a Widget",
+      parameters: [
+        {
+          $ref: "../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter",
+        },
+        {
+          $ref: "../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter",
+        },
+        {
+          $ref: "../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter",
+        },
+        {
+          name: "widgetName",
+          in: "path",
+          description: "The name of the widget",
+          required: true,
+          type: "string",
+        },
+      ],
+      responses: {
+        "204": { description: "The Azure resource exists" },
+        "404": { description: "The Azure resource is not found" },
+        default: {
+          description: "An unexpected error response.",
+          schema: {
+            $ref: "../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse",
+          },
+        },
+      },
     });
   });
 });

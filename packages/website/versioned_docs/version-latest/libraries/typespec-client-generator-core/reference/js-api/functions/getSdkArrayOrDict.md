@@ -14,7 +14,7 @@ getSdkArrayOrDict(
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Model` |
 | `operation`? | `Operation` |
 

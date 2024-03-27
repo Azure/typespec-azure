@@ -12,10 +12,12 @@ using Azure.ResourceManager;
 
 @service({
   title: "Microsoft.OperationsTest",
+})
+@OpenAPI.info({
   version: "2022-11-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@useDependency(Azure.Core.Versions.v1_0_Preview_1)
+@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @armProviderNamespace
 namespace Microsoft.OperationsTest;
 
@@ -170,9 +172,10 @@ interface ExtensionChildOperations extends ProxyResourceOperations<TestExtension
 
 @Azure.Core.lroStatus
 @doc("The set of provisioning state values")
-enum EnvelopeProvisioningState {
-  ...ResourceProvisioningState,
+union EnvelopeProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Working")
-  Working,
+  Working: "Working",
 }

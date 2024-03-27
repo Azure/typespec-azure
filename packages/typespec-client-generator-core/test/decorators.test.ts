@@ -1,10 +1,18 @@
-import { Enum, Interface, Model, Namespace, Operation, UsageFlags } from "@typespec/compiler";
+import {
+  Enum,
+  Interface,
+  Model,
+  Namespace,
+  Operation,
+  ignoreDiagnostics,
+} from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
   getClient,
+  getClientNameOverride,
   getOperationGroup,
   getUsage,
   listClients,
@@ -13,8 +21,8 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkOperationGroup } from "../src/interfaces.js";
-import { getCrossLanguageDefinitionId } from "../src/public-utils.js";
+import { SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
@@ -207,7 +215,8 @@ describe("typespec-client-generator-core: decorators", () => {
         @service({})
         @test namespace MyClient;
 
-        @route("/root1") op atRoot1(): void;        @route("/root2") op atRoot2(): void;
+        @route("/root1") op atRoot1(): void;       
+        @route("/root2") op atRoot2(): void;
 
         @operationGroup
         @test interface MyGroup {
@@ -305,6 +314,24 @@ describe("typespec-client-generator-core: decorators", () => {
       `)) as { one: Operation };
 
       strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+    });
+
+    it("crossLanguagePackageId", async () => {
+      await runner.compile(`
+        @client({name: "MyPackageClient"})
+        @service({})
+        namespace My.Package.Namespace;
+
+        namespace SubNamespace {
+          interface Widgets {
+            @test op one(): void;
+          }
+        }
+      `);
+      strictEqual(
+        ignoreDiagnostics(getCrossLanguagePackageId(runner.context)),
+        "My.Package.Namespace"
+      );
     });
 
     it("@operationGroup with scope", async () => {
@@ -1499,6 +1526,7 @@ describe("typespec-client-generator-core: decorators", () => {
   describe("@access", () => {
     it("mark an operation as internal", async () => {
       const { test } = (await runner.compile(`
+        @service({title: "Test Service"}) namespace TestService;
         @test
         @access(Access.internal)
         op test(): void;
@@ -2219,6 +2247,37 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
     });
+
+    it("patch usage", async () => {
+      const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model PatchModel {
+            age: int32;
+          }
+
+          @test
+          model JsonMergePatchModel {
+            prop: string
+          }
+
+          @patch
+          @route("/patch")
+          op patchModel(@body body: PatchModel): void;
+
+          @patch
+          @route("/jsonMergePatch")
+          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
+        }
+      `)) as { PatchModel: Model; JsonMergePatchModel: Model };
+
+      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
+      strictEqual(
+        getUsage(runner.context, JsonMergePatchModel),
+        UsageFlags.JsonMergePatch | UsageFlags.Input
+      );
+    });
   });
 
   describe("@flattenProperty", () => {
@@ -2320,6 +2379,70 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, {
         code: "decorator-wrong-target",
       });
+    });
+  });
+
+  describe("@clientName", () => {
+    it("carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @clientName("Test1Rename")
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          @clientName("func1Rename")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
+    });
+
+    it("augment carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        @test namespace MyService {
+          @test
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(MyService.Test1, "Test1Rename");
+        @@clientName(MyService.func1, "func1Rename");
+      `
+      )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
     });
   });
 });

@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Hello world",
-    "version": "0.1.0",
+    "version": "0000-00-00",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -618,7 +618,65 @@
       ],
       "x-ms-enum": {
         "name": "ErrorCode",
-        "modelAsString": true
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "InvalidRequest",
+            "value": "InvalidRequest"
+          },
+          {
+            "name": "InvalidArgument",
+            "value": "InvalidArgument"
+          },
+          {
+            "name": "Unauthorized",
+            "value": "Unauthorized"
+          },
+          {
+            "name": "Forbidden",
+            "value": "Forbidden"
+          },
+          {
+            "name": "NotFound",
+            "value": "NotFound"
+          },
+          {
+            "name": "ProjectNotFound",
+            "value": "ProjectNotFound"
+          },
+          {
+            "name": "OperationNotFound",
+            "value": "OperationNotFound"
+          },
+          {
+            "name": "AzureCognitiveSearchNotFound",
+            "value": "AzureCognitiveSearchNotFound"
+          },
+          {
+            "name": "AzureCognitiveSearchIndexNotFound",
+            "value": "AzureCognitiveSearchIndexNotFound"
+          },
+          {
+            "name": "TooManyRequests",
+            "value": "TooManyRequests"
+          },
+          {
+            "name": "AzureCognitiveSearchThrottling",
+            "value": "AzureCognitiveSearchThrottling"
+          },
+          {
+            "name": "AzureCognitiveSearchIndexLimitReached",
+            "value": "AzureCognitiveSearchIndexLimitReached"
+          },
+          {
+            "name": "InternalServerError",
+            "value": "InternalServerError"
+          },
+          {
+            "name": "ServiceUnavailable",
+            "value": "ServiceUnavailable"
+          }
+        ]
       }
     },
     "FeedbackRecord": {
@@ -692,7 +750,37 @@
       ],
       "x-ms-enum": {
         "name": "JobStatus",
-        "modelAsString": true
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "notStarted",
+            "value": "notStarted"
+          },
+          {
+            "name": "running",
+            "value": "running"
+          },
+          {
+            "name": "succeeded",
+            "value": "succeeded"
+          },
+          {
+            "name": "failed",
+            "value": "failed"
+          },
+          {
+            "name": "cancelled",
+            "value": "cancelled"
+          },
+          {
+            "name": "cancelling",
+            "value": "cancelling"
+          },
+          {
+            "name": "partiallyCompleted",
+            "value": "partiallyCompleted"
+          }
+        ]
       }
     },
     "Language": {
@@ -1007,7 +1095,17 @@
       ],
       "x-ms-enum": {
         "name": "QnaSourceKind",
-        "modelAsString": true
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "file",
+            "value": "file"
+          },
+          {
+            "name": "url",
+            "value": "url"
+          }
+        ]
       }
     },
     "QnaSourceRecord": {
@@ -1101,7 +1199,13 @@
       ],
       "x-ms-enum": {
         "name": "SourceContentStructureKind",
-        "modelAsString": true
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "unstructured",
+            "value": "unstructured"
+          }
+        ]
       }
     },
     "SuggestedQuestion": {

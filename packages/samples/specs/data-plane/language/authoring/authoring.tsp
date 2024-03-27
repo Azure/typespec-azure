@@ -19,7 +19,6 @@ using Azure.Core.Traits;
 )
 @service({
   title: "Microsoft Cognitive Language Service - Analyze Text Authoring",
-  version: "202ß2-05-15-preview",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @route("/authoring/analyze-text/")
@@ -81,15 +80,17 @@ model Project {
 }
 
 @doc("Represents the project kind.")
-enum ProjectKind {
+union ProjectKind {
+  string,
+
   @doc("For building a classification model to classify text using your own data. Each file will have only one label. For example, file 1 is classified as A and file 2 is classified as B.")
-  CustomSingleLabelClassification,
+  CustomSingleLabelClassification: "CustomSingleLabelClassification",
 
   @doc("For building a classification model to classify text using your own data. Each file can have one or many labels. For example, file 1 is classified as A, B, and C and file 2 is classified as B and C.")
-  CustomMultiLabelClassification,
+  CustomMultiLabelClassification: "CustomMultiLabelClassification",
 
   @doc("For building an extraction model to identify your domain categories using your own data.")
-  CustomEntityRecognition,
+  CustomEntityRecognition: "CustomEntityRecognition",
 }
 
 @doc("Represents the settings used to define the project behavior.")
@@ -133,27 +134,29 @@ model Job {
 }
 
 @doc("Represents the job status.")
-enum JobStatus {
+union JobStatus {
+  string,
+
   @doc("The job has not started yet.")
-  notStarted,
+  notStarted: "notStarted",
 
   @doc("The job is running.")
-  running,
+  running: "running",
 
   @doc("The job has completed successfully.")
-  succeeded,
+  succeeded: "succeeded",
 
   @doc("The job has failed.")
-  failed,
+  failed: "failed",
 
   @doc("The job has been cancelled.")
-  cancelled,
+  cancelled: "cancelled",
 
   @doc("The job is cancelling.")
-  cancelling,
+  cancelling: "cancelling",
 
   @doc("The job is partially completed.")
-  partiallyCompleted,
+  partiallyCompleted: "partiallyCompleted",
 }
 
 @doc("Represents a warning that was encountered while executing the request.")
@@ -206,7 +209,6 @@ model SupportedLanguages is Azure.Core.Page<SupportedLanguage>;
 
 @doc("Represents a training config version.")
 model TrainingConfigVersion {
-  @projectedName("csharp", "version")
   @doc("Represents the version of the config.")
   trainingConfigVersion: string;
 

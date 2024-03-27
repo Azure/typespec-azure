@@ -105,6 +105,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Unsupported kind ${"kind"}`,
       },
     },
+    "multiple-services": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
+      },
+    },
+    "server-param-not-path": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Template argument ${"templateArgumentName"} is not a path parameter, it is a ${"templateArgumentType"}. It has to be a path.`,
+      },
+    },
   },
 });
 

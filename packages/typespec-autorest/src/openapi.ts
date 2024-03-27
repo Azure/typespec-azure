@@ -12,6 +12,7 @@ import {
   SdkContext,
   createSdkContext,
   getClientNameOverride,
+  shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
@@ -118,10 +119,10 @@ import {
   checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
-  getInfo,
   getOpenAPITypeName,
   getParameterKey,
   isReadonlyProperty,
+  resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
 import { buildVersionProjections } from "@typespec/versioning";
@@ -369,13 +370,13 @@ function createOAPIEmitter(
   function initializeEmitter(service: Service, multipleService: boolean, version?: string) {
     const auth = processAuth(service.type);
 
+    const info = resolveInfo(program, service.type);
     root = {
       swagger: "2.0",
       info: {
-        title: service.title ?? "(title)",
-        version: version ?? service.version ?? "0000-00-00",
-        description: getDoc(program, service.type),
-        ...getInfo(program, service.type),
+        title: "(title)",
+        ...info,
+        version: version ?? info?.version ?? "0000-00-00",
         "x-typespec-generated": getEmitterDetails(program),
       },
       schemes: ["https"],
@@ -405,7 +406,7 @@ function createOAPIEmitter(
     operationExamplesMap = new Map();
     operationIdsWithExample = new Set();
 
-    outputFile = resolveOutputFile(service, multipleService, options, version);
+    outputFile = resolveOutputFile(program, service, multipleService, options, version);
   }
 
   function resolveHost(
@@ -1986,6 +1987,13 @@ function createOAPIEmitter(
       }
     }
 
+    if (
+      typespecType.kind === "ModelProperty" &&
+      shouldFlattenProperty(tcgcSdkContext, typespecType)
+    ) {
+      newTarget["x-ms-client-flatten"] = true;
+    }
+
     attachExtensions(typespecType, newTarget);
 
     return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
@@ -2349,6 +2357,7 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
 }
 
 function resolveOutputFile(
+  program: Program,
   service: Service,
   multipleServices: boolean,
   options: ResolvedAutorestEmitterOptions,
@@ -2356,7 +2365,8 @@ function resolveOutputFile(
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   if (azureResourceProviderFolder) {
-    version = version ?? service.version ?? "0000-00-00";
+    const info = resolveInfo(program, service.type);
+    version = version ?? info?.version ?? "0000-00-00";
   }
   const interpolated = interpolatePath(options.outputFile, {
     "azure-resource-provider-folder": azureResourceProviderFolder,

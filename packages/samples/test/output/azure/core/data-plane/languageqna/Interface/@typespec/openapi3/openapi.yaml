@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Hello world
-  version: 0.1.0
+  version: 0.0.0
 tags: []
 paths:
   /feedback/{projectName}:
@@ -515,22 +515,24 @@ components:
           description: Error target
       description: The error object
     ErrorCode:
-      type: string
-      enum:
-        - InvalidRequest
-        - InvalidArgument
-        - Unauthorized
-        - Forbidden
-        - NotFound
-        - ProjectNotFound
-        - OperationNotFound
-        - AzureCognitiveSearchNotFound
-        - AzureCognitiveSearchIndexNotFound
-        - TooManyRequests
-        - AzureCognitiveSearchThrottling
-        - AzureCognitiveSearchIndexLimitReached
-        - InternalServerError
-        - ServiceUnavailable
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - InvalidRequest
+            - InvalidArgument
+            - Unauthorized
+            - Forbidden
+            - NotFound
+            - ProjectNotFound
+            - OperationNotFound
+            - AzureCognitiveSearchNotFound
+            - AzureCognitiveSearchIndexNotFound
+            - TooManyRequests
+            - AzureCognitiveSearchThrottling
+            - AzureCognitiveSearchIndexLimitReached
+            - InternalServerError
+            - ServiceUnavailable
     FeedbackRecord:
       type: object
       properties:
@@ -573,15 +575,17 @@ components:
           description: Collection of Error types.
       description: Job state represents the job metadata and any errors.
     JobStatus:
-      type: string
-      enum:
-        - notStarted
-        - running
-        - succeeded
-        - failed
-        - cancelled
-        - cancelling
-        - partiallyCompleted
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - notStarted
+            - running
+            - succeeded
+            - failed
+            - cancelled
+            - cancelling
+            - partiallyCompleted
       description: Job status.
     Language:
       type: string
@@ -796,10 +800,12 @@ components:
           $ref: '#/components/schemas/SuggestedQuestionsCluster'
       description: Resource create operation model.
     QnaSourceKind:
-      type: string
-      enum:
-        - file
-        - url
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - file
+            - url
       description: Supported source types.
     QnaSourceRecord:
       type: object
@@ -862,9 +868,11 @@ components:
           description: Date-time when the QnA was last updated.
       description: Resource create or update operation model.
     SourceContentStructureKind:
-      type: string
-      enum:
-        - unstructured
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - unstructured
       description: Content structure type for sources.
     SuggestedQuestion:
       type: object

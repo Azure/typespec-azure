@@ -6,17 +6,26 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 
 ## Steps of running the tool
 
-- Ensure `powershell` is installed.
-- Ensure `autorest` tool is installed. [Installation guide](https://github.com/Azure/autorest/blob/main/docs/install/readme.md)
-- Download conversion script [here](https://aka.ms/azsdk/openapi-to-typespec-script).
-- Running the conversion tool.
+- Ensure [Node.js](https://nodejs.org/en/download/) 18.3 LTS or later is installed.
+- Install [`@azure-tools/typespec-client-generator-cli`](https://www.npmjs.com/package/@azure-tools/typespec-client-generator-cli):
 
-```powershell
-./convert.ps1 [path to readme.md] [path to output folder]
-
-# OR specify parameter by name
-./convert.ps1 -swaggerConfigFile [path to readme.md] -outputFolder [path to output folder]
+```shell
+npm install -g @azure-tools/typespec-client-generator-cli
 ```
+
+- Run the tool from the directory you would like to output your files.
+
+  - Convert a **data-plane** specification:
+
+    ```shell
+    tsp-client convert --swagger-readme [path to readme.md]
+    ```
+
+  - Convert a **control-plane** specification:
+
+    ```shell
+    tsp-client convert --swagger-readme [path to readme.md] --arm
+    ```
 
 - Review generated TypeSpec
 - Layout [the TypeSpec project folders appropriately](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
@@ -33,5 +42,5 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
     - A high-level description of the bug
     - Expected and Actual Results
     - Repro steps, including any TypeSpec code that you used
-    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](#troubleshooting-vscode-tooling-and-filing-issues)
+    - Any error messages you saw, including stack traces. For issues with VS or VS Code tooling see [Troubleshooting VSCode Tooling and Filing Issues](../../typespec-getting-started.md#troubleshooting-vscode-tooling-and-filing-issues)
 - Schedule review meetings with TypeSpec team.

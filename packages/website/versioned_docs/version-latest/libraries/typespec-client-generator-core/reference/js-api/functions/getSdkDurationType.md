@@ -11,7 +11,7 @@ getSdkDurationType(context, type): SdkDurationType
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `type` | `Scalar` |
 
 ## Returns

@@ -11,7 +11,7 @@ isInclude(context, entity): boolean
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `entity` | `Model` |
 
 ## Returns

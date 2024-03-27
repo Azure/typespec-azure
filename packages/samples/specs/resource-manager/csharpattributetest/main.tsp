@@ -13,6 +13,8 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.CSharpAttributeTest",
+})
+@OpenAPI.info({
   version: "2021-09-21-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -46,9 +48,10 @@ model CustomAttributesProperties {
 
 @Azure.Core.lroStatus
 @doc("Envelope provisioning state.")
-enum EnvelopeProvisioningState {
-  ...ResourceProvisioningState,
+union EnvelopeProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Working state.")
-  Working,
+  Working: "Working",
 }

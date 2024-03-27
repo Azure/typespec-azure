@@ -734,14 +734,14 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -950,14 +950,14 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -1648,14 +1648,14 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -1852,14 +1852,14 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -2397,14 +2397,14 @@
           "202": {
             "description": "Resource operation accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -2475,14 +2475,14 @@
           "202": {
             "description": "Resource operation accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -3397,14 +3397,14 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -3625,14 +3625,14 @@
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
                 "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
-              },
-              "Location": {
-                "type": "string",
-                "description": "The Location header contains the URL where the status of the long running operation can be checked."
               }
             }
           },
@@ -3777,12 +3777,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "ExtensionChildProperties2": {
@@ -3795,12 +3795,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "LocationChild": {
@@ -3837,7 +3837,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -3850,7 +3851,8 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         },
         "color": {
           "type": "string",
@@ -3858,7 +3860,6 @@
         }
       },
       "required": [
-        "provisioningState",
         "color"
       ]
     },
@@ -3876,10 +3877,6 @@
       "type": "object",
       "description": "The updatable properties of the LocationChild.",
       "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
-        },
         "color": {
           "type": "string",
           "description": "The color of the location"
@@ -3944,7 +3941,8 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         },
         "color": {
           "type": "string",
@@ -3952,7 +3950,6 @@
         }
       },
       "required": [
-        "provisioningState",
         "color"
       ]
     },
@@ -3990,7 +3987,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4011,10 +4009,6 @@
       "type": "object",
       "description": "The updatable properties of the LocationResource.",
       "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
-        },
         "color": {
           "type": "string",
           "description": "The color of the location"
@@ -4123,12 +4117,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "TenantChildProperties2": {
@@ -4141,12 +4135,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "TestExtensionChild": {
@@ -4203,7 +4197,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4227,10 +4222,6 @@
         "flavor": {
           "type": "string",
           "description": "The flavor of the extension child"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -4248,7 +4239,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4345,7 +4337,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4391,7 +4384,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4477,7 +4471,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4519,7 +4514,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4614,7 +4610,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4656,7 +4653,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4742,7 +4740,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4766,10 +4765,6 @@
         "flavor": {
           "type": "string",
           "description": "The flavor of the tracked child"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
         }
       }
     },
@@ -4787,7 +4782,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4886,7 +4882,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4939,7 +4936,8 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items"
+          "description": "The link to the next page of items",
+          "readOnly": true
         }
       },
       "required": [
@@ -4969,12 +4967,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     },
     "TrackedChildProperties2": {
@@ -4987,12 +4985,12 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The provisioning state of the resource."
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
         }
       },
       "required": [
-        "flavor",
-        "provisioningState"
+        "flavor"
       ]
     }
   },

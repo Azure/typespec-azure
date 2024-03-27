@@ -2,6 +2,7 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-resource-manager";
+import "@typespec/openapi";
 
 using TypeSpec.Rest;
 using TypeSpec.Http;
@@ -11,9 +12,11 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "Microsoft.Contoso",
-  version: "2022-05-22-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@OpenAPI.info({
+  version: "2022-05-22-preview",
+})
 namespace Microsoft.Contoso;
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -136,7 +139,7 @@ model WidgetProperties {
   ...DefaultProvisioningStateProperty;
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @Azure.Core.fixed
 @doc("Spin.")
 enum Spin {
@@ -177,6 +180,7 @@ model FlangeProperties {
   ...DefaultProvisioningStateProperty;
 }
 
+#suppress "deprecated" "Should replace TenantResourceDelete in the future"
 @armResourceOperations(Flange)
 interface Flanges
   extends TenantResourceCreate<Flange>,

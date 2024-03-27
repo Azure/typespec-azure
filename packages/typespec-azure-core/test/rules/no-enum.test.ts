@@ -31,6 +31,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         },
       ]);
   });
+
   it("allows the version enum", async () => {
     await tester
       .expect(
@@ -44,5 +45,134 @@ describe("typespec-azure-core: no-enum rule", () => {
         `
       )
       .toBeValid();
+  });
+
+  it("emit warning about other enums in versioned service", async () => {
+    await tester
+      .expect(
+        `       
+        @service
+        @versioned(Versions)
+        namespace Foo; 
+        enum Versions {
+          v1, v2
+        }
+
+        enum Bar { a,  b}
+        `
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-enum",
+        },
+      ]);
+  });
+
+  describe("codefix", () => {
+    it("codefix simple enum", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            cat, dog
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            cat: "cat", dog: "dog",
+          }
+        `);
+    });
+
+    it("keeps new lines", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            /** cat doc */
+            cat,
+            /** dog doc */
+            dog
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            /** cat doc */
+            cat: "cat",
+            /** dog doc */
+            dog: "dog",
+          }
+        `);
+    });
+
+    it("codefix enum with named member", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            Cat: "cat", Dog: "dog",
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            Cat: "cat", Dog: "dog",
+          }
+        `);
+    });
+
+    it("keeps decorators, comments, directives and doc comment between members", async () => {
+      await tester
+        .expect(
+          `        
+          enum PetKind {
+            // cat
+
+            /** cat */
+            @doc("cat")
+            #suppress "cat"
+            cat, 
+            
+            // dog
+
+            /** dog */
+            @doc("dog")
+            #suppress "dog"
+            dog
+
+            // end
+          }
+          `
+        )
+        .applyCodeFix("enum-to-extensible-union").toEqual(`
+          union PetKind {
+            string,
+
+            // cat
+
+            /** cat */
+            @doc("cat")
+            #suppress "cat"
+            cat: "cat", 
+            
+            // dog
+
+            /** dog */
+            @doc("dog")
+            #suppress "dog"
+            dog: "dog",
+
+            // end
+          }
+        `);
+    });
   });
 });

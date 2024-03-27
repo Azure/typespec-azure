@@ -55,7 +55,7 @@ op ArmResourceListByParent<
 > is ArmReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
@@ -81,12 +81,12 @@ op ArmResourceListAtScope<
 > is ArmReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
 >;
 
 /**
  * A resource GET operation
- * @template Resource the resource being patched
+ * @template Resource the resource being read
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
@@ -105,12 +105,35 @@ op ArmResourceRead<
 > is ArmReadOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Response,
-  ErrorResponse
+  Error
+>;
+
+/**
+ * Check a resource's existence via HEAD operation
+ * @template Resource the resource being checked
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the read operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("Check for the existence of a {name}", Resource)
+@head
+op ArmResourceCheckExistence<
+  Resource extends ArmResourceBase,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
+  Error extends {} = ErrorResponse
+> is ArmReadOperation<
+  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  Response,
+  Error
 >;
 
 /**
  * A long-running resource CreateOrUpdate (PUT)
- * @template Resource the resource being patched
+ * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -131,7 +154,7 @@ op ArmResourceRead<
 op ArmResourceCreateOrUpdateAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = {},
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -141,13 +164,13 @@ op ArmResourceCreateOrUpdateAsync<
 > is ArmCreateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Resource,
-  ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Response,
   Error
 >;
 
 /**
  * DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
- * @template Resource the resource being patched
+ * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
@@ -173,7 +196,7 @@ op ArmResourceCreateOrUpdateSync<
 
 /**
  * Synchronous PUT operation for Azure Resource Manager resources
- * @template Resource the resource being patched
+ * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
@@ -198,7 +221,7 @@ op ArmResourceCreateOrReplaceSync<
 
 /**
  * @dev A long-running resource CreateOrUpdate (PUT)
- * @template Resource the resource being patched
+ * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -208,7 +231,7 @@ op ArmResourceCreateOrReplaceSync<
 op ArmResourceCreateOrReplaceAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = {},
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -239,7 +262,8 @@ op ArmTagsPatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
     string
-  >,
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {}
 > is ArmCustomPatchAsync<
   Resource,
@@ -265,7 +289,8 @@ op ArmResourcePatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
     string
-  >,
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {}
 > is ArmCustomPatchAsync<
   Resource,
@@ -304,7 +329,8 @@ op ArmCustomPatchAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Resource,
     string
-  >,
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
     "Resource update request accepted.",
@@ -412,10 +438,12 @@ op ArmResourceDeleteAsyncBase<
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
  */
+#deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 op ArmResourceDeleteAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
@@ -433,7 +461,8 @@ op ArmResourceDeleteAsync<
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends ArmResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
@@ -514,7 +543,8 @@ op ArmResourceActionAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Response,
     string
-  >,
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<
@@ -568,17 +598,17 @@ op ArmResourceActionNoContentAsync<
   Resource extends ArmResource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-    void,
-    string
-  >,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
-  ArmAcceptedLroResponse | ArmNoContentResponse<"Action completed successfully.">,
+  ArmAcceptedLroResponse<
+    "Resource operation accepted.",
+    LroHeaders
+  > | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
   Error
@@ -601,7 +631,8 @@ op ArmResourceActionNoResponseContentAsync<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     void,
     string
-  >,
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 > is ArmResourceActionAsyncBase<

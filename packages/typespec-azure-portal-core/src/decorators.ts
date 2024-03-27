@@ -1,4 +1,4 @@
-import { ArmResourceKind, getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
+import { getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 import {
   BooleanLiteral,
   CompilerHost,
@@ -17,7 +17,14 @@ import {
 } from "@typespec/compiler";
 import { VersionMap, getVersions } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
-import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions } from "./types.js";
+import {
+  AboutOptions,
+  BrowseOptions,
+  DisplayNamesOptions,
+  LearnMoreDocsOptions,
+  MarketplaceOfferOptions,
+  PromotionOptions,
+} from "./types.js";
 
 /**
  * This is a Browse decorator which will be use to put more info on the browse view.
@@ -27,7 +34,9 @@ import { AboutOptions, BrowseOptions, PromotionOptions, marketplaceOfferOptions 
 export function $browse(context: DecoratorContext, target: Model, options: Model) {
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $browse);
-  checkIsArmResource(program, target, "browse");
+  if (!checkIsArmTrackedResource(program, target, "browse")) {
+    return;
+  }
   const browseOptionsResult: BrowseOptions = {};
   if (options && options.properties) {
     const query = options.properties.get("argQuery");
@@ -89,6 +98,7 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
       }
     } else if (target.namespace) {
       const service = getService(program, target.namespace);
+      // eslint-disable-next-line deprecation/deprecation
       if (service?.version && currentApiVersion !== service.version) {
         reportDiagnostic(program, {
           code: "invalid-apiversion",
@@ -145,15 +155,28 @@ export function getBrowseArgQuery(program: Program, target: Type) {
   return getBrowse(program, target)?.argQuery;
 }
 
+export function checkIsArmTrackedResource(
+  program: Program,
+  target: Model,
+  decoratorName: "browse"
+) {
+  if (getArmResourceKind(target) !== "Tracked") {
+    reportDiagnostic(program, {
+      code: "not-a-resource",
+      messageId: decoratorName,
+      target,
+    });
+    return false;
+  }
+  return true;
+}
+
 export function checkIsArmResource(
   program: Program,
   target: Model,
-  decoratorName: "browse" | "about" | "marketplaceOffer" | "promotion"
+  decoratorName: "about" | "marketplaceOffer" | "promotion"
 ) {
-  if (
-    getArmResourceKind(target) !== ("Tracked" as ArmResourceKind) &&
-    getArmResourceKind(target) !== ("Proxy" as ArmResourceKind)
-  ) {
+  if (getArmResourceKind(target) !== "Tracked" && getArmResourceKind(target) !== "Proxy") {
     reportDiagnostic(program, {
       code: "not-a-resource",
       format: {
@@ -181,7 +204,7 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     const icon = options.properties.get("icon");
     const learnMoreDocs = options.properties.get("learnMoreDocs");
     const keywords = options.properties.get("keywords");
-    const displayName = options.properties.get("displayName");
+    const displayNames = options.properties.get("displayNames");
     if (icon) {
       if (icon.type.kind === "Model") {
         //use decoratorTarget to find sourceLocation instead of target, since we want to find a file path related to where decorator was stated
@@ -202,13 +225,23 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
     }
     if (learnMoreDocs) {
       if (learnMoreDocs.type.kind === "Tuple") {
-        if (!checkIsValidLinks(program, target, learnMoreDocs.type.values)) {
-          return;
-        }
-        const learnMoreDocsValues = learnMoreDocs.type.values
-          .filter((value) => value.kind === "String")
-          .map((value: Type) => (value as StringLiteral).value);
-        aboutOptionsResult.learnMoreDocs = learnMoreDocsValues;
+        const learnMoreDocsResult: LearnMoreDocsOptions[] = [];
+        learnMoreDocs.type.values.forEach((learnMoreDoc) => {
+          const title = (learnMoreDoc as Model).properties.get("title");
+          const uri = (learnMoreDoc as Model).properties.get("uri");
+          const titleValue = title && (title.type as StringLiteral).value;
+          const uriValue = uri && (uri.type as StringLiteral).value;
+          if (titleValue && uriValue) {
+            if (!checkIsValidLink(program, target, uriValue)) {
+              return;
+            }
+            learnMoreDocsResult.push({
+              title: titleValue,
+              uri: uriValue,
+            } as LearnMoreDocsOptions);
+          }
+        });
+        aboutOptionsResult.learnMoreDocs = learnMoreDocsResult;
       }
     }
     if (keywords) {
@@ -218,39 +251,48 @@ export function $about(context: DecoratorContext, target: Model, options: Model)
           .map((value: Type) => (value as StringLiteral).value);
       }
     }
-    if (displayName) {
-      if (displayName.type.kind === "String") {
-        aboutOptionsResult.displayName = (displayName.type as StringLiteral).value;
+    if (displayNames) {
+      if (displayNames.type.kind === "Model") {
+        const singular =
+          displayNames.type && (displayNames.type as Model).properties.get("singular");
+        const singularValue = singular && singular.type && (singular.type as StringLiteral).value;
+        const plural = displayNames.type && (displayNames.type as Model).properties.get("plural");
+        const pluralValue = plural && plural.type && (plural.type as StringLiteral).value;
+        let displayNamesResult = {} as DisplayNamesOptions;
+        if (singularValue && pluralValue) {
+          displayNamesResult = {
+            singular: singularValue,
+            plural: pluralValue,
+          };
+        }
+        aboutOptionsResult.displayNames = displayNamesResult;
       }
     }
   }
   program.stateMap(PortalCoreKeys.about).set(target, aboutOptionsResult);
 }
 
-function checkIsValidLinks(program: Program, target: Model, links: Type[]) {
-  let valid = true;
-  links.forEach((value) => {
-    const pattern = /^https:\/\//;
-    if (!(value as StringLiteral).value.match(pattern)) {
-      reportDiagnostic(program, {
-        code: "invalid-link",
-        format: {
-          link: (value as StringLiteral).value,
-        },
-        target,
-      });
-      valid = false;
-    }
-  });
-  return valid;
+function checkIsValidLink(program: Program, target: Model, uri: string) {
+  const pattern = /^https:\/\//;
+  if (uri && !uri.match(pattern)) {
+    reportDiagnostic(program, {
+      code: "invalid-link",
+      format: {
+        link: uri,
+      },
+      target,
+    });
+    return false;
+  }
+  return true;
 }
 
 export function getAbout(program: Program, target: Type) {
   return program.stateMap(PortalCoreKeys.about).get(target);
 }
 
-export function getAboutDisplayName(program: Program, target: Type) {
-  return getAbout(program, target).displayName;
+export function getAboutDisplayNames(program: Program, target: Type) {
+  return getAbout(program, target).displayNames;
 }
 
 export function getAboutKeywords(program: Program, target: Type) {
@@ -265,7 +307,7 @@ export function $marketplaceOffer(context: DecoratorContext, target: Model, opti
   const { program } = context;
   validateDecoratorUniqueOnNode(context, target, $marketplaceOffer);
   checkIsArmResource(program, target, "marketplaceOffer");
-  const marketPlaceOfferResult: marketplaceOfferOptions = {};
+  const marketPlaceOfferResult: MarketplaceOfferOptions = {};
   if (options && options.properties) {
     const id = options.properties.get("id");
     if (id?.type.kind === "String") {

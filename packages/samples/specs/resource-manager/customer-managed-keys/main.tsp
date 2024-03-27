@@ -13,6 +13,8 @@ using Azure.Core;
 @armProviderNamespace("Contoso.CustomerManagedKeyExample")
 @service({
   title: "Contoso.CustomerManagedKeyExample",
+})
+@OpenAPI.info({
   version: "2023-03-01-preview",
 })
 @doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
@@ -45,7 +47,7 @@ interface Widgets {
   get is ArmResourceRead<WidgetResource>;
   create is ArmResourceCreateOrUpdateAsync<WidgetResource>;
   update is ArmTagsPatchSync<WidgetResource>;
-  delete is ArmResourceDeleteAsync<WidgetResource>;
+  delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
   listByResourceGroup is ArmResourceListByParent<WidgetResource>;
   listBySubscription is ArmListBySubscription<WidgetResource>;
 }

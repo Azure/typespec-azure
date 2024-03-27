@@ -11,7 +11,7 @@ getClientNameOverride(context, entity): string | undefined
 
 | Parameter | Type |
 | :------ | :------ |
-| `context` | [`SdkContext`](../interfaces/SdkContext.md)<`Record`<`string`, `any`\>\> |
+| `context` | `TCGCContext` |
 | `entity` | `Type` |
 
 ## Returns

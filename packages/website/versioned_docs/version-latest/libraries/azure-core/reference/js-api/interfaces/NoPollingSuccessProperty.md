@@ -12,7 +12,7 @@ A step in a logical operation that involves multiple calls
 
 ## Properties
 
-| Property | Type | Description | Inheritance |
+| Property | Type | Description | Overrides |
 | :------ | :------ | :------ | :------ |
 | `kind` | `"noPollingResult"` | - | - |
-| `responseModel` | `IntrinsicType` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep.responseModel`](LogicalOperationStep.md) |
+| `responseModel` | `IntrinsicType` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep`](LogicalOperationStep.md).`responseModel` |

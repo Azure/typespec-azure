@@ -14,6 +14,8 @@ using Autorest;
 @armProviderNamespace
 @service({
   title: "Microsoft.Confluent",
+})
+@OpenAPI.info({
   version: "2021-03-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -73,36 +75,38 @@ model OrganizationProperties {
 }
 
 @doc("SaaS offer status.")
-enum OfferStatus {
+union OfferStatus {
+  string,
+
   @doc("Offer started.")
-  Started,
+  Started: "Started",
 
   @doc("Offer pending fulfillment start.")
-  PendingFulfillmentStart,
+  PendingFulfillmentStart: "PendingFulfillmentStart",
 
   @doc("Offer in progress.")
-  InProgress,
+  InProgress: "InProgress",
 
   @doc("Offer subscribed.")
-  Subscribed,
+  Subscribed: "Subscribed",
 
   @doc("Offer suspended.")
-  Suspended,
+  Suspended: "Suspended",
 
   @doc("Offer reinstated.")
-  Reinstated,
+  Reinstated: "Reinstated",
 
   @doc("Offer succeeded.")
-  Succeeded,
+  Succeeded: "Succeeded",
 
   @doc("Offer failed.")
-  Failed,
+  Failed: "Failed",
 
   @doc("Offer unsubscribed.")
-  Unsubscribed,
+  Unsubscribed: "Unsubscribed",
 
   @doc("Offer updating.")
-  Updating,
+  Updating: "Updating",
 }
 
 @doc("Details of the product offering.")

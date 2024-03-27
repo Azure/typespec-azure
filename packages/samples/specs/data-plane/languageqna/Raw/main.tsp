@@ -26,7 +26,6 @@ using TypeSpec.OpenAPI;
 )
 @service({
   title: "Microsoft Cognitive Language Service - Question Answering - Authoring",
-  version: "21-10-01",
 })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Azure.QnAMaker;
@@ -44,7 +43,6 @@ model ApiKey {
 
 @doc("Collection of error types")
 model Errors {
-  @projectedName("csharp", "ErrorItems")
   @doc("The error list.")
   errors: Azure.Core.Foundations.Error[];
 }
@@ -284,27 +282,29 @@ model JobMetadata {
 }
 
 @doc("The job status.")
-enum JobStatus {
+union JobStatus {
+  string,
+
   @doc("The job has not started yet.")
-  notStarted,
+  notStarted: "notStarted",
 
   @doc("The job is running.")
-  running,
+  running: "running",
 
   @doc("The job has completed successfully.")
-  succeeded,
+  succeeded: "succeeded",
 
   @doc("The job has failed.")
-  failed,
+  failed: "failed",
 
   @doc("The job has been cancelled.")
-  cancelled,
+  cancelled: "cancelled",
 
   @doc("The job is cancelling.")
-  cancelling,
+  cancelling: "cancelling",
 
   @doc("The job is partially completed.")
-  partiallyCompleted,
+  partiallyCompleted: "partiallyCompleted",
 }
 
 @doc("Job state represents the job metadata and any errors")
@@ -392,18 +392,22 @@ model QnaSourceMetadata {
 }
 
 @doc("Supported source types.")
-enum QnaSourceKind {
+union QnaSourceKind {
+  string,
+
   @doc("File source")
-  file,
+  file: "file",
 
   @doc("Url source")
-  url,
+  url: "url",
 }
 
 @doc("Content structure type for sources.")
-enum SourceContentStructureKind {
+union SourceContentStructureKind {
+  string,
+
   @doc("The source content is unstructured")
-  unstructured,
+  unstructured: "unstructured",
 }
 
 @friendlyName("{name}UpdateRecord", Value)
@@ -421,15 +425,17 @@ model UpdateQnaSourceRecord {
 }
 
 @doc("The kind of an update operation.")
-enum UpdateOperationKind {
+union UpdateOperationKind {
+  string,
+
   @doc("Addition operation")
-  add,
+  add: "add",
 
   @doc("Deletion operation")
-  delete,
+  delete: "delete",
 
   @doc("Replace operation")
-  replace,
+  replace: "replace",
 }
 
 @doc("Question and answer record")

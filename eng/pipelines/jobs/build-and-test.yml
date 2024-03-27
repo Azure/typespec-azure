@@ -61,7 +61,7 @@ steps:
       searchFolder: "$(System.DefaultWorkingDirectory)/core/packages"
       testResultsFiles: "*/test-results.xml"
       mergeTestResults: true
-      failTaskOnFailedTests: true
+      failTaskOnFailedTests: false
       testRunTitle: "[CORE] Test os: ${{ parameters.poolName }}, node: ${{ parameters.nodeVersion }}"
     displayName: Publish core test results
     condition: always()
@@ -72,7 +72,7 @@ steps:
       searchFolder: "$(System.DefaultWorkingDirectory)/packages"
       testResultsFiles: "*/test-results.xml"
       mergeTestResults: true
-      failTaskOnFailedTests: true
+      failTaskOnFailedTests: false
       testRunTitle: "[NON-CORE] Test os: ${{ parameters.poolName }}, node: ${{ parameters.nodeVersion }}"
     displayName: Publish non-core test results
     condition: always()

@@ -1,5 +1,9 @@
 import { defineLinter } from "@typespec/compiler";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
+import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
+import { armNoRecordRule } from "./rules/arm-no-record.js";
+import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
+import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
 import { interfacesRule } from "./rules/arm-resource-interfaces.js";
@@ -25,7 +29,11 @@ import { retryAfterRule } from "./rules/retry-after.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 
 const rules = [
+  armNoRecordRule,
   armCommonTypesVersionRule,
+  armDeleteResponseCodesRule,
+  armPutResponseCodesRule,
+  armPostResponseCodesRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
@@ -59,12 +67,19 @@ export const $linter = defineLinter({
   rules,
   ruleSets: {
     all: {
+      extends: [
+        "@azure-tools/typespec-azure-core/all",
+        "@azure-tools/typespec-azure-core/canonical-versioning",
+      ],
       enable: {
         ...allRulesEnabled,
         // TODO: Enable this rule once azure-rest-api-specs repo is ready (issue #3839)
         [`@azure-tools/typespec-azure-resource-manager/${armCommonTypesVersionRule.name}`]: false,
       },
-      extends: ["@azure-tools/typespec-azure-core/all"],
+      disable: {
+        [`@azure-tools/typespec-azure-core/bad-record-type`]:
+          "This clashes with the ARM `no-record` rule.",
+      },
     },
   },
 });

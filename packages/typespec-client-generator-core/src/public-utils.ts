@@ -1,32 +1,32 @@
 import {
-  getDeprecationDetails,
-  getDoc,
-  getEffectiveModelType,
-  getFriendlyName,
-  getNamespaceFullName,
-  getProjectedName,
-  getSummary,
-  ignoreDiagnostics,
+  Diagnostic,
   Interface,
-  isErrorModel,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
   Operation,
-  resolveEncodedName,
   Type,
   Union,
+  createDiagnosticCollector,
+  getEffectiveModelType,
+  getFriendlyName,
+  getNamespaceFullName,
+  getProjectedName,
+  ignoreDiagnostics,
+  isErrorModel,
+  listServices,
+  resolveEncodedName,
 } from "@typespec/compiler";
 import {
+  HttpOperation,
+  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
   getQueryParamName,
-  HttpOperationParameter,
   isStatusCode,
 } from "@typespec/http";
-import { getVersions, Version } from "@typespec/versioning";
+import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
@@ -35,8 +35,8 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { parseEmitterName, TCGCContext } from "./internal-utils.js";
-import { reportDiagnostic } from "./lib.js";
+import { TCGCContext, getClientNamespaceStringHelper, parseEmitterName } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -79,18 +79,7 @@ export function isApiVersion(
  * @returns
  */
 export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  let packageName = context.packageName;
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  const services = listServices(context.program);
-  if (services.length === 0) {
-    return undefined;
-  }
-  return getNamespaceFullName(services[0].type);
+  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
 }
 
 /**
@@ -132,19 +121,6 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
 }
 
 /**
- * Whether a model is an Azure.Core model or not
- * @param t
- * @returns
- */
-export function isAzureCoreModel(t: Type): boolean {
-  return (
-    t.kind === "Model" &&
-    t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
-  );
-}
-
-/**
  *
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
@@ -182,85 +158,40 @@ export function getLibraryName(
 ): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
-  if (emitterSpecificName) return emitterSpecificName;
+  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
   // 2. check if there's a specific name for our language with deprecated @projectedName
   emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
-  if (emitterSpecificName) return emitterSpecificName;
+  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
   // 3. check if there's a client name with deprecated @projectedName
   const clientSpecificName = getProjectedName(context.program, type, "client");
-  if (clientSpecificName) return clientSpecificName;
+  if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
 
-  // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
-  return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
-}
+  // 4. check if there's a friendly name, if so return friendly name
+  const friendlyName = getFriendlyName(context.program, type);
+  if (friendlyName) return friendlyName;
 
-export function capitalize(name: string): string {
-  return name[0].toUpperCase() + name.slice(1);
-}
-
-export function reportUnionUnsupported(context: TCGCContext, type: Union): void {
-  reportDiagnostic(context.program, { code: "union-unsupported", target: type });
-}
-
-export function intOrFloat(value: number): "int32" | "float32" {
-  return value.toString().indexOf(".") === -1 ? "int32" : "float32";
-}
-
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
-  if (getSummary(context.program, type)) {
-    return {
-      description: getSummary(context.program, type),
-      details: getDoc(context.program, type),
-    };
+  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
+    return type.name + type.templateMapper.args.map((arg) => (arg as Model).name).join("");
   }
-  return {
-    description: getDoc(context.program, type),
-  };
+
+  return typeof type.name === "string" ? type.name : "";
 }
 
+/**
+ * Get the serialized name of a type.
+ * @param context
+ * @param type
+ * @returns
+ */
 export function getWireName(context: TCGCContext, type: Type & { name: string }) {
   // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
   // 2. Check if there's deprecated language projection
   return getProjectedName(context.program, type, "json") ?? type.name;
-}
-
-interface SdkTypeBaseHelper<TKind> {
-  __raw?: Type;
-  nullable: boolean;
-  deprecation?: string;
-  kind: TKind;
-}
-
-/**
- * Helper function to return default values for nullable, encode etc
- * @param type
- */
-export function getSdkTypeBaseHelper<TKind>(
-  context: TCGCContext,
-  type: Type | string,
-  kind: TKind
-): SdkTypeBaseHelper<TKind> {
-  if (typeof type === "string") {
-    return {
-      nullable: false,
-      kind,
-    };
-  }
-  return {
-    __raw: type,
-    nullable: false,
-    deprecation: getDeprecationDetails(context.program, type)?.message,
-    kind,
-  };
 }
 
 /**
@@ -285,6 +216,28 @@ export function getCrossLanguageDefinitionId(type: {
 }
 
 /**
+ * Helper function return the cross langauge package id for a package
+ */
+export function getCrossLanguagePackageId(context: TCGCContext): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const services = listServices(context.program);
+  if (services.length === 0) return diagnostics.wrap("");
+  const serviceNamespace = getNamespaceFullName(services[0].type);
+  if (services.length > 1) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "multiple-services",
+        target: services[0].type,
+        format: {
+          service: serviceNamespace,
+        },
+      })
+    );
+  }
+  return diagnostics.wrap(serviceNamespace);
+}
+
+/**
  * Create a name for anonymous model
  * @param context
  * @param type
@@ -295,13 +248,15 @@ export function getGeneratedName(
   operation?: Operation
 ): string {
   if (!context.generatedNames) {
-    context.generatedNames = new Set<string>();
+    context.generatedNames = new Map<Union | Model, string>();
   }
+  const generatedName = context.generatedNames.get(type);
+  if (generatedName) return generatedName;
 
   const contextPath = operation
     ? getContextPath(context, operation, type)
     : findContextPath(context, type);
-  const createdName = buildNameFromContextPaths(context, contextPath);
+  const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
 }
 
@@ -357,13 +312,12 @@ function getContextPath(
   root: Operation | Model,
   typeToFind: Model | Union
 ): ContextNode[] {
-  const program = context.program;
   // use visited set to avoid cycle model reference
   const visited: Set<Type> = new Set<Type>();
   let result: ContextNode[];
 
   if (root.kind === "Operation") {
-    const httpOperation = ignoreDiagnostics(getHttpOperation(program, root));
+    const httpOperation = getHttpOperationWithCache(context, root);
 
     if (httpOperation.parameters.body) {
       visited.clear();
@@ -493,7 +447,11 @@ function getContextPath(
  * @param contextPaths
  * @returns
  */
-function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNode[]): string {
+function buildNameFromContextPaths(
+  context: TCGCContext,
+  type: Union | Model,
+  contextPath: ContextNode[]
+): string {
   // fallback to empty name for corner case
   if (contextPath.length === 0) {
     return "";
@@ -526,17 +484,22 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
   // 3. simplely handle duplication
   let duplicateCount = 1;
   const rawCreateName = createName;
-  while (context.generatedNames?.has(createName)) {
+  const generatedNames = [...(context.generatedNames?.values() ?? [])];
+  while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
   if (context.generatedNames) {
-    context.generatedNames.add(createName);
+    context.generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Set<string>([createName]);
+    context.generatedNames = new Map<Union | Model, string>([[type, createName]]);
   }
   return createName;
 }
 
+/**
+ *
+ * @deprecated This function is deprecated. You should use isErrorModel from the standard TypeSpec library
+ */
 export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
   const errorDecorator = isErrorModel(context.program, model);
   if (errorDecorator) return true;
@@ -546,4 +509,19 @@ export function isErrorOrChildOfError(context: TCGCContext, model: Model): boole
     baseModel = baseModel.baseModel;
   }
   return false;
+}
+
+export function getHttpOperationWithCache(
+  context: TCGCContext,
+  operation: Operation
+): HttpOperation {
+  if (context.httpOperationCache === undefined) {
+    context.httpOperationCache = new Map<Operation, HttpOperation>();
+  }
+  if (context.httpOperationCache.has(operation)) {
+    return context.httpOperationCache.get(operation)!;
+  }
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+  context.httpOperationCache.set(operation, httpOperation);
+  return httpOperation;
 }

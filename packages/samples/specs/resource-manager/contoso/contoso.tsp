@@ -12,6 +12,8 @@ using Azure.ResourceManager;
 @armProviderNamespace
 @service({
   title: "ContosoProviderHubClient",
+})
+@OpenAPI.info({
   version: "2021-10-01-preview",
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -52,18 +54,19 @@ interface Employees extends TrackedResourceOperations<Employee, EmployeeProperti
 
 @doc("The provisioning state of a resource.")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("The resource is being provisioned")
-  Provisioning,
+  Provisioning: "Provisioning",
 
   @doc("The resource is updating")
-  Updating,
+  Updating: "Updating",
 
   @doc("The resource is being deleted")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("The resource create request has been accepted")
-  Accepted,
+  Accepted: "Accepted",
 }
