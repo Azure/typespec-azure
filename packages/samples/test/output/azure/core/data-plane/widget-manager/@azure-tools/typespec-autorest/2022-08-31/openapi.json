@@ -1729,6 +1729,10 @@
                 "error": {
                   "$ref": "#/definitions/Azure.Core.Foundations.Error",
                   "description": "Error object that describes the error when status is \"Failed\"."
+                },
+                "result": {
+                  "$ref": "#/definitions/TypeSpec.Http.AcceptedResponse",
+                  "description": "The result of the operation."
                 }
               },
               "required": [
@@ -2059,6 +2063,10 @@
       "required": [
         "value"
       ]
+    },
+    "TypeSpec.Http.AcceptedResponse": {
+      "type": "object",
+      "description": "The request has been accepted for processing, but processing has not yet completed."
     },
     "Versions": {
       "type": "string",

@@ -24,6 +24,7 @@ import {
   getOperationVerb,
   HttpOperation,
   isBody,
+  isBodyRoot,
   isHeader,
 } from "@typespec/http";
 import {
@@ -453,7 +454,7 @@ function createLroMetadata(
 function createOperationLink(program: Program, modelProperty: ModelProperty): OperationLink {
   let location: "ResponseBody" | "ResponseHeader" | "Self" = "ResponseBody";
   if (isHeader(program, modelProperty)) location = "ResponseHeader";
-  if (isBody(program, modelProperty)) location = "Self";
+  if (isBody(program, modelProperty) || isBodyRoot(program, modelProperty)) location = "Self";
   return {
     kind: "link",
     location: location,
@@ -527,7 +528,10 @@ function ensureContext(
 }
 
 function getBodyType(program: Program, model: Model): Model | undefined {
-  const bodyProps = filterModelProperties(model, (p) => isBody(program, p));
+  const bodyProps = filterModelProperties(
+    model,
+    (p) => isBody(program, p) || isBodyRoot(program, p)
+  );
   if (bodyProps.length === 1 && bodyProps[0].type.kind === "Model") return bodyProps[0].type;
   return undefined;
 }
@@ -834,7 +838,7 @@ function getStatusMonitorLinksFromModel(
   if (pollingLinks === undefined) return undefined;
   // favor status monitor links over stepwise polling
   if (pollingLinks.length > 1) {
-    pollingLinks = pollingLinks.filter((p) => !isBody(program, p));
+    pollingLinks = pollingLinks.filter((p) => !isBody(program, p) && !isBodyRoot(program, p));
   }
   const pollingProperty = pollingLinks[0];
   pollingData = getPollingLocationInfo(program, pollingProperty);

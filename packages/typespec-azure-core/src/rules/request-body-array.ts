@@ -1,5 +1,5 @@
 import { Operation, createRule } from "@typespec/compiler";
-import { isBody } from "@typespec/http";
+import { isBody, isBodyRoot } from "@typespec/http";
 
 export const bodyArrayRule = createRule({
   name: "request-body-problem",
@@ -14,7 +14,7 @@ export const bodyArrayRule = createRule({
       operation: (op: Operation) => {
         for (const prop of op.parameters.properties.values()) {
           if (
-            isBody(context.program, prop) &&
+            (isBody(context.program, prop) || isBodyRoot(context.program, prop)) &&
             prop.type.kind === "Model" &&
             prop.type.name === "Array"
           ) {

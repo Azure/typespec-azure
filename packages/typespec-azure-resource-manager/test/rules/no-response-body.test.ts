@@ -41,7 +41,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
         `
         model TestAcceptedResponse {
           @statusCode statusCode: 202;
-          @body body: string;
+          @bodyRoot body: string;
         }
         op walk(): TestAcceptedResponse;
       `

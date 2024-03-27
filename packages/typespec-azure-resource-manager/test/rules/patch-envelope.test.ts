@@ -75,7 +75,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
           @patch 
           op update(...ResourceInstanceParameters<FooResource>,  
           @doc("The resource properties to be updated.")
-          @body 
+          @bodyRoot 
           properties: MyPatchModel):TrackedResource<FooResource> | ErrorResponse;
       }
 

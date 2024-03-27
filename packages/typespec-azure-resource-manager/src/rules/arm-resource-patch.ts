@@ -11,7 +11,14 @@ import {
   isErrorType,
   paramMessage,
 } from "@typespec/compiler";
-import { getOperationVerb, isBody, isHeader, isPathParam, isQueryParam } from "@typespec/http";
+import {
+  getOperationVerb,
+  isBody,
+  isBodyRoot,
+  isHeader,
+  isPathParam,
+  isQueryParam,
+} from "@typespec/http";
 
 import { getArmResource } from "../resource.js";
 import { getSourceModel, isInternalTypeSpec } from "./utils.js";
@@ -121,7 +128,11 @@ function getPatchModel(program: Program, operation: Operation): ModelProperty[] 
       isPathParam(program, property)
     )
       continue;
-    if (isBody(program, property) && property.type.kind === "Scalar") return undefined;
+    if (
+      (isBody(program, property) || isBodyRoot(program, property)) &&
+      property.type.kind === "Scalar"
+    )
+      return undefined;
     bodyProperties.push(property);
   }
 

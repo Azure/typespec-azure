@@ -13,7 +13,10 @@ namespace Azure.ResourceManager;
 @doc("Azure operation completed successfully.")
 model ArmResponse<ResponseBody> {
   ...OkResponse;
-  ...Body<ResponseBody>;
+
+  @doc("The body type of the operation request or response.")
+  @bodyRoot
+  body: ResponseBody;
 }
 
 /**
@@ -219,7 +222,7 @@ model ArmResourceCreatedResponse<
 
   @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<Resource>)
   @doc("The resource body")
-  @body
+  @bodyRoot
   body: Resource;
 }
 
@@ -228,9 +231,12 @@ model ArmResourceCreatedResponse<
  * @template Resource The resource being updated
  */
 @doc("Resource '{name}' create operation succeeded", Resource)
-model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foundations.ArmResource>
-  is Body<Resource> {
+model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foundations.ArmResource> {
   ...CreatedResponse;
+
+  @doc("The body type of the operation request or response.")
+  @bodyRoot
+  body: Resource;
 }
 
 /**

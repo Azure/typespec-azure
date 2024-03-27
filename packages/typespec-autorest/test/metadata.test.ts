@@ -334,7 +334,7 @@ describe("typespec-autorest: metadata", () => {
        @header h: string;
       }
       @route("/single") @get op single(...Parameters): string;
-      @route("/batch") @get op batch(...Body<Parameters[]>): string;
+      @route("/batch") @get op batch(@bodyRoot _: Parameters[]): string;
       `
     );
     deepStrictEqual(res.paths, {
@@ -365,9 +365,8 @@ describe("typespec-autorest: metadata", () => {
           },
           parameters: [
             {
-              description: "The body type of the operation request or response.",
               in: "body",
-              name: "body",
+              name: "_",
               required: true,
               schema: {
                 type: "array",
@@ -606,15 +605,33 @@ describe("typespec-autorest: metadata", () => {
       PetCreate: {
         type: "object",
         properties: {
+          headers: {
+            type: "object",
+            properties: {
+              moreHeaders: {
+                type: "object",
+              },
+            },
+            required: ["moreHeaders"],
+          },
           name: {
             type: "string",
           },
         },
-        required: ["name"],
+        required: ["headers", "name"],
       },
       Pet: {
         type: "object",
         properties: {
+          headers: {
+            type: "object",
+            properties: {
+              moreHeaders: {
+                type: "object",
+              },
+            },
+            required: ["moreHeaders"],
+          },
           id: {
             type: "string",
           },
@@ -622,7 +639,7 @@ describe("typespec-autorest: metadata", () => {
             type: "string",
           },
         },
-        required: ["id", "name"],
+        required: ["headers", "id", "name"],
       },
     });
   });

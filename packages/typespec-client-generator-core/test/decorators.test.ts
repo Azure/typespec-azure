@@ -2073,16 +2073,16 @@ describe("typespec-client-generator-core: decorators", () => {
         @service({})
         @test namespace MyService {
           @test
-          model Model1{}
+          model Model1{ prop: string }
 
           @test
-          model Model2{}
+          model Model2{ prop: string }
 
           @test
-          model Model3{}
+          model Model3{ prop: string }
 
           @test
-          model Model4{}
+          model Model4 { prop: string }
 
           @test
           @route("/func1")
@@ -2127,18 +2127,18 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           @usage(Usage.input | Usage.output)
           @access(Access.public)
-          model Model1{}
+          model Model1{ prop: string }
 
           @test
-          model Model4{}
+          model Model4{ prop: string }
 
           @test
           @usage(Usage.output)
-          model Model2{}
+          model Model2{ prop: string }
 
           @test
           @usage(Usage.input)
-          model Model3{}
+          model Model3{ prop: string }
 
           @test
           @route("/func1")

@@ -67,7 +67,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
          @armResourceUpdate(FooResource)
-         @patch myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @body body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
+         @patch myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         @doc("The state of the resource")
