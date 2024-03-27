@@ -96,26 +96,29 @@ model PrivateLinkServiceConnectionState {
 }
 
 /** The provisioning state of the connection */
-enum PrivateEndpointConnectionProvisioningState {
-  ...ResourceProvisioningState,
+union PrivateEndpointConnectionProvisioningState {
+  ResourceProvisioningState,
 
   /** Connection is being created */
-  Creating,
+  Creating: "Creating",
 
   /** Connection is being deleted */
-  Deleting,
+  Deleting: "Deleting",
 }
 
 /** The private endpoint connection status */
-enum PrivateEndpointServiceConnectionStatus {
+union PrivateEndpointServiceConnectionStatus {
   /** Connectionaiting for approval or rejection */
-  Pending,
+  Pending: "Pending",
 
   /** Connection approved */
-  Approved,
+  Approved: "Approved",
 
   /** Connection Rejected */
-  Rejected,
+  Rejected: "Rejected",
+
+  /** modelAsString=true */
+  string,
 }
 
 model PrivateLinkResource extends Azure.ResourceManager.Foundations.ProxyResourceBase {

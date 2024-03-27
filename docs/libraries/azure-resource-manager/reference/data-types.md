@@ -1106,12 +1106,20 @@ The type of identity to use.
 enum Azure.ResourceManager.KeyEncryptionIdentity
 ```
 
+### `Versions` {#Azure.ResourceManager.Versions}
+
+Supported versions of Azure.ResourceManager building blocks.
+
+```typespec
+enum Azure.ResourceManager.Versions
+```
+
 ### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
 
 The provisioning state of the connection
 
 ```typespec
-enum Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
+union Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
 ```
 
 ### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
@@ -1119,36 +1127,28 @@ enum Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
 The private endpoint connection status
 
 ```typespec
-enum Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
+union Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
 ```
 
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
-Standard terminal provisioning state of resource type. You can spread into your
+Standard terminal provisioning state of resource type. You can include in your
 custom provision state to avoid duplication and ensure consistency
 
 ```typespec
-enum Azure.ResourceManager.ResourceProvisioningState
+union Azure.ResourceManager.ResourceProvisioningState
 ```
 
 #### Examples
 
 ```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
 }
-```
-
-### `Versions` {#Azure.ResourceManager.Versions}
-
-Supported versions of Azure.ResourceManager building blocks.
-
-```typespec
-enum Azure.ResourceManager.Versions
 ```
 
 ### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
