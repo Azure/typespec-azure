@@ -8,21 +8,6 @@ resources:
       type: git
       name: internal/azure-sdk-build-tools
       ref: refs/tags/azure-sdk-build-tools_20230613.1
-    - repository: autorest-python
-      type: github
-      endpoint: Azure
-      name: Azure/autorest.python
-      ref: refs/heads/main
-    - repository: autorest-csharp
-      type: github
-      endpoint: Azure
-      name: Azure/autorest.csharp
-      ref: refs/heads/main
-    - repository: azure-sdk-tools
-      type: github
-      endpoint: Azure
-      name: Azure/azure-sdk-tools
-      ref: refs/heads/main
 
 parameters:
   - name: stages
@@ -44,8 +29,6 @@ extends:
     settings:
       skipBuildTagsForGitHubPullRequests: true
     sdl:
-      credscan:
-        suppressionsFile: $(Build.SourcesDirectory)/eng/CredScanSuppression.json
       sourceAnalysisPool:
         name: azsdk-pool-mms-win-2022-general
         image: azsdk-pool-mms-win-2022-1espt
