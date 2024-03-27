@@ -308,7 +308,7 @@ export interface SdkCredentialType extends SdkTypeBase {
 
 export interface SdkEndpointType extends SdkTypeBase {
   kind: "endpoint";
-  serverUrl?: string;
+  serverUrl: string; // if not specified, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
   templateArguments: SdkPathParameter[];
 }
 
