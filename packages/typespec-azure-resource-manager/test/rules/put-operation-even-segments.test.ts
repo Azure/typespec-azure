@@ -38,34 +38,59 @@ it("Emits a warning for put operations that don't have an even number of path se
       @armResourceOperations
       interface Operations {
         @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee")
-        @armResourceUpdate(Employee)
+        @armResourceAction(Employee)
         @put operation1(@path subscriptionId: string, @path resourceGroupName: string): void;
 
         @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees")
-        @armResourceUpdate(Employee)
+        @armResourceAction(Employee)
         @put operation2(@path subscriptionId: string, @path resourceGroupName: string): void;
 
         @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/Contact")
-        @armResourceUpdate(Employee)
+        @armResourceAction(Employee)
         @put operation3(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string): void;
 
         @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/addContactName")
-        @armResourceUpdate(Employee)
+        @armResourceAction(Employee)
         @put operation4(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string): void;
 
         @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/{contactName}/addContact")
-        @armResourceUpdate(Employee)
+        @armResourceAction(Employee)
         @put operation5(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string, @path contactName: string): void;
 
         @route("{resourceUri}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/{contactName}/addContact")
-        @armResourceUpdate(Employee)
+        @armResourceAction(Employee)
         @put operation6(@path resourceUri: string, @path employeeName: string, @path contactName: string): void;
-      }
-      // "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Music/Songs/{songName}/providers/Microsoft.Album/Albums"
-      // "/providers/Microsoft.Music/Songs/{songName}/Artist/{artistName}/addSong"
-      // "/providers/Microsoft.Music/Songs"      `
+
+        @route("{resourceUri}/providers/Microsoft.Employee/Employees/{employeeName}/Contact/{contactName}/addContact")
+        @armResourceAction(Employee)
+        @put operation7(@path resourceUri: string, @path employeeName: string, @path contactName: string): void;
+
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Employee/Employees/{employeeName}/providers/Microsoft.Contact/Contacts")
+        @armResourceAction(Employee)
+        @put operation8(@path subscriptionId: string, @path resourceGroupName: string, @path employeeName: string, @path contactName: string): void;
+
+        @route("/providers/Microsoft.Employee/Employees/{employeeName}/Contact/{contactName}/addContact")
+        @armResourceAction(Employee)
+        @put operation9(@path employeeName: string, @path contactName: string): void;
+
+        @route("/providers/Microsoft.Employee/Employees")
+        @armResourceAction(Employee)
+        @put operation10(): void;
+      }`
     )
     .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+      },
       {
         code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
       },
