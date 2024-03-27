@@ -111,6 +111,7 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/${useStandardNames.name}`]: true,
         [`@azure-tools/typespec-azure-core/${friendlyNameRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: true,
+        [`@azure-tools/typespec-azure-core/${noClosedLiteralUnionRule.name}`]: true,
       },
       extends: ["@typespec/http/all"],
     },
