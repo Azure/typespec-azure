@@ -984,6 +984,50 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(pathParam.nullable, true);
     });
 
+    it("path defined in model", async () => {
+      await runner.compileWithBuiltInService(`
+      @route("{name}")
+      @put
+      op pathInModel(...NameParameter): void;
+
+      model NameParameter {
+        @doc("Name parameter")
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @format("UUID")
+        name: string;
+      }
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "pathInModel");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 1);
+      const pathMethod = method.parameters[0];
+      strictEqual(pathMethod.kind, "method");
+      strictEqual(pathMethod.name, "name");
+      strictEqual(pathMethod.optional, false);
+      strictEqual(pathMethod.onClient, false);
+      strictEqual(pathMethod.isApiVersionParam, false);
+      strictEqual(pathMethod.type.kind, "string");
+      strictEqual(pathMethod.nullable, false);
+
+      const serviceOperation = method.operation;
+      strictEqual(serviceOperation.bodyParam, undefined);
+      strictEqual(serviceOperation.parameters.length, 1);
+      const pathParam = serviceOperation.parameters[0];
+      strictEqual(pathParam.kind, "path");
+      strictEqual(pathParam.serializedName, "name");
+      strictEqual(pathParam.name, "name");
+      strictEqual(pathParam.optional, false);
+      strictEqual(pathParam.onClient, false);
+      strictEqual(pathParam.isApiVersionParam, false);
+      strictEqual(pathParam.type.kind, "string");
+      strictEqual(pathParam.urlEncode, true);
+      strictEqual(pathParam.nullable, false);
+      strictEqual(pathParam.correspondingMethodParams.length, 1);
+      deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod);
+    });
+
     it("header basic", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service({})

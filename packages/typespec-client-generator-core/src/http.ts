@@ -102,7 +102,7 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
   retval.parameters = httpOperation.parameters.parameters
-    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param)))
+    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, x.type)))
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
         x.kind === "header" || x.kind === "query" || x.kind === "path"
@@ -117,7 +117,9 @@ function getSdkHttpParameters(
   if (tspBody) {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter) {
-      const getParamResponse = diagnostics.pipe(getSdkHttpParameter(context, tspBody.parameter));
+      const getParamResponse = diagnostics.pipe(
+        getSdkHttpParameter(context, tspBody.parameter, "body")
+      );
       if (getParamResponse.kind !== "body") throw new Error("blah");
       retval.bodyParam = getParamResponse;
     } else {
@@ -263,13 +265,13 @@ function addContentTypeInfoToBodyParam(
 export function getSdkHttpParameter(
   context: TCGCContext,
   type: ModelProperty,
-  isMethodParameter: boolean = false
+  location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
-  if (isPathParam(context.program, type) || isMethodParameter) {
+  if (isPathParam(context.program, type) || location === "path") {
     // we don't url encode if the type can be assigned to url
     const urlEncode = !ignoreDiagnostics(
       program.checker.isTypeAssignableTo(
@@ -282,12 +284,12 @@ export function getSdkHttpParameter(
       ...base,
       kind: "path",
       urlEncode,
-      serializedName: getPathParamName(program, type),
+      serializedName: getPathParamName(program, type) ?? base.name,
       correspondingMethodParams,
       optional: false,
     });
   }
-  if (isBody(context.program, type)) {
+  if (isBody(context.program, type) || location === "body") {
     return diagnostics.wrap({
       ...base,
       kind: "body",
@@ -303,18 +305,18 @@ export function getSdkHttpParameter(
     collectionFormat: getCollectionFormat(context, type),
     correspondingMethodParams,
   };
-  if (isQueryParam(context.program, type)) {
+  if (isQueryParam(context.program, type) || location === "query") {
     return diagnostics.wrap({
       ...headerQueryBase,
       kind: "query",
-      serializedName: getQueryParamName(program, type),
+      serializedName: getQueryParamName(program, type) ?? base.name,
     });
   }
-  // has to be a header
+  if (!(isHeader(context.program, type) || location === "header")) throw new Error(`${type.name}`);
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
-    serializedName: getHeaderFieldName(program, type),
+    serializedName: getHeaderFieldName(program, type) ?? base.name,
   });
 }
 

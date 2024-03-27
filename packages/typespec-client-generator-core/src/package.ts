@@ -392,7 +392,7 @@ function getSdkEndpointParameter(
       templateArguments,
     };
     for (const param of servers[0].parameters.values()) {
-      const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, true));
+      const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, "path"));
       if (sdkParam.kind === "path") {
         templateArguments.push(sdkParam);
         sdkParam.description = sdkParam.description ?? servers[0].description;
