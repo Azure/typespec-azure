@@ -67,5 +67,5 @@ extends:
                 parameters:
                   nodeVersion: $(nodeVersion)
 
-          - template: /eng/pipelines/e2e-job.yml@self
+          - template: /eng/pipelines/jobs/e2e-job.yml@self
           - template: /eng/pipelines/jobs/publish-artifacts.yml@self
