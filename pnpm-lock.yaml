@@ -2216,6 +2216,12 @@ importers:
         specifier: ~18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:~
+        version: link:../typespec-autorest
+      '@azure-tools/typespec-autorest-canonical':
+        specifier: workspace:~
+        version: link:../typespec-autorest-canonical
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
         version: link:../typespec-azure-core
