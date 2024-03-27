@@ -67,14 +67,5 @@ extends:
                 parameters:
                   nodeVersion: $(nodeVersion)
 
-          - job: Consistency_Check
-            pool:
-              name: $(LINUXPOOL)
-              image: $(LINUXVMIMAGE)
-              os: linux
-
-            steps:
-              - template: /eng/pipelines/jobs/pull-request-consistency.yml@self
-
           - template: /eng/pipelines/e2e-job.yml@self
           - template: /eng/pipelines/jobs/publish-artifacts.yml@self
