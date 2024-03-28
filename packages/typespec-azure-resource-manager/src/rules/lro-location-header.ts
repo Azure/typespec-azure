@@ -21,15 +21,13 @@ export const lroLocationHeaderRule = createRule({
           if (response.statusCodes !== 202) {
             continue;
           }
-          if (response.responses.length !== 1) {
-            throw new Error("Expected exactly one response for 202 status code.");
-          }
-          const resp = response.responses[0];
-          if (resp.headers?.["Location"] === undefined) {
-            context.reportDiagnostic({
-              target: op,
-            });
-            return;
+          for (const resp of response.responses) {
+            if (resp.headers?.["Location"] === undefined) {
+              context.reportDiagnostic({
+                target: op,
+              });
+              return;
+            }
           }
         }
       },
