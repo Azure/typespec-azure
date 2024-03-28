@@ -8,6 +8,7 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
+  HttpOperationParameter,
   HttpStatusCodeRange,
   getHeaderFieldName,
   getHeaderFieldOptions,
@@ -102,7 +103,7 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
   retval.parameters = httpOperation.parameters.parameters
-    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, x.type)))
+    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, {location: x.type, name: x.name})))
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
         x.kind === "header" || x.kind === "query" || x.kind === "path"
@@ -118,7 +119,7 @@ function getSdkHttpParameters(
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter) {
       const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.parameter, "body")
+        getSdkHttpParameter(context, tspBody.parameter, {location: "body", name: tspBody.parameter.name})
       );
       if (getParamResponse.kind !== "body") throw new Error("blah");
       retval.bodyParam = getParamResponse;
@@ -267,16 +268,34 @@ function addContentTypeInfoToBodyParam(
   return diagnostics.diagnostics;
 }
 
+interface SdkHttpParameterOptions {
+  // sometimes info about the http parameter is on the wrapping http param
+  // we want to take this into account
+  location?: "path" | "query" | "header" | "body";
+  name?: string;
+}
+
+function getSdkHttpParameterFromHttpParameter(
+  context: TCGCContext,
+  type: HttpOperationParameter
+): [SdkHttpParameter, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type.param));
+}
+
+/**
+ * This function will be called for http properties in models. If we have access to an actual http parameter, that will take precedence
+ */
 export function getSdkHttpParameter(
   context: TCGCContext,
   type: ModelProperty,
-  location?: "path" | "query" | "header" | "body"
+  options?: SdkHttpParameterOptions
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
-  if (isPathParam(context.program, type) || location === "path") {
+  if (isPathParam(context.program, type) || options?.location === "path") {
     // we don't url encode if the type can be assigned to url
     const urlEncode = !ignoreDiagnostics(
       program.checker.isTypeAssignableTo(
@@ -289,12 +308,12 @@ export function getSdkHttpParameter(
       ...base,
       kind: "path",
       urlEncode,
-      serializedName: getPathParamName(program, type) ?? base.name,
+      serializedName: options?.name ?? getPathParamName(program, type) ?? base.name,
       correspondingMethodParams,
       optional: false,
     });
   }
-  if (isBody(context.program, type) || location === "body") {
+  if (isBody(context.program, type) || options?.location === "body") {
     return diagnostics.wrap({
       ...base,
       kind: "body",
@@ -310,18 +329,18 @@ export function getSdkHttpParameter(
     collectionFormat: getCollectionFormat(context, type),
     correspondingMethodParams,
   };
-  if (isQueryParam(context.program, type) || location === "query") {
+  if (isQueryParam(context.program, type) || options?.location === "query") {
     return diagnostics.wrap({
       ...headerQueryBase,
       kind: "query",
-      serializedName: getQueryParamName(program, type) ?? base.name,
+      serializedName: options?.name ?? getQueryParamName(program, type) ?? base.name,
     });
   }
-  if (!(isHeader(context.program, type) || location === "header")) throw new Error(`${type.name}`);
+  if (!(isHeader(context.program, type) || options?.location === "header")) throw new Error(`${type.name}`);
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
-    serializedName: getHeaderFieldName(program, type) ?? base.name,
+    serializedName: options?.name ?? getHeaderFieldName(program, type) ?? base.name,
   });
 }
 

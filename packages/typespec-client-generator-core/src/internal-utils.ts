@@ -330,3 +330,13 @@ export function isMultipartFormData(
 ): boolean {
   return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
 }
+
+export function urlEncode(context: TCGCContext, type: ModelProperty): boolean {
+  return !ignoreDiagnostics(
+    context.program.checker.isTypeAssignableTo(
+      type.type.projectionBase ?? type.type,
+      context.program.checker.getStdType("url"),
+      type.type
+    )
+  );
+}

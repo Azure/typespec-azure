@@ -995,11 +995,12 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.parameters.length, 1);
       const pathMethod = method.parameters[0];
       strictEqual(pathMethod.kind, "method");
-      strictEqual(pathMethod.name, "name");
+      strictEqual(pathMethod.name, "nameParameter");
       strictEqual(pathMethod.optional, false);
       strictEqual(pathMethod.onClient, false);
       strictEqual(pathMethod.isApiVersionParam, false);
-      strictEqual(pathMethod.type.kind, "string");
+      strictEqual(pathMethod.type.kind, "model");
+      strictEqual(pathMethod.type.name, "NameParameter");
       strictEqual(pathMethod.nullable, false);
 
       const serviceOperation = method.operation;
@@ -1008,7 +1009,7 @@ describe("typespec-client-generator-core: package", () => {
       const pathParam = serviceOperation.parameters[0];
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "name");
-      strictEqual(pathParam.name, "name");
+      strictEqual(pathParam.name, "nameParameter");
       strictEqual(pathParam.optional, false);
       strictEqual(pathParam.onClient, false);
       strictEqual(pathParam.isApiVersionParam, false);
