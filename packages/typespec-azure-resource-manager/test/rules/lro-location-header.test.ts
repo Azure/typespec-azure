@@ -35,10 +35,39 @@ it("Emits a warning for LRO 202 response that does not contain a Location header
         name: string;
       }
       model EmployeeProperties {}
+      
       @armResourceOperations
       interface Employees {
         @armResourceDelete(Employee)
-        update is ArmCustomPatchAsync<Employee, EmployeeProperties, LroHeaders = {}>;
+        delete is ArmResourceDeleteWithoutOkAsync<Employee, EmployeeProperties, LroHeaders = {}>;
+      }
+    `
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/lro-location-header",
+    });
+});
+
+it("Emits a warning for custom 202 response that does not contain a Location header", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      model Employee is ProxyResource<EmployeeProperties> {
+        @doc("Name of employee")
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      model EmployeeProperties {}
+      @armResourceOperations
+      interface Employees {
+        @armResourceDelete(Employee)
+        delete(): { @statusCode _: 202 };
       }
     `
     )
@@ -65,8 +94,7 @@ it("Does not emit a warning for LRO 202 response that contains the Location resp
       model EmployeeProperties {}
       @armResourceOperations
       interface Employees {
-        @armResourceDelete(Employee)
-        update is ArmCustomPatchAsync<Employee, EmployeeProperties>;
+        delete is ArmResourceDeleteWithoutOkAsync<Employee, EmployeeProperties>;
       }`
     )
     .toBeValid();

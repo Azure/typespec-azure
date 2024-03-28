@@ -13,8 +13,7 @@ Long-running (LRO) operations with 202 responses must have a "Location" response
 ```tsp
 @armResourceOperations
 interface Employees {
-  @armResourceDelete(Employee)
-  update is ArmCustomPatchAsync<Employee, EmployeeProperties, LroHeaders = {}>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee, EmployeeProperties, LroHeaders = {}>;
 }
 ```
 
@@ -23,7 +22,6 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  @armResourceDelete(Employee)
-  update is ArmCustomPatchAsync<Employee, EmployeeProperties>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee, EmployeeProperties>;
 }
 ```
