@@ -3,88 +3,94 @@
 # Add steps that run tests, create a NuGet package, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
-resources:
-  repositories:
-    - repository: azure-sdk-build-tools
-      type: git
-      name: internal/azure-sdk-build-tools
-      ref: refs/tags/azure-sdk-build-tools_20230613.1
-
 trigger:
   - main
   - release/*
 
 pr: none
 
-variables:
-  - template: templates/variables/globals.yml
-  - name: Artifacts
-    value: $(System.DefaultWorkingDirectory)/_artifacts/packages
-  - name: TYPESPEC_VS_CI_BUILD
-    value: true # Enable official Visual Studio extension build
-  - name: TYPESPEC_SKIP_DOCUSAURUS_BUILD
-    value: true # Disable docusaurus build
+extends:
+  template: /eng/pipelines/templates/1es-redirect.yml
+  parameters:
+    variables:
+      - template: /eng/pipelines/templates/variables/globals.yml
+      - name: Artifacts
+        value: $(System.DefaultWorkingDirectory)/_artifacts/packages
+      - name: TYPESPEC_VS_CI_BUILD
+        value: true # Enable official Visual Studio extension build
+      - name: TYPESPEC_SKIP_DOCUSAURUS_BUILD
+        value: true # Disable docusaurus build
 
-stages:
-  - stage: "Build"
-    jobs:
-      - job: Build
-        pool:
-          name: azsdk-pool-mms-ubuntu-2004-general
-          vmImage: ubuntu-20.04
-        steps:
-          - checkout: self
-            submodules: true
+    stages:
+      - stage: "Build"
+        jobs:
+          - job: Build
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+            steps:
+              - checkout: self
+                submodules: true
 
-          - template: ./templates/install.yml
+              - template: /eng/pipelines/templates/install.yml@self
 
-          - script: pnpm run build
-            displayName: Build
+              - script: pnpm run build
+                displayName: Build
 
-          - publish: $(Build.ArtifactStagingDirectory)
-            displayName: "Publish Artifacts"
-            artifact: packages
-            condition: succeededOrFailed()
+              - task: 1ES.PublishPipelineArtifact@1
+                displayName: "Publish Artifacts"
+                condition: succeededOrFailed()
+                inputs:
+                  path: $(Build.ArtifactStagingDirectory)
+                  artifact: packages
 
-  # Sign packages
-  - stage: Sign
-    jobs:
-      - job: Sign
-        pool:
-          name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022
-        steps:
-          - checkout: azure-sdk-build-tools
+      # Sign packages
+      - stage: Sign
+        jobs:
+          - job: Sign
+            pool:
+              name: $(WINDOWSPOOL)
+              image: $(WINDOWSVMIMAGE)
+              os: windows
+            steps:
+              - checkout: azure-sdk-build-tools
 
-          # Download artifacts
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Packages
-            inputs:
-              artifact: packages
-              path: $(Artifacts)
+              # Download artifacts
+              - task: DownloadPipelineArtifact@2
+                displayName: Download Packages
+                inputs:
+                  artifact: packages
+                  path: $(Artifacts)
 
-          # Sign packages
-          - template: pipelines/steps/net-signing.yml@azure-sdk-build-tools
-            parameters:
-              PackagesPath: $(Artifacts)
-              BuildToolsPath: $(Build.SourcesDirectory)
+              # Sign packages
+              - template: pipelines/steps/net-signing.yml@azure-sdk-build-tools
+                parameters:
+                  PackagesPath: $(Artifacts)
+                  BuildToolsPath: $(Build.SourcesDirectory)
 
-          # Republish artifacts
-          - publish: $(Artifacts)
-            displayName: "Publish processed files"
-            artifact: processed-files
-            condition: always()
+              # Republish artifacts
+              - task: 1ES.PublishPipelineArtifact@1
+                displayName: "Publish processed files"
+                condition: always()
+                inputs:
+                  path: $(Artifacts)
+                  artifact: processed-files
 
-  # Release Nuget packages to nuget.org
-  - stage: Publish
-    jobs:
-      - job:
-        steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Packages
-            inputs:
-              artifact: processed-files
-              path: $(Artifacts)
+      # Release Nuget packages to nuget.org
+      - stage: Publish
+        jobs:
+          - job:
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+            steps:
+              - task: DownloadPipelineArtifact@2
+                displayName: Download Packages
+                inputs:
+                  artifact: processed-files
+                  path: $(Artifacts)
 
-          - script: dotnet nuget push "$(Artifacts)/*.nupkg" --api-key "$(azure-sdk-nuget-pat)" --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
-            displayName: Push to NuGet.org
+              - script: dotnet nuget push "$(Artifacts)/*.nupkg" --api-key "$(azure-sdk-nuget-pat)" --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
+                displayName: Push to NuGet.org
