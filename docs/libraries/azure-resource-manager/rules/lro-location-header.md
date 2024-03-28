@@ -6,8 +6,6 @@ title: lro-location-header
 @azure-tools/typespec-azure-resource-manager/lro-location-header
 ```
 
-## Asynchronous
-
 Long-running (LRO) operations with 202 responses must have a "Location" response header.
 
 #### ❌ Incorrect
@@ -15,7 +13,8 @@ Long-running (LRO) operations with 202 responses must have a "Location" response
 ```tsp
 @armResourceOperations
 interface Employees {
-  delete is ArmResourceDeleteAsync<Employee>;
+  @armResourceDelete(Employee)
+  update is ArmCustomPatchAsync<Employee, EmployeeProperties, LroHeaders = {}>;
 }
 ```
 
@@ -24,6 +23,7 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+  @armResourceDelete(Employee)
+  update is ArmCustomPatchAsync<Employee, EmployeeProperties>;
 }
 ```

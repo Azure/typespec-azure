@@ -41,8 +41,7 @@ Long-running (LRO) delete operations should use the `ArmResourceDeleteWithoutOkA
 ```tsp
 @armResourceOperations
 interface Employees {
-  @armResourceDelete(Employee)
-  update is ArmCustomPatchAsync<Employee, EmployeeUpdate, LroHeaders = {}>;
+  delete is ArmResourceDeleteAsync<Employee>;
 }
 ```
 
@@ -51,7 +50,6 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  @armResourceDelete(Employee)
-  update is ArmCustomPatchAsync<Employee, EmployeeUpdate>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
 }
 ```
