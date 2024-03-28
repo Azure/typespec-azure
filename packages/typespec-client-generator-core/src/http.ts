@@ -3,6 +3,7 @@ import {
   ModelProperty,
   Type,
   createDiagnosticCollector,
+  getEffectiveModelType,
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
@@ -49,6 +50,7 @@ import {
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
 } from "./types.js";
+import { getEffectivePayloadType } from "./public-utils.js";
 
 export function getSdkHttpOperation(
   context: TCGCContext,
@@ -128,9 +130,6 @@ function getSdkHttpParameters(
         getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
       )
       let name = "body";
-      if (type.kind === "model") {
-        name = type.name[0].toLowerCase() + type.name.slice(1);
-      }
       retval.bodyParam = {
         kind: "body",
         name,
@@ -413,11 +412,24 @@ export function getCorrespondingMethodParams(
     if (!context.__api_version_parameter) throw new Error("No api version on the client");
     return [context.__api_version_parameter];
   }
+  function compareSource(
+    a: SdkHttpParameter,
+    b: SdkParameter
+  ): boolean {
+    if (a.name === b.name) return true;
+    let originalA = a.__raw?.sourceProperty ?? a.__raw;
+    let originalB = b.__raw?.sourceProperty ?? b.__raw;
+    if (!originalA && !originalB) return false;
+    // check if the original model properties are the same
+    if (originalA === originalB) return true;
+    // check if the model properties types are the same
+    const originalAType = a.type.__raw?.kind === "Model" ? getEffectiveModelType(context.program, a.type.__raw) : a.type.__raw;
+    const originalBType = b.type.__raw?.kind === "Model" ? getEffectiveModelType(context.program, b.type.__raw) : b.type.__raw;
+    return originalAType === originalBType;
+  }
   const correspondingMethodParameter = methodParameters.find(
     (x) =>
-    x.name === serviceParam.name ||
-    (x.__raw?.sourceProperty && x.__raw.sourceProperty === serviceParam.__raw) ||
-    (serviceParam.__raw?.sourceProperty && serviceParam.__raw.sourceProperty === x.__raw)
+    compareSource(serviceParam, x)
   );
   if (correspondingMethodParameter) {
     return [correspondingMethodParameter];
@@ -439,6 +451,10 @@ export function getCorrespondingMethodParams(
       paramInProperties(x, serviceParamType)
     );
     if (correspondingProperties.length !== bodyPropertyNames.length) {
+      let a = undefined;
+      if (serviceParam.type.__raw?.kind === "Model") {
+        a = getEffectiveModelType(context.program, serviceParam.type.__raw)
+      }
       throw new Error("Can't find corresponding properties for spread body parameter");
     }
     return correspondingProperties;

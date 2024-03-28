@@ -59,6 +59,7 @@ import { createDiagnostic } from "./lib.js";
 import {
   getClientNamespaceString,
   getDefaultApiVersion,
+  getEffectivePayloadType,
   getHttpOperationWithCache,
   getLibraryName,
 } from "./public-utils.js";
@@ -346,16 +347,17 @@ function getSdkServiceMethodParameter(
   const tspParameters = Array.from(operation.parameters.properties.values())
   let isSpreadOfNamedModel: boolean = false; // whether the parameters are spread
   const sourceModel = tspParameters[0]?.sourceProperty?.model;
+  let typeToPass = type.type;
   if (sourceModel) {
     const sdkSourceModel = diagnostics.pipe(getClientTypeWithDiagnostics(context, sourceModel));
     isSpreadOfNamedModel = sdkSourceModel.kind === "model" && !sdkSourceModel.generatedName;
     if (isSpreadOfNamedModel) {
-      type.type = sourceModel;
+      typeToPass = sourceModel;
       type.name = sourceModel.name.charAt(0).toLowerCase() + sourceModel.name.slice(1);;
     }
   }
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkModelPropertyType(context, type)),
+    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation, typeToPass)),
     kind: "method",
   });
 }

@@ -925,15 +925,16 @@ export function getSdkCredentialParameter(
 export function getSdkModelPropertyTypeBase(
   context: TCGCContext,
   type: ModelProperty,
-  operation?: Operation
+  operation?: Operation,
+  propertyType?: Type,
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
-  diagnostics.pipe(addEncodeInfo(context, type, propertyType));
-  addFormatInfo(context, type, propertyType);
+  let sdkPropertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, propertyType ?? type.type, operation));
+  diagnostics.pipe(addEncodeInfo(context, type, sdkPropertyType));
+  addFormatInfo(context, type, sdkPropertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
-    propertyType = getSdkEnum(context, knownValues, operation);
+    sdkPropertyType = getSdkEnum(context, knownValues, operation);
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
@@ -942,7 +943,7 @@ export function getSdkModelPropertyTypeBase(
     description: docWrapper.description,
     details: docWrapper.details,
     apiVersions: getAvailableApiVersions(context, type),
-    type: propertyType,
+    type: sdkPropertyType,
     nameInClient: name,
     name,
     optional: type.optional,
@@ -954,10 +955,11 @@ export function getSdkModelPropertyTypeBase(
 export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
-  operation?: Operation
+  operation?: Operation,
+  propertyType?: Type,
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation, propertyType));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type);
   // I'm a body model property

@@ -110,7 +110,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     const queryInfo = getQueryParamName(program, property);
     const pathInfo = getPathParamName(program, property);
     const statusCodeinfo = isStatusCode(program, property);
-    return !(headerInfo || queryInfo || pathInfo || statusCodeinfo);
+    return !(headerInfo || queryInfo || statusCodeinfo);
   }
 
   const effective = getEffectiveModelType(program, type, isSchemaProperty);
