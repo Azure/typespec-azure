@@ -1,5 +1,20 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { ModelProperty, Operation, createRule } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
+
+function getCaseInsensitiveHeader(
+  headers: Record<string, ModelProperty> | undefined,
+  key: string
+): string | undefined {
+  if (!headers) {
+    return undefined;
+  }
+  for (const header of Object.keys(headers)) {
+    if (header.toLowerCase() === key.toLowerCase()) {
+      return header;
+    }
+  }
+  return undefined;
+}
 
 /**
  * Ensure that LRO 202 responses have a Location Header.
@@ -22,7 +37,7 @@ export const lroLocationHeaderRule = createRule({
             continue;
           }
           for (const resp of response.responses) {
-            if (resp.headers?.["Location"] === undefined) {
+            if (getCaseInsensitiveHeader(resp.headers, "Location") === undefined) {
               context.reportDiagnostic({
                 target: op,
               });
