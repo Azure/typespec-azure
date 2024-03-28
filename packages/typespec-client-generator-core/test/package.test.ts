@@ -1009,7 +1009,7 @@ describe("typespec-client-generator-core: package", () => {
       const pathParam = serviceOperation.parameters[0];
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "name");
-      strictEqual(pathParam.name, "nameParameter");
+      strictEqual(pathParam.name, "name");
       strictEqual(pathParam.optional, false);
       strictEqual(pathParam.onClient, false);
       strictEqual(pathParam.isApiVersionParam, false);

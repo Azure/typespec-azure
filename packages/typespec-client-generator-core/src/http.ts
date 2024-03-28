@@ -275,14 +275,6 @@ interface SdkHttpParameterOptions {
   name?: string;
 }
 
-function getSdkHttpParameterFromHttpParameter(
-  context: TCGCContext,
-  type: HttpOperationParameter
-): [SdkHttpParameter, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type.param));
-}
-
 /**
  * This function will be called for http properties in models. If we have access to an actual http parameter, that will take precedence
  */
@@ -292,6 +284,9 @@ export function getSdkHttpParameter(
   options?: SdkHttpParameterOptions
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  if (type.sourceProperty) {
+    type = type.sourceProperty;
+  }
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
@@ -418,7 +413,12 @@ export function getCorrespondingMethodParams(
     if (!context.__api_version_parameter) throw new Error("No api version on the client");
     return [context.__api_version_parameter];
   }
-  const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
+  const correspondingMethodParameter = methodParameters.find(
+    (x) =>
+    x.name === serviceParam.name ||
+    (x.__raw?.sourceProperty && x.__raw.sourceProperty === serviceParam.__raw) ||
+    (serviceParam.__raw?.sourceProperty && serviceParam.__raw.sourceProperty === x.__raw)
+  );
   if (correspondingMethodParameter) {
     return [correspondingMethodParameter];
   }
