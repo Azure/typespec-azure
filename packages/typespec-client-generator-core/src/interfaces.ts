@@ -308,7 +308,7 @@ export interface SdkCredentialType extends SdkTypeBase {
 
 export interface SdkEndpointType extends SdkTypeBase {
   kind: "endpoint";
-  serverUrl?: string;
+  serverUrl: string; // if not specified, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
   templateArguments: SdkPathParameter[];
 }
 
@@ -500,7 +500,6 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 
 interface SdkLroServiceMethodOptions {
   __raw_lro_metadata: LroMetadata;
-  initialOperation: SdkServiceOperation;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>

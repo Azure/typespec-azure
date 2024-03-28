@@ -52,6 +52,7 @@ import {
   getClientNamespaceStringHelper,
   getDocHelper,
   getHashForType,
+  getSdkTypeBaseHelper,
   isNullable,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -159,7 +160,7 @@ function getSdkLroServiceMethod<
     ...basicServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata,
-    initialOperation: diagnostics.pipe(
+    operation: diagnostics.pipe(
       getSdkServiceOperation<TOptions, TServiceOperation>(
         context,
         metadata.operation,
@@ -398,10 +399,31 @@ function getSdkEndpointParameter(
   if (servers === undefined || servers.length > 1) {
     // if there is no defined server url, or if there are more than one
     // we will return a mandatory endpoint parameter in initialization
+    const name = "endpoint";
     type = {
       kind: "endpoint",
       nullable: false,
-      templateArguments: [],
+      serverUrl: "{endpoint}",
+      templateArguments: [
+        {
+          name,
+          nameInClient: name,
+          description: "Service host",
+          kind: "path",
+          onClient: true,
+          nullable: false,
+          urlEncode: false,
+          optional: false,
+          serializedName: "endpoint",
+          correspondingMethodParams: [],
+          type: {
+            ...getSdkTypeBaseHelper(context, client.service, "string"),
+            encode: "string",
+          },
+          isApiVersionParam: false,
+          apiVersions: getAvailableApiVersions(context, client.service),
+        },
+      ],
     };
   } else {
     // this means we have one server
