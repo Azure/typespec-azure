@@ -40,7 +40,7 @@ model CustomerManagedKeyEncryption {
   federatedClientId?: uuid;
 
   @doc("delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only.")
-  delegatedIdentityClientId: uuid;
+  delegatedIdentityClientId?: uuid;
 }
 
 @doc("All encryption configuration for a resource.")

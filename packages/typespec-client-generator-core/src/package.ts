@@ -1,19 +1,13 @@
 import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
+  ModelProperty,
   Operation,
-  Type,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
-  isErrorModel,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  HttpStatusCodeRange,
-  getHeaderFieldName,
-  isContentTypeHeader,
-} from "@typespec/http";
+import { getServers } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -21,15 +15,14 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
+import { getCorrespondingMethodParams, getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
-  SdkBodyParameter,
   SdkClient,
   SdkClientType,
   SdkContext,
+  SdkEndpointParameter,
+  SdkEndpointType,
   SdkEnumType,
-  SdkHeaderParameter,
-  SdkHttpOperation,
-  SdkHttpResponse,
   SdkInitializationType,
   SdkLroPagingServiceMethod,
   SdkLroServiceMethod,
@@ -43,7 +36,6 @@ import {
   SdkPagingServiceMethod,
   SdkParameter,
   SdkPathParameter,
-  SdkQueryParameter,
   SdkServiceMethod,
   SdkServiceOperation,
   SdkServiceParameter,
@@ -52,226 +44,29 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  TCGCContext,
   createGeneratedName,
   getAllResponseBodies,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
   getHashForType,
-  isAcceptHeader,
+  getSdkTypeBaseHelper,
   isNullable,
 } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 import {
   getClientNamespaceString,
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
-  getPropertyNames,
 } from "./public-utils.js";
 import {
-  addEncodeInfo,
-  addFormatInfo,
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
-  getSdkEndpointParameter,
   getSdkModelPropertyType,
 } from "./types.js";
-
-function getSdkHttpBodyParameters<TOptions extends object>(
-  context: SdkContext<TOptions, SdkHttpOperation>,
-  httpOperation: HttpOperation,
-  methodParameters: SdkParameter[]
-): [SdkBodyParameter[], readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const tspBody = httpOperation.parameters.body;
-  if (tspBody === undefined) return diagnostics.wrap([]);
-  let contentTypes = tspBody.contentTypes;
-  if (contentTypes.length === 0) {
-    contentTypes = ["application/json"];
-  }
-  const defaultContentType = contentTypes.includes("application/json")
-    ? "application/json"
-    : contentTypes[0];
-  if (!tspBody.parameter) {
-    const bodyType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-    );
-    const name = "body";
-    return diagnostics.wrap([
-      {
-        kind: "body",
-        nameInClient: name,
-        name,
-        description: getDocHelper(context, tspBody.type).description,
-        details: getDocHelper(context, tspBody.type).details,
-        onClient: false,
-        contentTypes: contentTypes,
-        defaultContentType: defaultContentType,
-        isApiVersionParam: false,
-        apiVersions: getAvailableApiVersions(context, tspBody.type),
-        type: bodyType,
-        optional: false,
-        nullable: isNullable(tspBody.type),
-      },
-    ]);
-  }
-  const body = diagnostics.pipe(
-    getSdkModelPropertyType(context, tspBody.parameter!, {
-      operation: httpOperation.operation,
-      defaultContentType: defaultContentType,
-    })
-  );
-  const methodBodyParameter = methodParameters.find(
-    (x) => x.name === getPropertyNames(context, tspBody.parameter!)[0]
-  );
-  if (body.kind !== "body") throw new Error("blah");
-  if (methodBodyParameter) {
-    return diagnostics.wrap([
-      {
-        ...body,
-        contentTypes,
-        defaultContentType,
-      },
-    ]);
-  } else {
-    // this means that the body parameter is a property on one of the method parameters
-    for (const methodParameter of methodParameters) {
-      if (methodParameter.type.kind === "model") {
-        const bodyProperty = methodParameter.type.properties.find((x) => x.kind === "body");
-        if (bodyProperty) {
-          return diagnostics.wrap([
-            {
-              ...body,
-              contentTypes,
-              defaultContentType,
-            },
-          ]);
-        }
-      }
-    }
-  }
-  throw new Error("blah");
-}
-
-function createContentTypeOrAcceptHeader(
-  bodyObject: SdkBodyParameter | SdkHttpResponse
-): Omit<SdkMethodParameter, "kind"> {
-  const name = bodyObject.kind === "body" ? "contentType" : "accept";
-  let type: SdkType = {
-    kind: "string",
-    encode: "string",
-    nullable: false,
-  };
-  // for contentType, we treat it as a constant IFF there's one value and it's application/json.
-  // this is to prevent a breaking change when a service adds more content types in the future.
-  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
-  //
-  // for accept, we treat it as a constant IFF there's a single value. adding more content types
-  // for this case is considered a breaking change for SDKs so we want to surface it as such.
-  // e.g. the service returns image/png then later provides the option to return image/jpeg.
-  if (
-    bodyObject.contentTypes &&
-    bodyObject.contentTypes.length === 1 &&
-    (/json/.test(bodyObject.contentTypes[0]) || name === "accept")
-  ) {
-    // in this case, we just want a content type of application/json
-    type = {
-      nullable: false,
-      kind: "constant",
-      value: bodyObject.contentTypes[0],
-      valueType: type,
-    };
-  }
-  // No need for clientDefaultValue because it's a constant, it only has one value
-  return {
-    type,
-    nameInClient: name,
-    name,
-    apiVersions: bodyObject.apiVersions,
-    isApiVersionParam: false,
-    onClient: false,
-    optional: false,
-    nullable: false,
-  };
-}
-
-function getSdkHttpOperation<TOptions extends object>(
-  context: SdkContext<TOptions, SdkHttpOperation>,
-  httpOperation: HttpOperation,
-  methodParameters: SdkMethodParameter[]
-): [SdkHttpOperation, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const { responses, exceptions } = diagnostics.pipe(
-    getSdkServiceResponseAndExceptions<TOptions, SdkHttpOperation>(context, httpOperation)
-  );
-  const parameters = httpOperation.parameters.parameters
-    .map((x) =>
-      diagnostics.pipe(
-        getSdkModelPropertyType(context, x.param, { operation: httpOperation.operation })
-      )
-    )
-    .filter(
-      (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
-        x.kind === "header" || x.kind === "query" || x.kind === "path"
-    );
-  const headerParams = parameters.filter((x): x is SdkHeaderParameter => x.kind === "header");
-  const bodyParams = diagnostics.pipe(
-    getSdkHttpBodyParameters(context, httpOperation, methodParameters)
-  );
-
-  if (
-    bodyParams.length &&
-    !headerParams.some((h) => h.__raw && isContentTypeHeader(context.program, h.__raw))
-  ) {
-    // We will always add a content type parameter if a body is being inputted
-    const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(bodyParams[0]),
-      description: `Body parameter's content type. Known values are ${bodyParams[0].contentTypes}`,
-    };
-    parameters.push({
-      ...contentTypeBase,
-      kind: "header",
-      serializedName: "Content-Type",
-    });
-    if (!methodParameters.some((m) => m.__raw && isContentTypeHeader(context.program, m.__raw))) {
-      methodParameters.push({
-        ...contentTypeBase,
-        kind: "method",
-      });
-    }
-  }
-  const responsesWithBodies = [...responses.values()]
-    .concat([...exceptions.values()])
-    .filter((r) => r.type);
-  if (responsesWithBodies.length > 0 && !headerParams.some((h) => isAcceptHeader(h))) {
-    // Always have an accept header if we're returning any response with a body
-    const acceptBase = {
-      ...createContentTypeOrAcceptHeader(responsesWithBodies[0]),
-    };
-    parameters.push({
-      ...acceptBase,
-      kind: "header",
-      serializedName: "Accept",
-    });
-    if (!methodParameters.some((m) => m.name === "accept")) {
-      methodParameters.push({
-        ...acceptBase,
-        kind: "method",
-      });
-    }
-  }
-  return diagnostics.wrap({
-    __raw: httpOperation,
-    kind: "http",
-    path: httpOperation.path,
-    verb: httpOperation.verb,
-    parameters,
-    bodyParams: bodyParams || [],
-    responses,
-    exceptions,
-  });
-}
 
 function getSdkServiceOperation<
   TOptions extends object,
@@ -363,7 +158,7 @@ function getSdkLroServiceMethod<
     ...basicServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata,
-    initialOperation: diagnostics.pipe(
+    operation: diagnostics.pipe(
       getSdkServiceOperation<TOptions, TServiceOperation>(
         context,
         metadata.operation,
@@ -414,123 +209,6 @@ function getSdkMethodResponse(
   };
 }
 
-function getSdkServiceResponseAndExceptions<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
-  httpOperation: HttpOperation
-): [
-  {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-  },
-  readonly Diagnostic[],
-] {
-  const diagnostics = createDiagnosticCollector();
-  const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
-  const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
-  for (const response of httpOperation.responses) {
-    const headers: SdkServiceResponseHeader[] = [];
-    let body: Type | undefined;
-    let contentTypes: string[] = [];
-
-    for (const innerResponse of response.responses) {
-      for (const header of Object.values(innerResponse.headers || [])) {
-        const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
-        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
-          ? "application/json"
-          : innerResponse.body?.contentTypes[0];
-        addEncodeInfo(context, header, clientType, defaultContentType);
-        addFormatInfo(context, header, clientType);
-        headers.push({
-          __raw: header,
-          description: getDocHelper(context, header).description,
-          details: getDocHelper(context, header).details,
-          serializedName: getHeaderFieldName(context.program, header),
-          type: clientType,
-          nullable: isNullable(header.type),
-        });
-      }
-      if (innerResponse.body) {
-        if (body && body !== innerResponse.body.type) {
-          throw new Error("blah");
-        }
-        contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body = innerResponse.body.type;
-      }
-    }
-
-    const sdkResponse: SdkHttpResponse = {
-      __raw: response,
-      kind: "http",
-      type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
-      headers,
-      contentTypes,
-      defaultContentType: contentTypes.includes("application/json")
-        ? "application/json"
-        : contentTypes[0],
-      apiVersions: getAvailableApiVersions(context, httpOperation.operation),
-      nullable: body ? isNullable(body) : true,
-    };
-    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions.set(response.statusCodes, sdkResponse);
-    } else {
-      responses.set(response.statusCodes, sdkResponse);
-    }
-  }
-  return diagnostics.wrap({ responses, exceptions });
-}
-
-function getParameterMappingHelper<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
-  method: SdkServiceMethod<TServiceOperation>,
-  serviceParam: SdkServiceParameter
-): SdkModelPropertyType[] {
-  if (serviceParam.isApiVersionParam) {
-    if (!context.__api_version_parameter) throw new Error("No api version on the client");
-    return [context.__api_version_parameter];
-  }
-  const correspondingMethodParameter = method.parameters.find((x) => x.name === serviceParam.name);
-  if (correspondingMethodParameter) {
-    return [correspondingMethodParameter];
-  }
-  function paramInProperties(param: SdkModelPropertyType, type: SdkType): boolean {
-    if (type.kind !== "model") return false;
-    return Array.from(type.properties.values())
-      .filter((x) => x.kind === "property")
-      .map((x) => x.name)
-      .includes(param.name);
-  }
-  const serviceParamType = serviceParam.type;
-  if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
-    // Here we have a spread body parameter
-    const correspondingProperties = method.parameters.filter((x) =>
-      paramInProperties(x, serviceParamType)
-    );
-    const bodyPropertyNames = serviceParamType.properties.filter((x) =>
-      paramInProperties(x, serviceParamType)
-    );
-    if (correspondingProperties.length !== bodyPropertyNames.length) {
-      throw new Error("Can't find corresponding properties for spread body parameter");
-    }
-    return correspondingProperties;
-  }
-  for (const methodParam of method.parameters) {
-    if (methodParam.type.kind === "model") {
-      for (const prop of methodParam.type.properties) {
-        if (prop.name === serviceParam.name) {
-          return [prop];
-        }
-      }
-    }
-  }
-  throw new Error("Can't find corresponding parameter");
-}
-
 function getSdkBasicServiceMethod<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
@@ -541,7 +219,7 @@ function getSdkBasicServiceMethod<
   const diagnostics = createDiagnosticCollector();
   // when we spread, all of the inputtable properties of our model get flattened onto the method
   const methodParameters = Array.from(operation.parameters.properties.values())
-    .map((x) => diagnostics.pipe(getSdkModelPropertyType(context, x, { isMethodParameter: true })))
+    .map((x) => diagnostics.pipe(getSdkMethodParameter(context, x)))
     .filter((x): x is SdkMethodParameter => x.kind === "method");
   // if there's an api version parameter, we want to bubble it up to the client
   // we don't want it on the method level, but we will keep it on the service operation level
@@ -572,7 +250,7 @@ function getSdkBasicServiceMethod<
     getParameterMapping: function getParameterMapping(
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
-      return getParameterMappingHelper<TOptions, TServiceOperation>(context, this, serviceParam);
+      return getCorrespondingMethodParams(context, methodParameters, serviceParam);
     },
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
@@ -602,7 +280,10 @@ function getSdkServiceMethod<
 function getClientDefaultApiVersion<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
->(context: SdkContext<TOptions, TServiceOperation>, client: SdkClient): string | undefined {
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup
+): string | undefined {
   let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
   if (!defaultVersion) {
     // eslint-disable-next-line deprecation/deprecation
@@ -616,7 +297,7 @@ function getSdkInitializationType<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const credentialParam = getSdkCredentialParameter(context, client);
@@ -629,7 +310,8 @@ function getSdkInitializationType<
   if (context.__api_version_parameter) {
     properties.push(context.__api_version_parameter);
   }
-  const name = `${client.name.split(".").at(-1)}Options`;
+  const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
+  const name = `${namePrefix.split(".").at(-1)}Options`;
   return diagnostics.wrap({
     __raw: client.service,
     description: "Initialization class for the client",
@@ -637,7 +319,7 @@ function getSdkInitializationType<
     properties,
     name,
     generatedName: true,
-    access: "public",
+    access: client.kind === "SdkClient" ? "public" : "internal",
     usage: UsageFlags.Input,
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
@@ -647,23 +329,31 @@ function getSdkInitializationType<
   });
 }
 
+function getSdkMethodParameter(
+  context: TCGCContext,
+  type: ModelProperty
+): [SdkMethodParameter, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
+    ...diagnostics.pipe(getSdkModelPropertyType(context, type)),
+    kind: "method",
+  });
+}
+
 function getSdkMethods<TOptions extends object, TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient,
-  group: SdkClient | SdkOperationGroup
+  client: SdkClient | SdkOperationGroup
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInOperationGroup(context, group)) {
+  for (const operation of listOperationsInOperationGroup(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TOptions, TServiceOperation>(context, operation))
     );
   }
-  for (const operationGroup of listOperationGroups(context, group)) {
+  for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
-    const operationGroupClient = diagnostics.pipe(
-      createSdkClientType(context, client, operationGroup)
-    );
+    const operationGroupClient = diagnostics.pipe(createSdkClientType(context, operationGroup));
     retval.push({
       kind: "clientaccessor",
       parameters: [],
@@ -678,26 +368,106 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
   return diagnostics.wrap(retval);
 }
 
+function getSdkEndpointParameter(
+  context: TCGCContext,
+  client: SdkClient | SdkOperationGroup
+): [SdkEndpointParameter, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const servers = getServers(context.program, client.service);
+  let type: SdkEndpointType;
+  let optional: boolean = false;
+  if (servers === undefined || servers.length > 1) {
+    // if there is no defined server url, or if there are more than one
+    // we will return a mandatory endpoint parameter in initialization
+    const name = "endpoint";
+    type = {
+      kind: "endpoint",
+      nullable: false,
+      serverUrl: "{endpoint}",
+      templateArguments: [
+        {
+          name,
+          nameInClient: name,
+          description: "Service host",
+          kind: "path",
+          onClient: true,
+          nullable: false,
+          urlEncode: false,
+          optional: false,
+          serializedName: "endpoint",
+          correspondingMethodParams: [],
+          type: {
+            ...getSdkTypeBaseHelper(context, client.service, "string"),
+            encode: "string",
+          },
+          isApiVersionParam: false,
+          apiVersions: getAvailableApiVersions(context, client.service),
+        },
+      ],
+    };
+  } else {
+    // this means we have one server
+    const templateArguments: SdkPathParameter[] = [];
+    type = {
+      kind: "endpoint",
+      nullable: false,
+      serverUrl: servers[0].url,
+      templateArguments,
+    };
+    for (const param of servers[0].parameters.values()) {
+      const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, "path"));
+      if (sdkParam.kind === "path") {
+        templateArguments.push(sdkParam);
+        sdkParam.description = sdkParam.description ?? servers[0].description;
+        sdkParam.onClient = true;
+      } else {
+        diagnostics.add(
+          createDiagnostic({
+            code: "server-param-not-path",
+            target: param,
+            format: {
+              templateArgumentName: sdkParam.name,
+              templateArgumentType: sdkParam.kind,
+            },
+          })
+        );
+      }
+    }
+    optional = Boolean(servers[0].url.length && templateArguments.every((param) => param.optional));
+  }
+  return diagnostics.wrap({
+    kind: "endpoint",
+    type,
+    nameInClient: "endpoint",
+    name: "endpoint",
+    description: "Service host",
+    onClient: true,
+    urlEncode: false,
+    apiVersions: getAvailableApiVersions(context, client.service),
+    optional,
+    isApiVersionParam: false,
+    nullable: false,
+  });
+}
+
 function createSdkClientType<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
-  client: SdkClient,
-  operationGroup?: SdkOperationGroup
+  client: SdkClient | SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const baseClientType = operationGroup ?? client;
-  const isClient = baseClientType.kind === "SdkClient";
-  const clientName = isClient ? baseClientType.name : baseClientType.type.name;
+  const isClient = client.kind === "SdkClient";
+  const clientName = isClient ? client.name : client.type.name;
   context.__api_versions = resolveVersions(context.program, client.service)
     .filter((x) => x.rootVersion)
     .map((x) => x.rootVersion!.value);
   context.__api_version_client_default_value = getClientDefaultApiVersion(context, client);
 
   // NOTE: getSdkMethods recursively calls createSdkClientType
-  const methods = diagnostics.pipe(getSdkMethods(context, client, baseClientType));
-  const docWrapper = getDocHelper(context, baseClientType.type);
+  const methods = diagnostics.pipe(getSdkMethods(context, client));
+  const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
     name: clientName,
@@ -706,11 +476,11 @@ function createSdkClientType<
     methods: methods,
     apiVersions: getAvailableApiVersions(context, client.type),
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    initialization: isClient
-      ? diagnostics.pipe(getSdkInitializationType<TOptions, TServiceOperation>(context, client)) // MUST call this after getSdkMethods has been called
-      : undefined,
+    initialization: diagnostics.pipe(
+      getSdkInitializationType<TOptions, TServiceOperation>(context, client)
+    ), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
-    arm: client.arm,
+    arm: client.kind === "SdkClient" ? client.arm : false,
   };
   context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
