@@ -417,8 +417,8 @@ export function getCorrespondingMethodParams(
     b: SdkParameter
   ): boolean {
     if (a.name === b.name) return true;
-    let originalA = a.__raw?.sourceProperty ?? a.__raw;
-    let originalB = b.__raw?.sourceProperty ?? b.__raw;
+    const originalA = a.__raw?.sourceProperty ?? a.__raw;
+    const originalB = b.__raw?.sourceProperty ?? b.__raw;
     if (!originalA && !originalB) return false;
     // check if the original model properties are the same
     if (originalA === originalB) return true;

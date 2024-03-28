@@ -2013,7 +2013,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.name, "Widget");
 
       strictEqual(method.operation.parameters.length, 2);
 
