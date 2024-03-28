@@ -21,6 +21,7 @@ import { coreOperationsRule } from "./rules/core-operations.js";
 import { deleteOperationMissingRule } from "./rules/delete-operation.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { listBySubscriptionRule } from "./rules/list-operation.js";
+import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
@@ -51,6 +52,7 @@ const rules = [
   interfacesRule,
   invalidActionVerbRule,
   listBySubscriptionRule,
+  lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
