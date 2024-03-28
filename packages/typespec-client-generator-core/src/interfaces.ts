@@ -256,7 +256,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkType;
+  valueType: SdkBuiltInType;
   description?: string;
   details?: string;
 }

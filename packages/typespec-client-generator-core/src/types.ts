@@ -895,7 +895,7 @@ function getSdkCredentialType(
       values: credentialTypes,
       nullable: false,
       name: createGeneratedName(client.service, "CredentialUnion"),
-      generatedName: false,
+      generatedName: true,
     };
   }
   return credentialTypes[0];

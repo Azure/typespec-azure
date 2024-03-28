@@ -20,6 +20,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
+import { camelCase } from "change-case";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -123,10 +124,14 @@ function getSdkHttpParameters(
       if (getParamResponse.kind !== "body") throw new Error("blah");
       retval.bodyParam = getParamResponse;
     } else {
+      const type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+      );
+      const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
         kind: "body",
-        name: "body",
-        nameInClient: "body",
+        name,
+        nameInClient: name,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
         onClient: false,
@@ -134,9 +139,7 @@ function getSdkHttpParameters(
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
         apiVersions: getAvailableApiVersions(context, tspBody.type),
-        type: diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-        ),
+        type,
         optional: false,
         nullable: isNullable(tspBody.type),
         correspondingMethodParams,
@@ -411,10 +414,7 @@ export function getCorrespondingMethodParams(
     const correspondingProperties = methodParameters.filter((x) =>
       paramInProperties(x, serviceParamType)
     );
-    const bodyPropertyNames = serviceParamType.properties.filter((x) =>
-      paramInProperties(x, serviceParamType)
-    );
-    if (correspondingProperties.length !== bodyPropertyNames.length) {
+    if (correspondingProperties.length !== serviceParamType.properties.length) {
       throw new Error("Can't find corresponding properties for spread body parameter");
     }
     return correspondingProperties;
