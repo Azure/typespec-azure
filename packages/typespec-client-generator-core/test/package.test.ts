@@ -997,11 +997,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.parameters.length, 1);
       const pathMethod = method.parameters[0];
       strictEqual(pathMethod.kind, "method");
-      strictEqual(pathMethod.name, "name");
+      strictEqual(pathMethod.name, "nameParameter");
       strictEqual(pathMethod.optional, false);
       strictEqual(pathMethod.onClient, false);
       strictEqual(pathMethod.isApiVersionParam, false);
-      strictEqual(pathMethod.type.kind, "string");
+      strictEqual(pathMethod.type.kind, "model");
       strictEqual(pathMethod.nullable, false);
 
       const serviceOperation = method.operation;
@@ -1018,7 +1018,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(pathParam.urlEncode, true);
       strictEqual(pathParam.nullable, false);
       strictEqual(pathParam.correspondingMethodParams.length, 1);
-      deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod);
+      deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod.type.properties[0]);
     });
 
     it("header basic", async () => {
@@ -1359,13 +1359,13 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodParam = method.parameters.find((x) => x.name === "key");
+      const methodParam = method.parameters.find((x) => x.name === "input");
       ok(methodParam);
       strictEqual(methodParam.kind, "method");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.type.kind, "model");
 
       const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(contentTypeParam);
@@ -1386,11 +1386,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      strictEqual(
-        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
-        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
-      );
-      strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
+      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
     });
 
     it("body alias spread", async () => {
@@ -1446,6 +1442,68 @@ describe("typespec-client-generator-core: package", () => {
         correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
       );
       strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
+    });
+
+    it("spread with discriminate type", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+
+        @discriminator("kind")
+        model Pet {
+          name?: string;
+        }
+
+        model Dog {
+          kind: "dog";
+        }
+
+        model Cat {
+          kind: "cat";
+        }
+
+        op test(...Pet): void;
+        `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 2);
+
+      const methodParam = method.parameters.find((x) => x.name === "pet");
+      ok(methodParam);
+      strictEqual(methodParam.kind, "method");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "model");
+
+      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethodParam);
+      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
+      strictEqual(contentTypeMethodParam.type.kind, "constant");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+      strictEqual(bodyParameter.kind, "body");
+      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
+      strictEqual(bodyParameter.defaultContentType, "application/json");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type.kind, "model");
+      strictEqual(bodyParameter.type.properties.length, 2);
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(bodyParameter.type.properties[0].nameInClient, "kind");
+      strictEqual(bodyParameter.type.properties[0].name, "kind");
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(bodyParameter.type.properties[1].nameInClient, "name");
+      strictEqual(bodyParameter.type.properties[1].name, "name");
+
+      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
+      strictEqual(correspondingMethodParams.length, 1);
+      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
     });
 
     it("parameter grouping", async () => {
@@ -1995,18 +2053,18 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "create");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 5);
+      strictEqual(method.parameters.length, 3);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["id", "weight", "color", "contentType", "accept"]
+        ["widget", "contentType", "accept"]
       );
 
       const bodyParameter = method.operation.bodyParam;
       ok(bodyParameter);
       strictEqual(bodyParameter.kind, "body");
       //eslint-disable-next-line deprecation/deprecation
-      strictEqual(bodyParameter.nameInClient, "body");
-      strictEqual(bodyParameter.name, "body");
+      strictEqual(bodyParameter.nameInClient, "widget");
+      strictEqual(bodyParameter.name, "widget");
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
@@ -2106,41 +2164,17 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "update");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 5);
+      strictEqual(method.parameters.length, 3);
 
-      const methodParamId = method.parameters[0];
-      strictEqual(methodParamId.kind, "method");
+      const methodParam = method.parameters[0];
+      strictEqual(methodParam.kind, "method");
       //eslint-disable-next-line deprecation/deprecation
-      strictEqual(methodParamId.nameInClient, "id");
-      strictEqual(methodParamId.name, "id");
-      strictEqual(methodParamId.optional, false);
-      strictEqual(methodParamId.onClient, false);
-      strictEqual(methodParamId.isApiVersionParam, false);
-      strictEqual(methodParamId.type.kind, "string");
-
-      const methodParamWeight = method.parameters[1];
-      strictEqual(methodParamWeight.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(methodParamWeight.nameInClient, "weight");
-      strictEqual(methodParamWeight.name, "weight");
-      strictEqual(methodParamWeight.optional, false);
-      strictEqual(methodParamWeight.onClient, false);
-      strictEqual(methodParamWeight.isApiVersionParam, false);
-      strictEqual(methodParamWeight.type.kind, "int32");
-
-      const methodParamColor = method.parameters[2];
-      strictEqual(methodParamColor.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(methodParamColor.nameInClient, "color");
-      strictEqual(methodParamColor.name, "color");
-      strictEqual(methodParamColor.optional, false);
-      strictEqual(methodParamColor.onClient, false);
-      strictEqual(methodParamColor.isApiVersionParam, false);
-      strictEqual(methodParamColor.type.kind, "enum");
-      strictEqual(methodParamColor.type.values[0].value, "red");
-      strictEqual(methodParamColor.type.values[0].valueType.kind, "string");
-      strictEqual(methodParamColor.type.values[1].value, "blue");
-      strictEqual(methodParamColor.type.values[1].valueType.kind, "string");
+      strictEqual(methodParam.nameInClient, "widget");
+      strictEqual(methodParam.name, "widget");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "model");
 
       const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(methodContentTypeParam);
@@ -2194,7 +2228,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationAcceptParam.optional, false);
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams.map((x) => x.name);
-      deepStrictEqual(correspondingMethodParams, ["weight", "color"]);
+      deepStrictEqual(correspondingMethodParams, ["widget"]);
       deepStrictEqual(
         bodyParameter.type.properties.map((p) => p.name),
         ["id", "weight", "color"]
