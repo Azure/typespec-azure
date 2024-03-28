@@ -1444,7 +1444,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
     });
 
-    it("spread with discriminate type", async () => {
+    it("spread with discriminate type with implicit property", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
         @service({})
         namespace My.Service;
