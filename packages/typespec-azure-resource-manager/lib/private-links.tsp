@@ -28,7 +28,7 @@ namespace Azure.ResourceManager;
 )
 model PrivateEndpoint {
   /** The resource identifier for private endpoint */
-  id?: ResourceIdentifier<[
+  id?: Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Network/privateEndpoints";
     }

@@ -24,7 +24,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @doc("A reference to a resource of type title.")
 @pattern("\\/subscriptions\\/[a-z0-9\\-]+\\/resourceGroups\\/[^\\/]+\\/providers\\/Microsoft\\.PlayFab\\/titles\\/[^\\/]+")
 scalar TitleReference
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Playfab/titles",
     }
@@ -33,7 +33,7 @@ scalar TitleReference
 @doc("A reference to a player database resource.")
 @pattern("\\/subscriptions\\/[a-z0-9\\-]+\\/resourceGroups\\/[^\\/]+\\/providers\\/Microsoft\\.PlayFab\\/playerDatabases\\/[^\\/]+")
 scalar PlayerDatabaseReference
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Playfab/playerDatabases",
     }

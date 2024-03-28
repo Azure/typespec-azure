@@ -199,6 +199,16 @@ namespace Azure {
           entity: TypeSpec.Reflection.Model,
           type: TypeSpec.Reflection.Scalar
         );
+
+        model ArmResourceIdentifierConfigOptions {
+          allowedResources: ArmResourceIdentifierAllowedResource[];
+        }
+
+        /** Configuration for the armResourceIdentifier scalar */
+        extern dec armResourceIdentifierConfig(
+          target: Scalar,
+          options: ArmResourceIdentifierConfigOptions
+        );
       }
     }
   }
