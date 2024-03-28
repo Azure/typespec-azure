@@ -81,6 +81,8 @@ it("Emits a warning for put operations that don't have an even number of path se
     .toEmitDiagnostics([
       {
         code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
+        message:
+          "PUT request path for 'operation1' should end with a path parameter in curly braces.",
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
@@ -109,6 +111,9 @@ it("Emits a warning for put operations that don't have an even number of path se
       {
         code: "@azure-tools/typespec-azure-resource-manager/put-operation-even-segments",
       },
+
+      // PUT request path for 'operation3' should have an even number of segments.
+      // PUT request path for 'operation3' should end with a path parameter in curly braces.
     ]);
 });
 

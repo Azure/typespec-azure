@@ -1,12 +1,13 @@
 import { Program, createRule, paramMessage } from "@typespec/compiler";
-import { getArmResources } from "../resource.js";
+import { getArmResources, getSingletonResourceKey } from "../resource.js";
 
 export const putOperationEvenSegmentsRule = createRule({
   name: "put-operation-even-segments",
   severity: "warning",
   description: "PUT operations should have an even number of segments.",
   messages: {
-    default: paramMessage`PUT request for resource '${"resourceName"}' should have an even number of segments.`,
+    evenSegments: paramMessage`PUT request path for '${"operationName"}' should have an even number of segments.`,
+    pathVariable: paramMessage`PUT request path for '${"operationName"}' should end with a path parameter in curly braces.`,
   },
   create(context) {
     return {
@@ -27,8 +28,22 @@ export const putOperationEvenSegmentsRule = createRule({
               if (segments.length % 2 !== 0) {
                 context.reportDiagnostic({
                   target: op.operation,
+                  messageId: "evenSegments",
                   format: {
-                    resourceName: resource.name,
+                    operationName: op.name,
+                  },
+                });
+              }
+              const isSingleton = getSingletonResourceKey(context.program, resource.typespecType);
+              if (isSingleton) continue;
+              const lastSegment = segments[segments.length - 1];
+
+              if (!lastSegment.startsWith("{") || !lastSegment.endsWith("}")) {
+                context.reportDiagnostic({
+                  target: op.operation,
+                  messageId: "pathVariable",
+                  format: {
+                    operationName: op.name,
                   },
                 });
               }
