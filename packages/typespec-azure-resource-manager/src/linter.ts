@@ -11,6 +11,7 @@ import { invalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.
 import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-envelope-property.js";
 import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
 import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
+import { armResourceNamePatternRule } from "./rules/arm-resource-name-pattern.js";
 import { armResourceOperationsRule } from "./rules/arm-resource-operation-response.js";
 import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
@@ -20,6 +21,7 @@ import { coreOperationsRule } from "./rules/core-operations.js";
 import { deleteOperationMissingRule } from "./rules/delete-operation.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { listBySubscriptionRule } from "./rules/list-operation.js";
+import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
@@ -39,6 +41,7 @@ const rules = [
   armResourceEnvelopeProperties,
   armResourceInvalidVersionFormatRule,
   armResourceKeyInvalidCharsRule,
+  armResourceNamePatternRule,
   armResourceOperationsRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
@@ -49,6 +52,7 @@ const rules = [
   interfacesRule,
   invalidActionVerbRule,
   listBySubscriptionRule,
+  lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
