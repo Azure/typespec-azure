@@ -350,7 +350,12 @@ export function extractLroStates(
 
         return diagnostics.wrap(undefined);
       } else {
-        storeLroState(program, result, variant.name.toString(), variant);
+        storeLroState(
+          program,
+          result,
+          typeof variant.name === "string" ? variant.name : option.value,
+          variant
+        );
       }
     }
   } else {
