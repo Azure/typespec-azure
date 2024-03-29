@@ -363,7 +363,7 @@ export function getSdkUnionWithDiagnostics(
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
     name: getLibraryName(context, type) || getGeneratedName(context, type),
-    generatedName: !type.name,
+    isGeneratedName: !type.name,
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
@@ -513,7 +513,7 @@ export function getSdkModelWithDiagnostics(
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
-      generatedName: !type.name,
+      isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
       properties: [],
@@ -625,7 +625,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
-      generatedName: false,
+      isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
       valueType: getSdkEnumValueType(context, type.members.values()),
@@ -677,7 +677,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name: getLibraryName(context, type.union) || getGeneratedName(context, type.union),
-      generatedName: !type.union.name,
+      isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
       valueType:
@@ -718,7 +718,7 @@ function getKnownValuesEnum(
       sdkType = {
         ...getSdkTypeBaseHelper(context, type, "enum"),
         name: getLibraryName(context, type),
-        generatedName: false,
+        isGeneratedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
         valueType: getSdkEnumValueType(context, knownValues.members.values()),
@@ -895,7 +895,7 @@ function getSdkCredentialType(
       values: credentialTypes,
       nullable: false,
       name: createGeneratedName(client.service, "CredentialUnion"),
-      generatedName: false,
+      isGeneratedName: false,
     };
   }
   return credentialTypes[0];

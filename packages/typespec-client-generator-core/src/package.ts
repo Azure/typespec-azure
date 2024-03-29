@@ -197,7 +197,7 @@ function getSdkMethodResponse(
       values: allResponseBodies,
       nullable: isNullable(sdkOperation),
       name: createGeneratedName(operation, "UnionResponse"),
-      generatedName: true,
+      isGeneratedName: true,
     };
   } else if (responseTypes) {
     type = allResponseBodies[0];
@@ -318,7 +318,7 @@ function getSdkInitializationType<
     kind: "model",
     properties,
     name,
-    generatedName: true,
+    isGeneratedName: true,
     access: client.kind === "SdkClient" ? "public" : "internal",
     usage: UsageFlags.Input,
     nullable: false,
