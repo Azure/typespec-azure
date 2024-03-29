@@ -351,7 +351,12 @@ export function extractLroStates(
 
         return diagnostics.wrap(undefined);
       } else {
-        storeLroState(program, result, option.value, variant);
+        storeLroState(
+          program,
+          result,
+          typeof variant.name === "string" ? variant.name : option.value,
+          variant
+        );
       }
     }
   } else {
