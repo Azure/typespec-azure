@@ -388,6 +388,7 @@ function getSdkEndpointParameter(
         {
           name,
           nameInClient: name,
+          isGeneratedName: true,
           description: "Service host",
           kind: "path",
           onClient: true,
@@ -440,6 +441,7 @@ function getSdkEndpointParameter(
     type,
     nameInClient: "endpoint",
     name: "endpoint",
+    isGeneratedName: true,
     description: "Service host",
     onClient: true,
     urlEncode: false,

@@ -321,6 +321,7 @@ export interface SdkModelPropertyTypeBase {
    */
   nameInClient: string;
   name: string;
+  isGeneratedName: boolean;
   description?: string;
   details?: string;
   apiVersions: string[];
