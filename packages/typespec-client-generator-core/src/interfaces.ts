@@ -14,6 +14,7 @@ import {
   HttpAuth,
   HttpOperation,
   HttpOperationResponse,
+  HttpStatusCodeRange,
   HttpVerb,
   Visibility,
 } from "@typespec/http";
@@ -57,7 +58,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkInitializationType;
+  initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
@@ -72,6 +73,7 @@ export interface SdkOperationGroup {
   type: Namespace | Interface;
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
+  service: Namespace;
 }
 
 interface SdkTypeBase {
@@ -306,7 +308,7 @@ export interface SdkCredentialType extends SdkTypeBase {
 
 export interface SdkEndpointType extends SdkTypeBase {
   kind: "endpoint";
-  serverUrl?: string;
+  serverUrl: string; // if not specified, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
   templateArguments: SdkPathParameter[];
 }
 
@@ -368,12 +370,14 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
@@ -381,6 +385,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   serializedName: string;
   optional: false;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -388,6 +393,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export type SdkHttpParameter =
@@ -439,9 +445,9 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
-  bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
-  responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
-  exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
+  bodyParam?: SdkBodyParameter;
+  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
 }
 
 /**
@@ -451,7 +457,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+interface SdkMethodBase {
   __raw?: Operation;
   name: string;
   access: AccessFlags | undefined;
@@ -459,12 +465,14 @@ interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   apiVersions: string[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod<TServiceOperation>[];
-  overloading?: SdkMethod<TServiceOperation>;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+  extends SdkMethodBase {
+  /**
+   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+   * @param serviceParam
+   */
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
@@ -492,7 +500,6 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 
 interface SdkLroServiceMethodOptions {
   __raw_lro_metadata: LroMetadata;
-  initialOperation: SdkServiceOperation;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -515,8 +522,7 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }

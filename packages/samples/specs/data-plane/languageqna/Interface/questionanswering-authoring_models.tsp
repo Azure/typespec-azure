@@ -112,14 +112,16 @@ model QnaSourceMetadata {
 }
 
 @doc("Supported source types.")
-enum QnaSourceKind {
-  file,
-  url,
+union QnaSourceKind {
+  string,
+  file: "file",
+  url: "url",
 }
 
 @doc("Content structure type for sources.")
-enum SourceContentStructureKind {
-  unstructured,
+union SourceContentStructureKind {
+  string,
+  unstructured: "unstructured",
 }
 
 @doc("Last updated date-time parameter.")
@@ -146,20 +148,22 @@ model JobState {
 }
 
 @doc("Job status.")
-enum JobStatus {
-  notStarted,
-  running,
-  succeeded,
-  failed,
-  cancelled,
-  cancelling,
-  partiallyCompleted,
+union JobStatus {
+  string,
+  notStarted: "notStarted",
+  running: "running",
+  succeeded: "succeeded",
+  failed: "failed",
+  cancelled: "cancelled",
+  cancelling: "cancelling",
+  partiallyCompleted: "partiallyCompleted",
 }
 
-enum UpdateOperationKind {
-  add,
-  delete,
-  replace,
+union UpdateOperationKind {
+  string,
+  add: "add",
+  delete: "delete",
+  replace: "replace",
 }
 
 model UpdateQnaRecord {

@@ -139,7 +139,7 @@ model WidgetProperties {
   ...DefaultProvisioningStateProperty;
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @Azure.Core.fixed
 @doc("Spin.")
 enum Spin {

@@ -138,22 +138,3 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
     checkParams(params, "/widgets");
   });
 });
-
-describe("typespec-autorest: Azure.Core concepts", () => {
-  it("defines embedding vector models", async () => {
-    const result = await openApiFor(`
-    ${wrapperCode}
-    model Foo is Azure.Core.EmbeddingVector<int32>;
-    `);
-    const model = result.definitions["Foo"];
-    deepStrictEqual(model, {
-      type: "array",
-      description: "A vector embedding frequently used in similarity search.",
-      "x-ms-embedding-vector": true,
-      items: {
-        type: "integer",
-        format: "int32",
-      },
-    });
-  });
-});
