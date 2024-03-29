@@ -458,7 +458,7 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "union");
       strictEqual(sdkType.name, "TestName");
-      ok(sdkType.generatedName);
+      ok(sdkType.isGeneratedName);
       const values = sdkType.values;
       strictEqual(values.length, 2);
       strictEqual(values[0].kind, "string");
@@ -1351,7 +1351,7 @@ describe("typespec-client-generator-core: types", () => {
       const modelType = getClientType(runner.context, Test) as SdkModelType;
       const enumType = modelType.properties[0].type as SdkEnumType;
       strictEqual(enumType.name, "TestColor");
-      strictEqual(enumType.generatedName, true);
+      strictEqual(enumType.isGeneratedName, true);
       strictEqual(enumType.isUnionAsEnum, true);
       const values = enumType.values;
       strictEqual(values[0].name, "left");
@@ -1398,7 +1398,7 @@ describe("typespec-client-generator-core: types", () => {
       const modelType = getClientType(runner.context, Test) as SdkModelType;
       const unionType = modelType.properties[0].type as SdkUnionType;
       strictEqual(unionType.name, "TestColor");
-      strictEqual(unionType.generatedName, true);
+      strictEqual(unionType.isGeneratedName, true);
       const values = unionType.values;
       const lr = values[0] as SdkEnumType;
       strictEqual(lr.name, "LR");
@@ -2010,12 +2010,12 @@ describe("typespec-client-generator-core: types", () => {
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.models.length, 2);
       strictEqual(sdkPackage.enums.length, 1);
-      const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.generatedName);
+      const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.isGeneratedName);
       ok(prop);
       strictEqual(prop.isFixed, false);
       strictEqual(prop.valueType.kind, "string");
-      const req = sdkPackage.models.find((x) => x.name === "SendRequest" && x.generatedName);
-      const resp = sdkPackage.models.find((x) => x.name === "GetResponse" && x.generatedName);
+      const req = sdkPackage.models.find((x) => x.name === "SendRequest" && x.isGeneratedName);
+      const resp = sdkPackage.models.find((x) => x.name === "GetResponse" && x.isGeneratedName);
       ok(req);
       ok(resp);
       strictEqual(req.properties[0].type, prop);
@@ -2039,7 +2039,7 @@ describe("typespec-client-generator-core: types", () => {
       const enums = runner.context.experimental_sdkPackage.enums;
       const kind = enums.find((x) => x.name === "PetKind");
       ok(pet && kind);
-      ok(kind.generatedName);
+      ok(kind.isGeneratedName);
       const kindProperty = pet.properties.find((x) => (x.name = "kind"));
       ok(kindProperty);
       strictEqual(kindProperty.type, kind);
