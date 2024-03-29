@@ -864,15 +864,17 @@ components:
           description: The errors encountered while executing the job.
       description: The details about a job.
     JobStatus:
-      type: string
-      enum:
-        - notStarted
-        - running
-        - succeeded
-        - failed
-        - cancelled
-        - cancelling
-        - partiallyCompleted
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - notStarted
+            - running
+            - succeeded
+            - failed
+            - cancelled
+            - cancelling
+            - partiallyCompleted
       description: Represents the job status.
     JobWarning:
       type: object
@@ -1033,11 +1035,13 @@ components:
           description: The project language. This is BCP-47 representation of a language. For example, use "en" for English, "en-gb" for English (UK), "es" for Spanish etc.
       description: The details of a project.
     ProjectKind:
-      type: string
-      enum:
-        - CustomSingleLabelClassification
-        - CustomMultiLabelClassification
-        - CustomEntityRecognition
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - CustomSingleLabelClassification
+            - CustomMultiLabelClassification
+            - CustomEntityRecognition
       description: Represents the project kind.
     ProjectSettings:
       type: object

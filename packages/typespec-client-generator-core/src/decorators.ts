@@ -157,7 +157,12 @@ function findClientService(
   let current: Namespace | undefined = client as any;
   while (current) {
     if (isService(program, current)) {
+      // we don't check scoped clients here, because we want to find the service for the client
       return current;
+    }
+    const client = program.stateMap(clientKey).get(current);
+    if (client && client[AllScopes]) {
+      return client[AllScopes].service;
     }
     current = current.namespace;
   }
@@ -248,6 +253,14 @@ export function $operationGroup(
     });
     return;
   }
+  const service = findClientService(context.program, target) ?? (target as any);
+  if (!isService(context.program, service)) {
+    reportDiagnostic(context.program, {
+      code: "client-service",
+      format: { name: target.name },
+      target: context.decoratorTarget,
+    });
+  }
 
   setScopedDecoratorData(
     context,
@@ -257,6 +270,7 @@ export function $operationGroup(
     {
       kind: "SdkOperationGroup",
       type: target,
+      service,
     },
     scope
   );
@@ -337,7 +351,14 @@ export function getOperationGroup(
   type: Namespace | Interface
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-
+  const service = findClientService(context.program, type) ?? (type as any);
+  if (!isService(context.program, service)) {
+    reportDiagnostic(context.program, {
+      code: "client-service",
+      format: { name: type.name },
+      target: type,
+    });
+  }
   if (hasExplicitClientOrOperationGroup(context)) {
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
@@ -350,6 +371,7 @@ export function getOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: buildOperationGroupPath(context, type),
+        service,
       };
     }
     if (
@@ -360,6 +382,7 @@ export function getOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: buildOperationGroupPath(context, type),
+        service,
       };
     }
   }
@@ -494,6 +517,7 @@ export function createSdkContext<
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
+    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
   };
   sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
   return sdkContext;
@@ -523,12 +547,12 @@ export function $convenientAPI(
 
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
-  return value ?? !!context.generateProtocolMethods;
+  return value ?? Boolean(context.generateProtocolMethods);
 }
 
 export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, convenientAPIKey, entity);
-  return value ?? !!context.generateConvenienceMethods;
+  return value ?? Boolean(context.generateConvenienceMethods);
 }
 
 const excludeKey = createStateSymbol("exclude");

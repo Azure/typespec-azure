@@ -248,13 +248,15 @@ export function getGeneratedName(
   operation?: Operation
 ): string {
   if (!context.generatedNames) {
-    context.generatedNames = new Set<string>();
+    context.generatedNames = new Map<Union | Model, string>();
   }
+  const generatedName = context.generatedNames.get(type);
+  if (generatedName) return generatedName;
 
   const contextPath = operation
     ? getContextPath(context, operation, type)
     : findContextPath(context, type);
-  const createdName = buildNameFromContextPaths(context, contextPath);
+  const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
 }
 
@@ -445,7 +447,11 @@ function getContextPath(
  * @param contextPaths
  * @returns
  */
-function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNode[]): string {
+function buildNameFromContextPaths(
+  context: TCGCContext,
+  type: Union | Model,
+  contextPath: ContextNode[]
+): string {
   // fallback to empty name for corner case
   if (contextPath.length === 0) {
     return "";
@@ -478,13 +484,14 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
   // 3. simplely handle duplication
   let duplicateCount = 1;
   const rawCreateName = createName;
-  while (context.generatedNames?.has(createName)) {
+  const generatedNames = [...(context.generatedNames?.values() ?? [])];
+  while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
   if (context.generatedNames) {
-    context.generatedNames.add(createName);
+    context.generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Set<string>([createName]);
+    context.generatedNames = new Map<Union | Model, string>([[type, createName]]);
   }
   return createName;
 }

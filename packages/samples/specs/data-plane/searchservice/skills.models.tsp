@@ -107,7 +107,9 @@ model OcrSkill extends SearchIndexerSkill {
   lineEnding?: LineEnding; // = LineEnding.Space https://github.com/microsoft/typespec/issues/130
 }
 
-enum LineEnding {
+union LineEnding {
+  string,
+
   @doc("Lines are separated by a single space character.")
   Space: "space",
 
@@ -136,7 +138,9 @@ model ImageAnalysisSkill extends SearchIndexerSkill {
 }
 
 @doc("The strings indicating what visual feature types to return.")
-enum VisualFeature {
+union VisualFeature {
+  string,
+
   @doc("Visual features recognized as adult persons.")
   Adult: "adult",
 
@@ -160,7 +164,9 @@ enum VisualFeature {
 }
 
 @doc("A string indicating which domain-specific details to return.")
-enum ImageDetail {
+union ImageDetail {
+  string,
+
   @doc("Details recognized as celebrities.")
   Celebrities: "celebrities",
 
@@ -213,7 +219,9 @@ model EntityRecognitionSkill extends SearchIndexerSkill {
 }
 
 @doc("A string indicating what entity categories to return.")
-enum EntityCategory {
+union EntityCategory {
+  string,
+
   @doc("Entities describing a physical location.")
   Location: "location",
 
@@ -322,7 +330,9 @@ model PIIDetectionSkill extends SearchIndexerSkill {
   domain?: string;
 }
 
-enum PIIDetectionSkillMaskingMode {
+union PIIDetectionSkillMaskingMode {
+  string,
+
   @doc("No masking occurs and the maskedText output will not be returned.")
   None: "none",
 
