@@ -2,6 +2,7 @@ import {
   PagedResultMetadata,
   UnionEnum,
   extractLroStates,
+  getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
   getPagedResult,
@@ -1824,6 +1825,12 @@ function createOAPIEmitter(
     const extensions = getExtensions(program, type);
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Scalar") {
+      const ext = getArmResourceIdentifierConfig(program, type);
+      if (ext) {
+        emitObject["x-ms-arm-id-details"] = ext;
+      }
     }
     if (extensions) {
       for (const key of extensions.keys()) {
