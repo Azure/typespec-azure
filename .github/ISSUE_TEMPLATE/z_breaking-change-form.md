@@ -1,5 +1,5 @@
 ---
-name: Breaking Change Review Form
+name: "[Internal Use] Breaking Change Review Form"
 about: Requesting Breaking Change Review for TypeSpec Azure features
 title: "[Breaking Change Review] {title} "
 labels: Breaking Change Review
