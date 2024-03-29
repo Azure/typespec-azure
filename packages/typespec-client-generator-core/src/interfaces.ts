@@ -237,7 +237,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
-  generatedName: boolean;
+  isGeneratedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -268,7 +268,7 @@ export interface SdkConstantType extends SdkTypeBase {
 
 export interface SdkUnionType extends SdkTypeBase {
   name: string;
-  generatedName: boolean;
+  isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -287,7 +287,7 @@ export interface SdkModelType extends SdkTypeBase {
    * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
    */
   isError: boolean;
-  generatedName: boolean;
+  isGeneratedName: boolean;
   description?: string;
   details?: string;
   access?: AccessFlags;
@@ -321,6 +321,7 @@ export interface SdkModelPropertyTypeBase {
    */
   nameInClient: string;
   name: string;
+  isGeneratedName: boolean;
   description?: string;
   details?: string;
   apiVersions: string[];
