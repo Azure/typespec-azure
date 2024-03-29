@@ -543,14 +543,17 @@ describe("typespec-autorest: operations", () => {
     strictEqual(res.paths["/"].get.deprecated, true);
   });
 
-  it(`@projectedName("client", <>) updates the operationId`, async () => {
+  it(`@projectedName("client", <>) updates the operationId (LEGACY)`, async () => {
     const res = await openApiFor(`
       @service namespace MyService;
+      #suppress "deprecated" "for testing"
       @route("/op-only") @projectedName("client", "clientCall") op serviceName(): void;
 
+      #suppress "deprecated" "for testing"
       @projectedName("client", "ClientInterfaceName") 
       interface ServiceInterfaceName {
         @route("/interface-only") same(): void;
+        #suppress "deprecated" "for testing"
         @route("/interface-and-op") @projectedName("client", "clientCall") serviceName(): void;
       }
      

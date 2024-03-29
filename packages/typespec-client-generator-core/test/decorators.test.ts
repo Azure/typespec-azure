@@ -4,7 +4,6 @@ import {
   Model,
   Namespace,
   Operation,
-  UsageFlags,
   ignoreDiagnostics,
 } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
@@ -13,6 +12,7 @@ import { beforeEach, describe, it } from "vitest";
 import {
   getAccess,
   getClient,
+  getClientNameOverride,
   getOperationGroup,
   getUsage,
   listClients,
@@ -21,7 +21,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkOperationGroup } from "../src/interfaces.js";
+import { SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -189,7 +189,12 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const groups = listOperationGroups(runner.context, getClient(runner.context, MyClient)!);
       deepStrictEqual(groups, [
-        { kind: "SdkOperationGroup", type: MyGroup, groupPath: "MyClient.MyGroup" },
+        {
+          kind: "SdkOperationGroup",
+          type: MyGroup,
+          groupPath: "MyClient.MyGroup",
+          service: MyClient,
+        },
       ]);
     });
 
@@ -205,7 +210,12 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const groups = listOperationGroups(runner.context, getClient(runner.context, MyClient)!);
       deepStrictEqual(groups, [
-        { kind: "SdkOperationGroup", type: MyGroup, groupPath: "MyClient.MyGroup" },
+        {
+          kind: "SdkOperationGroup",
+          type: MyGroup,
+          groupPath: "MyClient.MyGroup",
+          service: MyClient,
+        },
       ]);
     });
 
@@ -512,30 +522,35 @@ describe("typespec-client-generator-core: decorators", () => {
         kind: "SdkOperationGroup",
         type: AG,
         groupPath: "AClient.AG",
+        service: A,
       };
 
       const aag: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AAG,
         groupPath: "AClient.AA.AAG",
+        service: A,
       };
 
       const aabGroup1: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AABGroup1,
         groupPath: "AClient.AA.AAB.AABGroup1",
+        service: A,
       };
 
       const aabGroup2: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AABGroup2,
         groupPath: "AClient.AA.AAB.AABGroup2",
+        service: A,
       };
 
       const aaa: SdkOperationGroup = {
         kind: "SdkOperationGroup",
         type: AAA,
         groupPath: "AClient.AA.AAA",
+        service: A,
       };
 
       const aab: SdkOperationGroup = {
@@ -543,6 +558,7 @@ describe("typespec-client-generator-core: decorators", () => {
         type: AAB,
         subOperationGroups: [aabGroup1, aabGroup2],
         groupPath: "AClient.AA.AAB",
+        service: A,
       };
 
       const aa: SdkOperationGroup = {
@@ -550,6 +566,7 @@ describe("typespec-client-generator-core: decorators", () => {
         type: AA,
         subOperationGroups: [aaa, aab, aag],
         groupPath: "AClient.AA",
+        service: A,
       };
 
       const client = getClient(runner.context, A);
@@ -690,7 +707,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("interface without operation", async () => {
-      const { MyGroup } = (await runner.compile(`
+      const { MyGroup, MyClient } = (await runner.compile(`
         @service({})
         @test namespace MyClient;
 
@@ -698,12 +715,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @test interface MyGroup {
         }
-      `)) as { MyGroup: Interface };
+      `)) as { MyGroup: Interface; MyClient: Namespace };
 
       deepStrictEqual(getOperationGroup(runner.context, MyGroup), {
         kind: "SdkOperationGroup",
         type: MyGroup,
         groupPath: "MyClient.MyGroup",
+        service: MyClient,
       });
 
       const clients = listClients(runner.context);
@@ -2247,6 +2265,37 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
     });
+
+    it("patch usage", async () => {
+      const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          model PatchModel {
+            age: int32;
+          }
+
+          @test
+          model JsonMergePatchModel {
+            prop: string
+          }
+
+          @patch
+          @route("/patch")
+          op patchModel(@body body: PatchModel): void;
+
+          @patch
+          @route("/jsonMergePatch")
+          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
+        }
+      `)) as { PatchModel: Model; JsonMergePatchModel: Model };
+
+      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
+      strictEqual(
+        getUsage(runner.context, JsonMergePatchModel),
+        UsageFlags.JsonMergePatch | UsageFlags.Input
+      );
+    });
   });
 
   describe("@flattenProperty", () => {
@@ -2348,6 +2397,70 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, {
         code: "decorator-wrong-target",
       });
+    });
+  });
+
+  describe("@clientName", () => {
+    it("carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compile(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @clientName("Test1Rename")
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          @clientName("func1Rename")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
+    });
+
+    it("augment carry over", async () => {
+      const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
+        `
+        @service({})
+        @test namespace MyService {
+          @test
+          model Test1{}
+
+          @test
+          model Test2 is Test1{}
+
+          @test
+          @route("/func1")
+          op func1(): void;
+
+          @test
+          @route("/func2")
+          op func2 is func1;
+        }
+      `,
+        `
+        namespace Customizations;
+
+        @@clientName(MyService.Test1, "Test1Rename");
+        @@clientName(MyService.func1, "func1Rename");
+      `
+      )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+
+      strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
+      strictEqual(getClientNameOverride(runner.context, Test2), undefined);
+      strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
+      strictEqual(getClientNameOverride(runner.context, func2), undefined);
     });
   });
 });

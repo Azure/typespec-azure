@@ -18,6 +18,7 @@ import {
   resolveEncodedName,
 } from "@typespec/compiler";
 import {
+  HttpOperation,
   HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
@@ -167,8 +168,16 @@ export function getLibraryName(
   const clientSpecificName = getProjectedName(context.program, type, "client");
   if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
 
-  // 4. check if there's a friendly name, if so return friendly name, otherwise return undefined
-  return getFriendlyName(context.program, type) ?? (typeof type.name === "string" ? type.name : "");
+  // 4. check if there's a friendly name, if so return friendly name
+  const friendlyName = getFriendlyName(context.program, type);
+  if (friendlyName) return friendlyName;
+
+  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
+    return type.name + type.templateMapper.args.map((arg) => (arg as Model).name).join("");
+  }
+
+  return typeof type.name === "string" ? type.name : "";
 }
 
 /**
@@ -239,13 +248,15 @@ export function getGeneratedName(
   operation?: Operation
 ): string {
   if (!context.generatedNames) {
-    context.generatedNames = new Set<string>();
+    context.generatedNames = new Map<Union | Model, string>();
   }
+  const generatedName = context.generatedNames.get(type);
+  if (generatedName) return generatedName;
 
   const contextPath = operation
     ? getContextPath(context, operation, type)
     : findContextPath(context, type);
-  const createdName = buildNameFromContextPaths(context, contextPath);
+  const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
 }
 
@@ -301,13 +312,12 @@ function getContextPath(
   root: Operation | Model,
   typeToFind: Model | Union
 ): ContextNode[] {
-  const program = context.program;
   // use visited set to avoid cycle model reference
   const visited: Set<Type> = new Set<Type>();
   let result: ContextNode[];
 
   if (root.kind === "Operation") {
-    const httpOperation = ignoreDiagnostics(getHttpOperation(program, root));
+    const httpOperation = getHttpOperationWithCache(context, root);
 
     if (httpOperation.parameters.body) {
       visited.clear();
@@ -437,7 +447,11 @@ function getContextPath(
  * @param contextPaths
  * @returns
  */
-function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNode[]): string {
+function buildNameFromContextPaths(
+  context: TCGCContext,
+  type: Union | Model,
+  contextPath: ContextNode[]
+): string {
   // fallback to empty name for corner case
   if (contextPath.length === 0) {
     return "";
@@ -470,13 +484,14 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
   // 3. simplely handle duplication
   let duplicateCount = 1;
   const rawCreateName = createName;
-  while (context.generatedNames?.has(createName)) {
+  const generatedNames = [...(context.generatedNames?.values() ?? [])];
+  while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
   if (context.generatedNames) {
-    context.generatedNames.add(createName);
+    context.generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Set<string>([createName]);
+    context.generatedNames = new Map<Union | Model, string>([[type, createName]]);
   }
   return createName;
 }
@@ -494,4 +509,19 @@ export function isErrorOrChildOfError(context: TCGCContext, model: Model): boole
     baseModel = baseModel.baseModel;
   }
   return false;
+}
+
+export function getHttpOperationWithCache(
+  context: TCGCContext,
+  operation: Operation
+): HttpOperation {
+  if (context.httpOperationCache === undefined) {
+    context.httpOperationCache = new Map<Operation, HttpOperation>();
+  }
+  if (context.httpOperationCache.has(operation)) {
+    return context.httpOperationCache.get(operation)!;
+  }
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+  context.httpOperationCache.set(operation, httpOperation);
+  return httpOperation;
 }

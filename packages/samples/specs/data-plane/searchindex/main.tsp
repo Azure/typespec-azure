@@ -31,7 +31,7 @@ using Azure.Core;
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @fixed
 @doc("Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context in producing autocomplete terms.")
 enum AutocompleteMode {
@@ -46,7 +46,9 @@ enum AutocompleteMode {
 }
 
 @doc("This parameter is only valid if the query type is 'semantic'. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character '|' followed by the 'count-<number of answers>' option after the answers parameter value, such as 'extractive|count-3'. Default count is 1.")
-enum QueryAnswerType {
+union QueryAnswerType {
+  string,
+
   @doc("Do not return answers for the query.")
   None: "none",
 
@@ -55,7 +57,9 @@ enum QueryAnswerType {
 }
 
 @doc("This parameter is only valid if the query type is 'semantic'. If set, the query returns captions extracted from key passages in the highest ranked documents. When s is set to 'extractive', highlighting is enabled by default, and can be configured by appending the pipe character '|' followed by the 'highlight-<true/false>' option, such as 'extractive|highlight-true'. Defaults to 'None'.")
-enum QueryCaptionType {
+union QueryCaptionType {
+  string,
+
   @doc("Do not return captions for the query.")
   None: "none",
 
@@ -64,7 +68,9 @@ enum QueryCaptionType {
 }
 
 @doc("The language of the query.")
-enum QueryLanguage {
+union QueryLanguage {
+  string,
+
   @doc("Query language not specified.")
   None: "none",
 
@@ -283,7 +289,9 @@ enum QueryLanguage {
 }
 
 @doc("Improve search recall by spell-correcting individual search query terms.")
-enum QuerySpellerType {
+union QuerySpellerType {
+  string,
+
   @doc("Speller not enabled.")
   None: "none",
 
@@ -291,7 +299,7 @@ enum QuerySpellerType {
   Lexicon: "lexicon",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @fixed
 @doc("Specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax and 'semantic' if query syntax is not needed.")
 enum QueryType {
@@ -305,7 +313,7 @@ enum QueryType {
   Semantic: "semantic",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @fixed
 @doc("Index action type")
 enum IndexActionType {
@@ -322,7 +330,7 @@ enum IndexActionType {
   Delete: "delete",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @fixed
 @doc("Specifies whether any or all of the search terms must be matched in order to count the document as a match.")
 enum SearchMode {
@@ -333,7 +341,7 @@ enum SearchMode {
   All: "all",
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "Existing service."
+#suppress "@azure-tools/typespec-azure-core/no-enum" "Sample"
 @fixed
 @doc("A value that specifies whether we want to calculate scoring statistics (such as document frequency) globally for more consistent scoring, or locally, for lower latency. The default is 'local'. Use 'global' to aggregate scoring statistics globally before scoring. Using global scoring statistics can increase latency of search queries.")
 enum ScoringStatistics {
@@ -396,12 +404,12 @@ model AutocompleteItem {
 @doc("The result of Autocomplete query.")
 model AutocompleteResult {
   @doc("A value indicating the percentage of the index that was considered by the autocomplete request, or null if minimumCoverage was not specified in the request.")
-  @projectedName("json", "@search.coverage")
+  @encodedName("application/json", "@search.coverage")
   @visibility("read")
   coverage?: float64;
 
   @doc("The list of returned Autocompleted items.")
-  @projectedName("json", "value")
+  @encodedName("application/json", "value")
   @visibility("read")
   results: AutocompleteItem[];
 }
@@ -409,7 +417,7 @@ model AutocompleteResult {
 @doc("Parameters for fuzzy matching, and other autocomplete query behaviors.")
 model AutocompleteRequest {
   @doc("The search text on which to base autocomplete results.")
-  @projectedName("json", "search")
+  @encodedName("application/json", "search")
   searchText: string;
 
   @doc("Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context while producing auto-completed terms.")
@@ -419,7 +427,7 @@ model AutocompleteRequest {
   filter?: string;
 
   @doc("A value indicating whether to use fuzzy matching for the autocomplete query. Default is false. When set to true, the query will autocomplete terms even if there's a substituted or missing character in the search text. While this provides a better experience in some scenarios, it comes at a performance cost as fuzzy autocomplete queries are slower and consume more resources.")
-  @projectedName("json", "fuzzy")
+  @encodedName("application/json", "fuzzy")
   useFuzzyMatching?: boolean;
 
   @doc("A string tag that is appended to hit highlights. Must be set with highlightPreTag. If omitted, hit highlighting is disabled.")
@@ -465,12 +473,12 @@ model FacetResult {
 @doc("Response containing search results from an index.")
 model SearchDocumentsResult {
   @doc("The total count of results found by the search operation, or null if the count was not requested. If present, the count may be greater than the number of results in this response. This can happen if you use the $top or $skip parameters, or if Azure Cognitive Search can't return all the requested documents in a single Search response.")
-  @projectedName("json", "@odata.count")
+  @encodedName("application/json", "@odata.count")
   @visibility("read")
   count?: int64;
 
   @doc("Continuation URL returned when Azure Cognitive Search can't return all the requested results in a single Search response. You can use this URL to formulate another GET or POST Search request to get the next part of the search response. Make sure to use the same verb (GET or POST) as the request that produced this response.")
-  @projectedName("json", "@odata.nextLink")
+  @encodedName("application/json", "@odata.nextLink")
   @visibility("read")
   nextLink?: string;
 
@@ -480,22 +488,22 @@ model SearchDocumentsResult {
   `@search.coverage`?: float64;
 
   @doc("The facet query results for the search operation, organized as a collection of buckets for each faceted field; null if the query did not include any facet expressions.")
-  @projectedName("json", "@search.facets")
+  @encodedName("application/json", "@search.facets")
   @visibility("read")
   facets?: Record<FacetResult[]>;
 
   @doc("The answers query results for the search operation; null if the answers query parameter was not specified or set to 'none'.")
-  @projectedName("json", "@search.answers")
+  @encodedName("application/json", "@search.answers")
   @visibility("read")
   answers?: AnswerResult[];
 
   @doc("Continuation JSON payload returned when Azure Cognitive Search can't return all the requested results in a single Search response. You can use this JSON along with @odata.nextLink to formulate another POST Search request to get the next part of the search response.")
-  @projectedName("json", "@search.nextPageParameters")
+  @encodedName("application/json", "@search.nextPageParameters")
   @visibility("read")
   nextPageParameters?: SearchRequest;
 
   @doc("The sequence of results returned by the query.")
-  @projectedName("json", "value")
+  @encodedName("application/json", "value")
   @visibility("read")
   results: SearchResult[];
 }
@@ -521,23 +529,23 @@ model SearchError {
 model SearchResult {
   #suppress "@azure-tools/typespec-azure-core/no-nullable" "Existing service"
   @doc("Captions are the most representative passages from the document relatively to the search query. They are often used as document summary. Captions are only returned for queries of type 'semantic'.")
-  @projectedName("json", "@search.captions")
+  @encodedName("application/json", "@search.captions")
   @visibility("read")
   captions?: CaptionResult[] | null;
 
   @doc("Text fragments from the document that indicate the matching search terms, organized by each applicable field; null if hit highlighting was not enabled for the query.")
-  @projectedName("json", "@search.highlights")
+  @encodedName("application/json", "@search.highlights")
   @visibility("read")
   highlights?: Record<string[]>;
 
   #suppress "@azure-tools/typespec-azure-core/no-nullable" "Existing service"
   @doc("The relevance score computed by the semantic ranker for the top search results. Search results are sorted by the RerankerScore first and then by the Score. RerankerScore is only returned for queries of type 'semantic'.")
-  @projectedName("json", "@search.rerankerScore")
+  @encodedName("application/json", "@search.rerankerScore")
   @visibility("read")
   rerankerScore?: float64 | null;
 
   @doc("The relevance score of the document compared to other documents returned by the query.")
-  @projectedName("json", "@search.score")
+  @encodedName("application/json", "@search.score")
   @visibility("read")
   score: float64;
 }
@@ -545,7 +553,7 @@ model SearchResult {
 @doc("Parameters for filtering, sorting, faceting, paging, and other search query behaviors.")
 model SearchRequest {
   @doc("A value that specifies whether to fetch the total count of results. Default is false. Setting this value to true may have a performance impact. Note that the count returned is an approximation.")
-  @projectedName("json", "count")
+  @encodedName("application/json", "count")
   includeTotalResultCount?: boolean;
 
   @doc("The list of facet expressions to apply to the search query. Each facet expression contains a field name, optionally followed by a comma-separated list of name:value pairs.")
@@ -555,7 +563,7 @@ model SearchRequest {
   filter?: string; // ISSUE: Can't set externalDocs: https://github.com/Azure/typespec-azure/issues/1035
 
   @doc("The comma-separated list of field names to use for hit highlights. Only searchable fields can be used for hit highlighting.")
-  @projectedName("json", "highlight")
+  @encodedName("application/json", "highlight")
   highlightFields?: string;
 
   @doc("A string tag that is appended to hit highlights. Must be set with highlightPreTag. Default is &lt;/em&gt;.")
@@ -568,7 +576,7 @@ model SearchRequest {
   minimumCoverage?: float64;
 
   @doc("The comma-separated list of OData $orderby expressions by which to sort the results. Each expression can be either a field name or a call to either the geo.distance() or the search.score() functions. Each expression can be followed by asc to indicate ascending, or desc to indicate descending. The default is ascending order. Ties will be broken by the match scores of documents. If no $orderby is specified, the default sort order is descending by document match score. There can be at most 32 $orderby clauses.")
-  @projectedName("json", "orderby")
+  @encodedName("application/json", "orderby")
   orderBy?: string;
 
   @doc("A value that specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax.")
@@ -590,7 +598,7 @@ model SearchRequest {
   semanticConfiguration?: string;
 
   @doc("A full-text search query expression; Use \"*\" or omit this parameter to match all documents.")
-  @projectedName("json", "search")
+  @encodedName("application/json", "search")
   searchText?: string;
 
   @doc("The comma-separated list of field names to which to scope the full-text search. When using fielded search (fieldName:searchExpression) in a full Lucene query, the field names of each fielded search expression take precedence over any field names listed in this parameter.")
@@ -628,21 +636,21 @@ model SearchRequest {
 @doc("Represents an index action that operates on a document.")
 model IndexAction {
   @doc("The operation to perform on a document in an indexing batch.")
-  @projectedName("json", "@search.action")
+  @encodedName("application/json", "@search.action")
   actiontype?: IndexActionType;
 }
 
 @doc("Contains a batch of document write actions to send to the index.")
 model IndexBatch {
   @doc("The actions in the batch.")
-  @projectedName("json", "value")
+  @encodedName("application/json", "value")
   actions: IndexAction[];
 }
 
 @doc("Response containing the status of operations for all documents in the indexing request.")
 model IndexDocumentsResult {
   @doc("The list of status information for each document in the indexing request.")
-  @projectedName("json", "value")
+  @encodedName("application/json", "value")
   @visibility("read")
   results: IndexingResult[];
 }
@@ -658,7 +666,7 @@ model IndexingResult {
   errorMessage?: string;
 
   @doc("A value indicating whether the indexing operation succeeded for the document identified by the key.")
-  @projectedName("json", "status")
+  @encodedName("application/json", "status")
   @visibility("read")
   succeeded: boolean;
 
@@ -670,12 +678,12 @@ model IndexingResult {
 @doc("Response containing suggestion query results from an index.")
 model SuggestDocumentsResult {
   @doc("The sequence of results returned by the query.")
-  @projectedName("json", "value")
+  @encodedName("application/json", "value")
   @visibility("read")
   results: SuggestResult[];
 
   @doc("A value indicating the percentage of the index that was included in the query, or null if minimumCoverage was not set in the request.")
-  @projectedName("json", "@search.coverage")
+  @encodedName("application/json", "@search.coverage")
   @visibility("read")
   coverage?: float64;
 }
@@ -684,7 +692,7 @@ model SuggestDocumentsResult {
 @doc("A result containing a document found by a suggestion query, plus associated metadata.")
 model SuggestResult {
   @doc("The text of the suggestion result.")
-  @projectedName("json", "@search.text")
+  @encodedName("application/json", "@search.text")
   @visibility("read")
   text: string;
 }
@@ -696,7 +704,7 @@ model SuggestRequest {
   filter?: string;
 
   @doc("A value indicating whether to use fuzzy matching for the suggestion query. Default is false. When set to true, the query will find suggestions even if there's a substituted or missing character in the search text. While this provides a better experience in some scenarios, it comes at a performance cost as fuzzy suggestion searches are slower and consume more resources.")
-  @projectedName("json", "fuzzy")
+  @encodedName("application/json", "fuzzy")
   useFuzzyMatching?: boolean;
 
   @doc("A string tag that is appended to hit highlights. Must be set with highlightPreTag. If omitted, hit highlighting of suggestions is disabled.")
@@ -709,11 +717,11 @@ model SuggestRequest {
   minimumCoverage?: float64;
 
   @doc("The comma-separated list of OData $orderby expressions by which to sort the results. Each expression can be either a field name or a call to either the geo.distance() or the search.score() functions. Each expression can be followed by asc to indicate ascending, or desc to indicate descending. The default is ascending order. Ties will be broken by the match scores of documents. If no $orderby is specified, the default sort order is descending by document match score. There can be at most 32 $orderby clauses.")
-  @projectedName("json", "orderby")
+  @encodedName("application/json", "orderby")
   orderBy?: string;
 
   @doc("The search text to use to suggest documents. Must be at least 1 character, and no more than 100 characters.")
-  @projectedName("json", "search")
+  @encodedName("application/json", "search")
   searchText: string;
 
   @doc("The comma-separated list of field names to search for the specified search text. Target fields must be included in the specified suggester.")

@@ -9,12 +9,12 @@ import {
   Namespace,
   Operation,
   Type,
-  UsageFlags,
 } from "@typespec/compiler";
 import {
   HttpAuth,
   HttpOperation,
   HttpOperationResponse,
+  HttpStatusCodeRange,
   HttpVerb,
   Visibility,
 } from "@typespec/http";
@@ -26,7 +26,7 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  __clients?: Map<string, SdkClientType<TServiceOperation>>;
+  __clients?: SdkClientType<TServiceOperation>[];
 }
 
 export interface SdkEmitterOptions {
@@ -34,6 +34,7 @@ export interface SdkEmitterOptions {
   "generate-convenience-methods"?: boolean;
   "filter-out-core-models"?: boolean;
   "package-name"?: string;
+  "flatten-union-as-enum"?: boolean;
 }
 
 export interface SdkClient {
@@ -41,6 +42,9 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
+  /**
+   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
+   */
   arm: boolean;
   crossLanguageDefinitionId: string;
 }
@@ -54,12 +58,13 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkInitializationType;
+  initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
-  endpoint: string;
-  hasParameterizedEndpoint: boolean;
+  /**
+   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
+   */
   arm: boolean;
 }
 
@@ -68,11 +73,16 @@ export interface SdkOperationGroup {
   type: Namespace | Interface;
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
+  service: Namespace;
 }
 
 interface SdkTypeBase {
   __raw?: Type;
   kind: string;
+  /**
+   * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
+   * https://github.com/Azure/typespec-azure/issues/448
+   */
   nullable: boolean;
   deprecation?: string;
 }
@@ -89,7 +99,8 @@ export type SdkType =
   | SdkConstantType
   | SdkUnionType
   | SdkModelType
-  | SdkCredentialType;
+  | SdkCredentialType
+  | SdkEndpointType;
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -208,6 +219,7 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -219,12 +231,13 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  nullableValues: boolean;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
-  generatedName?: string;
+  generatedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -235,6 +248,7 @@ export interface SdkEnumType extends SdkTypeBase {
   access?: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  isUnionAsEnum: boolean;
 }
 
 export interface SdkEnumValueType extends SdkTypeBase {
@@ -253,8 +267,8 @@ export interface SdkConstantType extends SdkTypeBase {
 }
 
 export interface SdkUnionType extends SdkTypeBase {
-  name?: string;
-  generatedName?: string;
+  name: string;
+  generatedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -265,9 +279,15 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
+  /**
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData nad the `.usage` property on this model
+   */
   isFormDataType: boolean;
+  /**
+   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
+   */
   isError: boolean;
-  generatedName?: string;
+  generatedName: boolean;
   description?: string;
   details?: string;
   access?: AccessFlags;
@@ -275,6 +295,7 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
+  discriminatorProperty?: SdkModelPropertyType;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
@@ -285,10 +306,21 @@ export interface SdkCredentialType extends SdkTypeBase {
   scheme: HttpAuth;
 }
 
+export interface SdkEndpointType extends SdkTypeBase {
+  kind: "endpoint";
+  serverUrl: string; // if not specified, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
+  templateArguments: SdkPathParameter[];
+}
+
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
+  /**
+   * @deprecated This property is deprecated. Use `.name` instead.
+   * https://github.com/Azure/typespec-azure/issues/446
+   */
   nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];
@@ -296,6 +328,7 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  nullable: boolean;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
@@ -303,6 +336,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
+  type: SdkEndpointType;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
@@ -336,12 +370,14 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
@@ -349,6 +385,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   serializedName: string;
   optional: false;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -356,6 +393,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export type SdkHttpParameter =
@@ -374,17 +412,20 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
+  nullable: boolean;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
+  nullable: boolean;
 }
 
 export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
+  nullable: boolean;
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {
@@ -404,9 +445,9 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
-  bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
-  responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
-  exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
+  bodyParam?: SdkBodyParameter;
+  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
 }
 
 /**
@@ -416,7 +457,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
+interface SdkMethodBase {
   __raw?: Operation;
   name: string;
   access: AccessFlags | undefined;
@@ -424,12 +465,14 @@ interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   apiVersions: string[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod<TServiceOperation>[];
-  overloading?: SdkMethod<TServiceOperation>;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+  extends SdkMethodBase {
+  /**
+   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+   * @param serviceParam
+   */
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
@@ -457,7 +500,6 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 
 interface SdkLroServiceMethodOptions {
   __raw_lro_metadata: LroMetadata;
-  initialOperation: SdkServiceOperation;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -480,8 +522,7 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase<TServiceOperation> {
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }
@@ -505,3 +546,17 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
+
+/**
+ * This enum represents the different ways a model can be used in a method.
+ */
+export enum UsageFlags {
+  None = 0,
+  Input = 1 << 1,
+  Output = 1 << 2,
+  ApiVersionEnum = 1 << 3,
+  // Input will also be set when JsonMergePatch is set
+  JsonMergePatch = 1 << 4,
+  // Input will also be set when MultipartFormData is set
+  MultipartFormData = 1 << 5,
+}

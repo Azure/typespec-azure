@@ -20,7 +20,7 @@ model SearchIndexerSkillset {
   skills: SearchIndexerSkill[];
 
   @doc("Details about cognitive services to be used when running skills.")
-  @projectedName("json", "cognitiveServices")
+  @encodedName("application/json", "cognitiveServices")
   cognitiveServicesAccount?: CognitiveServicesAccount;
 
   @doc("Definition of additional projections to azure blob, table, or files, of enriched data.")
@@ -100,14 +100,16 @@ model OcrSkill extends SearchIndexerSkill {
   defaultLanguageCode?: OcrSkillLanguage;
 
   @doc("A value indicating to turn orientation detection on or not. Default is false.")
-  @projectedName("json", "detectOrientation")
+  @encodedName("application/json", "detectOrientation")
   shouldDetectOrientation?: boolean = false;
 
   @doc("Defines the sequence of characters to use between the lines of text recognized by the OCR skill. The default value is \"space\".")
   lineEnding?: LineEnding; // = LineEnding.Space https://github.com/microsoft/typespec/issues/130
 }
 
-enum LineEnding {
+union LineEnding {
+  string,
+
   @doc("Lines are separated by a single space character.")
   Space: "space",
 
@@ -136,7 +138,9 @@ model ImageAnalysisSkill extends SearchIndexerSkill {
 }
 
 @doc("The strings indicating what visual feature types to return.")
-enum VisualFeature {
+union VisualFeature {
+  string,
+
   @doc("Visual features recognized as adult persons.")
   Adult: "adult",
 
@@ -160,7 +164,9 @@ enum VisualFeature {
 }
 
 @doc("A string indicating which domain-specific details to return.")
-enum ImageDetail {
+union ImageDetail {
+  string,
+
   @doc("Details recognized as celebrities.")
   Celebrities: "celebrities",
 
@@ -213,7 +219,9 @@ model EntityRecognitionSkill extends SearchIndexerSkill {
 }
 
 @doc("A string indicating what entity categories to return.")
-enum EntityCategory {
+union EntityCategory {
+  string,
+
   @doc("Entities describing a physical location.")
   Location: "location",
 
@@ -322,7 +330,9 @@ model PIIDetectionSkill extends SearchIndexerSkill {
   domain?: string;
 }
 
-enum PIIDetectionSkillMaskingMode {
+union PIIDetectionSkillMaskingMode {
+  string,
+
   @doc("No masking occurs and the maskedText output will not be returned.")
   None: "none",
 

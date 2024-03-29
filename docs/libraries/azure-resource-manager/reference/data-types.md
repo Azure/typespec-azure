@@ -37,29 +37,28 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 
 #### Properties
 
-| Name        | Type    | Description                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `202`   | The status code.                                                                                         |
-| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `202` | The status code. |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
 
 ```typespec
-model Azure.ResourceManager.ArmAcceptedResponse<Message>
+model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 ```
 
 #### Template Parameters
 
-| Name    | Description                                                                        |
-| ------- | ---------------------------------------------------------------------------------- |
-| Message | The description of the response status (defaults to `Resource operation accepted`) |
+| Name         | Description                                                                        |
+| ------------ | ---------------------------------------------------------------------------------- |
+| Message      | The description of the response status (defaults to `Resource operation accepted`) |
+| ExtraHeaders | Additional headers in the response. Default includes Retry-After header            |
 
 #### Properties
 
-| Name        | Type    | Description                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `202`   | The status code.                                                                                         |
-| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `202` | The status code. |
 
 ### `ArmAsyncOperationHeader` {#Azure.ResourceManager.ArmAsyncOperationHeader}
 
@@ -111,22 +110,22 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 The Azure Resource Manager 201 response for a resource
 
 ```typespec
-model Azure.ResourceManager.ArmCreatedResponse<ResponseBody>
+model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 ```
 
 #### Template Parameters
 
-| Name         | Description                       |
-| ------------ | --------------------------------- |
-| ResponseBody | The contents of the response body |
+| Name         | Description                                                             |
+| ------------ | ----------------------------------------------------------------------- |
+| ResponseBody | The contents of the response body                                       |
+| ExtraHeaders | Additional headers in the response. Default includes Retry-After header |
 
 #### Properties
 
-| Name        | Type           | Description                                                                                              |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `201`          | The status code.                                                                                         |
-| retryAfter? | `int32`        | The Retry-After header can indicate how long the client should wait before polling the operation status. |
-| body        | `ResponseBody` | The body type of the operation request or response.                                                      |
+| Name       | Type           | Description                                         |
+| ---------- | -------------- | --------------------------------------------------- |
+| statusCode | `201`          | The status code.                                    |
+| body       | `ResponseBody` | The body type of the operation request or response. |
 
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 
@@ -142,10 +141,9 @@ model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 
 #### Properties
 
-| Name        | Type    | Description                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `202`   | The status code.                                                                                         |
-| retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
+| Name       | Type  | Description      |
+| ---------- | ----- | ---------------- |
+| statusCode | `202` | The status code. |
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 
@@ -291,11 +289,10 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 #### Properties
 
-| Name        | Type       | Description                                                                                              |
-| ----------- | ---------- | -------------------------------------------------------------------------------------------------------- |
-| statusCode  | `201`      | The status code.                                                                                         |
-| retryAfter? | `int32`    | The Retry-After header can indicate how long the client should wait before polling the operation status. |
-| body        | `Resource` |                                                                                                          |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `201`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
 
@@ -395,7 +392,7 @@ model Azure.ResourceManager.CustomerManagedKeyEncryption
 | keyEncryptionIdentity?          | [`KeyEncryptionIdentity`](./data-types.md#Azure.ResourceManager.KeyEncryptionIdentity) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
 | userAssignedIdentityResourceId? | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier)                      | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
 | federatedClientId?              | `Core.uuid`                                                                            | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
-| delegatedIdentityClientId       | `Core.uuid`                                                                            | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
+| delegatedIdentityClientId?      | `Core.uuid`                                                                            | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 

@@ -68,44 +68,49 @@ model LogzMonitorResourceProperties {
 
 @doc("Provisioning state of the monitoring resource")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("Accepted")
-  Accepted,
+  Accepted: "Accepted",
 
   @doc("Creating")
-  Creating,
+  Creating: "Creating",
 
   @doc("Updating")
-  Updating,
+  Updating: "Updating",
 
   @doc("Deleting")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("Deleted")
-  Deleted,
+  Deleted: "Deleted",
 
   @doc("Not Specified")
-  NotSpecified,
+  NotSpecified: "NotSpecified",
 }
 
 @doc("Flag specifying if the resource monitoring is enabled or disabled.")
-enum MonitoringStatus {
+union MonitoringStatus {
+  string,
+
   @doc("Enabled")
-  Enabled,
+  Enabled: "Enabled",
 
   @doc("Disabled")
-  Disabled,
+  Disabled: "Disabled",
 }
 
 @doc("Flag specifying the Marketplace Subscription Status of the resource. If payment is not made in time, the resource will go in Suspended state.")
-enum MarketplaceSubscriptionStatus {
+union MarketplaceSubscriptionStatus {
+  string,
+
   @doc("Active")
-  Active,
+  Active: "Active",
 
   @doc("Suspended")
-  Suspended,
+  Suspended: "Suspended",
 }
 
 @doc("Details of the log organization.")
@@ -152,12 +157,14 @@ model PlanData {
 }
 
 @doc("Liftr resource category")
-enum LiftrResourceCategories {
+union LiftrResourceCategories {
+  string,
+
   @doc("Unknown")
-  Unknown,
+  Unknown: "Unknown",
 
   @doc("Monitor logs")
-  MonitorLogs,
+  MonitorLogs: "MonitorLogs",
 }
 
 @doc("Properties for the Tag rules resource of a Monitor account.")
@@ -195,12 +202,14 @@ model FilteringTag {
 }
 
 @doc("Valid actions for a filtering tag. Exclusion takes priority over inclusion.")
-enum TagAction {
+union TagAction {
+  string,
+
   @doc("Include")
-  Include,
+  Include: "Include",
 
   @doc("Exclude")
-  Exclude,
+  Exclude: "Exclude",
 }
 
 @doc("Single sign-on properties for a LogZ resource.")
@@ -219,16 +228,18 @@ model LogzSingleSignOnProperties {
 }
 
 @doc("Various states of the SSO resource")
-enum SingleSignOnStates {
+union SingleSignOnStates {
+  string,
+
   @doc("Initial")
-  Initial,
+  Initial: "Initial",
 
   @doc("Enable")
-  Enable,
+  Enable: "Enable",
 
   @doc("Disable")
-  Disable,
+  Disable: "Disable",
 
   @doc("Existing")
-  Existing,
+  Existing: "Existing",
 }

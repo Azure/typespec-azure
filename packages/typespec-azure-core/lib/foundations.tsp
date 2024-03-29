@@ -168,7 +168,6 @@ model InnerError {
   code?: string;
 
   @doc("Inner error.")
-  @projectedName("csharp", "InnerErrorObject")
   innererror?: InnerError;
 }
 

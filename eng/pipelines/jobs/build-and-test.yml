@@ -3,30 +3,30 @@ parameters:
     type: string
   - name: dotnetVersion
     type: string
-  - name: poolName
+  - name: osName
     type: string
 
 steps:
   - checkout: self
     submodules: true
 
-  - template: ../templates/install.yml
+  - template: /eng/pipelines/templates/install.yml
     parameters:
       nodeVersion: ${{ parameters.nodeVersion }}
 
   # Only running UI test on linux
   - ${{ if ne(variables['Agent.OS'], 'Windows_NT') }}:
-      - template: ../templates/install-browsers.yml
+      - template: /eng/pipelines/templates/install-browsers.yml
 
   - script: pnpm run check-version-mismatch
     displayName: Check version mismatch
 
-  - template: ../templates/build.yml
+  - template: /eng/pipelines/templates/build.yml
 
   - script: pnpm run test-official
     displayName: Test
 
-  - template: ../templates/upload-coverage.yml
+  - template: /eng/pipelines/templates/upload-coverage.yml
 
   - script: pnpm run check-format
     displayName: Check Formatting
@@ -61,8 +61,8 @@ steps:
       searchFolder: "$(System.DefaultWorkingDirectory)/core/packages"
       testResultsFiles: "*/test-results.xml"
       mergeTestResults: true
-      failTaskOnFailedTests: true
-      testRunTitle: "[CORE] Test os: ${{ parameters.poolName }}, node: ${{ parameters.nodeVersion }}"
+      failTaskOnFailedTests: false
+      testRunTitle: "[CORE] Test os: ${{ parameters.osName }}, node: ${{ parameters.nodeVersion }}"
     displayName: Publish core test results
     condition: always()
 
@@ -72,13 +72,15 @@ steps:
       searchFolder: "$(System.DefaultWorkingDirectory)/packages"
       testResultsFiles: "*/test-results.xml"
       mergeTestResults: true
-      failTaskOnFailedTests: true
-      testRunTitle: "[NON-CORE] Test os: ${{ parameters.poolName }}, node: ${{ parameters.nodeVersion }}"
+      failTaskOnFailedTests: false
+      testRunTitle: "[NON-CORE] Test os: ${{ parameters.osName }}, node: ${{ parameters.nodeVersion }}"
     displayName: Publish non-core test results
     condition: always()
 
   # Disable for now as e2e test are disabled - REMOVE BEFORE MERGING
-  # - publish: ./core/packages/playground-website/test-results
-  #   artifact: "uitestresults-${{ parameters.poolName }}-node-${{ parameters.nodeVersion }}"
+  # - task: 1ES.PublishPipelineArtifact@1
   #   displayName: Publish UI tests artifacts
   #   condition: ne(variables['Agent.OS'], 'Windows_NT')
+  #   inputs:
+  #     path: : ./core/packages/playground-website/test-results
+  #     artifact: "uitestresults-${{ parameters.osName }}-node-${{ parameters.nodeVersion }}"

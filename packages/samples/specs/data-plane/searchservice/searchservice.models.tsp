@@ -46,15 +46,15 @@ model SearchIndexerDataSource {
 
 model SearchResourceEncryptionKey {
   @doc("The name of your Azure Key Vault key to be used to encrypt your data at rest.")
-  @projectedName("json", "keyVaultKeyName")
+  @encodedName("application/json", "keyVaultKeyName")
   keyName: string;
 
   @doc("The version of your Azure Key Vault key to be used to encrypt your data at rest.")
-  @projectedName("json", "keyVaultKeyVersion")
+  @encodedName("application/json", "keyVaultKeyVersion")
   keyVersion: string;
 
   @doc("The URI of your Azure Key Vault, also referred to as DNS name, that contains the key to be used to encrypt your data at rest. An example URI might be https://my-keyvault-name.vault.azure.net.")
-  @projectedName("json", "keyVaultUri")
+  @encodedName("application/json", "keyVaultUri")
   vaultUri: string;
 
   @doc("Optional Azure Active Directory credentials used for accessing your Azure Key Vault. Not required if using managed identity instead.")
@@ -72,7 +72,9 @@ model AzureActiveDirectoryApplicationCredentials {
   applicationSecret?: string;
 }
 
-enum SearchIndexerDataSourceType {
+union SearchIndexerDataSourceType {
+  string,
+
   @doc("Indicates an Azure SQL datasource.")
   AzureSql: "azuresql",
 
@@ -270,7 +272,9 @@ model IndexingParametersConfiguration {
 }
 
 @doc("Represents the parsing mode for indexing from an Azure blob data source.")
-enum BlobIndexerParsingMode {
+union BlobIndexerParsingMode {
+  string,
+
   @doc("Set to default for normal file processing.")
   Default: "default",
 
@@ -291,7 +295,9 @@ enum BlobIndexerParsingMode {
 }
 
 @doc("Specifies the data to extract from Azure blob storage and tells the indexer which data to extract from image content when \"imageAction\" is set to a value other than \"none\".  This applies to embedded image content in a .PDF or other application, or image files such as .jpg and .png, in Azure blobs.")
-enum BlobIndexerDataToExtract {
+union BlobIndexerDataToExtract {
+  string,
+
   @doc("Indexes just the standard blob properties and user-specified metadata.")
   StorageMetadata: "storageMetadata",
 
@@ -303,7 +309,9 @@ enum BlobIndexerDataToExtract {
 }
 
 @doc("Determines how to process embedded images and image files in Azure blob storage.  Setting the \"imageAction\" configuration to any value other than \"none\" requires that a skillset also be attached to that indexer.")
-enum BlobIndexerImageAction {
+union BlobIndexerImageAction {
+  string,
+
   @doc("Ignores embedded images or image files in the data set.  This is the default.")
   None: "none",
 
@@ -315,7 +323,9 @@ enum BlobIndexerImageAction {
 }
 
 @doc("Determines algorithm for text extraction from PDF files in Azure blob storage.")
-enum BlobIndexerPDFTextRotationAlgorithm {
+union BlobIndexerPDFTextRotationAlgorithm {
+  string,
+
   @doc("Leverages normal text extraction.  This is the default.")
   None: "none",
 
@@ -324,12 +334,14 @@ enum BlobIndexerPDFTextRotationAlgorithm {
 }
 
 @doc("Specifies the environment in which the indexer should execute.")
-enum IndexerExecutionEnvironment {
+union IndexerExecutionEnvironment {
+  string,
+
   @doc("Indicates that Azure Cognitive Search can determine where the indexer should execute. This is the default environment when nothing is specified and is the recommended value.")
-  standard,
+  standard: "standard",
 
   @doc("Indicates that the indexer should run with the environment provisioned specifically for the search service. This should only be specified as the execution environment if the indexer needs to access resources securely over shared private link resources.")
-  private,
+  private: "private",
 }
 
 @doc("Defines a mapping between a field in a data source and a target field in an index.")
@@ -377,7 +389,9 @@ model SearchIndexerStatus {
 }
 
 @doc("Represents the overall indexer status.")
-enum IndexerStatus {
+union IndexerStatus {
+  string,
+
   @doc("Indicates that the indexer is in an unknown state.")
   Unknown: "unknown",
 
@@ -417,13 +431,13 @@ model IndexerExecutionResult {
   warnings: SearchIndexerWarning[];
 
   @doc("The number of items that were processed during this indexer execution. This includes both successfully processed items and items where indexing was attempted but failed.")
-  @projectedName("json", "itemsProcessed")
+  @encodedName("application/json", "itemsProcessed")
   @visibility("read")
   itemCount: int32;
 
   @doc("The number of items that failed to be indexed during this indexer execution.")
   @visibility("read")
-  @projectedName("json", "itemsFailed")
+  @encodedName("application/json", "itemsFailed")
   failedItemCount: int32;
 
   @doc("Change tracking state with which an indexer execution started.")
@@ -436,7 +450,9 @@ model IndexerExecutionResult {
 }
 
 @doc("Represents the status of an individual indexer execution.")
-enum IndexerExecutionStatus {
+union IndexerExecutionStatus {
+  string,
+
   @doc("An indexer invocation has failed, but the failure may be transient. Indexer invocations will continue per schedule.")
   TransientFailure: "transientFailure",
 
@@ -451,7 +467,9 @@ enum IndexerExecutionStatus {
 }
 
 @doc("Details the status of an individual indexer execution.")
-enum IndexerExecutionStatusDetail {
+union IndexerExecutionStatusDetail {
+  string,
+
   @doc("Indicates that the reset that occurred was for a call to ResetDocs.")
   ResetDocs: "resetDocs",
 }
@@ -481,7 +499,9 @@ model IndexerCurrentState {
 }
 
 @doc("Represents the mode the indexer is executing in.")
-enum IndexingMode {
+union IndexingMode {
+  string,
+
   @doc("The indexer is indexing all documents in the datasource.")
   IndexingAllDocs: "indexingAllDocs",
 
