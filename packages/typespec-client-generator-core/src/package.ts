@@ -55,6 +55,7 @@ import {
   getHashForType,
   getSdkTypeBaseHelper,
   isNullable,
+  updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -366,8 +367,7 @@ function getSdkMethodParameter(
       nullable: false,
       discriminator: false,
       serializedName: name,
-      onClient: false,
-      isApiVersionParam: false,
+      ...updateWithApiVersionInformation(context, type),
     });
   }
   return diagnostics.wrap({

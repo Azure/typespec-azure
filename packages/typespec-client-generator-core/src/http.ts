@@ -394,7 +394,14 @@ export function getCorrespondingMethodParams(
   serviceParam: SdkHttpParameter
 ): SdkModelPropertyType[] {
   if (serviceParam.isApiVersionParam) {
-    if (!context.__api_version_parameter) throw new Error("No api version on the client");
+    if (!context.__api_version_parameter) {
+      const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
+      if (!apiVersionParam) {
+        throw new Error("Can't find corresponding api version parameter");
+      }
+      if (apiVersionParam.type.kind === "model") throw new Error(apiVersionParam.type.name);
+      throw new Error(apiVersionParam.type.kind);
+    }
     return [context.__api_version_parameter];
   }
   const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
@@ -404,9 +411,9 @@ export function getCorrespondingMethodParams(
 
   const serviceParamType = serviceParam.type;
   if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
-    const serviceParamPropertyNames = Array.from(serviceParamType.properties.values()).map(
-      (x) => x.name
-    );
+    const serviceParamPropertyNames = Array.from(serviceParamType.properties.values())
+      .filter((x) => x.kind === "property")
+      .map((x) => x.name);
     // Here we have a spread method parameter
     let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
       serviceParamPropertyNames.includes(x.name)

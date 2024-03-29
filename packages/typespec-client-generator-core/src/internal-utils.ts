@@ -82,7 +82,7 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: ModelProperty
+  type: ModelProperty | Model
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;

@@ -19,7 +19,6 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
-  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
@@ -62,13 +61,8 @@ export function getDefaultApiVersion(
  * @param parameter
  * @returns
  */
-export function isApiVersion(
-  context: TCGCContext,
-  parameter: HttpOperationParameter | ModelProperty
-): boolean {
-  return (
-    parameter.name.toLowerCase() === "apiversion" || parameter.name.toLowerCase() === "api-version"
-  );
+export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
+  return ["apiversion", "apiversionparameter", "api-version"].includes(type.name.toLowerCase());
 }
 
 /**
