@@ -3010,7 +3010,7 @@ describe("typespec-client-generator-core: types", () => {
       const formDataMethod = runner.context.experimental_sdkPackage.clients[0].methods[0];
       strictEqual(formDataMethod.kind, "basic");
       strictEqual(formDataMethod.name, "upload");
-      strictEqual(formDataMethod.parameters.length, 2);
+      strictEqual(formDataMethod.parameters.length, 3);
 
       const widgetFormParam = formDataMethod.parameters.find((x) => x.name === "widgetForm");
       ok(widgetFormParam);
@@ -3020,7 +3020,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(formDataMethod.parameters[0].type.name, "WidgetForm");
 
       const formDataOp = formDataMethod.operation;
-      strictEqual(formDataOp.parameters.length, 2);
+      strictEqual(formDataOp.parameters.length, 3);
+      ok(formDataOp.parameters.find((x) => x.name === "widgetName"));
       ok(formDataOp.parameters.find((x) => x.name === "accept" && x.kind === "header"));
       ok(formDataOp.parameters.find((x) => x.name === "contentType" && x.kind === "header"));
 

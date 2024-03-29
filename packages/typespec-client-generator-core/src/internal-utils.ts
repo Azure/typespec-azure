@@ -1,7 +1,6 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   Model,
-  ModelProperty,
   Namespace,
   Operation,
   Program,
@@ -82,7 +81,7 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: ModelProperty | Model
+  type: { name: string }
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;

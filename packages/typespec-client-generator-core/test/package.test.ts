@@ -2859,7 +2859,102 @@ describe("typespec-client-generator-core: package", () => {
       ok(clientRequestIdProperty);
       strictEqual(clientRequestIdProperty.kind, "header");
     });
+
+    it("multiple spread", async () => {
+      await runner.compile(`
+      @service({
+        title: "Pet Store Service",
+      })
+      namespace PetStore;
+      using TypeSpec.Rest.Resource;
+
+      @error
+      model PetStoreError {
+        code: int32;
+        message: string;
+      }
+
+      @resource("pets")
+      model Pet {
+        @key("petId")
+        id: int32;
+      }
+
+      @resource("checkups")
+      model Checkup {
+        @key("checkupId")
+        id: int32;
+
+        vetName: string;
+        notes: string;
+      }
+
+      interface PetCheckups
+        extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
+          ExtensionResourceList<Checkup, Pet, PetStoreError> {}
+      `);
+      const a = "b";
+    });
   });
+  describe("versioning", () => {
+    it("versioned service", async () => {
+      await runner.compile(`
+      @service({
+        title: "Pet Store Service",
+      })
+      @versioned(Versions)
+      namespace VersionedApi;
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      model ApiVersionParam {
+        @header apiVersion: Versions;
+      }
+
+      @discriminator("type")
+      model PetBase {
+        name: string;
+      }
+
+      model Dog extends PetBase {
+        type: "dog";
+        nextWalkTime: utcDateTime;
+
+        @madeOptional(Versions.v2)
+        walkerName?: string;
+
+        @added(Versions.v2)
+        commandList: string[];
+      }
+
+      @added(Versions.v2)
+      model Cat extends PetBase {
+        type: "cat";
+        catnipDose: int32;
+      }
+
+      @route("/")
+      interface MyService {
+        getPet(...ApiVersionParam): PetBase;
+
+        @added(Versions.v2)
+        @post
+        @route("/walkDog")
+        walkDog(...ApiVersionParam): OkResponse;
+
+        @removed(Versions.v2)
+        @post
+        @route("/walkCat")
+        walkCat(...ApiVersionParam): OkResponse;
+      }
+
+      `)
+
+    });
+
+  })
 });
 
 function getServiceMethodOfClient(

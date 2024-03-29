@@ -7,6 +7,7 @@ import {
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
+  isKey,
 } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
@@ -224,7 +225,7 @@ function getSdkBasicServiceMethod<
   const methodParameters: SdkMethodParameter[] = [];
   const spreadModelNames: string[] = [];
   for (const prop of operation.parameters.properties.values()) {
-    if (prop.sourceProperty?.model?.name) {
+    if (prop.sourceProperty?.model?.name && !isKey(context.program, prop.sourceProperty)) {
       if (!spreadModelNames.includes(prop.sourceProperty.model.name)) {
         spreadModelNames.push(prop.sourceProperty.model.name);
         methodParameters.push(
