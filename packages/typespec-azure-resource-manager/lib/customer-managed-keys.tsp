@@ -30,7 +30,7 @@ model CustomerManagedKeyEncryption {
   keyEncryptionIdentity?: KeyEncryptionIdentity;
 
   @doc("User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.")
-  userAssignedIdentityResourceId?: ResourceIdentifier<[
+  userAssignedIdentityResourceId?: Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.ManagedIdentity/userAssignedIdentities";
     }
