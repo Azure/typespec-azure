@@ -10,7 +10,7 @@ Azure stopped treating enums as extensible.
 
 ## Workaround
 
-To define an extensible enum you will need instead to use a `union` where one of the variant is `string`.
+To define an extensible enum you will need instead to use a `union` where one of the variants is `string`.
 If you see the linter warning [`@azure-tools/typespec-azure-core/no-enum`](https://tspwebsitepr.z22.web.core.windows.net/typespec-azure/prs/389/docs/next/libraries/azure-core/rules/no-enum) it also offer an automatic codefix (click the (ℹ) bulb in VS Code)
 For example
 
