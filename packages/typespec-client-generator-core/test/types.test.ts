@@ -2983,6 +2983,57 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(errorResponse.isFormDataType, false);
       ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
     });
+
+    it("expands model into formData parameters", async function () {
+      await runner.compileWithBuiltInService(`
+        @doc("A widget.")
+        model Widget {
+          @key("widgetName")
+          name: string;
+          displayName: string;
+          description: string;
+          color: string;
+        }
+
+        model WidgetForm is Widget {
+          @header("content-type")
+          contentType: "multipart/form-data";
+        }
+
+        @route("/widgets")
+        interface Widgets {
+          @route(":upload")
+          @post
+          upload(...WidgetForm): Widget;
+        }
+        `);
+      const formDataMethod = runner.context.experimental_sdkPackage.clients[0].methods[0];
+      strictEqual(formDataMethod.kind, "basic");
+      strictEqual(formDataMethod.name, "upload");
+      strictEqual(formDataMethod.parameters.length, 2);
+
+      const widgetFormParam = formDataMethod.parameters.find((x) => x.name === "widgetForm");
+      ok(widgetFormParam);
+      ok(formDataMethod.parameters.find((x) => x.name === "accept"));
+      strictEqual(formDataMethod.parameters[0].name, "widgetForm");
+      strictEqual(formDataMethod.parameters[0].type.kind, "model");
+      strictEqual(formDataMethod.parameters[0].type.name, "WidgetForm");
+
+      const formDataOp = formDataMethod.operation;
+      strictEqual(formDataOp.parameters.length, 2);
+      ok(formDataOp.parameters.find((x) => x.name === "accept" && x.kind === "header"));
+      ok(formDataOp.parameters.find((x) => x.name === "contentType" && x.kind === "header"));
+
+      const formDataBodyParam = formDataOp.bodyParam;
+      ok(formDataBodyParam);
+      strictEqual(formDataBodyParam.type.kind, "model");
+      strictEqual(formDataBodyParam.type.name, "Widget");
+      strictEqual(formDataBodyParam.correspondingMethodParams.length, 4);
+      deepStrictEqual(
+        formDataBodyParam.correspondingMethodParams.map((x) => x.name).sort(),
+        ["color", "description", "displayName", "name"].sort()
+      );
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {

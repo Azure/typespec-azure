@@ -401,23 +401,26 @@ export function getCorrespondingMethodParams(
   if (correspondingMethodParameter) {
     return [correspondingMethodParameter];
   }
-  function paramInProperties(param: SdkModelPropertyType, type: SdkType): boolean {
-    if (type.kind !== "model") return false;
-    return Array.from(type.properties.values())
-      .filter((x) => x.kind === "property")
-      .map((x) => x.name)
-      .includes(param.name);
-  }
+
   const serviceParamType = serviceParam.type;
   if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
-    // Here we have a spread body parameter
-    const correspondingProperties = methodParameters.filter((x) =>
-      paramInProperties(x, serviceParamType)
+    const serviceParamPropertyNames = Array.from(serviceParamType.properties.values()).map(
+      (x) => x.name
     );
-    if (correspondingProperties.length !== serviceParamType.properties.length) {
-      throw new Error("Can't find corresponding properties for spread body parameter");
+    // Here we have a spread method parameter
+    let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
+      serviceParamPropertyNames.includes(x.name)
+    );
+    if (correspondingProperties.length === serviceParamType.properties.length)
+      return correspondingProperties;
+    // now, we check if the service param properties are a subset of the method params
+    if (methodParameters.length === 1 && methodParameters[0].type.kind === "model") {
+      correspondingProperties = methodParameters[0].type.properties.filter((x) =>
+        serviceParamPropertyNames.includes(x.name)
+      );
+      if (correspondingProperties) return correspondingProperties;
     }
-    return correspondingProperties;
+    throw new Error("Can't find corresponding properties for spread body parameter");
   }
   for (const methodParam of methodParameters) {
     if (methodParam.type.kind === "model") {
