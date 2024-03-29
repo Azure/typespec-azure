@@ -1962,21 +1962,6 @@
       "type": "string",
       "description": "The ETag (or entity tag) HTTP response header is an identifier for a specific version of a resource.\nIt lets caches be more efficient and save bandwidth, as a web server does not need to resend a full response if the content was not changed.\n\nIt is a string of ASCII characters placed between double quotes, like \"675af34563dc-tr34\"."
     },
-    "CustomResult": {
-      "type": "object",
-      "properties": {
-        "MyResult": {
-          "type": "string"
-        },
-        "MyError": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "MyResult",
-        "MyError"
-      ]
-    },
     "Manufacturer": {
       "type": "object",
       "description": "A manufacturer of widgets.",
@@ -2021,8 +2006,7 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [
@@ -2044,8 +2028,7 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [
@@ -2067,8 +2050,7 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [

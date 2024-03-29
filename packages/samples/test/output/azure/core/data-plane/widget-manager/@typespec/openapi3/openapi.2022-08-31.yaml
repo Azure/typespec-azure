@@ -1433,16 +1433,6 @@ components:
       type: string
       format: uuid
       description: Universally Unique Identifier
-    CustomResult:
-      type: object
-      required:
-        - MyResult
-        - MyError
-      properties:
-        MyResult:
-          type: string
-        MyError:
-          type: string
     Manufacturer:
       type: object
       required:
@@ -1481,7 +1471,6 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
-          readOnly: true
       description: Paged collection of Manufacturer items
     PagedWidget:
       type: object
@@ -1497,7 +1486,6 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
-          readOnly: true
       description: Paged collection of Widget items
     PagedWidgetPart:
       type: object
@@ -1513,7 +1501,6 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
-          readOnly: true
       description: Paged collection of WidgetPart items
     RepeatabilityResult:
       type: string
@@ -1586,13 +1573,15 @@ components:
           description: The number of times the widget was repaired.
       description: Provides analytics about the use and maintenance of a Widget.
     WidgetColor:
-      type: string
-      enum:
-        - Black
-        - White
-        - Red
-        - Green
-        - Blue
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - Black
+            - White
+            - Red
+            - Green
+            - Blue
       description: The color of a widget.
     WidgetCreateOrUpdate:
       type: object
@@ -1669,10 +1658,12 @@ components:
           description: The date and time when the request was completed.
       description: A submitted repair request for a widget.
     WidgetRepairState:
-      type: string
-      enum:
-        - Succeeded
-        - Failed
-        - Canceled
-        - SentToManufacturer
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - Succeeded
+            - Failed
+            - Canceled
+            - SentToManufacturer
       description: The repair state of a widget.

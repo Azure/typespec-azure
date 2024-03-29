@@ -1,0 +1,8 @@
+emit:
+  - "@azure-tools/typespec-autorest"
+  - "@typespec/openapi3"
+linter:
+  extends:
+    # - "@azure-tools/typespec-azure-core/all"
+  enable:
+    "@azure-tools/typespec-azure-core/no-enum": true
