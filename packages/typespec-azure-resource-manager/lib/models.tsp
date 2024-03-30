@@ -90,40 +90,13 @@ model ProviderNamespace<Resource extends {}> {
 //#region Common Azure Resource Manager type definitions
 
 /**
- * A type definition that refers the id to an Azure Resource Manager resource.
- *
- * Sample usage:
- *   otherArmId: ResourceIdentifier;
- *   networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
- *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
- * @template AllowedResourceTypes An array of allowed resource types for the resource reference
+ * Use Azure.Core.armResourceIdentifier<AllowedResourceTypes>
  */
-@doc("A type definition that refers the id to an Azure Resource Manager resource.")
-@format("arm-id")
-@OpenAPI.extension(
-  "x-ms-arm-id-details",
-  {
-    allowedResources: AllowedResourceTypes,
-  }
-)
-scalar ResourceIdentifier<AllowedResourceTypes extends ResourceIdentifierAllowedResource[] = []>
-  extends string;
+#deprecated "Use Azure.Core.armResourceIdentifier<AllowedResourceTypes> instead."
+alias ResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierAllowedResource[] = never> = Azure.Core.armResourceIdentifier<AllowedResourceTypes>;
 
-/**
- * Used in ResourceIdentifier definition to represent a particular type of Azure Resource Manager resource, enabling constraints based on resource type.
- * See [link](https://github.com/Azure/autorest/tree/main/docs/extensions#schema)
- */
-@doc("Optional definition represents a particular type of Azure Resource Manager resource which can be referred to by a ResourceIdentifier.")
-model ResourceIdentifierAllowedResource {
-  @doc("The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.")
-  type: string;
-
-  @doc("""
-    An array of scopes. If not specified, the default scope is ["ResourceGroup"].
-    See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). 
-    """)
-  scopes?: string[] = [];
-}
+#deprecated "Use ArmResourceIdentifierAllowedResource instead."
+alias ResourceIdentifierAllowedResource = ArmResourceIdentifierAllowedResource;
 
 /**
  * Standard terminal provisioning state of resource type. You can spread into your
