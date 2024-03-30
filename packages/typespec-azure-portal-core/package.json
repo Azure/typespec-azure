@@ -51,7 +51,7 @@
     "c8": "^9.1.0",
     "eslint": "^8.57.0",
     "source-map-support": "~0.5.21",
-    "typescript": "~5.4.2",
+    "typescript": "~5.4.3",
     "vitest": "^1.4.0"
   },
   "exports": {
