@@ -2893,68 +2893,66 @@ describe("typespec-client-generator-core: package", () => {
         extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
           ExtensionResourceList<Checkup, Pet, PetStoreError> {}
       `);
-      const a = "b";
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 4);
+      deepStrictEqual(
+        sdkPackage.models.map((x) => x.name).sort(),
+        ["CheckupCollectionWithNextLink", "Checkup", "PetStoreError", "CheckupUpdate"].sort()
+      );
+      const createOrUpdate = sdkPackage.clients[0].methods[0];
+      strictEqual(createOrUpdate.kind, "basic");
+      strictEqual(createOrUpdate.name, "createOrUpdate");
+      strictEqual(createOrUpdate.parameters.length, 5);
+      strictEqual(createOrUpdate.parameters[0].name, "petId");
+      strictEqual(createOrUpdate.parameters[1].name, "checkupId");
+      strictEqual(createOrUpdate.parameters[2].name, "resource");
+      strictEqual(createOrUpdate.parameters[2].type.kind, "model");
+      strictEqual(createOrUpdate.parameters[2].type.name, "CheckupUpdate");
+      strictEqual(createOrUpdate.parameters[3].name, "contentType");
+      strictEqual(createOrUpdate.parameters[4].name, "accept");
+
+      const opParams = createOrUpdate.operation.parameters;
+      strictEqual(opParams.length, 4);
+      ok(opParams.find((x) => x.kind === "path" && x.serializedName === "petId"));
+      ok(opParams.find((x) => x.kind === "path" && x.serializedName === "checkupId"));
+      ok(opParams.find((x) => x.kind === "header" && x.serializedName === "Content-Type"));
+      ok(opParams.find((x) => x.kind === "header" && x.serializedName === "Accept"));
+      strictEqual(createOrUpdate.operation.responses.size, 2);
+      const response200 = createOrUpdate.operation.responses.get(200);
+      ok(response200);
+      ok(response200.type);
+      strictEqual(response200.type.kind, "model");
+      strictEqual(response200.type.name, "Checkup");
+      const response201 = createOrUpdate.operation.responses.get(201);
+      ok(response201);
+      ok(response201.type);
+      deepStrictEqual(response200.type, response201?.type);
     });
   });
   describe("versioning", () => {
-    it("versioned service", async () => {
-      await runner.compile(`
-      @service({
-        title: "Pet Store Service",
-      })
-      @versioned(Versions)
-      namespace VersionedApi;
-      enum Versions {
-        v1,
-        v2,
-      }
-
+    it("define own api version param", async () => {
+      await runner.compileWithBuiltInService(`
       model ApiVersionParam {
         @header apiVersion: Versions;
       }
 
-      @discriminator("type")
-      model PetBase {
-        name: string;
+      enum Versions {
+        v1, v2
       }
 
-      model Dog extends PetBase {
-        type: "dog";
-        nextWalkTime: utcDateTime;
-
-        @madeOptional(Versions.v2)
-        walkerName?: string;
-
-        @added(Versions.v2)
-        commandList: string[];
-      }
-
-      @added(Versions.v2)
-      model Cat extends PetBase {
-        type: "cat";
-        catnipDose: int32;
-      }
-
-      @route("/")
-      interface MyService {
-        getPet(...ApiVersionParam): PetBase;
-
-        @added(Versions.v2)
-        @post
-        @route("/walkDog")
-        walkDog(...ApiVersionParam): OkResponse;
-
-        @removed(Versions.v2)
-        @post
-        @route("/walkCat")
-        walkCat(...ApiVersionParam): OkResponse;
-      }
-
-      `)
-
+      op getPet(...ApiVersionParam): void;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.operation.parameters.length, 1);
+      const apiVersionParam = method.operation.parameters[0];
+      strictEqual(apiVersionParam.kind, "header");
+      strictEqual(apiVersionParam.serializedName, "api-version");
+      strictEqual(apiVersionParam.name, "apiVersion");
+      strictEqual(apiVersionParam.onClient, true);
+      strictEqual(apiVersionParam.isApiVersionParam, true);
     });
-
-  })
+  });
 });
 
 function getServiceMethodOfClient(

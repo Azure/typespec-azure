@@ -3015,13 +3015,14 @@ describe("typespec-client-generator-core: types", () => {
       const widgetFormParam = formDataMethod.parameters.find((x) => x.name === "widgetForm");
       ok(widgetFormParam);
       ok(formDataMethod.parameters.find((x) => x.name === "accept"));
-      strictEqual(formDataMethod.parameters[0].name, "widgetForm");
-      strictEqual(formDataMethod.parameters[0].type.kind, "model");
-      strictEqual(formDataMethod.parameters[0].type.name, "WidgetForm");
+      strictEqual(formDataMethod.parameters[0].name, "name");
+      strictEqual(formDataMethod.parameters[0].type.kind, "string");
+      strictEqual(formDataMethod.parameters[1].name, "widgetForm");
+      strictEqual(formDataMethod.parameters[1].type.kind, "model");
+      strictEqual(formDataMethod.parameters[1].type.name, "WidgetForm");
 
       const formDataOp = formDataMethod.operation;
-      strictEqual(formDataOp.parameters.length, 3);
-      ok(formDataOp.parameters.find((x) => x.name === "widgetName"));
+      strictEqual(formDataOp.parameters.length, 2);
       ok(formDataOp.parameters.find((x) => x.name === "accept" && x.kind === "header"));
       ok(formDataOp.parameters.find((x) => x.name === "contentType" && x.kind === "header"));
 
