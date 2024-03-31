@@ -25,6 +25,7 @@ import {
   setTypeSpecNamespace,
   StringLiteral,
   Type,
+  typespecTypeToJson,
   Union,
   UnionVariant,
   walkPropertiesInherited,
@@ -350,7 +351,12 @@ export function extractLroStates(
 
         return diagnostics.wrap(undefined);
       } else {
-        storeLroState(program, result, option.value, variant);
+        storeLroState(
+          program,
+          result,
+          typeof variant.name === "string" ? variant.name : option.value,
+          variant
+        );
       }
     }
   } else {
@@ -1219,6 +1225,60 @@ export function getAsEmbeddingVector(
   return program.stateMap(embeddingVectorKey).get(model);
 }
 
+const armResourceIdentifierConfigKey = createStateSymbol("armResourceIdentifierConfig");
+
+export interface ArmResourceIdentifierConfig {
+  readonly allowedResources: readonly ArmResourceIdentifierAllowedResource[];
+}
+
+export type ArmResourceDeploymentScope =
+  | "Tenant"
+  | "Subscription"
+  | "ResourceGroup"
+  | "ManagementGroup"
+  | "Extension";
+
+export interface ArmResourceIdentifierAllowedResource {
+  /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
+  readonly type: string;
+
+  /**
+   * An array of scopes. If not specified, the default scope is ["ResourceGroup"].
+   * See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes).
+   */
+  readonly scopes?: ArmResourceDeploymentScope[];
+}
+
+/** @internal */
+export function $armResourceIdentifierConfig(
+  context: DecoratorContext,
+  entity: Scalar,
+  config: Type
+) {
+  if (config.kind !== "Model") return;
+  const prop = config.properties.get("allowedResources");
+  if (prop === undefined || prop.type.kind !== "Tuple") return;
+  const [data, diagnostics] = typespecTypeToJson<ArmResourceIdentifierConfig>(
+    prop.type,
+    context.getArgumentTarget(0)!
+  );
+  context.program.reportDiagnostics(diagnostics);
+
+  if (data) {
+    context.program
+      .stateMap(armResourceIdentifierConfigKey)
+      .set(entity, { allowedResources: data });
+  }
+}
+
+/** Returns the config attached to an armResourceIdentifierScalar */
+export function getArmResourceIdentifierConfig(
+  program: Program,
+  entity: Scalar
+): ArmResourceIdentifierConfig {
+  return program.stateMap(armResourceIdentifierConfigKey).get(entity);
+}
+
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
   "Foundations.Private",
@@ -1227,5 +1287,6 @@ setTypeSpecNamespace(
   $ensureResourceType,
   $needsRoute,
   $ensureVerb,
-  $embeddingVector
+  $embeddingVector,
+  $armResourceIdentifierConfig
 );
