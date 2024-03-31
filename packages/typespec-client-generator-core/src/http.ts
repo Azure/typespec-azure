@@ -30,6 +30,7 @@ import {
   SdkHttpResponse,
   SdkMethodParameter,
   SdkModelPropertyType,
+  SdkModelType,
   SdkParameter,
   SdkPathParameter,
   SdkQueryParameter,
@@ -417,6 +418,14 @@ export function getCorrespondingMethodParams(
       .filter((x) => x.kind === "property")
       .map((x) => x.name);
     // Here we have a spread method parameter
+
+    // easy case is if the spread method parameter directly has the entire body as a property
+    const directBodyProperty = methodParameters
+      .map((x) => x.type)
+      .filter((x): x is SdkModelType => x.kind === "model")
+      .flatMap((x) => x.properties)
+      .find((x) => x.type === serviceParamType);
+    if (directBodyProperty) return [directBodyProperty];
     let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
       serviceParamPropertyNames.includes(x.name)
     );

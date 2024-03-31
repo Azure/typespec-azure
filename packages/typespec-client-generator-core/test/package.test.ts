@@ -2928,6 +2928,65 @@ describe("typespec-client-generator-core: package", () => {
       ok(response201.type);
       deepStrictEqual(response200.type, response201?.type);
     });
+    it("spread with @body in model", async () => {
+      await runner.compileWithBuiltInService(`
+        model Shelf {
+          name: string;
+          theme?: string;
+        }
+        model CreateShelfRequest {
+          @body
+          body: Shelf;
+        }
+        op createShelf(...CreateShelfRequest): Shelf;
+        `);
+      const method = getServiceMethodOfClient(runner.context.experimental_sdkPackage);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      const shelfModel = models.find((x) => x.name === "Shelf");
+      ok(shelfModel);
+      strictEqual(method.parameters.length, 3);
+      const createShelfRequest = method.parameters[0];
+      strictEqual(createShelfRequest.kind, "method");
+      strictEqual(createShelfRequest.name, "createShelfRequest");
+      strictEqual(createShelfRequest.optional, false);
+      strictEqual(createShelfRequest.isGeneratedName, true);
+      strictEqual(createShelfRequest.type.kind, "model");
+      strictEqual(createShelfRequest.type.properties.length, 1);
+      deepStrictEqual(createShelfRequest.type.properties[0].type, shelfModel);
+      const contentTypeMethoParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethoParam);
+      const acceptMethodParam = method.parameters.find((x) => x.name === "accept");
+      ok(acceptMethodParam);
+
+      const op = method.operation;
+      strictEqual(op.parameters.length, 2);
+      ok(
+        op.parameters.find(
+          (x) =>
+            x.kind === "header" &&
+            x.serializedName === "Content-Type" &&
+            x.correspondingMethodParams[0] === contentTypeMethoParam
+        )
+      );
+      ok(
+        op.parameters.find(
+          (x) =>
+            x.kind === "header" &&
+            x.serializedName === "Accept" &&
+            x.correspondingMethodParams[0] === acceptMethodParam
+        )
+      );
+
+      const bodyParam = op.bodyParam;
+      ok(bodyParam);
+      strictEqual(bodyParam.kind, "body");
+      strictEqual(bodyParam.name, "body");
+      strictEqual(bodyParam.optional, false);
+      strictEqual(bodyParam.isGeneratedName, false);
+      deepStrictEqual(bodyParam.type, shelfModel);
+      deepStrictEqual(bodyParam.correspondingMethodParams, createShelfRequest.type.properties);
+    });
   });
   describe("versioning", () => {
     it("define own api version param", async () => {
