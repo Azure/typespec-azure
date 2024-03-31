@@ -354,7 +354,8 @@ function getSdkMethodParameter(
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (type.kind === "Model") {
-    const name = camelCase(getLibraryName(context, type) ?? "body");
+    const libraryName = getLibraryName(context, type);
+    const name = camelCase(libraryName ?? "body");
     const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
     return diagnostics.wrap({
       kind: "method",
@@ -364,6 +365,7 @@ function getSdkMethodParameter(
       type: propertyType,
       nameInClient: name,
       name,
+      isGeneratedName: Boolean(libraryName),
       optional: false,
       nullable: false,
       discriminator: false,
