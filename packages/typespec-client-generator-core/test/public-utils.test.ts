@@ -170,7 +170,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("not api version param", async () => {
       const { func } = (await runner.compile(`
-        @test op func(@path notApiVersion: string): void;
+        @test op func(@path foo: string): void;
       `)) as { func: Operation };
 
       const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
