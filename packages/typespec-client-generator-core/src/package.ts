@@ -162,6 +162,17 @@ function getSdkLroServiceMethod<
       getClientTypeWithDiagnostics(context, finalResult)
     );
   }
+  let resultPath = metadata.finalResultPath ?? metadata.logicalPath;
+  if (!resultPath) {
+    // keep this specifically as envelopeResult and not finalEnvelopeResult, bc this is a very specific scenario
+    if (
+      metadata.envelopeResult !== metadata.logicalResult &&
+      basicServiceMethod.operation.verb === "post"
+    ) {
+      resultPath = "result";
+    }
+  }
+  basicServiceMethod.response;
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
@@ -174,12 +185,7 @@ function getSdkLroServiceMethod<
       )
     ),
     getResponseMapping(): string | undefined {
-      return (
-        metadata.logicalPath ??
-        (metadata.envelopeResult !== metadata.logicalResult && this.operation.verb === "post"
-          ? "result"
-          : undefined)
-      );
+      return resultPath;
     },
   });
 }
