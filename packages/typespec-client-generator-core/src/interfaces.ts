@@ -25,7 +25,11 @@ export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
+  /**
+   * @deprecated This property is deprecated. Use `.sdkPackage` instead.
+   */
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
+  sdkPackage: SdkPackage<TServiceOperation>;
   __clients?: SdkClientType<TServiceOperation>[];
 }
 
