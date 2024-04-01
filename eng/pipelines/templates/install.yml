@@ -18,13 +18,13 @@ steps:
   - task: Cache@2
     inputs:
       key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-      path: $(Pipeline.Workspace)/.pnpm-store
+      path: $(Build.SourcesDirectory)/.pnpm-store
     displayName: Cache pnpm store
 
   - script: |
       corepack enable
       corepack prepare pnpm@latest-8 --activate
-      pnpm config set store-dir $(Pipeline.Workspace)/.pnpm-store
+      pnpm config set store-dir $(Build.SourcesDirectory)/.pnpm-store
     displayName: "Setup pnpm"
 
   - script: |
