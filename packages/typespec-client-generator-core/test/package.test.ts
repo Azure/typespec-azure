@@ -1342,170 +1342,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(correspondingContentTypeMethodParams[0], methodContentTypeParam);
     });
 
-    it("body spread", async () => {
-      await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
-        namespace My.Service;
-
-        model Input {
-          key: string;
-        }
-
-        op myOp(...Input): void;
-        `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(method.name, "myOp");
-      strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 2);
-
-      const methodParam = method.parameters.find((x) => x.name === "input");
-      ok(methodParam);
-      strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "model");
-
-      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeParam);
-      strictEqual(contentTypeParam.clientDefaultValue, undefined);
-      strictEqual(contentTypeParam.type.kind, "constant");
-      strictEqual(contentTypeParam.onClient, false);
-
-      const serviceOperation = method.operation;
-      const bodyParameter = serviceOperation.bodyParam;
-      ok(bodyParameter);
-
-      strictEqual(bodyParameter.kind, "body");
-      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
-      strictEqual(bodyParameter.defaultContentType, "application/json");
-      strictEqual(bodyParameter.onClient, false);
-      strictEqual(bodyParameter.optional, false);
-      strictEqual(bodyParameter.type, sdkPackage.models[0]);
-
-      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
-      strictEqual(correspondingMethodParams.length, 1);
-      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
-    });
-
-    it("body alias spread", async () => {
-      await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
-        namespace My.Service;
-
-        alias BodyParameter = {
-          name: string;
-        };
-
-        op myOp(...BodyParameter): void;
-        `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(method.name, "myOp");
-      strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 2);
-
-      const methodParam = method.parameters.find((x) => x.name === "name");
-      ok(methodParam);
-      strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
-
-      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeMethodParam);
-      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
-      strictEqual(contentTypeMethodParam.type.kind, "constant");
-
-      const serviceOperation = method.operation;
-      const bodyParameter = serviceOperation.bodyParam;
-      ok(bodyParameter);
-      strictEqual(bodyParameter.kind, "body");
-      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
-      strictEqual(bodyParameter.defaultContentType, "application/json");
-      strictEqual(bodyParameter.onClient, false);
-      strictEqual(bodyParameter.optional, false);
-      strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.properties.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(bodyParameter.type.properties[0].nameInClient, "name");
-      strictEqual(bodyParameter.type.properties[0].name, "name");
-
-      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
-      strictEqual(correspondingMethodParams.length, 1);
-
-      strictEqual(
-        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
-        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
-      );
-      strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
-    });
-
-    it("spread with discriminate type with implicit property", async () => {
-      await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
-        namespace My.Service;
-
-        @discriminator("kind")
-        model Pet {
-          name?: string;
-        }
-
-        model Dog {
-          kind: "dog";
-        }
-
-        model Cat {
-          kind: "cat";
-        }
-
-        op test(...Pet): void;
-        `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(method.name, "test");
-      strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 2);
-
-      const methodParam = method.parameters.find((x) => x.name === "pet");
-      ok(methodParam);
-      strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "model");
-
-      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeMethodParam);
-      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
-      strictEqual(contentTypeMethodParam.type.kind, "constant");
-
-      const serviceOperation = method.operation;
-      const bodyParameter = serviceOperation.bodyParam;
-      ok(bodyParameter);
-      strictEqual(bodyParameter.kind, "body");
-      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
-      strictEqual(bodyParameter.defaultContentType, "application/json");
-      strictEqual(bodyParameter.onClient, false);
-      strictEqual(bodyParameter.optional, false);
-      strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.properties.length, 2);
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(bodyParameter.type.properties[0].nameInClient, "kind");
-      strictEqual(bodyParameter.type.properties[0].name, "kind");
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(bodyParameter.type.properties[1].nameInClient, "name");
-      strictEqual(bodyParameter.type.properties[1].name, "name");
-
-      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
-      strictEqual(correspondingMethodParams.length, 1);
-      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
-    });
-
     it("parameter grouping", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
         @service({})
@@ -2859,8 +2695,172 @@ describe("typespec-client-generator-core: package", () => {
       ok(clientRequestIdProperty);
       strictEqual(clientRequestIdProperty.kind, "header");
     });
+  });
+  describe("spread", async function () {
+    it("plain model with no decorators", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
 
-    it("multiple spread", async () => {
+        model Input {
+          key: string;
+        }
+
+        op myOp(...Input): void;
+        `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 2);
+
+      const methodParam = method.parameters.find((x) => x.name === "input");
+      ok(methodParam);
+      strictEqual(methodParam.kind, "method");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "model");
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      strictEqual(contentTypeParam.clientDefaultValue, undefined);
+      strictEqual(contentTypeParam.type.kind, "constant");
+      strictEqual(contentTypeParam.onClient, false);
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
+      strictEqual(bodyParameter.defaultContentType, "application/json");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+
+      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
+      strictEqual(correspondingMethodParams.length, 1);
+      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
+    });
+
+    it("alias with no decorators", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+
+        alias BodyParameter = {
+          name: string;
+        };
+
+        op myOp(...BodyParameter): void;
+        `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 2);
+
+      const methodParam = method.parameters.find((x) => x.name === "name");
+      ok(methodParam);
+      strictEqual(methodParam.kind, "method");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "string");
+
+      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethodParam);
+      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
+      strictEqual(contentTypeMethodParam.type.kind, "constant");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+      strictEqual(bodyParameter.kind, "body");
+      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
+      strictEqual(bodyParameter.defaultContentType, "application/json");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type.kind, "model");
+      strictEqual(bodyParameter.type.properties.length, 1);
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(bodyParameter.type.properties[0].nameInClient, "name");
+      strictEqual(bodyParameter.type.properties[0].name, "name");
+
+      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
+      strictEqual(correspondingMethodParams.length, 1);
+
+      strictEqual(
+        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
+        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
+      );
+      strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
+    });
+
+    it("spread with discriminate type with implicit property", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+
+        @discriminator("kind")
+        model Pet {
+          name?: string;
+        }
+
+        model Dog {
+          kind: "dog";
+        }
+
+        model Cat {
+          kind: "cat";
+        }
+
+        op test(...Pet): void;
+        `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 2);
+
+      const methodParam = method.parameters.find((x) => x.name === "pet");
+      ok(methodParam);
+      strictEqual(methodParam.kind, "method");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "model");
+
+      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethodParam);
+      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
+      strictEqual(contentTypeMethodParam.type.kind, "constant");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+      strictEqual(bodyParameter.kind, "body");
+      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
+      strictEqual(bodyParameter.defaultContentType, "application/json");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type.kind, "model");
+      strictEqual(bodyParameter.type.properties.length, 2);
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(bodyParameter.type.properties[0].nameInClient, "kind");
+      strictEqual(bodyParameter.type.properties[0].name, "kind");
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(bodyParameter.type.properties[1].nameInClient, "name");
+      strictEqual(bodyParameter.type.properties[1].name, "name");
+
+      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
+      strictEqual(correspondingMethodParams.length, 1);
+      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
+    });
+    it("rest template spreading of multiple models", async () => {
       await runner.compile(`
       @service({
         title: "Pet Store Service",
@@ -2928,7 +2928,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(response201.type);
       deepStrictEqual(response200.type, response201?.type);
     });
-    it("spread with @body in model", async () => {
+    it("model with @body decorator", async () => {
       await runner.compileWithBuiltInService(`
         model Shelf {
           name: string;
