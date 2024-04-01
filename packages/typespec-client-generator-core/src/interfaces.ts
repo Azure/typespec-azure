@@ -25,7 +25,11 @@ export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
+  /**
+   * @deprecated This property is deprecated. Use `.sdkPackage` instead.
+   */
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
+  sdkPackage: SdkPackage<TServiceOperation>;
   __clients?: SdkClientType<TServiceOperation>[];
 }
 
@@ -420,6 +424,7 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   nullable: boolean;
+  resultPath?: string; // if exists, tells you how to get from the service response to the method response
 }
 
 export interface SdkServiceResponse {
@@ -477,6 +482,9 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
+  /**
+   * @deprecated This property is deprecated. Access .resultPath on the method response instead
+   */
   getResponseMapping(): string | undefined; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;

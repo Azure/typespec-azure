@@ -440,7 +440,7 @@ export function getCorrespondingMethodParams(
         )
       );
     }
-    if (correspondingProperties.length === serviceParamType.properties.length)
+    if (correspondingProperties.length === serviceParamPropertyNames.length)
       return correspondingProperties;
     throw new Error(
       `Can't find corresponding parameter for ${serviceParam.name} out of ${methodParameters.map((m) => m.name).join(", ")}`
