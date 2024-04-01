@@ -10,7 +10,7 @@ steps:
     parameters:
       nodeVersion: ${{ parameters.nodeVersion }}
 
-  - script: pnpm build --filter "@typespec/internal-build-utils..."
+  - script: pnpm--filter "@typespec/internal-build-utils..." run build
     displayName: Build internal tools
 
   - script: npm install -g autorest && cd eng/scripts && npm install
