@@ -246,6 +246,9 @@ function getSdkBasicServiceMethod<
   if (apiVersionParam && context.__api_version_parameter === undefined) {
     context.__api_version_parameter = {
       ...apiVersionParam,
+      name: "apiVersion",
+      nameInClient: "apiVersion",
+      isGeneratedName: true,
       onClient: true,
       optional: false,
       clientDefaultValue: context.__api_version_client_default_value,
