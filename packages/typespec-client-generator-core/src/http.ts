@@ -20,6 +20,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
+import { camelCase } from "change-case";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -29,6 +30,7 @@ import {
   SdkHttpResponse,
   SdkMethodParameter,
   SdkModelPropertyType,
+  SdkModelType,
   SdkParameter,
   SdkPathParameter,
   SdkQueryParameter,
@@ -123,10 +125,14 @@ function getSdkHttpParameters(
       if (getParamResponse.kind !== "body") throw new Error("blah");
       retval.bodyParam = getParamResponse;
     } else {
+      const type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+      );
+      const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
         kind: "body",
-        name: "body",
-        nameInClient: "body",
+        name,
+        nameInClient: name,
         isGeneratedName: true,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
@@ -135,9 +141,7 @@ function getSdkHttpParameters(
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
         apiVersions: getAvailableApiVersions(context, tspBody.type),
-        type: diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-        ),
+        type,
         optional: false,
         nullable: isNullable(tspBody.type),
         correspondingMethodParams,
@@ -393,33 +397,54 @@ export function getCorrespondingMethodParams(
   serviceParam: SdkHttpParameter
 ): SdkModelPropertyType[] {
   if (serviceParam.isApiVersionParam) {
-    if (!context.__api_version_parameter) throw new Error("No api version on the client");
+    if (!context.__api_version_parameter) {
+      const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
+      if (!apiVersionParam) {
+        throw new Error("Can't find corresponding api version parameter");
+      }
+      if (apiVersionParam.type.kind === "model") throw new Error(apiVersionParam.type.name);
+      throw new Error(apiVersionParam.type.kind);
+    }
     return [context.__api_version_parameter];
   }
   const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
   if (correspondingMethodParameter) {
     return [correspondingMethodParameter];
   }
-  function paramInProperties(param: SdkModelPropertyType, type: SdkType): boolean {
-    if (type.kind !== "model") return false;
-    return Array.from(type.properties.values())
-      .filter((x) => x.kind === "property")
-      .map((x) => x.name)
-      .includes(param.name);
-  }
+
   const serviceParamType = serviceParam.type;
   if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
-    // Here we have a spread body parameter
-    const correspondingProperties = methodParameters.filter((x) =>
-      paramInProperties(x, serviceParamType)
+    const serviceParamPropertyNames = Array.from(serviceParamType.properties.values())
+      .filter((x) => x.kind === "property")
+      .map((x) => x.name);
+    // Here we have a spread method parameter
+
+    // easy case is if the spread method parameter directly has the entire body as a property
+    const directBodyProperty = methodParameters
+      .map((x) => x.type)
+      .filter((x): x is SdkModelType => x.kind === "model")
+      .flatMap((x) => x.properties)
+      .find((x) => x.type === serviceParamType);
+    if (directBodyProperty) return [directBodyProperty];
+    let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
+      serviceParamPropertyNames.includes(x.name)
     );
-    const bodyPropertyNames = serviceParamType.properties.filter((x) =>
-      paramInProperties(x, serviceParamType)
-    );
-    if (correspondingProperties.length !== bodyPropertyNames.length) {
-      throw new Error("Can't find corresponding properties for spread body parameter");
+    for (const methodParam of methodParameters) {
+      const methodParamIterable =
+        methodParam.type.kind === "model" ? methodParam.type.properties : [methodParam];
+      correspondingProperties = correspondingProperties.concat(
+        methodParamIterable.filter(
+          (x) =>
+            serviceParamPropertyNames.includes(x.name) &&
+            !correspondingProperties.find((e) => e.name === x.name)
+        )
+      );
     }
-    return correspondingProperties;
+    if (correspondingProperties.length === serviceParamType.properties.length)
+      return correspondingProperties;
+    throw new Error(
+      `Can't find corresponding parameter for ${serviceParam.name} out of ${methodParameters.map((m) => m.name).join(", ")}`
+    );
   }
   for (const methodParam of methodParameters) {
     if (methodParam.type.kind === "model") {
