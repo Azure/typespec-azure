@@ -4,6 +4,9 @@ parameters:
     type: string
     default: 20.x
 
+variables:
+  pnpm_config_cache: $(Pipeline.Workspace)/.pnpm-store
+
 steps:
   - task: UseDotNet@2
     inputs:
@@ -15,8 +18,17 @@ steps:
     displayName: Install Node.js
     retryCountOnTaskFailure: 3
 
-  - script: npm install -g pnpm@8.13.1
-    displayName: Install pnpm
+  - task: Cache@2
+    inputs:
+      key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+      path: $(pnpm_config_cache)
+    displayName: Cache pnpm
+
+  - script: |
+      corepack enable
+      corepack prepare pnpm@latest-8 --activate
+      pnpm config set store-dir $(pnpm_config_cache)
+    displayName: "Setup pnpm"
 
   - script: |
       echo "Node:"
