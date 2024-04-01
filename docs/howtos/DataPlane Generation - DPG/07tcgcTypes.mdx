@@ -12,9 +12,7 @@ import "@typespec/http";
 
 using TypeSpec.Http;
 
-@useAuth(
-  ApiKeyAuth<ApiKeyLocation.header, "api-key">
-)
+@useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
 @service({
   title: "Contoso Widget Manager",
 })
@@ -226,28 +224,23 @@ export interface SdkContext<
 It is used to persist information across functions. You should never define global constants or variables in your emitter code, because this leads to issues with multiple emitter runs. Instead, all global information should be stored in your context.
 
 You should define your own language-specific `SdkContext` that extends from the one defined in `@azure-tools/typespec-client-generator-core`. This is where you keep your global variables. You should utilize the `createSdkContext` from tcgc.
-You also shouldn't instantialize your own interface, instead you should call `createSdkContext` to create.
+You also shouldn't instantiate your own interface, instead you should call `createSdkContext` to create.
 
 ```ts
 import { EmitContext } from "@typespec/compiler";
 import { createSdkContext, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
 import { PythonEmitterOptions } from "./lib.js";
 
-interface PythonSdkContext<
-  TServiceOperation extends SdkServiceOperation
-> extends SdkContext<
-  PythonEmitterOptions,
-  TServiceOperation
-> {
+interface PythonSdkContext<TServiceOperation extends SdkServiceOperation>
+  extends SdkContext<PythonEmitterOptions, TServiceOperation> {
   ClientMap: Map<SdkClientType, PythonSdkClientType>;
 }
-
 
 export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
   const sdkContext: PythonSdkContext = {
     ...createSdkContext(context, "@azure-tools/typespec-python"),
     ClientMap: new Map<sdkClientType, PythonSdkClientType>(),
-  }
+  };
 }
 ```
 
@@ -308,14 +301,12 @@ const sdkPackage = sdkContext.sdkPackage;
 
 An `SdkClientType` represents a single client in your package.
 
-All clients will have an `initialization` property. Whether that property's access is `internal` or `public` will determine whether your client is publicly initializable or not.
+All clients will have an `initialization` property. Whether that property's access is `internal` or `public` will determine whether your client can be publicly instantiated or not.
 
 ### Interface
 
 ```ts
-export interface SdkClientType<
-  TServiceOperation extends SdkServiceOperation
-> {
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   name: string;
   kind: "client";
   description?: string;
@@ -444,9 +435,9 @@ const sdkInitializationType = {
           name: "endpoint",
           type: {
             kind: "string",
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       kind: "credential",
@@ -455,8 +446,8 @@ const sdkInitializationType = {
         scheme: {
           kind: "apiKey",
           in: "header",
-          name: "api-key"
-        }
+          name: "api-key",
+        },
       },
       onClient: true,
     },
@@ -467,7 +458,7 @@ const sdkInitializationType = {
   access: "public",
   isFormDataType: false,
   isError: false,
-}
+};
 ```
 
 ### Usage
@@ -480,24 +471,21 @@ Some emitters will create a model and have the client accept the model as option
 
 An `SdkMethod` is any of the types of methods that can be a method on a client.
 
-There are two main types of an `SdkMethod`: 
+There are two main types of an `SdkMethod`:
+
 1. `SdkClientAccessor` returns a subclient of the client it's on
 2. `SdkServiceMethod` wraps a service call
 
 ```ts
-export type SdkMethod<
-  TServiceOperation extends PythonSdkServiceOperation
-> =
-  SdkServiceMethod<TServiceOperation> |
-  SdkClientAccessor<TServiceOperation>;
+export type SdkMethod<TServiceOperation extends PythonSdkServiceOperation> =
+  | SdkServiceMethod<TServiceOperation>
+  | SdkClientAccessor<TServiceOperation>;
 ```
 
 They each extend from the shared `SdkMethodBase`
 
 ```ts
-interface SdkMethodBase<
-  TServiceOperation extends SdkServiceOperation
-> {
+interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   __raw?: Operation;
   name: string;
   access: AccessFlags | undefined;
@@ -512,18 +500,16 @@ Below we go into each method type
 
 ### SdkClientAccessor
 
-A `clientaccessor` method is simply a method on a client that returns another client. The returned client can be instantiable or uninstantiable. If the returned client is instantiable, most likely your `clientaccessor` will be part of the public api surface, so users can instantiate the subclient using your client method. If it is not instantiable, it is up to you how to expose the subclient on your current client for users to access.
+A `clientaccessor` method is simply a method on a client that returns another client. The returned client can be instantiable or un-instantiable. If the returned client is instantiable, most likely your `clientaccessor` will be part of the public api surface, so users can instantiate the subclient using your client method. If it is not instantiable, it is up to you how to expose the subclient on your current client for users to access.
 
 #### Interface
 
 ```ts
-interface SdkClientAccessor<
-  TServiceOperation extends SdkServiceOperation
->
+interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase<TServiceOperation> {
-    kind: "clientaccessor";
-    response: SdkClientType<TServiceOperation>;
-  }
+  kind: "clientaccessor";
+  response: SdkClientType<TServiceOperation>;
+}
 ```
 
 #### Example
@@ -543,7 +529,7 @@ const sdkClientAccessor = {
 
 #### Usage
 
-Our strong recommendation is you build up a list of clients by iterating through `sdkPackage.clients` first, and to *not* recurse into creating the subclients.
+Our strong recommendation is you build up a list of clients by iterating through `sdkPackage.clients` first, and to _not_ recurse into creating the subclients.
 Only once you've processed each client, then you go through and link clients to their subclients. Not doing recursion prevents confusion over where you are in the call chain.
 
 ```ts
@@ -551,19 +537,14 @@ import { SdkServiceOperation, SdkClientType } from "@azure-tools/typespec-client
 import { PythonSdkContext } from "./lib.js";
 import { PythonSdkClientType } from "./interfaces.js";
 
-function linkSubClients<
-  TServiceOperation extends PythonSdkServiceOperation
->(
-  sdkContext: PythonSdkContext<TServiceOperation>,
+function linkSubClients<TServiceOperation extends PythonSdkServiceOperation>(
+  sdkContext: PythonSdkContext<TServiceOperation>
 ): void {
   for (const client of sdkContext.clients) {
-    client.subclients = client.methods.filter(
-      (x) => x.kind === "clientaccessor"
-    ).map(
-      (x) => x.returnType
-    ).map(
-      (x) => sdkContext.ClientMap.get(x)
-    )
+    client.subclients = client.methods
+      .filter((x) => x.kind === "clientaccessor")
+      .map((x) => x.returnType)
+      .map((x) => sdkContext.ClientMap.get(x));
   }
 }
 ```
@@ -577,27 +558,23 @@ The actual service call is a separate property on the method, `.operation`. This
 All `SdkServiceMethod`s share the following base:
 
 ```ts
-interface SdkServiceMethodBase<
-  TServiceOperation extends SdkServiceOperation
->
+interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase<TServiceOperation> {
-    // This represents the operation request we need to send to the service.
-    // This helps abstract away the transport
-    operation: TServiceOperation;
-    // The parameters you generate on the method signature that users will interact with.
-    // These aren't tied to any protocol, so there are no 'header' / 'path' parameters etc.
-    parameters: SdkMethodParameter[];
-    response: SdkMethodResponse;
-    exception?: SdkMethodResponse;
-  }
+  // This represents the operation request we need to send to the service.
+  // This helps abstract away the transport
+  operation: TServiceOperation;
+  // The parameters you generate on the method signature that users will interact with.
+  // These aren't tied to any protocol, so there are no 'header' / 'path' parameters etc.
+  parameters: SdkMethodParameter[];
+  response: SdkMethodResponse;
+  exception?: SdkMethodResponse;
+}
 ```
 
 ```ts
-function serializeServiceMethod<
-  TServiceOperation extends PythonSdkServiceOperation
->(
+function serializeServiceMethod<TServiceOperation extends PythonSdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
-  method: SdkServiceMethod<TServiceOperation>,
+  method: SdkServiceMethod<TServiceOperation>
 ): PythonSdkServiceMethod {
   switch (method.kind) {
     case "basic":
@@ -621,8 +598,8 @@ This models a basic service call that is synchronous server side.
 ```ts
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation> {
-    kind: "basic";
-  }
+  kind: "basic";
+}
 ```
 
 ##### Example
@@ -684,7 +661,8 @@ We currently only have paging method support for azure-generated sdks.
 ##### Interface
 
 ```ts
-export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation> extends SdkServiceMethodBase<TServiceOperation> {
+export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation> {
   kind: "paging";
   // raw paging information returned from getPagedResult
   __raw_paged_metadata: PagedResultMetadata;
@@ -769,8 +747,9 @@ Only returned for azure-generated sdks
 ##### Interfaces
 
 ```ts
-export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation> extends SdkServiceMethodBase<TServiceOperation> {
-  kind: "lro",
+export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation> {
+  kind: "lro";
   // raw LroMetadata returned from azure-core helper function getLroMetadata
   __raw_lro_metadata: LroMetadata;
   // initial call to begin LRO polling
@@ -854,7 +833,7 @@ This is a combination of Lro and paging. We start off with an LRO call to the se
 
 ```ts
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends SdkServiceMethodBase<TServiceOperation>{
+  extends SdkServiceMethodBase<TServiceOperation> {
   kind: "lropaging";
   __raw_lro_metadata: LroMetadata;
   // initial call to start LRO
@@ -903,7 +882,7 @@ export interface SdkHttpOperation {
   // mapping of status codes to SdkHttpResponse for valid responses
   // HttpStatusCodeRange can represent either a single status code or a range.
   responses: Map<HttpStatusCodeRange, SdkHttpResponse>;
-  exceptions: Map<HttpStatusCodeRange, SdkHttpResponse>
+  exceptions: Map<HttpStatusCodeRange, SdkHttpResponse>;
 }
 ```
 
@@ -943,18 +922,14 @@ const sdkHttpOperation = {
 ### Usage
 
 ```ts
-function serializeServiceOperation<
-  TServiceOperation extends PythonSdkServiceOperation
->(
+function serializeServiceOperation<TServiceOperation extends PythonSdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
   method: SdkServiceMethod<TServiceOperation>,
-  operation: TServiceOperation,
+  operation: TServiceOperation
 ): TServiceOperation {
   switch (operation.kind) {
     case "http":
-      return serializeHttpServiceOperation(
-        context, method, operation
-      );
+      return serializeHttpServiceOperation(context, method, operation);
   }
 }
 ```
@@ -994,7 +969,7 @@ interface SdkModelPropertyTypeBase {
 
 ### Method parameters
 
-These are parameters to client initialization and method son the client. These will be the parameters that SDK users directly use. They will eventually be mapped to 
+These are parameters to client initialization and method son the client. These will be the parameters that SDK users directly use. They will eventually be mapped to
 
 #### SdkEndpointParameter
 
@@ -1006,7 +981,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType
+  type: SdkEndpointType;
 }
 ```
 
@@ -1197,16 +1172,14 @@ import { SdkMethodResponse } from "@azure-tools/typespec-client-generator-core";
 import { PythonSdkContext, PythonSdkMethodResponse } from "./lib.js";
 import { getPythonSdkType } from "./types.js";
 
-function serializeMethodResponse<
-  TServiceOperation extends SdkServiceOperation
->(
+function serializeMethodResponse<TServiceOperation extends SdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
-  response: SdkMethodResponse,
+  response: SdkMethodResponse
 ): PythonSdkMethodResponse {
   return {
     ...response,
     type: getPythonSdkType(context, response.type),
-  }
+  };
 }
 ```
 
@@ -1455,12 +1428,13 @@ export interface PythonSdkContext<
 
 ```ts
 import { EmitContext } from "@typespec/compiler";
-import { SdkContext, createSdkContext, SdkClientType } from "@azure-tools/typespec-client-generator-core";
-import { PythonSdkContext } from "./lib.js";
 import {
-  getPythonSdkType,
-  getSdkModelPropertyType,
-} from "./types.js";
+  SdkContext,
+  createSdkContext,
+  SdkClientType,
+} from "@azure-tools/typespec-client-generator-core";
+import { PythonSdkContext } from "./lib.js";
+import { getPythonSdkType, getSdkModelPropertyType } from "./types.js";
 import {
   PythonSdkType,
   PythonSdkPackage,
@@ -1470,72 +1444,53 @@ import {
 } from "./interfaces.js";
 import { serializeServiceMethod } from "./methods.js";
 
-export async function $onEmit(
-  context: EmitContext<PythonEmitterOptions>
-) {
+export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
   const sdkContext: PythonSdkContext = {
     ...createSdkContext(context, "@azure-tools/typespec-python"),
     __endpointPathParameters: {},
   };
 
   const pythonSdkPackage: PythonSdkPackage = {
-    clients: sdkContext.clients.map(
-      (x) => serializeClient(sdkContext, x)
-    ),
+    clients: sdkContext.clients.map((x) => serializeClient(sdkContext, x)),
     rootNamespace: sdkContext.sdkPackage.rootNamespace,
-    models: sdkContext.sdkPackage.models.map(
-      (x) => getPythonSdkType(sdkContext, x)
-    ),
-    enums: sdkContext.sdkPackage.enums.map(
-      (x) => getPythonSdkType(sdkContext, x)
-    )
-  }
+    models: sdkContext.sdkPackage.models.map((x) => getPythonSdkType(sdkContext, x)),
+    enums: sdkContext.sdkPackage.enums.map((x) => getPythonSdkType(sdkContext, x)),
+  };
 
-  linkSubClients(sdkContext)
+  linkSubClients(sdkContext);
 
   // Serialize the pythonSdkPackage and pass it to your generator
 }
 
-function serializeClient<
-  TServiceOperation extends PythonSdkServiceOperation
->(
+function serializeClient<TServiceOperation extends PythonSdkServiceOperation>(
   sdkContext: PythonSdkContext<TServiceOperation>,
   client: SdkClientType<TServiceOperation>
 ): PythonSdkClientType {
   const pythonClient = {
     ...client,
-    parameters: client.initialization?.properties.map(
-      (x) => getSdkModelPropertyType(sdkContext, x)
+    parameters: client.initialization?.properties.map((x) =>
+      getSdkModelPropertyType(sdkContext, x)
     ),
-    subClients: client.methods.filter(
-      (x) => x.kind === "clientaccessor"
-    ).map(
-      (x) => serializeClient(sdkContext, x.response)
-    ),
-    methods: client.methods.filter(
-      (x) => x.kind === "method"
-    ).map(
-      (x) => serializeServiceMethod(sdkContext, x)
-    ),
+    subClients: client.methods
+      .filter((x) => x.kind === "clientaccessor")
+      .map((x) => serializeClient(sdkContext, x.response)),
+    methods: client.methods
+      .filter((x) => x.kind === "method")
+      .map((x) => serializeServiceMethod(sdkContext, x)),
     subclients: [],
-  }
-  sdkContext,ClientMap.set(client, pythonClient);
+  };
+  sdkContext, ClientMap.set(client, pythonClient);
   return pythonClient;
 }
 
-function linkSubClients<
-  TServiceOperation extends PythonSdkServiceOperation
->(
-  sdkContext: PythonSdkContext<TServiceOperation>,
+function linkSubClients<TServiceOperation extends PythonSdkServiceOperation>(
+  sdkContext: PythonSdkContext<TServiceOperation>
 ): void {
   for (const client of sdkContext.clients) {
-    client.subclients = client.methods.filter(
-      (x) => x.kind === "clientaccessor"
-    ).map(
-      (x) => x.returnType
-    ).map(
-      (x) => sdkContext.ClientMap.get(x)
-    )
+    client.subclients = client.methods
+      .filter((x) => x.kind === "clientaccessor")
+      .map((x) => x.returnType)
+      .map((x) => sdkContext.ClientMap.get(x));
   }
 }
 ```
@@ -1543,7 +1498,7 @@ function linkSubClients<
 ### methods.ts
 
 ```ts
-import { 
+import {
   SdkClientType,
   SdkServiceMethod,
   SdkBasicServiceMethod,
@@ -1684,33 +1639,30 @@ import { getPythonSdkType, getSdkModelPropertyType } from "./types.js";
 function serializeHttpServiceOperation(
   context: PythonSdkContext<SdkHttpOperation>,
   method: SdkServiceMethod<SdkHttpOperation>,
-  operation: SdkHttpOperation,
+  operation: SdkHttpOperation
 ): PythonSdkHttpOperation {
   return {
     ...operation,
-    parameters: operation.parameters.map(
-      (x) => getSdkModelPropertyType(context, x)
+    parameters: operation.parameters.map((x) => getSdkModelPropertyType(context, x)),
+    bodyParam: operation.bodyParam
+      ? getSdkModelPropertyType(context, operation.bodyParam)
+      : undefined,
+    responses: Object.entries(operation.responses).map(([statusCode, responses]) =>
+      serializeHttpResponse(context, method, statusCode, responses)
     ),
-    bodyParam: (
-      operation.bodyParam ?
-      getSdkModelPropertyType(context, operation.bodyParam) : undefined
+    exceptions: Object.entries(operation.exceptions).map(([statusCode, exceptions]) =>
+      serializeHttpResponse(context, method, statusCode, exceptions)
     ),
-    responses: Object.entries(operation.responses).map(
-      ([statusCode, responses]) => serializeHttpResponse(context, method, statusCode, responses)
-    ),
-    exceptions: Object.entries(operation.exceptions).map(
-      ([statusCode, exceptions]) => serializeHttpResponse(context, method, statusCode, exceptions)
-    ),
-  }
+  };
 
   function serializeHttpResponse(
     context: PythonSdkContext<SdkHttpOperation>,
-    response: SdkHttpResponse,
+    response: SdkHttpResponse
   ): PythonSdkHttpResponse {
     return {
       ...response,
-      type: response.type? getPythonSdkType(context, response.type) : undefined,
-    }
+      type: response.type ? getPythonSdkType(context, response.type) : undefined,
+    };
   }
 }
 ```
@@ -1753,7 +1705,7 @@ export function getPythonSdkType<
   context: PythonSdkContext<TServiceOperation>,
   type: SdkType,
 ): PythonSdkType {
-  // We don't have to convert all types, just types that we want 
+  // We don't have to convert all types, just types that we want
   // to add more information onto
   switch (type.kind) {
     case "model":
