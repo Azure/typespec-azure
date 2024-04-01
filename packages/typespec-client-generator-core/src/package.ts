@@ -530,7 +530,7 @@ function createSdkClientType<
   return diagnostics.wrap(sdkClientType);
 }
 
-export function experimental_getSdkPackage<
+export function getSdkPackage<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
