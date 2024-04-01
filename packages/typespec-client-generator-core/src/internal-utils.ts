@@ -1,7 +1,6 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   Model,
-  ModelProperty,
   Namespace,
   Operation,
   Program,
@@ -14,7 +13,7 @@ import {
   ignoreDiagnostics,
   isNullType,
 } from "@typespec/compiler";
-import { HttpOperation } from "@typespec/http";
+import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
@@ -82,7 +81,7 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: ModelProperty
+  type: { name: string }
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -206,7 +205,9 @@ export function isAzureCoreModel(t: Type): boolean {
   return (
     t.kind === "Model" &&
     t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
+    ["Azure.Core", "Azure.Core.Foundations", "Azure.ResourceManager"].includes(
+      getNamespaceFullName(t.namespace)
+    )
   );
 }
 
@@ -258,13 +259,15 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpResponse>): {
+function getAllResponseBodiesAndNonBodyExists(
+  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
+): {
   allResponseBodies: SdkType[];
   nonBodyExists: boolean;
 } {
   const allResponseBodies: SdkType[] = [];
   let nonBodyExists = false;
-  for (const response of Object.values(responses)) {
+  for (const response of responses.values()) {
     if (response.type) {
       if (response.nullable) {
         nonBodyExists = true;
@@ -277,7 +280,9 @@ function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpR
   return { allResponseBodies, nonBodyExists };
 }
 
-export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>): SdkType[] {
+export function getAllResponseBodies(
+  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
+): SdkType[] {
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
