@@ -3,7 +3,9 @@ parameters:
   - name: nodeVersion
     type: string
     default: 20.x
-
+  - name: pnpmStorePath
+    type: string
+    default: $(Pipeline.Workspace)/.pnpm-store
 steps:
   - task: UseDotNet@2
     inputs:
@@ -18,13 +20,13 @@ steps:
   - task: Cache@2
     inputs:
       key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-      path: $(Build.SourcesDirectory)/.pnpm-store
+      path: ${{ parameters.pnpmStorePath }}
     displayName: Cache pnpm store
 
   - script: |
       corepack enable
       corepack prepare pnpm@latest-8 --activate
-      pnpm config set store-dir $(Build.SourcesDirectory)/.pnpm-store
+      pnpm config set store-dir ${{ parameters.pnpmStorePath }}
     displayName: "Setup pnpm"
 
   - script: |
