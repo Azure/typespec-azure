@@ -3016,7 +3016,7 @@ describe("typespec-client-generator-core: types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
         `);
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 2);
       const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
       ok(multiPartRequest);
