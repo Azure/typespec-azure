@@ -2696,7 +2696,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
-  describe("spread", async function () {
+  describe("spread", () => {
     it("plain model with no decorators", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
         @service({})
