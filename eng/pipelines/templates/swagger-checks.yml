@@ -9,7 +9,7 @@ steps:
     displayName: Install Node.js
     retryCountOnTaskFailure: 3
 
-  - script: npm install -g autorest
+  - script: npm install -g autorest && cd eng/scripts && npm install
     displayName: Swagger - Install Dependencies
   - script: node eng/scripts/lint-resourcemanager.js "packages/samples/test/output/azure/resource-manager"
     displayName: Swagger - Resource Manager Linting
