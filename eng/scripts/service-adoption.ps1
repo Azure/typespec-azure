@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
 This script analyzes a Git repository to find all commits that add a new 'tspconfig.yaml' file within a specified date range.
