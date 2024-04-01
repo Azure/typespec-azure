@@ -144,11 +144,8 @@ describe("typespec-client-generator-core: types", () => {
         autoUsings: ["Azure.Core"],
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(
+      await runnerWithCore.compileWithBuiltInAzureCoreService(
         `
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service
-        namespace MyNamespace;
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -182,24 +179,20 @@ describe("typespec-client-generator-core: types", () => {
         "filter-out-core-models": false,
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(`
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service
-        namespace MyService {
-          @resource("users")
-          @doc("Details about a user.")
-          model User {
-            @key
-            @doc("The user's name.")
-            @visibility("read")
-            name: string;
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      @resource("users")
+      @doc("Details about a user.")
+      model User {
+        @key
+        @doc("The user's name.")
+        @visibility("read")
+        name: string;
 
-            ...Azure.Core.EtagProperty;
-          }
+        ...Azure.Core.EtagProperty;
+      }
 
-          @doc("Gets status.")
-          op getStatus is GetResourceOperationStatus<User>;
-        }
+      @doc("Gets status.")
+      op getStatus is GetResourceOperationStatus<User>;
       `);
       const userModel = runnerWithCore.context.sdkPackage.models.find(
         (x) => x.kind === "model" && x.name === "User"
@@ -993,32 +986,29 @@ describe("typespec-client-generator-core: types", () => {
         autoUsings: ["Azure.Core"],
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(`
-        @service({})
-        @test namespace MyService {
-          #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
-          @doc(".")
-          @fixed
-          @usage(Usage.input | Usage.output)
-          @access(Access.public)
-          enum DaysOfWeekFixedEnum {
-            @doc("Monday") Monday,
-            @doc("Tuesday") Tuesday,
-            @doc("Wednesday") Wednesday,
-            @doc("Thursday") Thursday,
-            @doc("Friday") Friday,
-            @doc("Saturday") Saturday,
-            @doc("Sunday") Sunday,
-          }
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
+      @doc(".")
+      @fixed
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      enum DaysOfWeekFixedEnum {
+        @doc("Monday") Monday,
+        @doc("Tuesday") Tuesday,
+        @doc("Wednesday") Wednesday,
+        @doc("Thursday") Thursday,
+        @doc("Friday") Friday,
+        @doc("Saturday") Saturday,
+        @doc("Sunday") Sunday,
+      }
 
-          @doc(".")
-          @usage(Usage.input | Usage.output)
-          @access(Access.public)
-          model Test {
-            @doc(".")
-            prop: DaysOfWeekFixedEnum
-          }
-        }
+      @doc(".")
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        @doc(".")
+        prop: DaysOfWeekFixedEnum
+      }
       `);
       strictEqual(runnerWithCore.context.sdkPackage.models.length, 1);
       strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
@@ -2185,26 +2175,21 @@ describe("typespec-client-generator-core: types", () => {
         autoUsings: ["Azure.Core"],
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(`
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service
-        namespace MyService {
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      @resource("users")
+      @doc("Details about a user.")
+      model User {
+        @key
+        @doc("The user's id.")
+        @visibility("read")
+        id: int32;
 
-          @resource("users")
-          @doc("Details about a user.")
-          model User {
-            @key
-            @doc("The user's id.")
-            @visibility("read")
-            id: int32;
+        @doc("The user's name.")
+        name: string;
+      }
 
-            @doc("The user's name.")
-            name: string;
-          }
-
-          @doc("Creates or updates a User")
-          op createOrUpdate is ResourceCreateOrUpdate<User>;
-        }
+      @doc("Creates or updates a User")
+      op createOrUpdate is ResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.sdkPackage.models;
       strictEqual(models.length, 1);
@@ -2218,26 +2203,21 @@ describe("typespec-client-generator-core: types", () => {
         "filter-out-core-models": false,
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(`
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service
-        namespace MyService {
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+        @resource("users")
+        @doc("Details about a user.")
+        model User {
+          @key
+          @doc("The user's id.")
+          @visibility("read")
+          id: int32;
 
-          @resource("users")
-          @doc("Details about a user.")
-          model User {
-            @key
-            @doc("The user's id.")
-            @visibility("read")
-            id: int32;
-
-            @doc("The user's name.")
-            name: string;
-          }
-
-          @doc("Creates or updates a User")
-          op createOrUpdate is ResourceCreateOrUpdate<User>;
+          @doc("The user's name.")
+          name: string;
         }
+
+        @doc("Creates or updates a User")
+        op createOrUpdate is ResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.sdkPackage.models;
       strictEqual(models.length, 4);
@@ -2251,27 +2231,22 @@ describe("typespec-client-generator-core: types", () => {
         autoUsings: ["Azure.Core"],
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(`
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      @resource("users")
+      @doc("Details about a user.")
+      model User {
+        @key
+        @doc("The user's name.")
+        @visibility("read")
+        name: string;
+      }
 
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service
-        namespace MyService {
-          @resource("users")
-          @doc("Details about a user.")
-          model User {
-            @key
-            @doc("The user's name.")
-            @visibility("read")
-            name: string;
-          }
+      @doc("Gets status.")
+      op getStatus is GetResourceOperationStatus<User>;
 
-          @doc("Gets status.")
-          op getStatus is GetResourceOperationStatus<User>;
-
-          @doc("Polls status.")
-          @pollingOperation(MyService.getStatus)
-          op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
-        }
+      @doc("Polls status.")
+      @pollingOperation(My.Service.getStatus)
+      op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.sdkPackage.models;
       strictEqual(models.length, 1);
@@ -2285,26 +2260,22 @@ describe("typespec-client-generator-core: types", () => {
         "filter-out-core-models": false,
         emitterName: "@azure-tools/typespec-java",
       });
-      await runnerWithCore.compile(`
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        @service
-        namespace MyService {
-          @resource("users")
-          @doc("Details about a user.")
-          model User {
-            @key
-            @doc("The user's name.")
-            @visibility("read")
-            name: string;
-          }
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      @resource("users")
+      @doc("Details about a user.")
+      model User {
+        @key
+        @doc("The user's name.")
+        @visibility("read")
+        name: string;
+      }
 
-          @doc("Gets status.")
-          op getStatus is GetResourceOperationStatus<User>;
+      @doc("Gets status.")
+      op getStatus is GetResourceOperationStatus<User>;
 
-          @doc("Polls status.")
-          @pollingOperation(MyService.getStatus)
-          op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
-        }
+      @doc("Polls status.")
+      @pollingOperation(My.Service.getStatus)
+      op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.sdkPackage.models;
       strictEqual(models.length, 5);
