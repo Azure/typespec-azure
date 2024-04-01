@@ -3,6 +3,9 @@ parameters:
     type: string
 
 steps:
+  - checkout: self
+    submodules: true
+
   - template: /eng/pipelines/templates/install.yml
     parameters:
       nodeVersion: ${{ parameters.nodeVersion }}
