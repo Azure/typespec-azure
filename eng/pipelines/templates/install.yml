@@ -3,9 +3,9 @@ parameters:
   - name: nodeVersion
     type: string
     default: 20.x
-
-variables:
-  pnpm_config_cache: $(Pipeline.Workspace)/.pnpm-store
+  - name: pnpm_config_cache
+    type: string
+    default: $(Pipeline.Workspace)/.pnpm-store
 
 steps:
   - task: UseDotNet@2
