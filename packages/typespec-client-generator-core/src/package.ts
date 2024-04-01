@@ -158,6 +158,12 @@ function getSdkLroServiceMethod<
   basicServiceMethod.response.type = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, metadata.logicalResult)
   );
+  basicServiceMethod.response.resultPath =
+    metadata.logicalPath ??
+    (metadata.envelopeResult !== metadata.logicalResult &&
+    basicServiceMethod.operation.verb === "post"
+      ? "result"
+      : undefined);
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
@@ -170,12 +176,7 @@ function getSdkLroServiceMethod<
       )
     ),
     getResponseMapping(): string | undefined {
-      return (
-        metadata.logicalPath ??
-        (metadata.envelopeResult !== metadata.logicalResult && this.operation.verb === "post"
-          ? "result"
-          : undefined)
-      );
+      return this.response.resultPath;
     },
   });
 }
