@@ -1,14 +1,17 @@
 import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
+  Model,
   ModelProperty,
   Operation,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
+  isKey,
 } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
+import { camelCase } from "change-case";
 import {
   getAccess,
   listClients,
@@ -53,6 +56,7 @@ import {
   getHashForType,
   getSdkTypeBaseHelper,
   isNullable,
+  updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -154,6 +158,12 @@ function getSdkLroServiceMethod<
   basicServiceMethod.response.type = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, metadata.logicalResult)
   );
+  basicServiceMethod.response.resultPath =
+    metadata.logicalPath ??
+    (metadata.envelopeResult !== metadata.logicalResult &&
+    basicServiceMethod.operation.verb === "post"
+      ? "result"
+      : undefined);
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
@@ -166,12 +176,7 @@ function getSdkLroServiceMethod<
       )
     ),
     getResponseMapping(): string | undefined {
-      return (
-        metadata.logicalPath ??
-        (metadata.envelopeResult !== metadata.logicalResult && this.operation.verb === "post"
-          ? "result"
-          : undefined)
-      );
+      return this.response.resultPath;
     },
   });
 }
@@ -218,15 +223,33 @@ function getSdkBasicServiceMethod<
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // when we spread, all of the inputtable properties of our model get flattened onto the method
-  const methodParameters = Array.from(operation.parameters.properties.values())
-    .map((x) => diagnostics.pipe(getSdkMethodParameter(context, x)))
-    .filter((x): x is SdkMethodParameter => x.kind === "method");
+  const methodParameters: SdkMethodParameter[] = [];
+  const spreadModelNames: string[] = [];
+  for (const prop of operation.parameters.properties.values()) {
+    if (prop.sourceProperty?.model?.name && !isKey(context.program, prop.sourceProperty)) {
+      if (!spreadModelNames.includes(prop.sourceProperty.model.name)) {
+        spreadModelNames.push(prop.sourceProperty.model.name);
+        methodParameters.push(
+          diagnostics.pipe(getSdkMethodParameter(context, prop.sourceProperty.model))
+        );
+      }
+    } else {
+      const methodParameter = diagnostics.pipe(getSdkMethodParameter(context, prop));
+      if (methodParameter.kind === "method") {
+        methodParameters.push(methodParameter);
+      }
+    }
+  }
+
   // if there's an api version parameter, we want to bubble it up to the client
   // we don't want it on the method level, but we will keep it on the service operation level
   const apiVersionParam = methodParameters.find((x) => x.isApiVersionParam);
   if (apiVersionParam && context.__api_version_parameter === undefined) {
     context.__api_version_parameter = {
       ...apiVersionParam,
+      name: "apiVersion",
+      nameInClient: "apiVersion",
+      isGeneratedName: apiVersionParam.name !== "apiVersion",
       onClient: true,
       optional: false,
       clientDefaultValue: context.__api_version_client_default_value,
@@ -331,9 +354,29 @@ function getSdkInitializationType<
 
 function getSdkMethodParameter(
   context: TCGCContext,
-  type: ModelProperty
+  type: ModelProperty | Model
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  if (type.kind === "Model") {
+    const libraryName = getLibraryName(context, type);
+    const name = camelCase(libraryName ?? "body");
+    const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
+    return diagnostics.wrap({
+      kind: "method",
+      description: getDocHelper(context, type).description,
+      details: getDocHelper(context, type).details,
+      apiVersions: getAvailableApiVersions(context, type),
+      type: propertyType,
+      nameInClient: name,
+      name,
+      isGeneratedName: Boolean(libraryName),
+      optional: false,
+      nullable: false,
+      discriminator: false,
+      serializedName: name,
+      ...updateWithApiVersionInformation(context, type),
+    });
+  }
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkModelPropertyType(context, type)),
     kind: "method",
@@ -488,7 +531,7 @@ function createSdkClientType<
   return diagnostics.wrap(sdkClientType);
 }
 
-export function experimental_getSdkPackage<
+export function getSdkPackage<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {

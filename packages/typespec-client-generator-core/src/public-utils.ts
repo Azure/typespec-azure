@@ -19,7 +19,6 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
-  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
@@ -62,12 +61,10 @@ export function getDefaultApiVersion(
  * @param parameter
  * @returns
  */
-export function isApiVersion(
-  context: TCGCContext,
-  parameter: HttpOperationParameter | ModelProperty
-): boolean {
+export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
   return (
-    parameter.name.toLowerCase() === "apiversion" || parameter.name.toLowerCase() === "api-version"
+    type.name.toLowerCase().includes("apiversion") ||
+    type.name.toLowerCase().includes("api-version")
   );
 }
 
@@ -174,7 +171,16 @@ export function getLibraryName(
 
   // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
-    return type.name + type.templateMapper.args.map((arg) => (arg as Model).name).join("");
+    return (
+      type.name +
+      type.templateMapper.args
+        .filter(
+          (arg): arg is Model =>
+            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+        )
+        .map((arg) => pascalCase(arg.name))
+        .join("")
+    );
   }
 
   return typeof type.name === "string" ? type.name : "";
