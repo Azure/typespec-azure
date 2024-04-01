@@ -248,7 +248,7 @@ function getSdkBasicServiceMethod<
       ...apiVersionParam,
       name: "apiVersion",
       nameInClient: "apiVersion",
-      isGeneratedName: true,
+      isGeneratedName: apiVersionParam.name !== "apiVersion",
       onClient: true,
       optional: false,
       clientDefaultValue: context.__api_version_client_default_value,
