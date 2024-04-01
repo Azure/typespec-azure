@@ -33,5 +33,5 @@ jobs:
       - task: 1ES.PublishPipelineArtifact@1
         displayName: Publish packages(.tgz) as pipeline artifacts
         inputs:
-          path: $(Build.SourcesDirectory)/common/temp/artifacts/packages
+          path: $(Build.SourcesDirectory)/temp/artifacts
           artifact: packages
