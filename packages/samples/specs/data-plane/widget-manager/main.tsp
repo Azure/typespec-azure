@@ -25,21 +25,23 @@ enum Versions {
 // Models ////////////////////
 
 @doc("The color of a widget.")
-enum WidgetColor {
+union WidgetColor {
+  string,
+
   @doc("Black")
-  Black,
+  Black: "Black",
 
   @doc("White")
-  White,
+  White: "White",
 
   @doc("Red")
-  Red,
+  Red: "Red",
 
   @doc("Green")
-  Green,
+  Green: "Green",
 
   @doc("Blue")
-  Blue,
+  Blue: "Blue",
 }
 
 @doc("A widget.")
@@ -61,18 +63,20 @@ model Widget {
 
 @doc("The repair state of a widget.")
 @lroStatus
-enum WidgetRepairState {
+union WidgetRepairState {
+  string,
+
   @doc("Widget repairs succeeded.")
-  Succeeded,
+  Succeeded: "Succeeded",
 
   @doc("Widget repairs failed.")
-  Failed,
+  Failed: "Failed",
 
   @doc("Widget repairs were canceled.")
-  Canceled,
+  Canceled: "Canceled",
 
   @doc("Widget was sent to the manufacturer.")
-  SentToManufacturer,
+  SentToManufacturer: "SentToManufacturer",
 }
 
 @doc("A submitted repair request for a widget.")
@@ -264,11 +268,3 @@ op getServiceStatus is RpcOperation<
   },
   ServiceTraits
 >;
-
-model CustomResult {
-  @lroResult
-  MyResult: string;
-
-  @lroErrorResult
-  MyError: string;
-}
