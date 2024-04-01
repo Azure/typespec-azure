@@ -2767,6 +2767,23 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(createOrUpdate.getResponseMapping(), "result");
     });
+    it("lro delete", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await compileAzureWidgetService(
+        runnerWithCore,
+        `
+        op delete is ResourceOperations.LongRunningResourceDelete<Widget>;
+        `
+      );
+      const method = getServiceMethodOfClient(runnerWithCore.context.experimental_sdkPackage);
+      strictEqual(method.name, "delete");
+      strictEqual(method.kind, "lro");
+      strictEqual(method.response.type, undefined);
+    });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],

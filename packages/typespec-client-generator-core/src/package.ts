@@ -154,10 +154,14 @@ function getSdkLroServiceMethod<
   const basicServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
   );
-
-  basicServiceMethod.response.type = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, metadata.logicalResult)
-  );
+  const finalResult = metadata.finalResult ?? metadata.logicalResult;
+  if (finalResult === "void") {
+    basicServiceMethod.response.type = undefined;
+  } else if (finalResult) {
+    basicServiceMethod.response.type = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, finalResult)
+    );
+  }
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
