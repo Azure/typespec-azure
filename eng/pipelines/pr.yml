@@ -11,7 +11,20 @@ extends:
     stages:
       - stage: Build_And_Test
         jobs:
-          - job: Build_And_Test_Linux
+          - job: CI_AutorestChecks
+            displayName: "CI Autorest Checks"
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+
+            steps:
+              - template: /eng/pipelines/templates/swagger-checks.yml@self
+                parameters:
+                  nodeVersion: 20.x
+
+          - job: CI_Linux
+            displayName: "CI Linux"
             variables:
               TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
               TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
@@ -35,11 +48,8 @@ extends:
                   dotnetVersion: 8.0.x
                   osName: linux
 
-              - template: /eng/pipelines/templates/swagger-checks.yml@self
-                parameters:
-                  nodeVersion: $(nodeVersion)
-
-          - job: Build_And_Test_Windows
+          - job: CI_Windows
+            displayName: "CI Windows"
             variables:
               TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
               TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
@@ -62,10 +72,6 @@ extends:
                   nodeVersion: $(nodeVersion)
                   dotnetVersion: 8.0.x
                   osName: windows
-
-              - template: /eng/pipelines/templates/swagger-checks.yml@self
-                parameters:
-                  nodeVersion: $(nodeVersion)
 
           - template: /eng/pipelines/jobs/e2e-job.yml@self
           - template: /eng/pipelines/jobs/publish-artifacts.yml@self
