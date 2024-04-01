@@ -247,6 +247,9 @@ function getSdkBasicServiceMethod<
   if (apiVersionParam && context.__api_version_parameter === undefined) {
     context.__api_version_parameter = {
       ...apiVersionParam,
+      name: "apiVersion",
+      nameInClient: "apiVersion",
+      isGeneratedName: apiVersionParam.name !== "apiVersion",
       onClient: true,
       optional: false,
       clientDefaultValue: context.__api_version_client_default_value,
@@ -528,7 +531,7 @@ function createSdkClientType<
   return diagnostics.wrap(sdkClientType);
 }
 
-export function experimental_getSdkPackage<
+export function getSdkPackage<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {

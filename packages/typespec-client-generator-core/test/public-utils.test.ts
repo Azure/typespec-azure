@@ -799,7 +799,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       op getStatus is GetResourceOperationStatus<User>;
       `);
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 2);
       const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
       ok(model);
@@ -812,7 +812,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(`
         op test(@body body: {name: string}): void;
       `);
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
         ok(models[0].isGeneratedName);
@@ -822,7 +822,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(`
           op test(): {name: string};
         `);
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestResponse");
         ok(models[0].isGeneratedName);
@@ -832,7 +832,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(`
           op test(@body body: {name: string}): {name: string};
         `);
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         ok(models.find((x) => x.name === "TestRequest" && x.isGeneratedName));
         ok(models.find((x) => x.name === "TestResponse" && x.isGeneratedName));
@@ -847,7 +847,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
           op test(): A;
         `);
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         ok(models.find((x) => x.name === "APForA" && x.isGeneratedName));
       });
@@ -864,7 +864,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         ok(models.find((x) => x.name === "APForA" && x.isGeneratedName));
       });
@@ -881,7 +881,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): A;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         ok(models.find((x) => x.name === "APForA" && x.isGeneratedName));
       });
@@ -897,7 +897,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         ok(models.find((x) => x.name === "AMember" && x.isGeneratedName));
       });
@@ -908,7 +908,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: {name: string}[]): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
         ok(models[0].isGeneratedName);
@@ -920,7 +920,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: Record<{name: string}>): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
         ok(models[0].isGeneratedName);
@@ -935,7 +935,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "AMember" && x.isGeneratedName));
         ok(models.find((x) => x.name === "AMemberName" && x.isGeneratedName));
@@ -956,7 +956,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "BPForB" && x.isGeneratedName));
       });
@@ -986,7 +986,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: Fish): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 5);
         ok(models.find((x) => x.name === "SharkPForShark" && x.isGeneratedName));
         ok(models.find((x) => x.name === "SalmonPForSalmon" && x.isGeneratedName));
@@ -1009,7 +1009,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "BPForB" && x.isGeneratedName));
       });
@@ -1034,7 +1034,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 4);
         ok(models.find((x) => x.name === "CP1ForC" && x.isGeneratedName));
       });
@@ -1056,7 +1056,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "BP2ForB" && x.isGeneratedName));
       });
@@ -1075,7 +1075,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "APForA" && x.isGeneratedName));
         ok(models.find((x) => x.name === "APForAPForAnonymousModel" && x.isGeneratedName));
@@ -1090,7 +1090,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "APForA" && x.isGeneratedName));
         ok(models.find((x) => x.name === "APForAName" && x.isGeneratedName));
@@ -1107,7 +1107,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         ok(models.find((x) => x.name === "AB" && x.isGeneratedName));
       });
@@ -1123,7 +1123,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         const unionEnum = models[0].properties[0].type;
         strictEqual(unionEnum.kind, "enum");
@@ -1158,8 +1158,8 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
-        const diagnostics = runner.context.experimental_sdkPackage.diagnostics;
+        const models = runner.context.sdkPackage.models;
+        const diagnostics = runner.context.sdkPackage.diagnostics;
         strictEqual(models.length, 4);
         const union = models[0].properties[0].type;
         strictEqual(union.kind, "union");
@@ -1186,7 +1186,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(@body body: A): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
         const test1 = models.find((x) => x.name === "AChoice" && x.isGeneratedName);
         ok(test1);
@@ -1223,7 +1223,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op op3(@body body: B): boolean;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
         ok(models.find((x) => x.name === "BPForB" && x.isGeneratedName));
       });
@@ -1242,7 +1242,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         const propType = models[0].properties[0].type;
         strictEqual(propType.kind, "model");
@@ -1260,7 +1260,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         const unionEnum = models[0].properties[0].type;
         strictEqual(unionEnum.kind, "enum");
@@ -1283,7 +1283,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(...RequestParameter): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         ok(models.find((x) => x.name === "TestRequest" && x.isGeneratedName));
       });
@@ -1294,7 +1294,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           op test(foo: string, bar: string): void;
         `
         );
-        const models = runner.context.experimental_sdkPackage.models;
+        const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         ok(models.find((x) => x.name === "TestRequest" && x.isGeneratedName));
       });
@@ -1426,7 +1426,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           emitterName: "@azure-tools/typespec-java",
         });
         await runnerWithCore.compile(lroCode);
-        const models = runnerWithCore.context.experimental_sdkPackage.models;
+        const models = runnerWithCore.context.sdkPackage.models;
         strictEqual(models.length, 2);
         deepStrictEqual(models.map((x) => x.name).sort(), ["ExportedUser", "User"].sort());
       });
