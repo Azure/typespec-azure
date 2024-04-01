@@ -3,7 +3,7 @@
 This script analyzes a Git repository to find all commits that add a new 'tspconfig.yaml' file within a specified date range.
 
 .DESCRIPTION
-The script takes a start date, an end date, and an optional array of branch names as parameters. It then iterates over each branch and each month in the date range. For each month, it uses the `git log` command to find all commits that added a new 'tspconfig.yaml' file on the specified branches. The script counts the number of such commits for each month and outputs the counts in a table format. It also distinguishes between data plane and management plane commits based on the existence of 'resource-manager' or 'Management' in the file paths in the commit. Furthermore, it distinguishes between greenfield (new services) and brownfield (existing services) based on the existence of a 'stable' folder in the service path.
+The script takes a start date, an end date, and an optional array of branch names as parameters. It then iterates over each branch and each month in the date range. For each month, it uses the `git log` command to find all commits that added a new 'tspconfig.yaml' file on the specified branches. Afer eliminating duplicate commits between branches, the script counts the number of such commits for each month and outputs the counts in a table format. It also distinguishes between data plane and management plane commits based on the existence of 'resource-manager' or 'Management' in the file paths in the commit. Furthermore, it distinguishes between greenfield (new services) and brownfield (existing services) based on the existence of a 'stable' folder in the service path.
 
 .PARAMETER startDate
 The start date for the analysis. Must be a string in the format 'yyyy-MM-dd'.
