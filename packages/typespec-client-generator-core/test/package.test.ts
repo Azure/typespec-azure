@@ -2988,18 +2988,7 @@ describe("typespec-client-generator-core: package", () => {
       deepStrictEqual(bodyParam.correspondingMethodParams, createShelfRequest.type.properties);
     });
     it("formdata model without body decorator in spread model", async () => {
-      const runnerWithCore = await createSdkTestRunner({
-        librariesToAdd: [AzureCoreTestLibrary],
-        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-        emitterName: "@azure-tools/typespec-java",
-      });
-      await runnerWithCore.compileWithBuiltInAzureCoreService(`
-      model DocumentTranslateResult {
-        @header
-        contentType: "application/octet-stream";
-        @body
-        document: bytes;
-      }
+      await runner.compileWithBuiltInService(`
 
       model DocumentTranslateContent {
         @header contentType: "multipart/form-data";
@@ -3009,18 +2998,11 @@ describe("typespec-client-generator-core: package", () => {
         /** Glossary / translation memory will be used during translation in the form. */
         glossary?: bytes[];
       }
-      
-      #suppress "@azure-tools/typespec-azure-core/byos"
-      @post
-      @route("document:translate")
-      op documentTranslate is RpcOperation<
-        DocumentTranslateContent,
-        DocumentTranslateResult,
-        SupportsRepeatableRequests
-      >;
+      alias Intersected = DocumentTranslateContent & {};
+      op test(...Intersected): void;
       `);
-      const method = getServiceMethodOfClient(runnerWithCore.context.experimental_sdkPackage);
-      strictEqual(method.parameters.length, 4);
+      const method = getServiceMethodOfClient(runner.context.experimental_sdkPackage);
+      strictEqual(method.parameters.length, 3);
       const documentMethodParam = method.parameters.find((x) => x.name === "document");
       ok(documentMethodParam);
       strictEqual(documentMethodParam.kind, "method");
@@ -3030,7 +3012,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(glossaryMethodParam.kind, "method");
 
       ok(method.parameters.find((x) => x.name === "contentType"));
-      ok(method.parameters.find((x) => x.name === "accept"));
 
       const op = method.operation;
       ok(op.bodyParam);
