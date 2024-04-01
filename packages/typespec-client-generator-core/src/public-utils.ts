@@ -174,7 +174,10 @@ export function getLibraryName(
     return (
       type.name +
       type.templateMapper.args
-        .filter((arg): arg is Model => arg.kind === "Model" && arg.name.length > 0)
+        .filter(
+          (arg): arg is Model =>
+            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+        )
         .map((arg) => pascalCase(arg.name))
         .join("")
     );
