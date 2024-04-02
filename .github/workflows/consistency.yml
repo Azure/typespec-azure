@@ -57,8 +57,8 @@ jobs:
         name: Check formatting
 
   # Lint
-  format:
-    name: Format
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/actions/setup
