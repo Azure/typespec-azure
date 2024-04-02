@@ -12,20 +12,30 @@ title: "[I] SdkContext"
 | Type parameter | Value |
 | :------ | :------ |
 | `TOptions` extends `object` | `Record`<`string`, `any`\> |
+| `TServiceOperation` extends [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) | [`SdkHttpOperation`](SdkHttpOperation.md) |
 
 ## Properties
 
-| Property | Type | Inherited from |
-| :------ | :------ | :------ |
-| `arm?` | `boolean` | `TCGCContext.arm` |
-| `emitContext` | `EmitContext`<`TOptions`\> | - |
-| `emitterName` | `string` | `TCGCContext.emitterName` |
-| `filterOutCoreModels?` | `boolean` | `TCGCContext.filterOutCoreModels` |
-| `generateConvenienceMethods?` | `boolean` | `TCGCContext.generateConvenienceMethods` |
-| `generateProtocolMethods?` | `boolean` | `TCGCContext.generateProtocolMethods` |
-| `generatedNames?` | `Set`<`string`\> | `TCGCContext.generatedNames` |
-| `knownScalars?` | `Record`<`string`, [`SdkBuiltInKinds`](../type-aliases/SdkBuiltInKinds.md)\> | `TCGCContext.knownScalars` |
-| `modelsMap?` | `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\> | `TCGCContext.modelsMap` |
-| `operationModelsMap?` | `Map`<`Operation`, `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\>\> | `TCGCContext.operationModelsMap` |
-| `packageName?` | `string` | `TCGCContext.packageName` |
-| `program` | `Program` | `TCGCContext.program` |
+| Property | Type | Description | Inherited from |
+| :------ | :------ | :------ | :------ |
+| `__api_version_client_default_value?` | `string` | - | `TCGCContext.__api_version_client_default_value` |
+| `__api_version_parameter?` | [`SdkParameter`](../type-aliases/SdkParameter.md) | - | `TCGCContext.__api_version_parameter` |
+| `__api_versions?` | `string`[] | - | `TCGCContext.__api_versions` |
+| `__clients?` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\>[] | - | - |
+| `arm?` | `boolean` | - | `TCGCContext.arm` |
+| `emitContext` | `EmitContext`<`TOptions`\> | - | - |
+| `emitterName` | `string` | - | `TCGCContext.emitterName` |
+| ~~`experimental_sdkPackage`~~ | [`SdkPackage`](SdkPackage.md)<`TServiceOperation`\> | **Deprecated**<br />This property is deprecated. Use `.sdkPackage` instead. | - |
+| `filterOutCoreModels?` | `boolean` | - | `TCGCContext.filterOutCoreModels` |
+| `flattenUnionAsEnum?` | `boolean` | - | `TCGCContext.flattenUnionAsEnum` |
+| `generateConvenienceMethods?` | `boolean` | - | `TCGCContext.generateConvenienceMethods` |
+| `generateProtocolMethods?` | `boolean` | - | `TCGCContext.generateProtocolMethods` |
+| `generatedNames?` | `Map`<`Model` \| `Union`, `string`\> | - | `TCGCContext.generatedNames` |
+| `httpOperationCache?` | `Map`<`Operation`, `HttpOperation`\> | - | `TCGCContext.httpOperationCache` |
+| `knownScalars?` | `Record`<`string`, [`SdkBuiltInKinds`](../type-aliases/SdkBuiltInKinds.md)\> | - | `TCGCContext.knownScalars` |
+| `modelsMap?` | `Map`<`Type`, [`SdkEnumType`](SdkEnumType.md) \| [`SdkModelType`](SdkModelType.md)\> | - | `TCGCContext.modelsMap` |
+| `operationModelsMap?` | `Map`<`Operation`, `Map`<`Type`, [`SdkEnumType`](SdkEnumType.md) \| [`SdkModelType`](SdkModelType.md)\>\> | - | `TCGCContext.operationModelsMap` |
+| `packageName?` | `string` | - | `TCGCContext.packageName` |
+| `program` | `Program` | - | `TCGCContext.program` |
+| `sdkPackage` | [`SdkPackage`](SdkPackage.md)<`TServiceOperation`\> | - | - |
+| `unionsMap?` | `Map`<`Union`, [`SdkUnionType`](SdkUnionType.md)\> | - | `TCGCContext.unionsMap` |
