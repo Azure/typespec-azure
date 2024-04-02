@@ -1119,33 +1119,40 @@ function checkAndGetClientType(
   return diagnostics.wrap([clientType]);
 }
 
+interface ModelUsageOptions {
+  seenModelNames?: Set<SdkType>;
+  recurseThroughProperties?: boolean;
+}
+
 function updateUsageOfModel(
   context: TCGCContext,
   usage: UsageFlags,
   type?: SdkType,
-  seenModelNames?: Set<SdkType>
+  options?: ModelUsageOptions
 ): void {
+  options = options ?? {};
+  options.recurseThroughProperties = options?.recurseThroughProperties ?? true;
   if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
     return;
-  if (seenModelNames === undefined) {
-    seenModelNames = new Set<SdkType>();
+  if (options?.seenModelNames === undefined) {
+    options.seenModelNames = new Set<SdkType>();
   }
-  if (type.kind === "model" && seenModelNames.has(type)) return; // avoid circular references
+  if (type.kind === "model" && options.seenModelNames.has(type)) return; // avoid circular references
   if (type.kind === "array" || type.kind === "dict") {
-    return updateUsageOfModel(context, usage, type.valueType, seenModelNames);
+    return updateUsageOfModel(context, usage, type.valueType, options);
   }
   if (type.kind === "union") {
     for (const unionType of type.values) {
-      updateUsageOfModel(context, usage, unionType, seenModelNames);
+      updateUsageOfModel(context, usage, unionType, options);
     }
     return;
   }
   if (type.kind === "enumvalue") {
-    updateUsageOfModel(context, usage, type.enumType, seenModelNames);
+    updateUsageOfModel(context, usage, type.enumType, options);
     return;
   }
   if (type.kind !== "model" && type.kind !== "enum") return;
-  seenModelNames.add(type);
+  options.seenModelNames.add(type);
 
   const usageOverride = getUsageOverride(context, type.__raw as any);
   if (usageOverride) {
@@ -1160,18 +1167,20 @@ function updateUsageOfModel(
     type.baseModel.usage |= usage;
   }
   if (type.baseModel) {
-    updateUsageOfModel(context, usage, type.baseModel, seenModelNames);
+    updateUsageOfModel(context, usage, type.baseModel, options);
   }
   if (type.discriminatedSubtypes) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
-      updateUsageOfModel(context, usage, discriminatedSubtype, seenModelNames);
+      updateUsageOfModel(context, usage, discriminatedSubtype, options);
     }
   }
-  if (type.additionalProperties) {
-    updateUsageOfModel(context, usage, type.additionalProperties, seenModelNames);
+  if (type.additionalProperties && options.recurseThroughProperties) {
+    updateUsageOfModel(context, usage, type.additionalProperties, options);
   }
-  for (const property of type.properties) {
-    updateUsageOfModel(context, usage, property.type, seenModelNames);
+  if (options.recurseThroughProperties) {
+    for (const property of type.properties) {
+      updateUsageOfModel(context, usage, property.type, options);
+    }
   }
 }
 
@@ -1216,7 +1225,9 @@ function updateTypesFromOperation(
     }
     if (isMultipartFormData(context, httpBody.type, operation)) {
       bodies.forEach((body) => {
-        updateUsageOfModel(context, UsageFlags.MultipartFormData, body);
+        updateUsageOfModel(context, UsageFlags.MultipartFormData, body, {
+          recurseThroughProperties: false,
+        });
       });
     }
   }
