@@ -39,7 +39,7 @@ import {
 } from "./interfaces.js";
 import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { experimental_getSdkPackage } from "./package.js";
+import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
@@ -512,6 +512,7 @@ export function createSdkContext<
     program: context.program,
     emitContext: context,
     experimental_sdkPackage: undefined!,
+    sdkPackage: undefined!,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
@@ -519,7 +520,9 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
   };
-  sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
+  sdkContext.sdkPackage = getSdkPackage(sdkContext);
+  // eslint-disable-next-line deprecation/deprecation
+  sdkContext.experimental_sdkPackage = sdkContext.sdkPackage;
   return sdkContext;
 }
 
