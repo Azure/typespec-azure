@@ -26,10 +26,7 @@ interface Widgets {
 The name of the request body parameter is `resource` so you can change the name in clients using an augment decorator
 
 ```tsp
-@@projectedName(Widgets.createOrUpdate::parameters.resource,
-  "client",
-  "<desired-request-body-parameter-name>"
-);
+@@clientName(Widgets.createOrUpdate::parameters.resource, "<desired-request-body-parameter-name>");
 ```
 
 Note that this works for _any_ PUT operation template.
@@ -47,10 +44,7 @@ interface Widgets {
 The name of the request body parameter is `properties` so you can change the name in clients using an augment decorator
 
 ```tsp
-@@projectedName(Widgets.update::parameters.properties,
-  "client",
-  "<desired-request-body-parameter-name>"
-);
+@@clientName(Widgets.update::parameters.properties, "<desired-request-body-parameter-name>");
 ```
 
 Note that this works for _any_ PATCH operation template.
@@ -68,10 +62,7 @@ interface Widgets {
 The name of the request body parameter is `body` so you can change the name in clients using an augment decorator
 
 ```tsp
-@@projectedName(Widgets.mungeWidget::parameters.body,
-  "client",
-  "<desired-request-body-parameter-name>"
-);
+@@clientName(Widgets.mungeWidget::parameters.body, "<desired-request-body-parameter-name>");
 ```
 
 Note that this works for _any_ POST operation template.
