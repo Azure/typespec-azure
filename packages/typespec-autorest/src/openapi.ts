@@ -1635,6 +1635,29 @@ function createOAPIEmitter(
     );
   }
 
+  function getDiscriminatorValue(model: Model): string | undefined {
+    let discriminator;
+    let current = model;
+    while (current.baseModel) {
+      discriminator = getDiscriminator(program, current.baseModel);
+      if (discriminator) {
+        break;
+      }
+      current = current.baseModel;
+    }
+    if (discriminator === undefined) {
+      return undefined;
+    }
+    const prop = getProperty(model, discriminator.propertyName);
+    if (prop) {
+      const values = getStringValues(prop.type);
+      if (values.length === 1) {
+        return values[0];
+      }
+    }
+    return undefined;
+  }
+
   function getSchemaForModel(model: Model, visibility: Visibility) {
     const array = getArrayType(model, visibility);
     if (array) {
@@ -1647,17 +1670,11 @@ function createOAPIEmitter(
     };
 
     if (model.baseModel) {
-      const discriminator = getDiscriminator(program, model.baseModel);
-      if (discriminator) {
-        const prop = getProperty(model, discriminator.propertyName);
-        if (prop) {
-          const values = getStringValues(prop.type);
-          if (values.length === 1) {
-            const extensions = getExtensions(program, model);
-            if (!extensions.has("x-ms-discriminator-value")) {
-              modelSchema["x-ms-discriminator-value"] = values[0];
-            }
-          }
+      const discriminatorValue = getDiscriminatorValue(model);
+      if (discriminatorValue) {
+        const extensions = getExtensions(program, model);
+        if (!extensions.has("x-ms-discriminator-value")) {
+          modelSchema["x-ms-discriminator-value"] = discriminatorValue;
         }
       }
     }

@@ -154,25 +154,16 @@ function getSdkLroServiceMethod<
   const basicServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
   );
-  const finalResult = metadata.finalResult ?? metadata.logicalResult;
-  if (finalResult === "void") {
-    basicServiceMethod.response.type = undefined;
-  } else if (finalResult) {
-    basicServiceMethod.response.type = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, finalResult)
-    );
-  }
-  let resultPath = metadata.finalResultPath ?? metadata.logicalPath;
-  if (!resultPath) {
-    // keep this specifically as envelopeResult and not finalEnvelopeResult, bc this is a very specific scenario
-    if (
-      metadata.envelopeResult !== metadata.logicalResult &&
-      basicServiceMethod.operation.verb === "post"
-    ) {
-      resultPath = "result";
-    }
-  }
-  basicServiceMethod.response;
+
+  basicServiceMethod.response.type = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, metadata.logicalResult)
+  );
+  basicServiceMethod.response.resultPath =
+    metadata.logicalPath ??
+    (metadata.envelopeResult !== metadata.logicalResult &&
+    basicServiceMethod.operation.verb === "post"
+      ? "result"
+      : undefined);
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
@@ -185,7 +176,7 @@ function getSdkLroServiceMethod<
       )
     ),
     getResponseMapping(): string | undefined {
-      return resultPath;
+      return this.response.resultPath;
     },
   });
 }
@@ -540,7 +531,7 @@ function createSdkClientType<
   return diagnostics.wrap(sdkClientType);
 }
 
-export function experimental_getSdkPackage<
+export function getSdkPackage<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
