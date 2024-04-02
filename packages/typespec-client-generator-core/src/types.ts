@@ -208,9 +208,12 @@ function getSdkBuiltInTypeWithDiagnostics(
         kind = getScalarKind(type);
       }
     }
+    const docWrapper = getDocHelper(context, type);
     return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
+      description: docWrapper.description,
+      details: docWrapper.details,
     });
   } else if (type.kind === "String" || type.kind === "Boolean" || type.kind === "Number") {
     let kind: SdkBuiltInKinds;
@@ -779,6 +782,9 @@ export function getClientTypeWithDiagnostics(
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
         const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
         retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
+        const docWrapper = getDocHelper(context, type);
+        retval.description = docWrapper.description;
+        retval.details = docWrapper.details;
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
