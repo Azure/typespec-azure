@@ -473,13 +473,17 @@ function addDiscriminatorToModelType(
       kind: "property",
       optional: false,
       discriminator: true,
-      serializedName: discriminatorProperty ? discriminatorProperty.serializedName : discriminator.propertyName,
+      serializedName: discriminatorProperty
+        ? discriminatorProperty.serializedName
+        : discriminator.propertyName,
       type: discriminatorType!,
       nameInClient: name,
       name,
       isGeneratedName: false,
       onClient: false,
-      apiVersions: discriminatorProperty ? getAvailableApiVersions(context, discriminatorProperty.__raw!) : getAvailableApiVersions(context, type),
+      apiVersions: discriminatorProperty
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!)
+        : getAvailableApiVersions(context, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
