@@ -263,6 +263,25 @@ describe("typespec-client-generator-core: types", () => {
         }
       }
     });
+    it("with doc", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @doc("doc")
+        @summary("title")
+        scalar TestScalar extends string;
+        
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          prop: TestScalar;
+        }
+      `
+      );
+      const models = getAllModels(runner.context);
+      strictEqual(models[0].kind, "model");
+      strictEqual(models[0].properties[0].type.description, "title");
+      strictEqual(models[0].properties[0].type.details, "doc");
+    });
   });
   describe("SdkDurationType", () => {
     it("default", async function () {
@@ -333,9 +352,11 @@ describe("typespec-client-generator-core: types", () => {
     it("float seconds decorated scalar", async function () {
       await runner.compileWithBuiltInService(
         `
+        @doc("doc")
+        @summary("title")
         @encode(DurationKnownEncoding.seconds, float32)
         scalar Float32Duration extends duration;
-
+        
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -348,6 +369,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.valueType.kind, "duration");
       strictEqual(sdkType.valueType.wireType.kind, "float32");
       strictEqual(sdkType.valueType.encode, "seconds");
+      strictEqual(sdkType.valueType.description, "title");
+      strictEqual(sdkType.valueType.details, "doc");
     });
   });
 
@@ -420,6 +443,8 @@ describe("typespec-client-generator-core: types", () => {
     it("unixTimestamp array", async function () {
       await runner.compileWithBuiltInService(
         `
+        @doc("doc")
+        @summary("title")
         @encode(DateTimeKnownEncoding.unixTimestamp, int64)
         scalar unixTimestampDatetime extends utcDateTime;
 
@@ -435,6 +460,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.valueType.kind, "utcDateTime");
       strictEqual(sdkType.valueType.wireType.kind, "int64");
       strictEqual(sdkType.valueType.encode, "unixTimestamp");
+      strictEqual(sdkType.valueType.description, "title");
+      strictEqual(sdkType.valueType.details, "doc");
     });
   });
   describe("SdkUnionType", () => {
