@@ -1,4 +1,5 @@
 #!/usr/bin/env pwsh
+#cSpell:disable
 <#
 .SYNOPSIS
 This script analyzes a Git repository to find all commits that add a new 'tspconfig.yaml' file within a specified date range.
