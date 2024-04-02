@@ -2757,7 +2757,7 @@ describe("typespec-client-generator-core: package", () => {
         `);
       const sdkPackage = runner.context.experimental_sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
