@@ -1,0 +1,23 @@
+name: Install dependencies
+description: Setup for node. pnpm and dependencies
+inputs:
+  node-version:
+    required: false
+    description: Node version for setup-node
+    default: 20.x
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+
+    - name: Set node version to ${{ inputs.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}

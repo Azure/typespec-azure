@@ -15,20 +15,10 @@ jobs:
     name: Check Changes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 ## Needed for Changesets to find `main` branch
-          submodules: recursive
+      - uses: ./.github/actions/setup
 
       - run: git pull --force --no-tags origin main:main
         name: Get main ref
-
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
-
-      - uses: pnpm/action-setup@v2
 
       - run: pnpm install
         name: Install dependencies
@@ -39,3 +29,58 @@ jobs:
 
       - run: node eng/scripts/validate-core-submodule.js
         name: Check that core submodule is merged to core repo
+
+  # Validate spell check
+  spellcheck:
+    name: Spell check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup
+
+      - run: pnpm install
+        name: Install dependencies
+
+      - run: pnpm run cspell
+        name: Spell check
+
+  # Validate formatting
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup
+
+      - run: pnpm install
+        name: Install dependencies
+
+      - run: pnpm run format:check
+        name: Check formatting
+
+  # Lint
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup
+
+      - run: pnpm install
+        name: Install dependencies
+
+      - run: pnpm run lint
+        name: Lint
+
+  # Verify Arm OpenAPI common types are up to date
+  common-types-up-to-date:
+    name: Common types up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup
+
+      - run: pnpm install
+        name: Install dependencies
+
+      - run: node eng/scripts/download-common-types.js v3
+        name: Swagger - Fetch common-types v3
+
+      - run: node eng/scripts/check-for-changed-files.js
+        name: Check Git Status For Changed Files

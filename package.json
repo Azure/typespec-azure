@@ -6,7 +6,6 @@
   "scripts": {
     "run-all": "pnpm -r --filter=!./core/",
     "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build ",
-    "check-format": "pnpm run prettier --check",
     "check-version-mismatch": "syncpack list-mismatches",
     "change": "chronus",
     "clean": "pnpm run-all run clean",
@@ -14,6 +13,7 @@
     "dogfood": "pnpm install && pnpm build && pnpm run-all dogfood",
     "fix-version-mismatch": "syncpack fix-mismatches",
     "format": "pnpm run prettier --write",
+    "format:check": "pnpm run prettier --check",
     "lint": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run lint",
     "pack:all": "chronus pack --pack-destination ./temp/artifacts",
     "preinstall": "npx only-allow pnpm",

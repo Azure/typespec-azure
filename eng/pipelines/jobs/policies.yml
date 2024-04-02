@@ -1,0 +1,29 @@
+parameters:
+
+steps:
+  - checkout: self
+    submodules: true
+
+  - template: /eng/pipelines/templates/install.yml
+
+  - script: pnpm run check-version-mismatch
+    displayName: Check version mismatch
+
+  - script: pnpm run check-format
+    displayName: Check Formatting
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: pnpm run lint
+    displayName: Lint
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: node eng/scripts/download-common-types.js v3
+    displayName: Swagger - Fetch common-types v3
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: node eng/scripts/check-for-changed-files.js
+    displayName: Check Git Status For Changed Files
+
+  - script: pnpm run cspell
+    displayName: Spell check
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
