@@ -15,7 +15,6 @@
     "fix-version-mismatch": "syncpack fix-mismatches",
     "format": "pnpm run prettier --write",
     "lint": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run lint",
-    "merge-coverage": "c8 -- report --reporter=cobertura --reporter=text",
     "pack:all": "chronus pack --pack-destination ./temp/artifacts",
     "preinstall": "npx only-allow pnpm",
     "prepare-publish": "node ./eng/scripts/prepare-publish.js",

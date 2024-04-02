@@ -23,5 +23,5 @@ jobs:
       - script: node packages/e2e-tests/e2e-tests.mjs
         displayName: Cadl Ranch e2e tests
 
-      - script: pnpm e2e
+      - script: pnpm test:e2e
         displayName: UI Tests
