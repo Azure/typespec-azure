@@ -416,7 +416,7 @@ function addDiscriminatorToModelType(
       updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
-          if (property.serializedName === discriminator?.propertyName) {
+          if (property.__raw?.name === discriminator?.propertyName) {
             if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
               diagnostics.add(
                 createDiagnostic({
@@ -451,7 +451,7 @@ function addDiscriminatorToModelType(
     }
     for (let i = 0; i < model.properties.length; i++) {
       const property = model.properties[i];
-      if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
+      if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
         property.discriminator = true;
         model.discriminatorProperty = property;
         return diagnostics.wrap(undefined);
@@ -471,18 +471,22 @@ function addDiscriminatorToModelType(
         encode: "string",
       };
     }
-    const name = discriminator.propertyName;
+    const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
       kind: "property",
       optional: false,
       discriminator: true,
-      serializedName: discriminator.propertyName,
+      serializedName: discriminatorProperty
+        ? discriminatorProperty.serializedName
+        : discriminator.propertyName,
       type: discriminatorType!,
       nameInClient: name,
       name,
       isGeneratedName: false,
       onClient: false,
-      apiVersions: getAvailableApiVersions(context, type),
+      apiVersions: discriminatorProperty
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!)
+        : getAvailableApiVersions(context, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened

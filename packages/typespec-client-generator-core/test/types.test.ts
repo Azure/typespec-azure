@@ -2200,6 +2200,39 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindType.isFixed, false);
     });
 
+    it("discriminator rename", async () => {
+      await runner.compileWithBuiltInService(`
+      @discriminator("kind")
+      model Fish {
+        @clientName("type")
+        @encodedName("application/json", "@data.kind")
+        kind: string;
+        age: int32;
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
+        friends?: Fish[];
+        hate?: Record<Fish>;
+        partner?: Fish;
+      }
+
+      @get
+      op getModel(): Fish;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const fish = models.find((x) => x.name === "Fish");
+      ok(fish);
+      strictEqual(fish.properties.length, 2);
+      const discriminatorProperty = fish.properties.find((x) => x.name === "type");
+      ok(discriminatorProperty);
+      strictEqual(discriminatorProperty.kind, "property");
+      strictEqual(discriminatorProperty.discriminator, true);
+      strictEqual(discriminatorProperty.type.kind, "string");
+      strictEqual(discriminatorProperty.serializedName, "@data.kind");
+    });
+
     it("filterOutCoreModels true", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
