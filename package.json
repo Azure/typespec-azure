@@ -22,8 +22,8 @@
     "purge": "rimraf --glob \"packages/*/node_modules/\" --glob \"core/packages/*/node_modules/\"",
     "regen-docs": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run regen-docs",
     "regen-samples": "pnpm run-all run regen-samples",
-    "test-official": "pnpm run-all --aggregate-output --reporter=append-only test-official",
-    "test:e2e": "pnpm run-all run e2e",
+    "test-official": "pnpm run-all --aggregate-output --reporter=append-only --sequential test-official",
+    "test:e2e": "pnpm run-all run test:e2e",
     "test": "pnpm run-all --aggregate-output --reporter=append-only run test",
     "update-latest-docs": "pnpm run-all run update-latest-docs",
     "watch": "tsc --build ./tsconfig.ws.json --watch"
