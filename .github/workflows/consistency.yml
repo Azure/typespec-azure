@@ -60,6 +60,9 @@ jobs:
           submodules: recursive
       - uses: ./.github/actions/setup
 
+      - run: pnpm --filter="@typespec/prettier-plugin-typespec..." run  build
+        name: Build prettier plugin
+
       - run: pnpm install
         name: Install dependencies
 
@@ -79,6 +82,9 @@ jobs:
 
       - run: pnpm install
         name: Install dependencies
+
+      - run: pnpm --filter="@typespec/eslint-plugin..." run  build
+        name: Build prettier plugin
 
       - run: pnpm run lint
         name: Lint
