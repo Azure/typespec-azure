@@ -9,10 +9,10 @@ extends:
     variables:
       - template: /eng/pipelines/templates/variables/globals.yml@self
     stages:
-      - stage: Build_And_Test
+      - stage: CI
         jobs:
-          - job: CI_AutorestChecks
-            displayName: "CI Autorest Checks"
+          - job: AutorestChecks
+            displayName: "Autorest Checks"
             pool:
               name: $(LINUXPOOL)
               image: $(LINUXVMIMAGE)
@@ -23,8 +23,7 @@ extends:
                 parameters:
                   nodeVersion: 20.x
 
-          - job: CI_Linux
-            displayName: "CI Linux"
+          - job: Linux
             variables:
               TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
               TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
@@ -48,7 +47,7 @@ extends:
                   dotnetVersion: 8.0.x
                   osName: linux
 
-          - job: CI_Windows
+          - job: Windows
             displayName: "CI Windows"
             variables:
               TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build

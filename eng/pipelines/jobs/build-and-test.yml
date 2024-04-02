@@ -14,10 +14,6 @@ steps:
     parameters:
       nodeVersion: ${{ parameters.nodeVersion }}
 
-  # Only running UI test on linux
-  - ${{ if ne(variables['Agent.OS'], 'Windows_NT') }}:
-      - template: /eng/pipelines/templates/install-browsers.yml
-
   - script: pnpm run check-version-mismatch
     displayName: Check version mismatch
 
