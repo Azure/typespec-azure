@@ -582,10 +582,6 @@ components:
             - running
             - failed
             - succeeded
-            - running
-            - failed
-            - succeeded
-            - canceled
       description: Operation status.
     AuthorizeCopyRequest:
       type: object
@@ -1399,9 +1395,6 @@ components:
         - type: string
           enum:
             - notStarted
-            - running
-            - failed
-            - succeeded
             - running
             - failed
             - succeeded
