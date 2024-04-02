@@ -1084,8 +1084,6 @@ components:
             - none
             - generateNormalizedImages
             - generateNormalizedImagePerPage
-            - detectAngles
-            - replace
       description: Determines how to process embedded images and image files in Azure blob storage.  Setting the "imageAction" configuration to any value other than "none" requires that a skillset also be attached to that indexer.
     BlobIndexerPDFTextRotationAlgorithm:
       anyOf:
@@ -1093,10 +1091,7 @@ components:
         - type: string
           enum:
             - none
-            - generateNormalizedImages
-            - generateNormalizedImagePerPage
             - detectAngles
-            - replace
       description: Determines algorithm for text extraction from PDF files in Azure blob storage.
     BlobIndexerParsingMode:
       anyOf:
@@ -1406,45 +1401,6 @@ components:
         - type: string
           enum:
             - da
-            - nl
-            - en
-            - fi
-            - fr
-            - de
-            - it
-            - ja
-            - ko
-            - no
-            - pl
-            - pt-PT
-            - pt-BR
-            - ru
-            - es
-            - sv
-            - nl
-            - en
-            - fi
-            - fr
-            - de
-            - el
-            - it
-            - ja
-            - ko
-            - no
-            - pl
-            - pt-PT
-            - ru
-            - es
-            - sv
-            - tr
-            - de
-            - en
-            - es
-            - fi
-            - fr
-            - it
-            - ko
-            - pt
             - de
             - en
             - es
@@ -2267,38 +2223,6 @@ components:
             - ru
             - es
             - sv
-            - nl
-            - en
-            - fi
-            - fr
-            - de
-            - el
-            - it
-            - ja
-            - ko
-            - no
-            - pl
-            - pt-PT
-            - ru
-            - es
-            - sv
-            - tr
-            - de
-            - en
-            - es
-            - fi
-            - fr
-            - it
-            - ko
-            - pt
-            - de
-            - en
-            - es
-            - fi
-            - fr
-            - it
-            - ko
-            - pt
       description: The language codes supported for input text by KeyPhraseExtractionSkill.
     KeywordMarkerTokenFilter:
       type: object
@@ -3091,9 +3015,6 @@ components:
         - type: string
           enum:
             - none
-            - generateNormalizedImages
-            - generateNormalizedImagePerPage
-            - detectAngles
             - replace
     PathHierarchyTokenizerV2:
       type: object
@@ -4014,21 +3935,6 @@ components:
             - fi
             - fr
             - de
-            - it
-            - ja
-            - ko
-            - no
-            - pl
-            - pt-PT
-            - pt-BR
-            - ru
-            - es
-            - sv
-            - nl
-            - en
-            - fi
-            - fr
-            - de
             - el
             - it
             - ja
@@ -4040,22 +3946,6 @@ components:
             - es
             - sv
             - tr
-            - de
-            - en
-            - es
-            - fi
-            - fr
-            - it
-            - ko
-            - pt
-            - de
-            - en
-            - es
-            - fi
-            - fr
-            - it
-            - ko
-            - pt
       description: The language codes supported for input text by SentimentSkill.
     SentimentSkillV3:
       type: object
@@ -4209,45 +4099,6 @@ components:
         - type: string
           enum:
             - da
-            - nl
-            - en
-            - fi
-            - fr
-            - de
-            - it
-            - ja
-            - ko
-            - no
-            - pl
-            - pt-PT
-            - pt-BR
-            - ru
-            - es
-            - sv
-            - nl
-            - en
-            - fi
-            - fr
-            - de
-            - el
-            - it
-            - ja
-            - ko
-            - no
-            - pl
-            - pt-PT
-            - ru
-            - es
-            - sv
-            - tr
-            - de
-            - en
-            - es
-            - fi
-            - fr
-            - it
-            - ko
-            - pt
             - de
             - en
             - es
