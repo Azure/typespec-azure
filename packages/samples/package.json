@@ -28,7 +28,7 @@
     "watch": "tsc -p . --watch",
     "test": "vitest run",
     "test:watch": "vitest -w",
-    "test-official": "vitest run --coverage --reporter=junit --reporter=default --no-file-parallelism",
+    "test-official": "vitest run --coverage",
     "test:regen": "cross-env RECORD=true vitest run",
     "regen-samples": "cross-env RECORD=true vitest run"
   },
