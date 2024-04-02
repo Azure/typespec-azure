@@ -49,19 +49,6 @@ steps:
     displayName: "Purge dependencies"
     condition: always()
 
-  # It's important for performance to pass "packages" as "searchFolder" to avoid looking under root "node_modules".
-  # PublishTestResults.searchFolder only supports absolute paths, not relative.
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: "JUnit"
-      searchFolder: "$(System.DefaultWorkingDirectory)/core/packages"
-      testResultsFiles: "*/test-results.xml"
-      mergeTestResults: true
-      failTaskOnFailedTests: false
-      testRunTitle: "[CORE] Test os: ${{ parameters.osName }}, node: ${{ parameters.nodeVersion }}"
-    displayName: Publish core test results
-    condition: always()
-
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: "JUnit"
@@ -69,14 +56,6 @@ steps:
       testResultsFiles: "*/test-results.xml"
       mergeTestResults: true
       failTaskOnFailedTests: false
-      testRunTitle: "[NON-CORE] Test os: ${{ parameters.osName }}, node: ${{ parameters.nodeVersion }}"
+      testRunTitle: "Test os: ${{ parameters.osName }}, node: ${{ parameters.nodeVersion }}"
     displayName: Publish non-core test results
     condition: always()
-
-  # Disable for now as e2e test are disabled - REMOVE BEFORE MERGING
-  # - task: 1ES.PublishPipelineArtifact@1
-  #   displayName: Publish UI tests artifacts
-  #   condition: ne(variables['Agent.OS'], 'Windows_NT')
-  #   inputs:
-  #     path: : ./core/packages/playground-website/test-results
-  #     artifact: "uitestresults-${{ parameters.osName }}-node-${{ parameters.nodeVersion }}"

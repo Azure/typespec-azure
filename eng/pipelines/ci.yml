@@ -67,8 +67,7 @@ extends:
                 displayName: Create github releases
                 env:
                   GITHUB_TOKEN: $(azuresdk-github-pat)
-
-              - task: AzureCLI@1
+ 
                 displayName: "Publish bundled packages to package storage"
                 inputs:
                   azureSubscription: "Azure SDK Engineering System"
