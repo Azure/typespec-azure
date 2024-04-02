@@ -1171,7 +1171,7 @@ function updateUsageOfModel(
       updateUsageOfModel(context, usage, discriminatedSubtype, options);
     }
   }
-  if (type.additionalProperties && options.propagation) {
+  if (type.additionalProperties) {
     updateUsageOfModel(context, usage, type.additionalProperties, options);
   }
   for (const property of type.properties) {
