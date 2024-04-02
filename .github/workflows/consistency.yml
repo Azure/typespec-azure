@@ -15,6 +15,10 @@ jobs:
     name: Check Changes
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - uses: ./.github/actions/setup
 
       - run: git pull --force --no-tags origin main:main
@@ -35,6 +39,9 @@ jobs:
     name: Spell check
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: ./.github/actions/setup
 
       - run: pnpm install
@@ -48,6 +55,9 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: ./.github/actions/setup
 
       - run: pnpm install
@@ -61,6 +71,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - uses: ./.github/actions/setup
 
       - run: pnpm install
@@ -74,6 +88,10 @@ jobs:
     name: Common types up to date
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - uses: ./.github/actions/setup
 
       - run: pnpm install

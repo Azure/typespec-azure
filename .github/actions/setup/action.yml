@@ -10,10 +10,6 @@ runs:
   using: composite
 
   steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
     - name: Install pnpm
       uses: pnpm/action-setup@v2
 
