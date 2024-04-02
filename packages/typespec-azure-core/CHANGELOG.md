@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.41.0
+
+### Bug Fixes
+
+- [#392](https://github.com/Azure/typespec-azure/pull/392) Fix `@lroStatus` not detecting default states correctly when using union
+- [#498](https://github.com/Azure/typespec-azure/pull/498) `no-enum` rule codefix now convert to named variant when the enum had not values (e.g. `enum E {a, b}`)
+- [#549](https://github.com/Azure/typespec-azure/pull/549) Remove readOnly from nextLink in templates (#418)
+- [#462](https://github.com/Azure/typespec-azure/pull/462) Update `property-name-conflict` linter rule to stop looking and recommending `@projectedName` in favor of `@clientName`
+
+### Bump dependencies
+
+- [#437](https://github.com/Azure/typespec-azure/pull/437) Update dependencies
+
+### Features
+
+- [#407](https://github.com/Azure/typespec-azure/pull/407) Adding new `armResourceIdentifier` scalar to represent an Arm ID
+- [#505](https://github.com/Azure/typespec-azure/pull/505) Enable `no-closed-literal` linter rule by default in `all` ruleset
+- [#467](https://github.com/Azure/typespec-azure/pull/467) Enable `no-enum` rule by default in `all` ruleset
+
+
 ## 0.40.0
 
 ### Bug Fixes

@@ -28,7 +28,8 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"wrong-client-decorator"`
   \| `"encoding-multipart-bytes"`
   \| `"unsupported-kind"`
-  \| `"multiple-services"` |
+  \| `"multiple-services"`
+  \| `"server-param-not-path"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters

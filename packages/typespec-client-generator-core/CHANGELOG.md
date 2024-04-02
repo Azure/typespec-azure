@@ -1,5 +1,61 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.0
+
+### Bug Fixes
+
+- [#556](https://github.com/Azure/typespec-azure/pull/556) ensure apiVersion parameter is always generated with name `apiVersion`
+- [#563](https://github.com/Azure/typespec-azure/pull/563) filter out `TypeSpec.ARM` models as well from `sdkPackage.models`
+- [#434](https://github.com/Azure/typespec-azure/pull/434) Fix wrong client cache for package clients calculation
+- [#561](https://github.com/Azure/typespec-azure/pull/561) fix template naming for enums
+- [#508](https://github.com/Azure/typespec-azure/pull/508) fix wrong usage calculation for enum value model property
+- [#517](https://github.com/Azure/typespec-azure/pull/517) fix wrong union `generatedName` flag and refine templated model naming
+- [#389](https://github.com/Azure/typespec-azure/pull/389) rollback change of union as enum with hierarchy
+- [#412](https://github.com/Azure/typespec-azure/pull/412) prevent carry over for `@clientName`
+- [#569](https://github.com/Azure/typespec-azure/pull/569) don't recursively set `MultipartFormData` usage for models that are properties on a `MultipartFormData` model
+- [#572](https://github.com/Azure/typespec-azure/pull/572) Set spread model with none usage
+- [#501](https://github.com/Azure/typespec-azure/pull/501) rename UsageFlags.Versioning to UsageFlags.ApiVersionEnum
+
+### Bump dependencies
+
+- [#437](https://github.com/Azure/typespec-azure/pull/437) Update dependencies
+
+### Features
+
+- [#384](https://github.com/Azure/typespec-azure/pull/384) return Versions enum as part of getAllModels
+- [#538](https://github.com/Azure/typespec-azure/pull/538) When no server url is passed, we still set serverUrl to `{endpoint}` and make one templateArg for `endpoint`. This way, emitters can always look at a combination of serverUrl and templateArguments to get the full picture
+- [#395](https://github.com/Azure/typespec-azure/pull/395) add a cached getHttpOperation helper function
+- [#402](https://github.com/Azure/typespec-azure/pull/402) add `discriminatorProperty` ref to discriminated model
+- [#474](https://github.com/Azure/typespec-azure/pull/474) create SdkEndpointType to encapsulate templating and url
+- [#413](https://github.com/Azure/typespec-azure/pull/413) Add `@access` and `@usage` support for named union
+- [#502](https://github.com/Azure/typespec-azure/pull/502) add UsageFlags.MultipartFormData to represent whether a model is used as form data
+- [#551](https://github.com/Azure/typespec-azure/pull/551) add `isGeneratedName` to `SdkModelPropertyTypes`
+- [#455](https://github.com/Azure/typespec-azure/pull/455) We've added Usage.JsonMergePatch. Usage.Input continues to refer to all inputs, Usage.JsonMergePatch is set if a model is explicitly set as JSON merge patch input body
+- [#572](https://github.com/Azure/typespec-azure/pull/572) Workaround for arm provider method parameter
+- [#573](https://github.com/Azure/typespec-azure/pull/573) support sclar doc
+- [#393](https://github.com/Azure/typespec-azure/pull/393) give a nonredundant name for templated instance model
+- [#513](https://github.com/Azure/typespec-azure/pull/513) all clients now have an initialization property. whether the initialization property is public or not determines whether an end-user should instantiate that client
+
+### Deprecations
+
+- [#560](https://github.com/Azure/typespec-azure/pull/560) add deprecation for `getResponseMapping()` on method, switch to `.resultPath` on `SdkServiceMethodResponse` instead
+- [#504](https://github.com/Azure/typespec-azure/pull/504) deprecate `.arm` on `SdkClientType`. Instead, you should access `.arm` on your `SdkContext`
+- [#381](https://github.com/Azure/typespec-azure/pull/381) deprecating isErrorOrChildOfError. Users should directly use isErrorModel from the standard TypeSpec library
+- [#445](https://github.com/Azure/typespec-azure/pull/445) Users should call `.name` instead of `.nameInClient` on `SdkModelPropertyType`s
+- [#447](https://github.com/Azure/typespec-azure/pull/447) move nullability onto params and responses. Add nullableValues on SdkArrayType and SdkDictionaryType
+- [#503](https://github.com/Azure/typespec-azure/pull/503) Deprecate `.isError` on an `SdkModelType`. With `SdkPackage`, you should not need to know that a model is used as an error.
+- [#511](https://github.com/Azure/typespec-azure/pull/511) Remove support for unused `.overloads` and `.overloading` on `SdkMethod`
+
+### Breaking Changes
+
+- [#451](https://github.com/Azure/typespec-azure/pull/451) adjust generated discriminator property sequence to prevent potential breaking change
+- [#459](https://github.com/Azure/typespec-azure/pull/459) enums are always fixed after we switch to use union to represent extensible enum
+- [#444](https://github.com/Azure/typespec-azure/pull/444) SdkUnionType, SdkEnumType, and SdkModelType will now always have a `.name` property. `.isGeneratedName` is now a boolean that expresses whether the `.name` was generated or described in the tsp
+- [#524](https://github.com/Azure/typespec-azure/pull/524) depcreate getParameterMapping and make .bodyParam on SdkHttpOperation a single optional param instead of list
+- [#536](https://github.com/Azure/typespec-azure/pull/536) git status
+- [#515](https://github.com/Azure/typespec-azure/pull/515) change responses from a record to a mapping of status code, range, or default
+
+
 ## 0.40.0
 
 ### Bug Fixes
