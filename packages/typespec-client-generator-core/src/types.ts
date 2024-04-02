@@ -1121,7 +1121,7 @@ function checkAndGetClientType(
 
 interface ModelUsageOptions {
   seenModelNames?: Set<SdkType>;
-  recurseThroughProperties?: boolean;
+  propagation?: boolean;
 }
 
 function updateUsageOfModel(
@@ -1131,7 +1131,7 @@ function updateUsageOfModel(
   options?: ModelUsageOptions
 ): void {
   options = options ?? {};
-  options.recurseThroughProperties = options?.recurseThroughProperties ?? true;
+  options.propagation = options?.propagation ?? true;
   if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
     return;
   if (options?.seenModelNames === undefined) {
@@ -1162,10 +1162,7 @@ function updateUsageOfModel(
   }
 
   if (type.kind === "enum") return;
-  if (type.baseModel && (type.baseModel.usage & usage) === 0) {
-    // if it has a base model and the base model doesn't currently have that usage
-    type.baseModel.usage |= usage;
-  }
+  if (!options.propagation) return;
   if (type.baseModel) {
     updateUsageOfModel(context, usage, type.baseModel, options);
   }
@@ -1174,13 +1171,11 @@ function updateUsageOfModel(
       updateUsageOfModel(context, usage, discriminatedSubtype, options);
     }
   }
-  if (type.additionalProperties && options.recurseThroughProperties) {
+  if (type.additionalProperties && options.propagation) {
     updateUsageOfModel(context, usage, type.additionalProperties, options);
   }
-  if (options.recurseThroughProperties) {
-    for (const property of type.properties) {
-      updateUsageOfModel(context, usage, property.type, options);
-    }
+  for (const property of type.properties) {
+    updateUsageOfModel(context, usage, property.type, options);
   }
 }
 
@@ -1226,7 +1221,7 @@ function updateTypesFromOperation(
     if (isMultipartFormData(context, httpBody.type, operation)) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.MultipartFormData, body, {
-          recurseThroughProperties: false,
+          propagation: false,
         });
       });
     }
