@@ -3000,6 +3000,32 @@ describe("typespec-client-generator-core: types", () => {
         ["color", "description", "displayName", "name"].sort()
       );
     });
+
+    it("usage doesn't apply to properties of a form data", async function () {
+      await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+          address: Address;
+        }
+
+        model Address {
+          city: string;
+        }
+
+        @post
+        op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
+        `);
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 2);
+      const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+      ok(multiPartRequest);
+      ok(multiPartRequest.usage & UsageFlags.MultipartFormData);
+
+      const address = models.find((x) => x.name === "Address");
+      ok(address);
+      strictEqual(address.usage & UsageFlags.MultipartFormData, 0);
+    });
   });
   describe("SdkTupleType", () => {
     it("model with tupled properties", async function () {
