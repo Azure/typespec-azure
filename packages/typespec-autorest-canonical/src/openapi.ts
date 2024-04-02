@@ -28,7 +28,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  ProjectedNameView,
   Scalar,
   Service,
   StringLiteral,
@@ -40,7 +39,6 @@ import {
   Union,
   UnionVariant,
   compilerAssert,
-  createProjectedNameProgram,
   emitFile,
   getAllTags,
   getDiscriminator,
@@ -56,6 +54,7 @@ import {
   getMinValue,
   getNamespaceFullName,
   getPattern,
+  getProjectedName,
   getProperty,
   getPropertyType,
   getService,
@@ -309,8 +308,6 @@ function createOAPIEmitter(
   const globalConsumes = new Set<string>(["application/json"]);
 
   let outputFile: string;
-  let jsonView: ProjectedNameView;
-  let clientView: ProjectedNameView;
   let context: AutorestCanonicalEmitterContext;
 
   async function emitOpenAPI() {
@@ -320,8 +317,6 @@ function createOAPIEmitter(
     }
     for (const service of services) {
       currentService = service;
-      jsonView = createProjectedNameProgram(program, "json");
-      clientView = createProjectedNameProgram(program, "client");
       context = {
         program,
         service,
@@ -936,19 +931,19 @@ function createOAPIEmitter(
     return placeholder;
   }
 
-  function getJsonName(type: Type & { name: string }) {
-    const viaProjection = jsonView.getProjectedName(type);
+  function getJsonName(type: Type & { name: string }): string {
+    const viaProjection = getProjectedName(program, type, "json");
 
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? viaProjection : encodedName;
+    return encodedName === type.name ? viaProjection ?? type.name : encodedName;
   }
 
   function getClientName(type: Type & { name: string }): string {
-    const viaProjection = clientView.getProjectedName(type);
+    const viaProjection = getProjectedName(program, type, "client");
     const clientName = getClientNameOverride(tcgcSdkContext, type);
-    return clientName ?? viaProjection;
+    return clientName ?? viaProjection ?? type.name;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1557,8 +1552,8 @@ function createOAPIEmitter(
         continue;
       }
 
-      const jsonName = jsonView.getProjectedName(prop);
-      const clientName = clientView.getProjectedName(prop);
+      const jsonName = getJsonName(prop);
+      const clientName = getClientName(prop);
 
       const description = getDoc(program, prop);
 

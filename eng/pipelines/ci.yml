@@ -41,7 +41,7 @@ extends:
 
               - template: /eng/pipelines/templates/build.yml@self
 
-              - script: pnpm run test-official
+              - script: pnpm run test:ci
                 displayName: Test
 
               - template: /eng/pipelines/templates/upload-coverage.yml@self
