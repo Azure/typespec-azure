@@ -237,7 +237,7 @@ enum EmployeeProvisioningState {
 scalar EmployeeLevel extends int32;
 
 scalar EmployeeResourceId
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.HR/employees",
     }
@@ -343,14 +343,14 @@ It is often the case that resources need to reference other resources to provide
 
 ```typespec
 scalar EmployeeResourceId
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.HR/employees",
     }
   ]>;
 
 scalar NetworkInterfaceId
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Network/networkInterfaces",
     },
