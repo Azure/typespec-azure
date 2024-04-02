@@ -205,9 +205,7 @@ export function isAzureCoreModel(t: Type): boolean {
   return (
     t.kind === "Model" &&
     t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations", "Azure.ResourceManager"].includes(
-      getNamespaceFullName(t.namespace)
-    )
+    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
   );
 }
 

@@ -1284,8 +1284,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = runner.context.experimental_sdkPackage.models;
-        strictEqual(models.length, 1);
-        ok(models.find((x) => x.name === "TestRequest" && x.isGeneratedName));
+        strictEqual(models.length, 0);
       });
 
       it("anonymous model for body parameter", async () => {
@@ -1295,8 +1294,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = runner.context.experimental_sdkPackage.models;
-        strictEqual(models.length, 1);
-        ok(models.find((x) => x.name === "TestRequest" && x.isGeneratedName));
+        strictEqual(models.length, 0);
       });
 
       it("anonymous union in response header", async () => {

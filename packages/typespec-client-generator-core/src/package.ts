@@ -234,9 +234,9 @@ function getSdkBasicServiceMethod<
         );
       }
     } else {
-      const methodParameter = diagnostics.pipe(getSdkMethodParameter(context, prop));
-      if (methodParameter.kind === "method") {
-        methodParameters.push(methodParameter);
+      // workaround for the provider parameter in arm, need to refine method design in tcgc later
+      if (!context.arm || prop.name !== "provider") {
+        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop)));
       }
     }
   }
