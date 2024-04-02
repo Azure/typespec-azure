@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  Enum,
   Interface,
   Model,
   ModelProperty,
@@ -175,7 +176,7 @@ export function getLibraryName(
       type.name +
       type.templateMapper.args
         .filter(
-          (arg): arg is Model =>
+          (arg): arg is Model | Enum =>
             (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
         )
         .map((arg) => pascalCase(arg.name))

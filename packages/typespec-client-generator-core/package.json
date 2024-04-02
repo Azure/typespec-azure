@@ -57,6 +57,7 @@
     "pluralize": "^8.0.0"
   },
   "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:~",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/rest": "workspace:~",
