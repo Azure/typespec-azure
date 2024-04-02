@@ -648,6 +648,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       @doc("The properties of a widget")
       model WidgetProperties {
+        #suppress "deprecated" "for testing"
         @doc("The spin of the widget")
         @knownValues(SpinValues)
         spin?: string;
@@ -743,6 +744,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
           @doc("The properties of a widget")
           model WidgetProperties {
+            #suppress "deprecated" "for testing"
             @doc("The spin of the widget")
             @knownValues(SpinValues)
             spin?: string;
@@ -1023,6 +1025,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         }
         @doc("The properties of a widget")
         model WidgetProperties {
+          #suppress "deprecated" "for testing"
           @doc("The spin of the widget")
           @knownValues(SpinValues)
           spin?: string;
