@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0 ## Needed for Changesets to find `main` branch
           submodules: recursive
 
       - uses: ./.github/actions/setup
@@ -60,11 +61,11 @@ jobs:
           submodules: recursive
       - uses: ./.github/actions/setup
 
-      - run: pnpm --filter="@typespec/prettier-plugin-typespec..." run  build
-        name: Build prettier plugin
-
       - run: pnpm install
         name: Install dependencies
+
+      - run: pnpm --filter="@typespec/prettier-plugin-typespec..." run  build
+        name: Build prettier plugin
 
       - run: pnpm run format:check
         name: Check formatting
