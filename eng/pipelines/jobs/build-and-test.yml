@@ -57,5 +57,5 @@ steps:
       mergeTestResults: true
       failTaskOnFailedTests: false
       testRunTitle: "Test os: ${{ parameters.osName }}, node: ${{ parameters.nodeVersion }}"
-    displayName: Publish non-core test results
+    displayName: Publish test results
     condition: always()
