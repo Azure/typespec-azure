@@ -14,18 +14,6 @@ extends:
     stages:
       - stage: CI
         jobs:
-          - job: AutorestChecks
-            displayName: "Autorest Checks"
-            pool:
-              name: $(LINUXPOOL)
-              image: $(LINUXVMIMAGE)
-              os: linux
-
-            steps:
-              - template: /eng/pipelines/templates/swagger-checks.yml@self
-                parameters:
-                  nodeVersion: 20.x
-
           - job: Linux
             variables:
               TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
@@ -75,4 +63,15 @@ extends:
                   osName: windows
 
           - template: /eng/pipelines/jobs/e2e-job.yml@self
+          - job: AutorestChecks
+            displayName: "Autorest Checks"
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+
+            steps:
+              - template: /eng/pipelines/templates/swagger-checks.yml@self
+                parameters:
+                  nodeVersion: 20.x
           - template: /eng/pipelines/jobs/publish-artifacts.yml@self
