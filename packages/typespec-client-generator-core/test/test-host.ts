@@ -32,7 +32,6 @@ export interface SdkTestRunner extends BasicTestRunner {
   context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
-  compileWithBuiltInArmService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
     mainCode: string,
@@ -155,27 +154,6 @@ export async function createSdkTestRunner(
       );
       return result;
     };
-
-  // compile with arm service definition
-  sdkTestRunner.compileWithBuiltInArmService = async function compileWithBuiltInArmService(code) {
-    const result = await baseCompile(
-      `
-      @Azure.ResourceManager.armProviderNamespace
-      @server("http://localhost:3000", "endpoint")
-      @service()
-      namespace My.Service;
-      ${code}`,
-      {
-        noEmit: true,
-      }
-    );
-    sdkTestRunner.context = createSdkContextTestHelper(
-      sdkTestRunner.program,
-      options,
-      options.emitterName
-    );
-    return result;
-  };
 
   const mainAutoCode = [
     ...host.libraries
