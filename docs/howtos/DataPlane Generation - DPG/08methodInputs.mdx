@@ -1,0 +1,509 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Method Inputs
+
+This doc details what method input signatures language emitters will output.
+
+## Basic
+
+### HTTP Get
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+op @get get(): User;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def get() -> User:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### HTTP Post
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+op @post post(User): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+For model inputs, Python automatically generates an overload that allows SDK users to input through a file stream.
+
+TODO: generating this many method signatures feels verbose
+
+```python
+@overload
+def post(user: User, *, content_type: str = "application/json") -> None:
+  ...
+
+@overload
+def post(user: JSON, *, content_type: str = "application/json") -> None:
+  ...
+
+@overload
+def post(user: IO[bytes], *, content_type: str = "application/json") -> None:
+  ...
+
+def post(user: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+## Spread
+
+### Named model
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
+op upload(...User): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+class User:
+  first_name: str
+  last_name: str
+
+def upload(user: User) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Anonymous Model
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+op upload(firstName: string, lastName: string): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+def upload(first_name: str, last_name: str) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Alias
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+alias User = {
+  firstName: string,
+  lastName: string,
+};
+
+op upload(...User): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+def upload(first_name: str, last_name: str) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Model with only property decorated with @body
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
+model UserRequest {
+  @body user: User;
+}
+
+op upload(...UserRequest): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+class User:
+  first_name: str
+  last_name: str
+
+class UserRequest:
+  user: User
+
+def upload(userRequest: UserRequest) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Model with @query / @header decorator
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model BlobProperties {
+  @header contentLength: string;
+  @header contentType: string;
+}
+
+op setBlobProperties(...BlobProperties): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+
+class BlobProperties:
+  content_length: str
+  content_type: str
+
+def set_blob_properties(blob_properties: BlobProperties) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Model with @path decorator
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model BlobProperties {
+  @key
+  @visibility("read")
+  @path name: string;
+
+  @header contentLength: string;
+  @header contentType: string;
+}
+
+op setBlobProperties(...BlobProperties): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+
+class BlobProperties:
+  name: str # readonly
+  content_length: str
+  content_type: str
+
+def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Model with combination of http decorators and properties without decorator
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+
+model Schema {
+  @header contentType: "application/json";
+  schema: bytes;
+}
+
+op register(...Schema): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+class Schema:
+  content_type: str
+  schema: bytes
+
+def register(schema: Schema) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+## Options Bags
+
+## Azure Core
+
