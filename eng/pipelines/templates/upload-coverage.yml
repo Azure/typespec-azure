@@ -1,7 +1,4 @@
 steps:
-  - script: pnpm run merge-coverage
-    displayName: Merge code coverage
-
   - task: PublishCodeCoverageResults@2
     inputs:
       summaryFileLocation: $(Build.SourcesDirectory)/packages/*/coverage/cobertura-coverage.xml
