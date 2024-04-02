@@ -105,7 +105,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
             }
     
             enum StateKV {Succeeded, Failed, Canceled}
-
+            #suppress "deprecated" "for testing"
             @knownValues(StateKV)
             scalar State extends string;
           `

@@ -229,11 +229,13 @@ describe("typespec-client-generator-core: types", () => {
           three,
         }
 
+        #suppress "deprecated" "for testing"
         @knownValues(TestEnum)
         scalar testScalar extends string;
 
         model TestModel {
           prop1: testScalar;
+          #suppress "deprecated" "for testing"
           @knownValues(TestEnum)
           prop2: string;
         }
