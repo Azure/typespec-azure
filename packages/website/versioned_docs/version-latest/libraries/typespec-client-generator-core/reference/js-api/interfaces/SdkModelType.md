@@ -18,8 +18,8 @@ title: "[I] SdkModelType"
 | `baseModel?` | [`SdkModelType`](SdkModelType.md) | - | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - | - |
 | `deprecation?` | `string` | - | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | - | - | - |
-| `details?` | `string` | - | - | - |
+| `description?` | `string` | - | `SdkTypeBase.description` | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` | `SdkTypeBase.details` |
 | `discriminatedSubtypes?` | `Record`<`string`, [`SdkModelType`](SdkModelType.md)\> | - | - | - |
 | `discriminatorProperty?` | [`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md) | - | - | - |
 | `discriminatorValue?` | `string` | - | - | - |
