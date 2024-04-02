@@ -1,5 +1,6 @@
 jobs:
   - job: e2e
+    displayName: "E2E Tests"
 
     pool:
       name: $(LINUXPOOL)
