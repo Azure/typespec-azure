@@ -1210,6 +1210,8 @@ function updateTypesFromOperation(
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
+        // spread body model should be none usage
+        if (body.kind === "model" && body.isGeneratedName) return;
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {

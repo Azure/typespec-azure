@@ -64,6 +64,8 @@
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
+    "@azure-tools/typespec-autorest": "workspace:~",
     "@types/node": "~18.11.19",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:~",
@@ -75,6 +77,7 @@
     "@typespec/rest": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@typespec/versioning": "workspace:~",
+    "@typespec/openapi": "workspace:~",
     "@vitest/coverage-v8": "^1.4.0",
     "@vitest/ui": "^1.4.0",
     "c8": "^9.1.0",

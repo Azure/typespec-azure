@@ -1,5 +1,8 @@
+import { AutorestTestLibrary } from "@azure-tools/typespec-autorest/testing";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -2757,7 +2760,7 @@ describe("typespec-client-generator-core: package", () => {
         `);
       const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
@@ -3006,6 +3009,48 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(op.bodyParam.kind, "body");
       strictEqual(op.bodyParam.name, "documentTranslateContent");
       deepStrictEqual(op.bodyParam.correspondingMethodParams, [documentMethodParam]);
+    });
+    it("arm provider parameter spread", async () => {
+      const runnerWithArm = await createSdkTestRunner({
+        librariesToAdd: [
+          AzureCoreTestLibrary,
+          OpenAPITestLibrary,
+          AutorestTestLibrary,
+          AzureResourceManagerTestLibrary,
+        ],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithArm.compileWithBuiltInArmService(`
+      model Employee {}
+
+      model ProviderNamespace {
+        @path
+        @segment("providers")
+        @doc("The provider namespace for the resource.")
+        provider: "Microsoft.ThisWillBeReplaced";
+      }
+
+      op ArmReadOperation<Parameters, Response>(
+        ...Parameters,
+      ): Response;
+
+      @autoRoute
+      op get is ArmReadOperation<ProviderNamespace, Employee>;
+      `);
+      const sdkPackage = runnerWithArm.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = sdkPackage.clients[0].methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "get");
+      strictEqual(method.parameters.length, 1);
+      strictEqual(method.parameters[0].name, "accept");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      strictEqual(bodyParameter, undefined);
+      strictEqual(serviceOperation.parameters.length, 1);
+      strictEqual(serviceOperation.parameters[0].name, "accept");
     });
   });
   describe("versioning", () => {

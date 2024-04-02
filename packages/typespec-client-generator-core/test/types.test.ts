@@ -1993,17 +1993,14 @@ describe("typespec-client-generator-core: types", () => {
       interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
       `);
       const sdkPackage = runner.context.sdkPackage;
-      strictEqual(sdkPackage.models.length, 2);
+      strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.enums.length, 1);
       const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.isGeneratedName);
       ok(prop);
       strictEqual(prop.isFixed, false);
       strictEqual(prop.valueType.kind, "string");
-      const req = sdkPackage.models.find((x) => x.name === "SendRequest" && x.isGeneratedName);
       const resp = sdkPackage.models.find((x) => x.name === "GetResponse" && x.isGeneratedName);
-      ok(req);
       ok(resp);
-      strictEqual(req.properties[0].type, prop);
       strictEqual(resp.properties[0].type, prop);
     });
 
