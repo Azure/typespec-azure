@@ -2,6 +2,7 @@ import {
   PagedResultMetadata,
   UnionEnum,
   extractLroStates,
+  getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
   getPagedResult,
@@ -30,7 +31,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  ProjectedNameView,
   Scalar,
   Service,
   StringLiteral,
@@ -42,7 +42,6 @@ import {
   Union,
   UnionVariant,
   compilerAssert,
-  createProjectedNameProgram,
   emitFile,
   getAllTags,
   getDirectoryPath,
@@ -59,6 +58,7 @@ import {
   getMinValue,
   getNamespaceFullName,
   getPattern,
+  getProjectedName,
   getProperty,
   getPropertyType,
   getRelativePathFromDirectory,
@@ -319,8 +319,6 @@ function createOAPIEmitter(
   let operationExamplesMap: Map<string, { [title: string]: string }>;
   let operationIdsWithExample: Set<string>;
   let outputFile: string;
-  let jsonView: ProjectedNameView;
-  let clientView: ProjectedNameView;
   let context: AutorestEmitterContext;
 
   async function emitOpenAPI() {
@@ -339,8 +337,6 @@ function createOAPIEmitter(
         if (record.projections.length > 0) {
           projectedProgram = program = projectProgram(originalProgram, record.projections);
         }
-        jsonView = createProjectedNameProgram(program, "json");
-        clientView = createProjectedNameProgram(program, "client");
         context = {
           program,
           service,
@@ -1018,19 +1014,19 @@ function createOAPIEmitter(
     return placeholder;
   }
 
-  function getJsonName(type: Type & { name: string }) {
-    const viaProjection = jsonView.getProjectedName(type);
+  function getJsonName(type: Type & { name: string }): string {
+    const viaProjection = getProjectedName(program, type, "json");
 
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? viaProjection : encodedName;
+    return encodedName === type.name ? viaProjection ?? type.name : encodedName;
   }
 
   function getClientName(type: Type & { name: string }): string {
-    const viaProjection = clientView.getProjectedName(type);
+    const viaProjection = getProjectedName(program, type, "client");
     const clientName = getClientNameOverride(tcgcSdkContext, type);
-    return clientName ?? viaProjection;
+    return clientName ?? viaProjection ?? type.name;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1634,6 +1630,29 @@ function createOAPIEmitter(
     );
   }
 
+  function getDiscriminatorValue(model: Model): string | undefined {
+    let discriminator;
+    let current = model;
+    while (current.baseModel) {
+      discriminator = getDiscriminator(program, current.baseModel);
+      if (discriminator) {
+        break;
+      }
+      current = current.baseModel;
+    }
+    if (discriminator === undefined) {
+      return undefined;
+    }
+    const prop = getProperty(model, discriminator.propertyName);
+    if (prop) {
+      const values = getStringValues(prop.type);
+      if (values.length === 1) {
+        return values[0];
+      }
+    }
+    return undefined;
+  }
+
   function getSchemaForModel(model: Model, visibility: Visibility) {
     const array = getArrayType(model, visibility);
     if (array) {
@@ -1646,17 +1665,11 @@ function createOAPIEmitter(
     };
 
     if (model.baseModel) {
-      const discriminator = getDiscriminator(program, model.baseModel);
-      if (discriminator) {
-        const prop = getProperty(model, discriminator.propertyName);
-        if (prop) {
-          const values = getStringValues(prop.type);
-          if (values.length === 1) {
-            const extensions = getExtensions(program, model);
-            if (!extensions.has("x-ms-discriminator-value")) {
-              modelSchema["x-ms-discriminator-value"] = values[0];
-            }
-          }
+      const discriminatorValue = getDiscriminatorValue(model);
+      if (discriminatorValue) {
+        const extensions = getExtensions(program, model);
+        if (!extensions.has("x-ms-discriminator-value")) {
+          modelSchema["x-ms-discriminator-value"] = discriminatorValue;
         }
       }
     }
@@ -1824,6 +1837,12 @@ function createOAPIEmitter(
     const extensions = getExtensions(program, type);
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Scalar") {
+      const ext = getArmResourceIdentifierConfig(program, type);
+      if (ext) {
+        emitObject["x-ms-arm-id-details"] = ext;
+      }
     }
     if (extensions) {
       for (const key of extensions.keys()) {

@@ -35,7 +35,7 @@
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
-    "test-official": "vitest run --coverage --reporter=junit --reporter=default --no-file-parallelism",
+    "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "eslint . --ext .ts --max-warnings=0",
     "lint:fix": "eslint . --fix --ext .ts",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-service-csharp/reference"
@@ -72,7 +72,7 @@
     "c8": "^9.1.0",
     "eslint": "^8.57.0",
     "rimraf": "~5.0.5",
-    "typescript": "~5.4.2",
+    "typescript": "~5.4.3",
     "vitest": "^1.4.0"
   }
 }

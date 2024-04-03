@@ -31,6 +31,7 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
 export interface SdkTestRunner extends BasicTestRunner {
   context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
+  compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
     mainCode: string,
@@ -131,6 +132,28 @@ export async function createSdkTestRunner(
     );
     return result;
   };
+
+  // compile with dummy service definition
+  sdkTestRunner.compileWithBuiltInAzureCoreService =
+    async function compileWithBuiltInAzureCoreService(code) {
+      const result = await baseCompile(
+        `
+      @useDependency(Versions.v1_0_Preview_2)
+      @server("http://localhost:3000", "endpoint")
+      @service()
+      namespace My.Service;
+      ${code}`,
+        {
+          noEmit: true,
+        }
+      );
+      sdkTestRunner.context = createSdkContextTestHelper(
+        sdkTestRunner.program,
+        options,
+        options.emitterName
+      );
+      return result;
+    };
 
   const mainAutoCode = [
     ...host.libraries

@@ -4,7 +4,7 @@ title: "[F] $onValidate"
 
 ---
 ```ts
-$onValidate(program): Promise<void>
+$onValidate(program): Promise<boolean>
 ```
 
 ## Parameters
@@ -15,4 +15,4 @@ $onValidate(program): Promise<void>
 
 ## Returns
 
-`Promise`<`void`\>
+`Promise`<`boolean`\>

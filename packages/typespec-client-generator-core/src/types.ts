@@ -33,16 +33,8 @@ import {
   Authentication,
   Visibility,
   getAuthentication,
-  getHeaderFieldName,
-  getHeaderFieldOptions,
-  getPathParamName,
-  getQueryParamName,
-  getQueryParamOptions,
   getServers,
-  isBody,
   isHeader,
-  isPathParam,
-  isQueryParam,
   isStatusCode,
 } from "@typespec/http";
 import {
@@ -58,7 +50,6 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
-  CollectionFormat,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
@@ -70,13 +61,12 @@ import {
   SdkDatetimeType,
   SdkDictionaryType,
   SdkDurationType,
-  SdkEndpointParameter,
-  SdkEndpointType,
   SdkEnumType,
   SdkEnumValueType,
   SdkModelPropertyType,
+  SdkModelPropertyTypeBase,
   SdkModelType,
-  SdkPathParameter,
+  SdkOperationGroup,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -109,6 +99,7 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { TCGCContext } from "./internal-utils.js";
 
 function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
@@ -217,9 +208,12 @@ function getSdkBuiltInTypeWithDiagnostics(
         kind = getScalarKind(type);
       }
     }
+    const docWrapper = getDocHelper(context, type);
     return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
+      description: docWrapper.description,
+      details: docWrapper.details,
     });
   } else if (type.kind === "String" || type.kind === "Boolean" || type.kind === "Number") {
     let kind: SdkBuiltInKinds;
@@ -372,7 +366,7 @@ export function getSdkUnionWithDiagnostics(
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
     name: getLibraryName(context, type) || getGeneratedName(context, type),
-    generatedName: !type.name,
+    isGeneratedName: !type.name,
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
@@ -422,7 +416,7 @@ function addDiscriminatorToModelType(
       updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
-          if (property.serializedName === discriminator?.propertyName) {
+          if (property.__raw?.name === discriminator?.propertyName) {
             if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
               diagnostics.add(
                 createDiagnostic({
@@ -457,7 +451,7 @@ function addDiscriminatorToModelType(
     }
     for (let i = 0; i < model.properties.length; i++) {
       const property = model.properties[i];
-      if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
+      if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
         property.discriminator = true;
         model.discriminatorProperty = property;
         return diagnostics.wrap(undefined);
@@ -477,17 +471,22 @@ function addDiscriminatorToModelType(
         encode: "string",
       };
     }
-    const name = discriminator.propertyName;
+    const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
       kind: "property",
       optional: false,
       discriminator: true,
-      serializedName: discriminator.propertyName,
+      serializedName: discriminatorProperty
+        ? discriminatorProperty.serializedName
+        : discriminator.propertyName,
       type: discriminatorType!,
       nameInClient: name,
       name,
+      isGeneratedName: false,
       onClient: false,
-      apiVersions: getAvailableApiVersions(context, type),
+      apiVersions: discriminatorProperty
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!)
+        : getAvailableApiVersions(context, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -522,7 +521,7 @@ export function getSdkModelWithDiagnostics(
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
-      generatedName: !type.name,
+      isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
       properties: [],
@@ -634,7 +633,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
-      generatedName: false,
+      isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
       valueType: getSdkEnumValueType(context, type.members.values()),
@@ -686,7 +685,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name: getLibraryName(context, type.union) || getGeneratedName(context, type.union),
-      generatedName: !type.union.name,
+      isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
       valueType:
@@ -727,7 +726,7 @@ function getKnownValuesEnum(
       sdkType = {
         ...getSdkTypeBaseHelper(context, type, "enum"),
         name: getLibraryName(context, type),
-        generatedName: false,
+        isGeneratedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
         valueType: getSdkEnumValueType(context, knownValues.members.values()),
@@ -787,6 +786,9 @@ export function getClientTypeWithDiagnostics(
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
         const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
         retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
+        const docWrapper = getDocHelper(context, type);
+        retval.description = docWrapper.description;
+        retval.details = docWrapper.details;
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
@@ -882,26 +884,8 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
   return undefined;
 }
 
-function getCollectionFormat(
-  context: TCGCContext,
-  type: ModelProperty
-): CollectionFormat | undefined {
-  const program = context.program;
-  const tspCollectionFormat = (
-    isQueryParam(program, type)
-      ? getQueryParamOptions(program, type)
-      : isHeader(program, type)
-        ? getHeaderFieldOptions(program, type)
-        : undefined
-  )?.format;
-  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
-    return undefined;
-  }
-  return tspCollectionFormat;
-}
-
 function getSdkCredentialType(
-  client: SdkClient,
+  client: SdkClient | SdkOperationGroup,
   authentication: Authentication
 ): SdkCredentialType | SdkUnionType {
   const credentialTypes: SdkCredentialType[] = [];
@@ -922,7 +906,7 @@ function getSdkCredentialType(
       values: credentialTypes,
       nullable: false,
       name: createGeneratedName(client.service, "CredentialUnion"),
-      generatedName: false,
+      isGeneratedName: true,
     };
   }
   return credentialTypes[0];
@@ -930,7 +914,7 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClient
+  client: SdkClient | SdkOperationGroup
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
@@ -940,6 +924,7 @@ export function getSdkCredentialParameter(
     kind: "credential",
     nameInClient: name,
     name,
+    isGeneratedName: true,
     description: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service),
     onClient: true,
@@ -949,31 +934,22 @@ export function getSdkCredentialParameter(
   };
 }
 
-interface GetSdkModelPropertyTypeOptions {
-  isEndpointParam?: boolean;
-  operation?: Operation;
-  isMethodParameter?: boolean;
-  defaultContentType?: string;
-}
-
-export function getSdkModelPropertyType(
+export function getSdkModelPropertyTypeBase(
   context: TCGCContext,
   type: ModelProperty,
-  options: GetSdkModelPropertyTypeOptions = {}
-): [SdkModelPropertyType, readonly Diagnostic[]] {
+  operation?: Operation
+): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let propertyType = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, type.type, options.operation)
-  );
-  diagnostics.pipe(addEncodeInfo(context, type, propertyType, options.defaultContentType));
+  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+  diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
-    propertyType = getSdkEnum(context, knownValues, options.operation);
+    propertyType = getSdkEnum(context, knownValues, operation);
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
-  const base = {
+  return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
@@ -981,158 +957,52 @@ export function getSdkModelPropertyType(
     type: propertyType,
     nameInClient: name,
     name,
-    onClient: false,
+    isGeneratedName: false,
     optional: type.optional,
     nullable: isNullable(type.type),
-  };
-  const program = context.program;
-  const headerQueryOptions = {
-    ...base,
-    optional: type.optional,
-    collectionFormat: getCollectionFormat(context, type),
-  };
-  if (options.isMethodParameter) {
-    return diagnostics.wrap({
-      ...base,
-      kind: "method",
-      ...updateWithApiVersionInformation(context, type),
-      optional: type.optional,
-    });
-  } else if (isPathParam(program, type) || options.isEndpointParam) {
-    // we don't url encode if the type can be assigned to url
-    const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(
-        type.type.projectionBase ?? type.type,
-        program.checker.getStdType("url"),
-        type.type
-      )
-    );
-    return diagnostics.wrap({
-      ...base,
-      kind: "path",
-      urlEncode,
-      serializedName: getPathParamName(program, type),
-      ...updateWithApiVersionInformation(context, type),
-      optional: false,
-    });
-  } else if (isHeader(program, type)) {
-    return diagnostics.wrap({
-      ...headerQueryOptions,
-      kind: "header",
-      serializedName: getHeaderFieldName(program, type),
-      ...updateWithApiVersionInformation(context, type),
-    });
-  } else if (isQueryParam(program, type)) {
-    return diagnostics.wrap({
-      ...headerQueryOptions,
-      kind: "query",
-      serializedName: getQueryParamName(program, type),
-      ...updateWithApiVersionInformation(context, type),
-    });
-  } else if (isBody(program, type)) {
-    return diagnostics.wrap({
-      ...base,
-      kind: "body",
-      contentTypes: ["application/json"], // will update when we get to the operation level
-      defaultContentType: "application/json", // will update when we get to the operation level
-      ...updateWithApiVersionInformation(context, type),
-      optional: type.optional,
-    });
-  } else {
-    // I'm a body model property
-    let operationIsMultipart = false;
-    if (options.operation) {
-      const httpOperation = getHttpOperationWithCache(context, options.operation);
-      operationIsMultipart = Boolean(
-        httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
-      );
-    }
-    // Currently we only recognize bytes and list of bytes as potential file inputs
-    const isBytesInput =
-      base.type.kind === "bytes" ||
-      (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-    if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "encoding-multipart-bytes",
-          target: type,
-        })
-      );
-    }
-    return diagnostics.wrap({
-      ...base,
-      kind: "property",
-      optional: type.optional,
-      visibility: getSdkVisibility(context, type),
-      discriminator: false,
-      serializedName: getPropertyNames(context, type)[1],
-      isMultipartFileInput: isBytesInput && operationIsMultipart,
-      flatten: shouldFlattenProperty(context, type),
-      ...updateWithApiVersionInformation(context, type),
-    });
-  }
+    ...updateWithApiVersionInformation(context, type),
+  });
 }
 
-export function getSdkEndpointParameter(
+export function getSdkModelPropertyType(
   context: TCGCContext,
-  client: SdkClient
-): [SdkEndpointParameter, readonly Diagnostic[]] {
+  type: ModelProperty,
+  operation?: Operation
+): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const servers = getServers(context.program, client.service);
-  let type: SdkEndpointType;
-  let optional: boolean = false;
-  if (servers === undefined || servers.length > 1) {
-    // if there is no defined server url, or if there are more than one
-    // we will return a mandatory endpoint parameter in initialization
-    type = {
-      kind: "endpoint",
-      nullable: false,
-      templateArguments: [],
-    };
-  } else {
-    // this means we have one server
-    const templateArguments: SdkPathParameter[] = [];
-    type = {
-      kind: "endpoint",
-      nullable: false,
-      serverUrl: servers[0].url,
-      templateArguments,
-    };
-    for (const param of servers[0].parameters.values()) {
-      const sdkParam = diagnostics.pipe(
-        getSdkModelPropertyType(context, param, { isEndpointParam: true })
-      );
-      if (sdkParam.kind === "path") {
-        templateArguments.push(sdkParam);
-        sdkParam.description = sdkParam.description ?? servers[0].description;
-        sdkParam.onClient = true;
-      } else {
-        diagnostics.add(
-          createDiagnostic({
-            code: "server-param-not-path",
-            target: param,
-            format: {
-              templateArgumentName: sdkParam.name,
-              templateArgumentType: sdkParam.kind,
-            },
-          })
-        );
-      }
-    }
-    optional = !!servers[0].url.length && templateArguments.every((param) => param.optional);
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type);
+  // I'm a body model property
+  let operationIsMultipart = false;
+  if (operation) {
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+  }
+  // Currently we only recognize bytes and list of bytes as potential file inputs
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "encoding-multipart-bytes",
+        target: type,
+      })
+    );
   }
   return diagnostics.wrap({
-    kind: "endpoint",
-    type,
-    nameInClient: "endpoint",
-    name: "endpoint",
-    description: "Service host",
-    onClient: true,
-    urlEncode: false,
-    apiVersions: getAvailableApiVersions(context, client.service),
-    optional,
-    isApiVersionParam: false,
-    nullable: false,
+    ...base,
+    kind: "property",
+    optional: type.optional,
+    visibility: getSdkVisibility(context, type),
+    discriminator: false,
+    serializedName: getPropertyNames(context, type)[1],
+    isMultipartFileInput: isBytesInput && operationIsMultipart,
+    flatten: shouldFlattenProperty(context, type),
+    ...updateWithApiVersionInformation(context, type),
   });
 }
 
@@ -1151,9 +1021,7 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, property, { operation: operation })
-    );
+    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
@@ -1261,33 +1129,40 @@ function checkAndGetClientType(
   return diagnostics.wrap([clientType]);
 }
 
+interface ModelUsageOptions {
+  seenModelNames?: Set<SdkType>;
+  propagation?: boolean;
+}
+
 function updateUsageOfModel(
   context: TCGCContext,
   usage: UsageFlags,
   type?: SdkType,
-  seenModelNames?: Set<SdkType>
+  options?: ModelUsageOptions
 ): void {
+  options = options ?? {};
+  options.propagation = options?.propagation ?? true;
   if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
     return;
-  if (seenModelNames === undefined) {
-    seenModelNames = new Set<SdkType>();
+  if (options?.seenModelNames === undefined) {
+    options.seenModelNames = new Set<SdkType>();
   }
-  if (type.kind === "model" && seenModelNames.has(type)) return; // avoid circular references
+  if (type.kind === "model" && options.seenModelNames.has(type)) return; // avoid circular references
   if (type.kind === "array" || type.kind === "dict") {
-    return updateUsageOfModel(context, usage, type.valueType, seenModelNames);
+    return updateUsageOfModel(context, usage, type.valueType, options);
   }
   if (type.kind === "union") {
     for (const unionType of type.values) {
-      updateUsageOfModel(context, usage, unionType, seenModelNames);
+      updateUsageOfModel(context, usage, unionType, options);
     }
     return;
   }
   if (type.kind === "enumvalue") {
-    updateUsageOfModel(context, usage, type.enumType, seenModelNames);
+    updateUsageOfModel(context, usage, type.enumType, options);
     return;
   }
   if (type.kind !== "model" && type.kind !== "enum") return;
-  seenModelNames.add(type);
+  options.seenModelNames.add(type);
 
   const usageOverride = getUsageOverride(context, type.__raw as any);
   if (usageOverride) {
@@ -1297,23 +1172,20 @@ function updateUsageOfModel(
   }
 
   if (type.kind === "enum") return;
-  if (type.baseModel && (type.baseModel.usage & usage) === 0) {
-    // if it has a base model and the base model doesn't currently have that usage
-    type.baseModel.usage |= usage;
-  }
+  if (!options.propagation) return;
   if (type.baseModel) {
-    updateUsageOfModel(context, usage, type.baseModel, seenModelNames);
+    updateUsageOfModel(context, usage, type.baseModel, options);
   }
   if (type.discriminatedSubtypes) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
-      updateUsageOfModel(context, usage, discriminatedSubtype, seenModelNames);
+      updateUsageOfModel(context, usage, discriminatedSubtype, options);
     }
   }
   if (type.additionalProperties) {
-    updateUsageOfModel(context, usage, type.additionalProperties, seenModelNames);
+    updateUsageOfModel(context, usage, type.additionalProperties, options);
   }
   for (const property of type.properties) {
-    updateUsageOfModel(context, usage, property.type, seenModelNames);
+    updateUsageOfModel(context, usage, property.type, options);
   }
 }
 
@@ -1348,6 +1220,8 @@ function updateTypesFromOperation(
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
+        // spread body model should be none usage
+        if (body.kind === "model" && body.isGeneratedName) return;
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
@@ -1358,7 +1232,9 @@ function updateTypesFromOperation(
     }
     if (isMultipartFormData(context, httpBody.type, operation)) {
       bodies.forEach((body) => {
-        updateUsageOfModel(context, UsageFlags.MultipartFormData, body);
+        updateUsageOfModel(context, UsageFlags.MultipartFormData, body, {
+          propagation: false,
+        });
       });
     }
   }
