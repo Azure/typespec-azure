@@ -129,12 +129,12 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TOptions, TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters
-          )
+        getSdkServiceOperation<TOptions, TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters
         )
+      )
       : undefined,
     getResponseMapping(): string | undefined {
       return pagedMetadata?.itemsSegments?.join(".");
@@ -155,15 +155,17 @@ function getSdkLroServiceMethod<
     getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
   );
 
-  basicServiceMethod.response.type = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, metadata.logicalResult)
-  );
-  basicServiceMethod.response.resultPath =
-    metadata.logicalPath ??
-    (metadata.envelopeResult !== metadata.logicalResult &&
-    basicServiceMethod.operation.verb === "post"
-      ? "result"
-      : undefined);
+  if (metadata.finalResult === undefined || metadata.finalResult === "void") {
+    basicServiceMethod.response.type = undefined;
+  } if (metadata.finalResult === undefined || metadata.finalResult === "void") {
+    basicServiceMethod.response.type = undefined;
+  } else {
+    basicServiceMethod.response.type = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, metadata.finalResult)
+    );
+  }
+
+  basicServiceMethod.response.resultPath = metadata.finalResultPath;
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
