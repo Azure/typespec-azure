@@ -115,109 +115,6 @@ def post(user: [User, JSON, IO[bytes]], *, content_type: str = "application/json
 
 ## Spread
 
-### Named model
-
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
-
-```typespec
-model User {
-  firstName: string;
-  lastName: string;
-}
-
-op upload(...User): void;
-```
-
-</TabItem>
-
-<TabItem value="python" label="Python">
-
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
-
-```python
-class User:
-  first_name: str
-  last_name: str
-
-def upload(user: User) -> None:
-  ...
-```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
-```csharp
-```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
-```typescript
-```
-
-</TabItem>
-<TabItem value="java" label="Java" >
-
-```java
-```
-
-</TabItem>
-<TabItem value="go" label="Go" >
-
-```go
-```
-
-</TabItem>
-</Tabs>
-
-### Anonymous Model
-
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
-
-```typespec
-op upload(firstName: string, lastName: string): void;
-```
-
-</TabItem>
-
-<TabItem value="python" label="Python">
-
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
-
-```python
-def upload(first_name: str, last_name: str) -> None:
-  ...
-```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
-```csharp
-```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
-```typescript
-```
-
-</TabItem>
-<TabItem value="java" label="Java" >
-
-```java
-```
-
-</TabItem>
-<TabItem value="go" label="Go" >
-
-```go
-```
-
-</TabItem>
-</Tabs>
-
 ### Alias
 
 <Tabs>
@@ -270,7 +167,112 @@ def upload(first_name: str, last_name: str) -> None:
 </TabItem>
 </Tabs>
 
-### Model with only property decorated with @body
+### Alias with HTTP Parameters
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+alias User = {
+  @path id: string,
+  firstName: string,
+  lastName: string,
+};
+
+op upload(...User): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def upload(id: str, first_name: str, last_name: str) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs>
+
+### Named model
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
+op upload(...User): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+class User:
+  first_name: str
+  last_name: str
+
+def upload(user: User) -> None:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+```
+
+</TabItem>
+</Tabs> 
+
+### Model with @body Property
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -333,62 +335,7 @@ def upload(userRequest: UserRequest) -> None:
 </TabItem>
 </Tabs>
 
-### Model with @query / @header decorator
-
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
-
-```typespec
-model BlobProperties {
-  @header contentLength: string;
-  @header contentType: string;
-}
-
-op setBlobProperties(...BlobProperties): void;
-```
-
-</TabItem>
-
-<TabItem value="python" label="Python">
-
-```python
-
-class BlobProperties:
-  content_length: str
-  content_type: str
-
-def set_blob_properties(blob_properties: BlobProperties) -> None:
-  ...
-```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
-```csharp
-```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
-```typescript
-```
-
-</TabItem>
-<TabItem value="java" label="Java" >
-
-```java
-```
-
-</TabItem>
-<TabItem value="go" label="Go" >
-
-```go
-```
-
-</TabItem>
-</Tabs>
-
-### Model with @path decorator
+### Model with Decorated Properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -448,7 +395,7 @@ def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
 </TabItem>
 </Tabs>
 
-### Model with combination of http decorators and properties without decorator
+### Model with Decorated and non-Decorated Properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
