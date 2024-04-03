@@ -228,7 +228,11 @@ function getSdkBasicServiceMethod<
   const methodParameters: SdkMethodParameter[] = [];
   const spreadModelNames: string[] = [];
   for (const prop of operation.parameters.properties.values()) {
-    if (prop.sourceProperty?.model?.name && !isKey(context.program, prop.sourceProperty) && !isApiVersion(context, prop)) {
+    if (
+      prop.sourceProperty?.model?.name &&
+      !isKey(context.program, prop.sourceProperty) &&
+      !isApiVersion(context, prop)
+    ) {
       if (!spreadModelNames.includes(prop.sourceProperty.model.name)) {
         spreadModelNames.push(prop.sourceProperty.model.name);
         methodParameters.push(
