@@ -208,9 +208,12 @@ function getSdkBuiltInTypeWithDiagnostics(
         kind = getScalarKind(type);
       }
     }
+    const docWrapper = getDocHelper(context, type);
     return diagnostics.wrap({
       ...getSdkTypeBaseHelper(context, type, kind),
       encode: getEncodeHelper(context, type, kind),
+      description: docWrapper.description,
+      details: docWrapper.details,
     });
   } else if (type.kind === "String" || type.kind === "Boolean" || type.kind === "Number") {
     let kind: SdkBuiltInKinds;
@@ -413,7 +416,7 @@ function addDiscriminatorToModelType(
       updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
-          if (property.serializedName === discriminator?.propertyName) {
+          if (property.__raw?.name === discriminator?.propertyName) {
             if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
               diagnostics.add(
                 createDiagnostic({
@@ -448,7 +451,7 @@ function addDiscriminatorToModelType(
     }
     for (let i = 0; i < model.properties.length; i++) {
       const property = model.properties[i];
-      if (property.kind === "property" && property.serializedName === discriminator.propertyName) {
+      if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
         property.discriminator = true;
         model.discriminatorProperty = property;
         return diagnostics.wrap(undefined);
@@ -468,18 +471,22 @@ function addDiscriminatorToModelType(
         encode: "string",
       };
     }
-    const name = discriminator.propertyName;
+    const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
       kind: "property",
       optional: false,
       discriminator: true,
-      serializedName: discriminator.propertyName,
+      serializedName: discriminatorProperty
+        ? discriminatorProperty.serializedName
+        : discriminator.propertyName,
       type: discriminatorType!,
       nameInClient: name,
       name,
       isGeneratedName: false,
       onClient: false,
-      apiVersions: getAvailableApiVersions(context, type),
+      apiVersions: discriminatorProperty
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!)
+        : getAvailableApiVersions(context, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -779,6 +786,9 @@ export function getClientTypeWithDiagnostics(
         retval = getKnownValuesEnum(context, type, operation) ?? baseType;
         const namespace = type.namespace ? getNamespaceFullName(type.namespace) : "";
         retval.kind = context.knownScalars[`${namespace}.${type.name}`] ?? retval.kind;
+        const docWrapper = getDocHelper(context, type);
+        retval.description = docWrapper.description;
+        retval.details = docWrapper.details;
         break;
       }
       if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
@@ -1121,7 +1131,7 @@ function checkAndGetClientType(
 
 interface ModelUsageOptions {
   seenModelNames?: Set<SdkType>;
-  recurseThroughProperties?: boolean;
+  propagation?: boolean;
 }
 
 function updateUsageOfModel(
@@ -1131,7 +1141,7 @@ function updateUsageOfModel(
   options?: ModelUsageOptions
 ): void {
   options = options ?? {};
-  options.recurseThroughProperties = options?.recurseThroughProperties ?? true;
+  options.propagation = options?.propagation ?? true;
   if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
     return;
   if (options?.seenModelNames === undefined) {
@@ -1162,10 +1172,7 @@ function updateUsageOfModel(
   }
 
   if (type.kind === "enum") return;
-  if (type.baseModel && (type.baseModel.usage & usage) === 0) {
-    // if it has a base model and the base model doesn't currently have that usage
-    type.baseModel.usage |= usage;
-  }
+  if (!options.propagation) return;
   if (type.baseModel) {
     updateUsageOfModel(context, usage, type.baseModel, options);
   }
@@ -1174,13 +1181,11 @@ function updateUsageOfModel(
       updateUsageOfModel(context, usage, discriminatedSubtype, options);
     }
   }
-  if (type.additionalProperties && options.recurseThroughProperties) {
+  if (type.additionalProperties) {
     updateUsageOfModel(context, usage, type.additionalProperties, options);
   }
-  if (options.recurseThroughProperties) {
-    for (const property of type.properties) {
-      updateUsageOfModel(context, usage, property.type, options);
-    }
+  for (const property of type.properties) {
+    updateUsageOfModel(context, usage, property.type, options);
   }
 }
 
@@ -1215,6 +1220,8 @@ function updateTypesFromOperation(
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
+        // spread body model should be none usage
+        if (body.kind === "model" && body.isGeneratedName) return;
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
@@ -1226,7 +1233,7 @@ function updateTypesFromOperation(
     if (isMultipartFormData(context, httpBody.type, operation)) {
       bodies.forEach((body) => {
         updateUsageOfModel(context, UsageFlags.MultipartFormData, body, {
-          recurseThroughProperties: false,
+          propagation: false,
         });
       });
     }

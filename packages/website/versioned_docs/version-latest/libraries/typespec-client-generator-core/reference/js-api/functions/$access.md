@@ -16,7 +16,7 @@ $access(
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` \| `Enum` \| `Operation` |
+| `entity` | `Model` \| `Enum` \| `Operation` \| `Union` |
 | `value` | `EnumMember` |
 | `scope`? | `string` |
 

@@ -512,7 +512,6 @@ export function createSdkContext<
     program: context.program,
     emitContext: context,
     experimental_sdkPackage: undefined!,
-    sdkPackage: undefined!,
     emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
@@ -520,9 +519,7 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
   };
-  sdkContext.sdkPackage = getSdkPackage(sdkContext);
-  // eslint-disable-next-line deprecation/deprecation
-  sdkContext.experimental_sdkPackage = sdkContext.sdkPackage;
+  sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   return sdkContext;
 }
 

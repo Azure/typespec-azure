@@ -16,7 +16,7 @@ checkIsArmResource(
 | :------ | :------ |
 | `program` | `Program` |
 | `target` | `Model` |
-| `decoratorName` | `"browse"` \| `"about"` \| `"marketplaceOffer"` \| `"promotion"` |
+| `decoratorName` | `"about"` \| `"marketplaceOffer"` \| `"promotion"` |
 
 ## Returns
 

@@ -7,12 +7,14 @@ title: "[F] getWireName"
 getWireName(context, type): string
 ```
 
+Get the serialized name of a type.
+
 ## Parameters
 
-| Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
-| `type` | `Type` & `Object` |
+| Parameter | Type | Description |
+| :------ | :------ | :------ |
+| `context` | `TCGCContext` |  |
+| `type` | `Type` & `Object` |  |
 
 ## Returns
 

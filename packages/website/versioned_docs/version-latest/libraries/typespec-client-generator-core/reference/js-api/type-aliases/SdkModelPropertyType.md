@@ -6,8 +6,11 @@ title: "[T] SdkModelPropertyType"
 ```ts
 type SdkModelPropertyType: 
   | SdkBodyModelPropertyType
-  | SdkHeaderParameter
+  | SdkParameter
+  | SdkEndpointParameter
+  | SdkCredentialParameter
   | SdkQueryParameter
   | SdkPathParameter
-  | SdkBodyParameter;
+  | SdkBodyParameter
+  | SdkHeaderParameter;
 ```
