@@ -64,6 +64,7 @@ import {
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
+  isApiVersion,
 } from "./public-utils.js";
 import {
   getAllModelsWithDiagnostics,
@@ -122,6 +123,7 @@ function getSdkPagingServiceMethod<
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type)
     );
   }
+  basic.response.resultPath = pagedMetadata.itemsSegments?.join(".");
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
@@ -137,7 +139,7 @@ function getSdkPagingServiceMethod<
         )
       : undefined,
     getResponseMapping(): string | undefined {
-      return pagedMetadata?.itemsSegments?.join(".");
+      return basic.response.resultPath;
     },
   });
 }
@@ -226,7 +228,11 @@ function getSdkBasicServiceMethod<
   const methodParameters: SdkMethodParameter[] = [];
   const spreadModelNames: string[] = [];
   for (const prop of operation.parameters.properties.values()) {
-    if (prop.sourceProperty?.model?.name && !isKey(context.program, prop.sourceProperty)) {
+    if (
+      prop.sourceProperty?.model?.name &&
+      !isKey(context.program, prop.sourceProperty) &&
+      !isApiVersion(context, prop)
+    ) {
       if (!spreadModelNames.includes(prop.sourceProperty.model.name)) {
         spreadModelNames.push(prop.sourceProperty.model.name);
         methodParameters.push(
