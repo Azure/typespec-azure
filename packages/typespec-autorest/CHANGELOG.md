@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.41.1
+
+### Bug Fixes
+
+- [#568](https://github.com/Azure/typespec-azure/pull/568) Small performance improvements
+
+
 ## 0.41.0
 
 ### Bug Fixes
