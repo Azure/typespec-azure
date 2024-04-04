@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.1
+
+### Bug Fixes
+
+- [#597](https://github.com/Azure/typespec-azure/pull/597) fix api version and pageable result path issue
+
+
 ## 0.41.0
 
 ### Bug Fixes
