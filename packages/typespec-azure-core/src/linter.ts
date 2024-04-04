@@ -32,6 +32,7 @@ import { requireKeyVisibility } from "./rules/require-key-visibility.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
+import { useStandardInteger } from "./rules/use-standard-integer.js";
 import { useStandardNames } from "./rules/use-standard-names.js";
 import { useStandardOperations } from "./rules/use-standard-ops.js";
 
@@ -68,6 +69,7 @@ const rules = [
   responseSchemaMultiStatusCodeRule,
   rpcOperationRequestBodyRule,
   spreadDiscriminatedModelRule,
+  useStandardInteger,
   useStandardNames,
   useStandardOperations,
 ];
