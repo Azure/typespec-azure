@@ -244,7 +244,7 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 
 ### 2. Release the hot fix
 
-1. Make a new branch in this format `publish/hotfix/<hotfix-name>`
+1. Make a new branch in this format `publish/hotfix/<hotfix-name>` against the `release/xyz` branch
 1. Run `pnpm chronus version --ignore-policies` to bump the versions, commit push, make PR, wait for CI and squash merge.
 1. The package should then get published
 
