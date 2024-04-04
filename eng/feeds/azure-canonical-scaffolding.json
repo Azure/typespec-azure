@@ -118,8 +118,8 @@
     }
   },
   "azure-arm-canonical": {
-    "title": "(rest-api-spec repo) Azure Resource Manager Service Project Canonical",
-    "description": "Create a project in rest-api-spec repo, representing an Azure service ARM API",
+    "title": "(rest-api-spec repo) Azure Resource Manager Service Project with Canonical Swagger",
+    "description": "Create a project with canonical swagger in rest-api-spec repo, representing an Azure service ARM API",
     "compilerVersion": "0.45.2",
     "libraries": [],
     "skipCompilerPackage": true,
