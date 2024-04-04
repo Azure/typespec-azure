@@ -1,7 +1,7 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import { diagnoseOpenApiFor, emitOpenApiWithDiagnostics, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: format", () => {
   it("allows supported formats", async () => {
@@ -70,5 +70,49 @@ describe("typespec-autorest: format", () => {
       `
     );
     expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("ensures certain scalars emit int32 and int64 formats", async () => {
+    const [res, diagnostics] = await emitOpenApiWithDiagnostics(
+      `
+      @service
+      namespace Test;
+
+      model Widget {
+        intA: int32;
+        intB: int64;
+        intC: safeint;
+        intD: numeric;
+        intE: integer;
+      }
+      `
+    );
+    const model = res.definitions!["Widget"]!;
+    deepStrictEqual(model, {
+      properties: {
+        intA: {
+          format: "int32",
+          type: "integer",
+        },
+        intB: {
+          format: "int64",
+          type: "integer",
+        },
+        intC: {
+          format: "int64",
+          type: "integer",
+        },
+        intD: {
+          format: "int64",
+          type: "integer",
+        },
+        intE: {
+          format: "int64",
+          type: "integer",
+        },
+      },
+      required: ["intA", "intB", "intC", "intD", "intE"],
+      type: "object",
+    });
   });
 });
