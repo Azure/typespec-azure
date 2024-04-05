@@ -46,10 +46,8 @@
     "@docusaurus/types": "^3.2.0",
     "@types/node": "~18.11.19",
     "@types/react": "~18.2.73",
-    
     "@typespec/tspd": "workspace:~",
     "dotenv": "~16.4.5",
-    
     "file-loader": "~6.2.0",
     "monaco-editor-webpack-plugin": "~7.1.0",
     "rimraf": "~5.0.5",
