@@ -11,6 +11,7 @@ for (const [name, sample] of Object.entries(samples)) {
       ...(sample.compilerOptions ?? {}),
       noEmit: true,
       emit: sample.preferredEmitter ? [sample.preferredEmitter] : [],
+      outputDir: process.cwd(),
     });
     expectDiagnosticEmpty(program.diagnostics);
   });
