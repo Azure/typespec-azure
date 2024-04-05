@@ -3,7 +3,7 @@
 If you've installed TypeSpec on your local machine, you can create a new TypeSpec project by following these steps:
 
 1. **Open your command prompt** (PowerShell, cmd.exe, bash, etc.), create an empty folder for your new project, and `cd` into it.
-2. If creating a new service in the [Azure/azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repository, create the new service folder following our [directory structure guidelines](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md)¹[1].
+2. If creating a new service in the [Azure/azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repository, create the new service folder following our [directory structure guidelines](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
 3. To create a new Azure service specification, use the `tsp init` command:
    ```bash
    tsp init https://aka.ms/typespec/azure-init
