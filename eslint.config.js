@@ -10,7 +10,6 @@ import { fileURLToPath } from "url";
 export default tsEslint.config(
   {
     ignores: [
-      "core",
       "**/dist/**/*",
       "**/.temp/**/*",
       "**/generated-defs/*",
