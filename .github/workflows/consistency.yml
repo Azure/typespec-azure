@@ -15,6 +15,7 @@ jobs:
   check-changes:
     name: Check Changes
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,8 +35,7 @@ jobs:
         if: |
           !startsWith(github.head_ref, 'publish/') &&
           !startsWith(github.head_ref, 'dependabot/') &&
-          !startsWith(github.head_ref, 'backmerge/') &&
-          ne(github.event_name, 'merge_queue')
+          !startsWith(github.head_ref, 'backmerge/')
 
       - run: node eng/scripts/validate-core-submodule.js
         name: Check that core submodule is merged to core repo
