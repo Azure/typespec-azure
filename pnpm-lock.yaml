@@ -9367,7 +9367,7 @@ packages:
   /@types/jsonwebtoken@9.0.6:
     resolution: {integrity: sha512-/5hndP5dCjloafCXns6SZyESp3Ldq7YjH3zwzwczYnjxIT0Fqzk5ROSYVGfFyczIue7IUEj8hkvLbPoLQ18vQw==}
     dependencies:
-      '@types/node': 20.11.30
+      '@types/node': 18.11.19
     dev: true
 
   /@types/mdast@3.0.15:
@@ -9423,12 +9423,6 @@ packages:
 
   /@types/node@18.11.19:
     resolution: {integrity: sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==}
-
-  /@types/node@20.11.30:
-    resolution: {integrity: sha512-dHM6ZxwlmuZaRmUPfv1p+KrdD1Dci04FbdEm/9wEMouFqxYoFl5aMkt0VMAUtYRQDyYvD41WJLukhq/ha3YuTw==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: true
 
   /@types/normalize-package-data@2.4.4:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -10610,7 +10604,7 @@ packages:
   /builtins@5.0.1:
     resolution: {integrity: sha512-qwVpFEHNfhYJIzNRBvd2C1kyo6jz3ZSMPyyuR47OPdiKWlbYnZNyDWuyR175qDnAJLiCo5fBBqPb3RiXgWlkOQ==}
     dependencies:
-      semver: 7.5.4
+      semver: 7.6.0
     dev: true
 
   /bytes@3.0.0:
@@ -15986,7 +15980,7 @@ packages:
     dependencies:
       hosted-git-info: 7.0.1
       proc-log: 3.0.0
-      semver: 7.5.4
+      semver: 7.6.0
       validate-npm-package-name: 5.0.0
     dev: true
 
@@ -19083,10 +19077,6 @@ packages:
 
   /underscore@1.13.6:
     resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
-    dev: true
-
-  /undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
     dev: true
 
   /undici@5.28.3:
