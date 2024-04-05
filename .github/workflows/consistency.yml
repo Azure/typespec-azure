@@ -35,7 +35,7 @@ jobs:
           !startsWith(github.head_ref, 'publish/') &&
           !startsWith(github.head_ref, 'dependabot/') &&
           !startsWith(github.head_ref, 'backmerge/') &&
-          !startsWith(github.head_ref, 'gh-readonly-queue/') }}
+          !startsWith(github.head_ref, 'gh-readonly-queue/')
 
       - run: node eng/scripts/validate-core-submodule.js
         name: Check that core submodule is merged to core repo
