@@ -73,7 +73,7 @@ describe("typespec-autorest: format", () => {
   });
 
   it("ensures certain scalars emit int32 and int64 formats", async () => {
-    const [res, diagnostics] = await emitOpenApiWithDiagnostics(
+    const [res, _] = await emitOpenApiWithDiagnostics(
       `
       @service
       namespace Test;

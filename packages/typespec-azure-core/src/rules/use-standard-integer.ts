@@ -20,7 +20,7 @@ export const useStandardInteger = createRule({
           "uint32",
           "uint64",
         ];
-        for (const [name, prop] of model.properties) {
+        for (const [_, prop] of model.properties) {
           if (prop.type.kind === "Scalar") {
             if (nonRecommendedInts.includes(prop.type.name)) {
               context.reportDiagnostic({
