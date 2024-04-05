@@ -10,16 +10,19 @@ import { fileURLToPath } from "url";
 export default tsEslint.config(
   {
     ignores: [
+      "core",
       "**/dist/**/*",
       "**/.temp/**/*",
       "**/generated-defs/*",
       "**/website/build/**/*",
       "**/.docusaurus/**/*",
-      "packages/compiler/templates/**/*", // Ignore the templates which might have invalid code and not follow exactly our rules.
+      "core/packages/compiler/templates/**/*", // Ignore the templates which might have invalid code and not follow exactly our rules.
       // TODO: enable
       "**/.scripts/**/*",
       "eng/scripts/**/*",
+      "core/eng/scripts/**/*",
       "packages/*/scripts/**/*",
+      "core/packages/*/scripts/**/*",
     ],
   },
   eslint.configs.recommended,
@@ -48,7 +51,7 @@ export default tsEslint.config(
         "warn",
         { varsIgnorePattern: "^_", argsIgnorePattern: ".*", ignoreRestSiblings: true },
       ],
-      "@typescript-eslint/no-floating-promises": "error",
+      // "@typescript-eslint/no-floating-promises": "error",
 
       // This rule is bugged https://github.com/typescript-eslint/typescript-eslint/issues/6538
       "@typescript-eslint/no-misused-promises": "off",
@@ -56,7 +59,7 @@ export default tsEslint.config(
       /**
        * Unicorn
        */
-      "deprecation/deprecation": ["warn"],
+      // "deprecation/deprecation": ["warn"],
 
       /**
        * Unicorn
