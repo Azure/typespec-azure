@@ -823,7 +823,7 @@ describe("typespec-client-generator-core: types", () => {
         string,
       }
       `);
-      
+
       const enums = runner.context.experimental_sdkPackage.enums;
       strictEqual(enums.length, 1);
       const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
