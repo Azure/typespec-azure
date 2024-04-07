@@ -812,6 +812,25 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
       strictEqual(unionAsEnum.access, "public");
     });
+
+    it("usage override for orphan union as enum", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union UnionAsEnum {
+        "A",
+        "B",
+        string,
+      }
+      `);
+      
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
+      ok(unionAsEnum);
+      strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(unionAsEnum.access, "public");
+    });
   });
   describe("SdkEnumType", () => {
     it("string extensible", async function () {
