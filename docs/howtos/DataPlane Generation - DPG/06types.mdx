@@ -37,7 +37,7 @@ model Foo {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattnedd access.
+Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
 
 ```python
 class Properties(_model_base.Model):
@@ -50,7 +50,7 @@ class Foo(_model_base.Model):
 
     __flattened_items = ["properties"]      
 
-print(f.properties.name)  # Non-flattened access is prefered experience
+print(f.properties.name)  # Non-flattened access is preferred experience
 print(f.name)  # Flattened access is dynamically supported, but not documented
 
 ```
