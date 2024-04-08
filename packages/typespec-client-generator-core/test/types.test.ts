@@ -822,14 +822,26 @@ describe("typespec-client-generator-core: types", () => {
         "B",
         string,
       }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.internal)
+      union UnionAsEnumInternal {
+        "A",
+        "B",
+        string,
+      }
       `);
 
       const enums = runner.context.experimental_sdkPackage.enums;
-      strictEqual(enums.length, 1);
+      strictEqual(enums.length, 2);
       const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
       ok(unionAsEnum);
       strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
       strictEqual(unionAsEnum.access, "public");
+      const unionAsEnumInternal = enums.find((x) => x.name === "UnionAsEnumInternal");
+      ok(unionAsEnumInternal);
+      strictEqual(unionAsEnumInternal.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(unionAsEnumInternal.access, "internal");
     });
   });
   describe("SdkEnumType", () => {
