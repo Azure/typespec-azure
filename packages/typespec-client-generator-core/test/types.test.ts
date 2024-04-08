@@ -245,8 +245,9 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `
       );
-      const diagnostics = runner.context.experimental_sdkPackage.diagnostics;
-      expectDiagnostics(diagnostics, []);
+      // eslint-disable-next-line deprecation/deprecation
+      expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, []);
+      expectDiagnostics(runner.context.diagnostics, []);
       const m = runner.context.experimental_sdkPackage.models.find((x) => x.name === "TestModel");
       const e1 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "TestEnum");
       const e2 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "testScalar");
@@ -2977,7 +2978,8 @@ describe("typespec-client-generator-core: types", () => {
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
         `
       );
-      expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, {
+      ok(runner.context.diagnostics?.length);
+      expectDiagnostics(runner.context.diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
       });
     });

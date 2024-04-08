@@ -541,6 +541,9 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  /**
+   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
+   */
   diagnostics: readonly Diagnostic[];
 }
 
