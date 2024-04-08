@@ -23,7 +23,7 @@ describe("typespec-azure-core: no-enum rule", () => {
   it("emit warning for array of model without x-ms-identifiers", async () => {
     await tester
       .expect(
-        `        
+        `
         model Foo {
           bar: Bar[];
         }
@@ -35,14 +35,14 @@ describe("typespec-azure-core: no-enum rule", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Missing identifying properties of objects in the array item, please add @extension("x-ms-identifiers", [<prop>]) to specify it. If there are no appropriate identifying properties, please add @extension("x-ms-identifiers",[]).`,
+        message: `Missing identifying properties of objects in the array item, please add @OpenAPI.extension("x-ms-identifiers", [<prop>]) to specify it. If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers",[]).`,
       });
   });
 
   it("emit warning if value is not a tuple", async () => {
     await tester
       .expect(
-        `        
+        `
         model Foo {
           @OpenAPI.extension("x-ms-identifiers", "customName")
           bar: Bar[];
@@ -55,14 +55,14 @@ describe("typespec-azure-core: no-enum rule", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Value passed to @extension("x-ms-identifiers",...) was a "string". Pass an array of property name.`,
+        message: `Value passed to @OpenAPI.extension("x-ms-identifiers",...) was a "string". Pass an array of property name.`,
       });
   });
 
   it("emit diagnostic when x-ms-identifiers property names are not found in the target type", async () => {
     await tester
       .expect(
-        `        
+        `
         model Foo {
           @OpenAPI.extension("x-ms-identifiers", ["not-a-prop"])
           bar: Bar[];
@@ -82,7 +82,7 @@ describe("typespec-azure-core: no-enum rule", () => {
   it(`doesn't emit diagnostic if @extension("x-ms-identifiers",...) is specified`, async () => {
     await tester
       .expect(
-        `        
+        `
         model Foo {
           @OpenAPI.extension("x-ms-identifiers", ["customName"])
           bar: Bar[];
@@ -98,7 +98,7 @@ describe("typespec-azure-core: no-enum rule", () => {
   it(`doesn't emit diagnostic if element is a primitive type`, async () => {
     await tester
       .expect(
-        `        
+        `
         model Foo {
           bar: Bar[];
         }
