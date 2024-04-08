@@ -30,7 +30,7 @@ model Foo {
 
 ```json
 {
-  "TODO": true,
+  "TODO": true
 }
 ```
 
@@ -48,7 +48,7 @@ class Foo(_model_base.Model):
     properties: "_models.Properties" = rest_field()
     """Required."""
 
-    __flattened_items = ["properties"]      
+    __flattened_items = ["properties"]
 
 print(f.properties.name)  # Non-flattened access is preferred experience
 print(f.name)  # Flattened access is dynamically supported, but not documented
@@ -66,7 +66,7 @@ TODO
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO
+TODO;
 ```
 
 </TabItem>
