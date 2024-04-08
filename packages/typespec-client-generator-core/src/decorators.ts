@@ -525,6 +525,11 @@ export function createSdkContext<
     diagnostics: diagnostics.diagnostics,
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  if (sdkContext.diagnostics) {
+    sdkContext.diagnostics = sdkContext.diagnostics.concat(
+      sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+    );
+  }
   return sdkContext;
 }
 

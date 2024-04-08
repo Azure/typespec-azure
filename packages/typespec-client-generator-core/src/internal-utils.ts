@@ -258,13 +258,14 @@ export interface TCGCContext {
   __api_version_client_default_value?: string;
   __api_versions?: string[];
   knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics?: readonly Diagnostic[];
+  diagnostics: readonly Diagnostic[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
   return {
     program,
     emitterName: "__TCGC_INTERNAL__",
+    diagnostics: [],
   };
 }
 
