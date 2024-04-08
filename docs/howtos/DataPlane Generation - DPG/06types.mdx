@@ -5,6 +5,80 @@ import TabItem from "@theme/TabItem";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
+## Models
+
+### Flattening
+
+> **NOTE:** Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Properties {
+  name: string;
+}
+
+model Foo {
+  @flattenProperty
+  prop: Properties;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "TODO": true,
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattnedd access.
+
+```python
+class Properties(_model_base.Model):
+    name: str = rest_field()
+    """Required."""
+
+class Foo(_model_base.Model):
+    properties: "_models.Properties" = rest_field()
+    """Required."""
+
+    __flattened_items = ["properties"]      
+
+print(f.properties.name)  # Non-flattened access is prefered experience
+print(f.name)  # Flattened access is dynamically supported, but not documented
+
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO
+```
+
+</TabItem>
+</Tabs>
+
 ## Unions
 
 ### Union of literals with same type
