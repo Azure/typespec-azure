@@ -544,6 +544,41 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.nullableValues, true);
     });
 
+    it("additional property is nullable", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestExtends extends Record<string|null> {
+          name: string;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestIs is Record<string|null> {
+          name: string;
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+
+      const extendsType = models.find((x) => x.name === "TestExtends");
+      ok(extendsType);
+      strictEqual(extendsType.kind, "model");
+      strictEqual(extendsType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(extendsType.additionalProperties?.nullable, true);
+      strictEqual(extendsType.additionalPropertiesNullable, true);
+
+      const isType = models.find((x) => x.name === "TestIs");
+      ok(isType);
+      strictEqual(isType.kind, "model");
+      strictEqual(isType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(isType.additionalProperties?.nullable, true);
+      strictEqual(isType.additionalPropertiesNullable, true);
+    });
+
     it("model with simple union property", async function () {
       await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)

@@ -540,6 +540,7 @@ export function getSdkModelWithDiagnostics(
       sdkType.additionalProperties = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.sourceModel!.indexer!.value!, operation)
       );
+      sdkType.additionalPropertiesNullable = isNullable(type.sourceModel!.indexer!.value!);
     }
     if (type.baseModel) {
       sdkType.baseModel = context.modelsMap?.get(type.baseModel) as SdkModelType | undefined;
@@ -550,6 +551,7 @@ export function getSdkModelWithDiagnostics(
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
           sdkType.additionalProperties = baseModel.valueType;
+          sdkType.additionalPropertiesNullable = isNullable(baseModel.valueType.__raw!);
         } else {
           sdkType.baseModel = baseModel;
           updateModelsMap(context, type.baseModel, sdkType.baseModel, operation);
