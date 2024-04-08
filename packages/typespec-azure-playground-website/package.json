@@ -42,8 +42,8 @@
     "watch": "vite --port 5174",
     "test:e2e": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e",
     "test:e2e:headed": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e --headed",
-    "lint": "eslint . --ext .ts --max-warnings=0",
-    "lint:fix": "eslint . --fix --ext .ts"
+    "lint": "eslint .  --max-warnings=0",
+    "lint:fix": "eslint . --fix "
   },
   "files": [
     "lib/*.tsp",
@@ -74,12 +74,10 @@
     "@types/node": "~18.11.19",
     "@types/react-dom": "~18.2.23",
     "@typespec/bundler": "workspace:~",
-    "@typespec/eslint-config-typespec": "workspace:~",
     "@typespec/playground": "workspace:~",
     "@vitest/coverage-v8": "^1.4.0",
     "@vitest/ui": "^1.4.0",
     "cross-env": "~7.0.3",
-    "eslint": "^8.57.0",
     "rimraf": "~5.0.5",
     "typescript": "~5.4.3",
     "vitest": "^1.4.0"
