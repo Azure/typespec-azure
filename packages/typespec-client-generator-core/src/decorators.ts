@@ -16,6 +16,7 @@ import {
   SyntaxKind,
   Type,
   Union,
+  createDiagnosticCollector,
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
@@ -503,6 +504,7 @@ export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+  const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
@@ -512,12 +514,15 @@ export function createSdkContext<
     program: context.program,
     emitContext: context,
     experimental_sdkPackage: undefined!,
-    emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
+    emitterName: diagnostics.pipe(
+      parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
+    ), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
+    diagnostics: diagnostics.diagnostics,
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   return sdkContext;

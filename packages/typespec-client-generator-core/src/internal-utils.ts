@@ -1,11 +1,13 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  Diagnostic,
   Model,
   Namespace,
   Operation,
   Program,
   Type,
   Union,
+  createDiagnosticCollector,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
@@ -26,6 +28,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
+import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -38,16 +41,27 @@ import {
  * @param emitterName Full emitter name
  * @returns The language of the emitter. I.e. "@azure-tools/typespec-csharp" will return "csharp"
  */
-export function parseEmitterName(emitterName?: string): string {
+export function parseEmitterName(
+  program: Program,
+  emitterName?: string
+): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (!emitterName) {
-    throw new Error("No emitter name found in program");
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-emitter-name",
+        format: {},
+        target: program.getGlobalNamespaceType(),
+      })
+    );
+    return diagnostics.wrap("none");
   }
   const regex = /(?:cadl|typespec)-([^\\/]*)/;
   const match = emitterName.match(regex);
-  if (!match || match.length < 2) return "none";
+  if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
-  if (["typescript", "ts"].includes(language)) return "javascript";
-  return language;
+  if (["typescript", "ts"].includes(language)) return diagnostics.wrap("javascript");
+  return diagnostics.wrap(language);
 }
 
 /**
@@ -244,6 +258,7 @@ export interface TCGCContext {
   __api_version_client_default_value?: string;
   __api_versions?: string[];
   knownScalars?: Record<string, SdkBuiltInKinds>;
+  diagnostics?: readonly Diagnostic[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
