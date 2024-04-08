@@ -1316,7 +1316,7 @@ interface GetAllModelsOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(context: TCGCContext, type: Model | Enum) {
+function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Union) {
   const diagnostics = createDiagnosticCollector();
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
@@ -1408,6 +1408,10 @@ export function getAllModelsWithDiagnostics(
     // orphan enums
     for (const enumType of client.service.enums.values()) {
       handleServiceOrphanType(context, enumType);
+    }
+    // orphan unions
+    for (const unionType of client.service.unions.values()) {
+      handleServiceOrphanType(context, unionType);
     }
     // server parameters
     const servers = getServers(context.program, client.service);
