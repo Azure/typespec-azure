@@ -546,6 +546,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
    * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
    */
   diagnostics: readonly Diagnostic[];
+  crossLanguagePackageId: string;
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
