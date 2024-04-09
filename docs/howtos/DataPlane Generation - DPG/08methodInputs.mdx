@@ -29,12 +29,14 @@ def get() -> User:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -48,6 +50,7 @@ public User get();
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -91,12 +94,14 @@ def post(user: [User, JSON, IO[bytes]], *, content_type: str = "application/json
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -110,6 +115,7 @@ public void post(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -124,8 +130,8 @@ public void post(User user);
 
 ```typespec
 alias User = {
-  firstName: string,
-  lastName: string,
+  firstName: string;
+  lastName: string;
 };
 
 op upload(...User): void;
@@ -146,12 +152,14 @@ def upload(first_name: str, last_name: str) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -165,6 +173,7 @@ public void upload(String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -177,9 +186,9 @@ public void upload(String firstName, String lastName);
 
 ```typespec
 alias User = {
-  @path id: string,
-  firstName: string,
-  lastName: string,
+  @path id: string;
+  firstName: string;
+  lastName: string;
 };
 
 op upload(...User): void;
@@ -198,12 +207,14 @@ def upload(id: str, first_name: str, last_name: str) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -217,6 +228,7 @@ public void upload(String id, String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -253,12 +265,14 @@ def upload(user: User) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -281,10 +295,11 @@ public void upload(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
-</Tabs> 
+</Tabs>
 
 ### Model with @body Property
 
@@ -326,12 +341,14 @@ def upload(userRequest: UserRequest) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -354,6 +371,7 @@ public void upload(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -368,7 +386,8 @@ public void upload(User user);
 model BlobProperties {
   @key
   @visibility("read")
-  @path name: string;
+  @path
+  name: string;
 
   @header contentLength: string;
   @header contentType: string;
@@ -396,12 +415,14 @@ def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -415,6 +436,7 @@ public void setBlobProperties(String name, String contentLength, String contentT
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -426,7 +448,6 @@ public void setBlobProperties(String name, String contentLength, String contentT
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
-
 model Schema {
   @header contentType: "application/json";
   schema: bytes;
@@ -452,12 +473,14 @@ def register(schema: Schema) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+
 ```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+
 ```
 
 </TabItem>
@@ -479,6 +502,7 @@ public void register(Schema schema);
 <TabItem value="go" label="Go" >
 
 ```go
+
 ```
 
 </TabItem>
@@ -487,4 +511,3 @@ public void register(Schema schema);
 ## Options Bags
 
 ## Azure Core
-
