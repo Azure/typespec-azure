@@ -29,7 +29,12 @@ def get() -> User:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+//protocol method
+public virtual async Task<Response> GetUserAsync(RequestContext context){}
+public virtual Response GetUser(RequestContext context){}
+//convenience method
+public virtual async Task<Response<User>> GetUser(CancellationToken cancellationToken = default)
+public virtual Response<User> GetUser(CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -94,7 +99,12 @@ def post(user: [User, JSON, IO[bytes]], *, content_type: str = "application/json
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+//protocol method
+public virtual async Task<Response> PostAsync(RequestContent content, RequestContext context = null)
+public virtual Response Post(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> PostAsync(User user, CancellationToken cancellationToken = default)
+public virtual Response Post(User user, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -152,7 +162,12 @@ def upload(first_name: str, last_name: str) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+//protocol method
+public virtual async Task<Response> UploadAsync(RequestContent content, RequestContext context = null)
+public virtual Response Upload(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
+public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -207,7 +222,12 @@ def upload(id: str, first_name: str, last_name: str) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+//protocol method
+public virtual async Task<Response> UploadAsync(string id, RequestContent content, RequestContext context = null)
+public virtual Response Upload(string id, RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(string id, string firstName, string lastName, CancellationToken cancellationToken = default)
+public virtual Response Upload(string id, string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -265,7 +285,18 @@ def upload(user: User) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+public partial class User
+{
+  public User(string firstName, string lastName){}
+  public string FirstName { get; }
+  public string LastName { get; }
+}
+//protocol method
+public virtual async Task<Response> UploadAsync(RequestContent content, RequestContext context = null)
+public virtual Response Upload(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
+public virtual Response Upload(User user, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -341,7 +372,18 @@ def upload(userRequest: UserRequest) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+public partial class User
+{
+  public User(string firstName, string lastName){}
+  public string FirstName { get; }
+  public string LastName { get; }
+}
+//protocol method
+public virtual async Task<Response> UploadAsync(RequestContent content, RequestContext context = null)
+public virtual Response Upload(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
+public virtual Response Upload(User user, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -415,7 +457,9 @@ def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+//protocol method
+public virtual async Task<Response> SetBlobPropertiesAsync(string name, string contentLength, string contentTypes, RequestContext context = null)
+public virtual Response SetBlobProperties(string name, string contentLength, string contentTypes, RequestContext context = null)
 ```
 
 </TabItem>
@@ -473,7 +517,17 @@ def register(schema: Schema) -> None:
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-
+public partial class Schema
+{
+  public Schema(BinaryData schemaProperty){}
+  public BinaryData SchemaProperty { get; }
+}
+//protocol method
+public virtual async Task<Response> RegisterAsync(RequestContent content, RequestContext context = null)
+public virtual Response Register(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> RegisterAsync(Schema schema, CancellationToken cancellationToken = default)
+public virtual Response Register(Schema schema, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
