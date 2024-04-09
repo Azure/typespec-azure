@@ -30,7 +30,36 @@ model Foo {
 
 ```json
 {
-  "TODO": true
+  "kind": "model",
+  "name": "Foo",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "prop",
+      "serializedName": "prop",
+      "flatten": true,
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "model",
+        "name": "Properties",
+        "properties": [
+          {
+            "kind": "property",
+            "name": "name",
+            "serializedName": "name",
+            "flatten": false,
+            "optional": false,
+            "nullable": false,
+            "type": {
+              "kind": "string",
+              "encode": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
 
