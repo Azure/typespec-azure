@@ -279,7 +279,7 @@ def upload(user: User) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
-// model class
+// Model class
 @Immutable
 public final class User implements JsonSerializable<User> {
     public User(String firstName, String lastName);
@@ -287,7 +287,7 @@ public final class User implements JsonSerializable<User> {
     public String getLastName();
 }
 
-// client API
+// Client API
 public void upload(User user);
 ```
 
@@ -355,7 +355,7 @@ def upload(userRequest: UserRequest) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
-// model class
+// Model class
 @Immutable
 public final class User implements JsonSerializable<User> {
     public User(String firstName, String lastName);
@@ -363,7 +363,7 @@ public final class User implements JsonSerializable<User> {
     public String getLastName();
 }
 
-// client API
+// Client API
 public void upload(User user);
 ```
 
@@ -487,14 +487,14 @@ def register(schema: Schema) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
-// model class
+// Model class
 @Immutable
 public final class Schema implements JsonSerializable<Schema> {
     public Schema(byte[] schema);
     public byte[] getSchema();
 }
 
-// client API
+// Client API
 public void register(Schema schema);
 ```
 
