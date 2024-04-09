@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { useStandardInteger } from "../../src/rules/use-standard-integer.js";
+import { noGenericTypesRule } from "../../src/rules/no-generic-types.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 let runner: BasicTestRunner;
@@ -12,7 +12,7 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
-  tester = createLinterRuleTester(runner, useStandardInteger, "@azure-tools/typespec-azure-core");
+  tester = createLinterRuleTester(runner, noGenericTypesRule, "@azure-tools/typespec-azure-core");
 });
 
 it("emits a warning diagnostic for non-standard integer types", async () => {
