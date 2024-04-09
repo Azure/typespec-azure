@@ -41,6 +41,7 @@ def get() -> User:
 <TabItem value="java" label="Java" >
 
 ```java
+public User get();
 ```
 
 </TabItem>
@@ -102,6 +103,7 @@ def post(user: [User, JSON, IO[bytes]], *, content_type: str = "application/json
 <TabItem value="java" label="Java" >
 
 ```java
+public void post(User user);
 ```
 
 </TabItem>
@@ -156,6 +158,7 @@ def upload(first_name: str, last_name: str) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
+public void upload(String firstName, String lastName);
 ```
 
 </TabItem>
@@ -207,6 +210,7 @@ def upload(id: str, first_name: str, last_name: str) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
+public void upload(String id, String firstName, String lastName);
 ```
 
 </TabItem>
@@ -261,6 +265,16 @@ def upload(user: User) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
+// model class
+@Immutable
+public final cass User implements JsonSerializable<User> {
+    public User(String firstName, String lastName);
+    public String getFirstName();
+    public String getLastName();
+}
+
+// client API
+public void upload(User user);
 ```
 
 </TabItem>
@@ -324,6 +338,16 @@ def upload(userRequest: UserRequest) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
+// model class
+@Immutable
+public final cass User implements JsonSerializable<User> {
+    public User(String firstName, String lastName);
+    public String getFirstName();
+    public String getLastName();
+}
+
+// client API
+public void upload(User user);
 ```
 
 </TabItem>
@@ -384,6 +408,7 @@ def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
+public void setBlobProperties(String name, String contentLength, String contentType);
 ```
 
 </TabItem>
@@ -439,6 +464,15 @@ def register(schema: Schema) -> None:
 <TabItem value="java" label="Java" >
 
 ```java
+// model class
+@Immutable
+public final class Schema implements JsonSerializable<Schema> {
+    public Schema(byte[] schema);
+    public byte[] getSchema();
+}
+
+// client API
+public void register(Schema schema);
 ```
 
 </TabItem>
