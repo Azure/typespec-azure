@@ -245,8 +245,9 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `
       );
-      const diagnostics = runner.context.experimental_sdkPackage.diagnostics;
-      expectDiagnostics(diagnostics, []);
+      // eslint-disable-next-line deprecation/deprecation
+      expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, []);
+      expectDiagnostics(runner.context.diagnostics, []);
       const m = runner.context.experimental_sdkPackage.models.find((x) => x.name === "TestModel");
       const e1 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "TestEnum");
       const e2 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "testScalar");
@@ -541,6 +542,41 @@ describe("typespec-client-generator-core: types", () => {
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
+    });
+
+    it("additional property is nullable", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestExtends extends Record<string|null> {
+          name: string;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestIs is Record<string|null> {
+          name: string;
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+
+      const extendsType = models.find((x) => x.name === "TestExtends");
+      ok(extendsType);
+      strictEqual(extendsType.kind, "model");
+      strictEqual(extendsType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(extendsType.additionalProperties?.nullable, true);
+      strictEqual(extendsType.additionalPropertiesNullable, true);
+
+      const isType = models.find((x) => x.name === "TestIs");
+      ok(isType);
+      strictEqual(isType.kind, "model");
+      strictEqual(isType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(isType.additionalProperties?.nullable, true);
+      strictEqual(isType.additionalPropertiesNullable, true);
     });
 
     it("model with simple union property", async function () {
@@ -1403,6 +1439,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enumType.name, "TestColor");
       strictEqual(enumType.isGeneratedName, true);
       strictEqual(enumType.isUnionAsEnum, true);
+      strictEqual(enumType.crossLanguageDefinitionId, "TestColor");
       const values = enumType.values;
       strictEqual(values[0].name, "left");
       strictEqual(values[0].value, "left");
@@ -3008,7 +3045,8 @@ describe("typespec-client-generator-core: types", () => {
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
         `
       );
-      expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, {
+      ok(runner.context.diagnostics?.length);
+      expectDiagnostics(runner.context.diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
       });
     });
