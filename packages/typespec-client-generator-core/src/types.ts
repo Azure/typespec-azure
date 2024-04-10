@@ -402,16 +402,14 @@ export function getSdkConstant(
 function addDiscriminatorToModelType(
   context: TCGCContext,
   type: Model,
-  model: SdkModelType,
+  model: SdkModelType
 ): [undefined, readonly Diagnostic[]] {
   const discriminator = getDiscriminator(context.program, type);
   const diagnostics = createDiagnosticCollector();
   if (discriminator) {
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
-      const childModelSdkType = diagnostics.pipe(
-        getSdkModelWithDiagnostics(context, childModel)
-      );
+      const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
@@ -1443,7 +1441,9 @@ export function getAllModelsWithDiagnostics(
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));
-  return diagnostics.wrap([...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0));
+  return diagnostics.wrap(
+    [...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0)
+  );
 }
 
 export function getAllModels(
