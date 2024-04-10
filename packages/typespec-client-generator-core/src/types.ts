@@ -403,7 +403,6 @@ function addDiscriminatorToModelType(
   context: TCGCContext,
   type: Model,
   model: SdkModelType,
-  operation?: Operation
 ): [undefined, readonly Diagnostic[]] {
   const discriminator = getDiscriminator(context.program, type);
   const diagnostics = createDiagnosticCollector();
@@ -411,9 +410,8 @@ function addDiscriminatorToModelType(
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
       const childModelSdkType = diagnostics.pipe(
-        getSdkModelWithDiagnostics(context, childModel, operation)
+        getSdkModelWithDiagnostics(context, childModel)
       );
-      updateModelsMap(context, childModel, childModelSdkType, operation);
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
@@ -533,7 +531,7 @@ export function getSdkModelWithDiagnostics(
       isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
     };
-    updateModelsMap(context, type, sdkType, operation);
+    updateModelsMap(context, type, sdkType);
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
@@ -554,12 +552,13 @@ export function getSdkModelWithDiagnostics(
           sdkType.additionalPropertiesNullable = isNullable(baseModel.valueType.__raw!);
         } else {
           sdkType.baseModel = baseModel;
-          updateModelsMap(context, type.baseModel, sdkType.baseModel, operation);
         }
       }
     }
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
-    diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType, operation));
+    diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
+
+    updateModelsMap(context, type, sdkType, operation);
   }
   return diagnostics.wrap(sdkType);
 }
@@ -972,7 +971,7 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type);
   // I'm a body model property
@@ -1444,7 +1443,7 @@ export function getAllModelsWithDiagnostics(
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));
-  return diagnostics.wrap([...context.modelsMap.values()].filter((t) => (t.usage & filter) > 0));
+  return diagnostics.wrap([...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0));
 }
 
 export function getAllModels(

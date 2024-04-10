@@ -21,7 +21,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import { SdkModelType, SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -2064,6 +2064,42 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(test4Actual, undefined);
       const test5Actual = getAccess(runner.context, Test5);
       strictEqual(test5Actual, "public");
+    });
+
+    it("access propagation with nullable", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        model RunStep {
+          id: string;
+          lastError: RunStepError | null;
+        }
+
+        model RunStepError {
+          code: string;
+          message: string;
+        }
+
+        @get
+        @route("/threads/{threadId}/runs/{runId}/steps/{stepId}")
+        op getRunStep(
+          @path threadId: string,
+          @path runId: string,
+          @path stepId: string,
+        ): RunStep;
+
+        @get
+        @route("/threads/{threadId}/runs/{runId}/steps")
+        op listRunSteps(
+          @path threadId: string,
+          @path runId: string,
+        ): RunStep[];
+        @@access(listRunSteps, Access.internal);
+        `
+      );
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(models[0].access, undefined);
+      strictEqual(models[1].access, undefined);
     });
   });
 
