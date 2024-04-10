@@ -514,9 +514,10 @@ export function getSdkModelWithDiagnostics(
     updateModelsMap(context, type, sdkType, operation);
   } else {
     const docWrapper = getDocHelper(context, type);
+    const name = getLibraryName(context, type) || getGeneratedName(context, type);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
-      name: getLibraryName(context, type) || getGeneratedName(context, type),
+      name: name,
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -524,7 +525,7 @@ export function getSdkModelWithDiagnostics(
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(type, name),
       apiVersions: getAvailableApiVersions(context, type),
       isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
@@ -679,11 +680,12 @@ function getSdkUnionEnumValues(
 function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
-    const union = type.union as Union & { name: string };
+    const union = type.union;
     const docWrapper = getDocHelper(context, union);
+    const name = getLibraryName(context, type.union) || getGeneratedName(context, type.union);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
-      name: getLibraryName(context, type.union) || getGeneratedName(context, type.union),
+      name,
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -696,7 +698,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union, name),
       apiVersions: getAvailableApiVersions(context, type.union),
       isUnionAsEnum: true,
     };

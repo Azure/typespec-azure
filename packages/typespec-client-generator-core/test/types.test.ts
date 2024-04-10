@@ -1439,6 +1439,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enumType.name, "TestColor");
       strictEqual(enumType.isGeneratedName, true);
       strictEqual(enumType.isUnionAsEnum, true);
+      strictEqual(enumType.crossLanguageDefinitionId, "TestColor");
       const values = enumType.values;
       strictEqual(values[0].name, "left");
       strictEqual(values[0].value, "left");
