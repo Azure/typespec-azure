@@ -3,7 +3,6 @@
 changeKind: feature
 packages:
   - "@azure-tools/typespec-autorest"
-  - "@azure-tools/typespec-azure-core"
 ---
 
-Add `use-standard-integer` rule to disable LintDiff `IntegerTypeMustHaveFormat`.
+Add `no-generic-types` rule to disable LintDiff `IntegerTypeMustHaveFormat`.
