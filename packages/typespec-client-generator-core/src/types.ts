@@ -402,18 +402,14 @@ export function getSdkConstant(
 function addDiscriminatorToModelType(
   context: TCGCContext,
   type: Model,
-  model: SdkModelType,
-  operation?: Operation
+  model: SdkModelType
 ): [undefined, readonly Diagnostic[]] {
   const discriminator = getDiscriminator(context.program, type);
   const diagnostics = createDiagnosticCollector();
   if (discriminator) {
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
-      const childModelSdkType = diagnostics.pipe(
-        getSdkModelWithDiagnostics(context, childModel, operation)
-      );
-      updateModelsMap(context, childModel, childModelSdkType, operation);
+      const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
@@ -518,9 +514,10 @@ export function getSdkModelWithDiagnostics(
     updateModelsMap(context, type, sdkType, operation);
   } else {
     const docWrapper = getDocHelper(context, type);
+    const name = getLibraryName(context, type) || getGeneratedName(context, type);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
-      name: getLibraryName(context, type) || getGeneratedName(context, type),
+      name: name,
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -528,12 +525,12 @@ export function getSdkModelWithDiagnostics(
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(type, name),
       apiVersions: getAvailableApiVersions(context, type),
       isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
     };
-    updateModelsMap(context, type, sdkType, operation);
+    updateModelsMap(context, type, sdkType);
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
@@ -554,12 +551,13 @@ export function getSdkModelWithDiagnostics(
           sdkType.additionalPropertiesNullable = isNullable(baseModel.valueType.__raw!);
         } else {
           sdkType.baseModel = baseModel;
-          updateModelsMap(context, type.baseModel, sdkType.baseModel, operation);
         }
       }
     }
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
-    diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType, operation));
+    diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
+
+    updateModelsMap(context, type, sdkType, operation);
   }
   return diagnostics.wrap(sdkType);
 }
@@ -682,11 +680,12 @@ function getSdkUnionEnumValues(
 function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
-    const union = type.union as Union & { name: string };
+    const union = type.union;
     const docWrapper = getDocHelper(context, union);
+    const name = getLibraryName(context, type.union) || getGeneratedName(context, type.union);
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
-      name: getLibraryName(context, type.union) || getGeneratedName(context, type.union),
+      name,
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -699,7 +698,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union, name),
       apiVersions: getAvailableApiVersions(context, type.union),
       isUnionAsEnum: true,
     };
@@ -972,7 +971,7 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type);
   // I'm a body model property
@@ -1444,7 +1443,9 @@ export function getAllModelsWithDiagnostics(
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));
-  return diagnostics.wrap([...context.modelsMap.values()].filter((t) => (t.usage & filter) > 0));
+  return diagnostics.wrap(
+    [...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0)
+  );
 }
 
 export function getAllModels(

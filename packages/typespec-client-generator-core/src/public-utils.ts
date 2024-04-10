@@ -208,13 +208,16 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: {
-  name: string;
-  kind: string;
-  interface?: Interface;
-  namespace?: Namespace;
-}): string {
-  let retval = type.name;
+export function getCrossLanguageDefinitionId(
+  type: {
+    name?: string;
+    kind: string;
+    interface?: Interface;
+    namespace?: Namespace;
+  },
+  name?: string
+): string {
+  let retval = type.name ? type.name : name ?? "";
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
   }
