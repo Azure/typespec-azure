@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-autorest"
 ---
 
-Add `no-generic-types` rule to disable LintDiff `IntegerTypeMustHaveFormat`.
+Add `no-generic-numeric` rule to disable LintDiff `IntegerTypeMustHaveFormat`.

@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { noGenericTypesRule } from "../../src/rules/no-generic-types.js";
+import { noGenericNumericRule } from "../../src/rules/no-generic-numeric.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 let runner: BasicTestRunner;
@@ -12,7 +12,7 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
-  tester = createLinterRuleTester(runner, noGenericTypesRule, "@azure-tools/typespec-azure-core");
+  tester = createLinterRuleTester(runner, noGenericNumericRule, "@azure-tools/typespec-azure-core");
 });
 
 it("emits a warning diagnostic for generic types", async () => {
@@ -31,16 +31,16 @@ it("emits a warning diagnostic for generic types", async () => {
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-core/no-generic-types",
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
       },
       {
-        code: "@azure-tools/typespec-azure-core/no-generic-types",
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
       },
       {
-        code: "@azure-tools/typespec-azure-core/no-generic-types",
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
       },
       {
-        code: "@azure-tools/typespec-azure-core/no-generic-types",
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
       },
     ]);
 });

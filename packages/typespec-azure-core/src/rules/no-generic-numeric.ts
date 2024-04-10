@@ -8,11 +8,11 @@ const alternatives = new Map([
   ["decimal", "float32"],
 ]);
 
-export const noGenericTypesRule = createRule({
-  name: "no-generic-types",
+export const noGenericNumericRule = createRule({
+  name: "no-generic-numeric",
   description: "Don't use generic types. Use more specific types instead.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-generic-types",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-generic-numeric",
   messages: {
     default: paramMessage`Don't use generic type '${"name"}'. Use a more specific type that specifies the bit size, such as '${"alternative"}' instead.`,
   },
