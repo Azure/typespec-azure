@@ -1,4 +1,4 @@
-import { Model, createRule, paramMessage } from "@typespec/compiler";
+import { Model, Scalar, createRule, paramMessage } from "@typespec/compiler";
 
 const disallowList = new Set(["integer", "numeric", "float", "decimal"]);
 const alternatives = new Map([
@@ -15,6 +15,7 @@ export const noGenericNumericRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-generic-numeric",
   messages: {
     default: paramMessage`Don't use generic type '${"name"}'. Use a more specific type that specifies the bit size, such as '${"alternative"}' instead.`,
+    extend: paramMessage`Don't extend generic type '${"name"}'. Use a more specific type that specifies the bit size, such as '${"alternative"}' instead.`,
   },
   create(context) {
     return {
@@ -31,6 +32,26 @@ export const noGenericNumericRule = createRule({
               });
             }
           }
+        }
+      },
+      scalar: (scalar: Scalar) => {
+        let baseScalar: Scalar | undefined = undefined;
+        while (scalar.baseScalar !== undefined) {
+          baseScalar = scalar.baseScalar;
+          break;
+        }
+        if (baseScalar === undefined) {
+          return;
+        }
+        if (disallowList.has(baseScalar.name)) {
+          context.reportDiagnostic({
+            target: scalar,
+            messageId: "extend",
+            format: {
+              name: baseScalar.name,
+              alternative: alternatives.get(baseScalar.name)!,
+            },
+          });
         }
       },
     };
