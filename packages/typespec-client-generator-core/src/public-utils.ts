@@ -123,7 +123,9 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
 export function getEmitterTargetName(context: TCGCContext): string {
-  return parseEmitterName(context.program.emitters[0]?.metadata?.name); // eslint-disable-line deprecation/deprecation
+  return ignoreDiagnostics(
+    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name)
+  ); // eslint-disable-line deprecation/deprecation
 }
 
 /**
@@ -206,13 +208,16 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: {
-  name: string;
-  kind: string;
-  interface?: Interface;
-  namespace?: Namespace;
-}): string {
-  let retval = type.name;
+export function getCrossLanguageDefinitionId(
+  type: {
+    name?: string;
+    kind: string;
+    interface?: Interface;
+    namespace?: Namespace;
+  },
+  name?: string
+): string {
+  let retval = type.name ? type.name : name ?? "";
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
   }

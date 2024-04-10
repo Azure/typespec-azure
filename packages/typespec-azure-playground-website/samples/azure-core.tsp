@@ -45,21 +45,23 @@ enum Versions {
 // Models ////////////////////
 
 /** The color of a widget. */
-enum WidgetColor {
+union WidgetColor {
+  string,
+
   /** Black Widget Color */
-  Black,
+  Black: "Black",
 
   /** White Widget Color */
-  White,
+  White: "White",
 
   /** Red Widget Color */
-  Red,
+  Red: "Red",
 
   /** Green Widget Color */
-  Green,
+  Green: "Green",
 
   /** Blue Widget Color */
-  Blue,
+  Blue: "Blue",
 }
 
 /** A widget. */
@@ -81,18 +83,20 @@ model Widget {
 
 /** The repair state of a widget. */
 @lroStatus
-enum WidgetRepairState {
+union WidgetRepairState {
+  string,
+
   /** Widget repairs succeeded. */
-  Succeeded,
+  Succeeded: "Succeeded",
 
   /** Widget repairs failed. */
-  Failed,
+  Failed: "Failed",
 
   /** Widget repairs were canceled. */
-  Canceled,
+  Canceled: "Canceled",
 
   /** Widget was sent to the manufacturer. */
-  SentToManufacturer,
+  SentToManufacturer: "SentToManufacturer",
 }
 
 /** A submitted repair request for a widget. */

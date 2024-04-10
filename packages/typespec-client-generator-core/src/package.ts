@@ -7,6 +7,7 @@ import {
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
+  ignoreDiagnostics,
   isKey,
 } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
@@ -89,7 +90,14 @@ function getSdkServiceOperation<
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
-  throw new Error("Can't support other service operations yet");
+  diagnostics.add(
+    createDiagnostic({
+      code: "unsupported-protocol",
+      target: operation,
+      format: {},
+    })
+  );
+  return diagnostics.wrap(undefined as any);
 }
 function getSdkLroPagingServiceMethod<
   TOptions extends object,
@@ -265,10 +273,11 @@ function getSdkBasicServiceMethod<
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
   const response = getSdkMethodResponse(operation, serviceOperation);
+  const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
-    name: getLibraryName(context, operation),
+    name,
     access: getAccess(context, operation),
     parameters: methodParameters.filter((x) => !x.isApiVersionParam),
     description: getDocHelper(context, operation).description,
@@ -279,7 +288,9 @@ function getSdkBasicServiceMethod<
     getParameterMapping: function getParameterMapping(
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
-      return getCorrespondingMethodParams(context, methodParameters, serviceParam);
+      return ignoreDiagnostics(
+        getCorrespondingMethodParams(context, name, methodParameters, serviceParam)
+      );
     },
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
