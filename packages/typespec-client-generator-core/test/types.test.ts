@@ -352,6 +352,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.encode, "seconds");
     });
 
+    it("nullable float seconds", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          @encode(DurationKnownEncoding.seconds, float)
+          prop: duration | null;
+        }
+      `
+      );
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "duration");
+      strictEqual(sdkType.wireType.kind, "float");
+      strictEqual(sdkType.encode, "seconds");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.nullable, true);
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.wireType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
+    });
+
     it("float seconds decorated scalar", async function () {
       await runner.compileWithBuiltInService(
         `
@@ -441,6 +464,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
+    });
+
+    it("nullable unixTimestamp", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+          value: utcDateTime | null;
+        }
+      `
+      );
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "utcDateTime");
+      strictEqual(sdkType.wireType.kind, "int64");
+      strictEqual(sdkType.encode, "unixTimestamp");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.nullable, true);
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.wireType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
     });
 
     it("unixTimestamp array", async function () {
