@@ -155,6 +155,10 @@ export function addEncodeInfo(
     propertyType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type)
     ) as SdkBuiltInType;
+    if (type.kind === "ModelProperty" && isNullable(type.type)) {
+      // eslint-disable-next-line deprecation/deprecation
+      propertyType.wireType.nullable = true;
+    }
   }
   if (propertyType.kind === "utcDateTime" || propertyType.kind === "offsetDateTime") {
     if (encodeData) {
@@ -164,6 +168,10 @@ export function addEncodeInfo(
       ) as SdkBuiltInType;
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
       propertyType.encode = "rfc7231";
+    }
+    if (type.kind === "ModelProperty" && isNullable(type.type)) {
+      // eslint-disable-next-line deprecation/deprecation
+      propertyType.wireType.nullable = true;
     }
   }
   if (propertyType.kind === "bytes") {
