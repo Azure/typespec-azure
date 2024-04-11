@@ -1,14 +1,12 @@
 import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
-  Model,
-  ModelProperty,
   Operation,
+  Type,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
   ignoreDiagnostics,
-  isKey,
 } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
@@ -57,15 +55,14 @@ import {
   getHashForType,
   getSdkTypeBaseHelper,
   isNullable,
-  updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
   getClientNamespaceString,
   getDefaultApiVersion,
+  getEffectivePayloadType,
   getHttpOperationWithCache,
   getLibraryName,
-  isApiVersion,
 } from "./public-utils.js";
 import {
   getAllModelsWithDiagnostics,
@@ -232,26 +229,32 @@ function getSdkBasicServiceMethod<
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // when we spread, all of the inputtable properties of our model get flattened onto the method
   const methodParameters: SdkMethodParameter[] = [];
-  const spreadModelNames: string[] = [];
-  for (const prop of operation.parameters.properties.values()) {
-    if (
-      prop.sourceProperty?.model?.name &&
-      !isKey(context.program, prop.sourceProperty) &&
-      !isApiVersion(context, prop)
-    ) {
-      if (!spreadModelNames.includes(prop.sourceProperty.model.name)) {
-        spreadModelNames.push(prop.sourceProperty.model.name);
-        methodParameters.push(
-          diagnostics.pipe(getSdkMethodParameter(context, prop.sourceProperty.model))
-        );
+
+  const httpOperation = getHttpOperationWithCache(context, operation);
+  const parameters = httpOperation.parameters;
+  // path/query/header parameters
+  for (const param of parameters.parameters) {
+    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param)));
+  }
+  // body parameters
+  if (parameters.body?.parameter) {
+    methodParameters.push(
+      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter))
+    );
+  } else if (parameters.body) {
+    if (parameters.body.type.kind === "Model") {
+      const type = getEffectivePayloadType(context, parameters.body.type);
+      // spread case
+      if (type.name === "") {
+        for (const prop of type.properties.values()) {
+          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop)));
+        }
+      } else {
+        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, type)));
       }
     } else {
-      // workaround for the provider parameter in arm, need to refine method design in tcgc later
-      if (!context.arm || prop.name !== "provider") {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop)));
-      }
+      methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type)));
     }
   }
 
@@ -371,10 +374,10 @@ function getSdkInitializationType<
 
 function getSdkMethodParameter(
   context: TCGCContext,
-  type: ModelProperty | Model
+  type: Type
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (type.kind === "Model") {
+  if (type.kind !== "ModelProperty") {
     const libraryName = getLibraryName(context, type);
     const name = camelCase(libraryName ?? "body");
     const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
@@ -391,7 +394,8 @@ function getSdkMethodParameter(
       nullable: false,
       discriminator: false,
       serializedName: name,
-      ...updateWithApiVersionInformation(context, type),
+      isApiVersionParam: false,
+      onClient: false,
     });
   }
   return diagnostics.wrap({
