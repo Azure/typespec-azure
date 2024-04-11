@@ -3111,14 +3111,15 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(formDataMethod.name, "upload");
       strictEqual(formDataMethod.parameters.length, 3);
 
-      const widgetFormParam = formDataMethod.parameters.find((x) => x.name === "widgetForm");
-      ok(widgetFormParam);
+      const widgetParam = formDataMethod.parameters.find((x) => x.name === "widget");
+      ok(widgetParam);
       ok(formDataMethod.parameters.find((x) => x.name === "accept"));
-      strictEqual(formDataMethod.parameters[0].name, "name");
-      strictEqual(formDataMethod.parameters[0].type.kind, "string");
-      strictEqual(formDataMethod.parameters[1].name, "widgetForm");
+      strictEqual(formDataMethod.parameters[0].name, "contentType");
+      strictEqual(formDataMethod.parameters[0].type.kind, "constant");
+      strictEqual(formDataMethod.parameters[0].type.value, "multipart/form-data");
+      strictEqual(formDataMethod.parameters[1].name, "widget");
       strictEqual(formDataMethod.parameters[1].type.kind, "model");
-      strictEqual(formDataMethod.parameters[1].type.name, "WidgetForm");
+      strictEqual(formDataMethod.parameters[1].type.name, "Widget");
 
       const formDataOp = formDataMethod.operation;
       strictEqual(formDataOp.parameters.length, 2);
@@ -3129,11 +3130,7 @@ describe("typespec-client-generator-core: types", () => {
       ok(formDataBodyParam);
       strictEqual(formDataBodyParam.type.kind, "model");
       strictEqual(formDataBodyParam.type.name, "Widget");
-      strictEqual(formDataBodyParam.correspondingMethodParams.length, 4);
-      deepStrictEqual(
-        formDataBodyParam.correspondingMethodParams.map((x) => x.name).sort(),
-        ["color", "description", "displayName", "name"].sort()
-      );
+      strictEqual(formDataBodyParam.correspondingMethodParams[0], formDataMethod.parameters[1]);
     });
 
     it("usage doesn't apply to properties of a form data", async function () {
