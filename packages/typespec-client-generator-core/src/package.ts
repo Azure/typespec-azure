@@ -59,6 +59,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import {
   getClientNamespaceString,
+  getCrossLanguagePackageId,
   getDefaultApiVersion,
   getEffectivePayloadType,
   getHttpOperationWithCache,
@@ -562,6 +563,7 @@ export function getSdkPackage<
   for (const client of listClients(context)) {
     createSdkClientType(context, client);
   }
+  const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   return {
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
@@ -569,5 +571,6 @@ export function getSdkPackage<
     models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
     enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
     diagnostics: diagnostics.diagnostics,
+    crossLanguagePackageId,
   };
 }
