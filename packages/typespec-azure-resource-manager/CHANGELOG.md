@@ -1,13 +1,5 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
-## 0.41.1
-
-### Bug Fixes
-
-- [#605](https://github.com/Azure/typespec-azure/pull/605) Specify the fully qualified name of `@OpenAPI.extension` decorator in `missing-x-ms-identifiers` linter warning.
-- [#567](https://github.com/Azure/typespec-azure/pull/567) Enable `arm-common-types-version` rule by default.
-
-
 ## 0.41.0
 
 ### Bug Fixes
