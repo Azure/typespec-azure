@@ -27,13 +27,7 @@ enum Versions {
 
 /** A ContosoProviderHub resource */
 model RoleAssignment is ExtensionResource<RoleAssignmentProperties> {
-  /** Name of roleAssignment */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("roleAssignmentName")
-  @path
-  @segment("roleAssignments")
-  @visibility("read")
-  name: string;
+  ...DefaultNameParameter<RoleAssignment>;
 }
 
 /** RoleAssignment properties */

@@ -7,6 +7,30 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
+model DefaultNameParameter<
+  Resource extends ArmResource,
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+> {
+  @doc("The name of the resource")
+  @pattern(NamePattern)
+  @defaultResourceKeySegementName(Resource)
+  @path
+  name: string;
+}
+
+model CustomNameParameter<
+  SegmentName extends valueof string,
+  KeyName extends valueof string,
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+> {
+  @doc("The name of the resource")
+  @key(KeyName)
+  @segment(SegmentName)
+  @pattern(NamePattern)
+  @path
+  name: string;
+}
+
 //#region Standard Resource Operation Interfaces
 /**
  * Concrete tracked resource types can be created by aliasing this type using a specific property type.
