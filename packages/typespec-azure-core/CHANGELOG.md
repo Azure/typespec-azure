@@ -2,6 +2,10 @@
 
 ## 0.41.0
 
+No changes, version bump only.
+
+## 0.41.0
+
 ### Bug Fixes
 
 - [#392](https://github.com/Azure/typespec-azure/pull/392) Fix `@lroStatus` not detecting default states correctly when using union

@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.2
+
+### Bug Fixes
+
+- [#649](https://github.com/Azure/typespec-azure/pull/649) add `.crossLanguagePackageId` onto `SdkContext` types. This is a package id that is shared across languages, allowing linkage between packages generated across different languages
+- [#651](https://github.com/Azure/typespec-azure/pull/651) fix wrong propagation for nullable properties
+- [#656](https://github.com/Azure/typespec-azure/pull/656) change service method parameter impl
+- [#585](https://github.com/Azure/typespec-azure/pull/585) fix api version and pageable result path issue
+- [#625](https://github.com/Azure/typespec-azure/pull/625) support nullable additional properties
+- [#624](https://github.com/Azure/typespec-azure/pull/624) fix orphan union as enum has no usage problem
+- [#643](https://github.com/Azure/typespec-azure/pull/643) fix cross language definition id issue
+- [#655](https://github.com/Azure/typespec-azure/pull/655) fix wire type nullable info
+- [#630](https://github.com/Azure/typespec-azure/pull/630) use diagnostic system to raise errors and warnings
+
+
 ## 0.41.1
 
 ### Bug Fixes
