@@ -390,9 +390,9 @@ model Azure.ResourceManager.CustomerManagedKeyEncryption
 | Name                            | Type                                                                                   | Description                                                                                                                                                                                                                                                                                                                        |
 | ------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | keyEncryptionIdentity?          | [`KeyEncryptionIdentity`](./data-types.md#Azure.ResourceManager.KeyEncryptionIdentity) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
-| userAssignedIdentityResourceId? | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier)                      | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
+| userAssignedIdentityResourceId? | `Core.armResourceIdentifier`                                                           | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
 | federatedClientId?              | `Core.uuid`                                                                            | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
-| delegatedIdentityClientId       | `Core.uuid`                                                                            | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
+| delegatedIdentityClientId?      | `Core.uuid`                                                                            | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
@@ -642,9 +642,9 @@ model Azure.ResourceManager.PrivateEndpoint
 
 #### Properties
 
-| Name | Type                                                              | Description                                  |
-| ---- | ----------------------------------------------------------------- | -------------------------------------------- |
-| id?  | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier) | The resource identifier for private endpoint |
+| Name | Type                         | Description                                  |
+| ---- | ---------------------------- | -------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
 
 ### `PrivateEndpointConnection` {#Azure.ResourceManager.PrivateEndpointConnection}
 
@@ -859,22 +859,6 @@ model Azure.ResourceManager.ResourceGroupParameter
 | Name              | Type     | Description                                                   |
 | ----------------- | -------- | ------------------------------------------------------------- |
 | resourceGroupName | `string` | The name of the resource group. The name is case insensitive. |
-
-### `ResourceIdentifierAllowedResource` {#Azure.ResourceManager.ResourceIdentifierAllowedResource}
-
-Used in ResourceIdentifier definition to represent a particular type of Azure Resource Manager resource, enabling constraints based on resource type.
-See [link](https://github.com/Azure/autorest/tree/main/docs/extensions#schema)
-
-```typespec
-model Azure.ResourceManager.ResourceIdentifierAllowedResource
-```
-
-#### Properties
-
-| Name    | Type       | Description                                                                                                                                                                          |
-| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| type    | `string`   | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
-| scopes? | `string[]` | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
 
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
@@ -1142,52 +1126,21 @@ union Azure.ResourceManager.ResourceProvisioningState
 #### Examples
 
 ```typespec
-union FooProvisioningState {
-  ResourceProvisioningState, // include standard provisioning states
-  starting: "starting",
-  started: "started",
-  stopping: "stopping",
-  stopped: "stopped",
+enum FooProvisioningState {
+  ...ResourceProvisioningState, // include standard provisioning states
+  starting,
+  started,
+  stopping,
+  stopped,
 }
 ```
 
-### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
+### `Versions` {#Azure.ResourceManager.Versions}
 
-A type definition that refers the id to an Azure Resource Manager resource.
-
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+Supported versions of Azure.ResourceManager building blocks.
 
 ```typespec
-scalar Azure.ResourceManager.ResourceIdentifier
-```
-
-### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
-
-A type definition that refers the id to an Azure Resource Manager resource.
-
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
-
-```typespec
-scalar Azure.ResourceManager.ResourceIdentifier
-```
-
-### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
-
-A type definition that refers the id to an Azure Resource Manager resource.
-
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
-
-```typespec
-scalar Azure.ResourceManager.ResourceIdentifier
+enum Azure.ResourceManager.Versions
 ```
 
 ## Azure.ResourceManager.CommonTypes

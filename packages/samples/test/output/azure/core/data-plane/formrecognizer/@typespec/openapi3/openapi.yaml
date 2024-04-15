@@ -582,10 +582,6 @@ components:
             - running
             - failed
             - succeeded
-            - running
-            - failed
-            - succeeded
-            - canceled
       description: Operation status.
     AuthorizeCopyRequest:
       type: object
@@ -1402,9 +1398,6 @@ components:
             - running
             - failed
             - succeeded
-            - running
-            - failed
-            - succeeded
             - canceled
       description: Operation status.
     PagedModelSummary:
@@ -1421,7 +1414,6 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
-          readOnly: true
       description: Paged collection of ModelSummary items
     PagedOperationInfo:
       type: object
@@ -1437,7 +1429,6 @@ components:
           type: string
           format: uri
           description: The link to the next page of items
-          readOnly: true
       description: Paged collection of OperationInfo items
     SelectionMarkState:
       anyOf:

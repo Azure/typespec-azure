@@ -5,12 +5,9 @@ title: "[T] SdkBuiltInKinds"
 ---
 ```ts
 type SdkBuiltInKinds: 
-  | "bytes"
-  | "boolean"
-  | "plainDate"
-  | "plainTime"
-  | "any"
-  | SdkIntKinds
-  | SdkFloatKinds
-  | SdkStringKinds;
+  | keyof typeof SdkBuiltInKindsMiscellaneousEnum
+  | keyof typeof SdkIntKindsEnum
+  | keyof typeof SdkFloatKindsEnum
+  | keyof typeof SdkGenericBuiltInStringKindsEnum
+  | keyof typeof SdkAzureBuiltInStringKindsEnum;
 ```

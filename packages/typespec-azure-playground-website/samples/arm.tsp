@@ -56,7 +56,10 @@ model EmployeeProperties {
 /** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
-  ResourceProvisioningState,
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
 
   /** The resource is being provisioned */
   Provisioning: "Provisioning",
@@ -64,14 +67,17 @@ union ProvisioningState {
   /** The resource is updating */
   Updating: "Updating",
 
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
   /** The resource is being deleted */
   Deleting: "Deleting",
-
-  /** The resource create request has been accepted */
-  Accepted: "Accepted",
-
-  /** modelAsString=true */
-  string,
 }
 
 /** Employee move request */

@@ -16,4 +16,4 @@ getUsage(context, entity): UsageFlags
 
 ## Returns
 
-`UsageFlags`
+[`UsageFlags`](../enumerations/UsageFlags.md)

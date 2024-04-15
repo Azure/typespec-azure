@@ -12,8 +12,8 @@ getUsageOverride(context, entity): UsageFlags | undefined
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `TCGCContext` |
-| `entity` | `Model` \| `Enum` |
+| `entity` | `Model` \| `Enum` \| `Union` |
 
 ## Returns
 
-`UsageFlags` \| `undefined`
+[`UsageFlags`](../enumerations/UsageFlags.md) \| `undefined`
