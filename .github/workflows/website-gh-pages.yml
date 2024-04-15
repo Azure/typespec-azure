@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - main
-      - fix/website-build-omit-core
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
