@@ -13,7 +13,7 @@ model DefaultNameParameter<
 > {
   @doc("The name of the resource")
   @pattern(NamePattern)
-  @defaultResourceKeySegementName(Resource)
+  @defaultResourceKeySegmentName(Resource)
   @path
   name: string;
 }

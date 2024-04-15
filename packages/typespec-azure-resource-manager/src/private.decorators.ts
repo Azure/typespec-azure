@@ -83,7 +83,7 @@ export function $resourceParameterBaseFor(
   context.program.stateMap(ArmStateKeys.armResourceCollection).set(entity, resolvedValues);
 }
 
-export function $defaultResourceKeySegementName(
+export function $defaultResourceKeySegmentName(
   context: DecoratorContext,
   entity: ModelProperty,
   resource: Model
