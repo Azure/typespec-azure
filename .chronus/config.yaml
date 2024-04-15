@@ -46,3 +46,7 @@ changelog: ["@chronus/github/changelog", { repo: "azure/typespec-azure" }]
 
 ignore:
   - "@typespec/*"
+
+changedFiles:
+  - "!**/*.md"
+  - "!**/*.test.ts"
