@@ -109,7 +109,6 @@ union Origin {
   @doc("Indicates the operation is initiated by a user or system.")
   `user,system`: "user,system",
 
-  @doc("modelAsString=true")
   string,
 }
 
@@ -123,7 +122,6 @@ union ActionType {
   @doc("Actions are for internal-only APIs.")
   Internal: "Internal",
 
-  @doc("modelAsString=true")
   string,
 }
 
@@ -329,7 +327,6 @@ union createdByType {
   @doc("The entity was created by a key.")
   Key: "Key",
 
-  @doc("modelAsString=true")
   string,
 }
 
@@ -461,7 +458,6 @@ union ManagedServiceIdentityType {
   @doc("System and user assigned managed identity.")
   SystemAndUserAssigned: "SystemAssigned, UserAssigned",
 
-  @doc("modelAsString=true")
   string,
 }
 
@@ -479,7 +475,6 @@ union SystemAssignedServiceIdentityType {
   @doc("System assigned managed system identity.")
   SystemAssigned: "SystemAssigned",
 
-  @doc("modelAsString=true")
   string,
 }
 
@@ -717,7 +712,6 @@ union CheckNameAvailabilityReason {
   @doc("Name already exists.")
   AlreadyExists: "AlreadyExists",
 
-  @doc("modelAsString=true")
   string,
 }
 

@@ -11,7 +11,6 @@ union InfrastructureEncryption {
   @doc("Encryption is disabled")
   Disabled: "disabled",
 
-  @doc("modelAsString=true")
   string,
 }
 
@@ -29,7 +28,6 @@ union KeyEncryptionKeyIdentity {
   @doc("Delegated identity")
   DelegatedResourceIdentity: "delegatedResourceIdentity",
 
-  @doc("modelAsString=true")
   string,
 }
 
