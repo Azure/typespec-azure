@@ -1126,21 +1126,13 @@ union Azure.ResourceManager.ResourceProvisioningState
 #### Examples
 
 ```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
 }
-```
-
-### `Versions` {#Azure.ResourceManager.Versions}
-
-Supported versions of Azure.ResourceManager building blocks.
-
-```typespec
-enum Azure.ResourceManager.Versions
 ```
 
 ## Azure.ResourceManager.CommonTypes
