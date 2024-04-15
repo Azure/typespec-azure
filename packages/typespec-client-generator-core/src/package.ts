@@ -268,7 +268,6 @@ function getSdkBasicServiceMethod<
       name: "apiVersion",
       nameInClient: "apiVersion",
       isGeneratedName: apiVersionParam.name !== "apiVersion",
-      onClient: true,
       optional: false,
       clientDefaultValue: context.__api_version_client_default_value,
     };
@@ -283,7 +282,7 @@ function getSdkBasicServiceMethod<
     kind: "basic",
     name,
     access: getAccess(context, operation),
-    parameters: methodParameters.filter((x) => !x.isApiVersionParam),
+    parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
     operation: serviceOperation,
