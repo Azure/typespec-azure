@@ -454,7 +454,14 @@ export function getCorrespondingMethodParams(
         );
         return diagnostics.wrap([]);
       }
-      context.__api_version_parameter = apiVersionParam;
+      context.__api_version_parameter = {
+        ...apiVersionParam,
+        name: "apiVersion",
+        nameInClient: "apiVersion",
+        isGeneratedName: apiVersionParam.name !== "apiVersion",
+        optional: false,
+        clientDefaultValue: context.__api_version_client_default_value,
+      };
     }
     return diagnostics.wrap([context.__api_version_parameter]);
   }
