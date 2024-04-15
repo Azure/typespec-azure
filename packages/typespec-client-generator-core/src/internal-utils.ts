@@ -1,12 +1,13 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  Diagnostic,
   Model,
-  ModelProperty,
   Namespace,
   Operation,
   Program,
   Type,
   Union,
+  createDiagnosticCollector,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
@@ -14,7 +15,7 @@ import {
   ignoreDiagnostics,
   isNullType,
 } from "@typespec/compiler";
-import { HttpOperation } from "@typespec/http";
+import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
@@ -27,6 +28,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
+import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -39,16 +41,27 @@ import {
  * @param emitterName Full emitter name
  * @returns The language of the emitter. I.e. "@azure-tools/typespec-csharp" will return "csharp"
  */
-export function parseEmitterName(emitterName?: string): string {
+export function parseEmitterName(
+  program: Program,
+  emitterName?: string
+): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (!emitterName) {
-    throw new Error("No emitter name found in program");
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-emitter-name",
+        format: {},
+        target: program.getGlobalNamespaceType(),
+      })
+    );
+    return diagnostics.wrap("none");
   }
   const regex = /(?:cadl|typespec)-([^\\/]*)/;
   const match = emitterName.match(regex);
-  if (!match || match.length < 2) return "none";
+  if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
-  if (["typescript", "ts"].includes(language)) return "javascript";
-  return language;
+  if (["typescript", "ts"].includes(language)) return diagnostics.wrap("javascript");
+  return diagnostics.wrap(language);
 }
 
 /**
@@ -82,7 +95,7 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: ModelProperty
+  type: { name: string }
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -245,12 +258,14 @@ export interface TCGCContext {
   __api_version_client_default_value?: string;
   __api_versions?: string[];
   knownScalars?: Record<string, SdkBuiltInKinds>;
+  diagnostics: readonly Diagnostic[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
   return {
     program,
     emitterName: "__TCGC_INTERNAL__",
+    diagnostics: [],
   };
 }
 
@@ -258,13 +273,15 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpResponse>): {
+function getAllResponseBodiesAndNonBodyExists(
+  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
+): {
   allResponseBodies: SdkType[];
   nonBodyExists: boolean;
 } {
   const allResponseBodies: SdkType[] = [];
   let nonBodyExists = false;
-  for (const response of Object.values(responses)) {
+  for (const response of responses.values()) {
     if (response.type) {
       if (response.nullable) {
         nonBodyExists = true;
@@ -277,7 +294,9 @@ function getAllResponseBodiesAndNonBodyExists(responses: Record<number, SdkHttpR
   return { allResponseBodies, nonBodyExists };
 }
 
-export function getAllResponseBodies(responses: Record<number, SdkHttpResponse>): SdkType[] {
+export function getAllResponseBodies(
+  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
+): SdkType[] {
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 

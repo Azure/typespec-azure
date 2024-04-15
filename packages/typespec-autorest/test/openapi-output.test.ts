@@ -758,6 +758,7 @@ describe("typespec-autorest: enums", () => {
         Dog, Cat
       }
 
+      #suppress "deprecated" "for testing"
       @knownValues(KnownPetType)
       scalar PetType extends string;
       `

@@ -508,50 +508,32 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       strictEqual(foo.armProviderNamespace, "Microsoft.Test");
     });
 
-    it("resources with ResourceIdentifier property types", async () => {
+    it("resources with armResourceIdentifier property types", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+        Succeeded,
+        Canceled,
+        Failed
      }
 
-      @doc("Foo properties")
       model FooResourceProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("I am a Resource Identifier with type only")
-        armIdWithType: ResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
-
-        @doc("I am a a Resource Identifier with type and scopes")
-        armIdWithTypeAndScope: ResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
-
-        @doc("I am a a Resource Identifier with multiple types and scopes")
-        armIdWithMultipleTypeAndScope: ResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
-
-        @doc("The provisioning State")
+        simpleArmId: Azure.Core.armResourceIdentifier;
+        armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
+        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("Foo name")
         @key("fooName")
         @segment("foos")
         @path
         name: string;
-      }
-
-      @armResourceOperations
-      interface Foos extends TrackedResourceOperations<FooResource, FooResourceProperties> {
       }
     `);
 
@@ -574,7 +556,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       ];
       armIds.forEach(function (id) {
         const armIdProp = getResourcePropertyProperties(foo, id);
-        strictEqual((armIdProp?.type as Model).name, "ResourceIdentifier");
+        strictEqual((armIdProp?.type as Model).name, "armResourceIdentifier");
       });
     });
 
@@ -666,6 +648,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       @doc("The properties of a widget")
       model WidgetProperties {
+        #suppress "deprecated" "for testing"
         @doc("The spin of the widget")
         @knownValues(SpinValues)
         spin?: string;
@@ -761,6 +744,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
           @doc("The properties of a widget")
           model WidgetProperties {
+            #suppress "deprecated" "for testing"
             @doc("The spin of the widget")
             @knownValues(SpinValues)
             spin?: string;
@@ -1041,6 +1025,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         }
         @doc("The properties of a widget")
         model WidgetProperties {
+          #suppress "deprecated" "for testing"
           @doc("The spin of the widget")
           @knownValues(SpinValues)
           spin?: string;

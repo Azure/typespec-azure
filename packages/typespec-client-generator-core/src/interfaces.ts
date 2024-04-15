@@ -14,6 +14,7 @@ import {
   HttpAuth,
   HttpOperation,
   HttpOperationResponse,
+  HttpStatusCodeRange,
   HttpVerb,
   Visibility,
 } from "@typespec/http";
@@ -57,7 +58,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkInitializationType;
+  initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
@@ -72,6 +73,7 @@ export interface SdkOperationGroup {
   type: Namespace | Interface;
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
+  service: Namespace;
 }
 
 interface SdkTypeBase {
@@ -83,6 +85,8 @@ interface SdkTypeBase {
    */
   nullable: boolean;
   deprecation?: string;
+  description?: string;
+  details?: string;
 }
 
 export type SdkType =
@@ -235,12 +239,10 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
-  generatedName: boolean;
+  isGeneratedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
-  description?: string;
-  details?: string;
   isFlags: boolean;
   usage: UsageFlags;
   access?: AccessFlags;
@@ -254,9 +256,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkType;
-  description?: string;
-  details?: string;
+  valueType: SdkBuiltInType;
 }
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
@@ -266,7 +266,7 @@ export interface SdkConstantType extends SdkTypeBase {
 
 export interface SdkUnionType extends SdkTypeBase {
   name: string;
-  generatedName: boolean;
+  isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
 }
@@ -285,12 +285,11 @@ export interface SdkModelType extends SdkTypeBase {
    * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
    */
   isError: boolean;
-  generatedName: boolean;
-  description?: string;
-  details?: string;
+  isGeneratedName: boolean;
   access?: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
+  additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   discriminatorProperty?: SdkModelPropertyType;
@@ -306,7 +305,7 @@ export interface SdkCredentialType extends SdkTypeBase {
 
 export interface SdkEndpointType extends SdkTypeBase {
   kind: "endpoint";
-  serverUrl?: string;
+  serverUrl: string; // if not specified, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
   templateArguments: SdkPathParameter[];
 }
 
@@ -319,6 +318,7 @@ export interface SdkModelPropertyTypeBase {
    */
   nameInClient: string;
   name: string;
+  isGeneratedName: boolean;
   description?: string;
   details?: string;
   apiVersions: string[];
@@ -368,12 +368,14 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
@@ -381,6 +383,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   serializedName: string;
   optional: false;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -388,6 +391,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
+  correspondingMethodParams: SdkModelPropertyType[];
 }
 
 export type SdkHttpParameter =
@@ -413,6 +417,7 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   nullable: boolean;
+  resultPath?: string; // if exists, tells you how to get from the service response to the method response
 }
 
 export interface SdkServiceResponse {
@@ -439,9 +444,9 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
-  bodyParams: SdkBodyParameter[]; // array for cases like urlencoded / multipart
-  responses: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
-  exceptions: Record<number | string, SdkHttpResponse>; // we will use string to represent status code range
+  bodyParam?: SdkBodyParameter;
+  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
 }
 
 /**
@@ -463,9 +468,16 @@ interface SdkMethodBase {
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
+  /**
+   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+   * @param serviceParam
+   */
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
+  /**
+   * @deprecated This property is deprecated. Access .resultPath on the method response instead
+   */
   getResponseMapping(): string | undefined; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
@@ -490,7 +502,6 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 
 interface SdkLroServiceMethodOptions {
   __raw_lro_metadata: LroMetadata;
-  initialOperation: SdkServiceOperation;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -531,7 +542,11 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  /**
+   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
+   */
   diagnostics: readonly Diagnostic[];
+  crossLanguagePackageId: string;
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;

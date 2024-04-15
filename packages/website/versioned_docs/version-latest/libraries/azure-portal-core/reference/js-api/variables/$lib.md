@@ -26,7 +26,12 @@ const $lib: TypeSpecLibrary<Object, Record<string, any>,
 | `invalid-link.default` | `CallableMessage`<[`string`]\> | - |
 | `invalid-offer-id` | `Object` | - |
 | `invalid-offer-id.marketplaceOfferId` | `"@marketplaceOffer id cannot have a blank space."` | - |
+| `invalid-type` | `Object` | - |
+| `invalid-type.argQueryFile` | `CallableMessage`<[`string`]\> | - |
+| `invalid-type.argQueryString` | `CallableMessage`<[`string`]\> | - |
+| `invalid-type.iconSvg` | `CallableMessage`<[`string`]\> | - |
 | `not-a-resource` | `Object` | - |
+| `not-a-resource.browse` | `"@browse can only be applied to TrackedResource models"` | - |
 | `not-a-resource.default` | `CallableMessage`<[`string`]\> | - |
 | `too-many-essentials` | `Object` | - |
 | `too-many-essentials.default` | `"essentials can be only used 5 times in ModelProperty."` | - |
