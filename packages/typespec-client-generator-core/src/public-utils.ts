@@ -414,7 +414,8 @@ function getContextPath(
       currentType.kind === "Model" &&
       currentType.indexer &&
       currentType.properties.size === 0 &&
-      (currentType.name === "Array" || currentType.name === "Record")
+      ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+        (currentType.indexer.key.name === "integer" && currentType.name === "Array"))
     ) {
       // handle array or dict
       const dictOrArrayItemType: Type = currentType.indexer.value;

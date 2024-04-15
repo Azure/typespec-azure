@@ -277,17 +277,13 @@ export function getSdkArrayOrDictWithDiagnostics(
 ): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // if model with both indexer and properties or name should be a model with additional properties
-  if (
-    type.indexer !== undefined &&
-    type.properties.size === 0 &&
-    (type.name === "Array" || type.name === "Record")
-  ) {
+  if (type.indexer !== undefined && type.properties.size === 0) {
     if (!isNeverType(type.indexer.key)) {
       const valueType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.indexer.value!, operation)
       );
       const name = type.indexer.key.name;
-      if (name === "string") {
+      if (name === "string" && type.name === "Record") {
         // model MyModel is Record<> {} should be model with additional properties
         if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
           return diagnostics.wrap(undefined);
@@ -300,7 +296,7 @@ export function getSdkArrayOrDictWithDiagnostics(
           valueType,
           nullableValues: isNullable(type.indexer.value!),
         });
-      } else if (name === "integer") {
+      } else if (name === "integer" && type.name === "Array") {
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
