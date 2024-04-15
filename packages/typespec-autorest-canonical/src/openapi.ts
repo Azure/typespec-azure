@@ -41,6 +41,7 @@ import {
   compilerAssert,
   emitFile,
   getAllTags,
+  getDirectoryPath,
   getDiscriminator,
   getDoc,
   getEncode,
@@ -57,6 +58,8 @@ import {
   getProjectedName,
   getProperty,
   getPropertyType,
+  getRelativePathFromDirectory,
+  getRootLength,
   getService,
   getSummary,
   getVisibility,
@@ -145,6 +148,7 @@ import {
   Refable,
 } from "./types.js";
 import { AutorestCanonicalEmitterContext, resolveOperationId } from "./utils.js";
+import { getRef } from "./decorators.js";
 
 const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/{version}/openapi.json",
@@ -158,16 +162,18 @@ enum UnsupportedVersioningDecorators {
   TypeChangedFrom = "typeChangedFrom",
 }
 
-export const namespace = "AutorestCanonical";
 export const canonicalVersion = "canonical";
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
   const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest-canonical");
-  const armTypesDir = interpolatePath("{project-root}/../../common-types/resource-management", {
-    "project-root": context.program.projectRoot,
-    "emitter-output-dir": context.emitterOutputDir,
-  });
+  const armTypesDir = interpolatePath(
+    resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
+    {
+      "project-root": context.program.projectRoot,
+      "emitter-output-dir": context.emitterOutputDir,
+    }
+  );
   const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
     outputDir: context.emitterOutputDir,
@@ -827,7 +833,25 @@ function createOAPIEmitter(
     return header;
   }
 
+  function resolveRef(ref: string) {
+    const absoluteRef = interpolatePath(ref, {
+      "arm-types-dir": options.armTypesDir,
+    });
+
+    if (getRootLength(absoluteRef) === 0) {
+      return absoluteRef; // It is already relative.
+    }
+    return getRelativePathFromDirectory(getDirectoryPath(outputFile), absoluteRef, false);
+  }
+
   function getSchemaOrRef(type: Type, visibility: Visibility): any {
+    const refUrl = getRef(program, type, { version: context.version, service: context.service });
+    if (refUrl) {
+      return {
+        $ref: resolveRef(refUrl),
+      };
+    }
+
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
       return getSchemaForScalar(type);
     }
@@ -913,6 +937,16 @@ function createOAPIEmitter(
       while (property.sourceProperty) {
         property = property.sourceProperty;
       }
+    }
+
+    const refUrl = getRef(program, property, {
+      version: context.version,
+      service: context.service,
+    });
+    if (refUrl) {
+      return {
+        $ref: resolveRef(refUrl),
+      };
     }
 
     const parameter = params.get(property);
