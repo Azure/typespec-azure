@@ -10,6 +10,7 @@ import { resolve } from "path";
 import { themes } from "prism-react-renderer";
 
 function getMajorMinorVersion(pkgJsonPath) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const version = require(pkgJsonPath).version;
   const [major, minor] = version.split(".");
   return `${major}.${minor}.x`;

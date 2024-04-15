@@ -245,8 +245,9 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `
       );
-      const diagnostics = runner.context.experimental_sdkPackage.diagnostics;
-      expectDiagnostics(diagnostics, []);
+      // eslint-disable-next-line deprecation/deprecation
+      expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, []);
+      expectDiagnostics(runner.context.diagnostics, []);
       const m = runner.context.experimental_sdkPackage.models.find((x) => x.name === "TestModel");
       const e1 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "TestEnum");
       const e2 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "testScalar");
@@ -351,6 +352,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.encode, "seconds");
     });
 
+    it("nullable float seconds", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          @encode(DurationKnownEncoding.seconds, float)
+          prop: duration | null;
+        }
+      `
+      );
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "duration");
+      strictEqual(sdkType.wireType.kind, "float");
+      strictEqual(sdkType.encode, "seconds");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.nullable, true);
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.wireType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
+    });
+
     it("float seconds decorated scalar", async function () {
       await runner.compileWithBuiltInService(
         `
@@ -440,6 +464,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
+    });
+
+    it("nullable unixTimestamp", async function () {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+          value: utcDateTime | null;
+        }
+      `
+      );
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "utcDateTime");
+      strictEqual(sdkType.wireType.kind, "int64");
+      strictEqual(sdkType.encode, "unixTimestamp");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.nullable, true);
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.wireType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
     });
 
     it("unixTimestamp array", async function () {
@@ -541,6 +588,41 @@ describe("typespec-client-generator-core: types", () => {
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
+    });
+
+    it("additional property is nullable", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestExtends extends Record<string|null> {
+          name: string;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestIs is Record<string|null> {
+          name: string;
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+
+      const extendsType = models.find((x) => x.name === "TestExtends");
+      ok(extendsType);
+      strictEqual(extendsType.kind, "model");
+      strictEqual(extendsType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(extendsType.additionalProperties?.nullable, true);
+      strictEqual(extendsType.additionalPropertiesNullable, true);
+
+      const isType = models.find((x) => x.name === "TestIs");
+      ok(isType);
+      strictEqual(isType.kind, "model");
+      strictEqual(isType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(isType.additionalProperties?.nullable, true);
+      strictEqual(isType.additionalPropertiesNullable, true);
     });
 
     it("model with simple union property", async function () {
@@ -811,6 +893,37 @@ describe("typespec-client-generator-core: types", () => {
       ok(unionAsEnum);
       strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
       strictEqual(unionAsEnum.access, "public");
+    });
+
+    it("usage override for orphan union as enum", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union UnionAsEnum {
+        "A",
+        "B",
+        string,
+      }
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.internal)
+      union UnionAsEnumInternal {
+        "A",
+        "B",
+        string,
+      }
+      `);
+
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 2);
+      const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
+      ok(unionAsEnum);
+      strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(unionAsEnum.access, "public");
+      const unionAsEnumInternal = enums.find((x) => x.name === "UnionAsEnumInternal");
+      ok(unionAsEnumInternal);
+      strictEqual(unionAsEnumInternal.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(unionAsEnumInternal.access, "internal");
     });
   });
   describe("SdkEnumType", () => {
@@ -1372,6 +1485,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enumType.name, "TestColor");
       strictEqual(enumType.isGeneratedName, true);
       strictEqual(enumType.isUnionAsEnum, true);
+      strictEqual(enumType.crossLanguageDefinitionId, "TestColor");
       const values = enumType.values;
       strictEqual(values[0].name, "left");
       strictEqual(values[0].value, "left");
@@ -2977,7 +3091,8 @@ describe("typespec-client-generator-core: types", () => {
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
         `
       );
-      expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, {
+      ok(runner.context.diagnostics?.length);
+      expectDiagnostics(runner.context.diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/encoding-multipart-bytes",
       });
     });
@@ -3042,14 +3157,15 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(formDataMethod.name, "upload");
       strictEqual(formDataMethod.parameters.length, 3);
 
-      const widgetFormParam = formDataMethod.parameters.find((x) => x.name === "widgetForm");
-      ok(widgetFormParam);
+      const widgetParam = formDataMethod.parameters.find((x) => x.name === "widget");
+      ok(widgetParam);
       ok(formDataMethod.parameters.find((x) => x.name === "accept"));
-      strictEqual(formDataMethod.parameters[0].name, "name");
-      strictEqual(formDataMethod.parameters[0].type.kind, "string");
-      strictEqual(formDataMethod.parameters[1].name, "widgetForm");
+      strictEqual(formDataMethod.parameters[0].name, "contentType");
+      strictEqual(formDataMethod.parameters[0].type.kind, "constant");
+      strictEqual(formDataMethod.parameters[0].type.value, "multipart/form-data");
+      strictEqual(formDataMethod.parameters[1].name, "widget");
       strictEqual(formDataMethod.parameters[1].type.kind, "model");
-      strictEqual(formDataMethod.parameters[1].type.name, "WidgetForm");
+      strictEqual(formDataMethod.parameters[1].type.name, "Widget");
 
       const formDataOp = formDataMethod.operation;
       strictEqual(formDataOp.parameters.length, 2);
@@ -3060,11 +3176,7 @@ describe("typespec-client-generator-core: types", () => {
       ok(formDataBodyParam);
       strictEqual(formDataBodyParam.type.kind, "model");
       strictEqual(formDataBodyParam.type.name, "Widget");
-      strictEqual(formDataBodyParam.correspondingMethodParams.length, 4);
-      deepStrictEqual(
-        formDataBodyParam.correspondingMethodParams.map((x) => x.name).sort(),
-        ["color", "description", "displayName", "name"].sort()
-      );
+      strictEqual(formDataBodyParam.correspondingMethodParams[0], formDataMethod.parameters[1]);
     });
 
     it("usage doesn't apply to properties of a form data", async function () {

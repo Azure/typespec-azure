@@ -289,6 +289,7 @@ export interface SdkModelType extends SdkTypeBase {
   access?: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
+  additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   discriminatorProperty?: SdkModelPropertyType;
@@ -541,7 +542,11 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  /**
+   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
+   */
   diagnostics: readonly Diagnostic[];
+  crossLanguagePackageId: string;
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;

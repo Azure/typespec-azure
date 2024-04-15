@@ -2065,6 +2065,42 @@ describe("typespec-client-generator-core: decorators", () => {
       const test5Actual = getAccess(runner.context, Test5);
       strictEqual(test5Actual, "public");
     });
+
+    it("access propagation with nullable", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        model RunStep {
+          id: string;
+          lastError: RunStepError | null;
+        }
+
+        model RunStepError {
+          code: string;
+          message: string;
+        }
+
+        @get
+        @route("/threads/{threadId}/runs/{runId}/steps/{stepId}")
+        op getRunStep(
+          @path threadId: string,
+          @path runId: string,
+          @path stepId: string,
+        ): RunStep;
+
+        @get
+        @route("/threads/{threadId}/runs/{runId}/steps")
+        op listRunSteps(
+          @path threadId: string,
+          @path runId: string,
+        ): RunStep[];
+        @@access(listRunSteps, Access.internal);
+        `
+      );
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(models[0].access, undefined);
+      strictEqual(models[1].access, undefined);
+    });
   });
 
   describe("@usage", () => {

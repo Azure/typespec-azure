@@ -1,43 +1,34 @@
-# Creating a new project
+# Creating a New TypeSpec Project
 
-If you installed TypeSpec on your local machine, here is how you can create a new TypeSpec project:
+If you've installed TypeSpec on your local machine, you can create a new TypeSpec project by following these steps:
 
-First, open your command prompt (PowerShell, cmd.exe, bash, etc), create an empty folder for your new project, and cd into it. If creating a new service in the [Azure/azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repository, create the new service folder following our [directory structure guidelines](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
+1. **Open your command prompt** (PowerShell, cmd.exe, bash, etc.), create an empty folder for your new project, and `cd` into it.
+2. If creating a new service in the [Azure/azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repository, create the new service folder following our [directory structure guidelines](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
+3. To create a new Azure service specification, use the `tsp init` command:
+   ```bash
+   tsp init https://aka.ms/typespec/azure-init
+   ```
+   You will be prompted with a few questions regarding the service template, project name, and library updates.
 
-Now create a new Azure service specification using the tsp init command:
+### Understanding Project Templates
 
-```bash
-tsp init https://aka.ms/typespec/azure-init
+When initializing a new project, you'll encounter four templates:
 
-```
+- **(rest-api-spec repo) Azure Data Plane Service Project**: This template is configured for projects within the `azure-rest-api-specs` repository, with settings that comply with the repo's requirements, such as file paths and linting rules.
+- **(rest-api-spec repo) Azure Resource Manager Service Project**: Similar to the above, but tailored for Azure Resource Manager services within the `azure-rest-api-specs` repository.
+- **(stand alone) Azure Data Plane Service Project**: This template is configured for local use or in a personal repo, allowing for API development without the specific directory structure of the `azure-rest-api-specs` repo.
+- **(stand alone) Azure Resource Manager Service Project**: Similar to the above but designed for Azure Resource Manager services, configured for local use or in a personal repo.
 
-You will be prompted with a few questions:
+### Target Users
 
-- The service template: choose between "Azure Data Plane Service", "Azure Resource Manager Service"
-- The project name: Enter a name to be used as the project folder name or press enter to use the same name as the folder you created
-- Update the libraries: Press Enter to continue with the selected packages
+- **Rest-API-Spec Repo Projects**: Ideal for those contributing directly to the Azure REST API specifications, ensuring production-quality SDK generation.
+- **Standalone Projects**: Suited for API-first development, allowing users to generate OpenAPI specs, service code, and clients without conforming to the specs repo's structure.
 
-The prompts will look something like this:
+### Next Steps
 
-```bash
-TypeSpec compiler v0.34.0
-
-√ Please select a template » Azure Data Plane Service
-√ Project name ... myService
-√ Update the libraries? » @typespec/rest, @typespec/versioning, @azure-tools/typespec-autorest, @azure-tools/typespec-azure-core
-TypeSpec init completed.
-```
-
-You can run `tsp install` now to install dependencies.
-Once your project files have been created, execute the following command to install the TypeSpec compiler and libraries:
-
-```bash
-tsp install
-```
-
-You can now open the file `main.tsp` to follow along with the rest of the tutorial!
+After setting up your project, run `tsp install` to install dependencies. You can then open the file `main.tsp` to continue with the tutorial. Choose the tutorial that matches your chosen project template:
 
 | Azure Service Type       | Tutorial                                      | Produces                   |
 | ------------------------ | --------------------------------------------- | -------------------------- |
-| Azure Data-Plane Service | [Azure-Core tutorial](azure-core/step02)      | OpenApi 2.0 (Swagger) spec |
+| Azure Data-Plane Service | [Azure-Core tutorial](azure-core/step01)      | OpenApi 2.0 (Swagger) spec |
 | Azure Management Service | [ARM tutorial](azure-resource-manager/step00) | OpenApi 2.0 (Swagger) spec |
