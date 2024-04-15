@@ -1865,6 +1865,13 @@ importers:
         version: 1.5.0(@types/node@18.11.19)(@vitest/ui@1.5.0)(happy-dom@14.7.1)
 
   packages/typespec-azure-resource-manager:
+    dependencies:
+      change-case:
+        specifier: ~5.4.3
+        version: 5.4.4
+      pluralize:
+        specifier: ^8.0.0
+        version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-autorest':
         specifier: workspace:~
@@ -1875,6 +1882,9 @@ importers:
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
+      '@types/pluralize':
+        specifier: ^0.0.33
+        version: 0.0.33
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
