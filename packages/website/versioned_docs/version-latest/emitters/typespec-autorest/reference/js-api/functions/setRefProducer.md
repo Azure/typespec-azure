@@ -19,7 +19,7 @@ the options provided to the function (like the service and version).
 | Parameter | Type |
 | :------ | :------ |
 | `program` | `Program` |
-| `entity` | `Model` \| `ModelProperty` |
+| `entity` | `ModelProperty` \| `Model` |
 | `refProducer` | [`RefProducer`](../type-aliases/RefProducer.md) |
 
 ## Returns

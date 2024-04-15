@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  Enum,
   Interface,
   Model,
   ModelProperty,
@@ -19,7 +20,6 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
-  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
@@ -62,12 +62,10 @@ export function getDefaultApiVersion(
  * @param parameter
  * @returns
  */
-export function isApiVersion(
-  context: TCGCContext,
-  parameter: HttpOperationParameter | ModelProperty
-): boolean {
+export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
   return (
-    parameter.name.toLowerCase() === "apiversion" || parameter.name.toLowerCase() === "api-version"
+    type.name.toLowerCase().includes("apiversion") ||
+    type.name.toLowerCase().includes("api-version")
   );
 }
 
@@ -125,7 +123,9 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
 export function getEmitterTargetName(context: TCGCContext): string {
-  return parseEmitterName(context.program.emitters[0]?.metadata?.name); // eslint-disable-line deprecation/deprecation
+  return ignoreDiagnostics(
+    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name)
+  ); // eslint-disable-line deprecation/deprecation
 }
 
 /**
@@ -174,7 +174,16 @@ export function getLibraryName(
 
   // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
-    return type.name + type.templateMapper.args.map((arg) => (arg as Model).name).join("");
+    return (
+      type.name +
+      type.templateMapper.args
+        .filter(
+          (arg): arg is Model | Enum =>
+            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+        )
+        .map((arg) => pascalCase(arg.name))
+        .join("")
+    );
   }
 
   return typeof type.name === "string" ? type.name : "";
@@ -199,13 +208,16 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: {
-  name: string;
-  kind: string;
-  interface?: Interface;
-  namespace?: Namespace;
-}): string {
-  let retval = type.name;
+export function getCrossLanguageDefinitionId(
+  type: {
+    name?: string;
+    kind: string;
+    interface?: Interface;
+    namespace?: Namespace;
+  },
+  name?: string
+): string {
+  let retval = type.name ? type.name : name ?? "";
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
   }

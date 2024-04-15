@@ -35,6 +35,8 @@ const $lib: TypeSpecLibrary<Object, Record<string, any>, never>;
 | `invalid-usage.default` | `string` | - |
 | `multiple-services` | `Object` | - |
 | `multiple-services.default` | `CallableMessage`<[`string`]\> | - |
+| `server-param-not-path` | `Object` | - |
+| `server-param-not-path.default` | `CallableMessage`<[`string`, `string`]\> | - |
 | `union-null` | `Object` | - |
 | `union-null.default` | `string` | "Cannot have a union containing only null types." |
 | `union-unsupported` | `Object` | - |

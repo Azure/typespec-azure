@@ -811,26 +811,6 @@ describe("typespec-autorestcanonical: enums", () => {
       },
     });
   });
-
-  it("defines known values (modelAsString enums)", async () => {
-    const res = await oapiForModel(
-      "PetType",
-      `
-      enum KnownPetType {
-        Dog, Cat
-      }
-
-      @knownValues(KnownPetType)
-      scalar PetType extends string;
-      `
-    );
-    ok(res.isRef);
-    deepStrictEqual(res.defs.PetType, {
-      type: "string",
-      enum: ["Dog", "Cat"],
-      "x-ms-enum": { name: "PetType", modelAsString: true },
-    });
-  });
 });
 
 describe("typespec-autorestcanonical: extension decorator", () => {

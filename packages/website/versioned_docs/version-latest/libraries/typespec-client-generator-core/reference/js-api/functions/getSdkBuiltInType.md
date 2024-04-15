@@ -7,17 +7,13 @@ title: "[F] getSdkBuiltInType"
 getSdkBuiltInType(context, type): SdkBuiltInType
 ```
 
-Get the sdk built in type for a given typespec type
-
 ## Parameters
 
-| Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | the sdk context |
-| `type` |  \| `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` \| `Scalar` \| `IntrinsicType` | the typespec type |
+| Parameter | Type |
+| :------ | :------ |
+| `context` | `TCGCContext` |
+| `type` |  \| `Scalar` \| `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` \| `IntrinsicType` |
 
 ## Returns
 
 [`SdkBuiltInType`](../interfaces/SdkBuiltInType.md)
-
-the corresponding sdk type

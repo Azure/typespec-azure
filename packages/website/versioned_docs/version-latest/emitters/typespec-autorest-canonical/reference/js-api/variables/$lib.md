@@ -1,0 +1,44 @@
+---
+jsApi: true
+title: "[V] $lib"
+
+---
+```ts
+const $lib: TypeSpecLibrary<Object, AutorestCanonicalEmitterOptions, never>;
+```
+
+## Type declaration
+
+| Member | Type | Value |
+| :------ | :------ | :------ |
+| `duplicate-body-types` | `Object` | - |
+| `duplicate-body-types.default` | `"Request has multiple body types"` | "Request has multiple body types" |
+| `inline-cycle` | `Object` | - |
+| `inline-cycle.default` | `CallableMessage`<[`"type"`]\> | - |
+| `invalid-default` | `Object` | - |
+| `invalid-default.default` | `CallableMessage`<[`"type"`]\> | - |
+| `invalid-format` | `Object` | - |
+| `invalid-format.default` | `CallableMessage`<[`"schema"`, `"format"`]\> | - |
+| `invalid-multi-collection-format` | `Object` | - |
+| `invalid-multi-collection-format.default` | `"The 'multi' should be applied to parameter in 'query', 'header' or 'formData'."` | "The 'multi' should be applied to parameter in 'query', 'header' or 'formData'." |
+| `invalid-schema` | `Object` | - |
+| `invalid-schema.default` | `CallableMessage`<[`"type"`]\> | - |
+| `nonspecific-scalar` | `Object` | - |
+| `nonspecific-scalar.default` | `CallableMessage`<[`"type"`, `"chosenType"`]\> | - |
+| `union-null` | `Object` | - |
+| `union-null.default` | `"Cannot have a union containing only null types."` | "Cannot have a union containing only null types." |
+| `union-unsupported` | `Object` | - |
+| `union-unsupported.default` | `"Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type."` | "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type." |
+| `union-unsupported.empty` | `"Empty unions are not supported for OpenAPI v2 - enums must have at least one value."` | "Empty unions are not supported for OpenAPI v2 - enums must have at least one value." |
+| `unsupported-auth` | `Object` | - |
+| `unsupported-auth.default` | `CallableMessage`<[`"authType"`]\> | - |
+| `unsupported-http-auth-scheme` | `Object` | - |
+| `unsupported-http-auth-scheme.default` | `CallableMessage`<[`"scheme"`]\> | - |
+| `unsupported-multipart-type` | `Object` | - |
+| `unsupported-multipart-type.default` | `CallableMessage`<[`"part"`]\> | - |
+| `unsupported-param-type` | `Object` | - |
+| `unsupported-param-type.default` | `CallableMessage`<[`"part"`]\> | - |
+| `unsupported-status-code-range` | `Object` | - |
+| `unsupported-status-code-range.default` | `CallableMessage`<[`"start"`, `"end"`]\> | - |
+| `unsupported-versioning-decorator` | `Object` | - |
+| `unsupported-versioning-decorator.default` | `CallableMessage`<[`"decorator"`]\> | - |

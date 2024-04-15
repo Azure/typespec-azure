@@ -111,47 +111,62 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
     deepStrictEqual(openApi.definitions.CatCls.allOf, [{ $ref: "#/definitions/Pet" }]);
   });
 
-  it("defines discriminated unions with more than one level of inheritance", async () => {
+  it("defines discriminated inheritance with extra non discriminated leaf types", async () => {
     const openApi = await openApiFor(`
       @discriminator("kind")
       model Pet {
-        name: string;
-        weight?: float32;
+        kind: string;
       }
       model Cat extends Pet {
         kind: "cat";
-        meow: int32;
       }
       model Dog extends Pet {
         kind: "dog";
-        bark: string;
       }
       model Beagle extends Dog {
         purebred: boolean;
       }
-
-      op read(): { @body body: Pet };
       `);
-    ok(openApi.definitions.Pet, "expected definition named Pet");
-    ok(openApi.definitions.Cat, "expected definition named Cat");
-    ok(openApi.definitions.Dog, "expected definition named Dog");
-    ok(openApi.definitions.Beagle, "expected definition named Beagle");
-    deepStrictEqual(openApi.paths["/"].get.responses["200"].schema, {
-      $ref: "#/definitions/Pet",
-    });
     deepStrictEqual(openApi.definitions.Pet, {
       type: "object",
       properties: {
-        kind: { type: "string", description: "Discriminator property for Pet." },
-        name: { type: "string" },
-        weight: { type: "number", format: "float" },
+        kind: { type: "string" },
       },
-      required: ["kind", "name"],
+      required: ["kind"],
       discriminator: "kind",
     });
     deepStrictEqual(openApi.definitions.Cat.allOf, [{ $ref: "#/definitions/Pet" }]);
     deepStrictEqual(openApi.definitions.Dog.allOf, [{ $ref: "#/definitions/Pet" }]);
     deepStrictEqual(openApi.definitions.Beagle.allOf, [{ $ref: "#/definitions/Dog" }]);
+  });
+
+  it("defines discriminated inheritance with intermediate non discriminated model", async () => {
+    const openApi = await openApiFor(`
+      @discriminator("kind")
+      model Pet {
+        kind: string;
+      }
+      
+      model CommonPet extends Pet {
+        name: string;
+      }
+      
+      model Dog extends CommonPet {
+        kind: "dog-kind";
+      }
+      `);
+    deepStrictEqual(openApi.definitions.Pet, {
+      type: "object",
+      properties: {
+        kind: { type: "string" },
+      },
+      required: ["kind"],
+      discriminator: "kind",
+    });
+    deepStrictEqual(openApi.definitions.Dog.allOf, [{ $ref: "#/definitions/CommonPet" }]);
+    strictEqual(openApi.definitions.Dog["x-ms-discriminator-value"], "dog-kind");
+    deepStrictEqual(openApi.definitions.CommonPet.allOf, [{ $ref: "#/definitions/Pet" }]);
+    strictEqual(openApi.definitions.CommonPet["x-ms-discriminator-value"], undefined);
   });
 
   it("defines nested discriminated unions", async () => {

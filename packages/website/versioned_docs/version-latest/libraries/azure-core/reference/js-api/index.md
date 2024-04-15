@@ -10,6 +10,8 @@ title: "[P] JS API"
 
 ## Interfaces
 
+- [ArmResourceIdentifierAllowedResource](interfaces/ArmResourceIdentifierAllowedResource.md)
+- [ArmResourceIdentifierConfig](interfaces/ArmResourceIdentifierConfig.md)
 - [EmbeddingVectorMetadata](interfaces/EmbeddingVectorMetadata.md)
 - [FinalOperationLink](interfaces/FinalOperationLink.md)
 - [FinalOperationReference](interfaces/FinalOperationReference.md)
@@ -34,6 +36,7 @@ title: "[P] JS API"
 
 ## Type Aliases
 
+- [ArmResourceDeploymentScope](type-aliases/ArmResourceDeploymentScope.md)
 - [FinalOperationStep](type-aliases/FinalOperationStep.md)
 - [OperationStep](type-aliases/OperationStep.md)
 - [PollingLocationInfo](type-aliases/PollingLocationInfo.md)
@@ -96,6 +99,7 @@ title: "[P] JS API"
 - [filterModelProperties](functions/filterModelProperties.md)
 - [filterResponseModels](functions/filterResponseModels.md)
 - [getAllProperties](functions/getAllProperties.md)
+- [getArmResourceIdentifierConfig](functions/getArmResourceIdentifierConfig.md)
 - [getAsEmbeddingVector](functions/getAsEmbeddingVector.md)
 - [getFinalLocationValue](functions/getFinalLocationValue.md)
 - [getHttpMetadata](functions/getHttpMetadata.md)

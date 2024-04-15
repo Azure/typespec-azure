@@ -8,6 +8,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -22,7 +23,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -48,7 +49,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       type: "string",
       description: "I am a simple Resource Identifier",
       format: "arm-id",
-      "x-ms-arm-id-details": { allowedResources: [] },
     });
   });
 
@@ -56,6 +56,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -70,7 +71,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a Resource Identifier with type only")
-        armIdWithType: ResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
+        armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -104,6 +105,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -118,7 +120,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a a Resource Identifier with type and scopes")
-        armIdWithTypeAndScope: ResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -154,6 +156,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -168,7 +171,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a a Resource Identifier with multiple types and scopes")
-        armIdWithMultipleTypeAndScope: ResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -210,6 +213,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}

@@ -176,7 +176,7 @@
   },
   "azure-arm_stand_alone": {
     "title": "(stand alone) Azure Resource Manager Service Project",
-    "description": "Create a project in rest-api-spec repo, representing an Azure service ARM API",
+    "description": "Create a stand alone project representing an Azure service ARM API",
     "compilerVersion": "0.45.2",
     "libraries": [
       "@azure-tools/typespec-autorest",

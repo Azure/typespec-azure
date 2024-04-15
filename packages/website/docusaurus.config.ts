@@ -10,6 +10,7 @@ import { resolve } from "path";
 import { themes } from "prism-react-renderer";
 
 function getMajorMinorVersion(pkgJsonPath) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const version = require(pkgJsonPath).version;
   const [major, minor] = version.split(".");
   return `${major}.${minor}.x`;
@@ -228,6 +229,7 @@ const config: Config = {
     algolia: {
       // cspell:disable-next-line
       appId: "45W9UOZTFJ",
+      // This is the search API KEY this can be public https://support.algolia.com/hc/en-us/articles/18966776061329-Can-the-search-API-key-be-public
       apiKey: "a9d52fdde02ebb7bab1d19b4443dcde1",
       indexName: "typespec-azure",
     },

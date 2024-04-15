@@ -17,7 +17,7 @@ $useRef(
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` \| `ModelProperty` |
+| `entity` | `ModelProperty` \| `Model` |
 | `jsonRef` | `string` |
 
 ## Returns
