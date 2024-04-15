@@ -483,6 +483,7 @@ export function getCorrespondingMethodParams(
       }
       context.__subscriptionIdParameter = subscriptionIdParam;
     }
+    return diagnostics.wrap([context.__subscriptionIdParameter]);
   }
   const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
   if (correspondingMethodParameter) {
