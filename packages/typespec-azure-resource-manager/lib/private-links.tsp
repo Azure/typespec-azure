@@ -117,7 +117,6 @@ union PrivateEndpointServiceConnectionStatus {
   /** Connection Rejected */
   Rejected: "Rejected",
 
-  /** modelAsString=true */
   string,
 }
 

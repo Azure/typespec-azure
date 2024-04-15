@@ -72,7 +72,6 @@ union ProvisioningState {
   /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** modelAsString=true */
   string,
 }
 
