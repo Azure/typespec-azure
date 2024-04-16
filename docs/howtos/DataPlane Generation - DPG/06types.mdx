@@ -110,7 +110,16 @@ TODO
 </TabItem>
 <TabItem value="java" label="Java" >
 
-TODO
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, Object> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, Object> additionalProperties);
+}
+```
 
 </TabItem>
 </Tabs>
@@ -236,7 +245,15 @@ TODO
 </TabItem>
 <TabItem value="java" label="Java" >
 
-TODO
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, AnimalProperty> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, AnimalProperty> additionalProperties);
+}
+```
 
 </TabItem>
 </Tabs>
@@ -345,7 +362,15 @@ TODO
 </TabItem>
 <TabItem value="java" label="Java" >
 
-TODO
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, BinaryData> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, BinaryData> additionalProperties);
+}
+```
 
 </TabItem>
 </Tabs>
@@ -434,7 +459,15 @@ TODO
 </TabItem>
 <TabItem value="java" label="Java" >
 
-TODO
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, String> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, String> additionalProperties);
+}
+```
 
 </TabItem>
 </Tabs>
