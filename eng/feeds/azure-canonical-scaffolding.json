@@ -1,0 +1,66 @@
+{
+  "azure-arm-canonical": {
+    "title": "(rest-api-spec repo) Azure Resource Manager Service Project with Canonical Swagger",
+    "description": "Create a project with canonical swagger in rest-api-spec repo, representing an Azure service ARM API",
+    "compilerVersion": "0.45.2",
+    "libraries": [],
+    "skipCompilerPackage": true,
+    "config": {
+      "emit": ["@azure-tools/typespec-autorest", "@azure-tools/typespec-autorest-canonical"]
+    },
+    "files": [
+      {
+        "path": "package.json",
+        "destination": "package.json",
+        "skipGeneration": true
+      },
+      {
+        "path": "./arm-canonical/main.tsp",
+        "destination": "main.tsp"
+      },
+      {
+        "path": "./arm-canonical/employee.tsp",
+        "destination": "employee.tsp"
+      },
+      {
+        "path": "./arm-canonical/tspconfig.yaml",
+        "destination": "tspconfig.yaml"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Employees_CreateOrUpdate.json",
+        "destination": "examples/2021-10-01-preview/Employees_CreateOrUpdate.json"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Employees_Delete.json",
+        "destination": "examples/2021-10-01-preview/Employees_Delete.json"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Employees_ListByResourceGroup.json",
+        "destination": "examples/2021-10-01-preview/Employees_ListByResourceGroup.json"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Employees_ListBySubscription.json",
+        "destination": "examples/2021-10-01-preview/Employees_ListBySubscription.json"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Employees_Update.json",
+        "destination": "examples/2021-10-01-preview/Employees_Update.json"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Employees_Get.json",
+        "destination": "examples/2021-10-01-preview/Employees_Get.json"
+      },
+      {
+        "path": "./arm/examples/2021-10-01-preview/Operations_List.json",
+        "destination": "examples/2021-10-01-preview/Operations_List.json"
+      }
+    ],
+    "inputs": {
+      "ServiceNamespace": {
+        "description": "Please provide ARM Resource Provider Name in Pascal case:",
+        "type": "text",
+        "initialValue": "Microsoft.Contoso"
+      }
+    }
+  }
+}
