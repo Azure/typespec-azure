@@ -15,7 +15,7 @@ $traitAdded(
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `target` | `Model` \| `ModelProperty` |
+| `target` | `ModelProperty` \| `Model` |
 | `addedVersion` | `EnumMember` \| `NullType` |
 
 ## Returns

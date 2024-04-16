@@ -28,6 +28,7 @@ title: "[P] JS API"
 - [$onValidate](functions/$onValidate.md)
 - [$promotion](functions/$promotion.md)
 - [checkIsArmResource](functions/checkIsArmResource.md)
+- [checkIsArmTrackedResource](functions/checkIsArmTrackedResource.md)
 - [checkIsValidApiVersion](functions/checkIsValidApiVersion.md)
 - [getAbout](functions/getAbout.md)
 - [getAboutDisplayNames](functions/getAboutDisplayNames.md)

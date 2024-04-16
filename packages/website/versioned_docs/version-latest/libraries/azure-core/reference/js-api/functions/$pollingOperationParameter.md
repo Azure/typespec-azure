@@ -16,7 +16,7 @@ $pollingOperationParameter(
 | :------ | :------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
-| `target`? | `StringLiteral` \| `ModelProperty` |
+| `target`? | `ModelProperty` \| `StringLiteral` |
 
 ## Returns
 

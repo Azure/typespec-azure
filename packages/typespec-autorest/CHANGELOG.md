@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.41.1
+
+### Bug Fixes
+
+- [#568](https://github.com/Azure/typespec-azure/pull/568) Small performance improvements
+
+
+## 0.41.0
+
+### Bug Fixes
+
+- [#414](https://github.com/Azure/typespec-azure/pull/414) updating autorest to emit response headers in lexicographic order
+- [#512](https://github.com/Azure/typespec-azure/pull/512) Fix: Discriminated inheritance wasn't resolving the `x-ms-discriminator-value` when it had an intermediate model.
+
+### Bump dependencies
+
+- [#437](https://github.com/Azure/typespec-azure/pull/437) Update dependencies
+
+### Features
+
+- [#407](https://github.com/Azure/typespec-azure/pull/407) Add support for new `Azure.Core.armResourceManager` scalar
+
+
 ## 0.40.0
 
 ### Bump dependencies

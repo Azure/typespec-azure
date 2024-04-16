@@ -16,6 +16,7 @@ import {
   SyntaxKind,
   Type,
   Union,
+  createDiagnosticCollector,
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
@@ -39,7 +40,7 @@ import {
 } from "./interfaces.js";
 import { TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { experimental_getSdkPackage } from "./package.js";
+import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
@@ -157,7 +158,12 @@ function findClientService(
   let current: Namespace | undefined = client as any;
   while (current) {
     if (isService(program, current)) {
+      // we don't check scoped clients here, because we want to find the service for the client
       return current;
+    }
+    const client = program.stateMap(clientKey).get(current);
+    if (client && client[AllScopes]) {
+      return client[AllScopes].service;
     }
     current = current.namespace;
   }
@@ -248,6 +254,14 @@ export function $operationGroup(
     });
     return;
   }
+  const service = findClientService(context.program, target) ?? (target as any);
+  if (!isService(context.program, service)) {
+    reportDiagnostic(context.program, {
+      code: "client-service",
+      format: { name: target.name },
+      target: context.decoratorTarget,
+    });
+  }
 
   setScopedDecoratorData(
     context,
@@ -257,6 +271,7 @@ export function $operationGroup(
     {
       kind: "SdkOperationGroup",
       type: target,
+      service,
     },
     scope
   );
@@ -337,7 +352,14 @@ export function getOperationGroup(
   type: Namespace | Interface
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-
+  const service = findClientService(context.program, type) ?? (type as any);
+  if (!isService(context.program, service)) {
+    reportDiagnostic(context.program, {
+      code: "client-service",
+      format: { name: type.name },
+      target: type,
+    });
+  }
   if (hasExplicitClientOrOperationGroup(context)) {
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
@@ -350,6 +372,7 @@ export function getOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: buildOperationGroupPath(context, type),
+        service,
       };
     }
     if (
@@ -360,6 +383,7 @@ export function getOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: buildOperationGroupPath(context, type),
+        service,
       };
     }
   }
@@ -480,6 +504,7 @@ export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+  const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
@@ -489,14 +514,22 @@ export function createSdkContext<
     program: context.program,
     emitContext: context,
     experimental_sdkPackage: undefined!,
-    emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
+    emitterName: diagnostics.pipe(
+      parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
+    ), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
+    diagnostics: diagnostics.diagnostics,
   };
-  sdkContext.experimental_sdkPackage = experimental_getSdkPackage(sdkContext);
+  sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  if (sdkContext.diagnostics) {
+    sdkContext.diagnostics = sdkContext.diagnostics.concat(
+      sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+    );
+  }
   return sdkContext;
 }
 

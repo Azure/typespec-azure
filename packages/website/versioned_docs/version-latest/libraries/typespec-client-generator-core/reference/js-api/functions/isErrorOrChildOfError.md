@@ -17,3 +17,7 @@ isErrorOrChildOfError(context, model): boolean
 ## Returns
 
 `boolean`
+
+## Deprecated
+
+This function is deprecated. You should use isErrorModel from the standard TypeSpec library
