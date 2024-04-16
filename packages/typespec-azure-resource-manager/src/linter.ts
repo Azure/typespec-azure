@@ -77,8 +77,6 @@ export const $linter = defineLinter({
       ],
       enable: {
         ...allRulesEnabled,
-        // TODO: Enable this rule once azure-rest-api-specs repo is ready (issue #3839)
-        [`@azure-tools/typespec-azure-resource-manager/${armCommonTypesVersionRule.name}`]: false,
       },
       disable: {
         [`@azure-tools/typespec-azure-core/bad-record-type`]:

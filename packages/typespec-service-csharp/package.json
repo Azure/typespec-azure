@@ -35,9 +35,9 @@
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
-    "test-official": "vitest run --coverage --reporter=junit --reporter=default --no-file-parallelism",
-    "lint": "eslint . --ext .ts --max-warnings=0",
-    "lint:fix": "eslint . --fix --ext .ts",
+    "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
+    "lint": "eslint .  --max-warnings=0",
+    "lint:fix": "eslint . --fix ",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-service-csharp/reference"
   },
   "files": [
@@ -54,25 +54,22 @@
     "@typespec/versioning": "workspace:~"
   },
   "dependencies": {
-    "change-case": "~5.4.3"
+    "change-case": "~5.4.4"
   },
   "devDependencies": {
     "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@types/node": "~18.11.19",
     "@typespec/compiler": "workspace:~",
-    "@typespec/eslint-config-typespec": "workspace:~",
-    "@typespec/eslint-plugin": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/library-linter": "workspace:~",
     "@typespec/openapi": "workspace:~",
     "@typespec/rest": "workspace:~",
     "@typespec/tspd": "workspace:~",
-    "@vitest/coverage-v8": "^1.4.0",
+    "@vitest/coverage-v8": "^1.5.0",
     "c8": "^9.1.0",
-    "eslint": "^8.57.0",
     "rimraf": "~5.0.5",
-    "typescript": "~5.4.3",
-    "vitest": "^1.4.0"
+    "typescript": "~5.4.5",
+    "vitest": "^1.5.0"
   }
 }

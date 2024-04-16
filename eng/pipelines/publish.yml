@@ -1,0 +1,120 @@
+# Continuous Integration
+
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+  paths:
+    exclude:
+      - docs/release-notes/*.md
+      - packages/website/versioned_docs/version-latest/release-notes/*.md
+
+pr: none
+
+extends:
+  template: /eng/pipelines/templates/1es-redirect.yml
+  parameters:
+    variables:
+      - template: /eng/pipelines/templates/variables/globals.yml@self
+    stages:
+      - stage: CI
+        pool:
+          name: $(WINDOWSPOOL)
+          image: $(WINDOWSVMIMAGE)
+          os: windows
+        jobs:
+          - job: npm_stable
+            timeoutInMinutes: 90
+            displayName: Npm publish
+
+            variables:
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+            steps:
+              - checkout: self
+                submodules: true
+
+              - template: /eng/pipelines/templates/install.yml@self
+                parameters:
+                  nodeVersion: "20.x"
+
+              - template: /eng/pipelines/templates/build.yml@self
+
+              - script: pnpm run test:ci
+                displayName: Test
+
+              - template: /eng/pipelines/templates/upload-coverage.yml@self
+
+              - script: pnpm run pack:all
+                displayName: Pack packages
+
+              - pwsh: |
+                  echo "Updating config"
+                  pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+                  echo "Publishing"
+                  pnpm chronus publish  "./temp/artifacts/*.tgz" --access public  --engine npm --report-summary ./publish-summary.json
+                name: Publish
+                env:
+                  NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
+
+              - script: |
+                  echo "Publish summary:"
+                  cat ./publish-summary.json
+                displayName: Log publish summary
+
+              - script: pnpm chronus-github create-releases --repo azure/typespec-azure --publish-summary ./publish-summary.json
+                displayName: Create github releases
+                env:
+                  GITHUB_TOKEN: $(azuresdk-github-pat)
+
+              - task: AzureCLI@1
+                displayName: "Publish bundled packages to package storage"
+                inputs:
+                  azureSubscription: "Azure SDK Engineering System"
+                  scriptLocation: inlineScript
+                  inlineScript: node ./eng/scripts/upload-bundler-packages.js
+
+              - task: AzureCLI@1
+                displayName: "Publish Azure playground"
+                inputs:
+                  azureSubscription: "Azure SDK Engineering System"
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    az storage blob upload-batch ^
+                      --destination $web ^
+                      --account-name "cadlplayground" ^
+                      --destination-path cadl-azure/ ^
+                      --source "./packages/typespec-azure-playground-website/dist/" ^
+                      --overwrite
+
+          - job: npm_preview
+            timeoutInMinutes: 90
+            dependsOn: npm_stable
+            displayName: Npm publish dev version
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/main') # Only publish -dev on main branch.
+
+            variables:
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+            steps:
+              - checkout: self
+                submodules: true
+
+              - template: /eng/pipelines/templates/install.yml@self
+                parameters:
+                  nodeVersion: "20.x"
+
+              - template: /eng/pipelines/templates/build.yml@self
+
+              - script: node ./core/packages/internal-build-utils/cmd/cli.js bump-version-preview .
+                displayName: Bump version to prerelease targets
+
+              - pwsh: |
+                  echo "Updating config"
+                  pnpm config set '//registry.npmjs.org/:_authToken' '${NPM_AUTH_TOKEN}'
+                  echo "Publishing"
+                  pnpm -r --filter='./packages/*' publish --access public --no-git-checks --tag next
+                name: Publish
+                env:
+                  NPM_AUTH_TOKEN: $(azure-sdk-npm-token)

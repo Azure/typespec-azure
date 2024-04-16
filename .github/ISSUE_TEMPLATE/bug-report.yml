@@ -22,7 +22,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: Please provide a link to [Playground](https://azure.github.io/typespec/playground) or a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) is required unless you are absolutely sure that the issue is obvious and the provided information is enough to understand the problem.
+      description: Please provide a link to [Playground](https://azure.github.io/typespec-azure/playground) or a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) is required unless you are absolutely sure that the issue is obvious and the provided information is enough to understand the problem.
       placeholder: Reproduction
     validations:
       required: true

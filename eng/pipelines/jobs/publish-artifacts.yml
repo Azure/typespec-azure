@@ -1,6 +1,7 @@
 jobs:
   - job: publish_artifacts
     displayName: Publish Artifacts
+    condition: eq(variables['Build.Reason'], 'PullRequest') # Don't publish artifacts for merge queue builds
 
     variables:
       TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build

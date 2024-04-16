@@ -4,7 +4,7 @@ title: "[F] createSdkContext"
 
 ---
 ```ts
-createSdkContext<TOptions>(context, emitterName?): SdkContext<TOptions>
+createSdkContext<TOptions, TServiceOperation>(context, emitterName?): SdkContext<TOptions, TServiceOperation>
 ```
 
 ## Type parameters
@@ -12,6 +12,7 @@ createSdkContext<TOptions>(context, emitterName?): SdkContext<TOptions>
 | Type parameter | Value |
 | :------ | :------ |
 | `TOptions` extends `Record`<`string`, `any`\> | [`SdkEmitterOptions`](../interfaces/SdkEmitterOptions.md) |
+| `TServiceOperation` extends [`SdkHttpOperation`](../interfaces/SdkHttpOperation.md) | [`SdkHttpOperation`](../interfaces/SdkHttpOperation.md) |
 
 ## Parameters
 
@@ -22,4 +23,4 @@ createSdkContext<TOptions>(context, emitterName?): SdkContext<TOptions>
 
 ## Returns
 
-[`SdkContext`](../interfaces/SdkContext.md)<`TOptions`\>
+[`SdkContext`](../interfaces/SdkContext.md)<`TOptions`, `TServiceOperation`\>

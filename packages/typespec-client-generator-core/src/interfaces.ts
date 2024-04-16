@@ -25,11 +25,7 @@ export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  /**
-   * @deprecated This property is deprecated. Use `.sdkPackage` instead.
-   */
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  sdkPackage: SdkPackage<TServiceOperation>;
   __clients?: SdkClientType<TServiceOperation>[];
 }
 
@@ -89,6 +85,8 @@ interface SdkTypeBase {
    */
   nullable: boolean;
   deprecation?: string;
+  description?: string;
+  details?: string;
 }
 
 export type SdkType =
@@ -245,8 +243,6 @@ export interface SdkEnumType extends SdkTypeBase {
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
-  description?: string;
-  details?: string;
   isFlags: boolean;
   usage: UsageFlags;
   access?: AccessFlags;
@@ -261,8 +257,6 @@ export interface SdkEnumValueType extends SdkTypeBase {
   value: string | number;
   enumType: SdkEnumType;
   valueType: SdkBuiltInType;
-  description?: string;
-  details?: string;
 }
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
@@ -292,11 +286,10 @@ export interface SdkModelType extends SdkTypeBase {
    */
   isError: boolean;
   isGeneratedName: boolean;
-  description?: string;
-  details?: string;
   access?: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
+  additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   discriminatorProperty?: SdkModelPropertyType;
@@ -549,7 +542,11 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  /**
+   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
+   */
   diagnostics: readonly Diagnostic[];
+  crossLanguagePackageId: string;
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;

@@ -16,8 +16,8 @@ export const missingXmsIdentifiersRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers",
   messages: {
-    default: `Missing identifying properties of objects in the array item, please add @extension("x-ms-identifiers", [<prop>]) to specify it. If there are no appropriate identifying properties, please add @extension("x-ms-identifiers",[]).`,
-    notArray: paramMessage`Value passed to @extension("x-ms-identifiers",...) was a "${"valueType"}". Pass an array of property name.`,
+    default: `Missing identifying properties of objects in the array item, please add @OpenAPI.extension("x-ms-identifiers", [<prop>]) to specify it. If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers",[]).`,
+    notArray: paramMessage`Value passed to @OpenAPI.extension("x-ms-identifiers",...) was a "${"valueType"}". Pass an array of property name.`,
     missingProperty: paramMessage`Property "${"propertyName"}" is not found in "${"targetModelName"}". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
   },
   create(context) {

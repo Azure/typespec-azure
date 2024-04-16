@@ -15,5 +15,7 @@ type SdkType:
   | SdkEnumValueType
   | SdkConstantType
   | SdkUnionType
-  | SdkModelType;
+  | SdkModelType
+  | SdkCredentialType
+  | SdkEndpointType;
 ```

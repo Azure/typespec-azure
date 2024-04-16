@@ -1,4 +1,5 @@
 // @ts-check
+/* eslint-disable no-console */
 import { execSync } from "child_process";
 import dotenv from "dotenv";
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
