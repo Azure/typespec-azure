@@ -1134,8 +1134,7 @@ paths:
                       - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
                     description: Error object that describes the error when status is "Failed".
                   result:
-                    allOf:
-                      - $ref: '#/components/schemas/TypeSpec.Http.AcceptedResponse'
+                    type: object
                     description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
@@ -1512,9 +1511,6 @@ components:
         - accepted
         - rejected
       description: Repeatability Result header options
-    TypeSpec.Http.AcceptedResponse:
-      type: object
-      description: The request has been accepted for processing, but processing has not yet completed.
     Versions:
       type: string
       enum:
