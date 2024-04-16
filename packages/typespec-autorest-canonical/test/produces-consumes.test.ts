@@ -126,7 +126,7 @@ function createAdlFromConfig(configuration: ProducesConsumesOperation[]): string
   configuration.forEach((config) => {
     const opString =
       config.type === "consumes"
-        ? `@delete op remove(@body payload : ${config.modelName}) : NoContentResponse;`
+        ? `@delete op remove(@bodyRoot payload : ${config.modelName}) : NoContentResponse;`
         : `@get op read() : ${config.modelName};`;
     const doc = `
     ${config.modelDef}

@@ -289,7 +289,7 @@ describe("typespec-autorest: return types", () => {
     });
   });
 
-  it("return type with only response metadata should be 204 response w/ no content", async () => {
+  it("return type with only response metadata should be 200 response w/ no content", async () => {
     const res = await openApiFor(
       `
       @get op delete(): {@header date: string};

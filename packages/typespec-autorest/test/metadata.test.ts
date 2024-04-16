@@ -334,7 +334,7 @@ describe("typespec-autorest: metadata", () => {
        @header h: string;
       }
       @route("/single") @get op single(...Parameters): string;
-      @route("/batch") @get op batch(@bodyRoot _: Parameters[]): string;
+      @route("/batch") @get op batch(@bodyRoot body: Parameters[]): string;
       `
     );
     deepStrictEqual(res.paths, {
@@ -366,7 +366,7 @@ describe("typespec-autorest: metadata", () => {
           parameters: [
             {
               in: "body",
-              name: "_",
+              name: "body",
               required: true,
               schema: {
                 type: "array",
@@ -533,11 +533,11 @@ describe("typespec-autorest: metadata", () => {
     });
   });
 
-  it("supports nested metadata and removes emptied properties", async () => {
+  it("supports nested metadata and removes properties with @bodyIgnore ", async () => {
     const res = await openApiFor(
       `
       model Pet {
-        headers: {
+        @bodyIgnore  headers: {
           @header h1: string;
           moreHeaders: {
             @header h2: string;
@@ -605,33 +605,15 @@ describe("typespec-autorest: metadata", () => {
       PetCreate: {
         type: "object",
         properties: {
-          headers: {
-            type: "object",
-            properties: {
-              moreHeaders: {
-                type: "object",
-              },
-            },
-            required: ["moreHeaders"],
-          },
           name: {
             type: "string",
           },
         },
-        required: ["headers", "name"],
+        required: ["name"],
       },
       Pet: {
         type: "object",
         properties: {
-          headers: {
-            type: "object",
-            properties: {
-              moreHeaders: {
-                type: "object",
-              },
-            },
-            required: ["moreHeaders"],
-          },
           id: {
             type: "string",
           },
@@ -639,7 +621,7 @@ describe("typespec-autorest: metadata", () => {
             type: "string",
           },
         },
-        required: ["headers", "id", "name"],
+        required: ["id", "name"],
       },
     });
   });

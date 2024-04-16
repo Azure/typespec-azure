@@ -308,10 +308,10 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description                                         |
-| ---------- | ---------- | --------------------------------------------------- |
-| body       | `Resource` | The body type of the operation request or response. |
-| statusCode | `201`      | The status code.                                    |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `201`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResourceExistsResponse` {#Azure.ResourceManager.ArmResourceExistsResponse}
 
@@ -372,10 +372,10 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `200`          | The status code.                                    |
-| body       | `ResponseBody` | The body type of the operation request or response. |
+| Name       | Type           | Description      |
+| ---------- | -------------- | ---------------- |
+| statusCode | `200`          | The status code. |
+| body       | `ResponseBody` |                  |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
 

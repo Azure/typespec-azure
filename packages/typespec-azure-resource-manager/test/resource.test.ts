@@ -785,7 +785,6 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
           version: string,
           file: string
         ) {
-          console.log(">..", openApi.paths[path].get.responses["200"]);
           assertRef(
             openApi.paths[path].get.responses["200"].schema,
             `../../common-types/resource-management/${version}/${file}#/definitions/${defName}`
