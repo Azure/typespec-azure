@@ -5,7 +5,6 @@
     "libraries": [
       "@typespec/rest",
       "@typespec/openapi",
-      "@azure-tools/typespec-autorest",
       "@azure-tools/typespec-azure-core",
       "@azure-tools/typespec-azure-resource-manager"
     ]

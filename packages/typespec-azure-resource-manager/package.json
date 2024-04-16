@@ -52,7 +52,6 @@
     "!dist/test/**"
   ],
   "peerDependencies": {
-    "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",

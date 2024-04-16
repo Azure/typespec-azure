@@ -3,7 +3,6 @@ import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
-import "@azure-tools/typespec-autorest";
 import "@azure-tools/typespec-azure-core";
 
 import "./arm.foundations.tsp";
@@ -22,7 +21,6 @@ using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using TypeSpec.OpenAPI;
-using Autorest;
 using Azure.ResourceManager.Foundations;
 
 @versioned(Azure.ResourceManager.Versions)

@@ -6,7 +6,6 @@
     { "path": "../../core/packages/rest/tsconfig.json" },
     { "path": "../../core/packages/openapi/tsconfig.json" },
     { "path": "../typespec-azure-core/tsconfig.json" },
-    { "path": "../typespec-autorest/tsconfig.json" }
   ],
   "compilerOptions": {
     "outDir": "dist",
