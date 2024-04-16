@@ -5,6 +5,440 @@ import TabItem from "@theme/TabItem";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
+## Models
+
+### Models with additional properties
+
+#### Additional properties of any type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+Recommend usage: 
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<unknown>;
+}
+```
+
+Other usages:
+
+```typespec
+model Animal extends Record<unknown>{
+  name: string;
+  kind: string;
+}
+```
+
+```typespec
+model Animal is Record<unknown> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "any"
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["age"] = 5
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+TODO
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
+
+</TabItem>
+</Tabs>
+
+
+#### Additional properties of specific type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model AnimalProperty {
+  "category": string;
+  "value": unknown;
+}
+
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<AnimalProperty>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "model",
+    "name": "AnimalProperty",
+    "properties": [
+      {
+        "kind": "property",
+        "name": "category",
+        "serializedName": "category",
+        "optional": false,
+        "nullable": false,
+        "type": {
+          "kind": "string",
+          "encode": "string"
+        }
+      },
+      {
+        "kind": "property",
+        "name": "value",
+        "serializedName": "value",
+        "optional": false,
+        "nullable": false,
+        "type": {
+          "kind": "any"
+        }
+      }
+    ],
+    "additionalProperties": undefined,
+    "additionalPropertiesNullable": undefined
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from typing import Any
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+class AnimalProperty(_model_base.Model):
+
+    category: str = rest_field()
+    value: Any = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = AnimalProperty(category="relationship", value="Jerry")
+animal["age"] = AnimalProperty(category="attribute", value=5)
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+TODO
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of union type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string | int32>;
+}
+```
+
+```typespec
+model Animal{
+  name: string;
+  kind: string;
+  ...Record<string>;
+  ...Record<int32>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "union",
+    "name": "AnimalAdditionalProperty",
+    "generatedName": true,
+    "values": [
+      {
+        "kind": "string",
+        "encode": "string"
+      },
+      {
+        "kind": "int32"
+      }
+    ]
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["age"] = 5
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+TODO
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of nullable type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string | null>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "string"
+  },
+  "additionalPropertiesNullable": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["alert"] = None
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+TODO
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
+
+</TabItem>
+</Tabs>
+
 ## Unions
 
 ### Union of literals with same type
