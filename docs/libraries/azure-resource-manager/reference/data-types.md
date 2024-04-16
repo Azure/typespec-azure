@@ -1074,6 +1074,30 @@ model Azure.ResourceManager.TrackedResource<Properties>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
+### `Versions` {#Azure.ResourceManager.Versions}
+
+Supported versions of Azure.ResourceManager building blocks.
+
+```typespec
+enum Azure.ResourceManager.Versions
+```
+
+### `InfrastructureEncryption` {#Azure.ResourceManager.InfrastructureEncryption}
+
+(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
+
+```typespec
+union Azure.ResourceManager.InfrastructureEncryption
+```
+
+### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.KeyEncryptionKeyIdentity}
+
+The type of identity to use.
+
+```typespec
+union Azure.ResourceManager.KeyEncryptionKeyIdentity
+```
+
 ### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
 
 The provisioning state of the connection
@@ -1102,37 +1126,13 @@ union Azure.ResourceManager.ResourceProvisioningState
 #### Examples
 
 ```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
 }
-```
-
-### `Versions` {#Azure.ResourceManager.Versions}
-
-Supported versions of Azure.ResourceManager building blocks.
-
-```typespec
-enum Azure.ResourceManager.Versions
-```
-
-### `InfrastructureEncryption` {#Azure.ResourceManager.InfrastructureEncryption}
-
-(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
-
-```typespec
-union Azure.ResourceManager.InfrastructureEncryption
-```
-
-### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.KeyEncryptionKeyIdentity}
-
-The type of identity to use.
-
-```typespec
-union Azure.ResourceManager.KeyEncryptionKeyIdentity
 ```
 
 ## Azure.ResourceManager.CommonTypes
