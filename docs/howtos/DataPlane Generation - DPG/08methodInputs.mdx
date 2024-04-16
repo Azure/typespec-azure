@@ -13,7 +13,8 @@ This doc details what method input signatures language emitters will output.
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
-op @get get(): User;
+@get
+op get(): User;
 ```
 
 </TabItem>
@@ -67,7 +68,8 @@ public User get();
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
-op @post post(User): void;
+@post
+op post(@body body: User): void;
 ```
 
 </TabItem>
@@ -76,22 +78,20 @@ op @post post(User): void;
 
 For model inputs, Python automatically generates an overload that allows SDK users to input through a file stream.
 
-TODO: generating this many method signatures feels verbose
-
 ```python
 @overload
-def post(user: User, *, content_type: str = "application/json") -> None:
+def post(body: User, **kwargs: Any) -> None:
   ...
 
 @overload
-def post(user: JSON, *, content_type: str = "application/json") -> None:
+def post(body: JSON, **kwargs: Any) -> None:
   ...
 
 @overload
-def post(user: IO[bytes], *, content_type: str = "application/json") -> None:
+def post(body: IO[bytes], **kwargs: Any) -> None:
   ...
 
-def post(user: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
+def post(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
   ...
 ```
 
@@ -144,6 +144,7 @@ alias User = {
   lastName: string;
 };
 
+@post
 op upload(...User): void;
 ```
 
@@ -271,13 +272,10 @@ op upload(...User): void;
 </TabItem>
 
 <TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
-class User:
-  first_name: str
-  last_name: str
-
-def upload(user: User) -> None:
+def upload(self, user: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -332,7 +330,7 @@ public void upload(User user);
 </TabItem>
 </Tabs>
 
-### Model with @body Property
+### Model with `@body` Property
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -357,18 +355,12 @@ op upload(...UserRequest): void;
 For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
-class User:
-  first_name: str
-  last_name: str
-
-class UserRequest:
-  user: User
-
-def upload(userRequest: UserRequest) -> None:
+def upload(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
   ...
 ```
 
 </TabItem>
+
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
@@ -426,30 +418,24 @@ public void upload(User user);
 
 ```typespec
 model BlobProperties {
-  @key
-  @visibility("read")
   @path
   name: string;
 
-  @header contentLength: string;
-  @header contentType: string;
+  @header testHeader: string;
 }
 
-op setBlobProperties(...BlobProperties): void;
+@route("blob_propertes/{name}")
+op getBlobProperties(...BlobProperties): void;
 ```
 
 </TabItem>
 
 <TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
 
-class BlobProperties:
-  name: str # readonly
-  content_length: str
-  content_type: str
-
-def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
+def get_blob_properties(name: str, *, test_header: string, **kwargs: Any) -> None:
   ...
 ```
 
@@ -458,8 +444,8 @@ def set_blob_properties(name: str, blob_properties: BlobProperties) -> None:
 
 ```csharp
 //protocol method
-public virtual async Task<Response> SetBlobPropertiesAsync(string name, string contentLength, string contentTypes, RequestContext context = null)
-public virtual Response SetBlobProperties(string name, string contentLength, string contentTypes, RequestContext context = null)
+public virtual async Task<Response> GetBlobPropertiesAsync(string name, string testHeader, RequestContext context = null)
+public virtual Response GetBlobProperties(string name, string testHeader, RequestContext context = null)
 ```
 
 </TabItem>
@@ -473,7 +459,7 @@ public virtual Response SetBlobProperties(string name, string contentLength, str
 <TabItem value="java" label="Java" >
 
 ```java
-public void setBlobProperties(String name, String contentLength, String contentType);
+public void getBlobProperties(String name, String testHeader);
 ```
 
 </TabItem>
@@ -497,19 +483,20 @@ model Schema {
   schema: bytes;
 }
 
+@post
 op register(...Schema): void;
 ```
 
 </TabItem>
 
 <TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
 class Schema:
-  content_type: str
   schema: bytes
 
-def register(schema: Schema) -> None:
+def register(body: [Schema, JSON, IO[bytes]], **kwargs: Any) -> None:
   ...
 ```
 
@@ -561,7 +548,3 @@ public void register(Schema schema);
 
 </TabItem>
 </Tabs>
-
-## Options Bags
-
-## Azure Core
