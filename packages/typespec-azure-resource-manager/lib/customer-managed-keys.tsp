@@ -4,16 +4,21 @@ using Azure.ResourceManager.Private;
 namespace Azure.ResourceManager;
 
 @doc("(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.")
-enum InfrastructureEncryption {
+union InfrastructureEncryption {
   @doc("Encryption is enabled")
   Enabled: "enabled",
 
   @doc("Encryption is disabled")
   Disabled: "disabled",
+
+  string,
 }
 
+/** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
+alias KeyEncryptionIdentity = KeyEncryptionKeyIdentity;
+
 @doc("The type of identity to use.")
-enum KeyEncryptionIdentity {
+union KeyEncryptionKeyIdentity {
   @doc("System assigned identity")
   SystemAssignedIdentity: "systemAssignedIdentity",
 
@@ -22,12 +27,14 @@ enum KeyEncryptionIdentity {
 
   @doc("Delegated identity")
   DelegatedResourceIdentity: "delegatedResourceIdentity",
+
+  string,
 }
 
 @doc("Customer-managed key encryption properties for the resource.")
 model CustomerManagedKeyEncryption {
   @doc("The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.")
-  keyEncryptionIdentity?: KeyEncryptionIdentity;
+  keyEncryptionKeyIdentity?: KeyEncryptionKeyIdentity;
 
   @doc("User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.")
   userAssignedIdentityResourceId?: Azure.Core.armResourceIdentifier<[
