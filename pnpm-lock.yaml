@@ -16,8 +16,8 @@ importers:
         version: 1.0.0
     devDependencies:
       '@chronus/chronus':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       '@chronus/github':
         specifier: ^0.3.2
         version: 0.3.2
