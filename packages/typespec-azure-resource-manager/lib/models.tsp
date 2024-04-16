@@ -126,7 +126,6 @@ union ResourceProvisioningState {
   @doc("Resource creation was canceled.")
   Canceled: "Canceled",
 
-  @doc("modelAsString=true")
   string,
 }
 
