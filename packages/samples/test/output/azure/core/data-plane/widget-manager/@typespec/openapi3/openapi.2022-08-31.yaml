@@ -1133,9 +1133,6 @@ paths:
                     allOf:
                       - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
                     description: Error object that describes the error when status is "Failed".
-                  result:
-                    type: object
-                    description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
           description: An unexpected error response.

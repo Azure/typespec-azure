@@ -1729,10 +1729,6 @@
                 "error": {
                   "$ref": "#/definitions/Azure.Core.Foundations.Error",
                   "description": "Error object that describes the error when status is \"Failed\"."
-                },
-                "result": {
-                  "type": "object",
-                  "description": "The result of the operation."
                 }
               },
               "required": [

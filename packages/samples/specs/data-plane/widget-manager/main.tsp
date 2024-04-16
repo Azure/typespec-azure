@@ -236,7 +236,7 @@ interface WidgetParts {
   reorderParts is Operations.LongRunningResourceCollectionAction<
     WidgetPart,
     WidgetPartReorderRequest,
-    {}
+    never
   >;
 }
 
