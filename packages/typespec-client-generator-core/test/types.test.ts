@@ -2013,6 +2013,44 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(shark.discriminatorProperty, sharktypeProperty);
     });
 
+    it("handle derived model with discriminator first", async () => {
+      await runner.compileWithBuiltInService(`
+      model Salmon extends Fish {
+        kind: "salmon";
+        friends?: Fish[];
+        hate?: Record<Fish>;
+        partner?: Fish;
+      }
+
+      @discriminator("kind")
+      model Fish {
+        age: int32;
+      }
+
+      @get
+      op getSalmon(): Salmon;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const fish = models.find((x) => x.name === "Fish");
+      ok(fish);
+      const kindProperty = fish.properties[0];
+      ok(kindProperty);
+      strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.kind, "property");
+      strictEqual(kindProperty.discriminator, true);
+      strictEqual(kindProperty.type.kind, "string");
+      strictEqual(kindProperty.__raw, undefined);
+      strictEqual(fish.discriminatorProperty, kindProperty);
+
+      const salmon = models.find((x) => x.name === "Salmon");
+      ok(salmon);
+      strictEqual(salmon.properties.length, 4);
+      strictEqual(salmon.properties[0].name, "kind");
+      strictEqual((salmon.properties[0] as SdkBodyModelPropertyType).discriminator, true);
+      strictEqual(salmon.discriminatorValue, "salmon");
+    });
+
     it("single discriminated model", async () => {
       await runner.compileWithBuiltInService(`
       @discriminator("kind")

@@ -555,6 +555,8 @@ export function getSdkModelWithDiagnostics(
       );
       sdkType.additionalPropertiesNullable = isNullable(type.indexer.value);
     }
+    // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
+    diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     if (type.baseModel) {
       sdkType.baseModel = context.modelsMap?.get(type.baseModel) as SdkModelType | undefined;
       if (sdkType.baseModel === undefined) {
@@ -570,7 +572,6 @@ export function getSdkModelWithDiagnostics(
         }
       }
     }
-    diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
 
     updateModelsMap(context, type, sdkType, operation);
