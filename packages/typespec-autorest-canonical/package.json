@@ -56,7 +56,8 @@
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@typespec/versioning": "workspace:~"
+    "@typespec/versioning": "workspace:~",
+    "@azure-tools/typespec-autorest": "workspace:~"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",

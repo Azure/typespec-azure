@@ -1,3 +1,4 @@
+import { getRef } from "@azure-tools/typespec-autorest";
 import {
   PagedResultMetadata,
   UnionEnum,
@@ -127,7 +128,6 @@ import {
   getVersion,
 } from "@typespec/versioning";
 import { AutorestCanonicalOpenAPISchema } from "./autorest-canonical-openapi-schema.js";
-import { getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { AutorestCanonicalEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
@@ -162,6 +162,7 @@ enum UnsupportedVersioningDecorators {
   TypeChangedFrom = "typeChangedFrom",
 }
 
+export const namespace = "AutorestCanonical";
 export const canonicalVersion = "canonical";
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
