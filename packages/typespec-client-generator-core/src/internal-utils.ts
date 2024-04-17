@@ -105,7 +105,7 @@ export function updateWithApiVersionInformation(
   return {
     isApiVersionParam,
     clientDefaultValue: isApiVersionParam ? context.__api_version_client_default_value : undefined,
-    onClient: isApiVersionParam,
+    onClient: onClient(context, type),
   };
 }
 
@@ -259,6 +259,7 @@ export interface TCGCContext {
   __api_versions?: string[];
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
+  __subscriptionIdParameter?: SdkParameter;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -344,4 +345,12 @@ export function isMultipartFormData(
   operation?: Operation
 ): boolean {
   return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
+}
+
+export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
+  return Boolean(context.arm) && parameter.name === "subscriptionId";
+}
+
+export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
+  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }
