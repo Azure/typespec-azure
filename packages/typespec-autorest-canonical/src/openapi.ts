@@ -127,6 +127,7 @@ import {
   getVersion,
 } from "@typespec/versioning";
 import { AutorestCanonicalOpenAPISchema } from "./autorest-canonical-openapi-schema.js";
+import { getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { AutorestCanonicalEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
@@ -148,7 +149,6 @@ import {
   Refable,
 } from "./types.js";
 import { AutorestCanonicalEmitterContext, resolveOperationId } from "./utils.js";
-import { getRef } from "./decorators.js";
 
 const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/{version}/openapi.json",
