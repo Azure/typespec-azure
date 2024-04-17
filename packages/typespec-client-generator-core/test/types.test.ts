@@ -2721,7 +2721,7 @@ describe("typespec-client-generator-core: types", () => {
       ok(Test6);
       strictEqual(Test6.access, undefined);
     });
-    it("additionalProperties string", async () => {
+    it("additionalProperties of same type", async () => {
       await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
         @access(Access.public)
@@ -2735,26 +2735,43 @@ describe("typespec-client-generator-core: types", () => {
         }
         @usage(Usage.input | Usage.output)
         @access(Access.public)
+        model AdditionalPropertiesModel3 {
+          prop: string;
+          ...Record<string>;
+        }
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
         model NoAdditionalPropertiesModel {
           prop: string;
         }
       `);
       const models = runner.context.experimental_sdkPackage.models;
-      strictEqual(models.length, 3);
+      strictEqual(models.length, 4);
       const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
       const AdditionalPropertiesModel2 = models.find(
         (x) => x.name === "AdditionalPropertiesModel2"
       );
+      const AdditionalPropertiesModel3 = models.find(
+        (x) => x.name === "AdditionalPropertiesModel3"
+      );
       const NonAdditionalPropertiesModel = models.find(
         (x) => x.name === "NoAdditionalPropertiesModel"
       );
-      ok(AdditionalPropertiesModel && AdditionalPropertiesModel2 && NonAdditionalPropertiesModel);
+      ok(
+        AdditionalPropertiesModel &&
+          AdditionalPropertiesModel2 &&
+          AdditionalPropertiesModel3 &&
+          NonAdditionalPropertiesModel
+      );
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
       strictEqual(AdditionalPropertiesModel.baseModel, undefined);
       strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "any");
       strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel3.additionalProperties?.kind, "string");
+      strictEqual(AdditionalPropertiesModel3.baseModel, undefined);
       strictEqual(NonAdditionalPropertiesModel.additionalProperties, undefined);
     });
+
     it("additionalProperties usage", async () => {
       await runner.compileWithBuiltInService(`
         @service({})
@@ -2765,20 +2782,40 @@ describe("typespec-client-generator-core: types", () => {
           model AdditionalPropertiesModel2 is Record<Test> {
           }
 
+          model AdditionalPropertiesModel3 {
+            ...Record<Test2>;
+          }
+
           model Test {
           }
 
+          model Test2 {
+          }
+
+          @route("test")
           op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+          @route("test2")
+          op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
         }
       `);
       const models = runner.context.experimental_sdkPackage.models;
-      strictEqual(models.length, 3);
+      strictEqual(models.length, 5);
       const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
       const AdditionalPropertiesModel2 = models.find(
         (x) => x.name === "AdditionalPropertiesModel2"
       );
+      const AdditionalPropertiesModel3 = models.find(
+        (x) => x.name === "AdditionalPropertiesModel3"
+      );
       const Test = models.find((x) => x.name === "Test");
-      ok(AdditionalPropertiesModel && AdditionalPropertiesModel2 && Test);
+      const Test2 = models.find((x) => x.name === "Test2");
+      ok(
+        AdditionalPropertiesModel &&
+          AdditionalPropertiesModel2 &&
+          AdditionalPropertiesModel3 &&
+          Test &&
+          Test2
+      );
 
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
       strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -2786,8 +2823,44 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "model");
       strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
       strictEqual(AdditionalPropertiesModel2.usage, UsageFlags.Output);
+      strictEqual(AdditionalPropertiesModel3.additionalProperties?.kind, "model");
+      strictEqual(AdditionalPropertiesModel3.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel3.usage, UsageFlags.Input | UsageFlags.Output);
       strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(Test2.usage, UsageFlags.Input | UsageFlags.Output);
     });
+
+    it("additionalProperties of different types", async () => {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model AdditionalPropertiesModel {
+          prop: string;
+          ...Record<float32>;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model AdditionalPropertiesModel2 {
+          prop: string;
+          ...Record<boolean | float32>;
+        }
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
+      const AdditionalPropertiesModel2 = models.find(
+        (x) => x.name === "AdditionalPropertiesModel2"
+      );
+      ok(AdditionalPropertiesModel && AdditionalPropertiesModel2);
+      strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "float32");
+      strictEqual(AdditionalPropertiesModel.baseModel, undefined);
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "union");
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.values[0].kind, "boolean");
+      strictEqual(AdditionalPropertiesModel2.additionalProperties?.values[1].kind, "float32");
+      strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
+    });
+
     it("crossLanguageDefinitionId", async () => {
       await runner.compile(`
         @service({})

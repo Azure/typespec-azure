@@ -276,13 +276,14 @@ export function getSdkArrayOrDictWithDiagnostics(
   operation?: Operation
 ): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (type.indexer !== undefined) {
+  // if model with both indexer and properties or name should be a model with additional properties
+  if (type.indexer !== undefined && type.properties.size === 0) {
     if (!isNeverType(type.indexer.key)) {
       const valueType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.indexer.value!, operation)
       );
       const name = type.indexer.key.name;
-      if (name === "string") {
+      if (name === "string" && type.name === "Record") {
         // model MyModel is Record<> {} should be model with additional properties
         if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
           return diagnostics.wrap(undefined);
@@ -295,7 +296,7 @@ export function getSdkArrayOrDictWithDiagnostics(
           valueType,
           nullableValues: isNullable(type.indexer.value!),
         });
-      } else if (name === "integer") {
+      } else if (name === "integer" && type.name === "Array") {
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
@@ -546,6 +547,13 @@ export function getSdkModelWithDiagnostics(
         getClientTypeWithDiagnostics(context, type.sourceModel!.indexer!.value!, operation)
       );
       sdkType.additionalPropertiesNullable = isNullable(type.sourceModel!.indexer!.value!);
+    }
+    // model MyModel { ...Record<>} should be model with additional properties
+    if (type.indexer) {
+      sdkType.additionalProperties = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.indexer.value, operation)
+      );
+      sdkType.additionalPropertiesNullable = isNullable(type.indexer.value);
     }
     // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
