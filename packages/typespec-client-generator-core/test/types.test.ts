@@ -2046,7 +2046,7 @@ describe("typespec-client-generator-core: types", () => {
       const salmon = models.find((x) => x.name === "Salmon");
       ok(salmon);
       strictEqual(salmon.properties.length, 4);
-      strictEqual(salmon.properties[0].name, "kind")
+      strictEqual(salmon.properties[0].name, "kind");
       strictEqual((salmon.properties[0] as SdkBodyModelPropertyType).discriminator, true);
       strictEqual(salmon.discriminatorValue, "salmon");
     });
