@@ -93,6 +93,7 @@ import {
   HttpOperation,
   HttpOperationParameters,
   HttpOperationResponse,
+  HttpOperationResponseBody,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
@@ -149,6 +150,11 @@ import {
   Refable,
 } from "./types.js";
 import { AutorestCanonicalEmitterContext, resolveOperationId } from "./utils.js";
+
+interface SchemaContext {
+  readonly visibility: Visibility;
+  readonly ignoreMetadataAnnotations: boolean;
+}
 
 const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/{version}/openapi.json",
@@ -425,7 +431,10 @@ function createOAPIEmitter(
     }
     const parameters: OpenAPI2PathParameter[] = [];
     for (const prop of server.parameters.values()) {
-      const param = getOpenAPI2Parameter(prop, "path", Visibility.Read);
+      const param = getOpenAPI2Parameter(prop, "path", {
+        visibility: Visibility.Read,
+        ignoreMetadataAnnotations: false,
+      });
       if (
         prop.type.kind === "Scalar" &&
         ignoreDiagnostics(
@@ -792,7 +801,7 @@ function createOAPIEmitter(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: Type | undefined;
+    let body: HttpOperationResponseBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -802,20 +811,25 @@ function createOAPIEmitter(
       }
 
       if (data.body) {
-        if (body && body !== data.body.type) {
+        if (body && body.type !== data.body.type) {
           reportDiagnostic(program, {
             code: "duplicate-body-types",
             target: response.type,
           });
         }
-        body = data.body.type;
+        body = data.body;
         contentTypes.push(...data.body.contentTypes);
       }
     }
 
     if (body) {
-      const isBinary = contentTypes.every((t) => isBinaryPayload(body!, t));
-      openapiResponse.schema = isBinary ? { type: "file" } : getSchemaOrRef(body, Visibility.Read);
+      const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
+      openapiResponse.schema = isBinary
+        ? { type: "file" }
+        : getSchemaOrRef(body.type, {
+            visibility: Visibility.Read,
+            ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
+          });
     }
 
     for (const contentType of contentTypes) {
@@ -827,7 +841,10 @@ function createOAPIEmitter(
 
   function getResponseHeader(prop: ModelProperty): OpenAPI2HeaderDefinition {
     const header: any = {};
-    populateParameter(header, prop, "header", Visibility.Read);
+    populateParameter(header, prop, "header", {
+      visibility: Visibility.Read,
+      ignoreMetadataAnnotations: false,
+    });
     delete header.in;
     delete header.name;
     delete header.required;
@@ -879,14 +896,14 @@ function createOAPIEmitter(
     }
 
     if (type.kind === "ModelProperty") {
-      return resolveProperty(type, visibility);
+      return resolveProperty(type, schemaContext);
     }
 
-    type = metadataInfo.getEffectivePayloadType(type, visibility);
+    type = metadataInfo.getEffectivePayloadType(type, schemaContext.visibility);
     const name = getOpenAPITypeName(program, type, typeNameOptions);
 
     if (shouldInline(program, type)) {
-      const schema = getSchemaForInlineType(type, name, visibility);
+      const schema = getSchemaForInlineType(type, name, schemaContext);
 
       if (schema === undefined && isErrorType(type)) {
         // Exit early so that syntax errors are exposed.  This error will
@@ -901,18 +918,18 @@ function createOAPIEmitter(
       return schema;
     } else {
       // Use shared schema when type is not transformed by visibility from the canonical read visibility.
-      if (!metadataInfo.isTransformed(type, visibility)) {
-        visibility = Visibility.Read;
+      if (!metadataInfo.isTransformed(type, schemaContext.visibility)) {
+        schemaContext = { ...schemaContext, visibility: Visibility.Read };
       }
-      const pending = pendingSchemas.getOrAdd(type, visibility, () => ({
+      const pending = pendingSchemas.getOrAdd(type, schemaContext.visibility, () => ({
         type,
-        visibility,
-        ref: refs.getOrAdd(type, visibility, () => new Ref()),
+        visibility: schemaContext.visibility,
+        ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
       }));
       return { $ref: pending.ref };
     }
   }
-  function getSchemaForInlineType(type: Type, name: string, visibility: Visibility) {
+  function getSchemaForInlineType(type: Type, name: string, context: SchemaContext) {
     if (inProgressInlineTypes.has(type)) {
       reportDiagnostic(program, {
         code: "inline-cycle",
@@ -922,7 +939,7 @@ function createOAPIEmitter(
       return {};
     }
     inProgressInlineTypes.add(type);
-    const schema = getSchemaForType(type, visibility);
+    const schema = getSchemaForType(type, context);
     inProgressInlineTypes.delete(type);
     return schema;
   }
@@ -993,7 +1010,12 @@ function createOAPIEmitter(
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
-      emitParameter(httpOpParam.param, httpOpParam.type, visibility, httpOpParam.name);
+      emitParameter(
+        httpOpParam.param,
+        httpOpParam.type,
+        { visibility, ignoreMetadataAnnotations: false },
+        httpOpParam.name
+      );
     }
 
     if (consumes.length === 0 && methodParams.body) {
@@ -1009,9 +1031,14 @@ function createOAPIEmitter(
 
     if (methodParams.body && !isVoidType(methodParams.body.type)) {
       const isBinary = isBinaryPayload(methodParams.body.type, consumes);
+      const schemaContext = {
+        visibility,
+        ignoreMetadataAnnotations:
+          methodParams.body.isExplicit && methodParams.body.containsMetadataAnnotations,
+      };
       const schema = isBinary
         ? { type: "string", format: "binary" }
-        : getSchemaOrRef(methodParams.body.type, visibility);
+        : getSchemaOrRef(methodParams.body.type, schemaContext);
 
       if (currentConsumes.has("multipart/form-data")) {
         const bodyModelType = methodParams.body.type;
@@ -1019,14 +1046,14 @@ function createOAPIEmitter(
         compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
         if (bodyModelType) {
           for (const param of bodyModelType.properties.values()) {
-            emitParameter(param, "formData", visibility, getJsonName(param));
+            emitParameter(param, "formData", schemaContext, getJsonName(param));
           }
         }
       } else if (methodParams.body.parameter) {
         emitParameter(
           methodParams.body.parameter,
           "body",
-          visibility,
+          { visibility, ignoreMetadataAnnotations: false },
           getJsonName(methodParams.body.parameter),
           schema
         );
@@ -1060,7 +1087,7 @@ function createOAPIEmitter(
   function emitParameter(
     param: ModelProperty,
     kind: OpenAPI2ParameterType,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     name?: string,
     typeOverride?: any
   ) {
@@ -1073,17 +1100,17 @@ function createOAPIEmitter(
 
     // If the parameter already has a $ref, don't bother populating it
     if (!("$ref" in ph)) {
-      populateParameter(ph, param, kind, visibility, name, typeOverride);
+      populateParameter(ph, param, kind, schemaContext, name, typeOverride);
     }
   }
 
   function getSchemaForPrimitiveItems(
     type: Type,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     paramName: string,
     multipart?: boolean
   ): PrimitiveItems | undefined {
-    const fullSchema = getSchemaForType(type, visibility);
+    const fullSchema = getSchemaForType(type, schemaContext);
     if (fullSchema === undefined) {
       return undefined;
     }
@@ -1101,7 +1128,7 @@ function createOAPIEmitter(
 
   function getFormDataSchema(
     type: Type,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     paramName: string
   ): Omit<OpenAPI2FormDataParameter, "in" | "name"> | undefined {
     if (isBytes(type)) {
@@ -1109,7 +1136,7 @@ function createOAPIEmitter(
     }
 
     if (type.kind === "Model" && isArrayModelType(program, type)) {
-      const schema = getSchemaForPrimitiveItems(type.indexer.value, visibility, paramName, true);
+      const schema = getSchemaForPrimitiveItems(type.indexer.value, schemaContext, paramName, true);
       if (schema === undefined) {
         return undefined;
       }
@@ -1121,7 +1148,7 @@ function createOAPIEmitter(
         items: schema,
       };
     } else {
-      const schema = getSchemaForPrimitiveItems(type, visibility, paramName, true);
+      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, true);
 
       if (schema === undefined) {
         return undefined;
@@ -1134,7 +1161,7 @@ function createOAPIEmitter(
   function getOpenAPI2Parameter<T extends OpenAPI2ParameterType>(
     param: ModelProperty,
     kind: T,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     name?: string,
     bodySchema?: any
   ): OpenAPI2Parameter & { in: T } {
@@ -1155,7 +1182,7 @@ function createOAPIEmitter(
       compilerAssert(bodySchema, "bodySchema argument is required to populate body parameter");
       ph.schema = bodySchema;
     } else if (ph.in === "formData") {
-      Object.assign(ph, getFormDataSchema(param.type, visibility, ph.name));
+      Object.assign(ph, getFormDataSchema(param.type, schemaContext, ph.name));
     } else {
       const collectionFormat = (
         kind === "query"
@@ -1174,12 +1201,12 @@ function createOAPIEmitter(
       if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
         ph.type = "array";
         const schema = {
-          ...getSchemaForPrimitiveItems(param.type.indexer.value, visibility, ph.name),
+          ...getSchemaForPrimitiveItems(param.type.indexer.value, schemaContext, ph.name),
         };
         delete (schema as any).description;
         ph.items = schema;
       } else {
-        Object.assign(ph, getSchemaForPrimitiveItems(param.type, visibility, ph.name));
+        Object.assign(ph, getSchemaForPrimitiveItems(param.type, schemaContext, ph.name));
       }
     }
 
@@ -1197,11 +1224,11 @@ function createOAPIEmitter(
     ph: OpenAPI2Parameter,
     param: ModelProperty,
     kind: OpenAPI2ParameterType,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     name?: string,
     bodySchema?: any
   ) {
-    Object.assign(ph, getOpenAPI2Parameter(param, kind, visibility, name, bodySchema));
+    Object.assign(ph, getOpenAPI2Parameter(param, kind, schemaContext, name, bodySchema));
   }
 
   function emitParameters() {
@@ -1258,7 +1285,10 @@ function createOAPIEmitter(
           for (const [visibility, pending] of group) {
             processedSchemas.getOrAdd(type, visibility, () => ({
               ...pending,
-              schema: getSchemaForType(type, visibility),
+              schema: getSchemaForType(type, {
+                visibility: visibility,
+                ignoreMetadataAnnotations: false,
+              }),
             }));
           }
           pendingSchemas.delete(type);
@@ -1269,7 +1299,7 @@ function createOAPIEmitter(
     function processUnreferencedSchemas() {
       const addSchema = (type: Type) => {
         if (!processedSchemas.has(type) && !paramModels.has(type) && !shouldInline(program, type)) {
-          getSchemaOrRef(type, Visibility.Read);
+          getSchemaOrRef(type, { visibility: Visibility.Read, ignoreMetadataAnnotations: false });
         }
       };
       const skipSubNamespaces = isGlobalNamespace(program, serviceNamespace);
@@ -1293,7 +1323,7 @@ function createOAPIEmitter(
     }
   }
 
-  function getSchemaForType(type: Type, visibility: Visibility): OpenAPI2Schema | undefined {
+  function getSchemaForType(type: Type, schemaContext: SchemaContext): OpenAPI2Schema | undefined {
     const builtinType = getSchemaForLiterals(type);
     if (builtinType !== undefined) {
       return builtinType;
@@ -1303,15 +1333,15 @@ function createOAPIEmitter(
       case "Intrinsic":
         return getSchemaForIntrinsicType(type);
       case "Model":
-        return getSchemaForModel(type, visibility);
+        return getSchemaForModel(type, schemaContext);
       case "ModelProperty":
-        return getSchemaForType(type.type, visibility);
+        return getSchemaForType(type.type, schemaContext);
       case "Scalar":
         return getSchemaForScalar(type);
       case "Union":
-        return getSchemaForUnion(type, visibility);
+        return getSchemaForUnion(type, schemaContext);
       case "UnionVariant":
-        return getSchemaForUnionVariant(type, visibility);
+        return getSchemaForUnionVariant(type, schemaContext);
       case "Enum":
         return getSchemaForEnum(type);
       case "Tuple":
@@ -1412,7 +1442,7 @@ function createOAPIEmitter(
     return applyIntrinsicDecorators(union, schema);
   }
 
-  function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
+  function getSchemaForUnion(union: Union, schemaContext: SchemaContext): OpenAPI2Schema {
     const nonNullOptions = [...union.variants.values()]
       .map((x) => x.type)
       .filter((t) => !isNullType(t));
@@ -1426,7 +1456,7 @@ function createOAPIEmitter(
       const type = nonNullOptions[0];
 
       // Get the schema for the model type
-      const schema = getSchemaOrRef(type, visibility);
+      const schema = getSchemaOrRef(type, schemaContext);
       if (schema.$ref) {
         if (type.kind === "Model") {
           return { type: "object", allOf: [schema], "x-nullable": nullable };
@@ -1460,8 +1490,11 @@ function createOAPIEmitter(
     );
   }
 
-  function getSchemaForUnionVariant(variant: UnionVariant, visibility: Visibility): OpenAPI2Schema {
-    return getSchemaForType(variant.type, visibility)!;
+  function getSchemaForUnionVariant(
+    variant: UnionVariant,
+    schemaContext: SchemaContext
+  ): OpenAPI2Schema {
+    return getSchemaForType(variant.type, schemaContext)!;
   }
 
   function getDefaultValue(type: Type): any {
@@ -1512,8 +1545,8 @@ function createOAPIEmitter(
     });
   }
 
-  function getSchemaForModel(model: Model, visibility: Visibility) {
-    const array = getArrayType(model, visibility);
+  function getSchemaForModel(model: Model, schemaContext: SchemaContext) {
+    const array = getArrayType(model, schemaContext);
     if (array) {
       return array;
     }
@@ -1542,14 +1575,14 @@ function createOAPIEmitter(
     const properties: OpenAPI2Schema["properties"] = {};
 
     if (isRecordModelType(program, model)) {
-      modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, visibility);
+      modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, schemaContext);
     }
 
     const derivedModels = model.derivedModels.filter(includeDerivedModel);
 
     // getSchemaOrRef on all children to push them into components.schemas
     for (const child of derivedModels) {
-      getSchemaOrRef(child, visibility);
+      getSchemaOrRef(child, schemaContext);
     }
 
     const discriminator = getDiscriminator(program, model);
@@ -1578,7 +1611,13 @@ function createOAPIEmitter(
         reportDisallowedDecorator(UnsupportedVersioningDecorators.TypeChangedFrom, prop.type);
       }
 
-      if (!metadataInfo.isPayloadProperty(prop, visibility)) {
+      if (
+        !metadataInfo.isPayloadProperty(
+          prop,
+          schemaContext.visibility,
+          schemaContext.ignoreMetadataAnnotations
+        )
+      ) {
         continue;
       }
 
@@ -1600,7 +1639,10 @@ function createOAPIEmitter(
         }
       }
 
-      if (!metadataInfo.isOptional(prop, visibility) || prop.name === discriminator?.propertyName) {
+      if (
+        !metadataInfo.isOptional(prop, schemaContext.visibility) ||
+        prop.name === discriminator?.propertyName
+      ) {
         if (!modelSchema.required) {
           modelSchema.required = [];
         }
@@ -1608,7 +1650,7 @@ function createOAPIEmitter(
       }
 
       // Apply decorators on the property to the type's schema
-      properties[jsonName] = resolveProperty(prop, visibility);
+      properties[jsonName] = resolveProperty(prop, schemaContext);
       const property: OpenAPI2SchemaProperty = properties[jsonName];
       if (jsonName !== clientName) {
         property["x-ms-client-name"] = clientName;
@@ -1658,10 +1700,10 @@ function createOAPIEmitter(
     ) {
       // Take the base model schema but carry across the documentation property
       // that we set before
-      const baseSchema = getSchemaForType(model.baseModel, visibility);
+      const baseSchema = getSchemaForType(model.baseModel, schemaContext);
       Object.assign(modelSchema, baseSchema, { description: modelSchema.description });
     } else if (model.baseModel) {
-      const baseSchema = getSchemaOrRef(model.baseModel, visibility);
+      const baseSchema = getSchemaOrRef(model.baseModel, schemaContext);
       modelSchema.allOf = [baseSchema];
     }
 
@@ -1687,7 +1729,10 @@ function createOAPIEmitter(
     return true;
   }
 
-  function resolveProperty(prop: ModelProperty, visibility: Visibility): OpenAPI2SchemaProperty {
+  function resolveProperty(
+    prop: ModelProperty,
+    schemaContext: SchemaContext
+  ): OpenAPI2SchemaProperty {
     let propSchema;
     if (prop.type.kind === "Enum" && prop.default) {
       propSchema = getSchemaForEnum(prop.type);
@@ -1696,10 +1741,10 @@ function createOAPIEmitter(
       if (asEnum) {
         propSchema = getSchemaForUnionEnum(prop.type, asEnum);
       } else {
-        propSchema = getSchemaOrRef(prop.type, visibility);
+        propSchema = getSchemaOrRef(prop.type, schemaContext);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, visibility);
+      propSchema = getSchemaOrRef(prop.type, schemaContext);
     }
 
     return applyIntrinsicDecorators(prop, propSchema);
@@ -1971,11 +2016,14 @@ function createOAPIEmitter(
   /**
    * If the model is an array model return the OpenAPI2Schema for the array type.
    */
-  function getArrayType(typespecType: Model, visibility: Visibility): OpenAPI2Schema | undefined {
+  function getArrayType(typespecType: Model, context: SchemaContext): OpenAPI2Schema | undefined {
     if (isArrayModelType(program, typespecType)) {
       const array: OpenAPI2Schema = {
         type: "array",
-        items: getSchemaOrRef(typespecType.indexer.value!, visibility | Visibility.Item),
+        items: getSchemaOrRef(typespecType.indexer.value!, {
+          ...context,
+          visibility: context.visibility | Visibility.Item,
+        }),
       };
       if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];

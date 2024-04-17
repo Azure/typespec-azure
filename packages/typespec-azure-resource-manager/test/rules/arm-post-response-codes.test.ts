@@ -146,7 +146,7 @@ it("Does not emit a warning for a long-running post operation that satisfies the
         @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
         @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
         @armResourceAction(Widget)
-        @post create(...KeysOf<Widget>, @body body: Widget): {
+        @post create(...KeysOf<Widget>, @bodyRoot body: Widget): {
           @statusCode code: "202";
           @header("x-ms-operation-id") operationId: string;
         } | {
@@ -192,10 +192,10 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
         @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
         @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
         @armResourceAction(Widget)
-        @post create(...KeysOf<Widget>, @body body: Widget): {
+        @post create(...KeysOf<Widget>, @bodyRoot body: Widget): {
           @statusCode code: "202";
           @header("x-ms-operation-id") operationId: string;
-          @body body: Widget;
+          @bodyRoot body: Widget;
         } | ErrorResponse;
       }`
     )
@@ -239,7 +239,7 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
         @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
         @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
         @armResourceAction(Widget)
-        @post create(...KeysOf<Widget>, @body body: Widget): {
+        @post create(...KeysOf<Widget>, @bodyRoot body: Widget): {
           @statusCode code: "202";
           @header("x-ms-operation-id") operationId: string;
         } | {
@@ -288,7 +288,7 @@ it("Emits a warning for a long-running post operation that has invalid response 
         @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
         @finalOperation(Widgets.getWidget, {widgetName: RequestParameter<"name">})
         @armResourceAction(Widget)
-        @post create(...KeysOf<Widget>, @body body: Widget): {
+        @post create(...KeysOf<Widget>, @bodyRoot body: Widget): {
           @statusCode code: "203";
           @header("x-ms-operation-id") operationId: string
         } | ErrorResponse;
