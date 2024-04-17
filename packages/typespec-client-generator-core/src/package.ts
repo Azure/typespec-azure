@@ -259,20 +259,6 @@ function getSdkBasicServiceMethod<
     }
   }
 
-  // if there's an api version parameter, we want to bubble it up to the client
-  // we don't want it on the method level, but we will keep it on the service operation level
-  const apiVersionParam = methodParameters.find((x) => x.isApiVersionParam);
-  if (apiVersionParam && context.__api_version_parameter === undefined) {
-    context.__api_version_parameter = {
-      ...apiVersionParam,
-      name: "apiVersion",
-      nameInClient: "apiVersion",
-      isGeneratedName: apiVersionParam.name !== "apiVersion",
-      onClient: true,
-      optional: false,
-      clientDefaultValue: context.__api_version_client_default_value,
-    };
-  }
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
@@ -283,7 +269,7 @@ function getSdkBasicServiceMethod<
     kind: "basic",
     name,
     access: getAccess(context, operation),
-    parameters: methodParameters.filter((x) => !x.isApiVersionParam),
+    parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
     operation: serviceOperation,
@@ -353,6 +339,9 @@ function getSdkInitializationType<
   }
   if (context.__api_version_parameter) {
     properties.push(context.__api_version_parameter);
+  }
+  if (context.__subscriptionIdParameter) {
+    properties.push(context.__subscriptionIdParameter);
   }
   const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
   const name = `${namePrefix.split(".").at(-1)}Options`;
