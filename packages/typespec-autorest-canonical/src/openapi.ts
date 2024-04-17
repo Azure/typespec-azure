@@ -862,7 +862,7 @@ function createOAPIEmitter(
     return getRelativePathFromDirectory(getDirectoryPath(outputFile), absoluteRef, false);
   }
 
-  function getSchemaOrRef(type: Type, visibility: Visibility): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
     const refUrl = getRef(program, type, { version: context.version, service: context.service });
     if (refUrl) {
       return {
