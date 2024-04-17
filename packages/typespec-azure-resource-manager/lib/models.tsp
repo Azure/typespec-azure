@@ -99,32 +99,34 @@ alias ResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierAllow
 alias ResourceIdentifierAllowedResource = ArmResourceIdentifierAllowedResource;
 
 /**
- * Standard terminal provisioning state of resource type. You can spread into your
+ * Standard terminal provisioning state of resource type. You can include in your
  * custom provision state to avoid duplication and ensure consistency
  *
  * @example
  *
  * ```typespec
- * enum FooProvisioningState {
- *   ...ResourceProvisioningState,  // include standard provisioning states
- *   starting,
- *   started,
- *   stopping,
- *   stopped,
+ * union FooProvisioningState {
+ *   ResourceProvisioningState,  // include standard provisioning states
+ *   starting: "starting",
+ *   started: "started",
+ *   stopping: "stopping",
+ *   stopped: "stopped",
  * }
  * ```
  */
 @doc("The provisioning state of a resource type.")
 @Azure.Core.lroStatus
-enum ResourceProvisioningState {
+union ResourceProvisioningState {
   @doc("Resource has been created.")
-  Succeeded,
+  Succeeded: "Succeeded",
 
   @doc("Resource creation failed.")
-  Failed,
+  Failed: "Failed",
 
   @doc("Resource creation was canceled.")
-  Canceled,
+  Canceled: "Canceled",
+
+  string,
 }
 
 /**

@@ -323,6 +323,10 @@ describe("typespec-azure-core: decorators", () => {
           code: "@azure-tools/typespec-azure-core/lro-status-union-non-string",
           message: "Union contains non-string value type Scalar.",
         },
+        {
+          code: "@azure-tools/typespec-azure-core/lro-status-missing",
+          message: "Terminal long-running operation states are missing: Failed.",
+        },
       ]);
     });
 
