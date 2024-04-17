@@ -76,29 +76,3 @@ Omit unreachable types. By default all types declared under the service namespac
 
 If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
 This extension is meant for debugging and should not be depended on.
-
-## Decorators
-
-### Autorest
-
-- [`@useRef`](#@useref)
-
-#### `@useRef`
-
-`@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as Azure Resource Manager common types.
-
-`@useRef` can be specified on Models and ModelProperty.
-
-```typespec
-@Autorest.useRef(jsonRef: valueof string)
-```
-
-##### Target
-
-`Model | ModelProperty`
-
-##### Parameters
-
-| Name    | Type             | Description                       |
-| ------- | ---------------- | --------------------------------- |
-| jsonRef | `valueof string` | path or Uri to an OpenAPI schema. |
