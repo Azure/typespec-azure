@@ -101,8 +101,15 @@ TODO;
 </TabItem>
 <TabItem value="java" label="Java" >
 
+In Java, `@flattenProperty` have no effect on data-plane libraries.
+
 ```java
-TODO
+@Fluent
+public final class Properties {
+    public Properties();
+    public String getName();
+    public Properties setName(String name);
+}
 ```
 
 </TabItem>
