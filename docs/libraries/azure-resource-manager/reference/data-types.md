@@ -1074,43 +1074,6 @@ model Azure.ResourceManager.TrackedResource<Properties>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
-
-The provisioning state of the connection
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
-```
-
-### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
-
-The private endpoint connection status
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
-```
-
-### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
-
-Standard terminal provisioning state of resource type. You can spread into your
-custom provision state to avoid duplication and ensure consistency
-
-```typespec
-enum Azure.ResourceManager.ResourceProvisioningState
-```
-
-#### Examples
-
-```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
-}
-```
-
 ### `Versions` {#Azure.ResourceManager.Versions}
 
 Supported versions of Azure.ResourceManager building blocks.
@@ -1133,6 +1096,43 @@ The type of identity to use.
 
 ```typespec
 union Azure.ResourceManager.KeyEncryptionKeyIdentity
+```
+
+### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
+
+The provisioning state of the connection
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
+```
+
+### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
+
+The private endpoint connection status
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
+```
+
+### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
+
+Standard terminal provisioning state of resource type. You can include in your
+custom provision state to avoid duplication and ensure consistency
+
+```typespec
+union Azure.ResourceManager.ResourceProvisioningState
+```
+
+#### Examples
+
+```typespec
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
+}
 ```
 
 ## Azure.ResourceManager.CommonTypes

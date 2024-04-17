@@ -91,7 +91,7 @@ model ArmAcceptedLroResponse<
  */
 model ArmOperationStatus<
   Properties extends {} = never,
-  StatusValues extends TypeSpec.Reflection.Enum | TypeSpec.Reflection.Union = ResourceProvisioningState
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
 > is ArmResourceBase {
   /** RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status */
   @visibility("read")
