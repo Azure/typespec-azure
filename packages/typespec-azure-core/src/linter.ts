@@ -18,6 +18,7 @@ import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
+import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatUse } from "./rules/prevent-format.js";
@@ -70,6 +71,7 @@ const rules = [
   spreadDiscriminatedModelRule,
   useStandardNames,
   useStandardOperations,
+  noStringDiscriminatorRule,
 ];
 
 export const $linter = defineLinter({
@@ -112,6 +114,7 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/${friendlyNameRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noClosedLiteralUnionRule.name}`]: true,
+        [`@azure-tools/typespec-azure-core/${noStringDiscriminatorRule.name}`]: true,
       },
       extends: ["@typespec/http/all"],
     },
