@@ -99,26 +99,30 @@ enum ResourceHome {
 @doc("""
 The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
 """)
-enum Origin {
+union Origin {
   @doc("Indicates the operation is initiated by a user.")
-  user,
+  user: "user",
 
   @doc("Indicates the operation is initiated by a system.")
-  system,
+  system: "system",
 
   @doc("Indicates the operation is initiated by a user or system.")
-  `user,system`,
+  `user,system`: "user,system",
+
+  string,
 }
 
 /**
- * Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+ * Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
  */
 @doc("""
-Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
 """)
-enum ActionType {
+union ActionType {
   @doc("Actions are for internal-only APIs.")
-  Internal,
+  Internal: "Internal",
+
+  string,
 }
 
 /**
@@ -308,20 +312,22 @@ model ArmTagsProperty {
 /**
  * The kind of entity that created the resource.
  */
-// NOTE: This is how the enum is named in types.json
+// NOTE: This is how the extensible enum is named in types.json
 @doc("The kind of entity that created the resource.")
-enum createdByType {
+union createdByType {
   @doc("The entity was created by a user.")
-  User,
+  User: "User",
 
   @doc("The entity was created by an application.")
-  Application,
+  Application: "Application",
 
   @doc("The entity was created by a managed identity.")
-  ManagedIdentity,
+  ManagedIdentity: "ManagedIdentity",
 
   @doc("The entity was created by a key.")
-  Key,
+  Key: "Key",
+
+  string,
 }
 
 /**
@@ -384,7 +390,7 @@ model ManagedIdentityProperties {
   principalId?: string;
 
   @doc("The type of managed identity assigned to this resource.")
-  type: ManagedIdentityType;
+  type: ManagedServiceIdentityType;
 
   @doc("The identities assigned to this resource by the user.")
   userAssignedIdentities?: Record<UserAssignedIdentity>;
@@ -417,9 +423,12 @@ model ManagedSystemIdentityProperties {
   principalId?: string;
 
   @doc("The type of managed identity assigned to this resource.")
-  type: ManagedSystemIdentityType;
+  type: SystemAssignedServiceIdentityType;
 }
 
+/** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
+#deprecated "Please change to ManagedServiceIdentityType."
+alias ManagedIdentityType = ManagedServiceIdentityType;
 /**
  * A managed identity assigned by the user.
  */
@@ -436,30 +445,37 @@ model UserAssignedIdentity {
  * The kind of managed identity assigned to this resource.
  */
 @doc("The kind of managed identity assigned to this resource.")
-enum ManagedIdentityType {
+union ManagedServiceIdentityType {
   @doc("No managed identity.")
-  None,
+  None: "None",
 
   @doc("System assigned managed identity.")
-  SystemAssigned,
+  SystemAssigned: "SystemAssigned",
 
   @doc("User assigned managed identity.")
-  UserAssigned,
+  UserAssigned: "UserAssigned",
 
   @doc("System and user assigned managed identity.")
   SystemAndUserAssigned: "SystemAssigned, UserAssigned",
+
+  string,
 }
+
+/** Alias of SystemAssignedServiceIdentityType for back compatability. Please change to SystemAssignedServiceIdentityType. */
+alias ManagedSystemIdentityType = SystemAssignedServiceIdentityType;
 
 /**
  * The kind of managemed identity assigned to this resource.
  */
 @doc("The kind of managemed identity assigned to this resource.")
-enum ManagedSystemIdentityType {
+union SystemAssignedServiceIdentityType {
   @doc("No managed system identity.")
-  None,
+  None: "None",
 
   @doc("System assigned managed system identity.")
-  SystemAssigned,
+  SystemAssigned: "SystemAssigned",
+
+  string,
 }
 
 /**
@@ -651,7 +667,7 @@ model Operation {
   origin?: Origin;
 
   @doc("""
-  Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
   """)
   actionType?: ActionType;
 }
@@ -689,12 +705,14 @@ model CheckNameAvailabilityRequest {
  * Possible reasons for a name not being available.
  */
 @doc("Possible reasons for a name not being available.")
-enum CheckNameAvailabilityReason {
+union CheckNameAvailabilityReason {
   @doc("Name is invalid.")
-  Invalid,
+  Invalid: "Invalid",
 
   @doc("Name already exists.")
-  AlreadyExists,
+  AlreadyExists: "AlreadyExists",
+
+  string,
 }
 
 /**
@@ -776,7 +794,7 @@ op ArmCreateOperation<
   ErrorResponse extends {}
 >(
   ...HttpParameters,
-  @doc("Resource create parameters.") @body resource: BodyParameter,
+  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
 ): Response | ErrorResponse;
 
 /**
@@ -793,5 +811,5 @@ op ArmUpdateOperation<
   ErrorResponse extends {}
 >(
   ...HttpParameters,
-  @doc("The resource properties to be updated.") @body properties: BodyParameter,
+  @doc("The resource properties to be updated.") @bodyRoot properties: BodyParameter,
 ): Response | ErrorResponse;

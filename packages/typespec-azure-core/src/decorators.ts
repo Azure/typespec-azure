@@ -5,6 +5,7 @@ import {
   createDiagnosticCollector,
   DecoratorContext,
   Diagnostic,
+  DiagnosticCollector,
   Enum,
   EnumMember,
   getKnownValues,
@@ -310,6 +311,49 @@ function storeLroState(
   }
 }
 
+function extractLroStatesFromUnion(
+  program: Program,
+  entity: Type,
+  lroStateResult: PartialLongRunningStates,
+  diagnostics: DiagnosticCollector
+) {
+  if (entity.kind === "Union") {
+    for (const variant of entity.variants.values()) {
+      const option = variant.type;
+      if (option.kind === "Enum") {
+        for (const member of option.members.values()) {
+          storeLroState(program, lroStateResult, member.name, member);
+        }
+      } else if (option.kind === "Union") {
+        extractLroStatesFromUnion(program, option, lroStateResult, diagnostics);
+      } else if (option.kind === "Scalar" && option.name === "string") {
+        // Ignore string marking this union as open.
+        continue;
+      } else if (option.kind !== "String") {
+        diagnostics.add(
+          createDiagnostic({
+            code: "lro-status-union-non-string",
+            target: option,
+            format: {
+              type: option.kind,
+            },
+          })
+        );
+
+        return diagnostics.wrap(undefined);
+      } else {
+        storeLroState(
+          program,
+          lroStateResult,
+          typeof variant.name === "string" ? variant.name : option.value,
+          variant
+        );
+      }
+    }
+  }
+  return;
+}
+
 export function extractLroStates(
   program: Program,
   entity: Type
@@ -329,36 +373,7 @@ export function extractLroStates(
       storeLroState(program, result, member.name, member);
     }
   } else if (entity.kind === "Union") {
-    for (const variant of entity.variants.values()) {
-      const option = variant.type;
-      if (option.kind === "Enum") {
-        for (const member of option.members.values()) {
-          storeLroState(program, result, member.name, member);
-        }
-      } else if (option.kind === "Scalar" && option.name === "string") {
-        // Ignore string marking this union as open.
-        continue;
-      } else if (option.kind !== "String") {
-        diagnostics.add(
-          createDiagnostic({
-            code: "lro-status-union-non-string",
-            target: option,
-            format: {
-              type: option.kind,
-            },
-          })
-        );
-
-        return diagnostics.wrap(undefined);
-      } else {
-        storeLroState(
-          program,
-          result,
-          typeof variant.name === "string" ? variant.name : option.value,
-          variant
-        );
-      }
-    }
+    extractLroStatesFromUnion(program, entity, result, diagnostics);
   } else {
     diagnostics.add(
       createDiagnostic({

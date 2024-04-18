@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.3
+
+### Bug Fixes
+
+- [#665](https://github.com/Azure/typespec-azure/pull/665) support typespec new additional properties syntax
+- [#680](https://github.com/Azure/typespec-azure/pull/680) adjust sequence of properties calculation and discriminator calculation
+- [#673](https://github.com/Azure/typespec-azure/pull/673) add subscriptionId to client parameters
+
+### Bump dependencies
+
+- [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
+
+
 ## 0.41.2
 
 ### Bug Fixes
