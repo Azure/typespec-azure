@@ -2759,9 +2759,9 @@ describe("typespec-client-generator-core: types", () => {
       );
       ok(
         AdditionalPropertiesModel &&
-          AdditionalPropertiesModel2 &&
-          AdditionalPropertiesModel3 &&
-          NonAdditionalPropertiesModel
+        AdditionalPropertiesModel2 &&
+        AdditionalPropertiesModel3 &&
+        NonAdditionalPropertiesModel
       );
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
       strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -2811,10 +2811,10 @@ describe("typespec-client-generator-core: types", () => {
       const Test2 = models.find((x) => x.name === "Test2");
       ok(
         AdditionalPropertiesModel &&
-          AdditionalPropertiesModel2 &&
-          AdditionalPropertiesModel3 &&
-          Test &&
-          Test2
+        AdditionalPropertiesModel2 &&
+        AdditionalPropertiesModel3 &&
+        Test &&
+        Test2
       );
 
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
@@ -3062,6 +3062,36 @@ describe("typespec-client-generator-core: types", () => {
       );
     });
   });
+
+  describe("SdkArrayType", () => {
+    it("use model is to represent array", async () => {
+      await runner.compile(`
+        @service({})
+        namespace TestClient {
+          model TestModel {
+            prop: string;
+          }
+          model TestArray is TestModel[];
+
+          op get(): TestArray;
+        }
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      const model = models[0];
+      strictEqual(model.kind, "model");
+      strictEqual(model.name, "TestModel");
+      const client = runner.context.experimental_sdkPackage.clients[0];
+      ok(client);
+      const method = client.methods[0];
+      ok(method);
+      strictEqual(method.response.kind, "method");
+      strictEqual(method.response.type?.kind, "array");
+      strictEqual(method.response.type?.valueType.kind, "model");
+      strictEqual(method.response.type?.valueType.name, "TestModel");
+    });
+  });
+
   describe("SdkMultipartFormType", () => {
     it("multipart form basic", async function () {
       await runner.compileWithBuiltInService(`
