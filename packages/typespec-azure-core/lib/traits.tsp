@@ -65,7 +65,7 @@ model TraitOverride<Trait> {}
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllQueryParams(Parameters)
-model QueryParametersTrait<Parameters, Contexts = unknown> {
+model QueryParametersTrait<Parameters extends Model, Contexts = unknown> {
   @traitContext(Contexts)
   queryParams: {
     @traitLocation(TraitLocation.Parameters)
@@ -79,7 +79,8 @@ model QueryParametersTrait<Parameters, Contexts = unknown> {
  */
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
-model ListQueryParametersTrait<Parameters> is QueryParametersTrait<Parameters, TraitContext.List>;
+model ListQueryParametersTrait<Parameters extends Model>
+  is QueryParametersTrait<Parameters, TraitContext.List>;
 
 /**
  * Declares a trait that is applied as a request header parameter.
@@ -89,7 +90,7 @@ model ListQueryParametersTrait<Parameters> is QueryParametersTrait<Parameters, T
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllHeaderParams(Headers)
-model RequestHeadersTrait<Headers, Contexts = unknown> {
+model RequestHeadersTrait<Headers extends Model, Contexts = unknown> {
   @traitContext(Contexts)
   requestHeaders: {
     @traitLocation(TraitLocation.Parameters)
@@ -105,7 +106,7 @@ model RequestHeadersTrait<Headers, Contexts = unknown> {
 @trait
 @added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllHeaderParams(Headers)
-model ResponseHeadersTrait<Headers, Contexts = unknown> {
+model ResponseHeadersTrait<Headers extends Model, Contexts = unknown> {
   @traitContext(Contexts)
   responseHeaders: {
     @traitLocation(TraitLocation.Response)
@@ -322,7 +323,7 @@ namespace Azure {
          * @param target The model type where this check will be established.
          * @param paramModel The actual model type to check for query parameters.
          */
-        extern dec ensureAllQueryParams(target: unknown, paramModel: unknown);
+        extern dec ensureAllQueryParams(target: unknown, paramModel: Model);
 
         /**
          * `@ensureAllHeaderParams` checks the properties of `paramModel` to ensure they all are marked
@@ -331,7 +332,7 @@ namespace Azure {
          * @param target The model type where this check will be established.
          * @param paramModel The actual model type to check for header properties.
          */
-        extern dec ensureAllHeaderParams(target: unknown, paramModel: unknown);
+        extern dec ensureAllHeaderParams(target: unknown, paramModel: Model);
       }
     }
   }
