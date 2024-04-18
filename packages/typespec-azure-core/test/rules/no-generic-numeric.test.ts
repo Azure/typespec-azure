@@ -32,15 +32,23 @@ it("emits a warning for generic numeric types", async () => {
     .toEmitDiagnostics([
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't use generic type 'integer'. Use a more specific type that specifies the bit size, such as 'int32' instead.",
       },
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't use generic type 'numeric'. Use a more specific type that specifies the bit size, such as 'int32' instead.",
       },
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't use generic type 'float'. Use a more specific type that specifies the bit size, such as 'float32' instead.",
       },
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't use generic type 'decimal'. Use a more specific type that specifies the bit size, such as 'float32' instead.",
       },
     ]);
 });
@@ -67,15 +75,23 @@ it("emits a warning when extending generic numeric types", async () => {
     .toEmitDiagnostics([
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't extend generic type 'integer'. Use a more specific type that specifies the bit size, such as 'int32' instead.",
       },
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't extend generic type 'numeric'. Use a more specific type that specifies the bit size, such as 'int32' instead.",
       },
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't extend generic type 'float'. Use a more specific type that specifies the bit size, such as 'float32' instead.",
       },
       {
         code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't extend generic type 'decimal'. Use a more specific type that specifies the bit size, such as 'float32' instead.",
       },
     ]);
 });

@@ -24,7 +24,7 @@ export const noGenericNumericRule = createRule({
           if (prop.type.kind === "Scalar") {
             if (disallowList.has(prop.type.name)) {
               context.reportDiagnostic({
-                target: prop.type,
+                target: prop,
                 format: {
                   name: prop.type.name,
                   alternative: alternatives.get(prop.type.name)!,
@@ -35,6 +35,11 @@ export const noGenericNumericRule = createRule({
         }
       },
       scalar: (scalar: Scalar) => {
+        // if the scalar is the base scalar, then we don't need to check it as it will surface
+        // in usage (for example: as a model property)
+        if (disallowList.has(scalar.name)) {
+          return;
+        }
         let baseScalar: Scalar | undefined = undefined;
         while (scalar.baseScalar !== undefined) {
           baseScalar = scalar.baseScalar;
