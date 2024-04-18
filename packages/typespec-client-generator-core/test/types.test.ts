@@ -2759,9 +2759,9 @@ describe("typespec-client-generator-core: types", () => {
       );
       ok(
         AdditionalPropertiesModel &&
-        AdditionalPropertiesModel2 &&
-        AdditionalPropertiesModel3 &&
-        NonAdditionalPropertiesModel
+          AdditionalPropertiesModel2 &&
+          AdditionalPropertiesModel3 &&
+          NonAdditionalPropertiesModel
       );
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
       strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -2811,10 +2811,10 @@ describe("typespec-client-generator-core: types", () => {
       const Test2 = models.find((x) => x.name === "Test2");
       ok(
         AdditionalPropertiesModel &&
-        AdditionalPropertiesModel2 &&
-        AdditionalPropertiesModel3 &&
-        Test &&
-        Test2
+          AdditionalPropertiesModel2 &&
+          AdditionalPropertiesModel3 &&
+          Test &&
+          Test2
       );
 
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
