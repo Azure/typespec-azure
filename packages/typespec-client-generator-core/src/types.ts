@@ -1332,6 +1332,7 @@ function updateAccessOfModel(context: TCGCContext): void {
 interface GetAllModelsOptions {
   input?: boolean;
   output?: boolean;
+  version?: string;
 }
 
 function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Union) {
@@ -1403,7 +1404,7 @@ export function getAllModelsWithDiagnostics(
   if (context.operationModelsMap === undefined) {
     context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
   }
-  for (const client of listClients(context)) {
+  for (const client of listClients(context, {version: options.version})) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));

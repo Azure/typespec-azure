@@ -35,6 +35,7 @@ export interface SdkEmitterOptions {
   "filter-out-core-models"?: boolean;
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
+  version?: string;
 }
 
 export interface SdkClient {

@@ -522,6 +522,36 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
     });
 
+    it("projection on multiple", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        version: "2023-11-01",
+        emitterName: "@azure-tools/typespec-python"
+      });
+
+      await runnerWithVersion.compile(`
+      @service({})
+      @versioned(Versions)
+      namespace Server.Versions.Projected;
+
+      enum Versions {
+        v2023_10_01_preview: "2023-10-01-preview",
+        v2023_11_01: "2023-11-01",
+      }
+
+      model InputModel {
+        prop: string;
+      }
+
+      @added(Versions.v2023_10_01_preview)
+      @removed(Versions.v2023_11_01)
+      op foo(...InputModel): void;
+      `)
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+
+    });
+
     it("namespace", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],

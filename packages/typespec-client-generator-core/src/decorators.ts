@@ -240,7 +240,7 @@ export function listClients(context: TCGCContext, options: ListClientOptions = {
     let projectedService;
     if (options.version) {
       const versions = buildVersionProjections(context.program, service.type).filter(
-        (v) => !options.version || options.version === v.version
+        (v) => options.version === v.version
       );
       if (versions.length !== 1) throw new Error("can only handle one version");
       const projectedVersion = versions[0];

@@ -22,6 +22,7 @@ import {
   SdkClient,
   SdkClientType,
   SdkContext,
+  SdkEmitterOptions,
   SdkEndpointParameter,
   SdkEndpointType,
   SdkEnumType,
@@ -543,11 +544,11 @@ export function createSdkClientType<
 }
 
 export function getSdkPackage<
-  TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
+  TOptions extends Record<string, any> = SdkEmitterOptions,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
-  const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
+  const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context, {version: context.emitContext.options.version}));
   context.__clients = new Array<SdkClientType<TServiceOperation>>();
   for (const client of listClients(context)) {
     createSdkClientType(context, client);
