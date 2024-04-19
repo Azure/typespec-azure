@@ -6,7 +6,6 @@ namespace Azure {
      * Marks an Enum as being fixed since enums in Azure are
      * assumed to be extensible.
      */
-    #deprecated "Enums are now fixed by default. This decorator is no longer necessary."
     extern dec fixed(target: Enum);
 
     /**
