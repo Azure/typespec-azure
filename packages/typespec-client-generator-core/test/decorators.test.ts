@@ -2583,6 +2583,13 @@ describe("typespec-client-generator-core: decorators", () => {
       const error = sdkPackage.models.find((x) => x.name === "Error");
       ok(error);
       deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+      strictEqual(sdkPackage.enums.length, 1);
+      const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+      ok(versions);
+      deepStrictEqual(
+        versions.values.map((v) => v.value),
+        ["v1", "v2", "v3"]
+      );
     });
 
     it("basic latest version", async () => {
@@ -2668,6 +2675,12 @@ describe("typespec-client-generator-core: decorators", () => {
       const error = sdkPackage.models.find((x) => x.name === "Error");
       ok(error);
       deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+      const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+      ok(versions);
+      deepStrictEqual(
+        versions.values.map((v) => v.value),
+        ["v1", "v2", "v3"]
+      );
     });
 
     it("basic v3 version", async () => {
@@ -2753,6 +2766,12 @@ describe("typespec-client-generator-core: decorators", () => {
       const error = sdkPackage.models.find((x) => x.name === "Error");
       ok(error);
       deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+      const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+      ok(versions);
+      deepStrictEqual(
+        versions.values.map((v) => v.value),
+        ["v1", "v2", "v3"]
+      );
     });
 
     it("basic v2 version", async () => {
@@ -2841,6 +2860,12 @@ describe("typespec-client-generator-core: decorators", () => {
       const testModel = sdkPackage.models.find((x) => x.name === "Test");
       ok(testModel);
       deepStrictEqual(testModel.apiVersions, ["v2"]);
+      const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+      ok(versions);
+      deepStrictEqual(
+        versions.values.map((v) => v.value),
+        ["v1", "v2", "v3"]
+      );
     });
 
     it("basic v1 version", async () => {
@@ -2917,6 +2942,12 @@ describe("typespec-client-generator-core: decorators", () => {
       const error = sdkPackage.models.find((x) => x.name === "Error");
       ok(error);
       deepStrictEqual(error.apiVersions, ["v1"]);
+      const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+      ok(versions);
+      deepStrictEqual(
+        versions.values.map((v) => v.value),
+        ["v1", "v2", "v3"]
+      );
     });
 
     it("basic all version", async () => {
@@ -3005,6 +3036,12 @@ describe("typespec-client-generator-core: decorators", () => {
       // const testModel = sdkPackage.models.find(x => x.name === "Test");
       // ok(testModel);
       // deepStrictEqual(testModel.apiVersions, ["v2"]);
+      const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+      ok(versions);
+      deepStrictEqual(
+        versions.values.map((v) => v.value),
+        ["v1", "v2", "v3"]
+      );
     });
   });
 });
