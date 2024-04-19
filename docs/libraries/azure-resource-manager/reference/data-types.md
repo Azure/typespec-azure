@@ -394,6 +394,45 @@ model Azure.ResourceManager.CustomerManagedKeyEncryption
 | federatedClientId?              | `Core.uuid`                                                                                  | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
 | delegatedIdentityClientId?      | `Core.uuid`                                                                                  | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
+### `CustomNameParameter` {#Azure.ResourceManager.CustomNameParameter}
+
+```typespec
+model Azure.ResourceManager.CustomNameParameter<SegmentName, KeyName, NamePattern>
+```
+
+#### Template Parameters
+
+| Name        | Description |
+| ----------- | ----------- |
+| SegmentName |             |
+| KeyName     |             |
+| NamePattern |             |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
+### `DefaultNameParameter` {#Azure.ResourceManager.DefaultNameParameter}
+
+```typespec
+model Azure.ResourceManager.DefaultNameParameter<Resource, NamePattern>
+```
+
+#### Template Parameters
+
+| Name        | Description |
+| ----------- | ----------- |
+| Resource    |             |
+| NamePattern |             |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
 Standard resource provisioning state model. If you do not have any custom provisioning state,
@@ -1160,6 +1199,7 @@ model Azure.ResourceManager.Foundations.ArmResource
 | Name        | Type                                                                         | Description                                                                                                                                                                               |
 | ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | id          | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name        | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type        | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
 | systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
