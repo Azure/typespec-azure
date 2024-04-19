@@ -1618,11 +1618,10 @@ importers:
         version: 1.5.0(@types/node@18.11.19)(@vitest/ui@1.5.0)(happy-dom@14.7.1)
 
   packages/typespec-autorest-canonical:
-    dependencies:
+    devDependencies:
       '@azure-tools/typespec-autorest':
         specifier: workspace:~
         version: link:../typespec-autorest
-    devDependencies:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
         version: link:../typespec-azure-core
