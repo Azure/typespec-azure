@@ -3,6 +3,7 @@ import {
   Model,
   Operation,
   Program,
+  Union,
   createRule,
   getDiscriminatedTypes,
   getDoc,
@@ -33,8 +34,25 @@ function isExcludedEnumType(program: Program, enumObj: Enum): boolean {
         return true;
       }
     } else if (type.kind === "Union") {
-      // TODO: handle union types
-      let test = "best";
+      const discriminatorVariant = type.variants.get(discName.propertyName);
+      if (discriminatorVariant?.type === enumObj) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Discriminator unions are self-documenting and don't need separate documentation. */
+function isExcludedUnionType(program: Program, union: Union): boolean {
+  const discTypes = getDiscriminatedTypes(program);
+  for (const [type, discName] of discTypes) {
+    // FIXME: Detect when union is a discriminator
+    if (type.kind === "Union") {
+      const discriminatorVariant = type.variants.get(discName.propertyName);
+      if (discriminatorVariant?.type === union) {
+        return true;
+      }
     }
   }
   return false;
@@ -117,6 +135,9 @@ export const requireDocumentation = createRule({
               prop.type.kind === "EnumMember" &&
               isExcludedEnumType(context.program, prop.type.enum)
             ) {
+              return;
+            }
+            if (prop.type.kind === "Union" && isExcludedUnionType(context.program, prop.type)) {
               return;
             }
             if (!getDoc(context.program, prop)) {

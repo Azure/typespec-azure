@@ -120,14 +120,20 @@ describe("typespec-azure-core: documentation-required rule", () => {
       await tester
         .expect(
           `
-          @discriminator("kind")
-          union Pet {
-            cat: Cat,
+          union PetKind {
+            cat: "cat",
+            string,
           }
           
-          @doc("A Cat!")
-          model Cat {
-            kind: "cat";
+          @discriminator("kind")
+          @doc("Base Pet model")
+          model Pet {
+            kind: PetKind;
+          }
+          
+          @doc("A Merry Ol' Cat")
+          model Cat extends Pet {
+            kind: PetKind.cat,
           }`
         )
         .toBeValid();
