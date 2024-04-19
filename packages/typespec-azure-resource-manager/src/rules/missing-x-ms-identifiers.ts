@@ -12,7 +12,8 @@ import { isArmCommonType } from "../common-types.js";
 
 export const missingXmsIdentifiersRule = createRule({
   name: "missing-x-ms-identifiers",
-  description: "Azure services should not use enums.",
+  description:
+    "Array properties should describe their identifying properties with x-ms-identifiers.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers",
   messages: {
