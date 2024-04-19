@@ -29,7 +29,7 @@ enum Versions {
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
 /** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
-  ...DefaultNameParameter<Employee>;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */

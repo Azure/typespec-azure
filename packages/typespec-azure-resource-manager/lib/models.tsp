@@ -7,26 +7,24 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
-model DefaultNameParameter<
+/**
+ * Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+ * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+ * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+ * @template Resource The ARM resource this name parameter is applying to.
+ * @template KeyName Override default key name of the resource.
+ * @template SegmentName Override default segment name of the resource.
+ * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ */
+model ResourceNameParameter<
   Resource extends ArmResource,
+  KeyName extends valueof string = "",
+  SegmentName extends valueof string = "",
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
 > {
-  @doc("The name of the resource")
+  @doc("The name of the {name}", Resource)
   @pattern(NamePattern)
-  @defaultResourceKeySegmentName(Resource)
-  @path
-  name: string;
-}
-
-model CustomNameParameter<
-  SegmentName extends valueof string,
-  KeyName extends valueof string,
-  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
-> {
-  @doc("The name of the resource")
-  @key(KeyName)
-  @segment(SegmentName)
-  @pattern(NamePattern)
+  @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
   @path
   name: string;
 }

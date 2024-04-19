@@ -86,12 +86,22 @@ export function $resourceParameterBaseFor(
 export function $defaultResourceKeySegmentName(
   context: DecoratorContext,
   entity: ModelProperty,
-  resource: Model
+  resource: Model,
+  keyName: string,
+  segment: string
 ) {
   const modelName = camelCase(resource.name);
   const pluralName = pluralize(modelName);
-  context.call($key, entity, `${modelName}Name`);
-  context.call($segment, entity, pluralName);
+  if (keyName.length > 0) {
+    context.call($key, entity, keyName);
+  } else {
+    context.call($key, entity, `${modelName}Name`);
+  }
+  if (segment.length > 0) {
+    context.call($segment, entity, segment);
+  } else {
+    context.call($segment, entity, pluralName);
+  }
 }
 
 export function getResourceParameterBases(

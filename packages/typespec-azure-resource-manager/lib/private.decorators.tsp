@@ -87,4 +87,9 @@ extern dec armCommonTypesVersions(target: Enum);
  * Provides default name decoration on resource name property with
  * camelcased and pluralized key and segment name
  */
-extern dec defaultResourceKeySegmentName(target: ModelProperty, armResource: Model);
+extern dec defaultResourceKeySegmentName(
+  target: ModelProperty,
+  armResource: Model,
+  keyName: valueof string,
+  segment: valueof string
+);

@@ -28,7 +28,7 @@ enum Versions {
 /** A ContosoProviderHub resource */
 @singleton("default")
 model Employee is TrackedResource<EmployeeProperties> {
-  ...DefaultNameParameter<Employee>;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */

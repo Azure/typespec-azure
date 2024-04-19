@@ -27,7 +27,7 @@ enum Versions {
 
 /** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
-  ...DefaultNameParameter<Employee>;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */

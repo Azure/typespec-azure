@@ -27,7 +27,7 @@ enum Versions {
 
 /** A ContosoProviderHub resource */
 model RoleAssignment is ExtensionResource<RoleAssignmentProperties> {
-  ...DefaultNameParameter<RoleAssignment>;
+  ...ResourceNameParameter<RoleAssignment>;
 }
 
 /** RoleAssignment properties */

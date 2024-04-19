@@ -394,45 +394,6 @@ model Azure.ResourceManager.CustomerManagedKeyEncryption
 | federatedClientId?              | `Core.uuid`                                                                                  | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
 | delegatedIdentityClientId?      | `Core.uuid`                                                                                  | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
-### `CustomNameParameter` {#Azure.ResourceManager.CustomNameParameter}
-
-```typespec
-model Azure.ResourceManager.CustomNameParameter<SegmentName, KeyName, NamePattern>
-```
-
-#### Template Parameters
-
-| Name        | Description |
-| ----------- | ----------- |
-| SegmentName |             |
-| KeyName     |             |
-| NamePattern |             |
-
-#### Properties
-
-| Name | Type     | Description |
-| ---- | -------- | ----------- |
-| name | `string` |             |
-
-### `DefaultNameParameter` {#Azure.ResourceManager.DefaultNameParameter}
-
-```typespec
-model Azure.ResourceManager.DefaultNameParameter<Resource, NamePattern>
-```
-
-#### Template Parameters
-
-| Name        | Description |
-| ----------- | ----------- |
-| Resource    |             |
-| NamePattern |             |
-
-#### Properties
-
-| Name | Type     | Description |
-| ---- | -------- | ----------- |
-| name | `string` |             |
-
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
 Standard resource provisioning state model. If you do not have any custom provisioning state,
@@ -964,6 +925,31 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 | --------- | -------------------------------- | ---------------------------------- |
 | value     | `Array<Element>`                 | The {name} items on this page      |
 | nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
+
+### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
+
+Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+
+```typespec
+model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.              |
+| KeyName     | Override default key name of the resource.                        |
+| SegmentName | Override default segment name of the resource.                    |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`. |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 

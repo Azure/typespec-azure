@@ -58,7 +58,7 @@ model Group {
 /** A ContosoProviderHub resource */
 @parentResource(Group)
 model Employee is TrackedResource<EmployeeProperties> {
-  ...DefaultNameParameter<Employee>;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */
