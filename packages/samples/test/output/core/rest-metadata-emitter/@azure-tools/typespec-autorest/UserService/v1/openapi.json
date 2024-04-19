@@ -115,7 +115,7 @@
       ],
       "x-ms-enum": {
         "name": "Versions",
-        "modelAsString": false
+        "modelAsString": true
       }
     }
   },

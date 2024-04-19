@@ -121,7 +121,7 @@
       ],
       "x-ms-enum": {
         "name": "Versions",
-        "modelAsString": false
+        "modelAsString": true
       }
     }
   },
@@ -137,7 +137,7 @@
       ],
       "x-ms-enum": {
         "name": "Versions",
-        "modelAsString": false
+        "modelAsString": true
       },
       "x-ms-parameter-location": "method",
       "x-ms-client-name": "apiVersion"
