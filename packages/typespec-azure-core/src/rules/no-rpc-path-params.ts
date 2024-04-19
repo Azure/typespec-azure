@@ -28,7 +28,7 @@ export const noRpcPathParamsRule = createRule({
         while (operation.sourceOperation) {
           operation = operation.sourceOperation;
           if (
-            operation.name === "RpcOperation" &&
+            operation.name.endsWith("RpcOperation") &&
             operation.namespace?.name === "Core" &&
             operation.namespace?.namespace?.name === "Azure"
           ) {
