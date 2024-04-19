@@ -1,4 +1,13 @@
-import { Enum, Model, Operation, createRule, getDoc, paramMessage } from "@typespec/compiler";
+import {
+  Enum,
+  Model,
+  Operation,
+  Program,
+  createRule,
+  getDoc,
+  paramMessage,
+} from "@typespec/compiler";
+import { getVersionsForEnum } from "@typespec/versioning";
 import {
   isExcludedCoreType,
   isInlineModel,
@@ -6,6 +15,18 @@ import {
   isTemplatedInterfaceOperation,
   isTemplatedOperationSignature,
 } from "./utils.js";
+
+/** Versioning enums and Discriminator enums are usually self-documenting and
+ * don't need separate documentation.
+ */
+function isExcludedEnumType(program: Program, enumObj: Enum): boolean {
+  const versions = getVersionsForEnum(program, enumObj);
+  if (versions !== undefined && versions.length > 0) {
+    return true;
+  }
+  // TODO: Exclude discriminator enums as well
+  return false;
+}
 
 export const requireDocumentation = createRule({
   name: "documentation-required",
@@ -17,6 +38,10 @@ export const requireDocumentation = createRule({
   create(context) {
     return {
       enum: (enumObj: Enum) => {
+        // version enums and enum members are considered intrinsically self-documenting
+        if (isExcludedEnumType(context.program, enumObj)) {
+          return;
+        }
         if (!getDoc(context.program, enumObj) && !isExcludedCoreType(context.program, enumObj)) {
           context.reportDiagnostic({
             target: enumObj,
