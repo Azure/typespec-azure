@@ -52,17 +52,17 @@ Example: Multiple services
 
 **Type:** `string`
 
-#### `new-line`
-
-**Type:** `"crlf" | "lf"`
-
-Set the newline character for emitting files.
-
 #### `arm-types-dir`
 
 **Type:** `string`
 
 Path to the common-types.json file folder. Default: '${project-root}/../../common-types/resource-management'
+
+#### `new-line`
+
+**Type:** `"crlf" | "lf"`
+
+Set the newline character for emitting files.
 
 #### `omit-unreachable-types`
 
