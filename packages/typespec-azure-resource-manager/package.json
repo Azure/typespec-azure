@@ -52,8 +52,8 @@
     "!dist/test/**"
   ],
   "dependencies": {
-    "pluralize": "^8.0.0",
-    "change-case": "~5.4.3"
+    "change-case": "~5.4.4",
+    "pluralize": "^8.0.0"
   },
   "peerDependencies": {
     "@azure-tools/typespec-autorest": "workspace:~",
@@ -68,11 +68,11 @@
     "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@types/node": "~18.11.19",
+    "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/library-linter": "workspace:~",
     "@typespec/openapi": "workspace:~",
-    "@types/pluralize": "^0.0.33",
     "@typespec/rest": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@typespec/versioning": "workspace:~",

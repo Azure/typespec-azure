@@ -112,13 +112,7 @@ interface Dependents {
 
 @parentResource(Employee)
 model Dependent is ProxyResource<DependentProperties> {
-  /** Name of dependent */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("dependentName")
-  @path
-  @segment("dependents")
-  @visibility("read")
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Dependent properties */

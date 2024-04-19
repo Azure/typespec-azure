@@ -24,12 +24,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("A CodeSignAccount resource")
 model CodeSignAccount is TrackedResource<CodeSignAccountProperties> {
-  @doc("Code Signing account name")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("accountName")
-  @segment("codeSignAccounts")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 @armResourceOperations
@@ -118,12 +113,7 @@ union ProvisioningState {
 
 @parentResource(CodeSignAccount)
 model CertificateProfile is ProxyResource<CertificateProfileProperties> {
-  @doc("Certificate profile name")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("profileName")
-  @segment("certificateProfiles")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 @armResourceOperations

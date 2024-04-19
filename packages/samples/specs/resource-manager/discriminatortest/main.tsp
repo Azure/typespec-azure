@@ -26,12 +26,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("A DiscriminatorTest resource")
 model Employee is TrackedResource<EmployeeProperties> {
-  @doc("The name of the employee")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 @armResourceOperations

@@ -24,12 +24,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("A ContosoProviderHub resource")
 model Employee is TrackedResource<EmployeeProperties> {
-  @doc("The first and last name fo the employee")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 @doc("The rp-specific properties of the employee")
