@@ -312,7 +312,7 @@ namespace Azure {
          */
         extern dec ensureTraitsPresent(
           target: Interface | TypeSpec.Reflection.Operation,
-          traitModel: unknown,
+          traitModel: Model,
           expectedTraits: ExpectedTrait[]
         );
 
