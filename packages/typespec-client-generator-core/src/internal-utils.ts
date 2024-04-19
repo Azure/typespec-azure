@@ -5,6 +5,7 @@ import {
   Namespace,
   Operation,
   Program,
+  ProjectedProgram,
   Type,
   Union,
   createDiagnosticCollector,
@@ -19,6 +20,7 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -128,7 +130,8 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
   let addedCounter = 0;
   let removeCounter = 0;
   const retval: string[] = [];
-  for (const version of apiVersions) {
+  for (let i = 0; i < apiVersions.length; i++) {
+    const version = apiVersions[i];
     if (addedCounter < addedOnVersions.length && version === addedOnVersions[addedCounter]) {
       added = true;
       addedCounter++;
@@ -137,7 +140,17 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
       added = false;
       removeCounter++;
     }
-    if (added) retval.push(version);
+    if (added) {
+      // only add version smaller than config
+      if (
+        context.apiVersion === undefined ||
+        context.apiVersion === "latest" ||
+        context.apiVersion === "all" ||
+        apiVersions.indexOf(context.apiVersion) >= i
+      ) {
+        retval.push(version);
+      }
+    }
   }
   return retval;
 }
@@ -260,6 +273,10 @@ export interface TCGCContext {
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
   __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
+  apiVersion?: string;
+  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  originalProgram: Program;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -267,6 +284,7 @@ export function createTCGCContext(program: Program): TCGCContext {
     program,
     emitterName: "__TCGC_INTERNAL__",
     diagnostics: [],
+    originalProgram: program,
   };
 }
 
