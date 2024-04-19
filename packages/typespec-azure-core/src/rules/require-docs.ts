@@ -4,6 +4,7 @@ import {
   Operation,
   Program,
   createRule,
+  getDiscriminatedTypes,
   getDoc,
   paramMessage,
 } from "@typespec/compiler";
@@ -24,7 +25,18 @@ function isExcludedEnumType(program: Program, enumObj: Enum): boolean {
   if (versions !== undefined && versions.length > 0) {
     return true;
   }
-  // TODO: Exclude discriminator enums as well
+  const discTypes = getDiscriminatedTypes(program);
+  for (const [type, discName] of discTypes) {
+    if (type.kind === "Model") {
+      const discriminatorProperty = type.properties.get(discName.propertyName);
+      if (discriminatorProperty?.type === enumObj) {
+        return true;
+      }
+    } else if (type.kind === "Union") {
+      // TODO: handle union types
+      let test = "best";
+    }
+  }
   return false;
 }
 
@@ -97,6 +109,16 @@ export const requireDocumentation = createRule({
             });
           }
           for (const prop of model.properties.values()) {
+            // Properties that are discriminators are considered self-documenting
+            if (prop.type.kind === "Enum" && isExcludedEnumType(context.program, prop.type)) {
+              return;
+            }
+            if (
+              prop.type.kind === "EnumMember" &&
+              isExcludedEnumType(context.program, prop.type.enum)
+            ) {
+              return;
+            }
             if (!getDoc(context.program, prop)) {
               context.reportDiagnostic({
                 target: prop,
