@@ -21,7 +21,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import { SdkMethodResponse, SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -2497,6 +2497,514 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(getClientNameOverride(runner.context, Test2), undefined);
       strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
       strictEqual(getClientNameOverride(runner.context, func2), undefined);
+    });
+  });
+
+  describe("versioning projection", () => {
+    it("basic default version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+      
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      model Widget {
+        @key
+        @typeChangedFrom(Versions.v3, string)
+        id: int32;
+      
+        @renamedFrom(Versions.v3, "name")
+        @madeOptional(Versions.v3)
+        description?: string;
+      }
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      @added(Versions.v2)
+      @returnTypeChangedFrom(Versions.v3, Test)
+      op test(): void | Error;
+
+      op list(): Widget[] | Error;
+      
+      @added(Versions.v2)
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+      `);
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      strictEqual(sdkPackage.clients[0].methods.length, 3);
+      const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+      ok(list);
+      deepStrictEqual(list.apiVersions, ["v1", "v2", "v3"]);
+      const get = sdkPackage.clients[0].methods.find((x) => x.name === "get");
+      ok(get);
+      deepStrictEqual(get.apiVersions, ["v2", "v3"]);
+      const test = sdkPackage.clients[0].methods.find((x) => x.name === "test");
+      ok(test);
+      deepStrictEqual(test.apiVersions, ["v2", "v3"]);
+      const returnValue = test.response;
+      ok(returnValue);
+      strictEqual((returnValue as SdkMethodResponse).type, undefined);
+      strictEqual(sdkPackage.models.length, 2);
+      const widget = sdkPackage.models.find((x) => x.name === "Widget");
+      ok(widget);
+      deepStrictEqual(widget.apiVersions, ["v1", "v2", "v3"]);
+      strictEqual(widget?.properties.length, 2);
+      const id = widget?.properties.find((x) => x.name === "id");
+      ok(id);
+      deepStrictEqual(id.apiVersions, ["v1", "v2", "v3"]);
+      const description = widget?.properties.find((x) => x.name === "description");
+      ok(description);
+      deepStrictEqual(description.apiVersions, ["v1", "v2", "v3"]); // rename or change type will not change the apiVersions
+      strictEqual(description.optional, true);
+      const error = sdkPackage.models.find((x) => x.name === "Error");
+      ok(error);
+      deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+    });
+
+    it("basic latest version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "latest",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+      
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      model Widget {
+        @key
+        @typeChangedFrom(Versions.v3, string)
+        id: int32;
+      
+        @renamedFrom(Versions.v3, "name")
+        @madeOptional(Versions.v3)
+        description?: string;
+      }
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      @added(Versions.v2)
+      @returnTypeChangedFrom(Versions.v3, Test)
+      op test(): void | Error;
+
+      op list(): Widget[] | Error;
+      
+      @added(Versions.v2)
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+      `);
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      strictEqual(sdkPackage.clients[0].methods.length, 3);
+      const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+      ok(list);
+      deepStrictEqual(list.apiVersions, ["v1", "v2", "v3"]);
+      const get = sdkPackage.clients[0].methods.find((x) => x.name === "get");
+      ok(get);
+      deepStrictEqual(get.apiVersions, ["v2", "v3"]);
+      const test = sdkPackage.clients[0].methods.find((x) => x.name === "test");
+      ok(test);
+      deepStrictEqual(test.apiVersions, ["v2", "v3"]);
+      const returnValue = test.response;
+      ok(returnValue);
+      strictEqual((returnValue as SdkMethodResponse).type, undefined);
+      strictEqual(sdkPackage.models.length, 2);
+      const widget = sdkPackage.models.find((x) => x.name === "Widget");
+      ok(widget);
+      deepStrictEqual(widget.apiVersions, ["v1", "v2", "v3"]);
+      strictEqual(widget?.properties.length, 2);
+      const id = widget?.properties.find((x) => x.name === "id");
+      ok(id);
+      deepStrictEqual(id.apiVersions, ["v1", "v2", "v3"]);
+      const description = widget?.properties.find((x) => x.name === "description");
+      ok(description);
+      deepStrictEqual(description.apiVersions, ["v1", "v2", "v3"]); // rename or change type will not change the apiVersions
+      strictEqual(description.optional, true);
+      const error = sdkPackage.models.find((x) => x.name === "Error");
+      ok(error);
+      deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+    });
+
+    it("basic v3 version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v3",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+      
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      model Widget {
+        @key
+        @typeChangedFrom(Versions.v3, string)
+        id: int32;
+      
+        @renamedFrom(Versions.v3, "name")
+        @madeOptional(Versions.v3)
+        description?: string;
+      }
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      @added(Versions.v2)
+      @returnTypeChangedFrom(Versions.v3, Test)
+      op test(): void | Error;
+
+      op list(): Widget[] | Error;
+      
+      @added(Versions.v2)
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+      `);
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      strictEqual(sdkPackage.clients[0].methods.length, 3);
+      const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+      ok(list);
+      deepStrictEqual(list.apiVersions, ["v1", "v2", "v3"]);
+      const get = sdkPackage.clients[0].methods.find((x) => x.name === "get");
+      ok(get);
+      deepStrictEqual(get.apiVersions, ["v2", "v3"]);
+      const test = sdkPackage.clients[0].methods.find((x) => x.name === "test");
+      ok(test);
+      deepStrictEqual(test.apiVersions, ["v2", "v3"]);
+      const returnValue = test.response;
+      ok(returnValue);
+      strictEqual((returnValue as SdkMethodResponse).type, undefined);
+      strictEqual(sdkPackage.models.length, 2);
+      const widget = sdkPackage.models.find((x) => x.name === "Widget");
+      ok(widget);
+      deepStrictEqual(widget.apiVersions, ["v1", "v2", "v3"]);
+      strictEqual(widget?.properties.length, 2);
+      const id = widget?.properties.find((x) => x.name === "id");
+      ok(id);
+      deepStrictEqual(id.apiVersions, ["v1", "v2", "v3"]);
+      const description = widget?.properties.find((x) => x.name === "description");
+      ok(description);
+      deepStrictEqual(description.apiVersions, ["v1", "v2", "v3"]); // rename or change type will not change the apiVersions
+      strictEqual(description.optional, true);
+      const error = sdkPackage.models.find((x) => x.name === "Error");
+      ok(error);
+      deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+    });
+
+    it("basic v2 version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v2",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+      
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      model Widget {
+        @key
+        @typeChangedFrom(Versions.v3, string)
+        id: int32;
+      
+        @renamedFrom(Versions.v3, "name")
+        @madeOptional(Versions.v3)
+        description?: string;
+      }
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      @added(Versions.v2)
+      @returnTypeChangedFrom(Versions.v3, Test)
+      op test(): void | Error;
+
+      op list(): Widget[] | Error;
+      
+      @added(Versions.v2)
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+      `);
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      strictEqual(sdkPackage.clients[0].methods.length, 3);
+      const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+      ok(list);
+      deepStrictEqual(list.apiVersions, ["v1", "v2"]);
+      const get = sdkPackage.clients[0].methods.find((x) => x.name === "get");
+      ok(get);
+      deepStrictEqual(get.apiVersions, ["v2"]);
+      const test = sdkPackage.clients[0].methods.find((x) => x.name === "test");
+      ok(test);
+      deepStrictEqual(test.apiVersions, ["v2"]);
+      const returnValue = test.response;
+      ok(returnValue);
+      strictEqual((returnValue as SdkMethodResponse).type?.kind, "model");
+      strictEqual(sdkPackage.models.length, 3);
+      const widget = sdkPackage.models.find((x) => x.name === "Widget");
+      ok(widget);
+      deepStrictEqual(widget.apiVersions, ["v1", "v2"]);
+      strictEqual(widget?.properties.length, 2);
+      const id = widget?.properties.find((x) => x.name === "id");
+      ok(id);
+      deepStrictEqual(id.apiVersions, ["v1", "v2"]);
+      const name = widget?.properties.find((x) => x.name === "name");
+      ok(name);
+      deepStrictEqual(name.apiVersions, ["v1", "v2"]);
+      strictEqual(name.optional, false);
+      const error = sdkPackage.models.find((x) => x.name === "Error");
+      ok(error);
+      deepStrictEqual(error.apiVersions, ["v1", "v2"]);
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+      deepStrictEqual(testModel.apiVersions, ["v2"]);
+    });
+
+    it("basic v1 version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+      
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      model Widget {
+        @key
+        @typeChangedFrom(Versions.v3, string)
+        id: int32;
+      
+        @renamedFrom(Versions.v3, "name")
+        @madeOptional(Versions.v3)
+        description?: string;
+      }
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      @added(Versions.v2)
+      @returnTypeChangedFrom(Versions.v3, Test)
+      op test(): void | Error;
+
+      op list(): Widget[] | Error;
+      
+      @added(Versions.v2)
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+    `);
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      strictEqual(sdkPackage.clients[0].methods.length, 1);
+      const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+      ok(list);
+      deepStrictEqual(list.apiVersions, ["v1"]);
+      strictEqual(sdkPackage.models.length, 2);
+      const widget = sdkPackage.models.find((x) => x.name === "Widget");
+      ok(widget);
+      deepStrictEqual(widget.apiVersions, ["v1"]);
+      strictEqual(widget?.properties.length, 2);
+      const id = widget?.properties.find((x) => x.name === "id");
+      ok(id);
+      deepStrictEqual(id.apiVersions, ["v1"]);
+      const name = widget?.properties.find((x) => x.name === "name");
+      ok(name);
+      deepStrictEqual(name.apiVersions, ["v1"]);
+      strictEqual(name.optional, false);
+      const error = sdkPackage.models.find((x) => x.name === "Error");
+      ok(error);
+      deepStrictEqual(error.apiVersions, ["v1"]);
+    });
+
+    it("basic all version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "all",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+      
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      model Widget {
+        @key
+        @typeChangedFrom(Versions.v3, string)
+        id: int32;
+      
+        @renamedFrom(Versions.v3, "name")
+        @madeOptional(Versions.v3)
+        description?: string;
+      }
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      @added(Versions.v2)
+      @returnTypeChangedFrom(Versions.v3, Test)
+      op test(): void | Error;
+
+      op list(): Widget[] | Error;
+      
+      @added(Versions.v2)
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+    `);
+
+      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      strictEqual(sdkPackage.clients[0].methods.length, 3);
+      const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+      ok(list);
+      deepStrictEqual(list.apiVersions, ["v1", "v2", "v3"]);
+      const get = sdkPackage.clients[0].methods.find((x) => x.name === "get");
+      ok(get);
+      deepStrictEqual(get.apiVersions, ["v2", "v3"]);
+      const test = sdkPackage.clients[0].methods.find((x) => x.name === "test");
+      ok(test);
+      deepStrictEqual(test.apiVersions, ["v2", "v3"]);
+      const returnValue = test.response;
+      ok(returnValue);
+      strictEqual((returnValue as SdkMethodResponse).type, undefined);
+      strictEqual(sdkPackage.models.length, 2); // TODO: since Test model has no usage, we could not get it, need to fix
+      const widget = sdkPackage.models.find((x) => x.name === "Widget");
+      ok(widget);
+      deepStrictEqual(widget.apiVersions, ["v1", "v2", "v3"]);
+      strictEqual(widget?.properties.length, 2);
+      const id = widget?.properties.find((x) => x.name === "id");
+      ok(id);
+      deepStrictEqual(id.apiVersions, ["v1", "v2", "v3"]);
+      const description = widget?.properties.find((x) => x.name === "description");
+      ok(description);
+      deepStrictEqual(description.apiVersions, ["v1", "v2", "v3"]); // rename or change type will not change the apiVersions
+      strictEqual(description.optional, true);
+      const error = sdkPackage.models.find((x) => x.name === "Error");
+      ok(error);
+      deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+      // const testModel = sdkPackage.models.find(x => x.name === "Test");
+      // ok(testModel);
+      // deepStrictEqual(testModel.apiVersions, ["v2"]);
     });
   });
 });
