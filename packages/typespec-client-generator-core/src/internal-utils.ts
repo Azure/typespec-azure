@@ -19,6 +19,7 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -260,6 +261,7 @@ export interface TCGCContext {
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
   __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {

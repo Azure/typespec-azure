@@ -506,7 +506,7 @@ function getSdkEndpointParameter(
   });
 }
 
-function createSdkClientType<
+export function createSdkClientType<
   TOptions extends object,
   TServiceOperation extends SdkServiceOperation,
 >(

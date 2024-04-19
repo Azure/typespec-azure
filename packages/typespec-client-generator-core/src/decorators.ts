@@ -13,20 +13,24 @@ import {
   Node,
   Operation,
   Program,
+  Service,
   SyntaxKind,
   Type,
   Union,
   createDiagnosticCollector,
   getNamespaceFullName,
   getProjectedName,
+  getService,
   ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   listServices,
+  projectProgram,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
+import { buildVersionProjections } from "@typespec/versioning";
 import {
   AccessFlags,
   LanguageScopes,
@@ -205,13 +209,18 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   );
 }
 
+interface ListClientOptions {
+  version?: string;
+}
+
 /**
  * List all the clients.
  *
  * @param context TCGCContext
  * @returns Array of clients
  */
-export function listClients(context: TCGCContext): SdkClient[] {
+export function listClients(context: TCGCContext, options: ListClientOptions = {}): SdkClient[] {
+  if (context.__rawClients) return context.__rawClients;
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     return explicitClients;
@@ -220,25 +229,59 @@ export function listClients(context: TCGCContext): SdkClient[] {
   // if there is no explicit client, we will treat namespaces with service decorator as clients
   const services = listServices(context.program);
 
-  return services.map((service) => {
-    let originalName = service.type.name;
-    const clientNameOverride = getClientNameOverride(context, service.type);
+  context.__rawClients = [];
+  let currentService: Service;
+
+  for (const service of services) {
+    currentService = service;
+    const originalProgram = context.program;
+
+    let projectedProgram;
+    let projectedService;
+    if (options.version) {
+      const versions = buildVersionProjections(context.program, service.type).filter(
+        (v) => !options.version || options.version === v.version
+      );
+      if (versions.length !== 1) throw new Error("can only handle one version");
+      const projectedVersion = versions[0];
+      if (projectedVersion.projections.length > 0) {
+        projectedProgram = context.program = projectProgram(
+          originalProgram,
+          projectedVersion.projections
+        );
+      }
+      const projectedServiceNs: Namespace = projectedProgram
+        ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
+        : service.type;
+
+      projectedService =
+        projectedServiceNs === context.program.getGlobalNamespaceType()
+          ? { type: context.program.getGlobalNamespaceType() }
+          : getService(context.program, projectedServiceNs)!;
+    } else {
+      projectedService = service;
+    }
+    let originalName = projectedService.type.name;
+    const clientNameOverride = getClientNameOverride(context, projectedService.type);
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName =
+        getProjectedName(context.program, projectedService.type, "client") ??
+        projectedService.type.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service.type);
-    return {
+    context.arm = isArm(projectedService.type);
+    context.__rawClients.push({
       kind: "SdkClient",
       name: clientName,
       service: service.type,
       type: service.type,
       arm: isArm(service.type),
       crossLanguageDefinitionId: `${getNamespaceFullName(service.type)}.${clientName}`,
-    };
-  });
+    });
+  }
+  return context.__rawClients;
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");

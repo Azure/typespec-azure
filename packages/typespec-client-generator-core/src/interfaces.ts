@@ -55,6 +55,7 @@ export interface SdkInitializationType extends SdkModelType {
 
 export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
   kind: "client";
+  __raw: SdkClient;
   name: string;
   description?: string;
   details?: string;
