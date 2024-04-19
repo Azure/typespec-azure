@@ -168,8 +168,8 @@ enum UnsupportedVersioningDecorators {
   TypeChangedFrom = "typeChangedFrom",
 }
 
-export const namespace = "AutorestCanonical";
 export const canonicalVersion = "canonical";
+export const namespace = "AutorestCanonical";
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
