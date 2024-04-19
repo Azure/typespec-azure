@@ -1867,7 +1867,7 @@ importers:
   packages/typespec-azure-resource-manager:
     dependencies:
       change-case:
-        specifier: ~5.4.3
+        specifier: ~5.4.4
         version: 5.4.4
       pluralize:
         specifier: ^8.0.0
