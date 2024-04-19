@@ -47,6 +47,12 @@ export interface AutorestCanonicalEmitterOptions {
    * @default "never"
    */
   "include-x-typespec-name"?: "inline-only" | "never";
+
+  /**
+   * Path to the common-types.json file folder.
+   * @default "${project-root}/../../common-types/resource-management"
+   */
+  "arm-types-dir"?: string;
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
@@ -74,6 +80,12 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
       ].join("\n"),
     },
     "azure-resource-provider-folder": { type: "string", nullable: true },
+    "arm-types-dir": {
+      type: "string",
+      nullable: true,
+      description:
+        "Path to the common-types.json file folder. Default: '${project-root}/../../common-types/resource-management'",
+    },
     "new-line": {
       type: "string",
       enum: ["crlf", "lf"],
