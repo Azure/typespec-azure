@@ -1734,7 +1734,12 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(values[1].kind, "int32");
     });
     it("versioning", async function () {
-      await runner.compile(`
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "all",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(`
         @versioned(Versions)
         @service({title: "Widget Service"})
         namespace DemoService;
@@ -1760,7 +1765,7 @@ describe("typespec-client-generator-core: types", () => {
           removedProp: string;
         }
       `);
-      const sdkModel = runner.context.experimental_sdkPackage.models.find(
+      const sdkModel = runnerWithVersion.context.experimental_sdkPackage.models.find(
         (x) => x.kind === "model"
       );
       ok(sdkModel);
