@@ -43,6 +43,7 @@ import {
   getDocHelper,
   isAcceptHeader,
   isNullable,
+  isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -453,9 +454,36 @@ export function getCorrespondingMethodParams(
         );
         return diagnostics.wrap([]);
       }
-      context.__api_version_parameter = apiVersionParam;
+      context.__api_version_parameter = {
+        ...apiVersionParam,
+        name: "apiVersion",
+        nameInClient: "apiVersion",
+        isGeneratedName: apiVersionParam.name !== "apiVersion",
+        optional: false,
+        clientDefaultValue: context.__api_version_client_default_value,
+      };
     }
     return diagnostics.wrap([context.__api_version_parameter]);
+  }
+  if (isSubscriptionId(context, serviceParam)) {
+    if (!context.__subscriptionIdParameter) {
+      const subscriptionIdParam = methodParameters.find((x) => isSubscriptionId(context, x));
+      if (!subscriptionIdParam) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "no-corresponding-method-param",
+            target: serviceParam.__raw!,
+            format: {
+              paramName: "subscriptionId",
+              methodName: methodName,
+            },
+          })
+        );
+        return diagnostics.wrap([]);
+      }
+      context.__subscriptionIdParameter = subscriptionIdParam;
+    }
+    return diagnostics.wrap([context.__subscriptionIdParameter]);
   }
   const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
   if (correspondingMethodParameter) {

@@ -841,7 +841,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
               ${versionEnum}
 
               @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v3, "foo.json")
-              model Foo {}
+              model Foo {prop: string}
 
               model FooParam {
                 @path
@@ -851,7 +851,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
               @Azure.ResourceManager.Private.armCommonDefinition("Bar", { version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true }, "bar.json")
               @Azure.ResourceManager.Private.armCommonDefinition("Bar", Azure.ResourceManager.CommonTypes.Versions.v5, "bar-v5.json")
-              model Bar {}
+              model Bar {prop: string}
 
               model BarParam {
                 @path
@@ -861,7 +861,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
               }
 
               @Azure.ResourceManager.Private.armCommonDefinition("Baz", Azure.ResourceManager.CommonTypes.Versions.v5, "baz.json")
-              model Baz {}
+              model Baz {prop: string}
 
               model BazParam {
                 @path

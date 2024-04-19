@@ -1,4 +1,4 @@
-name: Deploy TypeSpec Website to github pages
+name: Deploy TypeSpec Azure Website to github pages
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -40,7 +40,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm --filter "@azure-tools/typespec-azure-website..." run build
+        run: pnpm --filter "@azure-tools/typespec-azure-website..." --filter '!@typespec/website' run build
         env:
           TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/"
           NODE_OPTIONS: "--max_old_space_size=4096"

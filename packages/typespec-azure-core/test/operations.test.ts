@@ -1356,7 +1356,7 @@ describe("typespec-azure-core: operation templates", () => {
             @header("operation-id") operate: string,
             @finalLocation @header("Location") location: ResourceLocation<SimpleWidget>,
             @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @body body?: SimpleWidget
+            @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1412,7 +1412,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
             @finalLocation(SimpleWidget)
             @header location: string;
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1466,7 +1466,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1513,7 +1513,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1565,7 +1565,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
             @finalLocation(SimpleWidget)
             @header location: string;
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1621,7 +1621,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1671,7 +1671,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1728,7 +1728,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
             @finalLocation(SimpleWidget)
             @header location: string;
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1782,7 +1782,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 202;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1830,7 +1830,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 202;
             @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1973,7 +1973,7 @@ describe("typespec-azure-core: operation templates", () => {
             @header id: string,
             @header("operation-id") operate: string,
             @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @body body?: SimpleWidget
+            @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -2032,7 +2032,7 @@ describe("typespec-azure-core: operation templates", () => {
             @header id: string,
             @header("operation-id") operate: string,
             @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @body body?: SimpleWidget
+            @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -2093,7 +2093,7 @@ describe("typespec-azure-core: operation templates", () => {
           @header id: string;
           @header("operation-id") operate: string;
           @pollingLocation @header("Operation-Location") opLink: string;
-          @lroResult @body body?: SimpleWidget;
+          @lroResult @bodyRoot body?: SimpleWidget;
         };
         `,
         "mungeWidget"
