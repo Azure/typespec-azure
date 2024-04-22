@@ -45,7 +45,7 @@ public virtual Response<User> GetUser(CancellationToken cancellationToken = defa
 // from user experience perspective
 
 // RLC
-export interface GetUser200Response extends HttpResponse{
+export interface GetUser200Response extends HttpResponse {
   status: "200";
   body: User;
 }
@@ -62,13 +62,12 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export asnyc function get(): Promise<User>;
+export async function get(): Promise<User>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  get(options: GetUserOptionalParams): Promise<User>
+  get(options: GetUserOptionalParams): Promise<User>;
 }
-
 ```
 
 </TabItem>
@@ -153,11 +152,11 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export asnyc function post(body: User, options: PostOptionalParams): Promise<void>;
+export async function post(body: User, options: PostOptionalParams): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  post(body: User, options: PostOptionalParams): Promise<void>
+  post(body: User, options: PostOptionalParams): Promise<void>;
 }
 ```
 
@@ -241,11 +240,15 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export asnyc function upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+export async function upload(
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams
+): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>
+  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
 ```
 
@@ -311,7 +314,10 @@ public virtual Response Upload(string id, string firstName, string lastName, Can
 export type DemoServiceContext = Client & {
   path: {
     /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users/{id}", id): {
+    (
+      path: "/users/{id}",
+      id
+    ): {
       post(
         options: {
           body: {
@@ -325,11 +331,21 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export asnyc function upload(id: string, firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+export async function upload(
+  id: string,
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams
+): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  upload(id: string, firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>
+  upload(
+    id: string,
+    firstName: string,
+    lastName: string,
+    options: UploadOptionalParams
+  ): Promise<void>;
 }
 ```
 
@@ -412,11 +428,11 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export asnyc function upload(body: User, options: UploadOptionalParams): Promise<void>;
+export async function upload(body: User, options: UploadOptionalParams): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  upload(body: User, options: UploadOptionalParams): Promise<void>
+  upload(body: User, options: UploadOptionalParams): Promise<void>;
 }
 ```
 
@@ -514,11 +530,11 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export asnyc function upload(user: User, options: UploadOptionalParams): Promise<void>;
+export async function upload(user: User, options: UploadOptionalParams): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  upload(user: User, options: UploadOptionalParams): Promise<void>
+  upload(user: User, options: UploadOptionalParams): Promise<void>;
 }
 ```
 
@@ -561,7 +577,7 @@ model BlobProperties {
   @header testHeader: string;
 }
 
-@route("blob_propertes/{name}")
+@route("blob_properties/{name}")
 op getBlobProperties(...BlobProperties): void;
 ```
 
@@ -594,7 +610,7 @@ public virtual Response GetBlobProperties(string name, string testHeader, Reques
 export type DemoServiceContext = Client & {
   path: {
     /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/blob_propertes/{name}", name): {
+    (path: "/blob_properties/{name}", name): {
       post(
         options: {
           headers: {
@@ -616,7 +632,7 @@ export interface GetBlobPropertiesOptionalParams extends OperationOptions {
 }
 
 // Modular api layer
-export asnyc function getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>;
+export async function getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
@@ -700,27 +716,30 @@ export type DemoServiceContext = Client & {
         options: {
           headers: {
             "content-type": "application/json";
-          } & RawHttpHeaders,
+          } & RawHttpHeaders;
           body: {
-            schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream
-          }
+            schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+          };
         } & RequestParameters
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
 };
 
-// Modular model 
+// Modular model
 export interface Schema {
-  schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream
+  schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
 }
 
 // Modular api layer
-export asnyc function register(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>;
+export async function register(
+  body: Schema,
+  options: GetBlobPropertiesOptionalParams
+): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  getBlobProperties(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>
+  getBlobProperties(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>;
 }
 ```
 
