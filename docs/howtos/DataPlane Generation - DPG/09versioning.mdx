@@ -1,0 +1,204 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Versioning
+
+This doc details what emitters will generate for versioned specs
+
+## Single API Version
+
+If there is just one API version in the spec, we will generate
+
+## Multiple API version
+
+The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate.
+
+We will get the versioning information from the `Versions` enum that you define and link as part of the `@typespec/versioning` library.
+
+> NOTE: The ordering of the values in the `Versions` enum is very important. We use this information to determine the order of versions. Our default value will be the **last entry** in the `Versions` list
+
+### Default
+
+By default our emitters will only generate the surface used by the latest api version if there are multiple defined.
+
+By default, only models used in api surface of the latest api version are included in generation. Documentation and enums showing the available API versions will still include all of the known api versions, meaning there will be documentation for both the preview and stable releases.
+
+For the below example, all languages will generate the api surface of default version `v2023_11_01`. There will be no generation of the operation `previewFunctionality`, and we will also not generate the `PreviewModel` because it's only used in `previewFunctionality`, and therefore is not used in the api surface of `v2023_11_01`.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+
+using TypeSpec.Versioning;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+op previewFunctionality(...PreviewModel): void;
+
+op stableFunctionality(...StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be v2023_11_01
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+with pytest.expect(ImportError):
+  preview_model = models.PreviewModel(preview_functionality="not present")
+
+with pytest.expect(AttributeError):
+  client.preview_functionality({"previewFunctionality": "not present"})
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+### Override to return all
+
+You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
+
+**To override the behavior, pass in `api-version: all` in your `tspconfig.yaml`.**
+
+```typespec
+import "@typespec/versioning";
+
+using TypeSpec.Versioning;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+op previewFunctionality(...PreviewModel): void;
+
+op stableFunctionality(...StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be v2023_11_01
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+preview_model = models.PreviewModel(preview_functionality="not present")
+# the model is generated as part of the api surface
+
+with pytest.expect(ValueError) as ex:
+  client.preview_functionality(preview_model)
+assert "preview_functionality is not available in API version 2023-11-01" in str(ex)
+
+preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01-preview")
+
+client.preview_functionality(preview_model) # call goes through
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>

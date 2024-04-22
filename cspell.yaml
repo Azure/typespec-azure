@@ -58,6 +58,7 @@ words:
   - psscriptanalyzer
   - PAYG
   - prismjs
+  - pytest
   - qnas
   - regionality
   - Reranker
