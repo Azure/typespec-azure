@@ -1163,6 +1163,28 @@ describe("typespec-client-generator-core: public-utils", () => {
         );
       });
 
+      it("should handle additional properties type", async () => {
+        await runner.compileWithBuiltInService(
+          `
+          model A {
+            ...Record<{name: string}>;
+          }
+
+          op test(@body body: A): void;
+        `
+        );
+        const models = runner.context.experimental_sdkPackage.models;
+        strictEqual(models.length, 2);
+        ok(
+          models.find(
+            (x) =>
+              x.name === "AAdditionalProperty" &&
+              x.isGeneratedName &&
+              x.crossLanguageDefinitionId === "TestService.AAdditionalProperty"
+          )
+        );
+      });
+
       it("should recursively handle array of anonymous model", async () => {
         await runner.compileWithBuiltInService(
           `

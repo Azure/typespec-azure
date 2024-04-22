@@ -308,10 +308,10 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description                                         |
-| ---------- | ---------- | --------------------------------------------------- |
-| body       | `Resource` | The body type of the operation request or response. |
-| statusCode | `201`      | The status code.                                    |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `201`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResourceExistsResponse` {#Azure.ResourceManager.ArmResourceExistsResponse}
 
@@ -372,10 +372,10 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `200`          | The status code.                                    |
-| body       | `ResponseBody` | The body type of the operation request or response. |
+| Name       | Type           | Description      |
+| ---------- | -------------- | ---------------- |
+| statusCode | `200`          | The status code. |
+| body       | `ResponseBody` |                  |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
 
@@ -1074,43 +1074,6 @@ model Azure.ResourceManager.TrackedResource<Properties>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
-
-The provisioning state of the connection
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
-```
-
-### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
-
-The private endpoint connection status
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
-```
-
-### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
-
-Standard terminal provisioning state of resource type. You can spread into your
-custom provision state to avoid duplication and ensure consistency
-
-```typespec
-enum Azure.ResourceManager.ResourceProvisioningState
-```
-
-#### Examples
-
-```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
-}
-```
-
 ### `Versions` {#Azure.ResourceManager.Versions}
 
 Supported versions of Azure.ResourceManager building blocks.
@@ -1133,6 +1096,43 @@ The type of identity to use.
 
 ```typespec
 union Azure.ResourceManager.KeyEncryptionKeyIdentity
+```
+
+### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
+
+The provisioning state of the connection
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
+```
+
+### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
+
+The private endpoint connection status
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
+```
+
+### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
+
+Standard terminal provisioning state of resource type. You can include in your
+custom provision state to avoid duplication and ensure consistency
+
+```typespec
+union Azure.ResourceManager.ResourceProvisioningState
+```
+
+#### Examples
+
+```typespec
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
+}
 ```
 
 ## Azure.ResourceManager.CommonTypes

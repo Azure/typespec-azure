@@ -794,7 +794,7 @@ op ArmCreateOperation<
   ErrorResponse extends {}
 >(
   ...HttpParameters,
-  @doc("Resource create parameters.") @body resource: BodyParameter,
+  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
 ): Response | ErrorResponse;
 
 /**
@@ -811,5 +811,5 @@ op ArmUpdateOperation<
   ErrorResponse extends {}
 >(
   ...HttpParameters,
-  @doc("The resource properties to be updated.") @body properties: BodyParameter,
+  @doc("The resource properties to be updated.") @bodyRoot properties: BodyParameter,
 ): Response | ErrorResponse;
