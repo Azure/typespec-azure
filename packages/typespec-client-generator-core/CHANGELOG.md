@@ -1,5 +1,15 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.4
+
+### Bug Fixes
+
+- [#692](https://github.com/Azure/typespec-azure/pull/692) fix wrong judgement for array type
+- [#559](https://github.com/Azure/typespec-azure/pull/559) take lroMetadata.finalResult into consideration
+- [#700](https://github.com/Azure/typespec-azure/pull/700) support get common models for specific api version, default to latest api version which may include breaking changes
+- [#713](https://github.com/Azure/typespec-azure/pull/713) enhance versioning and add tests
+
+
 ## 0.41.3
 
 ### Bug Fixes
