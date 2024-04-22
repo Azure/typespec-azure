@@ -42,6 +42,32 @@ public virtual Response<User> GetUser(CancellationToken cancellationToken = defa
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
+
+// RLC
+export interface GetUser200Response extends HttpResponse{
+  status: "200";
+  body: User;
+}
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/analyze' has methods for the following verbs: post */
+    (path: "/users"): {
+      get(
+        options: RequestParameters
+      ): StreamableMethod<GetUser200Response | GetUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export asnyc function get(): Promise<User>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  get(options: GetUserOptionalParams): Promise<User>
+}
 
 ```
 
@@ -111,7 +137,28 @@ public virtual Response Post(User user, CancellationToken cancellationToken = de
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: User;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export asnyc function post(body: User, options: PostOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  post(body: User, options: PostOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
@@ -175,7 +222,31 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: {
+            firstName: string;
+            lastName: string;
+          };
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export asnyc function upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
@@ -235,7 +306,31 @@ public virtual Response Upload(string id, string firstName, string lastName, Can
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users/{id}", id): {
+      post(
+        options: {
+          body: {
+            firstName: string;
+            lastName: string;
+          };
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export asnyc function upload(id: string, firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(id: string, firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
@@ -301,7 +396,28 @@ public virtual Response Upload(User user, CancellationToken cancellationToken = 
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: User;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export asnyc function upload(body: User, options: UploadOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(body: User, options: UploadOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
@@ -382,7 +498,28 @@ public virtual Response Upload(User user, CancellationToken cancellationToken = 
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: User;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export asnyc function upload(user: User, options: UploadOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(user: User, options: UploadOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
@@ -452,7 +589,39 @@ public virtual Response GetBlobProperties(string name, string testHeader, Reques
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/blob_propertes/{name}", name): {
+      post(
+        options: {
+          headers: {
+            "test-header": string;
+          } & RawHttpHeaders
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Options
+export interface GetBlobPropertiesOptionalParams extends OperationOptions {
+  requestOptions: {
+    headers: {
+      test-header: string
+    } & RawHttpHeadersInput
+  }
+}
+
+// Modular api layer
+export asnyc function getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
@@ -521,7 +690,38 @@ public virtual Response Register(Schema schema, CancellationToken cancellationTo
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/schemaRegister"): {
+      post(
+        options: {
+          headers: {
+            "content-type": "application/json";
+          } & RawHttpHeaders,
+          body: {
+            schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream
+          }
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular model 
+export interface Schema {
+  schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream
+}
+
+// Modular api layer
+export asnyc function register(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  getBlobProperties(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>
+}
 ```
 
 </TabItem>
