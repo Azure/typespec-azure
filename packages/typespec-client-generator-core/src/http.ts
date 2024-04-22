@@ -43,7 +43,9 @@ import {
   getDocHelper,
   isAcceptHeader,
   isNullable,
+  isSubscriptionId,
 } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -122,7 +124,20 @@ function getSdkHttpParameters(
       const getParamResponse = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.parameter, "body")
       );
-      if (getParamResponse.kind !== "body") throw new Error("blah");
+      if (getParamResponse.kind !== "body") {
+        diagnostics.add(
+          createDiagnostic({
+            code: "unexpected-http-param-type",
+            target: tspBody.parameter,
+            format: {
+              paramName: tspBody.parameter.name,
+              expectedType: "body",
+              actualType: getParamResponse.kind,
+            },
+          })
+        );
+        return diagnostics.wrap(retval);
+      }
       retval.bodyParam = getParamResponse;
     } else {
       const type = diagnostics.pipe(
@@ -148,10 +163,13 @@ function getSdkHttpParameters(
       };
     }
     addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
-    retval.bodyParam.correspondingMethodParams = getCorrespondingMethodParams(
-      context,
-      methodParameters,
-      retval.bodyParam
+    retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
+      getCorrespondingMethodParams(
+        context,
+        httpOperation.operation.name,
+        methodParameters,
+        retval.bodyParam
+      )
     );
   }
   if (
@@ -195,10 +213,8 @@ function getSdkHttpParameters(
     });
   }
   for (const param of retval.parameters) {
-    param.correspondingMethodParams = getCorrespondingMethodParams(
-      context,
-      methodParameters,
-      param
+    param.correspondingMethodParams = diagnostics.pipe(
+      getCorrespondingMethodParams(context, httpOperation.operation.name, methodParameters, param)
     );
   }
   return diagnostics.wrap(retval);
@@ -318,7 +334,19 @@ export function getSdkHttpParameter(
       serializedName: getQueryParamName(program, type) ?? base.name,
     });
   }
-  if (!(isHeader(context.program, type) || location === "header")) throw new Error(`${type.name}`);
+  if (!(isHeader(context.program, type) || location === "header")) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "unexpected-http-param-type",
+        target: type,
+        format: {
+          paramName: type.name,
+          expectedType: "path, query, header, or body",
+          actualType: type.kind,
+        },
+      })
+    );
+  }
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
@@ -363,7 +391,19 @@ function getSdkHttpResponseAndExceptions(
       }
       if (innerResponse.body) {
         if (body && body !== innerResponse.body.type) {
-          throw new Error("blah");
+          diagnostics.add(
+            createDiagnostic({
+              code: "multiple-response-types",
+              target: innerResponse.body.type,
+              format: {
+                operation: httpOperation.operation.name,
+                response:
+                  innerResponse.body.type.kind === "Model"
+                    ? innerResponse.body.type.name
+                    : innerResponse.body.type.kind,
+              },
+            })
+          );
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body = innerResponse.body.type;
@@ -393,23 +433,61 @@ function getSdkHttpResponseAndExceptions(
 
 export function getCorrespondingMethodParams(
   context: TCGCContext,
+  methodName: string,
   methodParameters: SdkParameter[],
   serviceParam: SdkHttpParameter
-): SdkModelPropertyType[] {
+): [SdkModelPropertyType[], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (serviceParam.isApiVersionParam) {
     if (!context.__api_version_parameter) {
       const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
       if (!apiVersionParam) {
-        throw new Error("Can't find corresponding api version parameter");
+        diagnostics.add(
+          createDiagnostic({
+            code: "no-corresponding-method-param",
+            target: serviceParam.__raw!,
+            format: {
+              paramName: "apiVersion",
+              methodName: methodName,
+            },
+          })
+        );
+        return diagnostics.wrap([]);
       }
-      if (apiVersionParam.type.kind === "model") throw new Error(apiVersionParam.type.name);
-      throw new Error(apiVersionParam.type.kind);
+      context.__api_version_parameter = {
+        ...apiVersionParam,
+        name: "apiVersion",
+        nameInClient: "apiVersion",
+        isGeneratedName: apiVersionParam.name !== "apiVersion",
+        optional: false,
+        clientDefaultValue: context.__api_version_client_default_value,
+      };
     }
-    return [context.__api_version_parameter];
+    return diagnostics.wrap([context.__api_version_parameter]);
+  }
+  if (isSubscriptionId(context, serviceParam)) {
+    if (!context.__subscriptionIdParameter) {
+      const subscriptionIdParam = methodParameters.find((x) => isSubscriptionId(context, x));
+      if (!subscriptionIdParam) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "no-corresponding-method-param",
+            target: serviceParam.__raw!,
+            format: {
+              paramName: "subscriptionId",
+              methodName: methodName,
+            },
+          })
+        );
+        return diagnostics.wrap([]);
+      }
+      context.__subscriptionIdParameter = subscriptionIdParam;
+    }
+    return diagnostics.wrap([context.__subscriptionIdParameter]);
   }
   const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
   if (correspondingMethodParameter) {
-    return [correspondingMethodParameter];
+    return diagnostics.wrap([correspondingMethodParameter]);
   }
 
   const serviceParamType = serviceParam.type;
@@ -425,7 +503,7 @@ export function getCorrespondingMethodParams(
       .filter((x): x is SdkModelType => x.kind === "model")
       .flatMap((x) => x.properties)
       .find((x) => x.type === serviceParamType);
-    if (directBodyProperty) return [directBodyProperty];
+    if (directBodyProperty) return diagnostics.wrap([directBodyProperty]);
     let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
       serviceParamPropertyNames.includes(x.name)
     );
@@ -441,21 +519,39 @@ export function getCorrespondingMethodParams(
       );
     }
     if (correspondingProperties.length === serviceParamPropertyNames.length)
-      return correspondingProperties;
-    throw new Error(
-      `Can't find corresponding parameter for ${serviceParam.name} out of ${methodParameters.map((m) => m.name).join(", ")}`
+      return diagnostics.wrap(correspondingProperties);
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-corresponding-method-param",
+        target: serviceParam.__raw!,
+        format: {
+          paramName: serviceParam.name,
+          methodName: methodName,
+        },
+      })
     );
+    return diagnostics.wrap([]);
   }
   for (const methodParam of methodParameters) {
     if (methodParam.type.kind === "model") {
       for (const prop of methodParam.type.properties) {
         if (prop.name === serviceParam.name) {
-          return [prop];
+          return diagnostics.wrap([prop]);
         }
       }
     }
   }
-  throw new Error("Can't find corresponding parameter");
+  diagnostics.add(
+    createDiagnostic({
+      code: "no-corresponding-method-param",
+      target: serviceParam.__raw!,
+      format: {
+        paramName: serviceParam.name,
+        methodName: methodName,
+      },
+    })
+  );
+  return diagnostics.wrap([]);
 }
 
 function getCollectionFormat(

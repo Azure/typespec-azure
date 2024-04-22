@@ -11,13 +11,13 @@ Check that array properties have `x-ms-identifiers` specified with `@OpenAPI.ext
 #### ❌ Incorrect
 
 ```tsp
-model Address [] {
+model Address {
   city: string;
   street: string;
 }
 
 model ResourceProperties {
-  array: Address[]
+  array: Address[];
 }
 ```
 

@@ -5,6 +5,118 @@ import TabItem from "@theme/TabItem";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
+## Models
+
+### Flattening
+
+> **NOTE:** Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Properties {
+  name: string;
+}
+
+model Foo {
+  @flattenProperty
+  prop: Properties;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Foo",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "prop",
+      "serializedName": "prop",
+      "flatten": true,
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "model",
+        "name": "Properties",
+        "properties": [
+          {
+            "kind": "property",
+            "name": "name",
+            "serializedName": "name",
+            "flatten": false,
+            "optional": false,
+            "nullable": false,
+            "type": {
+              "kind": "string",
+              "encode": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
+
+```python
+class Properties(_model_base.Model):
+    name: str = rest_field()
+    """Required."""
+
+class Foo(_model_base.Model):
+    properties: "_models.Properties" = rest_field()
+    """Required."""
+
+    __flattened_items = ["properties"]
+
+print(f.properties.name)  # Non-flattened access is preferred experience
+print(f.name)  # Flattened access is dynamically supported, but not documented
+
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.csharp/issues/4040
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+In Java, `@flattenProperty` have no effect on data-plane libraries.
+
+```java
+@Fluent
+public final class Properties {
+    public Properties();
+    public String getName();
+    public Properties setName(String name);
+}
+```
+
+</TabItem>
+</Tabs>
+
 ## Unions
 
 ### Union of literals with same type
@@ -320,8 +432,7 @@ model Widget {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python generates a union of literals again. Since we always generate our typing as open, this will
-look the same as our previous example where we generate an open union of strings.
+Python generates a union of literals again.
 
 ```python
 from typing import Literal, Union
@@ -390,7 +501,7 @@ For union of other union or enum. TCGC will do the flatten according to the flag
 
 With `flatten-union-as-enum` flagged `true`:
 
-````json
+```json
 {
   "kind": "enum",
   "name": "ProvisioningState",
@@ -421,8 +532,9 @@ With `flatten-union-as-enum` flagged `true`:
     }
   ],
   "isFixed": false,
-  "isUnionAsEnum": true,
+  "isUnionAsEnum": true
 }
+```
 
 With `flatten-union-as-enum` flagged `false`:
 
@@ -471,7 +583,7 @@ With `flatten-union-as-enum` flagged `false`:
     }
   ]
 }
-````
+```
 
 </TabItem>
 <TabItem value="python" label="Python">
@@ -483,7 +595,7 @@ from enum import Enum
 from corehttp.utils import CaseInsensitiveEnumMeta
 
 class ProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
-  IN_PROGRESS = "inProgress"
+  INPROGRESS = "InProgress"
   SUCCEEDED = "Succeeded"
   FAILED = "Failed"
   CANCELED = "Canceled"
@@ -498,7 +610,7 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
   private const string SucceededValue = "Succeeded";
   private const string FailedValue = "Failed";
   private const string CanceledValue = "Canceled";
-  private const string InProgressValue = "inProgress";
+  private const string InProgressValue = "InProgress";
 
   public static ProvisioningState Succeeded { get; } = new ProvisioningState(SucceededValue);
   public static ProvisioningState Failed { get; } = new ProvisioningState(FailedValue);
@@ -513,7 +625,7 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
 ```typescript
 export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
 // NOTE: extensible enum design may change in JS
-export type ProvisioningState = string | "inProgress" | ResourceProvisioningState;
+export type ProvisioningState = string | "InProgress" | ResourceProvisioningState;
 ```
 
 </TabItem>
@@ -521,7 +633,7 @@ export type ProvisioningState = string | "inProgress" | ResourceProvisioningStat
 
 ```java
 public final class ProvisioningState extends ExpandableStringEnum<ProvisioningState> {
-    public static final ProvisioningState IN_PROGRESS = fromString("inProgress");
+    public static final ProvisioningState INPROGRESS = fromString("InProgress");
     public static final ProvisioningState SUCCEEDED = fromString("Succeeded");
     public static final ProvisioningState FAILED = fromString("Failed");
     public static final ProvisioningState CANCELED = fromString("Canceled");
@@ -559,7 +671,7 @@ For union of other union or enum. TCGC will do the flatten according to the flag
 
 With `flatten-union-as-enum` flagged `true`:
 
-````json
+```json
 {
   "kind": "enum",
   "name": "Orientation",
@@ -590,8 +702,9 @@ With `flatten-union-as-enum` flagged `true`:
     }
   ],
   "isFixed": true,
-  "isUnionAsEnum": true,
+  "isUnionAsEnum": true
 }
+```
 
 With `flatten-union-as-enum` flagged `false`:
 
@@ -647,7 +760,7 @@ With `flatten-union-as-enum` flagged `false`:
     }
   ]
 }
-````
+```
 
 </TabItem>
 <TabItem value="python" label="Python">
@@ -727,7 +840,7 @@ For union of other union or enum. TCGC will do the flatten according to the flag
 
 With `flatten-union-as-enum` flagged `true`:
 
-````json
+```json
 {
   "kind": "enum",
   "name": "WidgetOrientations",
@@ -758,8 +871,9 @@ With `flatten-union-as-enum` flagged `true`:
     }
   ],
   "isFixed": true,
-  "isUnionAsEnum": true,
+  "isUnionAsEnum": true
 }
+```
 
 With `flatten-union-as-enum` flagged `false`:
 
@@ -815,7 +929,7 @@ With `flatten-union-as-enum` flagged `false`:
     }
   ]
 }
-````
+```
 
 </TabItem>
 <TabItem value="python" label="Python">

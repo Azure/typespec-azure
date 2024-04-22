@@ -1,13 +1,12 @@
 import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
-  Model,
-  ModelProperty,
   Operation,
+  Type,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
-  isKey,
+  ignoreDiagnostics,
 } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
@@ -56,12 +55,13 @@ import {
   getHashForType,
   getSdkTypeBaseHelper,
   isNullable,
-  updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
   getClientNamespaceString,
+  getCrossLanguagePackageId,
   getDefaultApiVersion,
+  getEffectivePayloadType,
   getHttpOperationWithCache,
   getLibraryName,
 } from "./public-utils.js";
@@ -88,7 +88,14 @@ function getSdkServiceOperation<
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
-  throw new Error("Can't support other service operations yet");
+  diagnostics.add(
+    createDiagnostic({
+      code: "unsupported-protocol",
+      target: operation,
+      format: {},
+    })
+  );
+  return diagnostics.wrap(undefined as any);
 }
 function getSdkLroPagingServiceMethod<
   TOptions extends object,
@@ -122,6 +129,7 @@ function getSdkPagingServiceMethod<
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type)
     );
   }
+  basic.response.resultPath = pagedMetadata.itemsSegments?.join(".");
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
@@ -137,7 +145,7 @@ function getSdkPagingServiceMethod<
         )
       : undefined,
     getResponseMapping(): string | undefined {
-      return pagedMetadata?.itemsSegments?.join(".");
+      return basic.response.resultPath;
     },
   });
 }
@@ -223,49 +231,46 @@ function getSdkBasicServiceMethod<
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // when we spread, all of the inputtable properties of our model get flattened onto the method
   const methodParameters: SdkMethodParameter[] = [];
-  const spreadModelNames: string[] = [];
-  for (const prop of operation.parameters.properties.values()) {
-    if (prop.sourceProperty?.model?.name && !isKey(context.program, prop.sourceProperty)) {
-      if (!spreadModelNames.includes(prop.sourceProperty.model.name)) {
-        spreadModelNames.push(prop.sourceProperty.model.name);
-        methodParameters.push(
-          diagnostics.pipe(getSdkMethodParameter(context, prop.sourceProperty.model))
-        );
+
+  const httpOperation = getHttpOperationWithCache(context, operation);
+  const parameters = httpOperation.parameters;
+  // path/query/header parameters
+  for (const param of parameters.parameters) {
+    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param)));
+  }
+  // body parameters
+  if (parameters.body?.parameter) {
+    methodParameters.push(
+      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter))
+    );
+  } else if (parameters.body) {
+    if (parameters.body.type.kind === "Model") {
+      const type = getEffectivePayloadType(context, parameters.body.type);
+      // spread case
+      if (type.name === "") {
+        for (const prop of type.properties.values()) {
+          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop)));
+        }
+      } else {
+        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, type)));
       }
     } else {
-      // workaround for the provider parameter in arm, need to refine method design in tcgc later
-      if (!context.arm || prop.name !== "provider") {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop)));
-      }
+      methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type)));
     }
   }
 
-  // if there's an api version parameter, we want to bubble it up to the client
-  // we don't want it on the method level, but we will keep it on the service operation level
-  const apiVersionParam = methodParameters.find((x) => x.isApiVersionParam);
-  if (apiVersionParam && context.__api_version_parameter === undefined) {
-    context.__api_version_parameter = {
-      ...apiVersionParam,
-      name: "apiVersion",
-      nameInClient: "apiVersion",
-      isGeneratedName: apiVersionParam.name !== "apiVersion",
-      onClient: true,
-      optional: false,
-      clientDefaultValue: context.__api_version_client_default_value,
-    };
-  }
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
   const response = getSdkMethodResponse(operation, serviceOperation);
+  const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
-    name: getLibraryName(context, operation),
+    name,
     access: getAccess(context, operation),
-    parameters: methodParameters.filter((x) => !x.isApiVersionParam),
+    parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
     operation: serviceOperation,
@@ -274,7 +279,9 @@ function getSdkBasicServiceMethod<
     getParameterMapping: function getParameterMapping(
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
-      return getCorrespondingMethodParams(context, methodParameters, serviceParam);
+      return ignoreDiagnostics(
+        getCorrespondingMethodParams(context, name, methodParameters, serviceParam)
+      );
     },
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
@@ -334,6 +341,9 @@ function getSdkInitializationType<
   if (context.__api_version_parameter) {
     properties.push(context.__api_version_parameter);
   }
+  if (context.__subscriptionIdParameter) {
+    properties.push(context.__subscriptionIdParameter);
+  }
   const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
   const name = `${namePrefix.split(".").at(-1)}Options`;
   return diagnostics.wrap({
@@ -355,10 +365,10 @@ function getSdkInitializationType<
 
 function getSdkMethodParameter(
   context: TCGCContext,
-  type: ModelProperty | Model
+  type: Type
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (type.kind === "Model") {
+  if (type.kind !== "ModelProperty") {
     const libraryName = getLibraryName(context, type);
     const name = camelCase(libraryName ?? "body");
     const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
@@ -375,7 +385,8 @@ function getSdkMethodParameter(
       nullable: false,
       discriminator: false,
       serializedName: name,
-      ...updateWithApiVersionInformation(context, type),
+      isApiVersionParam: false,
+      onClient: false,
     });
   }
   return diagnostics.wrap({
@@ -542,6 +553,7 @@ export function getSdkPackage<
   for (const client of listClients(context)) {
     createSdkClientType(context, client);
   }
+  const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   return {
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
@@ -549,5 +561,6 @@ export function getSdkPackage<
     models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
     enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
     diagnostics: diagnostics.diagnostics,
+    crossLanguagePackageId,
   };
 }

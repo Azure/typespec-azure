@@ -4,9 +4,9 @@ name: Consistency
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: ["main"]
+    branches: ["main", "release/*"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "release/*"]
   merge_group:
   workflow_dispatch: {}
 
@@ -15,6 +15,7 @@ jobs:
   check-changes:
     name: Check Changes
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,15 +24,18 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - run: git pull --force --no-tags origin main:main
-        name: Get main ref
+      - run: git pull --force --no-tags origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+        name: Get ${{ github.event.pull_request.base.ref }} ref for ${{ github.ref}}, evt ${{ github.event_name }}
 
       - run: pnpm install
         name: Install dependencies
 
       - run: npx chronus verify
         name: Check changelog
-        if: ${{ !startsWith(github.head_ref, 'publish/') && !startsWith(github.head_ref, 'dependabot/') && !startsWith(github.head_ref, 'backmerge/') }}
+        if: |
+          !startsWith(github.head_ref, 'publish/') &&
+          !startsWith(github.head_ref, 'dependabot/') &&
+          !startsWith(github.head_ref, 'backmerge/')
 
       - run: node eng/scripts/validate-core-submodule.js
         name: Check that core submodule is merged to core repo

@@ -2,6 +2,7 @@
   "name": "@azure-tools/typespec-azure-monorepo",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@8.13.1",
   "scripts": {
     "run-all": "pnpm -r --filter=!./core/",
@@ -14,7 +15,8 @@
     "fix-version-mismatch": "syncpack fix-mismatches",
     "format": "pnpm run prettier --write",
     "format:check": "pnpm run prettier --check",
-    "lint": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run lint",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
     "pack:all": "chronus pack --pack-destination ./temp/artifacts",
     "preinstall": "npx only-allow pnpm",
     "prepare-publish": "node ./eng/scripts/prepare-publish.js",
@@ -29,17 +31,27 @@
     "watch": "tsc --build ./tsconfig.ws.json --watch"
   },
   "devDependencies": {
-    "@chronus/chronus": "^0.8.3",
-    "@chronus/github": "^0.2.2",
+    "@chronus/chronus": "^0.10.1",
+    "@chronus/github": "^0.3.2",
+    "@eslint/js": "^8.57.0",
     "@pnpm/find-workspace-packages": "^6.0.9",
+    "@types/node": "~18.11.19",
+    "@typescript-eslint/parser": "^7.6.0",
+    "@typescript-eslint/utils": "^7.6.0",
     "c8": "^9.1.0",
-    "cspell": "^8.6.1",
+    "cspell": "^8.7.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-deprecation": "^2.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unicorn": "^52.0.0",
+    "eslint-plugin-vitest": "^0.5.3",
     "prettier": "~3.2.5",
     "prettier-plugin-organize-imports": "~3.2.4",
     "rimraf": "~5.0.5",
     "syncpack": "^12.3.0",
-    "typescript": "~5.4.3",
-    "vitest": "^1.4.0"
+    "typescript": "~5.4.5",
+    "typescript-eslint": "^7.6.0",
+    "vitest": "^1.5.0"
   },
   "syncpack": {
     "dependencyTypes": [

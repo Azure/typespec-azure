@@ -123,7 +123,9 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
 export function getEmitterTargetName(context: TCGCContext): string {
-  return parseEmitterName(context.program.emitters[0]?.metadata?.name); // eslint-disable-line deprecation/deprecation
+  return ignoreDiagnostics(
+    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name)
+  ); // eslint-disable-line deprecation/deprecation
 }
 
 /**
@@ -206,13 +208,16 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: {
-  name: string;
-  kind: string;
-  interface?: Interface;
-  namespace?: Namespace;
-}): string {
-  let retval = type.name;
+export function getCrossLanguageDefinitionId(
+  type: {
+    name?: string;
+    kind: string;
+    interface?: Interface;
+    namespace?: Namespace;
+  },
+  name?: string
+): string {
+  let retval = type.name ? type.name : name ?? "";
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
   }
@@ -405,7 +410,13 @@ function getContextPath(
     if (currentType === expectedType) {
       result.push({ displayName: pascalCase(displayName), type: currentType });
       return true;
-    } else if (currentType.kind === "Model" && currentType.indexer) {
+    } else if (
+      currentType.kind === "Model" &&
+      currentType.indexer &&
+      currentType.properties.size === 0 &&
+      ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+        (currentType.indexer.key.name === "integer" && currentType.name === "Array"))
+    ) {
       // handle array or dict
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
@@ -417,6 +428,15 @@ function getContextPath(
         // traverse model property
         // use property.name as displayName
         const result = dfsModelProperties(expectedType, property.type, property.name);
+        if (result) return true;
+      }
+      // handle additional properties type
+      if (currentType.indexer) {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.indexer.value,
+          "AdditionalProperty"
+        );
         if (result) return true;
       }
       result.pop();

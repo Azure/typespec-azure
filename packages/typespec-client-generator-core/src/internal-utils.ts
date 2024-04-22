@@ -1,11 +1,14 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  Diagnostic,
   Model,
   Namespace,
   Operation,
   Program,
+  ProjectedProgram,
   Type,
   Union,
+  createDiagnosticCollector,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
@@ -17,6 +20,7 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -26,6 +30,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
+import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -38,16 +43,27 @@ import {
  * @param emitterName Full emitter name
  * @returns The language of the emitter. I.e. "@azure-tools/typespec-csharp" will return "csharp"
  */
-export function parseEmitterName(emitterName?: string): string {
+export function parseEmitterName(
+  program: Program,
+  emitterName?: string
+): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (!emitterName) {
-    throw new Error("No emitter name found in program");
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-emitter-name",
+        format: {},
+        target: program.getGlobalNamespaceType(),
+      })
+    );
+    return diagnostics.wrap("none");
   }
   const regex = /(?:cadl|typespec)-([^\\/]*)/;
   const match = emitterName.match(regex);
-  if (!match || match.length < 2) return "none";
+  if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
-  if (["typescript", "ts"].includes(language)) return "javascript";
-  return language;
+  if (["typescript", "ts"].includes(language)) return diagnostics.wrap("javascript");
+  return diagnostics.wrap(language);
 }
 
 /**
@@ -91,7 +107,7 @@ export function updateWithApiVersionInformation(
   return {
     isApiVersionParam,
     clientDefaultValue: isApiVersionParam ? context.__api_version_client_default_value : undefined,
-    onClient: isApiVersionParam,
+    onClient: onClient(context, type),
   };
 }
 
@@ -114,7 +130,8 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
   let addedCounter = 0;
   let removeCounter = 0;
   const retval: string[] = [];
-  for (const version of apiVersions) {
+  for (let i = 0; i < apiVersions.length; i++) {
+    const version = apiVersions[i];
     if (addedCounter < addedOnVersions.length && version === addedOnVersions[addedCounter]) {
       added = true;
       addedCounter++;
@@ -123,7 +140,17 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
       added = false;
       removeCounter++;
     }
-    if (added) retval.push(version);
+    if (added) {
+      // only add version smaller than config
+      if (
+        context.apiVersion === undefined ||
+        context.apiVersion === "latest" ||
+        context.apiVersion === "all" ||
+        apiVersions.indexOf(context.apiVersion) >= i
+      ) {
+        retval.push(version);
+      }
+    }
   }
   return retval;
 }
@@ -244,12 +271,20 @@ export interface TCGCContext {
   __api_version_client_default_value?: string;
   __api_versions?: string[];
   knownScalars?: Record<string, SdkBuiltInKinds>;
+  diagnostics: readonly Diagnostic[];
+  __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
+  apiVersion?: string;
+  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  originalProgram: Program;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
   return {
     program,
     emitterName: "__TCGC_INTERNAL__",
+    diagnostics: [],
+    originalProgram: program,
   };
 }
 
@@ -328,4 +363,12 @@ export function isMultipartFormData(
   operation?: Operation
 ): boolean {
   return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
+}
+
+export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
+  return Boolean(context.arm) && parameter.name === "subscriptionId";
+}
+
+export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
+  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }

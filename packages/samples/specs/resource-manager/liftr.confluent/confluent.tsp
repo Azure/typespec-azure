@@ -168,7 +168,7 @@ interface MarketplaceAgreements extends ResourceListBySubscription<ConfluentAgre
     ...KeysOf<ConfluentAgreementResource>,
 
     @doc("The agreement details.")
-    @body
+    @bodyRoot
     agreement: ConfluentAgreementResource,
   ): ArmResponse<ConfluentAgreementResource> | ErrorResponse;
 }

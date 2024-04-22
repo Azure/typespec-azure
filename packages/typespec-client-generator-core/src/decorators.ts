@@ -16,6 +16,7 @@ import {
   SyntaxKind,
   Type,
   Union,
+  createDiagnosticCollector,
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
@@ -23,9 +24,11 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   listServices,
+  projectProgram,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
+import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessFlags,
   LanguageScopes,
@@ -204,6 +207,58 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   );
 }
 
+function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
+  if (!context.__service_projection) {
+    context.__service_projection = new Map();
+  }
+
+  let projectedService;
+  let projectedProgram;
+
+  if (context.__service_projection.has(client.service)) {
+    [projectedService, projectedProgram] = context.__service_projection.get(client.service)!;
+  } else {
+    const allApiVersions = getVersions(context.program, client.service)[1]
+      ?.getVersions()
+      .map((x) => x.value);
+    if (!allApiVersions) return;
+    let apiVersion = context.apiVersion;
+    if (
+      apiVersion === "latest" ||
+      apiVersion === undefined ||
+      !allApiVersions.includes(apiVersion)
+    ) {
+      apiVersion = allApiVersions[allApiVersions.length - 1];
+    }
+    if (apiVersion === undefined) return;
+    const versionProjections = buildVersionProjections(context.program, client.service).filter(
+      (v) => apiVersion === v.version
+    );
+    if (versionProjections.length !== 1)
+      throw new Error("Version projects should only contain one element");
+    const projectedVersion = versionProjections[0];
+    if (projectedVersion.projections.length > 0) {
+      projectedProgram = context.program = projectProgram(
+        context.originalProgram,
+        projectedVersion.projections
+      );
+    }
+    projectedService = projectedProgram
+      ? (projectedProgram.projector.projectedTypes.get(client.service) as Namespace)
+      : client.service;
+    context.__service_projection.set(client.service, [projectedService, projectedProgram]);
+  }
+
+  if (client.service !== client.type) {
+    client.type = projectedProgram
+      ? (projectedProgram.projector.projectedTypes.get(client.type) as Interface)
+      : client.type;
+  } else {
+    client.type = projectedService;
+  }
+  client.service = projectedService;
+}
+
 /**
  * List all the clients.
  *
@@ -211,15 +266,23 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
  * @returns Array of clients
  */
 export function listClients(context: TCGCContext): SdkClient[] {
+  if (context.__rawClients) return context.__rawClients;
+
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
+    if (context.apiVersion !== "all") {
+      for (const client of explicitClients as SdkClient[]) {
+        serviceVersioningProjection(context, client);
+      }
+    }
+    context.__rawClients = explicitClients;
     return explicitClients;
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
   const services = listServices(context.program);
 
-  return services.map((service) => {
+  const clients = services.map((service) => {
     let originalName = service.type.name;
     const clientNameOverride = getClientNameOverride(context, service.type);
     if (clientNameOverride) {
@@ -236,8 +299,14 @@ export function listClients(context: TCGCContext): SdkClient[] {
       type: service.type,
       arm: isArm(service.type),
       crossLanguageDefinitionId: `${getNamespaceFullName(service.type)}.${clientName}`,
-    };
+    } as SdkClient;
   });
+
+  if (context.apiVersion !== "all") {
+    clients.map((client) => serviceVersioningProjection(context, client));
+  }
+  context.__rawClients = clients;
+  return clients;
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");
@@ -503,6 +572,7 @@ export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+  const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
@@ -512,14 +582,24 @@ export function createSdkContext<
     program: context.program,
     emitContext: context,
     experimental_sdkPackage: undefined!,
-    emitterName: parseEmitterName(emitterName ?? context.program.emitters[0]?.metadata?.name), // eslint-disable-line deprecation/deprecation
+    emitterName: diagnostics.pipe(
+      parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
+    ), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
+    diagnostics: diagnostics.diagnostics,
+    apiVersion: context.options["api-version"],
+    originalProgram: context.program,
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  if (sdkContext.diagnostics) {
+    sdkContext.diagnostics = sdkContext.diagnostics.concat(
+      sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+    );
+  }
   return sdkContext;
 }
 

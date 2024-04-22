@@ -39,12 +39,22 @@ namespace Microsoft.ContosoProviderHub;
 interface Operations extends Azure.ResourceManager.Operations {}
 
 @lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
-  Provisioning,
-  Updating,
-  Deleting,
-  Accepted,
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned. */
+  Provisioning: "Provisioning",
+
+  /** The resource is being updated. */
+  Updating: "Updating",
+
+  /** The resource is being deleted. */
+  Deleting: "Deleting",
+
+  /** The resource provisioning request has been accepted. */
+  Accepted: "Accepted",
+
+  string,
 }
 
 @doc("The properties of UserResource")

@@ -332,7 +332,7 @@ it("puts inapplicable metadata in schema", async () => {
      @header h: string;
     }
     @route("/single") @get op single(...Parameters): string;
-    @route("/batch") @get op batch(...Body<Parameters[]>): string;
+    @route("/batch") @get op batch(@bodyRoot body: Parameters[]): string;
     `
   );
   deepStrictEqual(res.paths, {
@@ -363,7 +363,6 @@ it("puts inapplicable metadata in schema", async () => {
         },
         parameters: [
           {
-            description: "The body type of the operation request or response.",
             in: "body",
             name: "body",
             required: true,
@@ -532,11 +531,11 @@ it("handles cycle in transformed model", async () => {
   });
 });
 
-it("supports nested metadata and removes emptied properties", async () => {
+it("supports nested metadata and removes properties with @bodyIgnore", async () => {
   const res = await openApiFor(
     `
     model Pet {
-      headers: {
+      @bodyIgnore headers: {
         @header h1: string;
         moreHeaders: {
           @header h2: string;
