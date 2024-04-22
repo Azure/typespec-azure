@@ -185,7 +185,7 @@ export function getClient(
 ): SdkClient | undefined {
   if (hasExplicitClientOrOperationGroup(context)) {
     let client = getScopedDecoratorData(context, clientKey, type);
-    if ((client.type as Type).kind === "Intrinsic") client = undefined;
+    if (client && (client.type as Type).kind === "Intrinsic") client = undefined;
     return client;
   }
 
