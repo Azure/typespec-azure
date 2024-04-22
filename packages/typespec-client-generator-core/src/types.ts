@@ -288,6 +288,7 @@ export function getSdkArrayOrDictWithDiagnostics(
         if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
           return diagnostics.wrap(undefined);
         }
+        // other cases are dict
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "dict"),
           keyType: diagnostics.pipe(
@@ -296,7 +297,8 @@ export function getSdkArrayOrDictWithDiagnostics(
           valueType,
           nullableValues: isNullable(type.indexer.value!),
         });
-      } else if (name === "integer" && type.name === "Array") {
+      } else if (name === "integer") {
+        // only array's index key name is integer
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
