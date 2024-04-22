@@ -163,15 +163,16 @@ function getSdkLroServiceMethod<
     getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
   );
 
-  basicServiceMethod.response.type = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, metadata.logicalResult)
-  );
-  basicServiceMethod.response.resultPath =
-    metadata.logicalPath ??
-    (metadata.envelopeResult !== metadata.logicalResult &&
-    basicServiceMethod.operation.verb === "post"
-      ? "result"
-      : undefined);
+  if (metadata.finalResult === undefined || metadata.finalResult === "void") {
+    basicServiceMethod.response.type = undefined;
+  } else {
+    basicServiceMethod.response.type = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, metadata.finalResult)
+    );
+  }
+
+  basicServiceMethod.response.resultPath = metadata.finalResultPath;
+
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",

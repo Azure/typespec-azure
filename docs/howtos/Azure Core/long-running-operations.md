@@ -110,12 +110,12 @@ A StatusMonitor provides information that drives client polling until an operati
 
 | Decorator                    | Value                                                                                                                                                                                                                                                                     |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@lroStatus`                 | A decorator marking the field of the StatusMonitor that contains status information. This field should use an `enum` type to specify terminal status values.                                                                                                              |
+| `@lroStatus`                 | A decorator marking the field of the StatusMonitor that contains status information. This field should use a `union` type to specify terminal status values.                                                                                                              |
 | `@lroResult`                 | A decorator marking the property of the Status monitor that contains the result of the operation, when the operation completes successfully. By default, any field named 'result' in a StatusMonitor is assumed to contain the result of a successful operation.          |
 | `@lroErrorResult`            | A decorator marking the property of the Status monitor that contains errors when the operation is unsuccessful. By default, any field named 'error' in a StatusMonitor is assumed to contain the result of a successful operation.                                        |
-| `@lroSucceeded`              | If a status monitor uses a value other than `Succeeded` to indicate operation termination with success, then the enum value corresponding to successful completion should be decorated with this decorator.                                                               |
-| `@lroCanceled`               | If a status monitor uses a value other than `Canceled` to indicate that the operation was cancelled, then the enum value corresponding to cancellation should be decorated with this decorator.                                                                           |
-| `@lroFailed`                 | If a status monitor uses a value other than `Failed` to indicate operation termination with failure, then the enum value corresponding to operation failure should be decorated with this decorator.                                                                      |
+| `@lroSucceeded`              | If a status monitor uses a value other than `Succeeded` to indicate operation termination with success, then the variant corresponding to successful completion should be decorated with this decorator.                                                                  |
+| `@lroCanceled`               | If a status monitor uses a value other than `Canceled` to indicate that the operation was cancelled, then the variant corresponding to cancellation should be decorated with this decorator.                                                                              |
+| `@lroFailed`                 | If a status monitor uses a value other than `Failed` to indicate operation termination with failure, then the variant corresponding to operation failure should be decorated with this decorator.                                                                         |
 | `@pollingOperationParameter` | Indicates which request parameters or response properties of an operation can be used to call the operation that retrieves lro status (Status Monitor). Each application of the decorator may reference or name the corresponding parameter in the `getStatus` operation. |
 
 ### Examples of common (non-standard) Lro Patterns
@@ -133,17 +133,19 @@ In this example, the Status Monitor terminal properties for "Succeeded", "Failed
 
 ```tsp
 @lroStatus
-enum OperationStatus {
-  Running,
+union OperationStatus {
+  Running: "Running",
 
   @lroSucceeded
-  Completed,
+  Completed: "Completed",
 
   @lroCanceled
-  Aborted,
+  Aborted: "Aborted",
 
   @lroFailed
-  Faulted,
+  Faulted: "Faulted",
+
+  string,
 }
 
 model StatusMonitor {
@@ -249,11 +251,12 @@ In this example, the operation returns a `location` header with a link to the St
 
 ```tsp
 @lroStatus
-enum OperationStatus {
-  Running,
-  Succeeded,
-  Canceled,
-  Failed,
+union OperationStatus {
+  Running: "Running",
+  Succeeded: "Succeeded",
+  Canceled: "Canceled",
+  Failed: "Failed",
+  string,
 }
 
 model StatusMonitor {
@@ -316,11 +319,12 @@ In this example, the operation returns a `Azure-AsyncOperation` header with a li
 
 ```tsp
 @lroStatus
-enum OperationStatus {
-  Running,
-  Succeeded,
-  Canceled,
-  Failed,
+union OperationStatus {
+  Running: "Running",
+  Succeeded: "Succeeded",
+  Canceled: "Canceled",
+  Failed: "Failed",
+  string,
 }
 
 model StatusMonitor {
@@ -384,11 +388,12 @@ In this example, the operation returns a link to the Status Monitor (in `Azure-A
 
 ```tsp
 @lroStatus
-enum OperationStatus {
-  Running,
-  Succeeded,
-  Canceled,
-  Failed,
+union OperationStatus {
+  Running: "Running",
+  Succeeded: "Succeeded",
+  Canceled: "Canceled",
+  Failed: "Failed",
+  string,
 }
 
 model StatusMonitor {
@@ -464,11 +469,12 @@ In this example, the operation does not return a link, instead, the request para
 
 ```tsp
 @lroStatus
-enum OperationStatus {
-  Running,
-  Succeeded,
-  Canceled,
-  Failed,
+union OperationStatus {
+  Running: "Running",
+  Succeeded: "Succeeded",
+  Canceled: "Canceled",
+  Failed: "Failed",
+  string,
 }
 
 model StatusMonitor {

@@ -1619,6 +1619,9 @@ importers:
 
   packages/typespec-autorest-canonical:
     devDependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:~
+        version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
         version: link:../typespec-azure-core
