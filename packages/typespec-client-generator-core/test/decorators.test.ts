@@ -3044,4 +3044,215 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
   });
+
+  describe("versioning impact for apis", () => {
+    it("multiple clients", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+          v2,
+          v3,
+        }
+        
+        @client({name: "AClient"})
+        @test
+        interface A {
+          @route("/aa")
+          op aa(): void;
+
+          @added(Versions.v2)
+          @removed(Versions.v3)
+          @route("/ab")
+          op ab(): void;
+        }
+
+        @client({name: "BClient"})
+        @added(Versions.v2)
+        @test
+        interface B {
+          @route("/ba")
+          op ba(): void;
+
+          @route("/bb")
+          op bb(): void;
+        }
+      `;
+
+      let runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      let { A, B } = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
+      ok(getClient(runnerWithVersion.context, A));
+      strictEqual(getClient(runnerWithVersion.context, B), undefined);
+
+      let clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      let aClient = clients.find((x) => x.name === "AClient");
+      ok(aClient);
+      let aOps = listOperationsInOperationGroup(runnerWithVersion.context, aClient);
+      strictEqual(aOps.length, 1);
+      let aa = aOps.find((x) => x.name === "aa");
+      ok(aa);
+
+      runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v2",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      let result = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
+      A = result.A;
+      B = result.B;
+      ok(getClient(runnerWithVersion.context, A));
+      ok(getClient(runnerWithVersion.context, B));
+
+      clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 2);
+      aClient = clients.find((x) => x.name === "AClient");
+      ok(aClient);
+      aOps = listOperationsInOperationGroup(runnerWithVersion.context, aClient);
+      strictEqual(aOps.length, 2);
+      aa = aOps.find((x) => x.name === "aa");
+      ok(aa);
+      const ab = aOps.find((x) => x.name === "ab");
+      ok(ab);
+      let bClient = clients.find((x) => x.name === "BClient");
+      ok(bClient);
+      let bOps = listOperationsInOperationGroup(runnerWithVersion.context, bClient);
+      strictEqual(bOps.length, 2);
+      let ba = bOps.find((x) => x.name === "ba");
+      ok(ba);
+      let bb = bOps.find((x) => x.name === "bb");
+      ok(bb);
+
+      runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v3",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      result = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
+      A = result.A;
+      B = result.B;
+      ok(getClient(runnerWithVersion.context, A));
+      ok(getClient(runnerWithVersion.context, B));
+
+      clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 2);
+      aClient = clients.find((x) => x.name === "AClient");
+      ok(aClient);
+      aOps = listOperationsInOperationGroup(runnerWithVersion.context, aClient);
+      strictEqual(aOps.length, 1);
+      aa = aOps.find((x) => x.name === "aa");
+      ok(aa);
+      bClient = clients.find((x) => x.name === "BClient");
+      ok(bClient);
+      bOps = listOperationsInOperationGroup(runnerWithVersion.context, bClient);
+      strictEqual(bOps.length, 2);
+      ba = bOps.find((x) => x.name === "ba");
+      ok(ba);
+      bb = bOps.find((x) => x.name === "bb");
+      ok(bb);
+    });
+
+    it("multiple operation groups", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+          v2,
+          v3,
+        }
+        
+        namespace A {
+          @route("/a")
+          op a(): void;
+        }
+
+        @added(Versions.v2)
+        @removed(Versions.v3)
+        interface B {
+          @route("/b")
+          op b(): void;
+        }
+      `;
+
+      let runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      let clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      let client = clients.find((x) => x.name === "WidgetManagerClient");
+      ok(client);
+      let ops = listOperationGroups(runnerWithVersion.context, client);
+      strictEqual(ops.length, 1);
+      let aOp = ops.find((x) => x.type.name === "A");
+      ok(aOp);
+      let aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
+      strictEqual(aOps.length, 1);
+      let a = aOps.find((x) => x.name === "a");
+      ok(a);
+
+      runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v2",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      client = clients.find((x) => x.name === "WidgetManagerClient");
+      ok(client);
+      ops = listOperationGroups(runnerWithVersion.context, client);
+      strictEqual(ops.length, 2);
+      aOp = ops.find((x) => x.type.name === "A");
+      ok(aOp);
+      aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
+      strictEqual(aOps.length, 1);
+      a = aOps.find((x) => x.name === "a");
+      ok(a);
+      const bOp = ops.find((x) => x.type.name === "B");
+      ok(bOp);
+      const bOps = listOperationsInOperationGroup(runnerWithVersion.context, bOp);
+      strictEqual(bOps.length, 1);
+      const b = bOps.find((x) => x.name === "b");
+      ok(b);
+
+      runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v3",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      client = clients.find((x) => x.name === "WidgetManagerClient");
+      ok(client);
+      ops = listOperationGroups(runnerWithVersion.context, client);
+      strictEqual(ops.length, 1);
+      aOp = ops.find((x) => x.type.name === "A");
+      ok(aOp);
+      aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
+      strictEqual(aOps.length, 1);
+      a = aOps.find((x) => x.name === "a");
+      ok(a);
+    });
+  });
 });
