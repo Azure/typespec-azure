@@ -179,6 +179,11 @@ public void post(User user);
 
 ## Spread
 
+Please use the *spread* feature with caution.
+- The anonymous model to be spread into operation should have less than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
+- The anonymous model should be stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
+- The anonymous model should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
+
 ### Alias
 
 <Tabs>
