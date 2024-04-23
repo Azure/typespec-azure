@@ -23,10 +23,6 @@ model Employee is ProxyResource<{}> {
 
 ```tsp
 model Employee is ProxyResource<{}> {
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @path
-  @segment("employees")
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 ```

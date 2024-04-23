@@ -25,7 +25,9 @@ model ArmResource extends ArmResourceBase {
   @visibility("read")
   id: string;
 
-  // The name property must be included by the resource type author!
+  @doc("The name of the resource")
+  @visibility("read")
+  name: string;
 
   @doc("The type of the resource. E.g. \"Microsoft.Compute/virtualMachines\" or \"Microsoft.Storage/storageAccounts\"")
   @visibility("read")

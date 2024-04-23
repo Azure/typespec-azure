@@ -98,7 +98,7 @@
           {
             "name": "roleAssignmentName",
             "in": "path",
-            "description": "Name of roleAssignment",
+            "description": "The name of the RoleAssignment",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -135,7 +135,7 @@
           {
             "name": "roleAssignmentName",
             "in": "path",
-            "description": "Name of roleAssignment",
+            "description": "The name of the RoleAssignment",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -198,7 +198,7 @@
           {
             "name": "roleAssignmentName",
             "in": "path",
-            "description": "Name of roleAssignment",
+            "description": "The name of the RoleAssignment",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -244,7 +244,7 @@
           {
             "name": "roleAssignmentName",
             "in": "path",
-            "description": "Name of roleAssignment",
+            "description": "The name of the RoleAssignment",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -281,7 +281,7 @@
           {
             "name": "roleAssignmentName",
             "in": "path",
-            "description": "Name of roleAssignment",
+            "description": "The name of the RoleAssignment",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"

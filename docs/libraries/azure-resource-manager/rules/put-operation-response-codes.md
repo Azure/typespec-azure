@@ -6,7 +6,7 @@ title: put-operation-response-codes
 @azure-tools/typespec-azure-resource-manager/put-operation-response-codes
 ```
 
-Put operations should use the `ArmResourceCreateOrUpdateAsync`, `ArmResourceCreateOrReplaceAsync` or `ArmResourceCreateOrReplaceSync` template. They must have 200, 201, default and no other responses.
+Put operations should use the `ArmResourceCreateOrReplaceAsync` or `ArmResourceCreateOrReplaceSync` template. They must have 200, 201, default and no other responses.
 
 #### ❌ Incorrect
 
@@ -26,6 +26,6 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  createOrUpdate is ArmResourceCreateOrUpdateAsync<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
 }
 ```

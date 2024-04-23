@@ -926,6 +926,31 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 | value     | `Array<Element>`                 | The {name} items on this page      |
 | nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
 
+### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
+
+Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+
+```typespec
+model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.              |
+| KeyName     | Override default key name of the resource.                        |
+| SegmentName | Override default segment name of the resource.                    |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`. |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
 The dynamic parameters of a list call for a resource instance - pass in the proper base type to indicate
@@ -1160,6 +1185,7 @@ model Azure.ResourceManager.Foundations.ArmResource
 | Name        | Type                                                                         | Description                                                                                                                                                                               |
 | ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | id          | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name        | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type        | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
 | systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
