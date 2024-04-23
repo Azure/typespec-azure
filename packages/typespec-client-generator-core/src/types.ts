@@ -348,7 +348,7 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(getAnyType(context, type));
   }
 
-  // change to a simple logic: only convert to normal type if the union is type | null, otherwise, return all the union types
+  // convert to normal type if the union is type | null
   if (nonNullOptions.length === 1) {
     const clientType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
