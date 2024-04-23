@@ -5,23 +5,96 @@ import TabItem from "@theme/TabItem";
 
 This doc details what emitters will generate for versioned specs
 
-## Single API Version
+## Single api Version
 
-If there is just one API version in the spec, we will generate
+If there is just one api version in the spec, we will generate the api surface area for that one version.
 
-## Multiple API version
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+
+using TypeSpec.Versioning;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+op stableFunctionality(...StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01")
+# python allows you to override the api version, even if only one version is defined in the spec
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+## Multiple api versions
 
 The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate.
 
-We will get the versioning information from the `Versions` enum that you define and link as part of the `@typespec/versioning` library.
+We will get the versioning information from the `Versions` enum that you pass to the `@versioned` decorator from the `@typespec/versioning` library.
 
 > NOTE: The ordering of the values in the `Versions` enum is very important. We use this information to determine the order of versions. Our default value will be the **last entry** in the `Versions` list
 
 ### Default
 
-By default our emitters will only generate the surface used by the latest api version if there are multiple defined.
+By default our emitters will only generate the surface used by the latest api version if there are multiple defined. This includes generating only the models used in the surface area of the latest api version. 
 
-By default, only models used in api surface of the latest api version are included in generation. Documentation and enums showing the available API versions will still include all of the known api versions, meaning there will be documentation for both the preview and stable releases.
+Documentation and enums showing the available api versions will still include all of the known api versions, meaning there will be documentation for both the preview and stable releases.
 
 For the below example, all languages will generate the api surface of default version `v2023_11_01`. There will be no generation of the operation `previewFunctionality`, and we will also not generate the `PreviewModel` because it's only used in `previewFunctionality`, and therefore is not used in the api surface of `v2023_11_01`.
 
@@ -66,7 +139,7 @@ import pytest
 from my.service import MyServiceClient, models
 
 client = MyServiceClient(endpoint=..., credential=...)
-# client's api_version will be v2023_11_01
+# client's api_version will be "2023-11-01"
 
 stable_model = models.StableModel(stable_feature="present")
 print(stable_model)
@@ -110,11 +183,11 @@ with pytest.expect(AttributeError):
 </TabItem>
 </Tabs>
 
-### Override to return all
+### Override to a specific version
 
-You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
+You can override the signature to return the api surface area for a specific api version.
 
-**To override the behavior, pass in `api-version: all` in your `tspconfig.yaml`.**
+In this example, we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -150,6 +223,133 @@ op stableFunctionality(...StableModel): void;
 
 </TabItem>
 
+<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
+
+```yaml
+...
+options:
+  "@azure-tools/typespec-python":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-csharp":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-ts":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-java":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-go":
+    api-version: "2023-11-01-preview"
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+preview_client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01-preview"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+preview_client.stable_functionality(stable_model) # call goes through
+
+preview_model = models.PreviewModel(preview_functionality="present")
+# the model is generated as part of the api surface
+
+preview_client.preview_functionality(preview_model) # call goes through
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+
+### Override to return all
+
+You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+
+using TypeSpec.Versioning;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+op previewFunctionality(...PreviewModel): void;
+
+op stableFunctionality(...StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
+
+```yaml
+...
+options:
+  "@azure-tools/typespec-python":
+    api-version: "all"
+  "@azure-tools/typespec-csharp":
+    api-version: "all"
+  "@azure-tools/typespec-ts":
+    api-version: "all"
+  "@azure-tools/typespec-java":
+    api-version: "all"
+  "@azure-tools/typespec-go":
+    api-version: "all"
+```
+
+</TabItem>
+
 <TabItem value="python" label="Python">
 
 ```python
@@ -157,22 +357,22 @@ import pytest
 from my.service import MyServiceClient, models
 
 client = MyServiceClient(endpoint=..., credential=...)
-# client's api_version will be v2023_11_01
+# client's api_version will be "2023-11-01"
 
 stable_model = models.StableModel(stable_feature="present")
 print(stable_model)
 client.stable_functionality(stable_model) # call goes through
 
-preview_model = models.PreviewModel(preview_functionality="not present")
+preview_model = models.PreviewModel(preview_functionality="present")
 # the model is generated as part of the api surface
 
 with pytest.expect(ValueError) as ex:
   client.preview_functionality(preview_model)
-assert "preview_functionality is not available in API version 2023-11-01" in str(ex)
+assert "preview_functionality is not available in api version 2023-11-01" in str(ex)
 
 preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01-preview")
 
-client.preview_functionality(preview_model) # call goes through
+preview_client.preview_functionality(preview_model) # call goes through
 ```
 
 </TabItem>
