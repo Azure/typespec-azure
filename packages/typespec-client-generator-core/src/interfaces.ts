@@ -185,11 +185,19 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
 export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   return (
     kind in SdkBuiltInKindsMiscellaneousEnum ||
-    kind in SdkIntKindsEnum ||
-    kind in SdkFloatKindsEnum ||
+    isSdkIntKind(kind) ||
+    isSdkFloatKind(kind) ||
     kind in SdkGenericBuiltInStringKindsEnum ||
     kind in SdkAzureBuiltInStringKindsEnum
   );
+}
+
+export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum {
+  return kind in SdkIntKindsEnum;
+}
+
+export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKindsEnum {
+  return kind in SdkFloatKindsEnum;
 }
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
@@ -435,7 +443,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   defaultContentType?: string;
 }
 
-interface SdkServiceOperationBase {}
+interface SdkServiceOperationBase { }
 
 export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
@@ -497,7 +505,7 @@ interface SdkPagingServiceMethodOptions {
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+  SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
@@ -507,14 +515,14 @@ interface SdkLroServiceMethodOptions {
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions {
+  SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+  SdkLroServiceMethodOptions,
+  SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
