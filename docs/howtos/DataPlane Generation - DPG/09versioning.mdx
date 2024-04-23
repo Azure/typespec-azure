@@ -92,7 +92,7 @@ We will get the versioning information from the `Versions` enum that you pass to
 
 ### Default
 
-By default our emitters will only generate the surface used by the latest api version if there are multiple defined. This includes generating only the models used in the surface area of the latest api version. 
+By default our emitters will only generate the surface used by the latest api version if there are multiple defined. This includes generating only the models used in the surface area of the latest api version.
 
 Documentation and enums showing the available api versions will still include all of the known api versions, meaning there will be documentation for both the preview and stable releases.
 
@@ -226,7 +226,8 @@ op stableFunctionality(...StableModel): void;
 <TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
 
 ```yaml
-...
+
+---
 options:
   "@azure-tools/typespec-python":
     api-version: "2023-11-01-preview"
@@ -292,7 +293,6 @@ preview_client.preview_functionality(preview_model) # call goes through
 </TabItem>
 </Tabs>
 
-
 ### Override to return all
 
 You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
@@ -334,7 +334,8 @@ op stableFunctionality(...StableModel): void;
 <TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
 
 ```yaml
-...
+
+---
 options:
   "@azure-tools/typespec-python":
     api-version: "all"
