@@ -51,7 +51,7 @@ model User is TrackedResource<UserProperties> {
 @armResourceOperations
 interface Users {
   get is ArmResourceRead<User>;
-  create is ArmResourceCreateOrUpdateAsync<User>;
+  create is ArmResourceCreateOrReplaceAsync<User>;
   update is ArmResourcePatchSync<User, UserProperties>;
   delete is ArmResourceDeleteSync<User>;
   listByResourceGroup is ArmResourceListByParent<User>;
