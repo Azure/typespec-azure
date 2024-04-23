@@ -112,7 +112,7 @@ interface Dependents {
 
 @parentResource(Employee)
 model Dependent is ProxyResource<DependentProperties> {
-  ...ResourceNameParameter<Employee>;
+  ...ResourceNameParameter<Dependent>;
 }
 
 /** Dependent properties */

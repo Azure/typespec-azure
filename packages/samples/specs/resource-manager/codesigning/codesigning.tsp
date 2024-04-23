@@ -24,7 +24,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("A CodeSignAccount resource")
 model CodeSignAccount is TrackedResource<CodeSignAccountProperties> {
-  ...ResourceNameParameter<Employee>;
+  ...ResourceNameParameter<CodeSignAccount>;
 }
 
 @armResourceOperations
@@ -113,7 +113,7 @@ union ProvisioningState {
 
 @parentResource(CodeSignAccount)
 model CertificateProfile is ProxyResource<CertificateProfileProperties> {
-  ...ResourceNameParameter<Employee>;
+  ...ResourceNameParameter<CertificateProfile>;
 }
 
 @armResourceOperations

@@ -169,7 +169,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The name of the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -209,7 +209,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The name of the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -275,7 +275,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The name of the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -324,7 +324,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The name of the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -384,7 +384,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The name of the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"

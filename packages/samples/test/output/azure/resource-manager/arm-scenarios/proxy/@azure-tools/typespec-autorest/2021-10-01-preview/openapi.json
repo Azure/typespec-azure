@@ -462,7 +462,7 @@
           {
             "name": "dependentName",
             "in": "path",
-            "description": "Name of dependent",
+            "description": "The name of the Dependent",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -510,7 +510,7 @@
           {
             "name": "dependentName",
             "in": "path",
-            "description": "Name of dependent",
+            "description": "The name of the Dependent",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -584,7 +584,7 @@
           {
             "name": "dependentName",
             "in": "path",
-            "description": "Name of dependent",
+            "description": "The name of the Dependent",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -641,7 +641,7 @@
           {
             "name": "dependentName",
             "in": "path",
-            "description": "Name of dependent",
+            "description": "The name of the Dependent",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
