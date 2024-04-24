@@ -3043,6 +3043,73 @@ describe("typespec-client-generator-core: decorators", () => {
         ["v1", "v2", "v3"]
       );
     });
+
+    it("model only used in new version", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v2023_11_01_preview: "2023-11-01-preview",
+          v2023_11_01: "2023-11-01",
+        }
+        
+        model PreviewModel {
+          betaFeature: string;
+        }
+        
+        model StableModel {
+          stableFeature: string;
+        }
+        
+        @added(Versions.v2023_11_01_preview)
+        @removed(Versions.v2023_11_01)
+        @route("/preview")
+        op previewFunctionality(...PreviewModel): void;
+        
+        @route("/stable")
+        op stableFunctionality(...StableModel): void;
+      `;
+
+      let runnerWithVersion = await createSdkTestRunner({
+        "api-version": "2023-11-01-preview",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 2);
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        "previewFunctionality"
+      );
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[1].name,
+        "stableFunctionality"
+      );
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 2);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "PreviewModel");
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[1].name, "StableModel");
+
+      runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 1);
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        "stableFunctionality"
+      );
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "StableModel");
+    });
   });
 
   describe("versioning impact for apis", () => {
