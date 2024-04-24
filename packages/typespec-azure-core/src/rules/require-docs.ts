@@ -42,7 +42,7 @@ function findDiscriminator(program: Program, model?: Model): Discriminator | und
 /** Discriminator enums and unions are self-documenting and don't need separate documentation. */
 function isExcludedDiscriminator(
   program: Program,
-  type: ModelProperty | Enum,
+  type: ModelProperty | Enum | Union,
   discTypes: [Model | Union, Discriminator][]
 ): boolean {
   if (type.kind === "ModelProperty") {
@@ -57,10 +57,21 @@ function isExcludedDiscriminator(
         if (discObj?.type === type) {
           return true;
         }
+      } else if (discType.kind === "Union") {
+        let test = "best";
       }
     }
   }
   return false;
+}
+
+function getUnionName(union: Union): string {
+  if (union.name !== undefined) {
+    return union.name;
+  } else if (union.symbol !== undefined) {
+    return union.symbol.name;
+  }
+  return "{anonymous}";
 }
 
 export const requireDocumentation = createRule({
@@ -146,6 +157,30 @@ export const requireDocumentation = createRule({
                 format: { kind: prop.kind, name: prop.name },
               });
             }
+          }
+        }
+      },
+      union: (union: Union) => {
+        if (isExcludedDiscriminator(context.program, union, discTypes)) {
+          return;
+        }
+        const name = getUnionName(union);
+        if (!getDoc(context.program, union) && !isExcludedCoreType(context.program, union)) {
+          context.reportDiagnostic({
+            target: union,
+            format: { kind: union.kind, name: name },
+          });
+        }
+        for (const variant of union.variants.values()) {
+          if (!getDoc(context.program, variant)) {
+            // symbols don't need documentation
+            if (typeof variant.name !== "string") {
+              return;
+            }
+            context.reportDiagnostic({
+              target: variant,
+              format: { kind: variant.kind, name: variant.name },
+            });
           }
         }
       },
