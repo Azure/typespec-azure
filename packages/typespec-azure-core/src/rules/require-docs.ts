@@ -5,6 +5,7 @@ import {
   ModelProperty,
   Operation,
   Program,
+  Union,
   createRule,
   getDiscriminatedTypes,
   getDiscriminator,
@@ -39,14 +40,17 @@ function findDiscriminator(program: Program, model?: Model): Discriminator | und
 }
 
 /** Discriminator enums and unions are self-documenting and don't need separate documentation. */
-function isExcludedDiscriminator(program: Program, type: ModelProperty | Enum): boolean {
+function isExcludedDiscriminator(
+  program: Program,
+  type: ModelProperty | Enum,
+  discTypes: [Model | Union, Discriminator][]
+): boolean {
   if (type.kind === "ModelProperty") {
     const disc = findDiscriminator(program, type.model);
     if (disc && disc.propertyName === type.name) {
       return true;
     }
   } else if (type.kind === "Enum") {
-    const discTypes = getDiscriminatedTypes(program);
     for (const [discType, discName] of discTypes) {
       if (discType.kind === "Model") {
         const discObj = discType.properties.get(discName.propertyName);
@@ -67,13 +71,14 @@ export const requireDocumentation = createRule({
     default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
   },
   create(context) {
+    const discTypes = getDiscriminatedTypes(context.program);
     return {
       enum: (enumObj: Enum) => {
         // version enums and enum members are considered intrinsically self-documenting
         if (isExcludedVersionEnum(context.program, enumObj)) {
           return;
         }
-        if (isExcludedDiscriminator(context.program, enumObj)) {
+        if (isExcludedDiscriminator(context.program, enumObj, discTypes)) {
           return;
         }
         if (!getDoc(context.program, enumObj) && !isExcludedCoreType(context.program, enumObj)) {
@@ -132,7 +137,7 @@ export const requireDocumentation = createRule({
           }
           for (const prop of model.properties.values()) {
             // Properties that are discriminators are considered self-documenting
-            if (isExcludedDiscriminator(context.program, prop)) {
+            if (isExcludedDiscriminator(context.program, prop, discTypes)) {
               return;
             }
             if (!getDoc(context.program, prop)) {
