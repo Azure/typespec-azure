@@ -2498,6 +2498,94 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
       strictEqual(getClientNameOverride(runner.context, func2), undefined);
     });
+
+    it("@clientName with scope of versioning", async () => {
+      const testCode = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+          v2,
+        }
+        
+        @clientName("TestJava", "java")
+        @clientName("TestCSharp", "csharp")
+        model Test {}
+        op test(@body body: Test): void;
+      `;
+
+      // java
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+      }
+
+      // csharp
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+      }
+
+      // python
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+      }
+    });
+
+    it("augmented @clientName with scope of versioning", async () => {
+      const testCode = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+          v2,
+        }
+        
+        
+        model Test {}
+        op test(@body body: Test): void;
+      `;
+
+      const customization = `
+        namespace Customizations;
+
+        @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
+        @@clientName(Contoso.WidgetManager.Test, "TestJava", "java");
+      `
+
+      // java
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+        await runner.compileWithCustomization(testCode, customization);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+      }
+
+      // csharp
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+        await runner.compileWithCustomization(testCode, customization);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+      }
+
+      // python
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+        await runner.compileWithCustomization(testCode, customization);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+      }
+    });
   });
 
   describe("versioning projection", () => {
