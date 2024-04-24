@@ -171,6 +171,20 @@ model DefaultProvisioningStateProperty {
   provisioningState?: ResourceProvisioningState;
 }
 
+/** The standard evenlop definition of ExtendedLocation.
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ * ...ResourceNameParameter<Employee>;
+ * ...ExtendedLocationProperty;
+ * }
+ * ```
+ */
+model ExtendedLocationProperty {
+  extendedLocation: Foundations.ExtendedLocation;
+}
+
 /**
  * Standard Azure Resource Manager definition of ManagedServiceIdentity
  */
