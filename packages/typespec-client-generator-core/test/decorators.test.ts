@@ -2563,7 +2563,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
         @@clientName(Contoso.WidgetManager.Test, "TestJava", "java");
-      `
+      `;
 
       // java
       {
