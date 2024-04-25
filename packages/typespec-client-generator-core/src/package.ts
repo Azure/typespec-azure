@@ -315,6 +315,9 @@ function getClientDefaultApiVersion<
   context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient | SdkOperationGroup
 ): string | undefined {
+  if (context.apiVersion && !["latest", "all"].includes(context.apiVersion)) {
+    return context.apiVersion;
+  }
   let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
   if (!defaultVersion) {
     // eslint-disable-next-line deprecation/deprecation
