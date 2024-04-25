@@ -145,6 +145,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
           `
       union PetKind {      
         Cat: "Cat",
+        "Dog",
         string,
       }`
         )
@@ -159,12 +160,11 @@ describe("typespec-azure-core: documentation-required rule", () => {
             message:
               "The UnionVariant named 'Cat' should have a documentation or description, use doc comment /** */ to provide it.",
           },
-          // FIXME: Should this require documentation?
-          // {
-          //   code: "@azure-tools/typespec-azure-core/documentation-required",
-          //   message:
-          //     "The UnionVariant named 'string' should have a documentation or description, use doc comment /** */ to provide it.",
-          // },
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The UnionVariant named 'Dog' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
         ]);
     });
   });

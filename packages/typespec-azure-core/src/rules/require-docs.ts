@@ -6,6 +6,7 @@ import {
   Operation,
   Program,
   Union,
+  UnionVariant,
   createRule,
   getDiscriminatedTypes,
   getDiscriminator,
@@ -50,26 +51,34 @@ function isExcludedDiscriminator(
     if (disc && disc.propertyName === type.name) {
       return true;
     }
-  } else if (type.kind === "Enum") {
+  } else if (type.kind === "Enum" || type.kind === "Union") {
     for (const [discType, discName] of discTypes) {
       if (discType.kind === "Model") {
         const discObj = discType.properties.get(discName.propertyName);
         if (discObj?.type === type) {
           return true;
         }
-      } else if (discType.kind === "Union") {
-        let test = "best";
       }
     }
   }
   return false;
 }
 
-function getUnionName(union: Union): string {
+function getUnionName(union: Union): string | undefined {
   if (union.name !== undefined) {
     return union.name;
   }
-  return "{anonymous}";
+  return undefined;
+}
+
+function getVariantName(variant: UnionVariant): string | undefined {
+  if (variant.name !== undefined && typeof variant.name === "string") {
+    return variant.name;
+  }
+  if (variant.type.kind === "String") {
+    return variant.type.value;
+  }
+  return undefined;
 }
 
 export const requireDocumentation = createRule({
@@ -162,23 +171,25 @@ export const requireDocumentation = createRule({
         if (isExcludedDiscriminator(context.program, union, discTypes)) {
           return;
         }
-        const name = getUnionName(union);
         if (!getDoc(context.program, union) && !isExcludedCoreType(context.program, union)) {
-          context.reportDiagnostic({
-            target: union,
-            format: { kind: union.kind, name: name },
-          });
+          const name = getUnionName(union);
+          if (name !== undefined) {
+            context.reportDiagnostic({
+              target: union,
+              format: { kind: union.kind, name: name },
+            });
+          }
         }
         for (const variant of union.variants.values()) {
           if (!getDoc(context.program, variant)) {
             // symbols don't need documentation
-            if (typeof variant.name !== "string") {
-              continue;
+            const variantName = getVariantName(variant);
+            if (variantName !== undefined) {
+              context.reportDiagnostic({
+                target: variant,
+                format: { kind: variant.kind, name: variantName },
+              });
             }
-            context.reportDiagnostic({
-              target: variant,
-              format: { kind: variant.kind, name: variant.name },
-            });
           }
         }
       },
