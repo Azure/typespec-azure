@@ -68,8 +68,6 @@ function isExcludedDiscriminator(
 function getUnionName(union: Union): string {
   if (union.name !== undefined) {
     return union.name;
-  } else if (union.symbol !== undefined) {
-    return union.symbol.name;
   }
   return "{anonymous}";
 }
@@ -175,7 +173,7 @@ export const requireDocumentation = createRule({
           if (!getDoc(context.program, variant)) {
             // symbols don't need documentation
             if (typeof variant.name !== "string") {
-              return;
+              continue;
             }
             context.reportDiagnostic({
               target: variant,
