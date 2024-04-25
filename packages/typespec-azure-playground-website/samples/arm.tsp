@@ -28,7 +28,12 @@ enum Versions {
 
 /** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+  /** Name of employee */
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
+  @key("employeeName")
+  @path
+  @segment("employees")
+  name: string;
 }
 
 /** Employee properties */
