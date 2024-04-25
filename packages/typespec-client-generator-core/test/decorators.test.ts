@@ -2586,6 +2586,33 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
       }
     });
+
+    it("decorator on template parameter", async function () {
+      await runner.compileAndDiagnose(`
+        @service({})
+        namespace MyService;
+        
+        model ResourceBody<Resource> {
+          @body
+          resource: Resource;
+        }
+        
+        @post
+        op do<Resource extends {}>(...ResourceBody<Resource>): void;
+        
+        @@clientName(ResourceBody.resource, "body");
+        
+        model Test {
+          id: string;
+          prop: string;
+        }
+        
+        op test is do<Test>;
+        
+      `);
+
+      strictEqual(runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name, "body");
+    });
   });
 
   describe("versioning projection", () => {
