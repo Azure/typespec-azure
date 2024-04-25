@@ -363,7 +363,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const apiVersionParam = endpointParamType.templateArguments[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-      strictEqual(apiVersionParam.urlEncode, true);
+      strictEqual(apiVersionParam.urlEncode, false);
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");

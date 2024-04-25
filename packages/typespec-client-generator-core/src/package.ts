@@ -476,6 +476,7 @@ function getSdkEndpointParameter(
         templateArguments.push(sdkParam);
         sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
+        sdkParam.urlEncode = false;
       } else {
         diagnostics.add(
           createDiagnostic({
