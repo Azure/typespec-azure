@@ -2611,7 +2611,10 @@ describe("typespec-client-generator-core: decorators", () => {
         
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name, "body");
+      strictEqual(
+        runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name,
+        "body"
+      );
     });
   });
 
