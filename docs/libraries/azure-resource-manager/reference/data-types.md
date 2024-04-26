@@ -493,6 +493,29 @@ model Azure.ResourceManager.ErrorResponse
 | ------ | ------------------------------------------------------------------------------ | ----------------- |
 | error? | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | The error object. |
 
+### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
+
+The standard evenlop definition of ExtendedLocation.
+
+```typespec
+model Azure.ResourceManager.ExtendedLocationProperty
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ExtendedLocationProperty;
+}
+```
+
+#### Properties
+
+| Name             | Type                                                                                     | Description |
+| ---------------- | ---------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocation) |             |
+
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
 Concrete extension resource types can be created by aliasing this type using a specific property type.
@@ -1305,6 +1328,21 @@ model Azure.ResourceManager.Foundations.ErrorDetail
 | details?        | `ResourceManager.Foundations.ErrorDetail[]`         | The error details.         |
 | additionalInfo? | `ResourceManager.Foundations.ErrorAdditionalInfo[]` | The error additional info. |
 
+### `ExtendedLocation` {#Azure.ResourceManager.Foundations.ExtendedLocation}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.Foundations.ExtendedLocation
+```
+
+#### Properties
+
+| Name | Type                                                                                             | Description                        |
+| ---- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name | `string`                                                                                         | The name of the extended location. |
+| type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocationType) | The type of the extended location. |
+
 ### `ExtensionBaseParameters` {#Azure.ResourceManager.Foundations.ExtensionBaseParameters}
 
 The static parameters for an extension resource
@@ -1842,6 +1880,14 @@ The kind of entity that created the resource.
 
 ```typespec
 union Azure.ResourceManager.Foundations.createdByType
+```
+
+### `ExtendedLocationType` {#Azure.ResourceManager.Foundations.ExtendedLocationType}
+
+The supported ExtendedLocation types.
+
+```typespec
+union Azure.ResourceManager.Foundations.ExtendedLocationType
 ```
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Foundations.ManagedServiceIdentityType}
