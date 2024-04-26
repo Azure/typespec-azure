@@ -473,6 +473,7 @@ interface SdkMethodBase {
   apiVersions: string[];
   description?: string;
   details?: string;
+  crossLanguageDefintionId: string;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
