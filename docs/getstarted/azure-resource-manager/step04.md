@@ -2,7 +2,7 @@
 
 Some resources will provide more than the standard CRUD operations and will need to define a custom action endpoint. Additional resource operations can be added to the `interface` where you defined standard resource operations, using the `ArmResourceAction` templates.
 
-For example, to add an additional `POST` action called `/notify` to the standard operations of `User`:
+For example, to add an additional `POST` action called `/notify` to the standard operations of `UserResource`:
 
 ```typespec
 @doc("The details of a user notification.")
@@ -15,10 +15,10 @@ model NotificationDetails {
 }
 
 @armResourceOperations
-interface Users extends TrackedResourceOperations<User, UserProperties> {
+interface Users extends TrackedResourceOperations<UserResource, UserResourceProperties> {
   @doc("Send a notification to the user")
   @segment("notify")
-  NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
+  NotifyUser is ArmResourceActionNoContentSync<UserResource, NotificationDetails>;
 }
 ```
 
@@ -43,7 +43,7 @@ In a custom operation, you define the operation parameters, responses, http verb
 @doc("Send a notification to the user")
 @segment("notify")
 op NotifyUser(
-  ...ResourceInstanceParameters<User>,
+  ...ResourceInstanceParameters<UserResource>,
   @body notification: NotificationDetails,
 ): ArmResponse<string> | ErrorResponse;
 ```

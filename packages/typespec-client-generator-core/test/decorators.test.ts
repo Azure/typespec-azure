@@ -2586,6 +2586,36 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
       }
     });
+
+    it("decorator on template parameter", async function () {
+      await runner.compileAndDiagnose(`
+        @service({})
+        namespace MyService;
+        
+        model ResourceBody<Resource> {
+          @body
+          resource: Resource;
+        }
+        
+        @post
+        op do<Resource extends {}>(...ResourceBody<Resource>): void;
+        
+        @@clientName(ResourceBody.resource, "body");
+        
+        model Test {
+          id: string;
+          prop: string;
+        }
+        
+        op test is do<Test>;
+        
+      `);
+
+      strictEqual(
+        runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name,
+        "body"
+      );
+    });
   });
 
   describe("versioning projection", () => {
@@ -2634,7 +2664,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2643,6 +2673,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2726,7 +2763,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2735,6 +2772,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2817,7 +2861,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2826,6 +2870,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2908,7 +2959,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2917,6 +2968,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v2");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -3002,7 +3060,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -3011,6 +3069,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v1");
+
       strictEqual(sdkPackage.clients[0].methods.length, 1);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -3084,7 +3149,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -3093,6 +3158,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);

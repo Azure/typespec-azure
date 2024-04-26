@@ -2,11 +2,11 @@
 
 You can create parent/child relationships between resource types by using the `@parentResource` decorator when defining a resource type.
 
-For example, here's how you could create a new `AddressResource` resource under the `User` defined above:
+For example, here's how you could create a new `AddressResource` resource under the `UserResource` defined above:
 
 ```typespec
 @doc("An address resource belonging to a user resource.")
-@parentResource(User)
+@parentResource(UserResource)
 model AddressResource is ProxyResource<AddressResourceProperties> {
   @key("addressName")
   @segment("addresses")
