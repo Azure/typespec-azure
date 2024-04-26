@@ -163,6 +163,8 @@ const defaultOptions = {
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
+  // set api-version to all to prevent tcgc versioning projection
+  (context.options as any)["api-version"] = "all";
   const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
