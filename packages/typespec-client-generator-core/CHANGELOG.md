@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.7
+
+### Bug Fixes
+
+- [#748](https://github.com/Azure/typespec-azure/pull/748) add crossLanguageDefinitionId onto method types
+
+
+## 0.41.6
+
+### Bug Fixes
+
+- [#741](https://github.com/Azure/typespec-azure/pull/741) use correct default api version when projecting to a specific version
+
+
 ## 0.41.5
 
 ### Bug Fixes

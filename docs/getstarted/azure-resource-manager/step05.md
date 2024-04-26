@@ -39,26 +39,16 @@ namespace Microsoft.ContosoProviderHub;
 interface Operations extends Azure.ResourceManager.Operations {}
 
 @lroStatus
-union ProvisioningState {
-  ResourceProvisioningState,
-
-  /** The resource is being provisioned. */
-  Provisioning: "Provisioning",
-
-  /** The resource is being updated. */
-  Updating: "Updating",
-
-  /** The resource is being deleted. */
-  Deleting: "Deleting",
-
-  /** The resource provisioning request has been accepted. */
-  Accepted: "Accepted",
-
-  string,
+enum ProvisioningState {
+  ...ResourceProvisioningState,
+  Provisioning,
+  Updating,
+  Deleting,
+  Accepted,
 }
 
-@doc("The properties of User Resource")
-model UserProperties {
+@doc("The properties of UserResource")
+model UserResourceProperties {
   @doc("The user's full name")
   fullName: string;
 
@@ -69,8 +59,8 @@ model UserProperties {
   provisioningState?: ProvisioningState;
 }
 
-@doc("A User Resource")
-model User is TrackedResource<UserProperties> {
+@doc("A UserResource")
+model UserResource is TrackedResource<UserResourceProperties> {
   @key("userName")
   @segment("users")
   @doc("Address name")
@@ -89,21 +79,25 @@ model NotificationDetails {
 
 @armResourceOperations
 interface Users {
-  get is ArmResourceRead<User>;
-  create is ArmResourceCreateOrReplaceAsync<User>;
-  update is ArmResourcePatchSync<User, UserProperties>;
-  delete is ArmResourceDeleteSync<User>;
-  listByResourceGroup is ArmResourceListByParent<User>;
-  listBySubscription is ArmListBySubscription<User>;
+  get is ArmResourceRead<UserResource>;
+  create is ArmResourceCreateOrUpdateAsync<UserResource>;
+  update is ArmResourcePatchSync<UserResource, UserResourceProperties>;
+  delete is ArmResourceDeleteSync<UserResource>;
+  listByResourceGroup is ArmResourceListByParent<UserResource>;
+  listBySubscription is ArmListBySubscription<UserResource>;
   @doc("Send a notification to the user")
   @segment("notify")
-  NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
+  NotifyUser is ArmResourceActionNoContentSync<UserResource, NotificationDetails>;
 }
 
 @doc("An address resource belonging to a user resource.")
-@parentResource(User)
+@parentResource(UserResource)
 model AddressResource is ProxyResource<AddressResourceProperties> {
-  ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
+  @doc("Address name")
+  @key("addressName")
+  @segment("addresses")
+  @path
+  name: string;
 }
 
 @doc("The properties of AddressResource")

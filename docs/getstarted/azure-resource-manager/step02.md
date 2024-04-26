@@ -15,8 +15,8 @@ There are three essential components of a resource defined with TypeSpec:
 Each resource type must have a properties type which defines its custom properties. This type will be exposed as the `properties` property of the resource type.
 
 ```typespec
-@doc("The properties of User")
-model UserProperties {
+@doc("The properties of UserResource")
+model UserResourceProperties {
   @doc("The user's full name")
   fullName: string;
 
@@ -31,17 +31,19 @@ Resource types are defined as plain models which pull in a standard resource typ
 
 You define a resource type, you need the following:
 
-- A property model type which defines the resource type's custom properties as we described in step 1
-- A `name` parameter definition. You should use `ResourceNameParameter` model which automatically populate the following decorators with camel cased name for `@key` and pluralized name for `@segment` as values. You can override these values via `ResourceNameParameter`'s optional template parameter.
+- A `name` property which is marked with the following decorators
   - `@key`: Specifies the parameter name for this resource type in the service URI hierarchy
   - `@segment`: Specifies the name of the resource "collection", the URI segment that comes just before the parameter name which identifies the resource type
+- A second model type which defines the resource type's custom properties as we described in step 1
 
-Here we define a tracked resource called `User`:
+Here we define a tracked resource called `UserResource`:
 
 ```typespec
-@doc("A User Resource")
-model User is TrackedResource<UserProperties> {
-  ...ResourceNameParameter<User>;
+@doc("A UserResource")
+model UserResource is TrackedResource<UserResourceProperties> {
+  @key("userName")
+  @segment("users")
+  name: string;
 }
 ```
 
@@ -50,12 +52,12 @@ model User is TrackedResource<UserProperties> {
 ```typespec
 @armResourceOperations
 interface Users {
-  get is ArmResourceRead<User>;
-  create is ArmResourceCreateOrReplaceAsync<User>;
-  update is ArmResourcePatchSync<User, UserProperties>;
-  delete is ArmResourceDeleteSync<User>;
-  listByResourceGroup is ArmResourceListByParent<User>;
-  listBySubscription is ArmListBySubscription<User>;
+  get is ArmResourceRead<UserResource>;
+  create is ArmResourceCreateOrUpdateAsync<UserResource>;
+  update is ArmResourcePatchSync<UserResource, UserResourceProperties>;
+  delete is ArmResourceDeleteSync<UserResource>;
+  listByResourceGroup is ArmResourceListByParent<UserResource>;
+  listBySubscription is ArmListBySubscription<UserResource>;
 }
 ```
 
@@ -63,14 +65,14 @@ This uses operation templates defined in the `Azure.ResourceManager` namespace t
 
 The interface above creates the following operations for your service:
 
-| Method & Path                                                                                                        | Description                     |
-| -------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| `GET /subscriptions/{subscriptionId}/providers/Contoso.Users/users`                                                  | list all User by subscription   |
-| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users`               | list all User by resource group |
-| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | get item                        |
-| `PUT /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | create item                     |
-| `PATCH /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`  | patch item                      |
-| `DELETE /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}` | delete item                     |
+| Method & Path                                                                                                        | Description                             |
+| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `GET /subscriptions/{subscriptionId}/providers/Contoso.Users/users`                                                  | list all UserResource by subscription   |
+| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users`               | list all UserResource by resource group |
+| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | get item                                |
+| `PUT /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | create item                             |
+| `PATCH /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`  | patch item                              |
+| `DELETE /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}` | delete item                             |
 
 ### Alternate (Legacy) Syntax for Operations
 
@@ -81,20 +83,20 @@ To specify the standard set of TrackedResource operations for your resource, you
 
 ```typespec
 @armResourceOperations
-interface Users extends TrackedResourceOperations<User, UserProperties> {}
+interface Users extends TrackedResourceOperations<UserResource, UserResourceProperties> {}
 ```
 
-This will now produce all the endpoints(`get`, `post`, `put`, `patch` and `delete`, listByResourceGroup, listBySubscription) for a resource called `Users` and the `operations` endpoint for the service:
+This will now produce all the endpoints(`get`, `post`, `put`, `patch` and `delete`, listByResourceGroup, listBySubscription) for a resource called `UserResources` and the `operations` endpoint for the service:
 
-| Method & Path                                                                                                        | Description                          |
-| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `GET /providers/Contoso.Users/operations`                                                                            | List all operations for your service |
-| `GET /subscriptions/{subscriptionId}/providers/Contoso.Users/users`                                                  | list all User by subscription        |
-| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users`               | list all User by resource group      |
-| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | get item                             |
-| `PUT /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | insert item                          |
-| `PATCH /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`  | patch item                           |
-| `DELETE /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}` | delete item                          |
+| Method & Path                                                                                                        | Description                             |
+| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `GET /providers/Contoso.Users/operations`                                                                            | List all operations for your service    |
+| `GET /subscriptions/{subscriptionId}/providers/Contoso.Users/users`                                                  | list all UserResource by subscription   |
+| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users`               | list all UserResource by resource group |
+| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | get item                                |
+| `PUT /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | insert item                             |
+| `PATCH /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`  | patch item                              |
+| `DELETE /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}` | delete item                             |
 
 #### Base Resource Types
 
