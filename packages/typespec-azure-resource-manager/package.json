@@ -47,7 +47,7 @@
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/libraries/azure-resource-manager/reference"
   },
   "files": [
-    "lib/*.tsp",
+    "lib/**/*.tsp",
     "dist/**",
     "!dist/test/**"
   ],
