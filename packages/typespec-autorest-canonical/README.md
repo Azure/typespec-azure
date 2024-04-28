@@ -52,6 +52,12 @@ Example: Multiple services
 
 **Type:** `string`
 
+#### `arm-types-dir`
+
+**Type:** `string`
+
+Path to the common-types.json file folder. Default: '${project-root}/../../common-types/resource-management'
+
 #### `new-line`
 
 **Type:** `"crlf" | "lf"`

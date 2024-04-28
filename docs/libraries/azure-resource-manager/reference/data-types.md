@@ -308,10 +308,10 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description                                         |
-| ---------- | ---------- | --------------------------------------------------- |
-| body       | `Resource` | The body type of the operation request or response. |
-| statusCode | `201`      | The status code.                                    |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `201`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResourceExistsResponse` {#Azure.ResourceManager.ArmResourceExistsResponse}
 
@@ -372,10 +372,10 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `200`          | The status code.                                    |
-| body       | `ResponseBody` | The body type of the operation request or response. |
+| Name       | Type           | Description      |
+| ---------- | -------------- | ---------------- |
+| statusCode | `200`          | The status code. |
+| body       | `ResponseBody` |                  |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
 
@@ -492,6 +492,29 @@ model Azure.ResourceManager.ErrorResponse
 | Name   | Type                                                                           | Description       |
 | ------ | ------------------------------------------------------------------------------ | ----------------- |
 | error? | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | The error object. |
+
+### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
+
+The standard evenlop definition of ExtendedLocation.
+
+```typespec
+model Azure.ResourceManager.ExtendedLocationProperty
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ExtendedLocationProperty;
+}
+```
+
+#### Properties
+
+| Name             | Type                                                                                     | Description |
+| ---------------- | ---------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocation) |             |
 
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
@@ -926,6 +949,31 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 | value     | `Array<Element>`                 | The {name} items on this page      |
 | nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
 
+### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
+
+Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+
+```typespec
+model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.              |
+| KeyName     | Override default key name of the resource.                        |
+| SegmentName | Override default segment name of the resource.                    |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`. |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
 The dynamic parameters of a list call for a resource instance - pass in the proper base type to indicate
@@ -1074,43 +1122,6 @@ model Azure.ResourceManager.TrackedResource<Properties>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
-
-The provisioning state of the connection
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
-```
-
-### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
-
-The private endpoint connection status
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
-```
-
-### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
-
-Standard terminal provisioning state of resource type. You can spread into your
-custom provision state to avoid duplication and ensure consistency
-
-```typespec
-enum Azure.ResourceManager.ResourceProvisioningState
-```
-
-#### Examples
-
-```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
-}
-```
-
 ### `Versions` {#Azure.ResourceManager.Versions}
 
 Supported versions of Azure.ResourceManager building blocks.
@@ -1133,6 +1144,43 @@ The type of identity to use.
 
 ```typespec
 union Azure.ResourceManager.KeyEncryptionKeyIdentity
+```
+
+### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
+
+The provisioning state of the connection
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
+```
+
+### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
+
+The private endpoint connection status
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
+```
+
+### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
+
+Standard terminal provisioning state of resource type. You can include in your
+custom provision state to avoid duplication and ensure consistency
+
+```typespec
+union Azure.ResourceManager.ResourceProvisioningState
+```
+
+#### Examples
+
+```typespec
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
+}
 ```
 
 ## Azure.ResourceManager.CommonTypes
@@ -1160,6 +1208,7 @@ model Azure.ResourceManager.Foundations.ArmResource
 | Name        | Type                                                                         | Description                                                                                                                                                                               |
 | ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | id          | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name        | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type        | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
 | systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
@@ -1278,6 +1327,21 @@ model Azure.ResourceManager.Foundations.ErrorDetail
 | target?         | `string`                                            | The error target.          |
 | details?        | `ResourceManager.Foundations.ErrorDetail[]`         | The error details.         |
 | additionalInfo? | `ResourceManager.Foundations.ErrorAdditionalInfo[]` | The error additional info. |
+
+### `ExtendedLocation` {#Azure.ResourceManager.Foundations.ExtendedLocation}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.Foundations.ExtendedLocation
+```
+
+#### Properties
+
+| Name | Type                                                                                             | Description                        |
+| ---- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name | `string`                                                                                         | The name of the extended location. |
+| type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocationType) | The type of the extended location. |
 
 ### `ExtensionBaseParameters` {#Azure.ResourceManager.Foundations.ExtensionBaseParameters}
 
@@ -1816,6 +1880,14 @@ The kind of entity that created the resource.
 
 ```typespec
 union Azure.ResourceManager.Foundations.createdByType
+```
+
+### `ExtendedLocationType` {#Azure.ResourceManager.Foundations.ExtendedLocationType}
+
+The supported ExtendedLocation types.
+
+```typespec
+union Azure.ResourceManager.Foundations.ExtendedLocationType
 ```
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Foundations.ManagedServiceIdentityType}

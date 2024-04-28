@@ -841,7 +841,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
               ${versionEnum}
 
               @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v3, "foo.json")
-              model Foo {}
+              model Foo {prop: string}
 
               model FooParam {
                 @path
@@ -851,7 +851,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
               @Azure.ResourceManager.Private.armCommonDefinition("Bar", { version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true }, "bar.json")
               @Azure.ResourceManager.Private.armCommonDefinition("Bar", Azure.ResourceManager.CommonTypes.Versions.v5, "bar-v5.json")
-              model Bar {}
+              model Bar {prop: string}
 
               model BarParam {
                 @path
@@ -861,7 +861,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
               }
 
               @Azure.ResourceManager.Private.armCommonDefinition("Baz", Azure.ResourceManager.CommonTypes.Versions.v5, "baz.json")
-              model Baz {}
+              model Baz {prop: string}
 
               model BazParam {
                 @path
@@ -1075,5 +1075,28 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         },
       },
     });
+  });
+
+  it("emits correct extended location for resource", async () => {
+    const { program, diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget>;
+         ...ExtendedLocationProperty;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+  `);
+    const resources = getArmResources(program);
+    expectDiagnosticEmpty(diagnostics);
+    strictEqual(resources.length, 1);
+    ok(resources[0].typespecType.properties.has("extendedLocation"));
   });
 });

@@ -16,8 +16,8 @@ importers:
         version: 1.0.0
     devDependencies:
       '@chronus/chronus':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       '@chronus/github':
         specifier: ^0.3.2
         version: 0.3.2
@@ -82,8 +82,8 @@ importers:
   core:
     devDependencies:
       '@chronus/chronus':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       '@chronus/github':
         specifier: ^0.3.2
         version: 0.3.2
@@ -293,6 +293,9 @@ importers:
       change-case:
         specifier: ~5.4.4
         version: 5.4.4
+      follow-redirects:
+        specifier: ^1.15.6
+        version: 1.15.6
       globby:
         specifier: ~14.0.1
         version: 14.0.1
@@ -327,6 +330,9 @@ importers:
       '@types/babel__code-frame':
         specifier: ~7.0.6
         version: 7.0.6
+      '@types/follow-redirects':
+        specifier: ^1.14.4
+        version: 1.14.4
       '@types/mustache':
         specifier: ~4.2.5
         version: 4.2.5
@@ -1619,6 +1625,9 @@ importers:
 
   packages/typespec-autorest-canonical:
     devDependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:~
+        version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
         version: link:../typespec-azure-core
@@ -1865,6 +1874,13 @@ importers:
         version: 1.5.0(@types/node@18.11.19)(@vitest/ui@1.5.0)(happy-dom@14.7.1)
 
   packages/typespec-azure-resource-manager:
+    dependencies:
+      change-case:
+        specifier: ~5.4.4
+        version: 5.4.4
+      pluralize:
+        specifier: ^8.0.0
+        version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-autorest':
         specifier: workspace:~
@@ -1875,6 +1891,9 @@ importers:
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
+      '@types/pluralize':
+        specifier: ^0.0.33
+        version: 0.0.33
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -3866,6 +3885,30 @@ packages:
 
   /@chronus/chronus@0.10.0:
     resolution: {integrity: sha512-fXbHVoNRCstGgOLwq7J5/zyYUtVzMkormJjlYUqz9rLvR0D0kk7y/F0M8oippdLk7fLS6KS1JmM9AmRfMGnJBw==}
+    engines: {node: '>=16.0.0'}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+      globby: 14.0.1
+      is-unicode-supported: 2.0.0
+      micromatch: 4.0.5
+      pacote: 17.0.7
+      picocolors: 1.0.0
+      pluralize: 8.0.0
+      prompts: 2.4.2
+      semver: 7.6.0
+      source-map-support: 0.5.21
+      std-env: 3.7.0
+      yaml: 2.4.1
+      yargs: 17.7.2
+      zod: 3.22.4
+    transitivePeerDependencies:
+      - bluebird
+      - supports-color
+    dev: true
+
+  /@chronus/chronus@0.10.1:
+    resolution: {integrity: sha512-1LoobD4mq8J5uECTfIcu/SDPhAvduzw4CAwX97MdEve9/pwe+uSZUb2o9W8k1Wgzg3581ht5/Ox+RDdfLIorCQ==}
     engines: {node: '>=16.0.0'}
     hasBin: true
     dependencies:
@@ -9147,6 +9190,12 @@ packages:
       '@types/qs': 6.9.14
       '@types/serve-static': 1.15.5
     dev: false
+
+  /@types/follow-redirects@1.14.4:
+    resolution: {integrity: sha512-GWXfsD0Jc1RWiFmMuMFCpXMzi9L7oPDVwxUnZdg89kDNnqsRfUKXEtUYtA98A6lig1WXH/CYY/fvPW9HuN5fTA==}
+    dependencies:
+      '@types/node': 18.11.19
+    dev: true
 
   /@types/gtag.js@0.0.12:
     resolution: {integrity: sha512-YQV9bUsemkzG81Ea295/nF/5GijnD2Af7QhEofh7xu+kvCN6RdodgNwwGWXB5GMI3NoyvQo0odNctoH/qLMIpg==}

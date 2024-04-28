@@ -20,7 +20,7 @@ function createPatternCodeFix(diagnosticTarget: DiagnosticTarget) {
       const location = getSourceLocation(diagnosticTarget);
       const { lineStart, indent } = findLineStartAndIndent(location);
       const updatedLocation = { ...location, pos: lineStart };
-      return context.prependText(updatedLocation, `${indent}@pattern(/^[a-zA-Z0-9-]{3,24}$/)\n`);
+      return context.prependText(updatedLocation, `${indent}@pattern("^[a-zA-Z0-9-]{3,24}$")\n`);
     },
   });
 }
@@ -49,7 +49,7 @@ export const armResourceNamePatternRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name-pattern",
   description: "The resource name parameter should be defined with a 'pattern' restriction.",
   messages: {
-    default: `The resource name parameter should be defined with a 'pattern' restriction.  Decorate the "name" property in the resource definition using the @pattern decorator, with a regular expression indicating the allowed characters in the resource name.`,
+    default: `The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParamter' to specify the name parameter with options to override default pattern RegEx expression.`,
   },
   create(context) {
     return {

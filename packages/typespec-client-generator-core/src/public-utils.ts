@@ -410,7 +410,13 @@ function getContextPath(
     if (currentType === expectedType) {
       result.push({ displayName: pascalCase(displayName), type: currentType });
       return true;
-    } else if (currentType.kind === "Model" && currentType.indexer) {
+    } else if (
+      currentType.kind === "Model" &&
+      currentType.indexer &&
+      currentType.properties.size === 0 &&
+      ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+        currentType.indexer.key.name === "integer")
+    ) {
       // handle array or dict
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
@@ -423,6 +429,35 @@ function getContextPath(
         // use property.name as displayName
         const result = dfsModelProperties(expectedType, property.type, property.name);
         if (result) return true;
+      }
+      // handle additional properties type: model MyModel is Record<> {}
+      if (currentType.sourceModel?.kind === "Model" && currentType.sourceModel?.name === "Record") {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.sourceModel!.indexer!.value!,
+          "AdditionalProperty"
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel { ...Record<>}
+      if (currentType.indexer) {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.indexer.value,
+          "AdditionalProperty"
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel extends Record<> {}
+      if (currentType.baseModel) {
+        if (currentType.baseModel.name === "Record") {
+          const result = dfsModelProperties(
+            expectedType,
+            currentType.baseModel.indexer!.value!,
+            "AdditionalProperty"
+          );
+          if (result) return true;
+        }
       }
       result.pop();
       if (currentType.baseModel) {

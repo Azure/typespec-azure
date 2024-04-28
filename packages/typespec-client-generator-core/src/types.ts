@@ -276,17 +276,19 @@ export function getSdkArrayOrDictWithDiagnostics(
   operation?: Operation
 ): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (type.indexer !== undefined) {
+  // if model with both indexer and properties or name should be a model with additional properties
+  if (type.indexer !== undefined && type.properties.size === 0) {
     if (!isNeverType(type.indexer.key)) {
       const valueType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.indexer.value!, operation)
       );
       const name = type.indexer.key.name;
-      if (name === "string") {
+      if (name === "string" && type.name === "Record") {
         // model MyModel is Record<> {} should be model with additional properties
         if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
           return diagnostics.wrap(undefined);
         }
+        // other cases are dict
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "dict"),
           keyType: diagnostics.pipe(
@@ -296,6 +298,7 @@ export function getSdkArrayOrDictWithDiagnostics(
           nullableValues: isNullable(type.indexer.value!),
         });
       } else if (name === "integer") {
+        // only array's index key name is integer
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
@@ -345,7 +348,7 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(getAnyType(context, type));
   }
 
-  // change to a simple logic: only convert to normal type if the union is type | null, otherwise, return all the union types
+  // convert to normal type if the union is type | null
   if (nonNullOptions.length === 1) {
     const clientType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
@@ -547,6 +550,15 @@ export function getSdkModelWithDiagnostics(
       );
       sdkType.additionalPropertiesNullable = isNullable(type.sourceModel!.indexer!.value!);
     }
+    // model MyModel { ...Record<>} should be model with additional properties
+    if (type.indexer) {
+      sdkType.additionalProperties = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, type.indexer.value, operation)
+      );
+      sdkType.additionalPropertiesNullable = isNullable(type.indexer.value);
+    }
+    // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
+    diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     if (type.baseModel) {
       sdkType.baseModel = context.modelsMap?.get(type.baseModel) as SdkModelType | undefined;
       if (sdkType.baseModel === undefined) {
@@ -562,7 +574,6 @@ export function getSdkModelWithDiagnostics(
         }
       }
     }
-    diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
 
     updateModelsMap(context, type, sdkType, operation);

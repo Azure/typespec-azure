@@ -1,5 +1,51 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.7
+
+### Bug Fixes
+
+- [#748](https://github.com/Azure/typespec-azure/pull/748) add crossLanguageDefinitionId onto method types
+
+
+## 0.41.6
+
+### Bug Fixes
+
+- [#741](https://github.com/Azure/typespec-azure/pull/741) use correct default api version when projecting to a specific version
+
+
+## 0.41.5
+
+### Bug Fixes
+
+- [#727](https://github.com/Azure/typespec-azure/pull/727) export int and float type judgement function
+- [#731](https://github.com/Azure/typespec-azure/pull/731) fix `@clientName` lost after adding versioning support
+- [#726](https://github.com/Azure/typespec-azure/pull/726) fix additional property union naming problem
+
+
+## 0.41.4
+
+### Bug Fixes
+
+- [#692](https://github.com/Azure/typespec-azure/pull/692) fix wrong judgement for array type
+- [#559](https://github.com/Azure/typespec-azure/pull/559) take lroMetadata.finalResult into consideration
+- [#700](https://github.com/Azure/typespec-azure/pull/700) support get common models for specific api version, default to latest api version which may include breaking changes
+- [#713](https://github.com/Azure/typespec-azure/pull/713) enhance versioning and add tests
+
+
+## 0.41.3
+
+### Bug Fixes
+
+- [#665](https://github.com/Azure/typespec-azure/pull/665) support typespec new additional properties syntax
+- [#680](https://github.com/Azure/typespec-azure/pull/680) adjust sequence of properties calculation and discriminator calculation
+- [#673](https://github.com/Azure/typespec-azure/pull/673) add subscriptionId to client parameters
+
+### Bump dependencies
+
+- [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
+
+
 ## 0.41.2
 
 ### Bug Fixes

@@ -27,13 +27,7 @@ enum Versions {
 
 /** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
-  /** Name of employee */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @path
-  @segment("employees")
-  @visibility("read")
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */
@@ -55,20 +49,22 @@ model EmployeeProperties {
 
 /** The provisioning state of a resource. */
 @lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  ResourceProvisioningState,
 
   /** The resource is being provisioned */
-  Provisioning,
+  Provisioning: "Provisioning",
 
   /** The resource is updating */
-  Updating,
+  Updating: "Updating",
 
   /** The resource is being deleted */
-  Deleting,
+  Deleting: "Deleting",
 
   /** The resource create request has been accepted */
-  Accepted,
+  Accepted: "Accepted",
+
+  string,
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}

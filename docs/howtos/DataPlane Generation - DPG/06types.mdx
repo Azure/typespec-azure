@@ -7,6 +7,116 @@ This page documents what type definitions in TypeSpec are generated as in emitte
 
 ## Models
 
+### Flattening
+
+> **NOTE:** Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Properties {
+  name: string;
+}
+
+model Foo {
+  @flattenProperty
+  prop: Properties;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Foo",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "prop",
+      "serializedName": "prop",
+      "flatten": true,
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "model",
+        "name": "Properties",
+        "properties": [
+          {
+            "kind": "property",
+            "name": "name",
+            "serializedName": "name",
+            "flatten": false,
+            "optional": false,
+            "nullable": false,
+            "type": {
+              "kind": "string",
+              "encode": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
+
+```python
+class Properties(_model_base.Model):
+    name: str = rest_field()
+    """Required."""
+
+class Foo(_model_base.Model):
+    properties: "_models.Properties" = rest_field()
+    """Required."""
+
+    __flattened_items = ["properties"]
+
+print(f.properties.name)  # Non-flattened access is preferred experience
+print(f.name)  # Flattened access is dynamically supported, but not documented
+
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.csharp/issues/4040
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+In Java, `@flattenProperty` have no effect on data-plane libraries.
+
+```java
+@Fluent
+public final class Properties {
+    public Properties();
+    public String getName();
+    public Properties setName(String name);
+}
+```
+
+</TabItem>
+</Tabs>
+
 ### Models with additional properties
 
 #### Additional properties of any type

@@ -1,5 +1,5 @@
 import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getOpenApiAndDiagnostics, openApiFor } from "./test-host.js";
 
@@ -431,6 +431,95 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     ok(openapi.paths[privateEndpointGet]);
     ok(openapi.paths[privateEndpointGet].get);
     deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
+    ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  });
+
+  it("can use ResourceNameParameter for custom name parameter definition", async () => {
+    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+      `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      namespace Microsoft.PrivateLinkTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      /** Holder for private endpoint connections */
+      @tenantResource
+      model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
+        ...ResourceNameParameter<PrivateEndpointConnectionResource, "privateEndpointConnectionName", "privateEndpointConnections", "/[a-zA-Z]*">;
+      }
+      
+      /** Private connection operations */
+      @armResourceOperations(PrivateEndpointConnectionResource)
+      interface PrivateEndpointConnections {
+        /** List existing private connections */
+        listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
+        /** Get a specific private connection */
+        getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
+      }
+      `
+    );
+
+    const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
+    const privateEndpointGet =
+      "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
+    expectDiagnosticEmpty(diagnostics);
+    ok(openapi.paths[privateEndpointList]);
+    ok(openapi.paths[privateEndpointList].get);
+    deepStrictEqual(
+      openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+      "#/definitions/PrivateEndpointConnectionResourceListResult"
+    );
+    ok(openapi.definitions.PrivateEndpointConnectionResourceListResult.properties["value"]);
+    ok(openapi.paths[privateEndpointGet]);
+    ok(openapi.paths[privateEndpointGet].get);
+    deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
+    strictEqual(openapi.paths[privateEndpointGet].get.parameters[1].pattern, "/[a-zA-Z]*");
+    ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  });
+
+  it("can use ResourceNameParameter for default name parameter definition", async () => {
+    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+      `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      namespace Microsoft.PrivateLinkTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      /** Holder for private endpoint connections */
+      @tenantResource
+      model PrivateEndpointConnection is ProxyResource<PrivateEndpointConnectionProperties> {
+        ...ResourceNameParameter<PrivateEndpointConnection>;
+      }
+      
+      /** Private connection operations */
+      @armResourceOperations(PrivateEndpointConnection)
+      interface PrivateEndpointConnections {
+        /** List existing private connections */
+        listConnections is ArmResourceListByParent<PrivateEndpointConnection>;
+        /** Get a specific private connection */
+        getConnection is ArmResourceRead<PrivateEndpointConnection>;
+      }
+      `
+    );
+
+    const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
+    const privateEndpointGet =
+      "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
+    expectDiagnosticEmpty(diagnostics);
+    ok(openapi.paths[privateEndpointList]);
+    ok(openapi.paths[privateEndpointList].get);
+    deepStrictEqual(
+      openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+      "#/definitions/PrivateEndpointConnectionListResult"
+    );
+    ok(openapi.definitions.PrivateEndpointConnectionListResult.properties["value"]);
+    ok(openapi.paths[privateEndpointGet]);
+    ok(openapi.paths[privateEndpointGet].get);
+    deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
+    strictEqual(
+      openapi.paths[privateEndpointGet].get.parameters[1].pattern,
+      "^[a-zA-Z0-9-]{3,24}$"
+    );
     ok(openapi.paths[privateEndpointGet].get.parameters[1]);
   });
 });
