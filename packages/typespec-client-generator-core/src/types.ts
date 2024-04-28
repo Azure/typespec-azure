@@ -1201,7 +1201,10 @@ function updateUsageOfModel(
     updateUsageOfModel(context, usage, type.baseModel, options);
     options.ignoreSubTypeStack.pop();
   }
-  if (type.discriminatedSubtypes && (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1))) {
+  if (
+    type.discriminatedSubtypes &&
+    (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1))
+  ) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
       options.ignoreSubTypeStack.push(false);
       updateUsageOfModel(context, usage, discriminatedSubtype, options);
