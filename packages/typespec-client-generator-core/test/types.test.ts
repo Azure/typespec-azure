@@ -2752,6 +2752,76 @@ describe("typespec-client-generator-core: types", () => {
         op operation(@body input: Shark): Shark;
       `);
       const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 4);
+      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("usage propagation from subtype", async () => {
+      await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+          friends?: Fish[];
+          hate?: Record<Fish>;
+          partner?: Fish;
+        }
+
+        model SawShark extends Shark {
+          sharktype: "saw";
+        }
+
+        model GoblinShark extends Shark {
+          sharktype: "goblin";
+        }
+        op operation(@body input: Salmon): Salmon;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("usage propagation from subtype of type with another discriminated property", async () => {
+      await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+          food: Food;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+        }
+
+        @discriminator("kind")
+        model Food {
+          kind: string;
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+          friends?: Fish[];
+        }
+
+        model Fruit extends Food {
+          kind: "fruit";
+        }
+
+        model Meet extends Food {
+          kind: "meet";
+        }
+        op operation(@body input: Salmon): Salmon;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 5);
       strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
     });
