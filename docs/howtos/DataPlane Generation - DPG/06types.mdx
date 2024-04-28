@@ -578,7 +578,17 @@ animal["age"] = 5
 </TabItem>
 <TabItem value="csharp" label="CSharp" >
 
-TODO
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
@@ -687,7 +697,17 @@ animal["alert"] = None
 </TabItem>
 <TabItem value="csharp" label="CSharp" >
 
-TODO
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, string> AdditionalProperties { get; }
+}
+```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
