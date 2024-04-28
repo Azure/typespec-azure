@@ -210,7 +210,16 @@ animal["age"] = 5
 </TabItem>
 <TabItem value="csharp" label="CSharp" >
 
-TODO
+```csharp
+public partial class Animal : IJsonModel<Animal> {
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
@@ -364,7 +373,49 @@ animal["age"] = AnimalProperty(category="attribute", value=5)
 </TabItem>
 <TabItem value="csharp" label="CSharp" >
 
-TODO
+Due to currently there is no way to know whether a Json could be correctly mapped into the specified type in `.Net`, we currently generate any non-primitive value type in additional properties property as `BinaryData`.
+
+For typespec:
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<AnimalProperty>;
+}
+```
+The `C#` generated code is the same as if the type is `unknown`:
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+For typespec with additional properties of primitive types:
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string>;
+}
+```
+The `C#` generated code still has the specified type in `AdditionalProperties` property:
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, string> AdditionalProperties { get; }
+}
+```
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
