@@ -124,7 +124,7 @@ public final class Properties {
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
-Recommend usage: 
+Recommend usage:
 
 ```typespec
 model Animal {
@@ -137,7 +137,7 @@ model Animal {
 Other usages:
 
 ```typespec
-model Animal extends Record<unknown>{
+model Animal extends Record<unknown> {
   name: string;
   kind: string;
 }
@@ -237,8 +237,7 @@ export interface AnimalOutput extends Record<string, any> {
   kind: string;
 }
 
-
-// Modular for both legacy and non legacy 
+// Modular for both legacy and non legacy
 export interface Animal extends Record<string, any> {
   name: string;
   kind: string;
@@ -262,7 +261,6 @@ public final class Animal implements JsonSerializable<Animal> {
 </TabItem>
 </Tabs>
 
-
 #### Additional properties of specific type
 
 <Tabs>
@@ -270,8 +268,8 @@ public final class Animal implements JsonSerializable<Animal> {
 
 ```typespec
 model AnimalProperty {
-  "category": string;
-  "value": unknown;
+  category: string;
+  value: unknown;
 }
 
 model Animal {
@@ -376,6 +374,7 @@ animal["age"] = AnimalProperty(category="attribute", value=5)
 Due to currently there is no way to know whether a Json could be correctly mapped into the specified type in `.Net`, we currently generate any non-primitive value type in additional properties property as `BinaryData`.
 
 For typespec:
+
 ```typespec
 model Animal {
   name: string;
@@ -383,7 +382,9 @@ model Animal {
   ...Record<AnimalProperty>;
 }
 ```
+
 The `C#` generated code is the same as if the type is `unknown`:
+
 ```csharp
 public partial class Animal : IJsonModel<Animal>
 {
@@ -397,6 +398,7 @@ public partial class Animal : IJsonModel<Animal>
 ```
 
 For typespec with additional properties of primitive types:
+
 ```typespec
 model Animal {
   name: string;
@@ -404,7 +406,9 @@ model Animal {
   ...Record<string>;
 }
 ```
+
 The `C#` generated code still has the specified type in `AdditionalProperties` property:
+
 ```csharp
 public partial class Animal : IJsonModel<Animal>
 {
@@ -426,7 +430,7 @@ export interface AnimalProperty {
   category: string;
   value: unknown;
 }
-export interface Animal extends Record<string, unknown>{
+export interface Animal extends Record<string, unknown> {
   name: string;
   kind: string;
 }
@@ -436,7 +440,7 @@ export interface AnimalProperty {
   category: string;
   value: any;
 }
-export interface Animal extends Record<string, any>{
+export interface Animal extends Record<string, any> {
   name: string;
   kind: string;
 }
@@ -446,7 +450,7 @@ export interface AnimalProperty {
   category: string;
   value: any;
 }
-export interface Animal extends Record<string, any>{
+export interface Animal extends Record<string, any> {
   name: string;
   kind: string;
 }
@@ -462,9 +466,11 @@ export interface Animal {
   additionalProperties: Record<string, AnimalProperty>;
 }
 ```
+
 </TabItem>
 <TabItem value="java" label="Java" >
 
+```java
 @Fluent
 public final class Animal implements JsonSerializable<Animal> {
     public Animal(String name, String kind);
@@ -473,6 +479,7 @@ public final class Animal implements JsonSerializable<Animal> {
     public Map<String, AnimalProperty> getAdditionalProperties();
     public Animal setAdditionalProperties(Map<String, AnimalProperty> additionalProperties);
 }
+
 ```
 
 </TabItem>
@@ -483,7 +490,6 @@ public final class Animal implements JsonSerializable<Animal> {
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
-
 ```typespec
 model Animal {
   name: string;
@@ -493,7 +499,7 @@ model Animal {
 ```
 
 ```typespec
-model Animal{
+model Animal {
   name: string;
   kind: string;
   ...Record<string>;
@@ -579,13 +585,13 @@ TODO
 
 ```ts
 // RLC input and output
-export interface Animal extends Record<string, string | number>{
+export interface Animal extends Record<string, string | number> {
   name: string;
   kind: string;
 }
 
 // Modular for legacy and non-legacy clients
-export interface Animal extends Record<string, string | number>{
+export interface Animal extends Record<string, string | number> {
   name: string;
   kind: string;
 }
@@ -594,6 +600,7 @@ export interface Animal extends Record<string, string | number>{
 </TabItem>
 <TabItem value="java" label="Java" >
 
+```java
 @Fluent
 public final class Animal implements JsonSerializable<Animal> {
     public Animal(String name, String kind);
@@ -611,7 +618,6 @@ public final class Animal implements JsonSerializable<Animal> {
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
-
 
 ```typespec
 model Animal {
@@ -685,22 +691,26 @@ TODO
 
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
+
 ```ts
 // RLC input and output
-export interface Animal extends Record<string, string | null>{
+export interface Animal extends Record<string, string | null> {
   name: string;
   kind: string;
 }
 
 // Modular for legacy and non-legacy clients
-export interface Animal extends Record<string, string | null>{
+export interface Animal extends Record<string, string | null> {
   name: string;
   kind: string;
 }
 ```
+
 </TabItem>
+
 <TabItem value="java" label="Java" >
 
+```java
 @Fluent
 public final class Animal implements JsonSerializable<Animal> {
     public Animal(String name, String kind);
@@ -709,6 +719,7 @@ public final class Animal implements JsonSerializable<Animal> {
     public Map<String, String> getAdditionalProperties();
     public Animal setAdditionalProperties(Map<String, String> additionalProperties);
 }
+
 ```
 
 </TabItem>
