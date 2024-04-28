@@ -69,7 +69,48 @@ preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023
 <TabItem value="java" label="Java" >
 
 ```java
+// Java will generate a ServiceVersion enum containing the single api-version.
+public enum ServiceServiceVersion implements ServiceVersion {
+    /**
+     * Enum value 2023-11-01.
+     */
+    V2023_11_01("2023-11-01");
 
+    private final String version;
+
+    ServiceServiceVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Gets the latest service version supported by this client library.
+     * 
+     * @return The latest {@link ServiceServiceVersion}.
+     */
+    public static ServiceServiceVersion getLatest() {
+        return V2023_11_01;
+    }
+}
+
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+  // override the api version, even if only one version is defined in the spec
+  .serviceVersion(ServiceServiceVersion.V2023_11_01)
+  // other configurations
+  .buildClient();
+// client's api-version will be 2023-11-01
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
 ```
 
 </TabItem>
@@ -170,7 +211,52 @@ with pytest.expect(AttributeError):
 <TabItem value="java" label="Java" >
 
 ```java
+/** 
+ * Java will generate a ServiceVersion enum containing all available api-versions.
+ * The enum will only contain stable api-versions if the default version is stable("2023-11-01" in this particular case).
+ */
+public enum ServiceServiceVersion implements ServiceVersion {
+    /**
+     * Enum value 2023-11-01.
+     */
+    V2023_11_01("2023-11-01");
+    // "V2023_11_01_preview" will not be generated as it's preview and the default version "2023-11-01" is stable.
 
+    private final String version;
+
+    ServiceServiceVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Gets the latest service version supported by this client library.
+     * 
+     * @return The latest {@link ServiceServiceVersion}.
+     */
+    public static ServiceServiceVersion getLatest() {
+        return V2023_11_01;
+    }
+}
+
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+  // other configurations
+  .buildClient();
+// client's api-version will be 2023-11-01
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+
+// neither PreviewModel nor previewFunctionality will be generated
 ```
 
 </TabItem>
@@ -279,7 +365,54 @@ preview_client.preview_functionality(preview_model) # call goes through
 <TabItem value="java" label="Java" >
 
 ```java
+/** 
+ * Java will generate a ServiceVersion enum containing all available api-versions prior/equal to the specific one.
+ * The enum will only contain stable api-versions if the specific api-version is stable.
+ */
+public enum ServiceServiceVersion implements ServiceVersion {
+    /**
+     * Enum value 2023-11-01-preview.
+     */
+    V2023_11_01_PREVIEW("2023-11-01-preview");
+    // V2023_11_01 will not be generated as it appears after the specified V2023_11_01_PREVIEW.
 
+    private final String version;
+
+    ServiceServiceVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Gets the latest service version supported by this client library.
+     * 
+     * @return The latest {@link ServiceServiceVersion}.
+     */
+    public static ServiceServiceVersion getLatest() {
+        return V2023_11_01_PREVIEW;
+    }
+}
+
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+  // other configurations
+  .buildClient();
+// client's api-version will be 2023-11-01-preview
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+
+PreviewModel previewModel = new PreviewModel("present");
+// call goes through
+serviceClientClient.previewFunctionality(previewModel);
 ```
 
 </TabItem>
