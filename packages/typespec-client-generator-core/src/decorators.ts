@@ -571,16 +571,27 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+interface CreateSdkContextOptions {
+  ignoreVersioning?: boolean;
+}
+
 export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+>(
+  context: EmitContext<TOptions>,
+  emitterName?: string,
+  options?: CreateSdkContextOptions
+): SdkContext<TOptions, TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
+  if (options?.ignoreVersioning === false) {
+    context.options["api-version"] ?? "all";
+  }
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     program: context.program,
     emitContext: context,
