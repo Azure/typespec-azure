@@ -138,5 +138,34 @@ describe("typespec-azure-core: documentation-required rule", () => {
         )
         .toBeValid();
     });
+
+    it("on union (non-discriminator)", async () => {
+      await tester
+        .expect(
+          `
+      union PetKind {      
+        Cat: "Cat",
+        "Dog",
+        string,
+      }`
+        )
+        .toEmitDiagnostics([
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The Union named 'PetKind' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The UnionVariant named 'Cat' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The UnionVariant named 'Dog' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
+        ]);
+    });
   });
 });
