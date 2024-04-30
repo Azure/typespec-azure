@@ -1,4 +1,4 @@
-import { getClientNameOverride } from "@azure-tools/typespec-client-generator-core";
+import { SdkContext, getClientNameOverride } from "@azure-tools/typespec-client-generator-core";
 import {
   ModelProperty,
   Operation,
@@ -16,11 +16,11 @@ import { getOperationId } from "@typespec/openapi";
 import { pascalCase } from "change-case";
 
 export interface AutorestEmitterContext {
-  program: Program;
-  service: Service;
-  outputFile: string;
-  tcgcSdkContext: any;
-  version?: string;
+  readonly program: Program;
+  readonly service: Service;
+  readonly outputFile: string;
+  readonly tcgcSdkContext: SdkContext;
+  readonly version?: string;
 }
 
 export function getClientName(context: AutorestEmitterContext, type: Type & { name: string }) {

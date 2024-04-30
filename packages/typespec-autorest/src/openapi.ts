@@ -9,7 +9,7 @@ import {
   getUnionAsEnum,
   isFixed,
 } from "@azure-tools/typespec-azure-core";
-import { SdkContext, shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
+import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
@@ -28,7 +28,6 @@ import {
   Operation,
   Program,
   Scalar,
-  Service,
   SourceFile,
   StringLiteral,
   StringTemplate,
@@ -39,7 +38,6 @@ import {
   UnionVariant,
   compilerAssert,
   createDiagnosticCollector,
-  emitFile,
   getAllTags,
   getDirectoryPath,
   getDiscriminator,
@@ -53,14 +51,12 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
-  getNamespaceFullName,
   getPattern,
   getProjectedName,
   getProperty,
   getPropertyType,
   getRelativePathFromDirectory,
   getRootLength,
-  getService,
   getSummary,
   getVisibility,
   ignoreDiagnostics,
@@ -80,9 +76,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
-  listServices,
   navigateTypesInNamespace,
-  projectProgram,
   resolveEncodedName,
   resolvePath,
   stringTemplateToString,
@@ -123,7 +117,6 @@ import {
   resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
-import { buildVersionProjections } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -153,39 +146,32 @@ interface SchemaContext {
   readonly ignoreMetadataAnnotations: boolean;
 }
 
-export interface ResolvedAutorestEmitterOptions {
-  outputDir: string;
-  outputFile: string;
-  examplesDirectory?: string;
-  version?: string;
-  azureResourceProviderFolder?: string;
-
-  /**
-   * Set the newline character for emitting files.
-   * @default lf
-   */
-  newLine?: "crlf" | "lf";
+/**
+ * Options to configure the behavior of the Autorest document emitter.
+ */
+export interface AutorestDocumentEmitterOptions {
+  readonly examplesDirectory?: string;
 
   /**
    * Omit unreachable types.
    * By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.
    */
-  omitUnreachableTypes?: boolean;
+  readonly omitUnreachableTypes?: boolean;
 
   /**
    * If the x-typespec-name extension should be included
    */
-  includeXTypeSpecName: "inline-only" | "never";
+  readonly includeXTypeSpecName: "inline-only" | "never";
 
   /**
    * Arm types dir
    */
-  armTypesDir: string;
+  readonly armTypesDir: string;
 
   /**
    * readOnly property schema behavior
    */
-  useReadOnlyStatusSchema?: boolean;
+  readonly useReadOnlyStatusSchema?: boolean;
 }
 
 /**
@@ -230,80 +216,6 @@ interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
 }
 
-export async function emitAllServiceAtAllVersions(
-  program: Program,
-  tcgcSdkContext: SdkContext<any, any>,
-  options: ResolvedAutorestEmitterOptions
-) {
-  const services = listServices(program);
-  if (services.length === 0) {
-    services.push({ type: program.getGlobalNamespaceType() });
-  }
-
-  for (const service of services) {
-    const originalProgram = program;
-    const versions = buildVersionProjections(program, service.type).filter(
-      (v) => !options.version || options.version === v.version
-    );
-    for (const record of versions) {
-      let projectedProgram;
-      if (record.projections.length > 0) {
-        projectedProgram = program = projectProgram(originalProgram, record.projections);
-      }
-
-      const projectedServiceNs: Namespace = projectedProgram
-        ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
-        : service.type;
-      const projectedService =
-        projectedServiceNs === program.getGlobalNamespaceType()
-          ? { type: program.getGlobalNamespaceType() }
-          : getService(program, projectedServiceNs)!;
-      const context: AutorestEmitterContext = {
-        program,
-        outputFile: resolveOutputFile(
-          program,
-          projectedService,
-          services.length > 1,
-          options,
-          record.version
-        ),
-        service: projectedService,
-        version: record.version,
-        tcgcSdkContext,
-      };
-      const result = await getOpenAPIForService(context, options);
-      if (!program.compilerOptions.noEmit && !program.hasError()) {
-        // Sort the document
-        const sortedDocument = sortOpenAPIDocument(result.document);
-
-        // Write out the OpenAPI document to the output path
-        await emitFile(program, {
-          path: context.outputFile,
-          content: prettierOutput(JSON.stringify(sortedDocument, null, 2)),
-          newLine: options.newLine,
-        });
-
-        // Copy examples to the output directory
-        if (options.examplesDirectory && result.operationExamples.length > 0) {
-          const examplesPath = resolvePath(getDirectoryPath(context.outputFile), "examples");
-          await program.host.mkdirp(examplesPath);
-          for (const { examples } of result.operationExamples) {
-            if (examples) {
-              for (const [fileName, { file }] of Object.entries(examples)) {
-                await emitFile(program, {
-                  path: resolvePath(examplesPath, fileName),
-                  content: file.text,
-                  newLine: options.newLine,
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 export interface OperationExamples {
   readonly operationId: string;
   readonly examples: LoadedExample[];
@@ -316,7 +228,7 @@ export interface AutorestEmitterResult {
 
 export async function getOpenAPIForService(
   context: AutorestEmitterContext,
-  options: ResolvedAutorestEmitterOptions
+  options: AutorestDocumentEmitterOptions
 ): Promise<AutorestEmitterResult> {
   const { program, service } = context;
   const typeNameOptions: TypeNameOptions = {
@@ -2233,10 +2145,6 @@ export async function getOpenAPIForService(
   }
 }
 
-function prettierOutput(output: string) {
-  return output + "\n";
-}
-
 class ErrorTypeFoundError extends Error {
   constructor() {
     super("Error type found in evaluated TypeSpec output");
@@ -2254,42 +2162,13 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
-function resolveOutputFile(
-  program: Program,
-  service: Service,
-  multipleServices: boolean,
-  options: ResolvedAutorestEmitterOptions,
-  version?: string
-): string {
-  const azureResourceProviderFolder = options.azureResourceProviderFolder;
-  if (azureResourceProviderFolder) {
-    const info = resolveInfo(program, service.type);
-    version = version ?? info?.version ?? "0000-00-00";
-  }
-  const interpolated = interpolatePath(options.outputFile, {
-    "azure-resource-provider-folder": azureResourceProviderFolder,
-    "service-name":
-      multipleServices || azureResourceProviderFolder
-        ? getNamespaceFullName(service.type)
-        : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
-    version,
-  });
-
-  return resolvePath(options.outputDir, interpolated);
-}
-
 interface LoadedExample {
   readonly file: SourceFile;
   readonly data: any;
 }
 async function loadExamples(
   host: CompilerHost,
-  options: ResolvedAutorestEmitterOptions,
+  options: AutorestDocumentEmitterOptions,
   version?: string
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();

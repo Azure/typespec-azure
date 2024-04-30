@@ -4,7 +4,7 @@ export { $lib, AutorestEmitterOptions } from "./lib.js";
 export {
   getOpenAPIForService,
   sortOpenAPIDocument,
-  type ResolvedAutorestEmitterOptions,
+  type AutorestDocumentEmitterOptions,
 } from "./openapi.js";
 export type * from "./openapi2-document.js";
 export type { AutorestEmitterContext } from "./utils.js";

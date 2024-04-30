@@ -1,6 +1,6 @@
 import {
+  AutorestDocumentEmitterOptions,
   AutorestEmitterContext,
-  ResolvedAutorestEmitterOptions,
   getOpenAPIForService,
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
@@ -35,6 +35,18 @@ const defaultOptions = {
 
 export const canonicalVersion = "canonical";
 
+interface ResolvedAutorestCanonicalEmitterOptions extends AutorestDocumentEmitterOptions {
+  outputFile: string;
+  outputDir: string;
+  azureResourceProviderFolder?: string;
+
+  /**
+   * Set the newline character for emitting files.
+   * @default lf
+   */
+  readonly newLine?: "crlf" | "lf";
+}
+
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
   const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest-canonical");
@@ -45,7 +57,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
       "emitter-output-dir": context.emitterOutputDir,
     }
   );
-  const options: ResolvedAutorestEmitterOptions = {
+  const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
     outputDir: context.emitterOutputDir,
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
@@ -61,7 +73,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
 async function emitAllServices(
   program: Program,
   tcgcSdkContext: SdkContext<any, any>,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestCanonicalEmitterOptions
 ) {
   const services = listServices(program);
   if (services.length === 0) {
@@ -120,7 +132,7 @@ async function emitAllServices(
 function resolveOutputFile(
   service: Service,
   multipleServices: boolean,
-  options: ResolvedAutorestEmitterOptions,
+  options: ResolvedAutorestCanonicalEmitterOptions,
   version?: string
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
