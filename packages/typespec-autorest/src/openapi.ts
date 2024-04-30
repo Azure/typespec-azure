@@ -11,15 +11,15 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   SdkContext,
-  createSdkContext,
   getClientNameOverride,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
+  CompilerHost,
+  Diagnostic,
   DiagnosticTarget,
-  EmitContext,
   Enum,
   EnumMember,
   IntrinsicScalarName,
@@ -33,15 +33,16 @@ import {
   Program,
   Scalar,
   Service,
+  SourceFile,
   StringLiteral,
   StringTemplate,
   SyntaxKind,
-  TwoLevelMap,
   Type,
   TypeNameOptions,
   Union,
   UnionVariant,
   compilerAssert,
+  createDiagnosticCollector,
   emitFile,
   getAllTags,
   getDirectoryPath,
@@ -90,6 +91,7 @@ import {
   resolvePath,
   stringTemplateToString,
 } from "@typespec/compiler";
+import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
   HttpAuth,
@@ -129,7 +131,7 @@ import { buildVersionProjections } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
-import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2Document,
   OpenAPI2FormDataParameter,
@@ -153,39 +155,6 @@ import { AutorestEmitterContext, resolveOperationId } from "./utils.js";
 interface SchemaContext {
   readonly visibility: Visibility;
   readonly ignoreMetadataAnnotations: boolean;
-}
-const defaultOptions = {
-  "output-file":
-    "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
-  "new-line": "lf",
-  "include-x-typespec-name": "never",
-} as const;
-
-export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
-  const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
-  const armTypesDir = interpolatePath(
-    resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
-    {
-      "project-root": context.program.projectRoot,
-      "emitter-output-dir": context.emitterOutputDir,
-    }
-  );
-  const options: ResolvedAutorestEmitterOptions = {
-    outputFile: resolvedOptions["output-file"],
-    outputDir: context.emitterOutputDir,
-    azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
-    examplesDirectory: resolvedOptions["examples-directory"],
-    version: resolvedOptions["version"],
-    newLine: resolvedOptions["new-line"],
-    omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
-    includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
-    armTypesDir,
-    useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
-  };
-
-  const emitter = createOAPIEmitter(context.program, tcgcSdkContext, options);
-  await emitter.emitOpenAPI();
 }
 
 // TODO: When emitter options are available per emitter, add these to the interface
@@ -274,136 +243,217 @@ interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
 }
 
-function createOAPIEmitter(
+export async function emitAllServiceAtAllVersions(
   program: Program,
-  tcgcSdkContext: SdkContext,
+  tcgcSdkContext: SdkContext<any, any>,
   options: ResolvedAutorestEmitterOptions
 ) {
-  const tracer = getTracer(program);
-  tracer.trace("options", JSON.stringify(options, null, 2));
+  const services = listServices(program);
+  if (services.length === 0) {
+    services.push({ type: program.getGlobalNamespaceType() });
+  }
+
+  for (const service of services) {
+    const originalProgram = program;
+    const versions = buildVersionProjections(program, service.type).filter(
+      (v) => !options.version || options.version === v.version
+    );
+    for (const record of versions) {
+      let projectedProgram;
+      if (record.projections.length > 0) {
+        projectedProgram = program = projectProgram(originalProgram, record.projections);
+      }
+
+      const projectedServiceNs: Namespace = projectedProgram
+        ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
+        : service.type;
+      const projectedService =
+        projectedServiceNs === program.getGlobalNamespaceType()
+          ? { type: program.getGlobalNamespaceType() }
+          : getService(program, projectedServiceNs)!;
+      const context: AutorestEmitterContext = {
+        program,
+        outputFile: resolveOutputFile(
+          program,
+          projectedService,
+          services.length > 1,
+          options,
+          record.version
+        ),
+        service: projectedService,
+        version: record.version,
+        tcgcSdkContext,
+        getClientName: (type) => {
+          const viaProjection = getProjectedName(program, type, "client");
+          const clientName = getClientNameOverride(tcgcSdkContext, type);
+          return clientName ?? viaProjection ?? type.name;
+        },
+      };
+      const result = await getOpenAPIForService(context, options);
+      if (!program.compilerOptions.noEmit && !program.hasError()) {
+        // Sort the document
+        const sortedDocument = sortOpenAPIDocument(result.document);
+
+        // Write out the OpenAPI document to the output path
+        await emitFile(program, {
+          path: context.outputFile,
+          content: prettierOutput(JSON.stringify(sortedDocument, null, 2)),
+          newLine: options.newLine,
+        });
+
+        // Copy examples to the output directory
+        if (options.examplesDirectory && result.operationExamples.length > 0) {
+          const examplesPath = resolvePath(getDirectoryPath(context.outputFile), "examples");
+          await program.host.mkdirp(examplesPath);
+          for (const { examples } of result.operationExamples) {
+            if (examples) {
+              for (const [fileName, { file }] of Object.entries(examples)) {
+                await emitFile(program, {
+                  path: resolvePath(examplesPath, fileName),
+                  content: file.text,
+                  newLine: options.newLine,
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export interface OperationExamples {
+  readonly operationId: string;
+  readonly examples: LoadedExample[];
+}
+
+export interface AutorestEmitterResult {
+  readonly document: OpenAPI2Document;
+  readonly operationExamples: OperationExamples[];
+}
+
+async function getOpenAPIForService(
+  context: AutorestEmitterContext,
+  options: ResolvedAutorestEmitterOptions
+): Promise<AutorestEmitterResult> {
+  const { program, service } = context;
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
       return !isService(program, ns);
     },
   };
-  let root: OpenAPI2Document;
-  let currentService: Service;
+  const info = resolveInfo(program, service.type);
+  const auth = processAuth(service.type);
+
+  const root: OpenAPI2Document = {
+    swagger: "2.0",
+    info: {
+      title: "(title)",
+      ...info,
+      version: context.version ?? info?.version ?? "0000-00-00",
+      "x-typespec-generated": getEmitterDetails(program),
+    },
+    schemes: ["https"],
+    ...resolveHost(program, service.type),
+    externalDocs: getExternalDocs(program, service.type),
+    produces: [], // Pre-initialize produces and consumes so that
+    consumes: [], // they show up at the top of the document
+    security: auth?.security,
+    securityDefinitions: auth?.securitySchemes ?? {},
+    tags: [],
+    paths: {},
+    "x-ms-paths": {},
+    definitions: {},
+    parameters: {},
+  };
+
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
   let currentProduces: Set<string>;
-  let metadataInfo: MetadataInfo;
+  const metadataInfo: MetadataInfo = createMetadataInfo(program, {
+    canonicalVisibility: Visibility.Read,
+    canShareProperty: canSharePropertyUsingReadonlyOrXMSMutability,
+  });
 
   // Keep a map of all Types+Visibility combinations that were encountered
   // that need schema definitions.
-  let pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
+  const pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
 
   // Reuse a single ref object per Type+Visibility combination.
-  let refs = new TwoLevelMap<Type, Visibility, Ref>();
+  const refs = new TwoLevelMap<Type, Visibility, Ref>();
 
   // Keep track of inline types still in the process of having their schema computed
   // This is used to detect cycles in inline types, which is an
-  let inProgressInlineTypes = new Set<Type>();
+  const inProgressInlineTypes = new Set<Type>();
 
   // Map model properties that represent shared parameters to their parameter
   // definition that will go in #/parameters. Inlined parameters do not go in
   // this map.
-  let params: Map<ModelProperty, OpenAPI2Parameter>;
+  const params: Map<ModelProperty, OpenAPI2Parameter> = new Map();
 
   // Keep track of models that have had properties spread into parameters. We won't
   // consider these unreferenced when emitting unreferenced types.
-  let paramModels: Set<Type>;
+  const paramModels: Set<Type> = new Set();
 
   // De-dupe the per-endpoint tags that will be added into the #/tags
-  let tags: Set<string>;
+  const tags: Set<string> = new Set();
 
   // The set of produces/consumes values found in all operations
   const globalProduces = new Set<string>(["application/json"]);
   const globalConsumes = new Set<string>(["application/json"]);
 
-  let operationExamplesMap: Map<string, { [title: string]: string }>;
-  let operationIdsWithExample: Set<string>;
-  let outputFile: string;
-  let context: AutorestEmitterContext;
+  const operationIdsWithExample = new Set<string>();
 
-  async function emitOpenAPI() {
-    const services = listServices(program);
-    if (services.length === 0) {
-      services.push({ type: program.getGlobalNamespaceType() });
-    }
-    for (const service of services) {
-      currentService = service;
-      const originalProgram = program;
-      const versions = buildVersionProjections(program, service.type).filter(
-        (v) => !options.version || options.version === v.version
-      );
-      for (const record of versions) {
-        let projectedProgram;
-        if (record.projections.length > 0) {
-          projectedProgram = program = projectProgram(originalProgram, record.projections);
+  const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
+  program.reportDiagnostics(diagnostics);
+
+  const services = ignoreDiagnostics(getAllHttpServices(program));
+  const routes = services[0].operations;
+  reportIfNoRoutes(program, routes);
+
+  routes.forEach(emitOperation);
+
+  emitParameters();
+  emitSchemas(service.type);
+  emitTags();
+
+  // Finalize global produces/consumes
+  if (globalProduces.size > 0) {
+    root.produces = [...globalProduces.values()];
+  } else {
+    delete root.produces;
+  }
+  if (globalConsumes.size > 0) {
+    root.consumes = [...globalConsumes.values()];
+  } else {
+    delete root.consumes;
+  }
+
+  // Clean up empty entries
+  if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
+    delete root["x-ms-paths"];
+  }
+  if (root.security && Object.keys(root.security).length === 0) {
+    delete root["security"];
+  }
+  if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
+    delete root["securityDefinitions"];
+  }
+
+  return {
+    document: root,
+    operationExamples: [...operationIdsWithExample]
+      .map((operationId) => {
+        const data = exampleMap.get(operationId);
+        if (data) {
+          return { operationId, examples: Object.values(data) };
+        } else {
+          return undefined;
         }
-        context = {
-          program,
-          service,
-          version: record.version,
-          getClientName,
-        };
-        const projectedServiceNs: Namespace = projectedProgram
-          ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
-          : service.type;
-        await emitOpenAPIFromVersion(
-          projectedServiceNs === program.getGlobalNamespaceType()
-            ? { type: program.getGlobalNamespaceType() }
-            : getService(program, projectedServiceNs)!,
-          services.length > 1,
-          record.version
-        );
-      }
-    }
-  }
-  return { emitOpenAPI };
-
-  function initializeEmitter(service: Service, multipleService: boolean, version?: string) {
-    const auth = processAuth(service.type);
-
-    const info = resolveInfo(program, service.type);
-    root = {
-      swagger: "2.0",
-      info: {
-        title: "(title)",
-        ...info,
-        version: version ?? info?.version ?? "0000-00-00",
-        "x-typespec-generated": getEmitterDetails(program),
-      },
-      schemes: ["https"],
-      ...resolveHost(program, service.type),
-      externalDocs: getExternalDocs(program, service.type),
-      produces: [], // Pre-initialize produces and consumes so that
-      consumes: [], // they show up at the top of the document
-      security: auth?.security,
-      securityDefinitions: auth?.securitySchemes ?? {},
-      tags: [],
-      paths: {},
-      "x-ms-paths": {},
-      definitions: {},
-      parameters: {},
-    };
-
-    pendingSchemas = new TwoLevelMap();
-    refs = new TwoLevelMap();
-    metadataInfo = createMetadataInfo(program, {
-      canonicalVisibility: Visibility.Read,
-      canShareProperty: canSharePropertyUsingReadonlyOrXMSMutability,
-    });
-    inProgressInlineTypes = new Set();
-    params = new Map();
-    paramModels = new Set();
-    tags = new Set();
-    operationExamplesMap = new Map();
-    operationIdsWithExample = new Set();
-
-    outputFile = resolveOutputFile(program, service, multipleService, options, version);
-  }
+      })
+      .filter((x) => x) as any,
+  };
 
   function resolveHost(
     program: Program,
@@ -469,92 +519,6 @@ function createOAPIEmitter(
         parameters,
       },
     };
-  }
-
-  async function emitOpenAPIFromVersion(
-    service: Service,
-    multipleService: boolean,
-    version?: string
-  ) {
-    initializeEmitter(service, multipleService, version);
-
-    try {
-      await loadExamples(version);
-      const services = ignoreDiagnostics(getAllHttpServices(program));
-      const routes = services[0].operations;
-      reportIfNoRoutes(program, routes);
-
-      routes.forEach(emitOperation);
-
-      emitParameters();
-      emitSchemas(service.type);
-      emitTags();
-
-      // Finalize global produces/consumes
-      if (globalProduces.size > 0) {
-        root.produces = [...globalProduces.values()];
-      } else {
-        delete root.produces;
-      }
-      if (globalConsumes.size > 0) {
-        root.consumes = [...globalConsumes.values()];
-      } else {
-        delete root.consumes;
-      }
-
-      // Clean up empty entries
-      if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
-        delete root["x-ms-paths"];
-      }
-      if (root.security && Object.keys(root.security).length === 0) {
-        delete root["security"];
-      }
-      if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
-        delete root["securityDefinitions"];
-      }
-
-      if (!program.compilerOptions.noEmit && !program.hasError()) {
-        // Sort the document
-        const sortedRoot = sortOpenAPIDocument(root);
-
-        // Write out the OpenAPI document to the output path
-        await emitFile(program, {
-          path: outputFile,
-          content: prettierOutput(JSON.stringify(sortedRoot, null, 2)),
-          newLine: options.newLine,
-        });
-
-        // Copy examples to the output directory
-        if (options.examplesDirectory && operationIdsWithExample.size > 0) {
-          const examplesPath = resolvePath(getDirectoryPath(outputFile), "examples");
-          const exampleDir = version
-            ? resolvePath(options.examplesDirectory, version)
-            : resolvePath(options.examplesDirectory);
-          await program.host.mkdirp(examplesPath);
-          for (const operationId of operationIdsWithExample) {
-            const examples = operationExamplesMap.get(operationId);
-            if (examples) {
-              for (const [_, fileName] of Object.entries(examples)) {
-                const content = await program.host.readFile(resolvePath(exampleDir, fileName));
-                await emitFile(program, {
-                  path: resolvePath(examplesPath, fileName),
-                  content: content.text,
-                  newLine: options.newLine,
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      if (err instanceof ErrorTypeFoundError) {
-        // Return early, there must be a parse error if an ErrorType was
-        // inserted into the TypeSpec output
-        return;
-      } else {
-        throw err;
-      }
-    }
   }
 
   function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
@@ -710,7 +674,7 @@ function createOAPIEmitter(
     }
 
     if (options.examplesDirectory) {
-      const examples = operationExamplesMap.get(currentEndpoint.operationId as string);
+      const examples = exampleMap.get(currentEndpoint.operationId as string);
       if (examples && currentEndpoint.operationId) {
         operationIdsWithExample.add(currentEndpoint.operationId);
         currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
@@ -906,7 +870,7 @@ function createOAPIEmitter(
     if (getRootLength(absoluteRef) === 0) {
       return absoluteRef; // It is already relative.
     }
-    return getRelativePathFromDirectory(getDirectoryPath(outputFile), absoluteRef, false);
+    return getRelativePathFromDirectory(getDirectoryPath(context.outputFile), absoluteRef, false);
   }
 
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
@@ -1037,12 +1001,6 @@ function createOAPIEmitter(
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
     return encodedName === type.name ? viaProjection ?? type.name : encodedName;
-  }
-
-  function getClientName(type: Type & { name: string }): string {
-    const viaProjection = getProjectedName(program, type, "client");
-    const clientName = getClientNameOverride(tcgcSdkContext, type);
-    return clientName ?? viaProjection ?? type.name;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1374,67 +1332,6 @@ function createOAPIEmitter(
     }
   }
 
-  async function loadExamples(version?: string) {
-    if (options.examplesDirectory) {
-      const exampleDir = version
-        ? resolvePath(options.examplesDirectory, version)
-        : resolvePath(options.examplesDirectory);
-      try {
-        if (!(await program.host.stat(exampleDir)).isDirectory()) return;
-      } catch (err) {
-        reportDiagnostic(program, {
-          code: "example-loading",
-          messageId: "noDirectory",
-          format: { directory: exampleDir },
-          target: NoTarget,
-        });
-        return;
-      }
-      const exampleFiles = await program.host.readDir(exampleDir);
-      for (const fileName of exampleFiles) {
-        try {
-          const exampleFile = await program.host.readFile(resolvePath(exampleDir, fileName));
-          const example = JSON.parse(exampleFile.text);
-          if (!example.operationId || !example.title) {
-            reportDiagnostic(program, {
-              code: "example-loading",
-              messageId: "noOperationId",
-              format: { filename: fileName },
-              target: NoTarget,
-            });
-            continue;
-          }
-
-          if (!operationExamplesMap.has(example.operationId)) {
-            operationExamplesMap.set(example.operationId, {});
-          }
-          const examples = operationExamplesMap.get(example.operationId)!;
-
-          if (example.title in examples) {
-            reportDiagnostic(program, {
-              code: "duplicate-example-file",
-              target: NoTarget,
-              format: {
-                filename: fileName,
-                operationId: example.operationId,
-                title: example.title,
-              },
-            });
-          }
-
-          examples[example.title] = fileName;
-        } catch (err) {
-          reportDiagnostic(program, {
-            code: "example-loading",
-            messageId: "default",
-            format: { filename: fileName, error: err?.toString() ?? "" },
-            target: NoTarget,
-          });
-        }
-      }
-    }
-  }
-
   function getSchemaForType(type: Type, schemaContext: SchemaContext): OpenAPI2Schema | undefined {
     const builtinType = getSchemaForLiterals(type);
     if (builtinType !== undefined) {
@@ -1753,7 +1650,7 @@ function createOAPIEmitter(
       }
 
       const jsonName = getJsonName(prop);
-      const clientName = getClientName(prop);
+      const clientName = context.getClientName(prop);
 
       const description = getDoc(program, prop);
 
@@ -2008,7 +1905,7 @@ function createOAPIEmitter(
 
     if (
       typespecType.kind === "ModelProperty" &&
-      shouldFlattenProperty(tcgcSdkContext, typespecType)
+      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
     ) {
       newTarget["x-ms-client-flatten"] = true;
     }
@@ -2331,7 +2228,7 @@ function createOAPIEmitter(
         reportDiagnostic(program, {
           code: "unsupported-auth",
           format: { authType: (auth as any).type },
-          target: currentService.type,
+          target: service.type,
         });
         return undefined;
     }
@@ -2402,4 +2299,88 @@ function resolveOutputFile(
   });
 
   return resolvePath(options.outputDir, interpolated);
+}
+
+interface LoadedExample {
+  readonly file: SourceFile;
+  readonly data: any;
+}
+async function loadExamples(
+  host: CompilerHost,
+  options: ResolvedAutorestEmitterOptions,
+  version?: string
+): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
+  const diagnostics = createDiagnosticCollector();
+  if (!options.examplesDirectory) {
+    return diagnostics.wrap(new Map());
+  }
+  const exampleDir = version
+    ? resolvePath(options.examplesDirectory, version)
+    : resolvePath(options.examplesDirectory);
+  try {
+    if (!(await host.stat(exampleDir)).isDirectory()) return diagnostics.wrap(new Map());
+  } catch (err) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "example-loading",
+        messageId: "noDirectory",
+        format: { directory: exampleDir },
+        target: NoTarget,
+      })
+    );
+    return diagnostics.wrap(new Map());
+  }
+  const map = new Map();
+  const exampleFiles = await host.readDir(exampleDir);
+  for (const fileName of exampleFiles) {
+    try {
+      const exampleFile = await host.readFile(resolvePath(exampleDir, fileName));
+      const example = JSON.parse(exampleFile.text);
+      if (!example.operationId || !example.title) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "example-loading",
+            messageId: "noOperationId",
+            format: { filename: fileName },
+            target: NoTarget,
+          })
+        );
+        continue;
+      }
+
+      if (!map.has(example.operationId)) {
+        map.set(example.operationId, {});
+      }
+      const examples = map.get(example.operationId)!;
+
+      if (example.title in examples) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "duplicate-example-file",
+            target: NoTarget,
+            format: {
+              filename: fileName,
+              operationId: example.operationId,
+              title: example.title,
+            },
+          })
+        );
+      }
+
+      examples[example.title] = {
+        file: exampleFile,
+        data: example,
+      };
+    } catch (err) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "default",
+          format: { filename: fileName, error: err?.toString() ?? "" },
+          target: NoTarget,
+        })
+      );
+    }
+  }
+  return diagnostics.wrap(new Map());
 }

@@ -16,6 +16,8 @@ import { pascalCase } from "change-case";
 export interface AutorestEmitterContext {
   program: Program;
   service: Service;
+  outputFile: string;
+  tcgcSdkContext: any;
   version?: string;
   getClientName: (type: Type & { name: string }) => string;
 }
