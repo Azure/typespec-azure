@@ -26,8 +26,9 @@ export const rpcOperationRequestBodyRule = createRule({
             operation.namespace?.namespace?.name === "Azure"
           ) {
             const httpOperation = getHttpOperation(context.program, originalOperation)[0];
+            const bodyParam = httpOperation.parameters.body;
             const verb = httpOperation.verb.toLowerCase();
-            if (verb === "get" || verb === "delete") {
+            if ((verb === "get" || verb === "delete") && bodyParam !== undefined) {
               context.reportDiagnostic({
                 target: originalOperation,
                 messageId: "noBodyAllowed",

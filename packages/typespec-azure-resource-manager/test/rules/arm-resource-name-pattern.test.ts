@@ -94,7 +94,6 @@ it("Does not emit a warning for an ARM resource that specifies `@pattern` on the
     namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<{}> {
-      @doc("Name of employee")
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @key("employeeName")
       @path
@@ -111,6 +110,28 @@ it("Does not emit a warning for an ARM resource that specifies `@pattern` on the
       @visibility("read")
       name: string;
     }`
+    )
+    .toBeValid();
+});
+
+it("Does not emit a warning for an ARM resource that specifies `@pattern` on the on the scalar used", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @pattern("^[a-zA-Z0-9][a-zA-Z0-9-]{1,58}[a-zA-Z0-9]$")
+    scalar stringResourceName extends string;
+
+    model Employee is ProxyResource<{}> {
+      @key("employeeName")
+      @path
+      @segment("employees")
+      name: stringResourceName;
+    }
+    `
     )
     .toBeValid();
 });

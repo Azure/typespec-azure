@@ -1,5 +1,6 @@
 import {
   DiagnosticTarget,
+  ModelProperty,
   Program,
   SourceLocation,
   createRule,
@@ -59,8 +60,7 @@ export const armResourceNamePatternRule = createRule({
           // find the name property
           const nameProperty = resource.typespecType.properties.get("name");
           if (nameProperty !== undefined) {
-            const pattern = getPattern(program, nameProperty);
-            if (pattern === undefined) {
+            if (!hasPattern(program, nameProperty)) {
               context.reportDiagnostic({
                 target: nameProperty,
                 codefixes: [createPatternCodeFix(nameProperty)],
@@ -72,3 +72,18 @@ export const armResourceNamePatternRule = createRule({
     };
   },
 });
+
+function hasPattern(program: Program, property: ModelProperty): boolean {
+  const pattern = getPattern(program, property);
+  if (pattern !== undefined) {
+    return true;
+  }
+
+  if (property.type.kind === "Scalar") {
+    const pattern = getPattern(program, property.type);
+    if (pattern !== undefined) {
+      return true;
+    }
+  }
+  return false;
+}
