@@ -12,7 +12,7 @@ import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { OpenAPI2Document } from "../../typespec-autorest/src/types.js";
+import { OpenAPI2Document } from "../../typespec-autorest/src/openapi2-document.js";
 import { $lib } from "../src/lib.js";
 import { AzureResourceManagerTestLibrary } from "../src/testing/index.js";
 

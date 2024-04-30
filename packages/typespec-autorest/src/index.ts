@@ -6,4 +6,5 @@ export {
   sortOpenAPIDocument,
   type ResolvedAutorestEmitterOptions,
 } from "./openapi.js";
+export type * from "./openapi2-document.js";
 export type { AutorestEmitterContext } from "./utils.js";

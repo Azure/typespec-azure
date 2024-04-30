@@ -1,7 +1,7 @@
+import { OpenAPI2Parameter, OpenAPI2Schema } from "@azure-tools/typespec-autorest";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
-import { OpenAPI2Parameter, OpenAPI2Schema } from "../src/types.js";
 import { diagnoseOpenApiFor, oapiForModel, openApiFor } from "./test-host.js";
 
 describe("handle typespec intrinsic types", () => {

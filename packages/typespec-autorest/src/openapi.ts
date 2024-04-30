@@ -145,7 +145,7 @@ import {
   OpenAPI2StatusCode,
   PrimitiveItems,
   Refable,
-} from "./types.js";
+} from "./openapi2-document.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 
 interface SchemaContext {

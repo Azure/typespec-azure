@@ -1,3 +1,4 @@
+import { OpenAPI2Document } from "@azure-tools/typespec-autorest";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { SdkTestLibrary as TcgcTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
 import { Diagnostic } from "@typespec/compiler";
@@ -15,7 +16,6 @@ import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { ok } from "assert";
 import { AutorestCanonicalEmitterOptions } from "../src/lib.js";
 import { AutorestCanonicalTestLibrary } from "../src/testing/index.js";
-import { OpenAPI2Document } from "../src/types.js";
 
 export async function createAutorestCanonicalTestHost() {
   return createTestHost({
