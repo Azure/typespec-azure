@@ -76,6 +76,16 @@ model TrackedResource extends Resource {
 model ProxyResource extends Resource {}
 
 /**
+ * The base extension resource.
+ */
+// Note that ProxyResource is the base definition for both kinds of resources
+@doc("The base extension resource.")
+@armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v3)
+@armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v4)
+@armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v5)
+model ExtensionResource extends Resource {}
+
+/**
  * The SKU (Stock Keeping Unit) assigned to this resource.
  */
 @doc("The SKU (Stock Keeping Unit) assigned to this resource.")

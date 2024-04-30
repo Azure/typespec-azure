@@ -1355,6 +1355,18 @@ model Azure.ResourceManager.Foundations.ExtensionBaseParameters
 | apiVersion  | `string` | The API version to use for this operation.                             |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
 
+### `ExtensionResource` {#Azure.ResourceManager.Foundations.ExtensionResource}
+
+The base extension resource.
+
+```typespec
+model Azure.ResourceManager.Foundations.ExtensionResource
+```
+
+#### Properties
+
+None
+
 ### `ExtensionScope` {#Azure.ResourceManager.Foundations.ExtensionScope}
 
 Parameter model for listing an extension resource

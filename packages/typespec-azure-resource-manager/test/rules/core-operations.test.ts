@@ -28,8 +28,6 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
         @armProviderNamespace
         namespace Microsoft.Foo;
-
-        using Azure.ResourceManager.Foundations;
         
         model FooResource is TrackedResource<{}> {
           @key("foo") @segment("foo") @path
@@ -40,7 +38,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         interface FooResources extends ResourceCollectionOperations<FooResource> {
           @put createOrUpdate( ...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<FooResource> | ErrorResponse;
           @get get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
-          @patch update(...ResourceInstanceParameters<FooResource>, @bodyRoot properties: ResourceUpdateModel<FooResource, {}>): ArmResponse<FooResource> | ErrorResponse;
+          @patch update(...ResourceInstanceParameters<FooResource>, @bodyRoot properties: Foundations.ResourceUpdateModel<FooResource, {}>): ArmResponse<FooResource> | ErrorResponse;
           @delete delete(...ResourceInstanceParameters<FooResource>): | ArmDeletedResponse | ArmDeleteAcceptedResponse | ArmDeletedNoContentResponse | ErrorResponse;
           @post action(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
         }

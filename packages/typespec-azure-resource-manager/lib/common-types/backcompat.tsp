@@ -10,7 +10,7 @@ alias TrackedResourceBase = TrackedResource;
 alias ProxyResourceBase = ProxyResource;
 
 #deprecated "Please use Foundations.ProxyResource instead of Foundations.ExtensionResourceBase"
-alias ExtensionResourceBase = ProxyResource;
+alias ExtensionResourceBase = ExtensionResource;
 
 #deprecated "Please use Foundations.Sku instead of Foundations.ResourceSkuType"
 alias ResourceSkuType = Sku;

@@ -72,7 +72,7 @@ model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ExtensionResource<Properties extends {}> extends Foundations.ProxyResource {
+model ExtensionResource<Properties extends {}> extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
