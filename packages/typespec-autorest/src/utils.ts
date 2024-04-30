@@ -1,3 +1,4 @@
+import { getClientNameOverride } from "@azure-tools/typespec-client-generator-core";
 import {
   ModelProperty,
   Operation,
@@ -5,6 +6,7 @@ import {
   Service,
   Type,
   getFriendlyName,
+  getProjectedName,
   getVisibility,
   isGlobalNamespace,
   isService,
@@ -19,9 +21,13 @@ export interface AutorestEmitterContext {
   outputFile: string;
   tcgcSdkContext: any;
   version?: string;
-  getClientName: (type: Type & { name: string }) => string;
 }
 
+export function getClientName(context: AutorestEmitterContext, type: Type & { name: string }) {
+  const viaProjection = getProjectedName(context.program, type, "client");
+  const clientName = getClientNameOverride(context.tcgcSdkContext, type);
+  return clientName ?? viaProjection ?? type.name;
+}
 /**
  * Determines whether a type will be inlined in OpenAPI rather than defined
  * as a schema and referenced.
@@ -61,15 +67,17 @@ export function shouldInline(program: Program, type: Type): boolean {
  * @returns Operation ID in this format `<name>` or `<group>_<name>`
  */
 export function resolveOperationId(context: AutorestEmitterContext, operation: Operation) {
-  const { program, getClientName } = context;
+  const { program } = context;
   const explicitOperationId = getOperationId(program, operation);
   if (explicitOperationId) {
     return explicitOperationId;
   }
 
-  const operationName = getClientName(operation);
+  const operationName = getClientName(context, operation);
   if (operation.interface) {
-    return pascalCaseForOperationId(`${getClientName(operation.interface)}_${operationName}`);
+    return pascalCaseForOperationId(
+      `${getClientName(context, operation.interface)}_${operationName}`
+    );
   }
   const namespace = operation.namespace;
   if (

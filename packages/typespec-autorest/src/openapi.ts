@@ -9,11 +9,7 @@ import {
   getUnionAsEnum,
   isFixed,
 } from "@azure-tools/typespec-azure-core";
-import {
-  SdkContext,
-  getClientNameOverride,
-  shouldFlattenProperty,
-} from "@azure-tools/typespec-client-generator-core";
+import { SdkContext, shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
@@ -150,7 +146,7 @@ import {
   PrimitiveItems,
   Refable,
 } from "./types.js";
-import { AutorestEmitterContext, resolveOperationId } from "./utils.js";
+import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 
 interface SchemaContext {
   readonly visibility: Visibility;
@@ -283,11 +279,6 @@ export async function emitAllServiceAtAllVersions(
         service: projectedService,
         version: record.version,
         tcgcSdkContext,
-        getClientName: (type) => {
-          const viaProjection = getProjectedName(program, type, "client");
-          const clientName = getClientNameOverride(tcgcSdkContext, type);
-          return clientName ?? viaProjection ?? type.name;
-        },
       };
       const result = await getOpenAPIForService(context, options);
       if (!program.compilerOptions.noEmit && !program.hasError()) {
@@ -1650,7 +1641,7 @@ export async function getOpenAPIForService(
       }
 
       const jsonName = getJsonName(prop);
-      const clientName = context.getClientName(prop);
+      const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
 

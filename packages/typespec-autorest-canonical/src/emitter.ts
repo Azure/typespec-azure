@@ -4,11 +4,7 @@ import {
   getOpenAPIForService,
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
-import {
-  SdkContext,
-  createSdkContext,
-  getClientNameOverride,
-} from "@azure-tools/typespec-client-generator-core";
+import { SdkContext, createSdkContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
@@ -18,7 +14,6 @@ import {
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
-  getProjectedName,
   interpolatePath,
   listServices,
   navigateType,
@@ -64,7 +59,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
   await emitAllServices(context.program, tcgcSdkContext, options);
 }
 
-export async function emitAllServices(
+async function emitAllServices(
   program: Program,
   tcgcSdkContext: SdkContext<any, any>,
   options: ResolvedAutorestEmitterOptions
@@ -82,11 +77,6 @@ export async function emitAllServices(
       service,
       version: "canonical",
       tcgcSdkContext,
-      getClientName: (type) => {
-        const viaProjection = getProjectedName(program, type, "client");
-        const clientName = getClientNameOverride(tcgcSdkContext, type);
-        return clientName ?? viaProjection ?? type.name;
-      },
     };
     const result = await getOpenAPIForService(context, options);
     const includedVersions = getVersion(program, service.type)

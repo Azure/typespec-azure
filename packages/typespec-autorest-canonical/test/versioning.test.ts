@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { it } from "vitest";
-import { canonicalVersion } from "../src/openapi.js";
+import { canonicalVersion } from "../src/emitter.js";
 import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
 
 it("works with models", async () => {
