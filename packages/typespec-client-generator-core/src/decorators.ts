@@ -572,7 +572,7 @@ export function listOperationsInOperationGroup(
 }
 
 interface CreateSdkContextOptions {
-  ignoreVersioning?: boolean;
+  readonly versionStrategy?: "ignore";
 }
 
 export function createSdkContext<
@@ -589,8 +589,8 @@ export function createSdkContext<
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  if (options?.ignoreVersioning === false) {
-    context.options["api-version"] ?? "all";
+  if (options?.versionStrategy === "ignore") {
+    (context.options as any)["api-version"] = context.options["api-version"] ?? "all";
   }
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     program: context.program,
