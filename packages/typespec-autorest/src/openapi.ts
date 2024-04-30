@@ -153,15 +153,6 @@ interface SchemaContext {
   readonly ignoreMetadataAnnotations: boolean;
 }
 
-// TODO: When emitter options are available per emitter, add these to the interface
-interface EmitterDetails {
-  emitter: string;
-}
-
-function getEmitterDetails(program: Program): EmitterDetails[] {
-  return [{ emitter: "@azure-tools/typespec-autorest" }];
-}
-
 export interface ResolvedAutorestEmitterOptions {
   outputDir: string;
   outputFile: string;
@@ -343,7 +334,7 @@ export async function getOpenAPIForService(
       title: "(title)",
       ...info,
       version: context.version ?? info?.version ?? "0000-00-00",
-      "x-typespec-generated": getEmitterDetails(program),
+      "x-typespec-generated": { emitter: "@azure-tools/typespec-autorest" },
     },
     schemes: ["https"],
     ...resolveHost(program, service.type),

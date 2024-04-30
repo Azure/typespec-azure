@@ -82,8 +82,10 @@ async function emitAllServices(
       ?.getVersions()
       ?.map((item) => item.name);
     result.document.info["x-canonical-included-versions"] = includedVersions;
-    (result.document.info["x-typespec-generated"] as any)[0].emitter =
-      "@azure-tools/typespec-autorest-canonical";
+    result.document.info["x-typespec-generated"] = {
+      emitter: "@azure-tools/typespec-autorest-canonical",
+    };
+
     if (!program.compilerOptions.noEmit && !program.hasError()) {
       // Sort the document
       const sortedDocument = sortOpenAPIDocument(result.document);
