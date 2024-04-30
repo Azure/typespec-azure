@@ -34,7 +34,6 @@ const defaultOptions = {
 } as const;
 
 export const canonicalVersion = "canonical";
-export const namespace = "AutorestCanonical";
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
@@ -75,7 +74,7 @@ async function emitAllServices(
       program,
       outputFile: resolveOutputFile(service, services.length > 1, options),
       service,
-      version: "canonical",
+      version: canonicalVersion,
       tcgcSdkContext,
     };
     const result = await getOpenAPIForService(context, options);
