@@ -42,7 +42,6 @@ export async function createAutorestCanonicalTestRunner(
       "TypeSpec.Http",
       "TypeSpec.Rest",
       "TypeSpec.OpenAPI",
-      "AutorestCanonical",
       "Azure.Core",
       "Azure.ClientGenerator.Core",
     ],
