@@ -32,7 +32,7 @@ it("union of mixed types emit diagnostic", async () => {
     `
   );
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-autorest-canonical/union-unsupported",
+    code: "@azure-tools/typespec-autorest/union-unsupported",
     message:
       "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
   });

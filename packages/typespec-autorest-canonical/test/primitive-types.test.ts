@@ -27,7 +27,7 @@ describe("handle typespec intrinsic types", () => {
     ["duration", { type: "string", format: "duration" }],
     ["bytes", { type: "string", format: "byte" }],
     ["decimal", { type: "number", format: "decimal" }],
-    ["decimal128", { type: "number", format: "decimal128" }],
+    ["decimal128", { type: "number", format: "decimal" }],
   ];
 
   for (const test of cases) {
@@ -77,7 +77,7 @@ describe("handle nonspecific intrinsic types", () => {
       );
 
       expectDiagnostics(res, {
-        code: "@azure-tools/typespec-autorest-canonical/nonspecific-scalar",
+        code: "@azure-tools/typespec-autorest/nonspecific-scalar",
         message: test[1],
       });
     });

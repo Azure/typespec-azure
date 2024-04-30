@@ -492,7 +492,7 @@ describe("typespec-autorestcanonical: definitions", () => {
       op test(): Pet;
       `);
       expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-autorest-canonical/union-unsupported",
+        code: "@azure-tools/typespec-autorest/union-unsupported",
         message:
           "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
       });
@@ -503,7 +503,7 @@ describe("typespec-autorestcanonical: definitions", () => {
         "Pet",
         `
       model Pet {
-        #suppress "@azure-tools/typespec-autorest-canonical/union-unsupported" test
+        #suppress "@azure-tools/typespec-autorest/union-unsupported" test
         name: string | int32;
       };
       `

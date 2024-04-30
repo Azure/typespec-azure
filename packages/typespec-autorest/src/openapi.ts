@@ -332,7 +332,7 @@ export interface AutorestEmitterResult {
   readonly operationExamples: OperationExamples[];
 }
 
-async function getOpenAPIForService(
+export async function getOpenAPIForService(
   context: AutorestEmitterContext,
   options: ResolvedAutorestEmitterOptions
 ): Promise<AutorestEmitterResult> {
