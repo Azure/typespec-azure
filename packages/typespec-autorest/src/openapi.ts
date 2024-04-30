@@ -246,7 +246,7 @@ export async function getOpenAPIForService(
       title: "(title)",
       ...info,
       version: context.version ?? info?.version ?? "0000-00-00",
-      "x-typespec-generated": { emitter: "@azure-tools/typespec-autorest" },
+      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
     },
     schemes: ["https"],
     ...resolveHost(program, service.type),
