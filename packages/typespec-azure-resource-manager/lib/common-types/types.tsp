@@ -1,5 +1,6 @@
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
+using Azure.Core;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
@@ -11,22 +12,32 @@ model ArmResourceBase {}
  * Base model that defines common properties for all Azure Resource Manager resources.
  */
 @doc("Common properties for all Azure Resource Manager resources.")
-model ArmResource extends ArmResourceBase {
+model Resource extends ArmResourceBase {
   @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
   @visibility("read")
-  id: string;
+  id?: armResourceIdentifier;
 
   @doc("The name of the resource")
   @visibility("read")
-  name: string;
+  name?: string;
 
   @doc("The type of the resource. E.g. \"Microsoft.Compute/virtualMachines\" or \"Microsoft.Storage/storageAccounts\"")
   @visibility("read")
-  type: string;
+  type?: string;
 
   @doc("Azure Resource Manager metadata containing createdBy and modifiedBy information.")
   @visibility("read")
   systemData?: SystemData;
+}
+
+/** The resource model definition for an Azure Resource Manager resource with an etag. */
+@armCommonDefinition("TrackedResource", Azure.ResourceManager.CommonTypes.Versions.v3)
+@armCommonDefinition("TrackedResource", Azure.ResourceManager.CommonTypes.Versions.v4)
+@armCommonDefinition("TrackedResource", Azure.ResourceManager.CommonTypes.Versions.v5)
+model AzureEntityResource extends Resource {
+  /** Resource Etag. */
+  @visibility("read")
+  etag: string;
 }
 
 /**
@@ -46,8 +57,8 @@ model ArmTagsProperty {
 @armCommonDefinition("TrackedResource", Azure.ResourceManager.CommonTypes.Versions.v3)
 @armCommonDefinition("TrackedResource", Azure.ResourceManager.CommonTypes.Versions.v4)
 @armCommonDefinition("TrackedResource", Azure.ResourceManager.CommonTypes.Versions.v5)
-@doc("The resource model definition for an Azure Resource Manager tracked top level resource")
-model TrackedResourceBase extends ArmResource {
+@doc("The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'")
+model TrackedResource extends Resource {
   @doc("The geo-location where the resource lives")
   @visibility("read", "create")
   location: string;
@@ -62,17 +73,7 @@ model TrackedResourceBase extends ArmResource {
 @armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v3)
 @armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v4)
 @armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v5)
-model ProxyResourceBase extends ArmResource {}
-
-/**
- * The base extension resource.
- */
-// Note that ProxyResource is the base definition for both kinds of resources
-@doc("The base extension resource.")
-@armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v3)
-@armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v4)
-@armCommonDefinition("ProxyResource", Azure.ResourceManager.CommonTypes.Versions.v5)
-model ExtensionResourceBase extends ArmResource {}
+model ProxyResource extends Resource {}
 
 /**
  * The SKU (Stock Keeping Unit) assigned to this resource.
@@ -81,7 +82,7 @@ model ExtensionResourceBase extends ArmResource {}
 @armCommonDefinition("Sku", Azure.ResourceManager.CommonTypes.Versions.v3)
 @armCommonDefinition("Sku", Azure.ResourceManager.CommonTypes.Versions.v4)
 @armCommonDefinition("Sku", Azure.ResourceManager.CommonTypes.Versions.v5)
-model ResourceSkuType {
+model Sku {
   @doc("The name of the SKU, usually a combination of letters and numbers, for example, 'P3'")
   name: string;
 
@@ -379,7 +380,7 @@ union createdByType {
 @armCommonDefinition("Plan", Azure.ResourceManager.CommonTypes.Versions.v3)
 @armCommonDefinition("Plan", Azure.ResourceManager.CommonTypes.Versions.v4)
 @armCommonDefinition("Plan", Azure.ResourceManager.CommonTypes.Versions.v5)
-model ResourcePlanType {
+model Plan {
   @doc("A user defined name of the 3rd Party Artifact that is being procured.")
   name: string;
 

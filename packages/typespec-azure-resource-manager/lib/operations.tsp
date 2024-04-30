@@ -22,7 +22,7 @@ namespace Azure.ResourceManager;
 @armResourceList(Resource)
 @get
 op ArmListBySubscription<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
   Error extends {} = ErrorResponse
@@ -45,7 +45,7 @@ op ArmListBySubscription<
 @armRenameListByOperation(Resource, ParentName, ParentFriendlyName) // This must come before @armResourceList!
 @armResourceList(Resource)
 op ArmResourceListByParent<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = "",
@@ -73,7 +73,7 @@ op ArmResourceListByParent<
 @armRenameListByOperation(Resource) // This must come before @armResourceList!
 @armResourceList(Resource)
 op ArmResourceListAtScope<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
@@ -152,7 +152,7 @@ op ArmResourceCheckExistence<
 @armResourceCreateOrUpdate(Resource)
 @put
 op ArmResourceCreateOrUpdateAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
@@ -182,7 +182,7 @@ op ArmResourceCreateOrUpdateAsync<
 @armResourceCreateOrUpdate(Resource)
 @put
 op ArmResourceCreateOrUpdateSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
@@ -207,7 +207,7 @@ op ArmResourceCreateOrUpdateSync<
 @armResourceCreateOrUpdate(Resource)
 @put
 op ArmResourceCreateOrReplaceSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
@@ -229,7 +229,7 @@ op ArmResourceCreateOrReplaceSync<
  * @template Error Optional. The error response, if non-standard.
  */
 op ArmResourceCreateOrReplaceAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
@@ -255,7 +255,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  */
 op ArmTagsPatchAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Properties extends {} = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -282,7 +282,7 @@ op ArmTagsPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  */
 op ArmResourcePatchAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -322,7 +322,7 @@ op ArmResourcePatchAsync<
 @armResourceUpdate(Resource)
 @patch
 op ArmCustomPatchAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -351,7 +351,7 @@ op ArmCustomPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  */
 op ArmTagsPatchSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {}
 > is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters, Parameters>;
@@ -364,7 +364,7 @@ op ArmTagsPatchSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  */
 op ArmResourcePatchSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {}
@@ -389,7 +389,7 @@ op ArmResourcePatchSync<
 @armResourceUpdate(Resource)
 @patch
 op ArmCustomPatchSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
@@ -422,7 +422,7 @@ op ArmCustomPatchSync<
 @armResourceDelete(Resource)
 @delete
 op ArmResourceDeleteAsyncBase<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
@@ -440,7 +440,7 @@ op ArmResourceDeleteAsyncBase<
  */
 #deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 op ArmResourceDeleteAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
@@ -459,7 +459,7 @@ op ArmResourceDeleteAsync<
  * @template Error Optional. The error response, if non-standard.
  */
 op ArmResourceDeleteWithoutOkAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
@@ -481,7 +481,7 @@ op ArmResourceDeleteWithoutOkAsync<
 @armResourceDelete(Resource)
 @delete
 op ArmResourceDeleteSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
@@ -508,7 +508,7 @@ op ArmResourceDeleteSync<
 @armResourceAction(Resource)
 @post
 op ArmResourceActionAsyncBase<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model,
@@ -535,7 +535,7 @@ op ArmResourceActionAsyncBase<
  */
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
@@ -570,7 +570,7 @@ op ArmResourceActionAsync<
 @post
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -595,7 +595,7 @@ op ArmResourceActionSync<
  * @template Error Optional. The error response, if non-standard.
  */
 op ArmResourceActionNoContentAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
@@ -624,7 +624,7 @@ op ArmResourceActionNoContentAsync<
  * @template Error Optional. The error response, if non-standard.
  */
 op ArmResourceActionNoResponseContentAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -656,7 +656,7 @@ op ArmResourceActionNoResponseContentAsync<
 @armResourceAction(Resource)
 @post
 op ArmResourceActionNoContentSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
