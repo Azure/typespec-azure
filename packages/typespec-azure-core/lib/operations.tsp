@@ -90,7 +90,7 @@ alias ExpectedResourceOperationTraits = [
  */
 @ensureTraitsPresent(InterfaceTraits, ExpectedResourceOperationTraits)
 interface ResourceOperations<
-  InterfaceTraits,
+  InterfaceTraits extends TypeSpec.Reflection.Model,
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > {
   /**
