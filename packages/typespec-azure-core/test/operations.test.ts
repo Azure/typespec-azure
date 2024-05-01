@@ -2897,4 +2897,23 @@ describe("typespec-azure-core: operation templates", () => {
       ]);
     });
   });
+
+  // Regression test for https://github.com/Azure/typespec-azure/issues/332
+  it("doesn't crash when passing non model to ServiceTraits", async () => {
+    const [_, diagnostics] = await getOperations(`
+      alias Operations = Azure.Core.ResourceOperations<abc>;
+    `);
+    expectDiagnostics(
+      diagnostics.filter((x) => x.severity === "error"),
+      [
+        {
+          code: "unknown-identifier",
+          message: "Unknown identifier abc",
+        },
+        {
+          code: "unassignable",
+        },
+      ]
+    );
+  });
 });

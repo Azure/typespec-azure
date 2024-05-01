@@ -1,4 +1,4 @@
-import { Operation, createRule, getTypeName, paramMessage } from "@typespec/compiler";
+import { Operation, createRule, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
 
@@ -20,10 +20,15 @@ export const rpcOperationRequestBodyRule = createRule({
         const originalOperation = operation;
         while (operation.sourceOperation) {
           operation = operation.sourceOperation;
-          if (/^Azure\.Core\..*RpcOperation$/.test(getTypeName(operation))) {
+          if (
+            operation.name === "RpcOperation" &&
+            operation.namespace?.name === "Core" &&
+            operation.namespace?.namespace?.name === "Azure"
+          ) {
             const httpOperation = getHttpOperation(context.program, originalOperation)[0];
+            const bodyParam = httpOperation.parameters.body;
             const verb = httpOperation.verb.toLowerCase();
-            if (verb === "get" || verb === "delete") {
+            if ((verb === "get" || verb === "delete") && bodyParam !== undefined) {
               context.reportDiagnostic({
                 target: originalOperation,
                 messageId: "noBodyAllowed",

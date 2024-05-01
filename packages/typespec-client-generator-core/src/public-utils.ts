@@ -415,7 +415,7 @@ function getContextPath(
       currentType.indexer &&
       currentType.properties.size === 0 &&
       ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
-        (currentType.indexer.key.name === "integer" && currentType.name === "Array"))
+        currentType.indexer.key.name === "integer")
     ) {
       // handle array or dict
       const dictOrArrayItemType: Type = currentType.indexer.value;
@@ -430,7 +430,16 @@ function getContextPath(
         const result = dfsModelProperties(expectedType, property.type, property.name);
         if (result) return true;
       }
-      // handle additional properties type
+      // handle additional properties type: model MyModel is Record<> {}
+      if (currentType.sourceModel?.kind === "Model" && currentType.sourceModel?.name === "Record") {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.sourceModel!.indexer!.value!,
+          "AdditionalProperty"
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel { ...Record<>}
       if (currentType.indexer) {
         const result = dfsModelProperties(
           expectedType,
@@ -438,6 +447,17 @@ function getContextPath(
           "AdditionalProperty"
         );
         if (result) return true;
+      }
+      // handle additional properties type: model MyModel extends Record<> {}
+      if (currentType.baseModel) {
+        if (currentType.baseModel.name === "Record") {
+          const result = dfsModelProperties(
+            expectedType,
+            currentType.baseModel.indexer!.value!,
+            "AdditionalProperty"
+          );
+          if (result) return true;
+        }
       }
       result.pop();
       if (currentType.baseModel) {

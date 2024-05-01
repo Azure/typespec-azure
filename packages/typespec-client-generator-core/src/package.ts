@@ -59,6 +59,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import {
   getClientNamespaceString,
+  getCrossLanguageDefinitionId,
   getCrossLanguagePackageId,
   getDefaultApiVersion,
   getEffectivePayloadType,
@@ -163,15 +164,16 @@ function getSdkLroServiceMethod<
     getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
   );
 
-  basicServiceMethod.response.type = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, metadata.logicalResult)
-  );
-  basicServiceMethod.response.resultPath =
-    metadata.logicalPath ??
-    (metadata.envelopeResult !== metadata.logicalResult &&
-    basicServiceMethod.operation.verb === "post"
-      ? "result"
-      : undefined);
+  if (metadata.finalResult === undefined || metadata.finalResult === "void") {
+    basicServiceMethod.response.type = undefined;
+  } else {
+    basicServiceMethod.response.type = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, metadata.finalResult)
+    );
+  }
+
+  basicServiceMethod.response.resultPath = metadata.finalResultPath;
+
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
@@ -285,6 +287,7 @@ function getSdkBasicServiceMethod<
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
     },
+    crossLanguageDefintionId: getCrossLanguageDefinitionId({ ...operation, name }),
   });
 }
 
@@ -314,6 +317,9 @@ function getClientDefaultApiVersion<
   context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient | SdkOperationGroup
 ): string | undefined {
+  if (context.apiVersion && !["latest", "all"].includes(context.apiVersion)) {
+    return context.apiVersion;
+  }
   let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
   if (!defaultVersion) {
     // eslint-disable-next-line deprecation/deprecation
@@ -408,15 +414,17 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
     const operationGroupClient = diagnostics.pipe(createSdkClientType(context, operationGroup));
+    const name = `get${operationGroup.type.name}`;
     retval.push({
       kind: "clientaccessor",
       parameters: [],
-      name: `get${operationGroup.type.name}`,
+      name,
       description: getDocHelper(context, operationGroup.type).description,
       details: getDocHelper(context, operationGroup.type).details,
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type),
+      crossLanguageDefintionId: getCrossLanguageDefinitionId({ ...operationGroup.type, name }),
     });
   }
   return diagnostics.wrap(retval);
