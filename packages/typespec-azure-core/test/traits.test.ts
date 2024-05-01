@@ -264,7 +264,7 @@ describe("typespec-azure-core: service traits", () => {
           { trait: "MissingTrait", diagnostic: "conditional-requests-trait-missing" },
           { trait: "AnotherMissingTrait", diagnostic: "repeatable-requests-trait-missing" }
         ])
-        interface Operations<Traits> {}
+        interface Operations<Traits extends Reflection.Model> {}
 
         interface Usage extends Operations<ContextTrait & NoContextTrait> {}
         `);
