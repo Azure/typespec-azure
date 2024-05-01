@@ -1,5 +1,6 @@
 import {
   DiagnosticTarget,
+  ModelProperty,
   Program,
   SourceLocation,
   createRule,
@@ -49,7 +50,7 @@ export const armResourceNamePatternRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name-pattern",
   description: "The resource name parameter should be defined with a 'pattern' restriction.",
   messages: {
-    default: `The resource name parameter should be defined with a 'pattern' restriction.  Decorate the "name" property in the resource definition using the @pattern decorator, with a regular expression indicating the allowed characters in the resource name.`,
+    default: `The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParamter' to specify the name parameter with options to override default pattern RegEx expression.`,
   },
   create(context) {
     return {
@@ -59,8 +60,7 @@ export const armResourceNamePatternRule = createRule({
           // find the name property
           const nameProperty = resource.typespecType.properties.get("name");
           if (nameProperty !== undefined) {
-            const pattern = getPattern(program, nameProperty);
-            if (pattern === undefined) {
+            if (!hasPattern(program, nameProperty)) {
               context.reportDiagnostic({
                 target: nameProperty,
                 codefixes: [createPatternCodeFix(nameProperty)],
@@ -72,3 +72,18 @@ export const armResourceNamePatternRule = createRule({
     };
   },
 });
+
+function hasPattern(program: Program, property: ModelProperty): boolean {
+  const pattern = getPattern(program, property);
+  if (pattern !== undefined) {
+    return true;
+  }
+
+  if (property.type.kind === "Scalar") {
+    const pattern = getPattern(program, property.type);
+    if (pattern !== undefined) {
+      return true;
+    }
+  }
+  return false;
+}

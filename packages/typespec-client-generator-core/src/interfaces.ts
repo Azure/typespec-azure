@@ -185,11 +185,19 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
 export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   return (
     kind in SdkBuiltInKindsMiscellaneousEnum ||
-    kind in SdkIntKindsEnum ||
-    kind in SdkFloatKindsEnum ||
+    isSdkIntKind(kind) ||
+    isSdkFloatKind(kind) ||
     kind in SdkGenericBuiltInStringKindsEnum ||
     kind in SdkAzureBuiltInStringKindsEnum
   );
+}
+
+export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum {
+  return kind in SdkIntKindsEnum;
+}
+
+export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKindsEnum {
+  return kind in SdkFloatKindsEnum;
 }
 
 const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
@@ -465,6 +473,7 @@ interface SdkMethodBase {
   apiVersions: string[];
   description?: string;
   details?: string;
+  crossLanguageDefintionId: string;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>

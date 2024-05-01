@@ -348,7 +348,7 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(getAnyType(context, type));
   }
 
-  // change to a simple logic: only convert to normal type if the union is type | null, otherwise, return all the union types
+  // convert to normal type if the union is type | null
   if (nonNullOptions.length === 1) {
     const clientType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
@@ -1152,6 +1152,8 @@ function checkAndGetClientType(
 interface ModelUsageOptions {
   seenModelNames?: Set<SdkType>;
   propagation?: boolean;
+  // this is used to prevent propagation usage from subtype to base type's other subtypes
+  ignoreSubTypeStack?: boolean[];
 }
 
 function updateUsageOfModel(
@@ -1162,6 +1164,7 @@ function updateUsageOfModel(
 ): void {
   options = options ?? {};
   options.propagation = options?.propagation ?? true;
+  options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
   if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
     return;
   if (options?.seenModelNames === undefined) {
@@ -1194,18 +1197,29 @@ function updateUsageOfModel(
   if (type.kind === "enum") return;
   if (!options.propagation) return;
   if (type.baseModel) {
+    options.ignoreSubTypeStack.push(true);
     updateUsageOfModel(context, usage, type.baseModel, options);
+    options.ignoreSubTypeStack.pop();
   }
-  if (type.discriminatedSubtypes) {
+  if (
+    type.discriminatedSubtypes &&
+    (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1))
+  ) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
+      options.ignoreSubTypeStack.push(false);
       updateUsageOfModel(context, usage, discriminatedSubtype, options);
+      options.ignoreSubTypeStack.pop();
     }
   }
   if (type.additionalProperties) {
+    options.ignoreSubTypeStack.push(false);
     updateUsageOfModel(context, usage, type.additionalProperties, options);
+    options.ignoreSubTypeStack.pop();
   }
   for (const property of type.properties) {
+    options.ignoreSubTypeStack.push(false);
     updateUsageOfModel(context, usage, property.type, options);
+    options.ignoreSubTypeStack.pop();
   }
 }
 

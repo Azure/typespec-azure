@@ -550,6 +550,26 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(nameProp.nullable, true);
     });
 
+    it("nullable with more types", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          name: string | float32 | null;
+        }
+      `);
+
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "union");
+      strictEqual(sdkType.values.length, 2);
+      strictEqual(sdkType.values[0].kind, "string");
+      strictEqual(sdkType.values[1].kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, true);
+    });
+
     it("record with nullable", async function () {
       await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -563,6 +583,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(elementType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, false);
+      strictEqual(sdkType.nullableValues, true);
+    });
+
+    it("record with nullable with more types", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          name: Record<string | float32 | null>;
+        }
+      `);
+
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "dict");
+      const elementType = sdkType.valueType;
+      strictEqual(elementType.kind, "union");
+      strictEqual(elementType.values.length, 2);
+      strictEqual(elementType.values[0].kind, "string");
+      strictEqual(elementType.values[1].kind, "float32");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
@@ -590,6 +633,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.nullableValues, true);
     });
 
+    it("array with nullable with more types", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          name: (string | float32 | null)[];
+        }
+      `);
+
+      const sdkType = getSdkTypeHelper(runner);
+      strictEqual(sdkType.kind, "array");
+      const elementType = sdkType.valueType;
+      strictEqual(elementType.kind, "union");
+      strictEqual(elementType.values.length, 2);
+      strictEqual(elementType.values[0].kind, "string");
+      strictEqual(elementType.values[1].kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(elementType.nullable, true);
+      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(nameProp.nullable, false);
+      strictEqual(sdkType.nullableValues, true);
+    });
+
     it("additional property is nullable", async function () {
       await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -603,10 +669,17 @@ describe("typespec-client-generator-core: types", () => {
         model TestIs is Record<string|null> {
           name: string;
         }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestSpread {
+          name: string;
+          ...Record<string|null>
+        }
       `);
 
       const models = runner.context.experimental_sdkPackage.models;
-      strictEqual(models.length, 2);
+      strictEqual(models.length, 3);
 
       const extendsType = models.find((x) => x.name === "TestExtends");
       ok(extendsType);
@@ -623,6 +696,79 @@ describe("typespec-client-generator-core: types", () => {
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(isType.additionalProperties?.nullable, true);
       strictEqual(isType.additionalPropertiesNullable, true);
+
+      const spreadType = models.find((x) => x.name === "TestSpread");
+      ok(spreadType);
+      strictEqual(spreadType.kind, "model");
+      strictEqual(spreadType.additionalProperties?.kind, "string");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(spreadType.additionalProperties?.nullable, true);
+      strictEqual(spreadType.additionalPropertiesNullable, true);
+    });
+
+    it("additional property nullable with more types", async function () {
+      await runner.compileWithBuiltInService(`
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestExtends extends Record<string|float32|null> {
+          name: string;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestIs is Record<string|float32|null> {
+          name: string;
+        }
+
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model TestSpread {
+          name: string;
+          ...Record<string|float32|null>
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 3);
+
+      const extendsType = models.find((x) => x.name === "TestExtends");
+      ok(extendsType);
+      strictEqual(extendsType.kind, "model");
+      strictEqual(extendsType.additionalProperties?.kind, "union");
+      strictEqual(extendsType.additionalProperties?.name, "TestExtendsAdditionalProperty");
+      strictEqual(extendsType.additionalProperties?.isGeneratedName, true);
+      strictEqual(extendsType.additionalProperties?.values.length, 2);
+      strictEqual(extendsType.additionalProperties?.values[0].kind, "string");
+      strictEqual(extendsType.additionalProperties?.values[1].kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(extendsType.additionalProperties?.nullable, true);
+      strictEqual(extendsType.additionalPropertiesNullable, true);
+
+      const isType = models.find((x) => x.name === "TestIs");
+      ok(isType);
+      strictEqual(isType.kind, "model");
+      strictEqual(isType.additionalProperties?.kind, "union");
+      strictEqual(isType.additionalProperties?.name, "TestIsAdditionalProperty");
+      strictEqual(isType.additionalProperties?.isGeneratedName, true);
+      strictEqual(isType.additionalProperties?.values.length, 2);
+      strictEqual(isType.additionalProperties?.values[0].kind, "string");
+      strictEqual(isType.additionalProperties?.values[1].kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(isType.additionalProperties?.nullable, true);
+      strictEqual(isType.additionalPropertiesNullable, true);
+
+      const spreadType = models.find((x) => x.name === "TestSpread");
+      ok(spreadType);
+      strictEqual(spreadType.kind, "model");
+      strictEqual(spreadType.additionalProperties?.kind, "union");
+      strictEqual(spreadType.additionalProperties?.name, "TestSpreadAdditionalProperty");
+      strictEqual(spreadType.additionalProperties?.isGeneratedName, true);
+      strictEqual(spreadType.additionalProperties?.values.length, 2);
+      strictEqual(spreadType.additionalProperties?.values[0].kind, "string");
+      strictEqual(spreadType.additionalProperties?.values[1].kind, "float32");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(spreadType.additionalProperties?.nullable, true);
+      strictEqual(spreadType.additionalPropertiesNullable, true);
     });
 
     it("model with simple union property", async function () {
@@ -2604,6 +2750,76 @@ describe("typespec-client-generator-core: types", () => {
           sharktype: "goblin";
         }
         op operation(@body input: Shark): Shark;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 4);
+      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("usage propagation from subtype", async () => {
+      await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+          friends?: Fish[];
+          hate?: Record<Fish>;
+          partner?: Fish;
+        }
+
+        model SawShark extends Shark {
+          sharktype: "saw";
+        }
+
+        model GoblinShark extends Shark {
+          sharktype: "goblin";
+        }
+        op operation(@body input: Salmon): Salmon;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    });
+
+    it("usage propagation from subtype of type with another discriminated property", async () => {
+      await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+          food: Food;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+        }
+
+        @discriminator("kind")
+        model Food {
+          kind: string;
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+          friends?: Fish[];
+        }
+
+        model Fruit extends Food {
+          kind: "fruit";
+        }
+
+        model Meet extends Food {
+          kind: "meet";
+        }
+        op operation(@body input: Salmon): Salmon;
       `);
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 5);
