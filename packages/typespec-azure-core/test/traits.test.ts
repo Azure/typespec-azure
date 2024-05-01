@@ -264,7 +264,7 @@ describe("typespec-azure-core: service traits", () => {
           { trait: "MissingTrait", diagnostic: "conditional-requests-trait-missing" },
           { trait: "AnotherMissingTrait", diagnostic: "repeatable-requests-trait-missing" }
         ])
-        interface Operations<Traits> {}
+        interface Operations<Traits extends Reflection.Model> {}
 
         interface Usage extends Operations<ContextTrait & NoContextTrait> {}
         `);
@@ -302,6 +302,16 @@ describe("typespec-azure-core: service traits", () => {
         },
       ]);
     });
+
+    it("emits a diagnostic when using non model", async () => {
+      const diagnostics = await runner.diagnose(`
+        alias Test = Azure.Core.Traits.QueryParametersTrait<"abc">;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "unassignable",
+      });
+    });
   });
 
   describe("@ensureAllHeaderParams", () => {
@@ -325,6 +335,15 @@ describe("typespec-azure-core: service traits", () => {
           message: "Expected property 'isNotMarked' to be a header parameter.",
         },
       ]);
+    });
+    it("emits a diagnostic when using non model", async () => {
+      const diagnostics = await runner.diagnose(`
+        alias Test = Azure.Core.Traits.RequestHeadersTrait<"abc">;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "unassignable",
+      });
     });
   });
 });
