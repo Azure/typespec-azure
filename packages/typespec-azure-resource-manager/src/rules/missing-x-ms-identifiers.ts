@@ -13,7 +13,7 @@ import { isArmCommonType } from "../common-types.js";
 export const missingXmsIdentifiersRule = createRule({
   name: "missing-x-ms-identifiers",
   description:
-    "Array properties should describe their identifying properties with x-ms-identifiers.",
+    `Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", [id-prop])  where "id-prop" is a list of the names of identifying properties in the item type.`,
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers",
   messages: {
