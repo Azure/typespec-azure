@@ -62,7 +62,7 @@ model SystemOnlyResource is TrackedResource<SystemOnlyProperties> {
   @path
   name: string;
 
-  ...ManagedSystemAssignedIdentity;
+  ...ManagedSystemAssignedIdentityProperty;
 }
 
 @armResourceOperations

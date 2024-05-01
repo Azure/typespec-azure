@@ -188,9 +188,9 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @path
         name: string;
         ...ManagedServiceIdentityProperty;
-        ...ManagedBy;
-        ...ResourceSku;
-        ...ResourcePlan;
+        ...ManagedByProperty;
+        ...ResourceSkuProperty;
+        ...ResourcePlanProperty;
       }
 
       @doc("Patch model")

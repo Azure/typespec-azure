@@ -228,7 +228,7 @@ model ManagedSystemAssignedIdentityProperty {
   identity?: Foundations.SystemAssignedServiceIdentity;
 }
 
-/** `EntityTag` will be deprecated. Please use `EntityTagProperty` instead. */
+#deprecated "`EntityTag` will be deprecated. Please use `EntityTagProperty` instead."
 alias EntityTag = EntityTagProperty;
 /**
  * Model used only to spread in the standard `eTag` envelope property for a resource
@@ -238,7 +238,7 @@ alias EntityTag = EntityTagProperty;
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...EntityTag;
+ *   ...EntityTagProperty;
  * }
  * ```
  */
@@ -249,7 +249,7 @@ model EntityTagProperty {
   eTag?: string;
 }
 
-/** `ResourceKind` will be deprecated. Please use `ResourceKindProperty` instead. */
+#deprecated "`ResourceKind` will be deprecated. Please use `ResourceKindProperty` instead."
 alias ResourceKind = ResourceKindProperty;
 /**
  * Model used only to spread in the standard `kind` envelope property for a resource
@@ -258,7 +258,7 @@ alias ResourceKind = ResourceKindProperty;
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ResourceKind;
+ *   ...ResourceKindProperty;
  * }
  * ```
  */
@@ -278,7 +278,7 @@ model ResourceKindProperty {
 @friendlyName("{name}ListResult", Resource)
 model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resource>;
 
-/** `ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead. */
+#deprecated "`ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead."
 alias ResourcePlan = ResourcePlanProperty;
 /**
  * Model used only to spread in the standard `plan` envelope property for a resource
@@ -287,7 +287,7 @@ alias ResourcePlan = ResourcePlanProperty;
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ResourcePlan;
+ *   ...ResourcePlanProperty;
  * }
  * ```
  */
@@ -297,7 +297,7 @@ model ResourcePlanProperty {
   plan?: ResourcePlanType;
 }
 
-/** `ResourceSku` will be deprecated. Please use `ResourceSkuProperty` instead. */
+#deprecated "`ResourceSku` will be deprecated. Please use `ResourceSkuProperty` instead."
 alias ResourceSku = ResourceSkuProperty;
 /**
  * Model used only to spread in the standard `sku` envelope property for a resource
@@ -306,7 +306,7 @@ alias ResourceSku = ResourceSkuProperty;
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ResourceSku;
+ *   ...ResourceSkuProperty;
  * }
  * ```
  */
@@ -316,7 +316,7 @@ model ResourceSkuProperty {
   sku?: ResourceSkuType;
 }
 
-/** `ManagedBy` will be deprecated. Please use `ManagedByProperty` instead. */
+#deprecated "`ManagedBy` will be deprecated. Please use `ManagedByProperty` instead."
 alias ManagedBy = ManagedByProperty;
 /**
  * Model used only to spread in the standard `managedBy` envelope property for a resource
@@ -325,7 +325,7 @@ alias ManagedBy = ManagedByProperty;
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ManagedBy;
+ *   ...ManagedByProperty;
  * }
  * ```
  */
