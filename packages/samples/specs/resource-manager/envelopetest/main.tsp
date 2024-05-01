@@ -28,12 +28,12 @@ model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
   @path
   name: string;
 
-  ...EntityTag;
-  ...ManagedBy;
-  ...ResourceKind;
-  ...ResourcePlan;
-  ...ResourceSku;
-  ...ManagedServiceIdentity;
+  ...EntityTagProperty;
+  ...ManagedByProperty;
+  ...ResourceKindProperty;
+  ...ResourcePlanProperty;
+  ...ResourceSkuProperty;
+  ...ManagedServiceIdentityProperty;
 }
 
 @armResourceOperations

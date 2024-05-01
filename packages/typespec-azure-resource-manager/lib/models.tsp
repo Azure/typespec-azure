@@ -171,7 +171,8 @@ model DefaultProvisioningStateProperty {
   provisioningState?: ResourceProvisioningState;
 }
 
-/** The standard evenlop definition of ExtendedLocation.
+/**
+ * Model used only to spread in the standard `extendedLocation` envelope property for a resource
  *
  * @example
  * ```typespec
@@ -185,27 +186,53 @@ model ExtendedLocationProperty {
   extendedLocation: Foundations.ExtendedLocation;
 }
 
+#deprecated "Please change ManagedServiceIdentity to ManagedServiceIdentityProperty."
+alias ManagedServiceIdentity = ManagedServiceIdentityProperty;
+
 /**
- * Standard Azure Resource Manager definition of ManagedServiceIdentity
+ * Model used only to spread in the standard `ManagedServiceIdentity` envelope property for a resource
+ *
+ * @example
+ *
+ * ```typespec
+ * model Foo is TrackedResource<FooProperties> {
+ *   ...ResourceNameParameter<Foo>;
+ *   ...ManagedServiceIdentityProperty;
+ * }
+ * ```
  */
 @doc("The managed service identities envelope.")
-model ManagedServiceIdentity {
+model ManagedServiceIdentityProperty {
   @doc("The managed service identities assigned to this resource.")
-  identity?: ManagedIdentityProperties;
+  identity?: Foundations.ManagedServiceIdentity;
 }
 
+#deprecated "Please change ManagedSystemAssignedIdentity to ManagedSystemAssignedIdentityProperty."
+alias ManagedSystemAssignedIdentity = ManagedSystemAssignedIdentityProperty;
 /**
- * Standard Azure Resource Manager definition of ManagedServiceIdentity for services
- * that only support system-defined identities
+ * Model used only to spread in the standard `SystemAssignedServiceIdentity` envelope property for a resource
+ * that only support system-defined identities.
+ *
+ * @example
+ *
+ * ```typespec
+ * model Foo is TrackedResource<FooProperties> {
+ *   ...ResourceNameParameter<Foo>;
+ *   ...ManagedSystemAssignedIdentityProperty;
+ * }
+ * ```
  */
 @doc("Managed identity for services that are constrained to system-assigned managed identities.")
-model ManagedSystemAssignedIdentity {
+model ManagedSystemAssignedIdentityProperty {
   @doc("The managed service identities assigned to this resource.")
-  identity?: ManagedSystemIdentityProperties;
+  identity?: Foundations.SystemAssignedServiceIdentity;
 }
 
+/** `EntityTag` will be deprecated. Please use `EntityTagProperty` instead. */
+alias EntityTag = EntityTagProperty;
 /**
  * Model used only to spread in the standard `eTag` envelope property for a resource
+ *
  * @example
  *
  * ```typespec
@@ -216,12 +243,14 @@ model ManagedSystemAssignedIdentity {
  * ```
  */
 @doc("The eTag property envelope.")
-model EntityTag {
+model EntityTagProperty {
   @doc("If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.")
   @visibility("read")
   eTag?: string;
 }
 
+/** `ResourceKind` will be deprecated. Please use `ResourceKindProperty` instead. */
+alias ResourceKind = ResourceKindProperty;
 /**
  * Model used only to spread in the standard `kind` envelope property for a resource
  * @example
@@ -234,7 +263,7 @@ model EntityTag {
  * ```
  */
 @doc("The resource kind property envelope.")
-model ResourceKind {
+model ResourceKindProperty {
   @doc("Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.")
   @pattern("^[-\\w\\._,\\(\\\\\\)]+$")
   @visibility("read", "create")
@@ -249,6 +278,8 @@ model ResourceKind {
 @friendlyName("{name}ListResult", Resource)
 model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resource>;
 
+/** `ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead. */
+alias ResourcePlan = ResourcePlanProperty;
 /**
  * Model used only to spread in the standard `plan` envelope property for a resource
  * @example
@@ -261,11 +292,13 @@ model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resour
  * ```
  */
 @doc("The resource plan property envelope.")
-model ResourcePlan {
+model ResourcePlanProperty {
   @doc("Details of the resource plan.")
   plan?: ResourcePlanType;
 }
 
+/** `ResourceSku` will be deprecated. Please use `ResourceSkuProperty` instead. */
+alias ResourceSku = ResourceSkuProperty;
 /**
  * Model used only to spread in the standard `sku` envelope property for a resource
  * @example
@@ -278,11 +311,13 @@ model ResourcePlan {
  * ```
  */
 @doc("The SKU (Stock Keeping Unit) assigned to this resource.")
-model ResourceSku {
+model ResourceSkuProperty {
   @doc("The SKU (Stock Keeping Unit) assigned to this resource.")
   sku?: ResourceSkuType;
 }
 
+/** `ManagedBy` will be deprecated. Please use `ManagedByProperty` instead. */
+alias ManagedBy = ManagedByProperty;
 /**
  * Model used only to spread in the standard `managedBy` envelope property for a resource
  * @example
@@ -295,7 +330,7 @@ model ResourceSku {
  * ```
  */
 @doc("The managedBy property envelope.")
-model ManagedBy {
+model ManagedByProperty {
   @doc("The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.")
   managedBy?: string;
 }

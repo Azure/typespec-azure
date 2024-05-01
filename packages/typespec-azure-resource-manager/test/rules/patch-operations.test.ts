@@ -49,7 +49,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
       }
 
       #suppress "@azure-tools/typespec-azure-resource-manager/patch-envelope" "Testing"
@@ -124,13 +124,13 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
       }
 
       #suppress "@azure-tools/typespec-azure-resource-manager/patch-envelope" "Testing"
       @doc("A bad patch")
       model MyBadPatch {
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
         ...ArmTagsProperty;
         @doc("Blah?")
         blah?: string;
@@ -187,7 +187,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
         ...ManagedBy;
         ...ResourceSku;
         ...ResourcePlan;

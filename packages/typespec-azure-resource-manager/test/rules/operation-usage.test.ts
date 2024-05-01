@@ -52,7 +52,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
       }
 
       @armResourceOperations

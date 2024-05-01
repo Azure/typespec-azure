@@ -456,12 +456,12 @@ model Azure.ResourceManager.EncryptionConfiguration
 | customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CustomerManagedKeyEncryption) | All customer-managed key encryption properties for the resource.                                                                                                                                     |
 | keyEncryptionKeyUrl?          | `string`                                                                                             | key encryption key Url, versioned or unversioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
 
-### `EntityTag` {#Azure.ResourceManager.EntityTag}
+### `EntityTagProperty` {#Azure.ResourceManager.EntityTagProperty}
 
 Model used only to spread in the standard `eTag` envelope property for a resource
 
 ```typespec
-model Azure.ResourceManager.EntityTag
+model Azure.ResourceManager.EntityTagProperty
 ```
 
 #### Examples
@@ -495,7 +495,7 @@ model Azure.ResourceManager.ErrorResponse
 
 ### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
 
-The standard evenlop definition of ExtendedLocation.
+Model used only to spread in the standard `extendedLocation` envelope property for a resource
 
 ```typespec
 model Azure.ResourceManager.ExtendedLocationProperty
@@ -585,12 +585,12 @@ model Azure.ResourceManager.LocationResourceParameter
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
 
-### `ManagedBy` {#Azure.ResourceManager.ManagedBy}
+### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
 Model used only to spread in the standard `managedBy` envelope property for a resource
 
 ```typespec
-model Azure.ResourceManager.ManagedBy
+model Azure.ResourceManager.ManagedByProperty
 ```
 
 #### Examples
@@ -608,34 +608,52 @@ model Foo is TrackedResource<FooProperties> {
 | ---------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | managedBy? | `string` | The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource. |
 
-### `ManagedServiceIdentity` {#Azure.ResourceManager.ManagedServiceIdentity}
+### `ManagedServiceIdentityProperty` {#Azure.ResourceManager.ManagedServiceIdentityProperty}
 
-Standard Azure Resource Manager definition of ManagedServiceIdentity
+Model used only to spread in the standard `ManagedServiceIdentity` envelope property for a resource
 
 ```typespec
-model Azure.ResourceManager.ManagedServiceIdentity
+model Azure.ResourceManager.ManagedServiceIdentityProperty
+```
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  ...ResourceNameParameter<Foo>;
+  ...ManagedServiceIdentityProperty;
+}
 ```
 
 #### Properties
 
-| Name      | Type                                                                                                       | Description                                               |
-| --------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| identity? | [`ManagedIdentityProperties`](./data-types.md#Azure.ResourceManager.Foundations.ManagedIdentityProperties) | The managed service identities assigned to this resource. |
+| Name      | Type                                                                                                 | Description                                               |
+| --------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| identity? | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentity) | The managed service identities assigned to this resource. |
 
-### `ManagedSystemAssignedIdentity` {#Azure.ResourceManager.ManagedSystemAssignedIdentity}
+### `ManagedSystemAssignedIdentityProperty` {#Azure.ResourceManager.ManagedSystemAssignedIdentityProperty}
 
-Standard Azure Resource Manager definition of ManagedServiceIdentity for services
-that only support system-defined identities
+Model used only to spread in the standard `SystemAssignedServiceIdentity` envelope property for a resource
+that only support system-defined identities.
 
 ```typespec
-model Azure.ResourceManager.ManagedSystemAssignedIdentity
+model Azure.ResourceManager.ManagedSystemAssignedIdentityProperty
+```
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  ...ResourceNameParameter<Foo>;
+  ...ManagedSystemAssignedIdentityProperty;
+}
 ```
 
 #### Properties
 
-| Name      | Type                                                                                                                   | Description                                               |
-| --------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| identity? | [`ManagedSystemIdentityProperties`](./data-types.md#Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties) | The managed service identities assigned to this resource. |
+| Name      | Type                                                                                                               | Description                                               |
+| --------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| identity? | [`SystemAssignedServiceIdentity`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity) | The managed service identities assigned to this resource. |
 
 ### `ParentKeysOf` {#Azure.ResourceManager.ParentKeysOf}
 
@@ -905,12 +923,12 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 | -------- | -------------------------------- | ---------------------------------------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
 
-### `ResourceKind` {#Azure.ResourceManager.ResourceKind}
+### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
 Model used only to spread in the standard `kind` envelope property for a resource
 
 ```typespec
-model Azure.ResourceManager.ResourceKind
+model Azure.ResourceManager.ResourceKindProperty
 ```
 
 #### Examples
@@ -996,12 +1014,12 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 | -------- | -------------------------------- | ---------------------------------------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
 
-### `ResourcePlan` {#Azure.ResourceManager.ResourcePlan}
+### `ResourcePlanProperty` {#Azure.ResourceManager.ResourcePlanProperty}
 
 Model used only to spread in the standard `plan` envelope property for a resource
 
 ```typespec
-model Azure.ResourceManager.ResourcePlan
+model Azure.ResourceManager.ResourcePlanProperty
 ```
 
 #### Examples
@@ -1019,12 +1037,12 @@ model Foo is TrackedResource<FooProperties> {
 | ----- | ---------------------------------------------------------------------------------------- | ----------------------------- |
 | plan? | [`ResourcePlanType`](./data-types.md#Azure.ResourceManager.Foundations.ResourcePlanType) | Details of the resource plan. |
 
-### `ResourceSku` {#Azure.ResourceManager.ResourceSku}
+### `ResourceSkuProperty` {#Azure.ResourceManager.ResourceSkuProperty}
 
 Model used only to spread in the standard `sku` envelope property for a resource
 
 ```typespec
-model Azure.ResourceManager.ResourceSku
+model Azure.ResourceManager.ResourceSkuProperty
 ```
 
 #### Examples
@@ -1431,12 +1449,12 @@ model Azure.ResourceManager.Foundations.LocationScope<Resource>
 | location       | `string`                         | The location name.                         |
 | provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
 
-### `ManagedIdentityProperties` {#Azure.ResourceManager.Foundations.ManagedIdentityProperties}
+### `ManagedServiceIdentity` {#Azure.ResourceManager.Foundations.ManagedServiceIdentity}
 
 The properties of the managed service identities assigned to this resource.
 
 ```typespec
-model Azure.ResourceManager.Foundations.ManagedIdentityProperties
+model Azure.ResourceManager.Foundations.ManagedServiceIdentity
 ```
 
 #### Properties
@@ -1446,23 +1464,7 @@ model Azure.ResourceManager.Foundations.ManagedIdentityProperties
 | tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
 | principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
 | type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
-
-### `ManagedSystemIdentityProperties` {#Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties}
-
-The properties of the service-assigned identity associated with this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties
-```
-
-#### Properties
-
-| Name         | Type                                                                                                                       | Description                                             |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| tenantId?    | `string`                                                                                                                   | The Active Directory tenant id of the principal.        |
-| principalId? | `string`                                                                                                                   | The active directory identifier of this principal.      |
-| type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource. |
+| userAssignedIdentities? | [`UserAssignedIdentities`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentities)         | The identities assigned to this resource by the user.   |
 
 ### `Operation` {#Azure.ResourceManager.Foundations.Operation}
 
@@ -1738,6 +1740,22 @@ model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 | subscriptionId | `string`                         | The ID of the target subscription.         |
 | provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
 
+### `SystemAssignedServiceIdentity` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity}
+
+The properties of the service-assigned identity associated with this resource.
+
+```typespec
+model Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity
+```
+
+#### Properties
+
+| Name         | Type                                                                                                                       | Description                                             |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| tenantId?    | `string`                                                                                                                   | The Active Directory tenant id of the principal.        |
+| principalId? | `string`                                                                                                                   | The active directory identifier of this principal.      |
+| type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource. |
+
 ### `SystemData` {#Azure.ResourceManager.Foundations.SystemData}
 
 Metadata pertaining to creation and last modification of the resource.
@@ -1826,6 +1844,20 @@ model Azure.ResourceManager.Foundations.TrackedResourceBase
 | -------- | ---------------- | ----------------------------------------- |
 | location | `string`         | The geo-location where the resource lives |
 | tags?    | `Record<string>` | Resource tags.                            |
+
+### `UserAssignedIdentities` {#Azure.ResourceManager.Foundations.UserAssignedIdentities}
+
+The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
+
+```typespec
+model Azure.ResourceManager.Foundations.UserAssignedIdentities
+```
+
+#### Properties
+
+| Name | Type                                                                                             | Description           |
+| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
+|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentity) | Additional properties |
 
 ### `UserAssignedIdentity` {#Azure.ResourceManager.Foundations.UserAssignedIdentity}
 
