@@ -172,7 +172,8 @@ model DefaultProvisioningStateProperty {
 }
 
 /**
- * Model used only to spread in the standard `extendedLocation` envelope property for a resource
+ * Model representing the standard `extendedLocation` envelope property for a resource.
+ * Spread this model into a Resource Model, if the resource supports extended locations
  *
  * @example
  * ```typespec
@@ -190,7 +191,8 @@ model ExtendedLocationProperty {
 alias ManagedServiceIdentity = ManagedServiceIdentityProperty;
 
 /**
- * Model used only to spread in the standard `ManagedServiceIdentity` envelope property for a resource
+ * Model representing the standard `ManagedServiceIdentity` envelope property for a resource.
+ * Spread this model into a resource model if the resource supports both system-assigned and user-assigned managed identities.
  *
  * @example
  *
@@ -210,8 +212,9 @@ model ManagedServiceIdentityProperty {
 #deprecated "Please change ManagedSystemAssignedIdentity to ManagedSystemAssignedIdentityProperty."
 alias ManagedSystemAssignedIdentity = ManagedSystemAssignedIdentityProperty;
 /**
- * Model used only to spread in the standard `SystemAssignedServiceIdentity` envelope property for a resource
- * that only support system-defined identities.
+ * Model representing the standard `SystemAssignedServiceIdentity` envelope property for a resource.
+ * Spread this model into a resource model if the resource supports system-assigned managed identities
+ * but does not support user-assigned managed identities.
  *
  * @example
  *
@@ -252,7 +255,9 @@ model EntityTagProperty {
 #deprecated "`ResourceKind` will be deprecated. Please use `ResourceKindProperty` instead."
 alias ResourceKind = ResourceKindProperty;
 /**
- * Model used only to spread in the standard `kind` envelope property for a resource
+ * Model representing the standard `kind` envelope property for a resource.
+ * Spread this model into a resource model if the resource support ARM `kind`.
+ *
  * @example
  *
  * ```typespec
@@ -281,7 +286,9 @@ model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resour
 #deprecated "`ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead."
 alias ResourcePlan = ResourcePlanProperty;
 /**
- * Model used only to spread in the standard `plan` envelope property for a resource
+ * Model representing the standard `plan` envelope property for a resource.
+ * Spread this model into a resource Model if the resource supports ARM `plan`.
+ *
  * @example
  *
  * ```typespec
@@ -300,7 +307,9 @@ model ResourcePlanProperty {
 #deprecated "`ResourceSku` will be deprecated. Please use `ResourceSkuProperty` instead."
 alias ResourceSku = ResourceSkuProperty;
 /**
- * Model used only to spread in the standard `sku` envelope property for a resource
+ * Model representing the standard `sku` envelope property for a resource.
+ * Spread this model into a resource model if the resource supports standard ARM `sku`.
+ *
  * @example
  *
  * ```typespec
@@ -319,7 +328,9 @@ model ResourceSkuProperty {
 #deprecated "`ManagedBy` will be deprecated. Please use `ManagedByProperty` instead."
 alias ManagedBy = ManagedByProperty;
 /**
- * Model used only to spread in the standard `managedBy` envelope property for a resource
+ * Model representing the standard `managedBy` envelope property for a resource.
+ * Spread this model into a resource model if the resource is managed by another entity.
+ *
  * @example
  *
  * ```typespec
