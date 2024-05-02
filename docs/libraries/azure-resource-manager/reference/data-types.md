@@ -469,7 +469,7 @@ model Azure.ResourceManager.EntityTagProperty
 ```typespec
 model Foo is TrackedResource<FooProperties> {
   // Only have standard Succeeded, Failed, Cancelled states
-  ...EntityTag;
+  ...EntityTagProperty;
 }
 ```
 
@@ -598,7 +598,7 @@ model Azure.ResourceManager.ManagedByProperty
 ```typespec
 model Foo is TrackedResource<FooProperties> {
   // Only have standard Succeeded, Failed, Cancelled states
-  ...ManagedBy;
+  ...ManagedByProperty;
 }
 ```
 
@@ -936,7 +936,7 @@ model Azure.ResourceManager.ResourceKindProperty
 ```typespec
 model Foo is TrackedResource<FooProperties> {
   // Only have standard Succeeded, Failed, Cancelled states
-  ...ResourceKind;
+  ...ResourceKindProperty;
 }
 ```
 
@@ -1027,7 +1027,7 @@ model Azure.ResourceManager.ResourcePlanProperty
 ```typespec
 model Foo is TrackedResource<FooProperties> {
   // Only have standard Succeeded, Failed, Cancelled states
-  ...ResourcePlan;
+  ...ResourcePlanProperty;
 }
 ```
 
@@ -1050,7 +1050,7 @@ model Azure.ResourceManager.ResourceSkuProperty
 ```typespec
 model Foo is TrackedResource<FooProperties> {
   // Only have standard Succeeded, Failed, Cancelled states
-  ...ResourceSku;
+  ...ResourceSkuProperty;
 }
 ```
 
