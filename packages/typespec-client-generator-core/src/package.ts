@@ -78,6 +78,7 @@ function getSdkServiceOperation<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup,
   operation: Operation,
   methodParameters: SdkMethodParameter[]
 ): [TServiceOperation, readonly Diagnostic[]] {
@@ -85,7 +86,7 @@ function getSdkServiceOperation<
   const httpOperation = getHttpOperationWithCache(context, operation);
   if (httpOperation) {
     const sdkHttpOperation = diagnostics.pipe(
-      getSdkHttpOperation(context, httpOperation, methodParameters)
+      getSdkHttpOperation(context, client, httpOperation, methodParameters)
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
@@ -103,12 +104,13 @@ function getSdkLroPagingServiceMethod<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup,
   operation: Operation
 ): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkLroServiceMethod<TOptions, TServiceOperation>(context, operation)),
-    ...diagnostics.pipe(getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, operation)),
+    ...diagnostics.pipe(getSdkLroServiceMethod<TOptions, TServiceOperation>(context, client, operation)),
+    ...diagnostics.pipe(getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, client, operation)),
     kind: "lropaging",
   });
 }
@@ -118,12 +120,13 @@ function getSdkPagingServiceMethod<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup,
   operation: Operation
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const pagedMetadata = getPagedResult(context.program, operation)!;
   const basic = diagnostics.pipe(
-    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
+    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, client, operation)
   );
   if (pagedMetadata.itemsProperty) {
     basic.response.type = diagnostics.pipe(
@@ -140,6 +143,7 @@ function getSdkPagingServiceMethod<
       ? diagnostics.pipe(
           getSdkServiceOperation<TOptions, TServiceOperation>(
             context,
+            client,
             pagedMetadata.nextLinkOperation,
             basic.parameters
           )
@@ -156,12 +160,13 @@ function getSdkLroServiceMethod<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup,
   operation: Operation
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const metadata = getLroMetadata(context.program, operation)!;
   const basicServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
+    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, client, operation)
   );
 
   if (metadata.finalResult === undefined || metadata.finalResult === "void") {
@@ -181,6 +186,7 @@ function getSdkLroServiceMethod<
     operation: diagnostics.pipe(
       getSdkServiceOperation<TOptions, TServiceOperation>(
         context,
+        client,
         metadata.operation,
         basicServiceMethod.parameters
       )
@@ -229,6 +235,7 @@ function getSdkBasicServiceMethod<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -262,7 +269,7 @@ function getSdkBasicServiceMethod<
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
+    getSdkServiceOperation<TOptions, TServiceOperation>(context, client, operation, methodParameters)
   );
   const response = getSdkMethodResponse(operation, serviceOperation);
   const name = getLibraryName(context, operation);
@@ -281,7 +288,7 @@ function getSdkBasicServiceMethod<
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
       return ignoreDiagnostics(
-        getCorrespondingMethodParams(context, name, methodParameters, serviceParam)
+        getCorrespondingMethodParams(context, client, name, methodParameters, serviceParam)
       );
     },
     getResponseMapping: function getResponseMapping(): string | undefined {
@@ -296,18 +303,19 @@ function getSdkServiceMethod<
   TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
+  client: SdkClient | SdkOperationGroup,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
   const paging = getPagedResult(context.program, operation);
   if (lro && paging) {
-    return getSdkLroPagingServiceMethod<TOptions, TServiceOperation>(context, operation);
+    return getSdkLroPagingServiceMethod<TOptions, TServiceOperation>(context, client, operation);
   } else if (paging) {
-    return getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, operation);
+    return getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, client, operation);
   } else if (lro) {
-    return getSdkLroServiceMethod<TOptions, TServiceOperation>(context, operation);
+    return getSdkLroServiceMethod<TOptions, TServiceOperation>(context, client, operation);
   }
-  return getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation);
+  return getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, client, operation);
 }
 
 function getClientDefaultApiVersion<
@@ -343,8 +351,9 @@ function getSdkInitializationType<
   if (credentialParam) {
     properties.push(credentialParam);
   }
-  if (context.__api_version_parameter) {
-    properties.push(context.__api_version_parameter);
+  const apiVersionParam = context.__clientToApiVersionParameter.get(client);
+  if (apiVersionParam) {
+    properties.push(apiVersionParam);
   }
   if (context.__subscriptionIdParameter) {
     properties.push(context.__subscriptionIdParameter);
@@ -408,7 +417,7 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInOperationGroup(context, client)) {
     retval.push(
-      diagnostics.pipe(getSdkServiceMethod<TOptions, TServiceOperation>(context, operation))
+      diagnostics.pipe(getSdkServiceMethod<TOptions, TServiceOperation>(context, client, operation))
     );
   }
   for (const operationGroup of listOperationGroups(context, client)) {

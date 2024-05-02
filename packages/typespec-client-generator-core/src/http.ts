@@ -24,6 +24,7 @@ import { camelCase } from "change-case";
 import {
   CollectionFormat,
   SdkBodyParameter,
+  SdkClient,
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkHttpParameter,
@@ -31,6 +32,7 @@ import {
   SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
+  SdkOperationGroup,
   SdkParameter,
   SdkPathParameter,
   SdkQueryParameter,
@@ -55,6 +57,7 @@ import {
 
 export function getSdkHttpOperation(
   context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[]
 ): [SdkHttpOperation, readonly Diagnostic[]] {
@@ -66,7 +69,7 @@ export function getSdkHttpOperation(
     .concat([...exceptions.values()])
     .filter((r) => r.type);
   const parameters = diagnostics.pipe(
-    getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0])
+    getSdkHttpParameters(context, client, httpOperation, methodParameters, responsesWithBodies[0])
   );
   return diagnostics.wrap({
     __raw: httpOperation,
@@ -96,6 +99,7 @@ interface SdkHttpParameters {
 
 function getSdkHttpParameters(
   context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
   responseBody?: SdkHttpResponse
@@ -166,6 +170,7 @@ function getSdkHttpParameters(
     retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
       getCorrespondingMethodParams(
         context,
+        client,
         httpOperation.operation.name,
         methodParameters,
         retval.bodyParam
@@ -214,7 +219,7 @@ function getSdkHttpParameters(
   }
   for (const param of retval.parameters) {
     param.correspondingMethodParams = diagnostics.pipe(
-      getCorrespondingMethodParams(context, httpOperation.operation.name, methodParameters, param)
+      getCorrespondingMethodParams(context, client, httpOperation.operation.name, methodParameters, param)
     );
   }
   return diagnostics.wrap(retval);
@@ -433,13 +438,15 @@ function getSdkHttpResponseAndExceptions(
 
 export function getCorrespondingMethodParams(
   context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
   methodName: string,
   methodParameters: SdkParameter[],
   serviceParam: SdkHttpParameter
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (serviceParam.isApiVersionParam) {
-    if (!context.__api_version_parameter) {
+    const existingApiVersion = context.__clientToApiVersionParameter.get(client);
+    if (!existingApiVersion) {
       const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
       if (!apiVersionParam) {
         diagnostics.add(
@@ -454,16 +461,17 @@ export function getCorrespondingMethodParams(
         );
         return diagnostics.wrap([]);
       }
-      context.__api_version_parameter = {
+      const apiVersionParamUpdated: SdkParameter = {
         ...apiVersionParam,
         name: "apiVersion",
         nameInClient: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
         clientDefaultValue: context.__api_version_client_default_value,
-      };
+      }
+      context.__clientToApiVersionParameter.set(client, apiVersionParamUpdated);
     }
-    return diagnostics.wrap([context.__api_version_parameter]);
+    return diagnostics.wrap([context.__clientToApiVersionParameter.get(client)!]);
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {

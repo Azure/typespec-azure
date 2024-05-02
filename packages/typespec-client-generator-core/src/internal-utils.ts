@@ -25,6 +25,7 @@ import {
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
+  SdkOperationGroup,
   SdkParameter,
   SdkServiceOperation,
   SdkType,
@@ -267,7 +268,7 @@ export interface TCGCContext {
   generatedNames?: Map<Union | Model, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __api_version_parameter?: SdkParameter;
+  __clientToApiVersionParameter: Map<SdkClient | SdkOperationGroup, SdkParameter>;
   __api_version_client_default_value?: string;
   __api_versions?: string[];
   knownScalars?: Record<string, SdkBuiltInKinds>;
@@ -285,6 +286,7 @@ export function createTCGCContext(program: Program): TCGCContext {
     emitterName: "__TCGC_INTERNAL__",
     diagnostics: [],
     originalProgram: program,
+    __clientToApiVersionParameter: new Map(),
   };
 }
 
