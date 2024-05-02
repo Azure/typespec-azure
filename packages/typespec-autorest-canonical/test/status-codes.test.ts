@@ -51,7 +51,7 @@ it("emit diagnostic if status code range is not supported", async () => {
   );
   expectDiagnostics(diagnostics, [
     {
-      code: "@azure-tools/typespec-autorest-canonical/unsupported-status-code-range",
+      code: "@azure-tools/typespec-autorest/unsupported-status-code-range",
       message:
         "Status code range '455 to '495' is not supported. OpenAPI 2.0 can only represent range 1XX, 2XX, 3XX, 4XX and 5XX. Example: `@minValue(400) @maxValue(499)` for 4XX.",
     },

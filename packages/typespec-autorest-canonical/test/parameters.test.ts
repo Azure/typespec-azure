@@ -1,7 +1,7 @@
+import { OpenAPI2HeaderParameter, OpenAPI2QueryParameter } from "@azure-tools/typespec-autorest";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { OpenAPI2HeaderParameter, OpenAPI2QueryParameter } from "../src/types.js";
 import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
 
 it("create a query param", async () => {
