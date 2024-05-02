@@ -245,7 +245,7 @@ it("issues diagnostics when there is differrent body types across content types"
     `
   );
   expectDiagnostics(ignoreUseStandardOps(diagnostics), {
-    code: "@azure-tools/typespec-autorest-canonical/duplicate-body-types",
+    code: "@azure-tools/typespec-autorest/duplicate-body-types",
     message: "Request has multiple body types",
   });
 });
