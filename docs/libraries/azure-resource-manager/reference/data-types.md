@@ -495,7 +495,8 @@ model Azure.ResourceManager.ErrorResponse
 
 ### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
 
-Model used only to spread in the standard `extendedLocation` envelope property for a resource
+Model representing the standard `extendedLocation` envelope property for a resource.
+Spread this model into a Resource Model, if the resource supports extended locations
 
 ```typespec
 model Azure.ResourceManager.ExtendedLocationProperty
@@ -587,7 +588,8 @@ model Azure.ResourceManager.LocationResourceParameter
 
 ### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
-Model used only to spread in the standard `managedBy` envelope property for a resource
+Model representing the standard `managedBy` envelope property for a resource.
+Spread this model into a resource model if the resource is managed by another entity.
 
 ```typespec
 model Azure.ResourceManager.ManagedByProperty
@@ -610,7 +612,8 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ManagedServiceIdentityProperty` {#Azure.ResourceManager.ManagedServiceIdentityProperty}
 
-Model used only to spread in the standard `ManagedServiceIdentity` envelope property for a resource
+Model representing the standard `ManagedServiceIdentity` envelope property for a resource.
+Spread this model into a resource model if the resource supports both system-assigned and user-assigned managed identities.
 
 ```typespec
 model Azure.ResourceManager.ManagedServiceIdentityProperty
@@ -633,8 +636,9 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ManagedSystemAssignedIdentityProperty` {#Azure.ResourceManager.ManagedSystemAssignedIdentityProperty}
 
-Model used only to spread in the standard `SystemAssignedServiceIdentity` envelope property for a resource
-that only support system-defined identities.
+Model representing the standard `SystemAssignedServiceIdentity` envelope property for a resource.
+Spread this model into a resource model if the resource supports system-assigned managed identities
+but does not support user-assigned managed identities.
 
 ```typespec
 model Azure.ResourceManager.ManagedSystemAssignedIdentityProperty
@@ -925,7 +929,8 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 
 ### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
-Model used only to spread in the standard `kind` envelope property for a resource
+Model representing the standard `kind` envelope property for a resource.
+Spread this model into a resource model if the resource support ARM `kind`.
 
 ```typespec
 model Azure.ResourceManager.ResourceKindProperty
@@ -1016,7 +1021,8 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 
 ### `ResourcePlanProperty` {#Azure.ResourceManager.ResourcePlanProperty}
 
-Model used only to spread in the standard `plan` envelope property for a resource
+Model representing the standard `plan` envelope property for a resource.
+Spread this model into a resource Model if the resource supports ARM `plan`.
 
 ```typespec
 model Azure.ResourceManager.ResourcePlanProperty
@@ -1039,7 +1045,8 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ResourceSkuProperty` {#Azure.ResourceManager.ResourceSkuProperty}
 
-Model used only to spread in the standard `sku` envelope property for a resource
+Model representing the standard `sku` envelope property for a resource.
+Spread this model into a resource model if the resource supports standard ARM `sku`.
 
 ```typespec
 model Azure.ResourceManager.ResourceSkuProperty
