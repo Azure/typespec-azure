@@ -575,12 +575,12 @@ export async function getOpenAPIForService(
     }
 
     if (options.examplesDirectory) {
-      const examples = exampleMap.get(currentEndpoint.operationId as string);
+      const examples = exampleMap.get(currentEndpoint.operationId);
       if (examples && currentEndpoint.operationId) {
         operationIdsWithExample.add(currentEndpoint.operationId);
         currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, fileName] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${fileName}` };
+        for (const [title, example] of Object.entries(examples)) {
+          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
         }
       }
     }
@@ -2194,6 +2194,7 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
 }
 
 interface LoadedExample {
+  readonly relativePath: string;
   readonly file: SourceFile;
   readonly data: any;
 }
@@ -2222,7 +2223,7 @@ async function loadExamples(
     );
     return diagnostics.wrap(new Map());
   }
-  const map = new Map();
+  const map = new Map<string, Record<string, LoadedExample>>();
   const exampleFiles = await host.readDir(exampleDir);
   for (const fileName of exampleFiles) {
     try {
@@ -2260,6 +2261,7 @@ async function loadExamples(
       }
 
       examples[example.title] = {
+        relativePath: fileName,
         file: exampleFile,
         data: example,
       };
@@ -2274,5 +2276,5 @@ async function loadExamples(
       );
     }
   }
-  return diagnostics.wrap(new Map());
+  return diagnostics.wrap(map);
 }
