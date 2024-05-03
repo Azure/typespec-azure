@@ -64,6 +64,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
     version: resolvedOptions["version"],
     newLine: resolvedOptions["new-line"],
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
+    versionEnumStrategy: resolvedOptions["version-enum-strategy"],
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],

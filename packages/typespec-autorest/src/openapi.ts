@@ -117,6 +117,7 @@ import {
   resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
+import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -172,6 +173,12 @@ export interface AutorestDocumentEmitterOptions {
    * readOnly property schema behavior
    */
   readonly useReadOnlyStatusSchema?: boolean;
+
+  /**
+   * Decide how to deal with the version enum when `omitUnreachableTypes` is not set.
+   * @default "omit"
+   */
+  readonly versionEnumStrategy?: "omit" | "include";
 }
 
 /**
@@ -1201,7 +1208,12 @@ export async function getOpenAPIForService(
 
     function processUnreferencedSchemas() {
       const addSchema = (type: Type) => {
-        if (!processedSchemas.has(type) && !paramModels.has(type) && !shouldInline(program, type)) {
+        if (
+          !processedSchemas.has(type) &&
+          !paramModels.has(type) &&
+          !shouldInline(program, type) &&
+          !shouldOmitThisUnreachableType(type)
+        ) {
           getSchemaOrRef(type, { visibility: Visibility.Read, ignoreMetadataAnnotations: false });
         }
       };
@@ -1217,6 +1229,25 @@ export async function getOpenAPIForService(
         { skipSubNamespaces }
       );
       processSchemas();
+    }
+
+    function shouldOmitThisUnreachableType(type: Type): boolean {
+      if (
+        options.versionEnumStrategy !== "include" &&
+        type.kind === "Enum" &&
+        isVersionEnum(program, type)
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function isVersionEnum(program: Program, enumObj: Enum): boolean {
+      const versions = getVersionsForEnum(program, enumObj);
+      if (versions !== undefined && versions.length > 0) {
+        return true;
+      }
+      return false;
     }
   }
 
