@@ -3297,7 +3297,7 @@ describe("typespec-client-generator-core: decorators", () => {
           test2(): void;
         }
         `
-      )
+      );
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
       const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
@@ -3305,7 +3305,9 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(versioningClient.methods.length, 2);
 
       strictEqual(versioningClient.initialization.properties.length, 1);
-      const versioningClientEndpoint = versioningClient.initialization.properties.find(x => x.kind === "endpoint");
+      const versioningClientEndpoint = versioningClient.initialization.properties.find(
+        (x) => x.kind === "endpoint"
+      );
       ok(versioningClientEndpoint);
       deepStrictEqual(versioningClientEndpoint.apiVersions, ["v1", "v2"]);
 
@@ -3324,7 +3326,9 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(interfaceV2.methods.length, 1);
 
       strictEqual(interfaceV2.initialization.properties.length, 1);
-      const interfaceV2Endpoint = interfaceV2.initialization.properties.find(x => x.kind === "endpoint");
+      const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
+        (x) => x.kind === "endpoint"
+      );
       ok(interfaceV2Endpoint);
       deepStrictEqual(interfaceV2Endpoint.apiVersions, ["v2"]);
 

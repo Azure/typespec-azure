@@ -973,7 +973,11 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
-    apiVersions: getAvailableApiVersions(context, type, operation?.namespace || type.model?.namespace),
+    apiVersions: getAvailableApiVersions(
+      context,
+      type,
+      operation?.namespace || type.model?.namespace
+    ),
     type: propertyType,
     nameInClient: name,
     name,

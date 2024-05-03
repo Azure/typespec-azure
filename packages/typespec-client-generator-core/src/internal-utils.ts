@@ -26,7 +26,6 @@ import {
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
-  SdkOperationGroup,
   SdkParameter,
   SdkServiceOperation,
   SdkType,
@@ -100,7 +99,7 @@ export function getClientNamespaceStringHelper(
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: { name: string },
-  namespace?: Namespace | Interface,
+  namespace?: Namespace | Interface
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -109,12 +108,19 @@ export function updateWithApiVersionInformation(
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
-    clientDefaultValue: (isApiVersionParam && namespace) ? context.__namespaceToApiVersionClientDefaultValue.get(namespace) : undefined,
+    clientDefaultValue:
+      isApiVersionParam && namespace
+        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        : undefined,
     onClient: onClient(context, type),
   };
 }
 
-export function filterApiVersionsWithDecorators(context: TCGCContext, type: Type, apiVersions: string[]): string[] {
+export function filterApiVersionsWithDecorators(
+  context: TCGCContext,
+  type: Type,
+  apiVersions: string[]
+): string[] {
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   let added: boolean = addedOnVersions.length ? false : true;
@@ -153,19 +159,23 @@ export function filterApiVersionsWithDecorators(context: TCGCContext, type: Type
  * @param client If it's associated with a client, meaning it's a param etc, we can see if it's available on that client
  * @returns All api versions the type is available on
  */
-export function getAvailableApiVersions(context: TCGCContext, type: Type, namespace?: Namespace | Interface): string[] {
-  let cachedApiVersions: string[] = []
+export function getAvailableApiVersions(
+  context: TCGCContext,
+  type: Type,
+  namespace?: Namespace | Interface
+): string[] {
+  let cachedApiVersions: string[] = [];
   if (namespace) {
     cachedApiVersions = context.__namespaceToApiVersions.get(namespace) || [];
   }
-  
+
   const apiVersions =
-  cachedApiVersions ||
+    cachedApiVersions ||
     getVersions(context.program, type)[1]
       ?.getVersions()
       .map((x) => x.value);
   if (!apiVersions) return [];
-  return filterApiVersionsWithDecorators(context, type, apiVersions)
+  return filterApiVersionsWithDecorators(context, type, apiVersions);
 }
 
 interface DocWrapper {

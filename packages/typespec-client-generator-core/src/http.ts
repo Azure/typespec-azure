@@ -111,7 +111,9 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
   retval.parameters = httpOperation.parameters.parameters
-    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type)))
+    .map((x) =>
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type))
+    )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
         x.kind === "header" || x.kind === "query" || x.kind === "path"
@@ -220,7 +222,13 @@ function getSdkHttpParameters(
   }
   for (const param of retval.parameters) {
     param.correspondingMethodParams = diagnostics.pipe(
-      getCorrespondingMethodParams(context, client, httpOperation.operation.name, methodParameters, param)
+      getCorrespondingMethodParams(
+        context,
+        client,
+        httpOperation.operation.name,
+        methodParameters,
+        param
+      )
     );
   }
   return diagnostics.wrap(retval);
@@ -471,7 +479,7 @@ export function getCorrespondingMethodParams(
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
         clientDefaultValue: context.__namespaceToApiVersionClientDefaultValue.get(client.type),
-      }
+      };
       context.__namespaceToApiVersionParameter.set(client.type, apiVersionParamUpdated);
     }
     return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(client.type)!]);

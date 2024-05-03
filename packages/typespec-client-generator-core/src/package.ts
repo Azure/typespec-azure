@@ -111,8 +111,12 @@ function getSdkLroPagingServiceMethod<
 ): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkLroServiceMethod<TOptions, TServiceOperation>(context, client, operation)),
-    ...diagnostics.pipe(getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, client, operation)),
+    ...diagnostics.pipe(
+      getSdkLroServiceMethod<TOptions, TServiceOperation>(context, client, operation)
+    ),
+    ...diagnostics.pipe(
+      getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, client, operation)
+    ),
     kind: "lropaging",
   });
 }
@@ -247,12 +251,16 @@ function getSdkBasicServiceMethod<
   const parameters = httpOperation.parameters;
   // path/query/header parameters
   for (const param of parameters.parameters) {
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, client, param.param, operation)));
+    methodParameters.push(
+      diagnostics.pipe(getSdkMethodParameter(context, client, param.param, operation))
+    );
   }
   // body parameters
   if (parameters.body?.parameter) {
     methodParameters.push(
-      diagnostics.pipe(getSdkMethodParameter(context, client, parameters.body?.parameter, operation))
+      diagnostics.pipe(
+        getSdkMethodParameter(context, client, parameters.body?.parameter, operation)
+      )
     );
   } else if (parameters.body) {
     if (parameters.body.type.kind === "Model") {
@@ -260,18 +268,29 @@ function getSdkBasicServiceMethod<
       // spread case
       if (type.name === "") {
         for (const prop of type.properties.values()) {
-          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, client, prop, operation)));
+          methodParameters.push(
+            diagnostics.pipe(getSdkMethodParameter(context, client, prop, operation))
+          );
         }
       } else {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, client, type, operation)));
+        methodParameters.push(
+          diagnostics.pipe(getSdkMethodParameter(context, client, type, operation))
+        );
       }
     } else {
-      methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, client, parameters.body.type, operation)));
+      methodParameters.push(
+        diagnostics.pipe(getSdkMethodParameter(context, client, parameters.body.type, operation))
+      );
     }
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TOptions, TServiceOperation>(context, client, operation, methodParameters)
+    getSdkServiceOperation<TOptions, TServiceOperation>(
+      context,
+      client,
+      operation,
+      methodParameters
+    )
   );
   const response = getSdkMethodResponse(operation, serviceOperation);
   const name = getLibraryName(context, operation);
@@ -391,7 +410,7 @@ function getSdkMethodParameter(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   type: Type,
-  operation: Operation,
+  operation: Operation
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (type.kind !== "ModelProperty") {
@@ -571,22 +590,33 @@ function createSdkClientType<
   return diagnostics.wrap(sdkClientType);
 }
 
-function populateApiVersionInformation(
-  context: SdkContext,
-): void {
-  
+function populateApiVersionInformation(context: SdkContext): void {
   for (const client of listClients(context)) {
-    let clientApiVersions = resolveVersions(context.program, client.service).filter((x) => x.rootVersion)
-    .map((x) => x.rootVersion!.value)
-    context.__namespaceToApiVersions.set(client.type, filterApiVersionsWithDecorators(context, client.type, clientApiVersions));
-      
-    context.__namespaceToApiVersionClientDefaultValue.set(client.type, getClientDefaultApiVersion(context, client));
+    let clientApiVersions = resolveVersions(context.program, client.service)
+      .filter((x) => x.rootVersion)
+      .map((x) => x.rootVersion!.value);
+    context.__namespaceToApiVersions.set(
+      client.type,
+      filterApiVersionsWithDecorators(context, client.type, clientApiVersions)
+    );
+
+    context.__namespaceToApiVersionClientDefaultValue.set(
+      client.type,
+      getClientDefaultApiVersion(context, client)
+    );
     for (const og of listOperationGroups(context, client)) {
-      clientApiVersions = resolveVersions(context.program, og.service).filter((x) => x.rootVersion)
-    .map((x) => x.rootVersion!.value)
-      context.__namespaceToApiVersions.set(og.type, filterApiVersionsWithDecorators(context, og.type, clientApiVersions));
-        
-      context.__namespaceToApiVersionClientDefaultValue.set(og.type, getClientDefaultApiVersion(context, og));
+      clientApiVersions = resolveVersions(context.program, og.service)
+        .filter((x) => x.rootVersion)
+        .map((x) => x.rootVersion!.value);
+      context.__namespaceToApiVersions.set(
+        og.type,
+        filterApiVersionsWithDecorators(context, og.type, clientApiVersions)
+      );
+
+      context.__namespaceToApiVersionClientDefaultValue.set(
+        og.type,
+        getClientDefaultApiVersion(context, og)
+      );
     }
   }
 }
