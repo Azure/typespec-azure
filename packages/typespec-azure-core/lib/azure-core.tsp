@@ -7,7 +7,7 @@ import "./traits.tsp";
 import "./foundations.tsp";
 import "./models.tsp";
 import "./operations.tsp";
-import "./legacy.tsp";
+import "./obsolete.tsp";
 import "./decorators.tsp";
 import "../dist/src/index.js";
 

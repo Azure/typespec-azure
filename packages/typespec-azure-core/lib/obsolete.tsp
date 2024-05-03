@@ -27,6 +27,7 @@ alias StandardResourceOperations = ResourceOperations<NoConditionalRequests &
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance."
 op ResourceCreateOrReplace<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
@@ -41,6 +42,7 @@ op ResourceCreateOrReplace<
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance."
 op LongRunningResourceCreateOrReplace<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
@@ -55,6 +57,7 @@ op LongRunningResourceCreateOrReplace<
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance."
 op ResourceCreateOrUpdate<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
@@ -69,6 +72,7 @@ op ResourceCreateOrUpdate<
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance."
 op LongRunningResourceCreateOrUpdate<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
@@ -82,6 +86,7 @@ op LongRunningResourceCreateOrUpdate<
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `ResourceUpdate` from a `ResourceOperations` interface instance."
 op ResourceUpdate<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
@@ -96,6 +101,7 @@ op ResourceUpdate<
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `ResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance."
 op ResourceCreateWithServiceProvidedName<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
@@ -110,6 +116,7 @@ op ResourceCreateWithServiceProvidedName<
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
+#deprecated "Use `LongRunningResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance."
 op LongRunningResourceCreateWithServiceProvidedName<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
