@@ -596,7 +596,9 @@ export function createSdkContext<
     diagnostics: diagnostics.diagnostics,
     apiVersion: context.options["api-version"],
     originalProgram: context.program,
-    __clientToApiVersionParameter: new Map(),
+    __namespaceToApiVersionParameter: new Map(),
+    __namespaceToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {

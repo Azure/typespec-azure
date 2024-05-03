@@ -1,6 +1,7 @@
 import {
   Diagnostic,
   ModelProperty,
+  Operation,
   Type,
   createDiagnosticCollector,
   ignoreDiagnostics,
@@ -63,7 +64,7 @@ export function getSdkHttpOperation(
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
-    getSdkHttpResponseAndExceptions(context, httpOperation)
+    getSdkHttpResponseAndExceptions(context, client, httpOperation)
   );
   const responsesWithBodies = [...responses.values()]
     .concat([...exceptions.values()])
@@ -110,7 +111,7 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
   retval.parameters = httpOperation.parameters.parameters
-    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, x.type)))
+    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type)))
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
         x.kind === "header" || x.kind === "query" || x.kind === "path"
@@ -126,7 +127,7 @@ function getSdkHttpParameters(
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter) {
       const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.parameter, "body")
+        getSdkHttpParameter(context, tspBody.parameter, httpOperation.operation, "body")
       );
       if (getParamResponse.kind !== "body") {
         diagnostics.add(
@@ -159,7 +160,7 @@ function getSdkHttpParameters(
         contentTypes: [],
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
-        apiVersions: getAvailableApiVersions(context, tspBody.type),
+        apiVersions: getAvailableApiVersions(context, tspBody.type, client.type),
         type,
         optional: false,
         nullable: isNullable(tspBody.type),
@@ -292,10 +293,11 @@ function addContentTypeInfoToBodyParam(
 export function getSdkHttpParameter(
   context: TCGCContext,
   type: ModelProperty,
+  operation?: Operation,
   location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, type) || location === "path") {
@@ -361,6 +363,7 @@ export function getSdkHttpParameter(
 
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
   httpOperation: HttpOperation
 ): [
   {
@@ -424,7 +427,7 @@ function getSdkHttpResponseAndExceptions(
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
-      apiVersions: getAvailableApiVersions(context, httpOperation.operation),
+      apiVersions: getAvailableApiVersions(context, httpOperation.operation, client.type),
       nullable: body ? isNullable(body) : true,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
@@ -445,7 +448,7 @@ export function getCorrespondingMethodParams(
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (serviceParam.isApiVersionParam) {
-    const existingApiVersion = context.__clientToApiVersionParameter.get(client);
+    const existingApiVersion = context.__namespaceToApiVersionParameter.get(client.type);
     if (!existingApiVersion) {
       const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
       if (!apiVersionParam) {
@@ -467,11 +470,11 @@ export function getCorrespondingMethodParams(
         nameInClient: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
-        clientDefaultValue: context.__api_version_client_default_value,
+        clientDefaultValue: context.__namespaceToApiVersionClientDefaultValue.get(client.type),
       }
-      context.__clientToApiVersionParameter.set(client, apiVersionParamUpdated);
+      context.__namespaceToApiVersionParameter.set(client.type, apiVersionParamUpdated);
     }
-    return diagnostics.wrap([context.__clientToApiVersionParameter.get(client)!]);
+    return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(client.type)!]);
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {
