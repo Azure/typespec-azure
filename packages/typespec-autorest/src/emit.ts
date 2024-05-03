@@ -135,9 +135,9 @@ export async function emitAllServiceAtAllVersions(
           await program.host.mkdirp(examplesPath);
           for (const { examples } of result.operationExamples) {
             if (examples) {
-              for (const [fileName, { file }] of Object.entries(examples)) {
+              for (const { relativePath, file } of Object.values(examples)) {
                 await emitFile(program, {
-                  path: resolvePath(examplesPath, fileName),
+                  path: resolvePath(examplesPath, relativePath),
                   content: file.text,
                   newLine: options.newLine,
                 });
