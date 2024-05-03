@@ -353,7 +353,15 @@ function getSdkInitializationType<
   if (credentialParam) {
     properties.push(credentialParam);
   }
-  const apiVersionParam = context.__namespaceToApiVersionParameter.get(client.type);
+  let apiVersionParam = context.__namespaceToApiVersionParameter.get(client.type);
+  if (!apiVersionParam) {
+    for (const operationGroup of listOperationGroups(context, client)) {
+      // if any sub operation groups have an api version param, the top level needs
+      // the api version param as well
+      apiVersionParam = context.__namespaceToApiVersionParameter.get(operationGroup.type);
+      if (apiVersionParam) break;
+    }
+  }
   if (apiVersionParam) {
     properties.push(apiVersionParam);
   }
@@ -497,6 +505,9 @@ function getSdkEndpointParameter(
         sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
         sdkParam.apiVersions = context.__namespaceToApiVersions.get(client.type) || [];
+        const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
+        sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+        sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
       } else {
         diagnostics.add(
           createDiagnostic({
