@@ -1,23 +1,27 @@
-# Creating a New TypeSpec Project
+# Creating a project
 
 If you've installed TypeSpec on your local machine, you can create a new TypeSpec project by following these steps:
 
 1. **Open your command prompt** (PowerShell, cmd.exe, bash, etc.), create an empty folder for your new project, and `cd` into it.
 2. If creating a new service in the [Azure/azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repository, create the new service folder following our [directory structure guidelines](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
 3. To create a new Azure service specification, use the `tsp init` command:
-   ```bash
-   tsp init https://aka.ms/typespec/azure-init
-   ```
-   You will be prompted with a few questions regarding the service template, project name, and library updates.
+
+```bash
+tsp init https://aka.ms/typespec/azure-init
+```
+
+You will be prompted with a few questions regarding the service template, project name, and library updates.
 
 ### Understanding Project Templates
 
 When initializing a new project, you'll encounter four templates:
 
-- **(rest-api-spec repo) Azure Data Plane Service Project**: This template is configured for projects within the `azure-rest-api-specs` repository, with settings that comply with the repo's requirements, such as file paths and linting rules.
-- **(rest-api-spec repo) Azure Resource Manager Service Project**: Similar to the above, but tailored for Azure Resource Manager services within the `azure-rest-api-specs` repository.
-- **(stand alone) Azure Data Plane Service Project**: This template is configured for local use or in a personal repo, allowing for API development without the specific directory structure of the `azure-rest-api-specs` repo.
-- **(stand alone) Azure Resource Manager Service Project**: Similar to the above but designed for Azure Resource Manager services, configured for local use or in a personal repo.
+| Template Name                                                   | Description                                                                                                                                                                          |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **(rest-api-spec repo) Azure Data Plane Service Project**       | This template is configured for projects within the `azure-rest-api-specs` repository, with settings that comply with the repo's requirements, such as file paths and linting rules. |
+| **(rest-api-spec repo) Azure Resource Manager Service Project** | Similar to the above, but tailored for Azure Resource Manager services within the `azure-rest-api-specs` repository.                                                                 |
+| **(standalone) Azure Data Plane Service Project**               | This template is configured for local use or in a personal repo, allowing for API development without the specific directory structure of the `azure-rest-api-specs` repo.           |
+| **(standalone) Azure Resource Manager Service Project**         | Similar to the above but designed for Azure Resource Manager services, configured for local use or in a personal repo.                                                               |
 
 ### Target Users
 
