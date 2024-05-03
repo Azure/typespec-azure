@@ -28,7 +28,12 @@ When initializing a new project, you'll encounter four templates:
 - **Rest-API-Spec Repo Projects**: Ideal for those contributing directly to the Azure REST API specifications, ensuring production-quality SDK generation.
 - **Standalone Projects**: Suited for API-first development, allowing users to generate OpenAPI specs, service code, and clients without conforming to the specs repo's structure.
 
-### Next Steps
+### Install the dependencies
+
+Now that the new project has been created, you can install the dependencies by running the following command:
+
+- `npm ci` - If in the `azure-rest-api-specs` repo.
+- `tsp install` - If a standalone project
 
 After setting up your project, run `tsp install` to install dependencies. You can then open the file `main.tsp` to continue with the tutorial. Choose the tutorial that matches your chosen project template:
 
