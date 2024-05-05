@@ -30,14 +30,14 @@ enum ResourceHome {
  *
  * @template Resource The type of the resource.
  */
-alias BaseParameters<Resource extends ArmResourceBase> = DefaultBaseParameters<Resource>;
+alias BaseParameters<Resource extends {}> = DefaultBaseParameters<Resource>;
 
 /**
  * Base parameters for a resource.
  * @template Resource The type of the resource.
  */
 @resourceBaseParametersOf(Resource)
-model DefaultBaseParameters<Resource extends ArmResourceBase> {
+model DefaultBaseParameters<Resource extends {}> {
   ...ApiVersionParameter;
 
   // unless tenant or extension

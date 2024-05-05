@@ -1195,18 +1195,6 @@ enum Azure.ResourceManager.CommonTypes.Versions
 
 ## Azure.ResourceManager.Foundations
 
-### `ArmResourceBase` {#Azure.ResourceManager.Foundations.ArmResourceBase}
-
-Base class used for type definitions
-
-```typespec
-model Azure.ResourceManager.Foundations.ArmResourceBase
-```
-
-#### Properties
-
-None
-
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}
 
 Standard type definition for Azure Resource Manager Tags property.
@@ -1609,7 +1597,7 @@ model Azure.ResourceManager.Foundations.Resource
 
 | Name        | Type                                                                         | Description                                                                                                                                                                               |
 | ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| id?         | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
 | name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type?       | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
 | systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |

@@ -5,17 +5,14 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
 
-/** Base class used for type definitions */
-model ArmResourceBase {}
-
 /**
  * Base model that defines common properties for all Azure Resource Manager resources.
  */
 @doc("Common properties for all Azure Resource Manager resources.")
-model Resource extends ArmResourceBase {
+model Resource {
   @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
   @visibility("read")
-  id?: armResourceIdentifier;
+  id?: string;
 
   @doc("The name of the resource")
   @visibility("read")

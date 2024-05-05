@@ -150,7 +150,7 @@ model ResourceUriParameter {
  * @template BaseParameters The parameters representing the base Uri of the resource
  */
 model ResourceInstanceParameters<
-  Resource extends ArmResourceBase,
+  Resource extends {},
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;

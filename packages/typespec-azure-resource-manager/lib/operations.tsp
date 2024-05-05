@@ -97,7 +97,7 @@ op ArmResourceListAtScope<
 @get
 @armResourceRead(Resource)
 op ArmResourceRead<
-  Resource extends ArmResourceBase,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
@@ -120,7 +120,7 @@ op ArmResourceRead<
 @doc("Check for the existence of a {name}", Resource)
 @head
 op ArmResourceCheckExistence<
-  Resource extends ArmResourceBase,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
