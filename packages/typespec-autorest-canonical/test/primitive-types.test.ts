@@ -1,7 +1,7 @@
+import { OpenAPI2Parameter, OpenAPI2Schema } from "@azure-tools/typespec-autorest";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
-import { OpenAPI2Parameter, OpenAPI2Schema } from "../src/types.js";
 import { diagnoseOpenApiFor, oapiForModel, openApiFor } from "./test-host.js";
 
 describe("handle typespec intrinsic types", () => {
@@ -27,7 +27,7 @@ describe("handle typespec intrinsic types", () => {
     ["duration", { type: "string", format: "duration" }],
     ["bytes", { type: "string", format: "byte" }],
     ["decimal", { type: "number", format: "decimal" }],
-    ["decimal128", { type: "number", format: "decimal128" }],
+    ["decimal128", { type: "number", format: "decimal" }],
   ];
 
   for (const test of cases) {
@@ -77,7 +77,7 @@ describe("handle nonspecific intrinsic types", () => {
       );
 
       expectDiagnostics(res, {
-        code: "@azure-tools/typespec-autorest-canonical/nonspecific-scalar",
+        code: "@azure-tools/typespec-autorest/nonspecific-scalar",
         message: test[1],
       });
     });

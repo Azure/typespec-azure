@@ -44,11 +44,7 @@ it("emits diagnostic for unsupported formats", async () => {
     op get(): void;
     `
   );
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-autorest-canonical/invalid-format",
-      message:
-        "'string' format 'fake' is not supported in AutorestCanonical. It will not be emitted.",
-    },
-  ]);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-autorest/invalid-format",
+  });
 });
