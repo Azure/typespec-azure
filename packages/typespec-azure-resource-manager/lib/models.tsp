@@ -17,7 +17,7 @@ namespace Azure.ResourceManager;
  * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
  */
 model ResourceNameParameter<
-  Resource extends Foundations.Resource,
+  Resource extends Private.ArmResourceTypeConstraint,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
@@ -248,7 +248,8 @@ model ResourceKind {
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends Private.ArmResourceTypeConstraint>
+  is Azure.Core.Page<Resource>;
 
 /**
  * Model used only to spread in the standard `plan` envelope property for a resource

@@ -97,7 +97,7 @@ model ExtensionBaseParameters is TenantBaseParameters {
 @doc("The updatable properties of the {name}.", Resource)
 @friendlyName("{name}UpdateProperties", Resource)
 model ResourceUpdateModelProperties<
-  Resource extends Foundations.Resource,
+  Resource extends Private.ArmResourceTypeConstraint,
   Properties extends TypeSpec.Reflection.Model
 > is OptionalProperties<UpdateableProperties<Properties>>;
 
@@ -111,7 +111,7 @@ model ResourceUpdateModelProperties<
 @friendlyName("{name}Update", Resource)
 @omitIfEmpty("properties")
 model ResourceUpdateModel<
-  Resource extends Foundations.Resource,
+  Resource extends Private.ArmResourceTypeConstraint,
   Properties extends TypeSpec.Reflection.Model
 > is OptionalProperties<UpdateableProperties<OmitProperties<Resource, "Name" | "name">>> {
   @extension("x-ms-client-flatten", true)
@@ -124,47 +124,47 @@ model ResourceUpdateModel<
  */
 @doc("The type used for updating tags in {name} resources.", Resource)
 @friendlyName("{name}TagsUpdate", Resource)
-model TagsUpdateModel<Resource extends Foundations.Resource> {
+model TagsUpdateModel<Resource extends Private.ArmResourceTypeConstraint> {
   ...ArmTagsProperty;
 }
 
 // Tenant resource operation definitions
 
-alias TenantParentScope<Resource extends Foundations.Resource> = TenantScope<Resource>;
+alias TenantParentScope<Resource extends Private.ArmResourceTypeConstraint> = TenantScope<Resource>;
 
 /**
  * Parameter model for listing a resource at the tenant scope
  * @template Resource The type of the resource.
  */
-model TenantScope<Resource extends Foundations.Resource>
+model TenantScope<Resource extends Private.ArmResourceTypeConstraint>
   is ResourceParentParameters<Resource, TenantBaseParameters>;
 
 /**
  * Parameter model for listing a resource at the subscription scope
  * @template Resource The type of the resource.
  */
-model SubscriptionScope<Resource extends Foundations.Resource>
+model SubscriptionScope<Resource extends Private.ArmResourceTypeConstraint>
   is ResourceParentParameters<Resource, SubscriptionBaseParameters>;
 
 /**
  * Parameter model for listing a resource at the location scope
  * @template Resource The type of the resource.
  */
-model LocationScope<Resource extends Foundations.Resource>
+model LocationScope<Resource extends Private.ArmResourceTypeConstraint>
   is ResourceParentParameters<Resource, LocationBaseParameters>;
 
 /**
  * Parameter model for listing an extension resource
  * @template Resource The type of the resource.
  */
-model ExtensionScope<Resource extends Foundations.Resource>
+model ExtensionScope<Resource extends Private.ArmResourceTypeConstraint>
   is ResourceParentParameters<Resource, ExtensionBaseParameters>;
 
 /**
  * Parameter model for listing a resource at the resource group scope
  * @template Resource The type of the resource.
  */
-model ResourceGroupScope<Resource extends Foundations.Resource>
+model ResourceGroupScope<Resource extends Private.ArmResourceTypeConstraint>
   is ResourceParentParameters<Resource>;
 
 /**
@@ -175,7 +175,7 @@ model ResourceGroupScope<Resource extends Foundations.Resource>
 @doc("The type used for update operations of the {name}.", Resource)
 @friendlyName("{name}Update", Resource)
 model ProxyResourceUpdateModel<
-  Resource extends Foundations.Resource,
+  Resource extends Private.ArmResourceTypeConstraint,
   Properties extends TypeSpec.Reflection.Model
 > {
   @extension("x-ms-client-flatten", true)

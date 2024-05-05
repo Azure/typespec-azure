@@ -165,7 +165,7 @@ model ResourceInstanceParameters<
  * @template BaseParameters The parameters representing the base Uri of the resource
  */
 model ResourceParentParameters<
-  Resource extends Foundations.Resource,
+  Resource extends Private.ArmResourceTypeConstraint,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;
@@ -177,7 +177,7 @@ model ResourceParentParameters<
  * The dynamic parameters of a list call for an extension resource instance.
  * @template Resource The extension resource
  */
-alias ExtensionResourceInstanceParameters<Resource extends Foundations.Resource> = ResourceInstanceParameters<
+alias ExtensionResourceInstanceParameters<Resource extends Private.ArmResourceTypeConstraint> = ResourceInstanceParameters<
   Resource,
   ExtensionBaseParameters
 >;
@@ -186,7 +186,7 @@ alias ExtensionResourceInstanceParameters<Resource extends Foundations.Resource>
  * The dynamic parameters of a list call for a tenant resource instance.
  * @template Resource the tenant resource
  */
-alias TenantInstanceParameters<Resource extends Foundations.Resource> = ResourceInstanceParameters<
+alias TenantInstanceParameters<Resource extends Private.ArmResourceTypeConstraint> = ResourceInstanceParameters<
   Resource,
   TenantBaseParameters
 >;
