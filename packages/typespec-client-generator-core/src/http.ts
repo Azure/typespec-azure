@@ -15,7 +15,6 @@ import {
   getQueryParamName,
   getQueryParamOptions,
   isBody,
-  isContentTypeHeader,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -42,6 +41,7 @@ import {
   getAvailableApiVersions,
   getDocHelper,
   isAcceptHeader,
+  isContentTypeHeader,
   isNullable,
   isSubscriptionId,
 } from "./internal-utils.js";
@@ -172,16 +172,13 @@ function getSdkHttpParameters(
       )
     );
   }
-  if (
-    retval.bodyParam &&
-    !headerParams.some((h) => h.__raw && isContentTypeHeader(context.program, h.__raw))
-  ) {
+  if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
-    if (!methodParameters.some((m) => m.__raw && isContentTypeHeader(context.program, m.__raw))) {
+    if (!methodParameters.some((m) => m.name === "contentType")) {
       methodParameters.push({
         ...contentTypeBase,
         kind: "method",
