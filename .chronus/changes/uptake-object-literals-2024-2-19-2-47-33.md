@@ -6,4 +6,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Update to support new tuple literals
+Add support for values

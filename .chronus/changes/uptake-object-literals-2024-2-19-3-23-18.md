@@ -1,8 +1,8 @@
 ---
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
-changeKind: fix
+changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Added support for new tuple literals
+Add support for values
