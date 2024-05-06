@@ -1,6 +1,7 @@
 import {
   Diagnostic,
   ModelProperty,
+  Operation,
   Type,
   createDiagnosticCollector,
   ignoreDiagnostics,
@@ -40,6 +41,7 @@ import {
   TCGCContext,
   getAvailableApiVersions,
   getDocHelper,
+  getLocationOfOperation,
   isAcceptHeader,
   isContentTypeHeader,
   isNullable,
@@ -106,7 +108,9 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
   retval.parameters = httpOperation.parameters.parameters
-    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, x.type)))
+    .map((x) =>
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type))
+    )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
         x.kind === "header" || x.kind === "query" || x.kind === "path"
@@ -122,7 +126,7 @@ function getSdkHttpParameters(
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter) {
       const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.parameter, "body")
+        getSdkHttpParameter(context, tspBody.parameter, httpOperation.operation, "body")
       );
       if (getParamResponse.kind !== "body") {
         diagnostics.add(
@@ -155,7 +159,11 @@ function getSdkHttpParameters(
         contentTypes: [],
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
-        apiVersions: getAvailableApiVersions(context, tspBody.type),
+        apiVersions: getAvailableApiVersions(
+          context,
+          tspBody.type,
+          httpOperation.operation.namespace
+        ),
         type,
         optional: false,
         nullable: isNullable(tspBody.type),
@@ -166,7 +174,7 @@ function getSdkHttpParameters(
     retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
       getCorrespondingMethodParams(
         context,
-        httpOperation.operation.name,
+        httpOperation.operation,
         methodParameters,
         retval.bodyParam
       )
@@ -211,7 +219,7 @@ function getSdkHttpParameters(
   }
   for (const param of retval.parameters) {
     param.correspondingMethodParams = diagnostics.pipe(
-      getCorrespondingMethodParams(context, httpOperation.operation.name, methodParameters, param)
+      getCorrespondingMethodParams(context, httpOperation.operation, methodParameters, param)
     );
   }
   return diagnostics.wrap(retval);
@@ -284,10 +292,11 @@ function addContentTypeInfoToBodyParam(
 export function getSdkHttpParameter(
   context: TCGCContext,
   type: ModelProperty,
+  operation?: Operation,
   location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, type) || location === "path") {
@@ -416,7 +425,11 @@ function getSdkHttpResponseAndExceptions(
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
-      apiVersions: getAvailableApiVersions(context, httpOperation.operation),
+      apiVersions: getAvailableApiVersions(
+        context,
+        httpOperation.operation,
+        httpOperation.operation.namespace
+      ),
       nullable: body ? isNullable(body) : true,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
@@ -430,13 +443,16 @@ function getSdkHttpResponseAndExceptions(
 
 export function getCorrespondingMethodParams(
   context: TCGCContext,
-  methodName: string,
+  operation: Operation,
   methodParameters: SdkParameter[],
   serviceParam: SdkHttpParameter
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  const operationLocation = getLocationOfOperation(operation);
   if (serviceParam.isApiVersionParam) {
-    if (!context.__api_version_parameter) {
+    const existingApiVersion = context.__namespaceToApiVersionParameter.get(operationLocation);
+    if (!existingApiVersion) {
       const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
       if (!apiVersionParam) {
         diagnostics.add(
@@ -445,22 +461,24 @@ export function getCorrespondingMethodParams(
             target: serviceParam.__raw!,
             format: {
               paramName: "apiVersion",
-              methodName: methodName,
+              methodName: operation.name,
             },
           })
         );
         return diagnostics.wrap([]);
       }
-      context.__api_version_parameter = {
+      const apiVersionParamUpdated: SdkParameter = {
         ...apiVersionParam,
         name: "apiVersion",
         nameInClient: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
-        clientDefaultValue: context.__api_version_client_default_value,
+        clientDefaultValue:
+          context.__namespaceToApiVersionClientDefaultValue.get(operationLocation),
       };
+      context.__namespaceToApiVersionParameter.set(operationLocation, apiVersionParamUpdated);
     }
-    return diagnostics.wrap([context.__api_version_parameter]);
+    return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(operationLocation)!]);
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {
@@ -472,7 +490,7 @@ export function getCorrespondingMethodParams(
             target: serviceParam.__raw!,
             format: {
               paramName: "subscriptionId",
-              methodName: methodName,
+              methodName: operation.name,
             },
           })
         );
@@ -523,7 +541,7 @@ export function getCorrespondingMethodParams(
         target: serviceParam.__raw!,
         format: {
           paramName: serviceParam.name,
-          methodName: methodName,
+          methodName: operation.name,
         },
       })
     );
@@ -544,7 +562,7 @@ export function getCorrespondingMethodParams(
       target: serviceParam.__raw!,
       format: {
         paramName: serviceParam.name,
-        methodName: methodName,
+        methodName: operation.name,
       },
     })
   );

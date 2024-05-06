@@ -1,6 +1,7 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
+  Interface,
   Model,
   Namespace,
   Operation,
@@ -97,7 +98,8 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: { name: string }
+  type: { name: string },
+  namespace?: Namespace | Interface
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -106,24 +108,19 @@ export function updateWithApiVersionInformation(
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
-    clientDefaultValue: isApiVersionParam ? context.__api_version_client_default_value : undefined,
+    clientDefaultValue:
+      isApiVersionParam && namespace
+        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        : undefined,
     onClient: onClient(context, type),
   };
 }
 
-/**
- *
- * @param context
- * @param type
- * @returns All api versions the type is available on
- */
-export function getAvailableApiVersions(context: TCGCContext, type: Type): string[] {
-  const apiVersions =
-    context.__api_versions ||
-    getVersions(context.program, type)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-  if (!apiVersions) return [];
+export function filterApiVersionsWithDecorators(
+  context: TCGCContext,
+  type: Type,
+  apiVersions: string[]
+): string[] {
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   let added: boolean = addedOnVersions.length ? false : true;
@@ -153,6 +150,32 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
     }
   }
   return retval;
+}
+
+/**
+ *
+ * @param context
+ * @param type
+ * @param client If it's associated with a client, meaning it's a param etc, we can see if it's available on that client
+ * @returns All api versions the type is available on
+ */
+export function getAvailableApiVersions(
+  context: TCGCContext,
+  type: Type,
+  namespace?: Namespace | Interface
+): string[] {
+  let cachedApiVersions: string[] = [];
+  if (namespace) {
+    cachedApiVersions = context.__namespaceToApiVersions.get(namespace) || [];
+  }
+
+  const apiVersions =
+    cachedApiVersions ||
+    getVersions(context.program, type)[1]
+      ?.getVersions()
+      .map((x) => x.value);
+  if (!apiVersions) return [];
+  return filterApiVersionsWithDecorators(context, type, apiVersions);
 }
 
 interface DocWrapper {
@@ -271,9 +294,9 @@ export interface TCGCContext {
   generatedNames?: Map<Union | Model, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __api_version_parameter?: SdkParameter;
-  __api_version_client_default_value?: string;
-  __api_versions?: string[];
+  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __namespaceToApiVersions: Map<Interface | Namespace, string[]>;
+  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
   __subscriptionIdParameter?: SdkParameter;
@@ -289,6 +312,9 @@ export function createTCGCContext(program: Program): TCGCContext {
     emitterName: "__TCGC_INTERNAL__",
     diagnostics: [],
     originalProgram: program,
+    __namespaceToApiVersionParameter: new Map(),
+    __namespaceToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
   };
 }
 
@@ -375,4 +401,9 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
 
 export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
   return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
+}
+
+export function getLocationOfOperation(operation: Operation): Namespace | Interface {
+  // have to check interface first, because interfaces are more granular than namespaces
+  return (operation.interface || operation.namespace)!;
 }
