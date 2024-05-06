@@ -127,7 +127,7 @@ it("emits a diagnostic for unsupported HTTP authentication schemes", async () =>
 
   expectDiagnostics(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]), [
     {
-      code: "@azure-tools/typespec-autorest-canonical/unsupported-http-auth-scheme",
+      code: "@azure-tools/typespec-autorest/unsupported-http-auth-scheme",
     },
   ]);
 });

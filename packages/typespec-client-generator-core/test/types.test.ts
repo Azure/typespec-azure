@@ -2558,7 +2558,7 @@ describe("typespec-client-generator-core: types", () => {
       }
 
       @doc("Creates or updates a User")
-      op createOrUpdate is ResourceCreateOrUpdate<User>;
+      op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
@@ -2586,7 +2586,7 @@ describe("typespec-client-generator-core: types", () => {
         }
 
         @doc("Creates or updates a User")
-        op createOrUpdate is ResourceCreateOrUpdate<User>;
+        op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.experimental_sdkPackage.models;
       strictEqual(models.length, 4);
@@ -2611,11 +2611,11 @@ describe("typespec-client-generator-core: types", () => {
       }
 
       @doc("Gets status.")
-      op getStatus is GetResourceOperationStatus<User>;
+      op getStatus is StandardResourceOperations.GetResourceOperationStatus<User>;
 
       @doc("Polls status.")
       @pollingOperation(My.Service.getStatus)
-      op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
+      op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
@@ -2640,11 +2640,11 @@ describe("typespec-client-generator-core: types", () => {
       }
 
       @doc("Gets status.")
-      op getStatus is GetResourceOperationStatus<User>;
+      op getStatus is StandardResourceOperations.GetResourceOperationStatus<User>;
 
       @doc("Polls status.")
       @pollingOperation(My.Service.getStatus)
-      op createOrUpdateUser is LongRunningResourceCreateOrUpdate<User>;
+      op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.experimental_sdkPackage.models;
       strictEqual(models.length, 5);
