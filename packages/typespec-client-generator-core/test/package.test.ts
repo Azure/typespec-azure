@@ -21,6 +21,37 @@ describe("typespec-client-generator-core: package", () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
 
+  function getServiceWithDefaultApiVersion(op: string) {
+    return `
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        /**
+         * Need to be set as 'http://localhost:3000' in client.
+         */
+        endpoint: url,
+      }
+    )
+    @service({})
+    @versioned(Versions)
+    namespace Server.Versions.Versioned;
+
+    /**
+     * The version of the API.
+     */
+    enum Versions {
+      /**
+       * The version 2022-12-01-preview.
+       */
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
+
+    ${op}
+    `;
+  }
+
   describe("package name", () => {
     it("as config option", async () => {
       const runnerWithPackageName = await createSdkTestRunner({
@@ -756,37 +787,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.type.kind, "string");
       strictEqual(apiVersionParam.clientDefaultValue, undefined);
     });
-
-    function getServiceWithDefaultApiVersion(op: string) {
-      return `
-      @server(
-        "{endpoint}",
-        "Testserver endpoint",
-        {
-          /**
-           * Need to be set as 'http://localhost:3000' in client.
-           */
-          endpoint: url,
-        }
-      )
-      @service({})
-      @versioned(Versions)
-      namespace Server.Versions.Versioned;
-
-      /**
-       * The version of the API.
-       */
-      enum Versions {
-        /**
-         * The version 2022-12-01-preview.
-         */
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        v2022_12_01_preview: "2022-12-01-preview",
-      }
-
-      ${op}
-      `;
-    }
 
     it("service with default api version, method without api version param", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -1646,6 +1646,40 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.response.kind, "method");
       strictEqual(method.response.type?.kind, "bytes");
+    });
+
+    it("lro rpc case", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceWithDefaultApiVersion(`
+        model GenerationOptions {
+          prompt: string;
+        }
+        
+        model GenerationResponse is Azure.Core.Foundations.OperationStatus<GenerationResult>;
+        
+        model GenerationResult {
+          data: string;
+        }
+        
+        @route("/generations:submit")
+        op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
+      `));
+      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+
+      strictEqual(method.parameters.length, 4);
+      deepStrictEqual(method.parameters.map((x) => x.name),
+        [
+          "apiVersion",
+          "generationOptions",
+          "contentType",
+          "accept",
+        ]);
     });
   });
 
@@ -2533,6 +2567,7 @@ describe("typespec-client-generator-core: package", () => {
       const createOrUpdate = client.methods.find((x) => x.name === "createOrUpdateWidget");
       ok(createOrUpdate);
       strictEqual(createOrUpdate.kind, "lro");
+      strictEqual(createOrUpdate.parameters.length, 12);
       strictEqual(
         createOrUpdate.crossLanguageDefintionId,
         "Contoso.WidgetManager.Widgets.createOrUpdateWidget"
