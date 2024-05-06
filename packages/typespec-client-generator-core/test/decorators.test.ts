@@ -3270,6 +3270,74 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
       strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "StableModel");
     });
+    it("add client", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v1: "v1",
+          v2: "v2",
+        }
+        op test(): void;
+
+        @added(Versions.v2)
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients.length, 2);
+      const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
+      ok(versioningClient);
+      strictEqual(versioningClient.methods.length, 2);
+
+      strictEqual(versioningClient.initialization.properties.length, 1);
+      const versioningClientEndpoint = versioningClient.initialization.properties.find(
+        (x) => x.kind === "endpoint"
+      );
+      ok(versioningClientEndpoint);
+      deepStrictEqual(versioningClientEndpoint.apiVersions, ["v1", "v2"]);
+
+      const serviceMethod = versioningClient.methods.find((x) => x.kind === "basic");
+      ok(serviceMethod);
+      strictEqual(serviceMethod.name, "test");
+      deepStrictEqual(serviceMethod.apiVersions, ["v1", "v2"]);
+
+      const clientAccessor = versioningClient.methods.find((x) => x.kind === "clientaccessor");
+      ok(clientAccessor);
+      strictEqual(clientAccessor.name, "getInterfaceV2");
+      deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
+
+      const interfaceV2 = sdkPackage.clients.find((x) => x.name === "InterfaceV2");
+      ok(interfaceV2);
+      strictEqual(interfaceV2.methods.length, 1);
+
+      strictEqual(interfaceV2.initialization.properties.length, 1);
+      const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
+        (x) => x.kind === "endpoint"
+      );
+      ok(interfaceV2Endpoint);
+      deepStrictEqual(interfaceV2Endpoint.apiVersions, ["v2"]);
+
+      strictEqual(interfaceV2.methods.length, 1);
+      const test2Method = interfaceV2.methods.find((x) => x.kind === "basic");
+      ok(test2Method);
+      strictEqual(test2Method.name, "test2");
+      deepStrictEqual(test2Method.apiVersions, ["v2"]);
+    });
   });
 
   describe("versioning impact for apis", () => {

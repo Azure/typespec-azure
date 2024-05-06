@@ -71,7 +71,9 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const tracer = getTracer(context.program);
   tracer.trace("options", JSON.stringify(options, null, 2));
 
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
+  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest", {
+    versionStrategy: "ignore",
+  });
 
   await emitAllServiceAtAllVersions(context.program, tcgcSdkContext, options);
 }
@@ -135,9 +137,9 @@ export async function emitAllServiceAtAllVersions(
           await program.host.mkdirp(examplesPath);
           for (const { examples } of result.operationExamples) {
             if (examples) {
-              for (const [fileName, { file }] of Object.entries(examples)) {
+              for (const { relativePath, file } of Object.values(examples)) {
                 await emitFile(program, {
-                  path: resolvePath(examplesPath, fileName),
+                  path: resolvePath(examplesPath, relativePath),
                   content: file.text,
                   newLine: options.newLine,
                 });
