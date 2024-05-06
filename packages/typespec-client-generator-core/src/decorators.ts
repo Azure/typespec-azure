@@ -946,7 +946,7 @@ export function $clientName(
           context.program.checker.resolveTypeReference(
             (context.decoratorTarget as AugmentDecoratorStatementNode).targetType
           )
-        ) !== entity
+        )?.node !== entity.node
       ) {
         return;
       }

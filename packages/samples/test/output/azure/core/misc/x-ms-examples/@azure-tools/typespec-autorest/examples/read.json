@@ -1,0 +1,14 @@
+{
+  "title": "Read pet",
+  "operationId": "Pets_Read",
+  "description": "Read pet example",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "name": "Rex",
+        "age": 3
+      }
+    }
+  }
+}

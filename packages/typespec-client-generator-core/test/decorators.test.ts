@@ -2498,6 +2498,124 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
       strictEqual(getClientNameOverride(runner.context, func2), undefined);
     });
+
+    it("@clientName with scope of versioning", async () => {
+      const testCode = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+          v2,
+        }
+        
+        @clientName("TestJava", "java")
+        @clientName("TestCSharp", "csharp")
+        model Test {}
+        op test(@body body: Test): void;
+      `;
+
+      // java
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+      }
+
+      // csharp
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+      }
+
+      // python
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+      }
+    });
+
+    it("augmented @clientName with scope of versioning", async () => {
+      const testCode = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+          v2,
+        }
+        
+        
+        model Test {}
+        op test(@body body: Test): void;
+      `;
+
+      const customization = `
+        namespace Customizations;
+
+        @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
+        @@clientName(Contoso.WidgetManager.Test, "TestJava", "java");
+      `;
+
+      // java
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+        await runner.compileWithCustomization(testCode, customization);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+      }
+
+      // csharp
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+        await runner.compileWithCustomization(testCode, customization);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+      }
+
+      // python
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+        await runner.compileWithCustomization(testCode, customization);
+        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+      }
+    });
+
+    it("decorator on template parameter", async function () {
+      await runner.compileAndDiagnose(`
+        @service({})
+        namespace MyService;
+        
+        model ResourceBody<Resource> {
+          @body
+          resource: Resource;
+        }
+        
+        @post
+        op do<Resource extends {}>(...ResourceBody<Resource>): void;
+        
+        @@clientName(ResourceBody.resource, "body");
+        
+        model Test {
+          id: string;
+          prop: string;
+        }
+        
+        op test is do<Test>;
+        
+      `);
+
+      strictEqual(
+        runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name,
+        "body"
+      );
+    });
   });
 
   describe("versioning projection", () => {
@@ -2546,7 +2664,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2555,6 +2673,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2638,7 +2763,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2647,6 +2772,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2729,7 +2861,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2738,6 +2870,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2820,7 +2959,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2829,6 +2968,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v2");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2914,7 +3060,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -2923,6 +3069,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v1");
+
       strictEqual(sdkPackage.clients[0].methods.length, 1);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -2996,7 +3149,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
 
-      op list(): Widget[] | Error;
+      op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
       @route("/widget/{id}")
@@ -3005,6 +3158,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
+
+      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionParam);
+      strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
       strictEqual(sdkPackage.clients[0].methods.length, 3);
       const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
       ok(list);
@@ -3042,6 +3202,73 @@ describe("typespec-client-generator-core: decorators", () => {
         versions.values.map((v) => v.value),
         ["v1", "v2", "v3"]
       );
+    });
+
+    it("model only used in new version", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v2023_11_01_preview: "2023-11-01-preview",
+          v2023_11_01: "2023-11-01",
+        }
+        
+        model PreviewModel {
+          betaFeature: string;
+        }
+        
+        model StableModel {
+          stableFeature: string;
+        }
+        
+        @added(Versions.v2023_11_01_preview)
+        @removed(Versions.v2023_11_01)
+        @route("/preview")
+        op previewFunctionality(...PreviewModel): void;
+        
+        @route("/stable")
+        op stableFunctionality(...StableModel): void;
+      `;
+
+      let runnerWithVersion = await createSdkTestRunner({
+        "api-version": "2023-11-01-preview",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 2);
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        "previewFunctionality"
+      );
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[1].name,
+        "stableFunctionality"
+      );
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 2);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "PreviewModel");
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[1].name, "StableModel");
+
+      runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 1);
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        "stableFunctionality"
+      );
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
+      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "StableModel");
     });
   });
 

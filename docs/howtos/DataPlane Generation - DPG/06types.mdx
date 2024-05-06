@@ -117,6 +117,634 @@ public final class Properties {
 </TabItem>
 </Tabs>
 
+### Models with additional properties
+
+#### Additional properties of any type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+Recommend usage:
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<unknown>;
+}
+```
+
+Other usages:
+
+```typespec
+model Animal extends Record<unknown> {
+  name: string;
+  kind: string;
+}
+```
+
+```typespec
+model Animal is Record<unknown> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "any"
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["age"] = 5
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Animal : IJsonModel<Animal> {
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input
+export interface Animal extends Record<string, unknown> {
+  name: string;
+  kind: string;
+}
+
+// RLC output
+export interface AnimalOutput extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+
+// Modular for both legacy and non legacy
+export interface Animal extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, Object> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, Object> additionalProperties);
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of specific type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model AnimalProperty {
+  category: string;
+  value: unknown;
+}
+
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<AnimalProperty>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "model",
+    "name": "AnimalProperty",
+    "properties": [
+      {
+        "kind": "property",
+        "name": "category",
+        "serializedName": "category",
+        "optional": false,
+        "nullable": false,
+        "type": {
+          "kind": "string",
+          "encode": "string"
+        }
+      },
+      {
+        "kind": "property",
+        "name": "value",
+        "serializedName": "value",
+        "optional": false,
+        "nullable": false,
+        "type": {
+          "kind": "any"
+        }
+      }
+    ],
+    "additionalProperties": undefined,
+    "additionalPropertiesNullable": undefined
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from typing import Any
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+class AnimalProperty(_model_base.Model):
+
+    category: str = rest_field()
+    value: Any = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = AnimalProperty(category="relationship", value="Jerry")
+animal["age"] = AnimalProperty(category="attribute", value=5)
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+Due to currently there is no way to know whether a Json could be correctly mapped into the specified type in `.Net`, we currently generate any non-primitive value type in additional properties property as `BinaryData`.
+
+For typespec:
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<AnimalProperty>;
+}
+```
+
+The `C#` generated code is the same as if the type is `unknown`:
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+For typespec with additional properties of primitive types:
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string>;
+}
+```
+
+The `C#` generated code still has the specified type in `AdditionalProperties` property:
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, string> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input
+export interface AnimalProperty {
+  category: string;
+  value: unknown;
+}
+export interface Animal extends Record<string, unknown> {
+  name: string;
+  kind: string;
+}
+
+// RLC output
+export interface AnimalProperty {
+  category: string;
+  value: any;
+}
+export interface Animal extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+
+// Modular for legacy clients
+export interface AnimalProperty {
+  category: string;
+  value: any;
+}
+export interface Animal extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+
+// Modular for non-legacy clients
+export interface AnimalProperty {
+  category: string;
+  value: any;
+}
+export interface Animal {
+  name: string;
+  kind: string;
+  additionalProperties: Record<string, AnimalProperty>;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, AnimalProperty> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, AnimalProperty> additionalProperties);
+}
+
+```
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of union type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string | int32>;
+}
+```
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string>;
+  ...Record<int32>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "union",
+    "name": "AnimalAdditionalProperty",
+    "generatedName": true,
+    "values": [
+      {
+        "kind": "string",
+        "encode": "string"
+      },
+      {
+        "kind": "int32"
+      }
+    ]
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["age"] = 5
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input and output
+export interface Animal extends Record<string, string | number> {
+  name: string;
+  kind: string;
+}
+
+// Modular for legacy and non-legacy clients
+export interface Animal extends Record<string, string | number> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, BinaryData> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, BinaryData> additionalProperties);
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of nullable type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string | null>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "string"
+  },
+  "additionalPropertiesNullable": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["alert"] = None
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, string> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input and output
+export interface Animal extends Record<string, string | null> {
+  name: string;
+  kind: string;
+}
+
+// Modular for legacy and non-legacy clients
+export interface Animal extends Record<string, string | null> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, String> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, String> additionalProperties);
+}
+
+```
+
+</TabItem>
+</Tabs>
+
 ## Unions
 
 ### Union of literals with same type

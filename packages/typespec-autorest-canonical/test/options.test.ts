@@ -1,3 +1,4 @@
+import { OpenAPI2Document } from "@azure-tools/typespec-autorest";
 import { resolvePath } from "@typespec/compiler";
 import {
   BasicTestRunner,
@@ -7,7 +8,6 @@ import {
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { AutorestCanonicalEmitterOptions } from "../src/lib.js";
-import { OpenAPI2Document } from "../src/types.js";
 import { createAutorestCanonicalTestRunner, ignoreDiagnostics } from "./test-host.js";
 
 async function openapiWithOptions(

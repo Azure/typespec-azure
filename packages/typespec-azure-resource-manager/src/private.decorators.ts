@@ -1,5 +1,6 @@
 import { RefProducerParams, setRefProducer } from "@azure-tools/typespec-autorest";
 import {
+  $key,
   $visibility,
   DecoratorContext,
   Enum,
@@ -14,8 +15,10 @@ import {
   getKeyName,
   getTypeName,
 } from "@typespec/compiler";
-import { getSegment } from "@typespec/rest";
+import { $segment, getSegment } from "@typespec/rest";
 import { getVersion } from "@typespec/versioning";
+import { camelCase } from "change-case";
+import pluralize from "pluralize";
 import { getArmCommonTypesVersion, getArmCommonTypesVersions } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
@@ -78,6 +81,27 @@ export function $resourceParameterBaseFor(
     resolvedValues.push(value.name);
   }
   context.program.stateMap(ArmStateKeys.armResourceCollection).set(entity, resolvedValues);
+}
+
+export function $defaultResourceKeySegmentName(
+  context: DecoratorContext,
+  entity: ModelProperty,
+  resource: Model,
+  keyName: string,
+  segment: string
+) {
+  const modelName = camelCase(resource.name);
+  const pluralName = pluralize(modelName);
+  if (keyName.length > 0) {
+    context.call($key, entity, keyName);
+  } else {
+    context.call($key, entity, `${modelName}Name`);
+  }
+  if (segment.length > 0) {
+    context.call($segment, entity, segment);
+  } else {
+    context.call($segment, entity, pluralName);
+  }
 }
 
 export function getResourceParameterBases(

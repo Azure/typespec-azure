@@ -293,4 +293,4 @@ const libDef = {
 } as const;
 
 export const $lib = createTypeSpecLibrary(libDef);
-export const { reportDiagnostic, createStateSymbol, getTracer } = $lib;
+export const { reportDiagnostic, createDiagnostic, createStateSymbol, getTracer } = $lib;

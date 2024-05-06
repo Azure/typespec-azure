@@ -40,7 +40,7 @@ it("part of type `string` produce `type: string`", async () => {
 it("part of type `object` produce `type: string`", async () => {
   const res = await openApiFor(
     `
-    #suppress "@azure-tools/typespec-autorest-canonical/unsupported-multipart-type" "For test"
+    #suppress "@azure-tools/typespec-autorest/unsupported-multipart-type" "For test"
     op upload(@header contentType: "multipart/form-data", address: {city: string, street: string}): void;
     `
   );
