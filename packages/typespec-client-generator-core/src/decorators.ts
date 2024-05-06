@@ -589,9 +589,6 @@ export function createSdkContext<
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  if (options?.versionStrategy === "ignore") {
-    (context.options as any)["api-version"] = context.options["api-version"] ?? "all";
-  }
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     program: context.program,
     emitContext: context,
@@ -605,7 +602,7 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     diagnostics: diagnostics.diagnostics,
-    apiVersion: context.options["api-version"],
+    apiVersion: options?.versionStrategy === "ignore" ? "all" : context.options["api-version"],
     originalProgram: context.program,
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
