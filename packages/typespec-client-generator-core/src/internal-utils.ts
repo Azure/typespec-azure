@@ -1,10 +1,12 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
+  Interface,
   Model,
   Namespace,
   Operation,
   Program,
+  ProjectedProgram,
   Type,
   Union,
   createDiagnosticCollector,
@@ -19,6 +21,7 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -95,7 +98,8 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: { name: string }
+  type: { name: string },
+  namespace?: Namespace | Interface
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -104,31 +108,27 @@ export function updateWithApiVersionInformation(
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
-    clientDefaultValue: isApiVersionParam ? context.__api_version_client_default_value : undefined,
+    clientDefaultValue:
+      isApiVersionParam && namespace
+        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        : undefined,
     onClient: onClient(context, type),
   };
 }
 
-/**
- *
- * @param context
- * @param type
- * @returns All api versions the type is available on
- */
-export function getAvailableApiVersions(context: TCGCContext, type: Type): string[] {
-  const apiVersions =
-    context.__api_versions ||
-    getVersions(context.program, type)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-  if (!apiVersions) return [];
+export function filterApiVersionsWithDecorators(
+  context: TCGCContext,
+  type: Type,
+  apiVersions: string[]
+): string[] {
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   let added: boolean = addedOnVersions.length ? false : true;
   let addedCounter = 0;
   let removeCounter = 0;
   const retval: string[] = [];
-  for (const version of apiVersions) {
+  for (let i = 0; i < apiVersions.length; i++) {
+    const version = apiVersions[i];
     if (addedCounter < addedOnVersions.length && version === addedOnVersions[addedCounter]) {
       added = true;
       addedCounter++;
@@ -137,9 +137,45 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
       added = false;
       removeCounter++;
     }
-    if (added) retval.push(version);
+    if (added) {
+      // only add version smaller than config
+      if (
+        context.apiVersion === undefined ||
+        context.apiVersion === "latest" ||
+        context.apiVersion === "all" ||
+        apiVersions.indexOf(context.apiVersion) >= i
+      ) {
+        retval.push(version);
+      }
+    }
   }
   return retval;
+}
+
+/**
+ *
+ * @param context
+ * @param type
+ * @param client If it's associated with a client, meaning it's a param etc, we can see if it's available on that client
+ * @returns All api versions the type is available on
+ */
+export function getAvailableApiVersions(
+  context: TCGCContext,
+  type: Type,
+  namespace?: Namespace | Interface
+): string[] {
+  let cachedApiVersions: string[] = [];
+  if (namespace) {
+    cachedApiVersions = context.__namespaceToApiVersions.get(namespace) || [];
+  }
+
+  const apiVersions =
+    cachedApiVersions ||
+    getVersions(context.program, type)[1]
+      ?.getVersions()
+      .map((x) => x.value);
+  if (!apiVersions) return [];
+  return filterApiVersionsWithDecorators(context, type, apiVersions);
 }
 
 interface DocWrapper {
@@ -227,6 +263,10 @@ export function isAcceptHeader(param: SdkModelPropertyType): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
+export function isContentTypeHeader(param: SdkModelPropertyType): boolean {
+  return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
+}
+
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
   const httpOperation = getHttpOperationWithCache(context, operation);
@@ -254,12 +294,16 @@ export interface TCGCContext {
   generatedNames?: Map<Union | Model, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __api_version_parameter?: SdkParameter;
-  __api_version_client_default_value?: string;
-  __api_versions?: string[];
+  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __namespaceToApiVersions: Map<Interface | Namespace, string[]>;
+  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
   __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
+  apiVersion?: string;
+  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  originalProgram: Program;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -267,6 +311,10 @@ export function createTCGCContext(program: Program): TCGCContext {
     program,
     emitterName: "__TCGC_INTERNAL__",
     diagnostics: [],
+    originalProgram: program,
+    __namespaceToApiVersionParameter: new Map(),
+    __namespaceToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
   };
 }
 
@@ -353,4 +401,9 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
 
 export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
   return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
+}
+
+export function getLocationOfOperation(operation: Operation): Namespace | Interface {
+  // have to check interface first, because interfaces are more granular than namespaces
+  return (operation.interface || operation.namespace)!;
 }

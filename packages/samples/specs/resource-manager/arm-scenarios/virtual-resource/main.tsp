@@ -58,13 +58,7 @@ model Group {
 /** A ContosoProviderHub resource */
 @parentResource(Group)
 model Employee is TrackedResource<EmployeeProperties> {
-  /** Name of employee */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @path
-  @segment("employees")
-  @visibility("read")
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */

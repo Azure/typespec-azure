@@ -1,7 +1,7 @@
 import { HttpVerb } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { OpenAPI2Document } from "../src/types.js";
+import { OpenAPI2Document } from "../src/openapi2-document.js";
 import { openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: shared routes", () => {

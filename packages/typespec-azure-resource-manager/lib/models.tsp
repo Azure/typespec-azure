@@ -7,6 +7,28 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
+/**
+ * Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+ * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+ * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+ * @template Resource The ARM resource this name parameter is applying to.
+ * @template KeyName Override default key name of the resource.
+ * @template SegmentName Override default segment name of the resource.
+ * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ */
+model ResourceNameParameter<
+  Resource extends ArmResource,
+  KeyName extends valueof string = "",
+  SegmentName extends valueof string = "",
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+> {
+  @doc("The name of the {name}", Resource)
+  @pattern(NamePattern)
+  @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
+  @path
+  name: string;
+}
+
 //#region Standard Resource Operation Interfaces
 /**
  * Concrete tracked resource types can be created by aliasing this type using a specific property type.
@@ -147,6 +169,20 @@ model DefaultProvisioningStateProperty {
   @doc("The provisioning state of the resource.")
   @visibility("read")
   provisioningState?: ResourceProvisioningState;
+}
+
+/** The standard evenlop definition of ExtendedLocation.
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ * ...ResourceNameParameter<Employee>;
+ * ...ExtendedLocationProperty;
+ * }
+ * ```
+ */
+model ExtendedLocationProperty {
+  extendedLocation: Foundations.ExtendedLocation;
 }
 
 /**

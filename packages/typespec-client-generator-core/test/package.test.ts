@@ -21,6 +21,37 @@ describe("typespec-client-generator-core: package", () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
 
+  function getServiceWithDefaultApiVersion(op: string) {
+    return `
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        /**
+         * Need to be set as 'http://localhost:3000' in client.
+         */
+        endpoint: url,
+      }
+    )
+    @service({})
+    @versioned(Versions)
+    namespace Server.Versions.Versioned;
+
+    /**
+     * The version of the API.
+     */
+    enum Versions {
+      /**
+       * The version 2022-12-01-preview.
+       */
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
+
+    ${op}
+    `;
+  }
+
   describe("package name", () => {
     it("as config option", async () => {
       const runnerWithPackageName = await createSdkTestRunner({
@@ -574,11 +605,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(clientAccessor.name, "getMyOperationGroup");
       strictEqual(clientAccessor.parameters.length, 0);
       strictEqual(clientAccessor.response, operationGroup);
+      strictEqual(clientAccessor.crossLanguageDefintionId, "TestService.getMyOperationGroup");
 
       strictEqual(operationGroup.initialization.properties.length, 1);
       strictEqual(operationGroup.initialization.access, "internal");
       strictEqual(operationGroup.methods.length, 1);
       strictEqual(operationGroup.methods[0].name, "func");
+      strictEqual(
+        operationGroup.methods[0].crossLanguageDefintionId,
+        "TestService.MyOperationGroup.func"
+      );
     });
 
     it("operationGroup2", async () => {
@@ -612,6 +648,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const fooAccessor = mainClient.methods[0];
       strictEqual(fooAccessor.kind, "clientaccessor");
+      strictEqual(fooAccessor.crossLanguageDefintionId, "TestService.getFoo");
       strictEqual(fooAccessor.access, "internal");
       strictEqual(fooAccessor.name, "getFoo");
       strictEqual(fooAccessor.parameters.length, 0);
@@ -621,6 +658,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(barAccessor.kind, "clientaccessor");
       strictEqual(barAccessor.access, "internal");
       strictEqual(barAccessor.name, "getBar");
+      strictEqual(barAccessor.crossLanguageDefintionId, "TestService.getBar");
       strictEqual(barAccessor.parameters.length, 0);
       strictEqual(barAccessor.response, barClient);
 
@@ -630,6 +668,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const fooBarAccessor = fooClient.methods[0];
       strictEqual(fooBarAccessor.kind, "clientaccessor");
+      strictEqual(fooBarAccessor.crossLanguageDefintionId, "TestService.Foo.getBar");
       strictEqual(fooBarAccessor.access, "internal");
       strictEqual(fooBarAccessor.name, "getBar");
       strictEqual(fooBarAccessor.parameters.length, 0);
@@ -640,12 +679,14 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(fooBarClient.methods.length, 1);
       strictEqual(fooBarClient.methods[0].kind, "basic");
       strictEqual(fooBarClient.methods[0].name, "one");
+      strictEqual(fooBarClient.methods[0].crossLanguageDefintionId, "TestService.Foo.Bar.one");
 
       strictEqual(barClient.initialization.properties.length, 1);
       strictEqual(barClient.initialization.access, "internal");
       strictEqual(barClient.methods.length, 1);
       strictEqual(barClient.methods[0].kind, "basic");
       strictEqual(barClient.methods[0].name, "two");
+      strictEqual(barClient.methods[0].crossLanguageDefintionId, "TestService.Bar.two");
     });
 
     function getServiceNoDefaultApiVersion(op: string) {
@@ -747,37 +788,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.clientDefaultValue, undefined);
     });
 
-    function getServiceWithDefaultApiVersion(op: string) {
-      return `
-      @server(
-        "{endpoint}",
-        "Testserver endpoint",
-        {
-          /**
-           * Need to be set as 'http://localhost:3000' in client.
-           */
-          endpoint: url,
-        }
-      )
-      @service({})
-      @versioned(Versions)
-      namespace Server.Versions.Versioned;
-
-      /**
-       * The version of the API.
-       */
-      enum Versions {
-        /**
-         * The version 2022-12-01-preview.
-         */
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        v2022_12_01_preview: "2022-12-01-preview",
-      }
-
-      ${op}
-      `;
-    }
-
     it("service with default api version, method without api version param", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
@@ -804,6 +814,10 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(withoutApiVersion.kind, "basic");
       strictEqual(withoutApiVersion.parameters.length, 0);
       strictEqual(withoutApiVersion.operation.parameters.length, 0);
+      strictEqual(
+        withoutApiVersion.crossLanguageDefintionId,
+        "Server.Versions.Versioned.withoutApiVersion"
+      );
     });
 
     it("service with default api version, method with api version param", async () => {
@@ -843,6 +857,10 @@ describe("typespec-client-generator-core: package", () => {
       const withApiVersion = client.methods[0];
       strictEqual(withApiVersion.name, "withQueryApiVersion");
       strictEqual(withApiVersion.kind, "basic");
+      strictEqual(
+        withApiVersion.crossLanguageDefintionId,
+        "Server.Versions.Versioned.withQueryApiVersion"
+      );
       strictEqual(withApiVersion.parameters.length, 1);
       strictEqual(withApiVersion.operation.parameters.length, 1);
       strictEqual(withApiVersion.parameters[0].isApiVersionParam, true);
@@ -894,6 +912,10 @@ describe("typespec-client-generator-core: package", () => {
       const withApiVersion = client.methods[0];
       strictEqual(withApiVersion.name, "withPathApiVersion");
       strictEqual(withApiVersion.kind, "basic");
+      strictEqual(
+        withApiVersion.crossLanguageDefintionId,
+        "Server.Versions.Versioned.withPathApiVersion"
+      );
       strictEqual(withApiVersion.parameters.length, 1);
       strictEqual(withApiVersion.parameters[0].isApiVersionParam, true);
       strictEqual(withApiVersion.parameters[0].name, "apiVersion");
@@ -924,6 +946,7 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
+      strictEqual(method.crossLanguageDefintionId, "My.Service.myOp");
       strictEqual(method.parameters.length, 1);
 
       const methodParam = method.parameters[0];
@@ -999,6 +1022,7 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "pathInModel");
       strictEqual(method.kind, "basic");
+      strictEqual(method.crossLanguageDefintionId, "TestService.pathInModel");
       strictEqual(method.parameters.length, 1);
       const pathMethod = method.parameters[0];
       strictEqual(pathMethod.kind, "method");
@@ -1037,6 +1061,7 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
+      strictEqual(method.crossLanguageDefintionId, "My.Service.myOp");
       strictEqual(method.parameters.length, 1);
 
       const methodParam = method.parameters[0];
@@ -1621,6 +1646,38 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.response.kind, "method");
       strictEqual(method.response.type?.kind, "bytes");
+    });
+
+    it("lro rpc case", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        getServiceWithDefaultApiVersion(`
+        model GenerationOptions {
+          prompt: string;
+        }
+        
+        model GenerationResponse is Azure.Core.Foundations.OperationStatus<GenerationResult>;
+        
+        model GenerationResult {
+          data: string;
+        }
+        
+        @route("/generations:submit")
+        op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
+      `)
+      );
+      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+
+      strictEqual(method.parameters.length, 4);
+      deepStrictEqual(
+        method.parameters.map((x) => x.name),
+        ["apiVersion", "generationOptions", "contentType", "accept"]
+      );
     });
   });
 
@@ -2424,6 +2481,10 @@ describe("typespec-client-generator-core: package", () => {
       ok(getStatus);
       strictEqual(getStatus.name, "getWidgetOperationStatus");
       strictEqual(getStatus.kind, "basic");
+      strictEqual(
+        getStatus.crossLanguageDefintionId,
+        "Contoso.WidgetManager.Widgets.getWidgetOperationStatus"
+      );
       strictEqual(getStatus.parameters.length, 4);
 
       const methodWidgetName = getStatus.parameters.find((p) => p.name === "widgetName");
@@ -2504,6 +2565,11 @@ describe("typespec-client-generator-core: package", () => {
       const createOrUpdate = client.methods.find((x) => x.name === "createOrUpdateWidget");
       ok(createOrUpdate);
       strictEqual(createOrUpdate.kind, "lro");
+      strictEqual(createOrUpdate.parameters.length, 12);
+      strictEqual(
+        createOrUpdate.crossLanguageDefintionId,
+        "Contoso.WidgetManager.Widgets.createOrUpdateWidget"
+      );
       deepStrictEqual(
         createOrUpdate.parameters.map((x) => x.name),
         [
@@ -2596,6 +2662,23 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(createOrUpdate.response.resultPath, "result");
     });
+    it("lro delete", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await compileAzureWidgetService(
+        runnerWithCore,
+        `
+        op delete is ResourceOperations.LongRunningResourceDelete<Widget>;
+        `
+      );
+      const method = getServiceMethodOfClient(runnerWithCore.context.experimental_sdkPackage);
+      strictEqual(method.name, "delete");
+      strictEqual(method.kind, "lro");
+      strictEqual(method.response.type, undefined);
+    });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
@@ -2621,6 +2704,10 @@ describe("typespec-client-generator-core: package", () => {
       const listManufacturers = widgetClient.methods[0];
 
       strictEqual(listManufacturers.name, "listManufacturers");
+      strictEqual(
+        listManufacturers.crossLanguageDefintionId,
+        "Contoso.WidgetManager.Widgets.listManufacturers"
+      );
       strictEqual(listManufacturers.kind, "paging");
       strictEqual(listManufacturers.parameters.length, 3);
       deepStrictEqual(

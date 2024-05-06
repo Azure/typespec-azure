@@ -7,7 +7,7 @@ import {
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { AutorestEmitterOptions } from "../src/lib.js";
-import { OpenAPI2Document } from "../src/types.js";
+import { OpenAPI2Document } from "../src/openapi2-document.js";
 import { createAutorestTestRunner, ignoreDiagnostics } from "./test-host.js";
 
 async function openapiWithOptions(

@@ -29,13 +29,7 @@ enum Versions {
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
 /** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
-  /** Name of employee */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @path
-  @segment("employees")
-  @visibility("read")
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */
@@ -118,13 +112,7 @@ interface Dependents {
 
 @parentResource(Employee)
 model Dependent is ProxyResource<DependentProperties> {
-  /** Name of dependent */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("dependentName")
-  @path
-  @segment("dependents")
-  @visibility("read")
-  name: string;
+  ...ResourceNameParameter<Dependent>;
 }
 
 /** Dependent properties */

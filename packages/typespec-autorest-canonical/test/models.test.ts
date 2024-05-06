@@ -299,7 +299,7 @@ it("errors on empty enum", async () => {
 
   expectDiagnostics(diagnostics, [
     {
-      code: "@azure-tools/typespec-autorest-canonical/union-unsupported",
+      code: "@azure-tools/typespec-autorest/union-unsupported",
       message:
         "Empty unions are not supported for OpenAPI v2 - enums must have at least one value.",
       severity: "warning",
@@ -652,9 +652,7 @@ it("detects cycles in inline type", async () => {
     { "omit-unreachable-types": true }
   );
 
-  expectDiagnostics(diagnostics, [
-    { code: "@azure-tools/typespec-autorest-canonical/inline-cycle" },
-  ]);
+  expectDiagnostics(diagnostics, [{ code: "@azure-tools/typespec-autorest/inline-cycle" }]);
 });
 
 it("excludes properties with type 'never'", async () => {
