@@ -33,7 +33,7 @@ configuration:
           - isIssue
           - isOpen
           - hasLabel:
-              label: No-Recent-Activity
+              label: no-recent-activity
           - hasLabel:
               label: needs-author-feedback
           - noActivitySince:
