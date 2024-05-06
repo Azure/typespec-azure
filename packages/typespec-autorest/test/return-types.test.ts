@@ -1,9 +1,27 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createAutorestTestRunner, ignoreUseStandardOps, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: return types", () => {
+  it("model used with @body and without shouldn't conflict if it contains no metadata", async () => {
+    const res = await openApiFor(
+      `
+      model Foo {
+        name: string;
+      }
+      @route("c1") op c1(): Foo;
+      @route("c2") op c2(): {@body _: Foo};
+      `
+    );
+    deepStrictEqual(res.paths["/c1"].get.responses["200"].schema, {
+      $ref: "#/definitions/Foo",
+    });
+    deepStrictEqual(res.paths["/c2"].get.responses["200"].schema, {
+      $ref: "#/definitions/Foo",
+    });
+  });
+
   it("defines responses with response headers", async () => {
     const res = await openApiFor(
       `
@@ -254,34 +272,6 @@ describe("typespec-autorest: return types", () => {
     strictEqual(res.paths["/"].get.responses["200"].schema.type, "array");
   });
 
-  it("return type with no properties should be 200 with empty object as type", async () => {
-    const res = await openApiFor(
-      `
-      @get op test(): {};
-      `
-    );
-
-    const responses = res.paths["/"].get.responses;
-    ok(responses["200"]);
-    deepStrictEqual(responses["200"].schema, {
-      type: "object",
-    });
-  });
-
-  it("{} return type should produce 200 ", async () => {
-    const res = await openApiFor(
-      `
-      @get op test(): {};
-      `
-    );
-
-    const responses = res.paths["/"].get.responses;
-    ok(responses["200"]);
-    deepStrictEqual(responses["200"].schema, {
-      type: "object",
-    });
-  });
-
   it("produce additionalProperties schema if response is Record<T>", async () => {
     const res = await openApiFor(
       `
@@ -299,7 +289,7 @@ describe("typespec-autorest: return types", () => {
     });
   });
 
-  it("return type with only response metadata should be 204 response w/ no content", async () => {
+  it("return type with only response metadata should be 200 response w/ no content", async () => {
     const res = await openApiFor(
       `
       @get op delete(): {@header date: string};
@@ -307,23 +297,9 @@ describe("typespec-autorest: return types", () => {
     );
 
     const responses = res.paths["/"].get.responses;
-    ok(responses["204"]);
-    ok(responses["204"].schema === undefined, "response should have no content");
-    ok(responses["200"] === undefined);
-  });
-
-  it("defaults status code to 204 when implicit body has no content", async () => {
-    const res = await openApiFor(
-      `
-      @delete
-      op delete(): { @header date: string };
-      `
-    );
-    const responses = res.paths["/"].delete.responses;
-    ok(responses["200"] === undefined);
-    ok(responses["204"]);
-    ok(responses["204"].headers["date"]);
-    ok(responses["204"].schema === undefined);
+    ok(responses["200"]);
+    ok(responses["200"].schema === undefined, "response should have no content");
+    ok(responses["204"] === undefined);
   });
 
   it("defaults status code to default when model has @error decorator", async () => {
@@ -491,7 +467,74 @@ describe("typespec-autorest: return types", () => {
 
   it("defaults to 204 no content with void @body", async () => {
     const res = await openApiFor(`@get op read(): {@body body: void};`);
-    ok(res.paths["/"].get.responses["204"]);
+    ok(res.paths["/"].get.responses["200"]);
+  });
+
+  it("using @body ignore any metadata property underneath", async () => {
+    const res = await openApiFor(`@get op read(): {
+      @body body: {
+        #suppress "@typespec/http/metadata-ignored"
+        @header header: string,
+        #suppress "@typespec/http/metadata-ignored"
+        @query query: string,
+        #suppress "@typespec/http/metadata-ignored"
+        @statusCode code: 201,
+      }
+    };`);
+    expect(res.paths["/"].get.responses["200"].schema).toEqual({
+      type: "object",
+      properties: {
+        header: { type: "string" },
+        query: { type: "string" },
+        code: { type: "number", enum: [201] },
+      },
+      required: ["header", "query", "code"],
+    });
+  });
+
+  describe("response model resolving to no property in the body produce no body", () => {
+    it.each(["{}", "{@header prop: string}", `{@visibility("none") prop: string}`])(
+      "%s",
+      async (body) => {
+        const res = await openApiFor(`op test(): ${body};`);
+        strictEqual(res.paths["/"].get.responses["200"].schema, undefined);
+      }
+    );
+  });
+
+  it("property in body with only metadata properties should still be included", async () => {
+    const res = await openApiFor(`op read(): {
+        headers: {
+          @header header1: string;
+          @header header2: string;
+        };
+        name: string;
+      };`);
+    expect(res.paths["/"].get.responses["200"].schema).toEqual({
+      type: "object",
+      properties: {
+        headers: { type: "object" },
+        name: { type: "string" },
+      },
+      required: ["headers", "name"],
+    });
+  });
+
+  it("property in body with only metadata properties and @bodyIgnore should not be included", async () => {
+    const res = await openApiFor(`op read(): {
+        @bodyIgnore headers: {
+          @header header1: string;
+          @header header2: string;
+        };
+        name: string;
+    };`);
+    expect(res.paths["/"].get.responses["200"].schema).toEqual({
+      type: "object",
+      properties: {
+        name: { type: "string" },
+      },
+      required: ["name"],
+    });
   });
 
   describe("binary responses", () => {

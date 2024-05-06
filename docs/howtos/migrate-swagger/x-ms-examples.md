@@ -5,7 +5,7 @@ title: x-ms-examples
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
 The examples must be placed in the `examples-directory` (default to `{project-root}/examples`) and have the `operationdId` property.
 
-:::warn
+:::warning
 Do not use `@extension("x-ms-examples", "<value>")`.
 :::
 
@@ -50,6 +50,6 @@ Note, latest OAV tool should automatically generate the following. However, if y
 - include `title` field and make sure it is descriptive and unique for each operation.
 - include `operationId`. This is used to match with declared operations in TypeSpec and correctly output in swagger.
 
-:::warn
+:::warning
 The examples are now in the examples directory relative to the output openapi.json. You must now copy them to the examples directory in the project root. The typespec-autorest emitter will then copy them back to the correct location when generating the OpenAPI 2.0.
 :::

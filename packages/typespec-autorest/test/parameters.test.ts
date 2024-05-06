@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { describe, it } from "vitest";
-import { OpenAPI2HeaderParameter, OpenAPI2QueryParameter } from "../src/types.js";
+import { describe, expect, it } from "vitest";
+import { OpenAPI2HeaderParameter, OpenAPI2QueryParameter } from "../src/openapi2-document.js";
 import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: parameters", () => {
@@ -220,6 +220,73 @@ describe("typespec-autorest: parameters", () => {
   it("omit request body if type is void", async () => {
     const res = await openApiFor(`op test(@body foo: void): void;`);
     deepStrictEqual(res.paths["/"].post.parameters, []);
+  });
+
+  it("using @body ignore any metadata property underneath", async () => {
+    const res = await openApiFor(`@get op read(
+      @body body: {
+        #suppress "@typespec/http/metadata-ignored"
+        @header header: string,
+        #suppress "@typespec/http/metadata-ignored"
+        @query query: string,
+        #suppress "@typespec/http/metadata-ignored"
+        @statusCode code: 201,
+      }
+    ): void;`);
+    expect(res.paths["/"].get.parameters[0].schema).toEqual({
+      type: "object",
+      properties: {
+        header: { type: "string" },
+        query: { type: "string" },
+        code: { type: "number", enum: [201] },
+      },
+      required: ["header", "query", "code"],
+    });
+  });
+
+  describe("request parameters resolving to no property in the body produce no body", () => {
+    it.each(["()", "(@header prop: string)", `(@visibility("none") prop: string)`])(
+      "%s",
+      async (params) => {
+        const res = await openApiFor(`op test${params}: void;`);
+        strictEqual(res.paths["/"].get.requestBody, undefined);
+      }
+    );
+  });
+
+  it("property in body with only metadata properties should still be included", async () => {
+    const res = await openApiFor(`op read(
+        headers: {
+          @header header1: string;
+          @header header2: string;
+        };
+        name: string;
+      ): void;`);
+    expect(res.paths["/"].post.parameters[2].schema).toEqual({
+      type: "object",
+      properties: {
+        headers: { type: "object" },
+        name: { type: "string" },
+      },
+      required: ["headers", "name"],
+    });
+  });
+
+  it("property in body with only metadata properties and @bodyIgnore should not be included", async () => {
+    const res = await openApiFor(`op read(
+        @bodyIgnore headers: {
+          @header header1: string;
+          @header header2: string;
+        };
+        name: string;
+    ): void;`);
+    expect(res.paths["/"].post.parameters[2].schema).toEqual({
+      type: "object",
+      properties: {
+        name: { type: "string" },
+      },
+      required: ["name"],
+    });
   });
 
   describe("content type parameter", () => {

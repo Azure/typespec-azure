@@ -323,6 +323,10 @@ describe("typespec-azure-core: decorators", () => {
           code: "@azure-tools/typespec-azure-core/lro-status-union-non-string",
           message: "Union contains non-string value type Scalar.",
         },
+        {
+          code: "@azure-tools/typespec-azure-core/lro-status-missing",
+          message: "Terminal long-running operation states are missing: Failed.",
+        },
       ]);
     });
 
@@ -495,6 +499,26 @@ describe("typespec-azure-core: decorators", () => {
         failedState: ["Borked"],
         canceledState: ["Chucked"],
         states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
+      });
+    });
+
+    it("resolve default state from union variant name", async () => {
+      const { DefaultLroStates } = (await runner.compile(`
+        @test
+        @lroStatus
+        union DefaultLroStates {
+          Succeeded: "uSucceeded",
+          Failed: "uFailed",
+          Canceled: "uCancelled",
+          Extra: "uExtra",
+        }
+      `)) as { DefaultLroStates: Model };
+
+      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
+        succeededState: ["Succeeded"],
+        failedState: ["Failed"],
+        canceledState: ["Canceled"],
+        states: ["Succeeded", "Failed", "Canceled", "Extra"],
       });
     });
   });

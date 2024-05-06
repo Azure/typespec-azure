@@ -13,16 +13,18 @@ export const armResourceDuplicatePropertiesRule = createRule({
     return {
       model: (model: Model) => {
         const resourceModel = getArmResource(context.program, model);
+        const reportedDup = new Set<string>();
         if (resourceModel !== undefined) {
           const resourceProperties = getProperty(model, "properties")?.type;
           for (const property of getProperties(model)) {
             if (resourceProperties !== undefined && resourceProperties.kind === "Model") {
               const targetProperty = getProperty(resourceProperties, property.name);
-              if (targetProperty !== undefined) {
+              if (targetProperty !== undefined && !reportedDup.has(property.name)) {
                 context.reportDiagnostic({
                   format: { propertyName: property.name },
                   target: targetProperty,
                 });
+                reportedDup.add(property.name);
               }
             }
           }

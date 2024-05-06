@@ -169,7 +169,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The first and last name fo the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -209,7 +209,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The first and last name fo the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -275,7 +275,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The first and last name fo the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -324,7 +324,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "The first and last name fo the employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -400,8 +400,7 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [

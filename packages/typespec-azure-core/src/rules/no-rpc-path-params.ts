@@ -1,4 +1,4 @@
-import { Operation, createRule, getTypeName } from "@typespec/compiler";
+import { Operation, createRule } from "@typespec/compiler";
 import { isPathParam } from "@typespec/http";
 import { isExcludedCoreType } from "./utils.js";
 
@@ -27,7 +27,11 @@ export const noRpcPathParamsRule = createRule({
         const originalOperation = operation;
         while (operation.sourceOperation) {
           operation = operation.sourceOperation;
-          if (/^Azure\.Core\..*RpcOperation$/.test(getTypeName(operation))) {
+          if (
+            operation.name.endsWith("RpcOperation") &&
+            operation.namespace?.name === "Core" &&
+            operation.namespace?.namespace?.name === "Azure"
+          ) {
             // Check the original operation to see if it contains path
             // parameters.  We only need to check the operation parameters
             // because the route path is validated against the op parameters

@@ -111,6 +111,42 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
       },
     },
+    "server-param-not-path": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Template argument ${"templateArgumentName"} is not a path parameter, it is a ${"templateArgumentType"}. It has to be a path.`,
+      },
+    },
+    "unexpected-http-param-type": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Expected parameter "${"paramName"}" to be of type "${"expectedType"}", but instead it is of type "${"actualType"}"`,
+      },
+    },
+    "multiple-response-types": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple response types found in operation ${"operation"}. Only one response type is supported, so we will choose the first one ${"response"}`,
+      },
+    },
+    "no-corresponding-method-param": {
+      severity: "error",
+      messages: {
+        default: `Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
+      },
+    },
+    "unsupported-protocol": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Currently we only support HTTP and HTTPS protocols`,
+      },
+    },
+    "no-emitter-name": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Can not find name for your emitter, please check your emitter name.`,
+      },
+    },
   },
 });
 

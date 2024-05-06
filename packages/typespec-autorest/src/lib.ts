@@ -61,6 +61,12 @@ export interface AutorestEmitterOptions {
   "omit-unreachable-types"?: boolean;
 
   /**
+   * Decide how to deal with the Version enum when when `omit-unreachable-types` is not set.
+   * @default "omit"
+   */
+  "version-enum-strategy"?: "omit" | "include";
+
+  /**
    * If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
    * This extension is meant for debugging and should not be depended on.
    * @default "never"
@@ -152,6 +158,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         "Omit unreachable types. By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.",
     },
+    "version-enum-strategy": {
+      type: "string",
+      nullable: true,
+      description:
+        "Decide how to deal with the Version enum when when `omit-unreachable-types` is not set. Default to 'omit'",
+      default: "omit",
+    },
     "include-x-typespec-name": {
       type: "string",
       enum: ["inline-only", "never"],
@@ -173,24 +186,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
 const libDef = {
   name: "@azure-tools/typespec-autorest",
   diagnostics: {
-    "security-service-namespace": {
-      severity: "error",
-      messages: {
-        default: "Cannot add security details to a namespace other than the service namespace.",
-      },
-    },
-    "resource-namespace": {
-      severity: "error",
-      messages: {
-        default: "Resource goes on namespace",
-      },
-    },
-    "missing-path-param": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Path contains parameter ${"param"} but wasn't found in given parameters`,
-      },
-    },
     "duplicate-body-types": {
       severity: "error",
       messages: {
@@ -240,24 +235,6 @@ const libDef = {
       severity: "error",
       messages: {
         default: paramMessage`Invalid type '${"type"}' for a default value`,
-      },
-    },
-    "invalid-property-type-for-collection-format": {
-      severity: "error",
-      messages: {
-        default: "The collectionFormat can only be applied to model property with type 'string[]'.",
-      },
-    },
-    "invalid-collection-format": {
-      severity: "error",
-      messages: {
-        default: "The format should be one of 'csv','ssv','tsv','pipes' and 'multi'.",
-      },
-    },
-    "non-recommended-collection-format": {
-      severity: "warning",
-      messages: {
-        default: "The recommendation of collection format are 'csv' and 'multi'.",
       },
     },
     "invalid-multi-collection-format": {
@@ -329,4 +306,4 @@ const libDef = {
 } as const;
 
 export const $lib = createTypeSpecLibrary(libDef);
-export const { reportDiagnostic, createStateSymbol, getTracer } = $lib;
+export const { reportDiagnostic, createDiagnostic, createStateSymbol, getTracer } = $lib;

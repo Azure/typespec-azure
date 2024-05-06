@@ -1,5 +1,5 @@
 import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getOpenApiAndDiagnostics, openApiFor } from "./test-host.js";
 
@@ -8,6 +8,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -22,7 +23,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -48,7 +49,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       type: "string",
       description: "I am a simple Resource Identifier",
       format: "arm-id",
-      "x-ms-arm-id-details": { allowedResources: [] },
     });
   });
 
@@ -56,6 +56,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -70,7 +71,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a Resource Identifier with type only")
-        armIdWithType: ResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
+        armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -104,6 +105,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -118,7 +120,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a a Resource Identifier with type and scopes")
-        armIdWithTypeAndScope: ResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -154,6 +156,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -168,7 +171,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @doc("Foo properties")
       model FooResourceProperties {
         @doc("I am a a Resource Identifier with multiple types and scopes")
-        armIdWithMultipleTypeAndScope: ResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
 
         @doc("The provisioning State")
         provisioningState: ResourceState;
@@ -210,6 +213,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const openapi = await openApiFor(
       `@armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -427,6 +431,95 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     ok(openapi.paths[privateEndpointGet]);
     ok(openapi.paths[privateEndpointGet].get);
     deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
+    ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  });
+
+  it("can use ResourceNameParameter for custom name parameter definition", async () => {
+    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+      `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      namespace Microsoft.PrivateLinkTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      /** Holder for private endpoint connections */
+      @tenantResource
+      model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
+        ...ResourceNameParameter<PrivateEndpointConnectionResource, "privateEndpointConnectionName", "privateEndpointConnections", "/[a-zA-Z]*">;
+      }
+      
+      /** Private connection operations */
+      @armResourceOperations(PrivateEndpointConnectionResource)
+      interface PrivateEndpointConnections {
+        /** List existing private connections */
+        listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
+        /** Get a specific private connection */
+        getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
+      }
+      `
+    );
+
+    const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
+    const privateEndpointGet =
+      "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
+    expectDiagnosticEmpty(diagnostics);
+    ok(openapi.paths[privateEndpointList]);
+    ok(openapi.paths[privateEndpointList].get);
+    deepStrictEqual(
+      openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+      "#/definitions/PrivateEndpointConnectionResourceListResult"
+    );
+    ok(openapi.definitions.PrivateEndpointConnectionResourceListResult.properties["value"]);
+    ok(openapi.paths[privateEndpointGet]);
+    ok(openapi.paths[privateEndpointGet].get);
+    deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
+    strictEqual(openapi.paths[privateEndpointGet].get.parameters[1].pattern, "/[a-zA-Z]*");
+    ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  });
+
+  it("can use ResourceNameParameter for default name parameter definition", async () => {
+    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+      `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      namespace Microsoft.PrivateLinkTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      /** Holder for private endpoint connections */
+      @tenantResource
+      model PrivateEndpointConnection is ProxyResource<PrivateEndpointConnectionProperties> {
+        ...ResourceNameParameter<PrivateEndpointConnection>;
+      }
+      
+      /** Private connection operations */
+      @armResourceOperations(PrivateEndpointConnection)
+      interface PrivateEndpointConnections {
+        /** List existing private connections */
+        listConnections is ArmResourceListByParent<PrivateEndpointConnection>;
+        /** Get a specific private connection */
+        getConnection is ArmResourceRead<PrivateEndpointConnection>;
+      }
+      `
+    );
+
+    const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
+    const privateEndpointGet =
+      "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
+    expectDiagnosticEmpty(diagnostics);
+    ok(openapi.paths[privateEndpointList]);
+    ok(openapi.paths[privateEndpointList].get);
+    deepStrictEqual(
+      openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+      "#/definitions/PrivateEndpointConnectionListResult"
+    );
+    ok(openapi.definitions.PrivateEndpointConnectionListResult.properties["value"]);
+    ok(openapi.paths[privateEndpointGet]);
+    ok(openapi.paths[privateEndpointGet].get);
+    deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
+    strictEqual(
+      openapi.paths[privateEndpointGet].get.parameters[1].pattern,
+      "^[a-zA-Z0-9-]{3,24}$"
+    );
     ok(openapi.paths[privateEndpointGet].get.parameters[1]);
   });
 });

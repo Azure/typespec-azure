@@ -149,6 +149,7 @@ model SdkDictionaryType extends SdkType {
  * @property access: Access level of the enum
  * @property usage: Usage cases for the enum. Used to filter when people only want input or output enums
  * @property summary: Summary of an enum
+ * @property isUnionAsEnum: Whether the enum is converted from TypeSpec union type
  */
 model SdkEnumType extends SdkType {
   kind: "enum";
@@ -163,6 +164,7 @@ model SdkEnumType extends SdkType {
   usage: UsageFlags;
   summary: string;
   nameSpace: string;
+  isUnionAsEnum: boolean;
 }
 
 /**
@@ -248,7 +250,7 @@ model SdkModelType extends SdkType {
  * @property kind: The kind of property
  * @property __raw: The original TSP property
  * @property type: The type of the property
- * @property nameInClient: The name of the property in our client SDKs
+ * @property name: The name of the property in our client SDKs
  * @property description: Description for the property
  * @property details: Optional details of the property
  * @property apiVersions: Api versions the property is available for
@@ -260,7 +262,7 @@ model SdkModelType extends SdkType {
 model SdkModelPropertyType {
   __raw?: ModelProperty;
   type: SdkType;
-  nameInClient: string;
+  name: string;
   description?: string;
   details?: string;
   apiVersions: string[];
@@ -291,13 +293,13 @@ model SdkModelPropertyType {
  *     kind: "model",
  *     properties: [
  *       {
- *         nameInClient: "path_param",
+ *         name: "path_param",
  *         serializedName: "pathParam"
  *         type: "string",
  *         kind: "path"
  *       },
  *       {
- *         nameInClient: "query_param",
+ *         name: "query_param",
  *         name: "queryParam",
  *         type: "string",
  *         kind: "query"
@@ -307,7 +309,7 @@ model SdkModelPropertyType {
  *   kind: "method"
  * }
  * PathServiceParameter: {
- *   nameInClient: "pathParam",
+ *   name: "pathParam",
  *   serializedName: "pathParam",
  *   type: "string",
  *   kind: "path",
@@ -317,7 +319,7 @@ model SdkModelPropertyType {
  *   }
  * }
  * QueryServiceParameter: {
- *   nameInClient: "queryParam",
+ *   name: "queryParam",
  *   serializedName: "queryParam",
  *   type: "string",
  *   kind: "query",
@@ -529,8 +531,6 @@ alias SdkServiceParameter = SdkQueryServiceParameter | SdkHeaderServiceParameter
  * @property parameters: Parameters object for the method
  * @property description: Description of the operation
  * @property details: Optional details of the operation
- * @property overloads: Any overloads of this method
- * @property overloading: The method that this method overloads
  */
 @discriminator("kind")
 model SdkMethod {
@@ -539,8 +539,6 @@ model SdkMethod {
   parameters: SdkMethodParameter[];
   description?: string;
   details?: string;
-  overloads?: SdkMethod[];
-  overloading?: SdkMethod;
 }
 
 /**
@@ -719,7 +717,7 @@ model SdkClientType {
   name: string;
   description?: string;
   details?: string;
-  initialization?: SdkModelType;
+  initialization: SdkModelType;
   methods: SdkMethod[];
 
   // TODO: we have groups of clients (for example, network client is a grouping of resource clients).

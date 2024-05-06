@@ -32,16 +32,22 @@ words:
   - DMSS
   - Donezo
   - dynatrace
+  - espt
   - foos
   - horiz
   - Howtos
   - infile
   - kvset
+  - kwargs
   - liftr
+  - LINUXNEXTVMIMAGE
+  - LINUXOS
+  - LINUXVMIMAGE
   - logz
   - LRO
   - lropaging
   - Lucene
+  - MACVMIMAGE
   - msazure
   - msdata
   - mylocation
@@ -49,6 +55,7 @@ words:
   - odata
   - Onco
   - oncophenotype
+  - psscriptanalyzer
   - PAYG
   - prismjs
   - qnas
@@ -59,3 +66,4 @@ words:
   - SERVICERP
   - tcgc
   - userrp
+  - WINDOWSVMIMAGE

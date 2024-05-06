@@ -36,7 +36,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
     it("on model", async () =>
       await checkDocRequired(
         "┆model Foo {}",
-        "The Model named 'Foo' should have a documentation or description, please use decorator @doc to add it."
+        "The Model named 'Foo' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on model property", async () =>
@@ -44,25 +44,25 @@ describe("typespec-azure-core: documentation-required rule", () => {
         `@doc("Abc") model Foo {
           ┆x: string;
         }`,
-        "The ModelProperty named 'x' should have a documentation or description, please use decorator @doc to add it."
+        "The ModelProperty named 'x' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on operation", async () =>
       await checkDocRequired(
         `┆op read(): void;`,
-        "The Operation named 'read' should have a documentation or description, please use decorator @doc to add it."
+        "The Operation named 'read' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on property", async () =>
       await checkDocRequired(
         `@doc("op doc") op read(┆param1: string): void;`,
-        "The ModelProperty named 'param1' should have a documentation or description, please use decorator @doc to add it."
+        "The ModelProperty named 'param1' should have a documentation or description, use doc comment /** */ to provide it."
       ));
 
     it("on enum", async () => {
       await checkDocRequired(
         "┆enum Foo {}",
-        "The Enum named 'Foo' should have a documentation or description, please use decorator @doc to add it."
+        "The Enum named 'Foo' should have a documentation or description, use doc comment /** */ to provide it."
       );
     });
 
@@ -71,8 +71,101 @@ describe("typespec-azure-core: documentation-required rule", () => {
         `@doc(".") enum Foo {
           ┆Bar,
         }`,
-        "The EnumMember named 'Bar' should have a documentation or description, please use decorator @doc to add it."
+        "The EnumMember named 'Bar' should have a documentation or description, use doc comment /** */ to provide it."
       );
+    });
+
+    it("does not require documentation on version enums", async () => {
+      await tester
+        .expect(
+          `
+          @versioned(Contoso.WidgetManager.Versions)
+          namespace Contoso.WidgetManager;
+          
+          enum Versions {
+            @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+            "2022-08-30",
+          }`
+        )
+        .toBeValid();
+    });
+
+    it("does not require documentation on discriminator enums", async () => {
+      await tester
+        .expect(
+          `
+          enum PetKind {
+            cat,
+            dog,
+          }
+          
+          @discriminator("kind")
+          @doc("Base Pet model")
+          model Pet {
+            kind: PetKind;
+          
+            @doc("Pet name")
+            name: string;
+          }
+          
+          @doc("A Cat")
+          model Cat extends Pet {
+            kind: PetKind.cat;
+          }`
+        )
+        .toBeValid();
+    });
+
+    it("does not require documentation on discriminator unions", async () => {
+      await tester
+        .expect(
+          `
+          union PetKind {
+            cat: "cat",
+            string,
+          }
+          
+          @discriminator("kind")
+          @doc("Base Pet model")
+          model Pet {
+            kind: PetKind;
+          }
+          
+          @doc("A Merry Ol' Cat")
+          model Cat extends Pet {
+            kind: PetKind.cat,
+          }`
+        )
+        .toBeValid();
+    });
+
+    it("on union (non-discriminator)", async () => {
+      await tester
+        .expect(
+          `
+      union PetKind {      
+        Cat: "Cat",
+        "Dog",
+        string,
+      }`
+        )
+        .toEmitDiagnostics([
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The Union named 'PetKind' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The UnionVariant named 'Cat' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
+          {
+            code: "@azure-tools/typespec-azure-core/documentation-required",
+            message:
+              "The UnionVariant named 'Dog' should have a documentation or description, use doc comment /** */ to provide it.",
+          },
+        ]);
     });
   });
 });

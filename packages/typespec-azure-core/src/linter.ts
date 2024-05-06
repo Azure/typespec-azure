@@ -13,6 +13,7 @@ import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
 import { noFixedEnumDiscriminatorRule } from "./rules/no-fixed-enum-discriminator.js";
+import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
@@ -51,6 +52,7 @@ const rules = [
   noExplicitRoutesResourceOps,
   noFixedEnumDiscriminatorRule,
   nonBreakingVersioningRule,
+  noGenericNumericRule,
   noNullableRule,
   noOffsetDateTimeRule,
   noResponseBodyRule,
@@ -110,7 +112,8 @@ export const $linter = defineLinter({
           true,
         [`@azure-tools/typespec-azure-core/${useStandardNames.name}`]: true,
         [`@azure-tools/typespec-azure-core/${friendlyNameRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: false,
+        [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: true,
+        [`@azure-tools/typespec-azure-core/${noClosedLiteralUnionRule.name}`]: true,
       },
       extends: ["@typespec/http/all"],
     },

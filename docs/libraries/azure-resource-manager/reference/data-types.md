@@ -122,10 +122,10 @@ model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `201`          | The status code.                                    |
-| body       | `ResponseBody` | The body type of the operation request or response. |
+| Name       | Type           | Description      |
+| ---------- | -------------- | ---------------- |
+| statusCode | `201`          | The status code. |
+| body       | `ResponseBody` |                  |
 
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 
@@ -308,10 +308,10 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description                                         |
-| ---------- | ---------- | --------------------------------------------------- |
-| body       | `Resource` | The body type of the operation request or response. |
-| statusCode | `201`      | The status code.                                    |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `201`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResourceExistsResponse` {#Azure.ResourceManager.ArmResourceExistsResponse}
 
@@ -372,10 +372,10 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `200`          | The status code.                                    |
-| body       | `ResponseBody` | The body type of the operation request or response. |
+| Name       | Type           | Description      |
+| ---------- | -------------- | ---------------- |
+| statusCode | `200`          | The status code. |
+| body       | `ResponseBody` |                  |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
 
@@ -387,12 +387,12 @@ model Azure.ResourceManager.CustomerManagedKeyEncryption
 
 #### Properties
 
-| Name                            | Type                                                                                   | Description                                                                                                                                                                                                                                                                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| keyEncryptionIdentity?          | [`KeyEncryptionIdentity`](./data-types.md#Azure.ResourceManager.KeyEncryptionIdentity) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
-| userAssignedIdentityResourceId? | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier)                      | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
-| federatedClientId?              | `Core.uuid`                                                                            | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
-| delegatedIdentityClientId       | `Core.uuid`                                                                            | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
+| Name                            | Type                                                                                         | Description                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| keyEncryptionKeyIdentity?       | [`KeyEncryptionKeyIdentity`](./data-types.md#Azure.ResourceManager.KeyEncryptionKeyIdentity) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
+| userAssignedIdentityResourceId? | `Core.armResourceIdentifier`                                                                 | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
+| federatedClientId?              | `Core.uuid`                                                                                  | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
+| delegatedIdentityClientId?      | `Core.uuid`                                                                                  | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
@@ -492,6 +492,29 @@ model Azure.ResourceManager.ErrorResponse
 | Name   | Type                                                                           | Description       |
 | ------ | ------------------------------------------------------------------------------ | ----------------- |
 | error? | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | The error object. |
+
+### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
+
+The standard evenlop definition of ExtendedLocation.
+
+```typespec
+model Azure.ResourceManager.ExtendedLocationProperty
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ExtendedLocationProperty;
+}
+```
+
+#### Properties
+
+| Name             | Type                                                                                     | Description |
+| ---------------- | ---------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocation) |             |
 
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
@@ -642,9 +665,9 @@ model Azure.ResourceManager.PrivateEndpoint
 
 #### Properties
 
-| Name | Type                                                              | Description                                  |
-| ---- | ----------------------------------------------------------------- | -------------------------------------------- |
-| id?  | [`ResourceIdentifier`](#Azure.ResourceManager.ResourceIdentifier) | The resource identifier for private endpoint |
+| Name | Type                         | Description                                  |
+| ---- | ---------------------------- | -------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
 
 ### `PrivateEndpointConnection` {#Azure.ResourceManager.PrivateEndpointConnection}
 
@@ -860,22 +883,6 @@ model Azure.ResourceManager.ResourceGroupParameter
 | ----------------- | -------- | ------------------------------------------------------------- |
 | resourceGroupName | `string` | The name of the resource group. The name is case insensitive. |
 
-### `ResourceIdentifierAllowedResource` {#Azure.ResourceManager.ResourceIdentifierAllowedResource}
-
-Used in ResourceIdentifier definition to represent a particular type of Azure Resource Manager resource, enabling constraints based on resource type.
-See [link](https://github.com/Azure/autorest/tree/main/docs/extensions#schema)
-
-```typespec
-model Azure.ResourceManager.ResourceIdentifierAllowedResource
-```
-
-#### Properties
-
-| Name    | Type       | Description                                                                                                                                                                          |
-| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| type    | `string`   | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
-| scopes? | `string[]` | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
-
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
 The dynamic parameters of a resource instance - pass in the proper base type to indicate
@@ -894,9 +901,9 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 
 #### Properties
 
-| Name     | Type                             | Description                              |
-| -------- | -------------------------------- | ---------------------------------------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ResourceKind` {#Azure.ResourceManager.ResourceKind}
 
@@ -942,6 +949,31 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 | value     | `Array<Element>`                 | The {name} items on this page      |
 | nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
 
+### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
+
+Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+
+```typespec
+model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.              |
+| KeyName     | Override default key name of the resource.                        |
+| SegmentName | Override default segment name of the resource.                    |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`. |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
 The dynamic parameters of a list call for a resource instance - pass in the proper base type to indicate
@@ -960,9 +992,9 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 
 #### Properties
 
-| Name     | Type                             | Description                              |
-| -------- | -------------------------------- | ---------------------------------------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ResourcePlan` {#Azure.ResourceManager.ResourcePlan}
 
@@ -1090,59 +1122,6 @@ model Azure.ResourceManager.TrackedResource<Properties>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `InfrastructureEncryption` {#Azure.ResourceManager.InfrastructureEncryption}
-
-(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
-
-```typespec
-enum Azure.ResourceManager.InfrastructureEncryption
-```
-
-### `KeyEncryptionIdentity` {#Azure.ResourceManager.KeyEncryptionIdentity}
-
-The type of identity to use.
-
-```typespec
-enum Azure.ResourceManager.KeyEncryptionIdentity
-```
-
-### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
-
-The provisioning state of the connection
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
-```
-
-### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
-
-The private endpoint connection status
-
-```typespec
-enum Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
-```
-
-### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
-
-Standard terminal provisioning state of resource type. You can spread into your
-custom provision state to avoid duplication and ensure consistency
-
-```typespec
-enum Azure.ResourceManager.ResourceProvisioningState
-```
-
-#### Examples
-
-```typespec
-enum FooProvisioningState {
-  ...ResourceProvisioningState, // include standard provisioning states
-  starting,
-  started,
-  stopping,
-  stopped,
-}
-```
-
 ### `Versions` {#Azure.ResourceManager.Versions}
 
 Supported versions of Azure.ResourceManager building blocks.
@@ -1151,43 +1130,57 @@ Supported versions of Azure.ResourceManager building blocks.
 enum Azure.ResourceManager.Versions
 ```
 
-### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
+### `InfrastructureEncryption` {#Azure.ResourceManager.InfrastructureEncryption}
 
-A type definition that refers the id to an Azure Resource Manager resource.
-
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
 
 ```typespec
-scalar Azure.ResourceManager.ResourceIdentifier
+union Azure.ResourceManager.InfrastructureEncryption
 ```
 
-### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
+### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.KeyEncryptionKeyIdentity}
 
-A type definition that refers the id to an Azure Resource Manager resource.
-
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+The type of identity to use.
 
 ```typespec
-scalar Azure.ResourceManager.ResourceIdentifier
+union Azure.ResourceManager.KeyEncryptionKeyIdentity
 ```
 
-### `ResourceIdentifier` {#Azure.ResourceManager.ResourceIdentifier}
+### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
 
-A type definition that refers the id to an Azure Resource Manager resource.
-
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+The provisioning state of the connection
 
 ```typespec
-scalar Azure.ResourceManager.ResourceIdentifier
+union Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
+```
+
+### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
+
+The private endpoint connection status
+
+```typespec
+union Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
+```
+
+### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
+
+Standard terminal provisioning state of resource type. You can include in your
+custom provision state to avoid duplication and ensure consistency
+
+```typespec
+union Azure.ResourceManager.ResourceProvisioningState
+```
+
+#### Examples
+
+```typespec
+union FooProvisioningState {
+  ResourceProvisioningState, // include standard provisioning states
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
+}
 ```
 
 ## Azure.ResourceManager.CommonTypes
@@ -1215,6 +1208,7 @@ model Azure.ResourceManager.Foundations.ArmResource
 | Name        | Type                                                                         | Description                                                                                                                                                                               |
 | ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | id          | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name        | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type        | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
 | systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
@@ -1334,6 +1328,21 @@ model Azure.ResourceManager.Foundations.ErrorDetail
 | details?        | `ResourceManager.Foundations.ErrorDetail[]`         | The error details.         |
 | additionalInfo? | `ResourceManager.Foundations.ErrorAdditionalInfo[]` | The error additional info. |
 
+### `ExtendedLocation` {#Azure.ResourceManager.Foundations.ExtendedLocation}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.Foundations.ExtendedLocation
+```
+
+#### Properties
+
+| Name | Type                                                                                             | Description                        |
+| ---- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name | `string`                                                                                         | The name of the extended location. |
+| type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocationType) | The type of the extended location. |
+
 ### `ExtensionBaseParameters` {#Azure.ResourceManager.Foundations.ExtensionBaseParameters}
 
 The static parameters for an extension resource
@@ -1432,12 +1441,12 @@ model Azure.ResourceManager.Foundations.ManagedIdentityProperties
 
 #### Properties
 
-| Name                    | Type                                                                                           | Description                                             |
-| ----------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| tenantId?               | `string`                                                                                       | The Active Directory tenant id of the principal.        |
-| principalId?            | `string`                                                                                       | The active directory identifier of this principal.      |
-| type                    | [`ManagedIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                     | The identities assigned to this resource by the user.   |
+| Name                    | Type                                                                                                         | Description                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
+| principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
+| type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
+| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
 
 ### `ManagedSystemIdentityProperties` {#Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties}
 
@@ -1449,11 +1458,11 @@ model Azure.ResourceManager.Foundations.ManagedSystemIdentityProperties
 
 #### Properties
 
-| Name         | Type                                                                                                       | Description                                             |
-| ------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| tenantId?    | `string`                                                                                                   | The Active Directory tenant id of the principal.        |
-| principalId? | `string`                                                                                                   | The active directory identifier of this principal.      |
-| type         | [`ManagedSystemIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedSystemIdentityType) | The type of managed identity assigned to this resource. |
+| Name         | Type                                                                                                                       | Description                                             |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| tenantId?    | `string`                                                                                                                   | The Active Directory tenant id of the principal.        |
+| principalId? | `string`                                                                                                                   | The active directory identifier of this principal.      |
+| type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource. |
 
 ### `Operation` {#Azure.ResourceManager.Foundations.Operation}
 
@@ -1471,7 +1480,7 @@ model Azure.ResourceManager.Foundations.Operation
 | isDataAction? | `boolean`                                                                                | Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.                          |
 | display?      | [`OperationDisplay`](./data-types.md#Azure.ResourceManager.Foundations.OperationDisplay) | Localized display information for this particular operation.                                                                                                                    |
 | origin?       | [`Origin`](./data-types.md#Azure.ResourceManager.Foundations.Origin)                     | The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"                                            |
-| actionType?   | [`ActionType`](./data-types.md#Azure.ResourceManager.Foundations.ActionType)             | Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.                                                                                  |
+| actionType?   | [`ActionType`](./data-types.md#Azure.ResourceManager.Foundations.ActionType)             | Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.                                                                       |
 
 ### `OperationDisplay` {#Azure.ResourceManager.Foundations.OperationDisplay}
 
@@ -1833,54 +1842,6 @@ model Azure.ResourceManager.Foundations.UserAssignedIdentity
 | clientId?    | `string` | The active directory client identifier for this principal. |
 | principalId? | `string` | The active directory identifier for this principal.        |
 
-### `ActionType` {#Azure.ResourceManager.Foundations.ActionType}
-
-Enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-
-```typespec
-enum Azure.ResourceManager.Foundations.ActionType
-```
-
-### `CheckNameAvailabilityReason` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityReason}
-
-Possible reasons for a name not being available.
-
-```typespec
-enum Azure.ResourceManager.Foundations.CheckNameAvailabilityReason
-```
-
-### `createdByType` {#Azure.ResourceManager.Foundations.createdByType}
-
-The kind of entity that created the resource.
-
-```typespec
-enum Azure.ResourceManager.Foundations.createdByType
-```
-
-### `ManagedIdentityType` {#Azure.ResourceManager.Foundations.ManagedIdentityType}
-
-The kind of managed identity assigned to this resource.
-
-```typespec
-enum Azure.ResourceManager.Foundations.ManagedIdentityType
-```
-
-### `ManagedSystemIdentityType` {#Azure.ResourceManager.Foundations.ManagedSystemIdentityType}
-
-The kind of managemed identity assigned to this resource.
-
-```typespec
-enum Azure.ResourceManager.Foundations.ManagedSystemIdentityType
-```
-
-### `Origin` {#Azure.ResourceManager.Foundations.Origin}
-
-The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-
-```typespec
-enum Azure.ResourceManager.Foundations.Origin
-```
-
 ### `ResourceHome` {#Azure.ResourceManager.Foundations.ResourceHome}
 
 An internal enum to indicate the resource support for various path types
@@ -1895,4 +1856,60 @@ Available service tiers for the SKU.
 
 ```typespec
 enum Azure.ResourceManager.Foundations.SkuTier
+```
+
+### `ActionType` {#Azure.ResourceManager.Foundations.ActionType}
+
+Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+
+```typespec
+union Azure.ResourceManager.Foundations.ActionType
+```
+
+### `CheckNameAvailabilityReason` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityReason}
+
+Possible reasons for a name not being available.
+
+```typespec
+union Azure.ResourceManager.Foundations.CheckNameAvailabilityReason
+```
+
+### `createdByType` {#Azure.ResourceManager.Foundations.createdByType}
+
+The kind of entity that created the resource.
+
+```typespec
+union Azure.ResourceManager.Foundations.createdByType
+```
+
+### `ExtendedLocationType` {#Azure.ResourceManager.Foundations.ExtendedLocationType}
+
+The supported ExtendedLocation types.
+
+```typespec
+union Azure.ResourceManager.Foundations.ExtendedLocationType
+```
+
+### `ManagedServiceIdentityType` {#Azure.ResourceManager.Foundations.ManagedServiceIdentityType}
+
+The kind of managed identity assigned to this resource.
+
+```typespec
+union Azure.ResourceManager.Foundations.ManagedServiceIdentityType
+```
+
+### `Origin` {#Azure.ResourceManager.Foundations.Origin}
+
+The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+
+```typespec
+union Azure.ResourceManager.Foundations.Origin
+```
+
+### `SystemAssignedServiceIdentityType` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType}
+
+The kind of managemed identity assigned to this resource.
+
+```typespec
+union Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType
 ```

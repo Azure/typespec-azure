@@ -4,17 +4,18 @@ title: "[F] isApiVersion"
 
 ---
 ```ts
-isApiVersion(context, parameter): boolean
+isApiVersion(context, type): boolean
 ```
 
 Return whether a parameter is the Api Version parameter of a client
 
 ## Parameters
 
-| Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | - |
-| `parameter` | `ModelProperty` \| `HttpOperationParameter` |  |
+| Parameter | Type |
+| :------ | :------ |
+| `context` | `TCGCContext` |
+| `type` | `Object` |
+| `type.name` | `string` |
 
 ## Returns
 

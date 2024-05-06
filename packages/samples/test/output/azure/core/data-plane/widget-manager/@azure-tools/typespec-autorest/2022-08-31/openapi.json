@@ -179,6 +179,10 @@
               "$ref": "#/definitions/Manufacturer"
             },
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -202,10 +206,6 @@
                     }
                   ]
                 }
-              },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
               },
               "x-ms-client-request-id": {
                 "type": "string",
@@ -220,6 +220,10 @@
               "$ref": "#/definitions/Manufacturer"
             },
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -243,10 +247,6 @@
                     }
                   ]
                 }
-              },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
               },
               "x-ms-client-request-id": {
                 "type": "string",
@@ -674,6 +674,15 @@
               "$ref": "#/definitions/Widget"
             },
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
+              "Operation-Location": {
+                "type": "string",
+                "format": "uri",
+                "description": "The location for monitoring the operation state."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -698,19 +707,10 @@
                   ]
                 }
               },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
-              },
               "x-ms-client-request-id": {
                 "type": "string",
                 "format": "uuid",
                 "description": "An opaque, globally-unique, client-generated string identifier for the request."
-              },
-              "Operation-Location": {
-                "type": "string",
-                "format": "uri",
-                "description": "The location for monitoring the operation state."
               }
             }
           },
@@ -720,6 +720,15 @@
               "$ref": "#/definitions/Widget"
             },
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
+              "Operation-Location": {
+                "type": "string",
+                "format": "uri",
+                "description": "The location for monitoring the operation state."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -744,19 +753,10 @@
                   ]
                 }
               },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
-              },
               "x-ms-client-request-id": {
                 "type": "string",
                 "format": "uuid",
                 "description": "An opaque, globally-unique, client-generated string identifier for the request."
-              },
-              "Operation-Location": {
-                "type": "string",
-                "format": "uri",
-                "description": "The location for monitoring the operation state."
               }
             }
           },
@@ -1127,6 +1127,10 @@
               "$ref": "#/definitions/WidgetAnalytics"
             },
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -1150,10 +1154,6 @@
                     }
                   ]
                 }
-              },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
               },
               "x-ms-client-request-id": {
                 "type": "string",
@@ -1168,6 +1168,10 @@
               "$ref": "#/definitions/WidgetAnalytics"
             },
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
               "Repeatability-Result": {
                 "type": "string",
                 "description": "Indicates whether the repeatable request was accepted or rejected.",
@@ -1191,10 +1195,6 @@
                     }
                   ]
                 }
-              },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
               },
               "x-ms-client-request-id": {
                 "type": "string",
@@ -1385,6 +1385,10 @@
           "201": {
             "description": "The request has succeeded and a new resource has been created as a result.",
             "headers": {
+              "ETag": {
+                "type": "string",
+                "description": "The entity tag for the response."
+              },
               "Location": {
                 "type": "string",
                 "format": "uri",
@@ -1413,10 +1417,6 @@
                     }
                   ]
                 }
-              },
-              "ETag": {
-                "type": "string",
-                "description": "The entity tag for the response."
               },
               "x-ms-client-request-id": {
                 "type": "string",
@@ -1962,21 +1962,6 @@
       "type": "string",
       "description": "The ETag (or entity tag) HTTP response header is an identifier for a specific version of a resource.\nIt lets caches be more efficient and save bandwidth, as a web server does not need to resend a full response if the content was not changed.\n\nIt is a string of ASCII characters placed between double quotes, like \"675af34563dc-tr34\"."
     },
-    "CustomResult": {
-      "type": "object",
-      "properties": {
-        "MyResult": {
-          "type": "string"
-        },
-        "MyError": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "MyResult",
-        "MyError"
-      ]
-    },
     "Manufacturer": {
       "type": "object",
       "description": "A manufacturer of widgets.",
@@ -2021,8 +2006,7 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [
@@ -2044,8 +2028,7 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [
@@ -2067,31 +2050,12 @@
         "nextLink": {
           "type": "string",
           "format": "uri",
-          "description": "The link to the next page of items",
-          "readOnly": true
+          "description": "The link to the next page of items"
         }
       },
       "required": [
         "value"
       ]
-    },
-    "Versions": {
-      "type": "string",
-      "description": "The Contoso Widget Manager service version.",
-      "enum": [
-        "2022-08-31"
-      ],
-      "x-ms-enum": {
-        "name": "Versions",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "2022-08-31",
-            "value": "2022-08-31",
-            "description": "Version 2022-08-31"
-          }
-        ]
-      }
     },
     "Widget": {
       "type": "object",

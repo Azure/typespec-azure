@@ -12,7 +12,7 @@ using Azure.Core;
 @service({
   title: "Form Recognizer",
 })
-@useDependency(Azure.Core.Versions.v1_0_Preview_1)
+@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Extracts content, layout, and structured data from documents.")
 namespace Azure.FormRecognizer;
 
@@ -151,15 +151,17 @@ interface DocumentModels {
 }
 
 @doc("Method used to compute string offset and length.")
-enum StringIndexType {
+union StringIndexType {
+  string,
+
   @doc("Text elements")
-  textElements,
+  textElements: "textElements",
 
   @doc("Unicode code points")
-  unicodeCodePoint,
+  unicodeCodePoint: "unicodeCodePoint",
 
   @doc("UTF-16 code units")
-  utf16CodeUnit,
+  utf16CodeUnit: "utf16CodeUnit",
 }
 
 @doc("Unique model name")
@@ -243,18 +245,20 @@ model CustomDocumentModelsInfo {
 }
 
 @doc("Operation status.")
-enum AnalyzeResultOperationStatus {
+union AnalyzeResultOperationStatus {
+  string,
+
   @doc("Operation has not started.")
-  notStarted,
+  notStarted: "notStarted",
 
   @doc("Operation is running.")
-  running,
+  running: "running",
 
   @doc("Operation has failed.")
-  failed,
+  failed: "failed",
 
   @doc("Operation has succeeded.")
-  succeeded,
+  succeeded: "succeeded",
 }
 
 @resource("analyzeResults")
@@ -351,12 +355,14 @@ model DocumentPage {
 }
 
 @doc("The unit used by the width, height, and boundingBox properties. For images, the unit is \"pixel\". For PDF, the unit is \"inch\".")
-enum LengthUnit {
+union LengthUnit {
+  string,
+
   @doc("Unit is pixel.")
-  pixel,
+  pixel: "pixel",
 
   @doc("Unit is inch.")
-  inch,
+  inch: "inch",
 }
 
 @doc("Contiguous region of the concatenated content property, specified as an offset and length.")
@@ -413,12 +419,14 @@ model DocumentSelectionMark {
 scalar Confidence extends float64;
 
 @doc("State of the selection mark.")
-enum SelectionMarkState {
+union SelectionMarkState {
+  string,
+
   @doc("Selected.")
-  selected,
+  selected: "selected",
 
   @doc("Unselected.")
-  unselected,
+  unselected: "unselected",
 }
 
 @doc("A table object consisting table cells arranged in a rectangular layout.")
@@ -467,21 +475,23 @@ model DocumentTableCell {
 }
 
 @doc("Table cell kind.")
-enum DocumentTableCellKind {
+union DocumentTableCellKind {
+  string,
+
   @doc("Content cell.")
-  content,
+  content: "content",
 
   @doc("Row header cell.")
-  rowHeader,
+  rowHeader: "rowHeader",
 
   @doc("Column header cell.")
-  columnHeader,
+  columnHeader: "columnHeader",
 
   @doc("Stub cell.")
-  stubHead,
+  stubHead: "stubHead",
 
   @doc("Blank cell.")
-  description,
+  description: "description",
 }
 
 @doc("Bounding box on a specific page of the input.")
@@ -626,48 +636,52 @@ model DocumentField {
 }
 
 @doc("Semantic data type of the field value.")
-enum DocumentFieldType {
-  @doc("String value.")
+union DocumentFieldType {
   string,
 
+  @doc("String value.")
+  string: "string",
+
   @doc("Date value")
-  date,
+  date: "date",
 
   @doc("Time value")
-  time,
+  time: "time",
 
   @doc("Phone number value")
-  phoneNumber,
+  phoneNumber: "phoneNumber",
 
   @doc("Floating point value")
-  number,
+  number: "number",
 
   @doc("Integer value")
-  integer,
+  integer: "integer",
 
   @doc("Selection mark value.")
-  selectionMark,
+  selectionMark: "selectionMark",
 
   @doc("Country code value.")
-  countryRegion,
+  countryRegion: "countryRegion",
 
   @doc("Signature value.")
-  signature,
+  signature: "signature",
 
   @doc("Array value.")
-  array,
+  array: "array",
 
   @doc("Object value.")
-  object,
+  object: "object",
 }
 
 @doc("Presence of signature.")
-enum DocumentSignatureType {
+union DocumentSignatureType {
+  string,
+
   @doc("Document is signed.")
-  signed,
+  signed: "signed",
 
   @doc("Document is unsigned.")
-  unsigned,
+  unsigned: "unsigned",
 }
 
 @doc("A content line object consisting of an adjacent sequence of content elements, such as words and selection marks.")
@@ -781,33 +795,37 @@ model OperationInfo {
 }
 
 @doc("Operation status.")
-enum OperationStatus {
+union OperationStatus {
+  string,
+
   @doc("Operation has not started yet.")
-  notStarted,
+  notStarted: "notStarted",
 
   @doc("Operation is running.")
-  running,
+  running: "running",
 
   @doc("Operation failed.")
-  failed,
+  failed: "failed",
 
   @doc("Operation succeeded.")
-  succeeded,
+  succeeded: "succeeded",
 
   @doc("Operation was canceled.")
-  canceled,
+  canceled: "canceled",
 }
 
 @doc("Type of operation")
-enum OperationKind {
+union OperationKind {
+  string,
+
   @doc("Operation to build a new custom model.")
-  documentModelBuild,
+  documentModelBuild: "documentModelBuild",
 
   @doc("Operation to compose a new custom model.")
-  documentModelCompose,
+  documentModelCompose: "documentModelCompose",
 
   @doc("Operation to copy a custom model.")
-  documentModelCopyTo,
+  documentModelCopyTo: "documentModelCopyTo",
 }
 
 @doc("The response for the getOperation operation.")

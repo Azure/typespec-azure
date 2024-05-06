@@ -57,6 +57,19 @@ model Azure.Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>
 | tokenUrl         | `TokenUrl`                                       |             |
 | scopes           | `Scopes`                                         |             |
 
+### `ArmResourceIdentifierAllowedResource` {#Azure.Core.ArmResourceIdentifierAllowedResource}
+
+```typespec
+model Azure.Core.ArmResourceIdentifierAllowedResource
+```
+
+#### Properties
+
+| Name    | Type                                | Description                                                                                                                                                                          |
+| ------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| type    | `string`                            | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
+| scopes? | `Core.ArmResourceDeploymentScope[]` | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
+
 ### `AzureApiKeyAuthentication` {#Azure.Core.AzureApiKeyAuthentication}
 
 Azure API Key Authentication using the "Ocp-Apim-Subscription-Key" hea
@@ -466,6 +479,12 @@ Supported versions of Azure.Core TypeSpec building blocks.
 enum Azure.Core.Versions
 ```
 
+### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
+
+```typespec
+union Azure.Core.ArmResourceDeploymentScope
+```
+
 ### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
 
 The available kinds of polling options
@@ -480,6 +499,19 @@ Repeatability Result header options
 
 ```typespec
 union Azure.Core.RepeatabilityResult
+```
+
+### `armResourceIdentifier` {#Azure.Core.armResourceIdentifier}
+
+A type definition that refers the id to an Azure Resource Manager resource.
+
+Sample usage:
+otherArmId: ResourceIdentifier;
+networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
+vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+
+```typespec
+scalar Azure.Core.armResourceIdentifier
 ```
 
 ### `azureLocation` {#Azure.Core.azureLocation}

@@ -1068,34 +1068,42 @@ components:
         - $ref: '#/components/schemas/Similarity'
       description: Ranking function based on the Okapi BM25 similarity algorithm. BM25 is a TF-IDF-like algorithm that includes length normalization (controlled by the 'b' parameter) as well as term frequency saturation (controlled by the 'k1' parameter).
     BlobIndexerDataToExtract:
-      type: string
-      enum:
-        - storageMetadata
-        - allMetadata
-        - contentAndMetadata
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - storageMetadata
+            - allMetadata
+            - contentAndMetadata
       description: Specifies the data to extract from Azure blob storage and tells the indexer which data to extract from image content when "imageAction" is set to a value other than "none".  This applies to embedded image content in a .PDF or other application, or image files such as .jpg and .png, in Azure blobs.
     BlobIndexerImageAction:
-      type: string
-      enum:
-        - none
-        - generateNormalizedImages
-        - generateNormalizedImagePerPage
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - none
+            - generateNormalizedImages
+            - generateNormalizedImagePerPage
       description: Determines how to process embedded images and image files in Azure blob storage.  Setting the "imageAction" configuration to any value other than "none" requires that a skillset also be attached to that indexer.
     BlobIndexerPDFTextRotationAlgorithm:
-      type: string
-      enum:
-        - none
-        - detectAngles
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - none
+            - detectAngles
       description: Determines algorithm for text extraction from PDF files in Azure blob storage.
     BlobIndexerParsingMode:
-      type: string
-      enum:
-        - default
-        - text
-        - delimitedText
-        - json
-        - jsonArray
-        - jsonLines
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - default
+            - text
+            - delimitedText
+            - json
+            - jsonArray
+            - jsonLines
       description: Represents the parsing mode for indexing from an Azure blob data source.
     CharFilter:
       type: object
@@ -1115,9 +1123,11 @@ components:
           '#Microsoft.Azure.Search.PatternReplaceCharFilter': '#/components/schemas/PatternReplaceCharFilter'
       description: Base type for character filters.
     CharFilterName:
-      type: string
-      enum:
-        - html_strip
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - html_strip
       description: Defines the names of all character filters supported by Azure Cognitive Search.
     CjkBigramTokenFilter:
       type: object
@@ -1140,12 +1150,14 @@ components:
         - $ref: '#/components/schemas/TokenFilter'
       description: Forms bigrams of CJK terms that are generated from the standard tokenizer. This token filter is implemented using Apache Lucene.
     CjkBigramTokenFilterScripts:
-      type: string
-      enum:
-        - han
-        - hiragana
-        - katakana
-        - hangul
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - han
+            - hiragana
+            - katakana
+            - hangul
       description: Scripts that can be ignored by CjkBigramTokenFilter.
     ClassicSimilarity:
       type: object
@@ -1384,17 +1396,19 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: A skill looks for text from a custom, user-defined list of words and phrases.
     CustomEntityLookupSkillLanguage:
-      type: string
-      enum:
-        - da
-        - de
-        - en
-        - es
-        - fi
-        - fr
-        - it
-        - ko
-        - pt
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - da
+            - de
+            - en
+            - es
+            - fi
+            - fr
+            - it
+            - ko
+            - pt
       description: The language codes supported for input text by CustomEntityLookupSkill.
     CustomNormalizer:
       type: object
@@ -1583,10 +1597,12 @@ components:
         - $ref: '#/components/schemas/TokenFilter'
       description: Generates n-grams of the given size(s) starting from the front or the back of an input token. This token filter is implemented using Apache Lucene.
     EdgeNGramTokenFilterSide:
-      type: string
-      enum:
-        - front
-        - back
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - front
+            - back
       description: Specifies which side of the input an n-gram should be generated from.
     EdgeNGramTokenFilterV2:
       type: object
@@ -1661,15 +1677,17 @@ components:
         - $ref: '#/components/schemas/TokenFilter'
       description: Removes elisions. For example, "l'avion" (the plane) will be converted to "avion" (plane). This token filter is implemented using Apache Lucene.
     EntityCategory:
-      type: string
-      enum:
-        - location
-        - organization
-        - person
-        - quantity
-        - datetime
-        - url
-        - email
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - location
+            - organization
+            - person
+            - quantity
+            - datetime
+            - url
+            - email
       description: A string indicating what entity categories to return.
     EntityLinkingSkill:
       type: object
@@ -1724,31 +1742,33 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: Text analytics entity recognition.
     EntityRecognitionSkillLanguage:
-      type: string
-      enum:
-        - ar
-        - cs
-        - zh-Hans
-        - zh-Hant
-        - da
-        - nl
-        - en
-        - fi
-        - fr
-        - de
-        - el
-        - hu
-        - it
-        - ja
-        - ko
-        - no
-        - pl
-        - pt-PT
-        - pt-BR
-        - ru
-        - es
-        - sv
-        - tr
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - ar
+            - cs
+            - zh-Hans
+            - zh-Hant
+            - da
+            - nl
+            - en
+            - fi
+            - fr
+            - de
+            - el
+            - hu
+            - it
+            - ja
+            - ko
+            - no
+            - pl
+            - pt-PT
+            - pt-BR
+            - ru
+            - es
+            - sv
+            - tr
       description: The language codes supported for input text by EntityRecognitionSkill.
     EntityRecognitionSkillV3:
       type: object
@@ -1880,19 +1900,23 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: A skill that analyzes image files. It extracts a rich set of visual features based on the image content.
     ImageAnalysisSkillLanguage:
-      type: string
-      enum:
-        - en
-        - es
-        - ja
-        - pt
-        - zh
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - en
+            - es
+            - ja
+            - pt
+            - zh
       description: The language codes supported for input by ImageAnalysisSkill.
     ImageDetail:
-      type: string
-      enum:
-        - celebrities
-        - landmarks
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - celebrities
+            - landmarks
       description: A string indicating which domain-specific details to return.
     IndexerCurrentState:
       type: object
@@ -1925,10 +1949,12 @@ components:
           description: The list of datasource document ids that have been reset. The datasource document id is the unique identifier for the data in the datasource. The indexer will prioritize selectively re-ingesting these ids.
       description: Represents all of the state that defines and dictates the indexer's current execution.
     IndexerExecutionEnvironment:
-      type: string
-      enum:
-        - standard
-        - private
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - standard
+            - private
       description: Specifies the environment in which the indexer should execute.
     IndexerExecutionResult:
       type: object
@@ -1994,30 +2020,38 @@ components:
           readOnly: true
       description: Represents the result of an individual indexer execution.
     IndexerExecutionStatus:
-      type: string
-      enum:
-        - transientFailure
-        - success
-        - inProgress
-        - reset
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - transientFailure
+            - success
+            - inProgress
+            - reset
       description: Represents the status of an individual indexer execution.
     IndexerExecutionStatusDetail:
-      type: string
-      enum:
-        - resetDocs
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - resetDocs
       description: Details the status of an individual indexer execution.
     IndexerStatus:
-      type: string
-      enum:
-        - unknown
-        - error
-        - running
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - unknown
+            - error
+            - running
       description: Represents the overall indexer status.
     IndexingMode:
-      type: string
-      enum:
-        - indexingAllDocs
-        - indexingResetDocs
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - indexingAllDocs
+            - indexingResetDocs
       description: Represents the mode the indexer is executing in.
     IndexingParameters:
       type: object
@@ -2169,24 +2203,26 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: A skill that uses text analytics for key phrase extraction.
     KeyPhraseExtractionSkillLanguage:
-      type: string
-      enum:
-        - da
-        - nl
-        - en
-        - fi
-        - fr
-        - de
-        - it
-        - ja
-        - ko
-        - no
-        - pl
-        - pt-PT
-        - pt-BR
-        - ru
-        - es
-        - sv
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - da
+            - nl
+            - en
+            - fi
+            - fr
+            - de
+            - it
+            - ja
+            - ko
+            - no
+            - pl
+            - pt-PT
+            - pt-BR
+            - ru
+            - es
+            - sv
       description: The language codes supported for input text by KeyPhraseExtractionSkill.
     KeywordMarkerTokenFilter:
       type: object
@@ -2307,101 +2343,103 @@ components:
           '#Microsoft.Azure.Search.StopAnalyzer': '#/components/schemas/StopAnalyzer'
       description: Base type for analyzers.
     LexicalAnalyzerName:
-      type: string
-      enum:
-        - ar.microsoft
-        - ar.lucene
-        - hy.lucene
-        - bn.microsoft
-        - eu.lucene
-        - bg.microsoft
-        - bg.lucene
-        - ca.microsoft
-        - ca.lucene
-        - zh-Hans.microsoft
-        - zh-Hans.lucene
-        - zh-Hant.microsoft
-        - zh-Hant.lucene
-        - hr.microsoft
-        - cs.microsoft
-        - cs.lucene
-        - da.microsoft
-        - da.lucene
-        - nl.microsoft
-        - nl.lucene
-        - en.microsoft
-        - en.lucene
-        - et.microsoft
-        - fi.microsoft
-        - fi.lucene
-        - fr.microsoft
-        - fr.lucene
-        - gl.lucene
-        - de.microsoft
-        - de.lucene
-        - el.microsoft
-        - el.lucene
-        - gu.microsoft
-        - he.microsoft
-        - hi.microsoft
-        - hi.lucene
-        - hu.microsoft
-        - hu.lucene
-        - is.microsoft
-        - id.microsoft
-        - id.lucene
-        - ga.lucene
-        - it.microsoft
-        - it.lucene
-        - ja.microsoft
-        - ja.lucene
-        - kn.microsoft
-        - ko.microsoft
-        - ko.lucene
-        - lv.microsoft
-        - lv.lucene
-        - lt.microsoft
-        - ml.microsoft
-        - ms.microsoft
-        - mr.microsoft
-        - nb.microsoft
-        - no.lucene
-        - fa.lucene
-        - pl.microsoft
-        - pl.lucene
-        - pt-BR.microsoft
-        - pt-BR.lucene
-        - pt-PT.microsoft
-        - pt-PT.lucene
-        - pa.microsoft
-        - ro.microsoft
-        - ro.lucene
-        - ru.microsoft
-        - ru.lucene
-        - sr-cyrillic.microsoft
-        - sr-latin.microsoft
-        - sk.microsoft
-        - sl.microsoft
-        - es.microsoft
-        - es.lucene
-        - sv.microsoft
-        - sv.lucene
-        - ta.microsoft
-        - te.microsoft
-        - th.microsoft
-        - th.lucene
-        - tr.microsoft
-        - tr.lucene
-        - uk.microsoft
-        - ur.microsoft
-        - vi.microsoft
-        - standard.lucene
-        - standardasciifolding.lucene
-        - keyword
-        - pattern
-        - simple
-        - stop
-        - whitespace
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - ar.microsoft
+            - ar.lucene
+            - hy.lucene
+            - bn.microsoft
+            - eu.lucene
+            - bg.microsoft
+            - bg.lucene
+            - ca.microsoft
+            - ca.lucene
+            - zh-Hans.microsoft
+            - zh-Hans.lucene
+            - zh-Hant.microsoft
+            - zh-Hant.lucene
+            - hr.microsoft
+            - cs.microsoft
+            - cs.lucene
+            - da.microsoft
+            - da.lucene
+            - nl.microsoft
+            - nl.lucene
+            - en.microsoft
+            - en.lucene
+            - et.microsoft
+            - fi.microsoft
+            - fi.lucene
+            - fr.microsoft
+            - fr.lucene
+            - gl.lucene
+            - de.microsoft
+            - de.lucene
+            - el.microsoft
+            - el.lucene
+            - gu.microsoft
+            - he.microsoft
+            - hi.microsoft
+            - hi.lucene
+            - hu.microsoft
+            - hu.lucene
+            - is.microsoft
+            - id.microsoft
+            - id.lucene
+            - ga.lucene
+            - it.microsoft
+            - it.lucene
+            - ja.microsoft
+            - ja.lucene
+            - kn.microsoft
+            - ko.microsoft
+            - ko.lucene
+            - lv.microsoft
+            - lv.lucene
+            - lt.microsoft
+            - ml.microsoft
+            - ms.microsoft
+            - mr.microsoft
+            - nb.microsoft
+            - no.lucene
+            - fa.lucene
+            - pl.microsoft
+            - pl.lucene
+            - pt-BR.microsoft
+            - pt-BR.lucene
+            - pt-PT.microsoft
+            - pt-PT.lucene
+            - pa.microsoft
+            - ro.microsoft
+            - ro.lucene
+            - ru.microsoft
+            - ru.lucene
+            - sr-cyrillic.microsoft
+            - sr-latin.microsoft
+            - sk.microsoft
+            - sl.microsoft
+            - es.microsoft
+            - es.lucene
+            - sv.microsoft
+            - sv.lucene
+            - ta.microsoft
+            - te.microsoft
+            - th.microsoft
+            - th.lucene
+            - tr.microsoft
+            - tr.lucene
+            - uk.microsoft
+            - ur.microsoft
+            - vi.microsoft
+            - standard.lucene
+            - standardasciifolding.lucene
+            - keyword
+            - pattern
+            - simple
+            - stop
+            - whitespace
       description: Defines the names of all text analyzers supported by Azure Cognitive Search.
     LexicalNormalizer:
       type: object
@@ -2420,13 +2458,15 @@ components:
           '#Microsoft.Azure.Search.CustomNormalizer': '#/components/schemas/CustomNormalizer'
       description: Base type for normalizers.
     LexicalNormalizerName:
-      type: string
-      enum:
-        - asciifolding
-        - elision
-        - lowercase
-        - standard
-        - uppercase
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - asciifolding
+            - elision
+            - lowercase
+            - standard
+            - uppercase
       description: Defines the names of all text normalizers supported by Azure Cognitive Search.
     LexicalTokenizer:
       type: object
@@ -2456,21 +2496,23 @@ components:
           '#Microsoft.Azure.Search.UaxUrlEmailTokenizer': '#/components/schemas/UaxUrlEmailTokenizer'
       description: Base type for tokenizers.
     LexicalTokenizerName:
-      type: string
-      enum:
-        - classic
-        - edgeNGram
-        - keyword_v2
-        - letter
-        - lowercase
-        - microsoft_language_tokenizer
-        - microsoft_language_stemming_tokenizer
-        - nGram
-        - path_hierarchy_v2
-        - pattern
-        - standard_v2
-        - uax_url_email
-        - whitespace
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - classic
+            - edgeNGram
+            - keyword_v2
+            - letter
+            - lowercase
+            - microsoft_language_tokenizer
+            - microsoft_language_stemming_tokenizer
+            - nGram
+            - path_hierarchy_v2
+            - pattern
+            - standard_v2
+            - uax_url_email
+            - whitespace
       description: Defines the names of all tokenizers supported by Azure Cognitive Search.
     LimitTokenFilter:
       type: object
@@ -2495,12 +2537,14 @@ components:
         - $ref: '#/components/schemas/TokenFilter'
       description: Limits the number of tokens while indexing. This token filter is implemented using Apache Lucene.
     LineEnding:
-      type: string
-      enum:
-        - space
-        - carriageReturn
-        - lineFeed
-        - carriageReturnLineFeed
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - space
+            - carriageReturn
+            - lineFeed
+            - carriageReturnLineFeed
     LuceneStandardAnalyzer:
       type: object
       required:
@@ -2686,98 +2730,102 @@ components:
         - $ref: '#/components/schemas/LexicalTokenizer'
       description: Grammar-based tokenizer that is suitable for processing most European-language documents. This tokenizer is implemented using Apache Lucene.
     MicrosoftStemmingTokenizerLanguage:
-      type: string
-      enum:
-        - bangla
-        - bulgarian
-        - catalan
-        - chineseSimplified
-        - chineseTraditional
-        - croatian
-        - czech
-        - danish
-        - dutch
-        - english
-        - french
-        - german
-        - greek
-        - gujarati
-        - hindi
-        - icelandic
-        - indonesian
-        - italian
-        - japanese
-        - kannada
-        - korean
-        - malay
-        - malayalam
-        - marathi
-        - norwegianBokmaal
-        - polish
-        - portuguese
-        - portugueseBrazilian
-        - punjabi
-        - romanian
-        - russian
-        - serbianCyrillic
-        - serbianLatin
-        - slovenian
-        - spanish
-        - swedish
-        - tamil
-        - telugu
-        - thai
-        - ukrainian
-        - urdu
-        - vietnamese
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - bangla
+            - bulgarian
+            - catalan
+            - chineseSimplified
+            - chineseTraditional
+            - croatian
+            - czech
+            - danish
+            - dutch
+            - english
+            - french
+            - german
+            - greek
+            - gujarati
+            - hindi
+            - icelandic
+            - indonesian
+            - italian
+            - japanese
+            - kannada
+            - korean
+            - malay
+            - malayalam
+            - marathi
+            - norwegianBokmaal
+            - polish
+            - portuguese
+            - portugueseBrazilian
+            - punjabi
+            - romanian
+            - russian
+            - serbianCyrillic
+            - serbianLatin
+            - slovenian
+            - spanish
+            - swedish
+            - tamil
+            - telugu
+            - thai
+            - ukrainian
+            - urdu
+            - vietnamese
       description: Lists the languages supported by the Microsoft language stemming  tokenizer.
     MicrosoftTokenizerLanguage:
-      type: string
-      enum:
-        - arabic
-        - bangla
-        - bulgarian
-        - catalan
-        - croatian
-        - czech
-        - danish
-        - dutch
-        - english
-        - finnish
-        - french
-        - german
-        - greek
-        - gujarati
-        - hebrew
-        - hindi
-        - hungarian
-        - icelandic
-        - indonesian
-        - italian
-        - kannada
-        - latvian
-        - lithuanian
-        - malay
-        - malayalam
-        - marathi
-        - norwegianBokmaal
-        - polish
-        - portuguese
-        - portugueseBrazilian
-        - punjabi
-        - romanian
-        - russian
-        - serbianCyrillic
-        - serbianLatin
-        - slovak
-        - slovenian
-        - spanish
-        - swedish
-        - tamil
-        - telugu
-        - turkish
-        - ukrainian
-        - urdu
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - arabic
+            - bangla
+            - bulgarian
+            - catalan
+            - croatian
+            - czech
+            - danish
+            - dutch
+            - english
+            - finnish
+            - french
+            - german
+            - greek
+            - gujarati
+            - hebrew
+            - hindi
+            - hungarian
+            - icelandic
+            - indonesian
+            - italian
+            - kannada
+            - latvian
+            - lithuanian
+            - malay
+            - malayalam
+            - marathi
+            - norwegianBokmaal
+            - polish
+            - portuguese
+            - portugueseBrazilian
+            - punjabi
+            - romanian
+            - russian
+            - serbianCyrillic
+            - serbianLatin
+            - slovak
+            - slovenian
+            - spanish
+            - swedish
+            - tamil
+            - telugu
+            - turkish
+            - ukrainian
+            - urdu
       description: Lists the languages supported by the Microsoft language tokenizer.
     NGramTokenFilter:
       type: object
@@ -2877,35 +2925,37 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: A skill that uses text analytics for key phrase extraction.
     OcrSkillLanguage:
-      type: string
-      enum:
-        - zh-Hans
-        - zh-Hant
-        - cs
-        - da
-        - nl
-        - en
-        - fi
-        - fr
-        - de
-        - el
-        - hu
-        - it
-        - ja
-        - ko
-        - nb
-        - pl
-        - pt
-        - ru
-        - es
-        - sv
-        - tr
-        - ar
-        - ro
-        - sr-Cyrl
-        - sr-Latn
-        - sk
-        - unk
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - zh-Hans
+            - zh-Hant
+            - cs
+            - da
+            - nl
+            - en
+            - fi
+            - fr
+            - de
+            - el
+            - hu
+            - it
+            - ja
+            - ko
+            - nb
+            - pl
+            - pt
+            - ru
+            - es
+            - sv
+            - tr
+            - ar
+            - ro
+            - sr-Cyrl
+            - sr-Latn
+            - sk
+            - unk
       description: The language codes supported for input by OcrSkill.
     OutputFieldMappingEntry:
       type: object
@@ -2960,10 +3010,12 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: Using the Text Analytics API, extracts personal information from an input text and gives you the option of masking it.
     PIIDetectionSkillMaskingMode:
-      type: string
-      enum:
-        - none
-        - replace
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - none
+            - replace
     PathHierarchyTokenizerV2:
       type: object
       required:
@@ -3137,16 +3189,18 @@ components:
           description: Defines the keyword fields to be used for semantic ranking, captions, highlights, and answers. For the best result, the selected fields should contain a list of keywords. The order of the fields in the array represents their priority. Fields with lower priority may get truncated if the content is long.
       description: Describes the title, content, and keywords fields to be used for semantic ranking, captions, highlights, and answers.
     RegexFlags:
-      type: string
-      enum:
-        - CANON_EQ
-        - CASE_INSENSITIVE
-        - COMMENTS
-        - DOTALL
-        - LITERAL
-        - MULTILINE
-        - UNICODE_CASE
-        - UNIX_LINES
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - CANON_EQ
+            - CASE_INSENSITIVE
+            - COMMENTS
+            - DOTALL
+            - LITERAL
+            - MULTILINE
+            - UNICODE_CASE
+            - UNIX_LINES
       description: Defines flags that can be combined to control how regular expressions are used in the pattern analyzer and pattern tokenizer.
     ResourceCounter:
       type: object
@@ -3190,21 +3244,25 @@ components:
           tag: '#/components/schemas/TagScoringFunction'
       description: Base type for functions that can modify document scores during ranking.
     ScoringFunctionAggregation:
-      type: string
-      enum:
-        - sum
-        - average
-        - minimum
-        - maximum
-        - firstMatching
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - sum
+            - average
+            - minimum
+            - maximum
+            - firstMatching
       description: Defines the aggregation function used to combine the results of all the scoring functions in a scoring profile.
     ScoringFunctionInterpolation:
-      type: string
-      enum:
-        - linear
-        - constant
-        - quadratic
-        - logarithmic
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - linear
+            - constant
+            - quadratic
+            - logarithmic
       description: Defines the function used to interpolate score boosting across a range of documents.
     ScoringProfile:
       type: object
@@ -3309,16 +3367,18 @@ components:
             $ref: '#/components/schemas/SearchField'
       description: Represents a field in an index definition, which describes the name, data type, and search behavior of a field.
     SearchFieldDataType:
-      type: string
-      enum:
-        - Edm.String
-        - Edm.Int32
-        - Edm.Int64
-        - Edm.Double
-        - Edm.Boolean
-        - Edm.DateTimeOffset
-        - Edm.GeographyPoint
-        - Edm.ComplexType
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - Edm.String
+            - Edm.Int32
+            - Edm.Int64
+            - Edm.Double
+            - Edm.Boolean
+            - Edm.DateTimeOffset
+            - Edm.GeographyPoint
+            - Edm.ComplexType
       description: Defines the data type of a field in a search index.
     SearchIndex:
       type: object
@@ -3522,14 +3582,16 @@ components:
             - $ref: '#/components/schemas/SearchResourceEncryptionKey'
           description: A description of an encryption key that you create in Azure Key Vault. This key is used to provide an additional level of encryption-at-rest for your datasource definition when you want full assurance that no one, not even Microsoft, can decrypt your data source definition in Azure Cognitive Search. Once you have encrypted your data source definition, it will always remain encrypted. Azure Cognitive Search will ignore attempts to set this property to null. You can change this property as needed if you want to rotate your encryption key; Your datasource definition will be unaffected. Encryption with customer-managed keys is not available for free search services, and is only available for paid services created on or after January 1, 2019.
     SearchIndexerDataSourceType:
-      type: string
-      enum:
-        - azuresql
-        - cosmosdb
-        - azureblob
-        - azuretable
-        - mysql
-        - adlsgen2
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - azuresql
+            - cosmosdb
+            - azureblob
+            - azuretable
+            - mysql
+            - adlsgen2
     SearchIndexerError:
       type: object
       required:
@@ -3863,25 +3925,27 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: Text analytics positive-negative sentiment analysis, scored as a floating point value in a range of zero to 1.
     SentimentSkillLanguage:
-      type: string
-      enum:
-        - da
-        - nl
-        - en
-        - fi
-        - fr
-        - de
-        - el
-        - it
-        - ja
-        - ko
-        - no
-        - pl
-        - pt-PT
-        - ru
-        - es
-        - sv
-        - tr
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - da
+            - nl
+            - en
+            - fi
+            - fr
+            - de
+            - el
+            - it
+            - ja
+            - ko
+            - no
+            - pl
+            - pt-PT
+            - ru
+            - es
+            - sv
+            - tr
       description: The language codes supported for input text by SentimentSkill.
     SentimentSkillV3:
       type: object
@@ -4030,17 +4094,19 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: A skill to split a string into chunks of text.
     SplitSkillLanguage:
-      type: string
-      enum:
-        - da
-        - de
-        - en
-        - es
-        - fi
-        - fr
-        - it
-        - ko
-        - pt
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - da
+            - de
+            - en
+            - es
+            - fi
+            - fr
+            - it
+            - ko
+            - pt
       description: The language codes supported for input text by SplitSkill.
     StopAnalyzer:
       type: object
@@ -4080,9 +4146,11 @@ components:
           description: The list of field names to which the suggester applies. Each field must be searchable.
       description: Defines how the Suggest API should apply to a group of fields in the index.
     SuggesterSearchMode:
-      type: string
-      enum:
-        - analyzingInfixMatching
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - analyzingInfixMatching
       description: A value indicating the capabilities of the suggester.
     TagScoringFunction:
       type: object
@@ -4154,80 +4222,82 @@ components:
         - $ref: '#/components/schemas/SearchIndexerSkill'
       description: A skill to translate text from one language to another.
     TextTranslationSkillLanguage:
-      type: string
-      enum:
-        - af
-        - ar
-        - bn
-        - bs
-        - bg
-        - yue
-        - ca
-        - zh-Hans
-        - zh-Hant
-        - hr
-        - cs
-        - da
-        - nl
-        - en
-        - et
-        - fj
-        - fil
-        - fi
-        - fr
-        - de
-        - el
-        - ht
-        - he
-        - hi
-        - mww
-        - hu
-        - is
-        - id
-        - it
-        - ja
-        - sw
-        - tlh
-        - tlh-Latn
-        - tlh-Piqd
-        - ko
-        - lv
-        - lt
-        - mg
-        - ms
-        - mt
-        - nb
-        - fa
-        - pl
-        - pt
-        - pt-br
-        - pt-PT
-        - otq
-        - ro
-        - ru
-        - sm
-        - sr-Cyrl
-        - sr-Latn
-        - sk
-        - sl
-        - es
-        - sv
-        - ty
-        - ta
-        - te
-        - th
-        - to
-        - tr
-        - uk
-        - ur
-        - vi
-        - cy
-        - yua
-        - ga
-        - kn
-        - mi
-        - ml
-        - pa
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - af
+            - ar
+            - bn
+            - bs
+            - bg
+            - yue
+            - ca
+            - zh-Hans
+            - zh-Hant
+            - hr
+            - cs
+            - da
+            - nl
+            - en
+            - et
+            - fj
+            - fil
+            - fi
+            - fr
+            - de
+            - el
+            - ht
+            - he
+            - hi
+            - mww
+            - hu
+            - is
+            - id
+            - it
+            - ja
+            - sw
+            - tlh
+            - tlh-Latn
+            - tlh-Piqd
+            - ko
+            - lv
+            - lt
+            - mg
+            - ms
+            - mt
+            - nb
+            - fa
+            - pl
+            - pt
+            - pt-br
+            - pt-PT
+            - otq
+            - ro
+            - ru
+            - sm
+            - sr-Cyrl
+            - sr-Latn
+            - sk
+            - sl
+            - es
+            - sv
+            - ty
+            - ta
+            - te
+            - th
+            - to
+            - tr
+            - uk
+            - ur
+            - vi
+            - cy
+            - yua
+            - ga
+            - kn
+            - mi
+            - ml
+            - pa
       description: The language codes supported for input text by TextTranslationSkill.
     TextWeights:
       type: object
@@ -4242,13 +4312,15 @@ components:
           description: The dictionary of per-field weights to boost document scoring. The keys are field names and the values are the weights for each field.
       description: Defines weights on index fields for which matches should boost scoring in search queries.
     TokenCharacterKind:
-      type: string
-      enum:
-        - letter
-        - digit
-        - whitespace
-        - punctuation
-        - symbol
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - letter
+            - digit
+            - whitespace
+            - punctuation
+            - symbol
       description: Represents classes of characters on which a token filter can operate.
     TokenFilter:
       type: object
@@ -4281,42 +4353,44 @@ components:
           '#Microsoft.Azure.Search.PatternReplaceTokenFilter': '#/components/schemas/PatternReplaceTokenFilter'
       description: Base type for token filters.
     TokenFilterName:
-      type: string
-      enum:
-        - arabic_normalization
-        - apostrophe
-        - asciifolding
-        - cjk_bigram
-        - cjk_width
-        - classic
-        - common_grams
-        - edgeNGram_v2
-        - elision
-        - german_normalization
-        - hindi_normalization
-        - indic_normalization
-        - keyword_repeat
-        - kstem
-        - length
-        - limit
-        - lowercase
-        - nGram_v2
-        - persian_normalization
-        - phonetic
-        - porter_stem
-        - reverse
-        - scandinavian_normalization
-        - scandinavian_folding
-        - shingle
-        - snowball
-        - sorani_normalization
-        - stemmer
-        - stopwords
-        - trim
-        - truncate
-        - unique
-        - uppercase
-        - word_delimiter
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - arabic_normalization
+            - apostrophe
+            - asciifolding
+            - cjk_bigram
+            - cjk_width
+            - classic
+            - common_grams
+            - edgeNGram_v2
+            - elision
+            - german_normalization
+            - hindi_normalization
+            - indic_normalization
+            - keyword_repeat
+            - kstem
+            - length
+            - limit
+            - lowercase
+            - nGram_v2
+            - persian_normalization
+            - phonetic
+            - porter_stem
+            - reverse
+            - scandinavian_normalization
+            - scandinavian_folding
+            - shingle
+            - snowball
+            - sorani_normalization
+            - stemmer
+            - stopwords
+            - trim
+            - truncate
+            - unique
+            - uppercase
+            - word_delimiter
       description: Defines the names of all token filters supported by Azure Cognitive Search.
     UaxUrlEmailTokenizer:
       type: object
@@ -4337,15 +4411,17 @@ components:
         - $ref: '#/components/schemas/LexicalTokenizer'
       description: Tokenize urls and emails as one token. This tokenizer is implemented using Apache Lucene.
     VisualFeature:
-      type: string
-      enum:
-        - adult
-        - brands
-        - categories
-        - description
-        - faces
-        - objects
-        - tags
+      anyOf:
+        - type: string
+        - type: string
+          enum:
+            - adult
+            - brands
+            - categories
+            - description
+            - faces
+            - objects
+            - tags
       description: The strings indicating what visual feature types to return.
     WebApiSkill:
       type: object

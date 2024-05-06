@@ -7,7 +7,12 @@ import "@azure-tools/typespec-autorest";
 import "@azure-tools/typespec-azure-core";
 
 import "./arm.foundations.tsp";
-import "./common-types.tsp";
+import "./common-types/common-types.tsp";
+import "./common-types/types.tsp";
+import "./common-types/managed-identity.tsp";
+import "./common-types/private-links.tsp";
+import "./common-types/customer-managed-keys.tsp";
+import "./common-types/extended-location.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";
@@ -15,8 +20,6 @@ import "./decorators.tsp";
 import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
-import "./private-links.tsp";
-import "./customer-managed-keys.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -34,6 +37,6 @@ namespace Azure.ResourceManager;
 @doc("Supported versions of Azure.ResourceManager building blocks.")
 enum Versions {
   @doc("Version 1.0-preview.1")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v1_0_Preview_1: "1.0-preview.1",
 }

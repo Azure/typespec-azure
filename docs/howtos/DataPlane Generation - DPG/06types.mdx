@@ -5,9 +5,1810 @@ import TabItem from "@theme/TabItem";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
+## Models
+
+### Flattening
+
+> **NOTE:** Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Properties {
+  name: string;
+}
+
+model Foo {
+  @flattenProperty
+  prop: Properties;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Foo",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "prop",
+      "serializedName": "prop",
+      "flatten": true,
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "model",
+        "name": "Properties",
+        "properties": [
+          {
+            "kind": "property",
+            "name": "name",
+            "serializedName": "name",
+            "flatten": false,
+            "optional": false,
+            "nullable": false,
+            "type": {
+              "kind": "string",
+              "encode": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
+
+```python
+class Properties(_model_base.Model):
+    name: str = rest_field()
+    """Required."""
+
+class Foo(_model_base.Model):
+    properties: "_models.Properties" = rest_field()
+    """Required."""
+
+    __flattened_items = ["properties"]
+
+print(f.properties.name)  # Non-flattened access is preferred experience
+print(f.name)  # Flattened access is dynamically supported, but not documented
+
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.csharp/issues/4040
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+In Java, `@flattenProperty` have no effect on data-plane libraries.
+
+```java
+@Fluent
+public final class Properties {
+    public Properties();
+    public String getName();
+    public Properties setName(String name);
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Models with additional properties
+
+#### Additional properties of any type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+Recommend usage:
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<unknown>;
+}
+```
+
+Other usages:
+
+```typespec
+model Animal extends Record<unknown> {
+  name: string;
+  kind: string;
+}
+```
+
+```typespec
+model Animal is Record<unknown> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "any"
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["age"] = 5
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Animal : IJsonModel<Animal> {
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input
+export interface Animal extends Record<string, unknown> {
+  name: string;
+  kind: string;
+}
+
+// RLC output
+export interface AnimalOutput extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+
+// Modular for both legacy and non legacy
+export interface Animal extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, Object> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, Object> additionalProperties);
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of specific type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model AnimalProperty {
+  category: string;
+  value: unknown;
+}
+
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<AnimalProperty>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "model",
+    "name": "AnimalProperty",
+    "properties": [
+      {
+        "kind": "property",
+        "name": "category",
+        "serializedName": "category",
+        "optional": false,
+        "nullable": false,
+        "type": {
+          "kind": "string",
+          "encode": "string"
+        }
+      },
+      {
+        "kind": "property",
+        "name": "value",
+        "serializedName": "value",
+        "optional": false,
+        "nullable": false,
+        "type": {
+          "kind": "any"
+        }
+      }
+    ],
+    "additionalProperties": undefined,
+    "additionalPropertiesNullable": undefined
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from typing import Any
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+class AnimalProperty(_model_base.Model):
+
+    category: str = rest_field()
+    value: Any = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = AnimalProperty(category="relationship", value="Jerry")
+animal["age"] = AnimalProperty(category="attribute", value=5)
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+Due to currently there is no way to know whether a Json could be correctly mapped into the specified type in `.Net`, we currently generate any non-primitive value type in additional properties property as `BinaryData`.
+
+For typespec:
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<AnimalProperty>;
+}
+```
+
+The `C#` generated code is the same as if the type is `unknown`:
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+For typespec with additional properties of primitive types:
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string>;
+}
+```
+
+The `C#` generated code still has the specified type in `AdditionalProperties` property:
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, string> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input
+export interface AnimalProperty {
+  category: string;
+  value: unknown;
+}
+export interface Animal extends Record<string, unknown> {
+  name: string;
+  kind: string;
+}
+
+// RLC output
+export interface AnimalProperty {
+  category: string;
+  value: any;
+}
+export interface Animal extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+
+// Modular for legacy clients
+export interface AnimalProperty {
+  category: string;
+  value: any;
+}
+export interface Animal extends Record<string, any> {
+  name: string;
+  kind: string;
+}
+
+// Modular for non-legacy clients
+export interface AnimalProperty {
+  category: string;
+  value: any;
+}
+export interface Animal {
+  name: string;
+  kind: string;
+  additionalProperties: Record<string, AnimalProperty>;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, AnimalProperty> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, AnimalProperty> additionalProperties);
+}
+
+```
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of union type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string | int32>;
+}
+```
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string>;
+  ...Record<int32>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "union",
+    "name": "AnimalAdditionalProperty",
+    "generatedName": true,
+    "values": [
+      {
+        "kind": "string",
+        "encode": "string"
+      },
+      {
+        "kind": "int32"
+      }
+    ]
+  },
+  "additionalPropertiesNullable": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["age"] = 5
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, BinaryData> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input and output
+export interface Animal extends Record<string, string | number> {
+  name: string;
+  kind: string;
+}
+
+// Modular for legacy and non-legacy clients
+export interface Animal extends Record<string, string | number> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, BinaryData> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, BinaryData> additionalProperties);
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Additional properties of nullable type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Animal {
+  name: string;
+  kind: string;
+  ...Record<string | null>;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Animal",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "name",
+      "serializedName": "name",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    },
+    {
+      "kind": "property",
+      "name": "kind",
+      "serializedName": "kind",
+      "optional": false,
+      "nullable": false,
+      "type": {
+        "kind": "string",
+        "encode": "string"
+      }
+    }
+  ],
+  "additionalProperties": {
+    "kind": "string"
+  },
+  "additionalPropertiesNullable": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python DPG model is original designed to support adding any additional properties.
+
+```python
+from .. import _model_base
+from .._model_base import rest_field
+
+class Animal(_model_base.Model):
+
+    name: str = rest_field()
+    kind: str = rest_field()
+
+animal = Animal(name="Tom", kind="Cat")
+animal["friend"] = "Jerry"
+animal["alert"] = None
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Animal : IJsonModel<Animal>
+{
+    public Animal(string name, string kind);
+
+    public string Name { get; }
+    public string Kind { get; }
+
+    public IDictionary<string, string> AdditionalProperties { get; }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```ts
+// RLC input and output
+export interface Animal extends Record<string, string | null> {
+  name: string;
+  kind: string;
+}
+
+// Modular for legacy and non-legacy clients
+export interface Animal extends Record<string, string | null> {
+  name: string;
+  kind: string;
+}
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java" >
+
+```java
+@Fluent
+public final class Animal implements JsonSerializable<Animal> {
+    public Animal(String name, String kind);
+    public String getName();
+    public String getKind();
+    public Map<String, String> getAdditionalProperties();
+    public Animal setAdditionalProperties(Map<String, String> additionalProperties);
+}
+
+```
+
+</TabItem>
+</Tabs>
+
+## Unions
+
+### Union of literals with same type
+
+All emitters will generate their version of a closed enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union LR {
+  left: "left",
+  right: "right",
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "LR",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python never generates closed enum by design. We will always permit users to pass in additional values.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public enum LR
+{
+  Left,
+  Right
+}
+```
+
+Serialization/deserialization will respect the value defined, in this case it is "left" for `LR.Left` and "right" for `LR.Right` respectively.
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export type LR = "left" | "right";
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum LR {
+   LEFT("left"),
+   RIGHT("right");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Inline union of literals with same type
+
+This is union defined inline at point of usage.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Widget {
+  horizontal: "left" | "right";
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "WidgetHorizontals",
+  "generatedName": true,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates this as a union of literals, not as enum. We also don't generate a closed set of literals.
+
+```python
+from typing import Literal, Union
+
+model Widget:
+  horizontal: Union[Literal["left"] | Literal["right"] | str]
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Widget
+{
+  public WidgetHorizontal Horizontal;
+}
+public enum WidgetHorizontal
+{
+  Left,
+  Right
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export interface Widget {
+  horizontal: "left" | "right";
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum WidgetHorizontal {
+   LEFT("left"),
+   RIGHT("right");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Union of basic type and literals of that type
+
+Each language will generate their version of an open enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union Colors {
+  string,
+  red: "red",
+  blue: "blue",
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "Colors",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "red",
+      "value": "red"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "blue",
+      "value": "blue"
+    }
+  ],
+  "isFixed": false,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates open enum again here.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Colors(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  RED = "red"
+  BLUE = "blue"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public readonly partial struct Colors : IEquatable<Colors>
+{
+  private const string RedValue = "red";
+  private const string BlueValue = "blue";
+  public static Colors Red { get; } = new Colors(RedValue);
+  public static Colors Blue { get; } = new Colors(BlueValue);
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export type Colors = string | "red" | "blue";
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public final class Colors extends ExpandableStringEnum<Colors> {
+    public static final Colors RED = fromString("red");
+    public static final Colors BLUE = fromString("blue");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Inline union of basic type and literals of that type
+
+This is union defined inline at point of usage which include the base type as an option.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Widget {
+  color: "red" | "blue" | string;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "WidgetColors",
+  "generatedName": true,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "red",
+      "value": "red"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "blue",
+      "value": "blue"
+    }
+  ],
+  "isFixed": false,
+  "isUnionAsEnum": true
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates a union of literals again.
+
+```python
+from typing import Literal, Union
+
+model Widget:
+  color: Union[Literal["red"] | Literal["blue"] | str]
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Widget
+{
+  public WidgetColor Color;
+}
+public readonly partial struct WidgetColor : IEquatable<WidgetColor>
+{
+  private const string RedValue = "red";
+  private const string BlueValue = "blue";
+  public static WidgetColor Red { get; } = new WidgetColor(RedValue);
+  public static WidgetColor Blue { get; } = new WidgetColor(BlueValue);
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export interface Widget {
+  color: "red" | "blue" | string;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public final class WidgetColor extends ExpandableStringEnum<Colors> {
+    public static final Color RED = fromString("red");
+    public static final Color BLUE = fromString("blue");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Union of other union/enum, basic type and literals of that type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@azure-tools/typespec-azure-resource-manager";
+
+union ProvisioningState {
+  string,
+  "InProgress",
+  Azure.ResourceManager.ResourceProvisioningState,
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+For union of other union or enum. TCGC will do the flatten according to the flag.
+
+With `flatten-union-as-enum` flagged `true`:
+
+```json
+{
+  "kind": "enum",
+  "name": "ProvisioningState",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "InProgress",
+      "value": "InProgress"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "Succeeded",
+      "value": "Succeeded"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "Failed",
+      "value": "Failed"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "Canceled",
+      "value": "Canceled"
+    }
+  ],
+  "isFixed": false,
+  "isUnionAsEnum": true
+}
+```
+
+With `flatten-union-as-enum` flagged `false`:
+
+```json
+{
+  "kind": "union",
+  "name": "ProvisioningState",
+  "generatedName": false,
+  "values": [
+    {
+      "kind": "string"
+    },
+    {
+      "kind": "constant",
+      "value": "InProgress",
+      "valueType": {
+        "kind": "string"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "ResourceProvisioningState",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "Succeeded",
+          "value": "Succeeded"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "Failed",
+          "value": "Failed"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "Canceled",
+          "value": "Canceled"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": false
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates a single open enum.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class ProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  INPROGRESS = "InProgress"
+  SUCCEEDED = "Succeeded"
+  FAILED = "Failed"
+  CANCELED = "Canceled"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
+{
+  private const string SucceededValue = "Succeeded";
+  private const string FailedValue = "Failed";
+  private const string CanceledValue = "Canceled";
+  private const string InProgressValue = "InProgress";
+
+  public static ProvisioningState Succeeded { get; } = new ProvisioningState(SucceededValue);
+  public static ProvisioningState Failed { get; } = new ProvisioningState(FailedValue);
+  public static ProvisioningState Canceled { get; } = new ProvisioningState(CanceledValue);
+  public static ProvisioningState InProgress { get; } = new ProvisioningState(InProgressValue);
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
+// NOTE: extensible enum design may change in JS
+export type ProvisioningState = string | "InProgress" | ResourceProvisioningState;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public final class ProvisioningState extends ExpandableStringEnum<ProvisioningState> {
+    public static final ProvisioningState INPROGRESS = fromString("InProgress");
+    public static final ProvisioningState SUCCEEDED = fromString("Succeeded");
+    public static final ProvisioningState FAILED = fromString("Failed");
+    public static final ProvisioningState CANCELED = fromString("Canceled");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Union of other unions of literals with same type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union LR {
+  left: "left",
+  right: "right",
+}
+
+union UD {
+  up: "up",
+  down: "down",
+}
+
+union Orientation {
+  LR,
+  UD,
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+For union of other union or enum. TCGC will do the flatten according to the flag.
+
+With `flatten-union-as-enum` flagged `true`:
+
+```json
+{
+  "kind": "enum",
+  "name": "Orientation",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "up",
+      "value": "up"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "down",
+      "value": "down"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true
+}
+```
+
+With `flatten-union-as-enum` flagged `false`:
+
+```json
+{
+  "kind": "union",
+  "name": "Orientation",
+  "generatedName": false,
+  "values": [
+    {
+      "kind": "enum",
+      "name": "LR",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "left",
+          "value": "left"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "right",
+          "value": "right"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    },
+    {
+      "kind": "enum",
+      "name": "UD",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "up",
+          "value": "up"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "down",
+          "value": "down"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+  UP = "up"
+  DOWN = "down"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public enum Orientation
+{
+  Left,
+  Right,
+  Up,
+  Down
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export type LR = "left" | "right";
+export type UD = "up" | "down";
+export type Orientation = LR | UD;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum Orientation {
+   LEFT("left"),
+   RIGHT("right"),
+   UP("up"),
+   DOWN("down");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Inline union of other unions of literals with same type
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+union LR {
+  left: "left",
+  right: "right",
+}
+
+union UD {
+  up: "up",
+  down: "down",
+}
+
+model Widget {
+  orientation: LR | UD;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+For union of other union or enum. TCGC will do the flatten according to the flag.
+
+With `flatten-union-as-enum` flagged `true`:
+
+```json
+{
+  "kind": "enum",
+  "name": "WidgetOrientations",
+  "generatedName": true,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "up",
+      "value": "up"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "down",
+      "value": "down"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": true
+}
+```
+
+With `flatten-union-as-enum` flagged `false`:
+
+```json
+{
+  "kind": "union",
+  "name": "WidgetOrientations",
+  "generatedName": true,
+  "values": [
+    {
+      "kind": "enum",
+      "name": "LR",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "left",
+          "value": "left"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "right",
+          "value": "right"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    },
+    {
+      "kind": "enum",
+      "name": "UD",
+      "generatedName": false,
+      "valueType": {
+        "kind": "string"
+      },
+      "values": [
+        {
+          "kind": "enumvalue",
+          "name": "up",
+          "value": "up"
+        },
+        {
+          "kind": "enumvalue",
+          "name": "down",
+          "value": "down"
+        }
+      ],
+      "isFixed": true,
+      "isUnionAsEnum": true
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Since this is inline, Python will generate this as a single union of all possible literal values.
+
+```python
+from typing import Literal
+
+type WidgetOrientation = "left" | "right" | "up" | "down" | str
+
+model Widget:
+  orientation: WidgetOrientation
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Widget
+{
+  public WidgetOrientation Orientation;
+}
+public enum WidgetOrientation
+{
+  Left,
+  Right,
+  Up,
+  Down
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export interface Widget {
+  orientation: LR | UD;
+}
+
+export type LR = "left" | "right";
+export type UD = "up" | "down";
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum WidgetOrientation {
+   LEFT("left"),
+   RIGHT("right"),
+   UP("up"),
+   DOWN("down");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Union with multiple types
+
+These are unions where the values don't share same type.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Shirt {
+  sizing: 32 | 34 | int32 | "small" | "medium" | string;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "union",
+  "name": "ShirtSizings",
+  "generatedName": true,
+  "values": [
+    {
+      "kind": "constant",
+      "value": 32,
+      "valueType": {
+        "kind": "int32"
+      }
+    },
+    {
+      "kind": "constant",
+      "value": 34,
+      "valueType": {
+        "kind": "int32"
+      }
+    },
+    {
+      "kind": "constant",
+      "value": "small",
+      "valueType": {
+        "kind": "string"
+      }
+    },
+    {
+      "kind": "constant",
+      "value": "medium",
+      "valueType": {
+        "kind": "string"
+      }
+    },
+    {
+      "kind": "string"
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python will generate this as a union since these entries don't share the same type
+
+```python
+from typing import Literal
+
+type ShirtSizing = Literal[32] | Literal[34] | int | Literal["small"] | Literal["medium"] | str
+
+model Shirt:
+  sizing: ShirtSizing
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public partial class Shirt
+{
+  public BinaryData Shirt;
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export interface Shirt {
+  sizing: 32 | 34 | number | "small" | "medium" | string;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public final class Shirt {
+    private BinaryData sizing;
+}
+```
+
+</TabItem>
+</Tabs>
+
 ## Enums
 
-## Versioning Enums
+### Standard
+
+Standard enums will be generated as closed enums.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+enum LR {
+  left,
+  right,
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "LR",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python never generates closed enums by design. We will always permit users to pass in additional values.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public enum LR
+{
+  Left,
+  Right
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+export type LR = "left" | "right";
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum LR {
+   LEFT("left"),
+   RIGHT("right");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Versioning Enums
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -24,6 +1825,35 @@ enum Versions {
 ```
 
 </TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "enum",
+  "name": "Versions",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "v1",
+      "value": "v1"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "v2",
+      "value": "v2"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": false,
+  "usage": 8
+}
+```
+
+</TabItem>
 <TabItem value="" label="Python">
 
 ```
@@ -34,10 +1864,117 @@ enum Versions {
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
-public enum Versions
+// CSharp does not generate the enum used for versioning
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// JS does not generate the enum used for versioning
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public enum ServiceServiceVersion implements ServiceVersion {
+    V1("v1"),
+    V2("v2");
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Spread
+
+Spreading enums will return the resultant enum as a new single closed enum.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+enum LR {
+  left,
+  right,
+}
+
+enum UD {
+  up,
+  down,
+}
+
+enum Orientation {
+  ...LR,
+  ...UD,
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
 {
-    v1,
-    v2
+  "kind": "enum",
+  "name": "Orientation",
+  "generatedName": false,
+  "valueType": {
+    "kind": "string"
+  },
+  "values": [
+    {
+      "kind": "enumvalue",
+      "name": "left",
+      "value": "left"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "right",
+      "value": "right"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "up",
+      "value": "up"
+    },
+    {
+      "kind": "enumvalue",
+      "name": "down",
+      "value": "down"
+    }
+  ],
+  "isFixed": true,
+  "isUnionAsEnum": false
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python generates one open enum, because Python never generates an enum as fully closed.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+  UP = "up"
+  DOWN = "down"
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+public enum Orientation
+{
+  Left,
+  Right,
+  Up,
+  Down
 }
 ```
 
@@ -45,16 +1982,18 @@ public enum Versions
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO;
+export type Orientation = "left" | "right" | "up" | "down";
 ```
 
 </TabItem>
 <TabItem value="java" label="Java" >
 
 ```java
-public enum Versions {
-    v1,
-    v2
+public enum Orientation {
+   LEFT("left"),
+   RIGHT("right"),
+   UP("up"),
+   DOWN("down");
 }
 ```
 

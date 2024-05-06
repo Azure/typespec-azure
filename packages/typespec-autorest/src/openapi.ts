@@ -2,23 +2,20 @@ import {
   PagedResultMetadata,
   UnionEnum,
   extractLroStates,
+  getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
   isFixed,
 } from "@azure-tools/typespec-azure-core";
-import {
-  SdkContext,
-  createSdkContext,
-  getClientNameOverride,
-  shouldFlattenProperty,
-} from "@azure-tools/typespec-client-generator-core";
+import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
+  CompilerHost,
+  Diagnostic,
   DiagnosticTarget,
-  EmitContext,
   Enum,
   EnumMember,
   IntrinsicScalarName,
@@ -30,21 +27,18 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  ProjectedNameView,
   Scalar,
-  Service,
+  SourceFile,
   StringLiteral,
   StringTemplate,
   SyntaxKind,
-  TwoLevelMap,
   Type,
   TypeNameOptions,
   Union,
   UnionVariant,
   Value,
   compilerAssert,
-  createProjectedNameProgram,
-  emitFile,
+  createDiagnosticCollector,
   getAllTags,
   getDirectoryPath,
   getDiscriminator,
@@ -58,13 +52,12 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
-  getNamespaceFullName,
   getPattern,
+  getProjectedName,
   getProperty,
   getPropertyType,
   getRelativePathFromDirectory,
   getRootLength,
-  getService,
   getSummary,
   getVisibility,
   ignoreDiagnostics,
@@ -84,19 +77,19 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
-  listServices,
   navigateTypesInNamespace,
-  projectProgram,
   resolveEncodedName,
   resolvePath,
   stringTemplateToString,
 } from "@typespec/compiler";
+import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
   HttpAuth,
   HttpOperation,
   HttpOperationParameters,
   HttpOperationResponse,
+  HttpOperationResponseBody,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
@@ -125,11 +118,11 @@ import {
   resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
-import { buildVersionProjections } from "@typespec/versioning";
+import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
-import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2Document,
   OpenAPI2FormDataParameter,
@@ -147,85 +140,46 @@ import {
   OpenAPI2StatusCode,
   PrimitiveItems,
   Refable,
-} from "./types.js";
-import { AutorestEmitterContext, resolveOperationId } from "./utils.js";
+} from "./openapi2-document.js";
+import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 
-const defaultOptions = {
-  "output-file":
-    "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
-  "new-line": "lf",
-  "include-x-typespec-name": "never",
-} as const;
-
-export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
-  const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
-  const armTypesDir = interpolatePath(
-    resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
-    {
-      "project-root": context.program.projectRoot,
-      "emitter-output-dir": context.emitterOutputDir,
-    }
-  );
-  const options: ResolvedAutorestEmitterOptions = {
-    outputFile: resolvedOptions["output-file"],
-    outputDir: context.emitterOutputDir,
-    azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
-    examplesDirectory: resolvedOptions["examples-directory"],
-    version: resolvedOptions["version"],
-    newLine: resolvedOptions["new-line"],
-    omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
-    includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
-    armTypesDir,
-    useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
-  };
-
-  const emitter = createOAPIEmitter(context.program, tcgcSdkContext, options);
-  await emitter.emitOpenAPI();
+interface SchemaContext {
+  readonly visibility: Visibility;
+  readonly ignoreMetadataAnnotations: boolean;
 }
 
-// TODO: When emitter options are available per emitter, add these to the interface
-interface EmitterDetails {
-  emitter: string;
-}
-
-function getEmitterDetails(program: Program): EmitterDetails[] {
-  return [{ emitter: "@azure-tools/typespec-autorest" }];
-}
-
-export interface ResolvedAutorestEmitterOptions {
-  outputDir: string;
-  outputFile: string;
-  examplesDirectory?: string;
-  version?: string;
-  azureResourceProviderFolder?: string;
-
-  /**
-   * Set the newline character for emitting files.
-   * @default lf
-   */
-  newLine?: "crlf" | "lf";
+/**
+ * Options to configure the behavior of the Autorest document emitter.
+ */
+export interface AutorestDocumentEmitterOptions {
+  readonly examplesDirectory?: string;
 
   /**
    * Omit unreachable types.
    * By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.
    */
-  omitUnreachableTypes?: boolean;
+  readonly omitUnreachableTypes?: boolean;
 
   /**
    * If the x-typespec-name extension should be included
    */
-  includeXTypeSpecName: "inline-only" | "never";
+  readonly includeXTypeSpecName: "inline-only" | "never";
 
   /**
    * Arm types dir
    */
-  armTypesDir: string;
+  readonly armTypesDir: string;
 
   /**
    * readOnly property schema behavior
    */
-  useReadOnlyStatusSchema?: boolean;
+  readonly useReadOnlyStatusSchema?: boolean;
+
+  /**
+   * Decide how to deal with the version enum when `omitUnreachableTypes` is not set.
+   * @default "omit"
+   */
+  readonly versionEnumStrategy?: "omit" | "include";
 }
 
 /**
@@ -270,140 +224,138 @@ interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
 }
 
-function createOAPIEmitter(
-  program: Program,
-  tcgcSdkContext: SdkContext,
-  options: ResolvedAutorestEmitterOptions
-) {
-  const tracer = getTracer(program);
-  tracer.trace("options", JSON.stringify(options, null, 2));
+export interface OperationExamples {
+  readonly operationId: string;
+  readonly examples: LoadedExample[];
+}
+
+export interface AutorestEmitterResult {
+  readonly document: OpenAPI2Document;
+  readonly operationExamples: OperationExamples[];
+}
+
+export async function getOpenAPIForService(
+  context: AutorestEmitterContext,
+  options: AutorestDocumentEmitterOptions
+): Promise<AutorestEmitterResult> {
+  const { program, service } = context;
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
       return !isService(program, ns);
     },
   };
-  let root: OpenAPI2Document;
-  let currentService: Service;
+  const info = resolveInfo(program, service.type);
+  const auth = processAuth(service.type);
+
+  const root: OpenAPI2Document = {
+    swagger: "2.0",
+    info: {
+      title: "(title)",
+      ...info,
+      version: context.version ?? info?.version ?? "0000-00-00",
+      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
+    },
+    schemes: ["https"],
+    ...resolveHost(program, service.type),
+    externalDocs: getExternalDocs(program, service.type),
+    produces: [], // Pre-initialize produces and consumes so that
+    consumes: [], // they show up at the top of the document
+    security: auth?.security,
+    securityDefinitions: auth?.securitySchemes ?? {},
+    tags: [],
+    paths: {},
+    "x-ms-paths": {},
+    definitions: {},
+    parameters: {},
+  };
+
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
   let currentProduces: Set<string>;
-  let metadataInfo: MetadataInfo;
+  const metadataInfo: MetadataInfo = createMetadataInfo(program, {
+    canonicalVisibility: Visibility.Read,
+    canShareProperty: canSharePropertyUsingReadonlyOrXMSMutability,
+  });
 
   // Keep a map of all Types+Visibility combinations that were encountered
   // that need schema definitions.
-  let pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
+  const pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
 
   // Reuse a single ref object per Type+Visibility combination.
-  let refs = new TwoLevelMap<Type, Visibility, Ref>();
+  const refs = new TwoLevelMap<Type, Visibility, Ref>();
 
   // Keep track of inline types still in the process of having their schema computed
   // This is used to detect cycles in inline types, which is an
-  let inProgressInlineTypes = new Set<Type>();
+  const inProgressInlineTypes = new Set<Type>();
 
   // Map model properties that represent shared parameters to their parameter
   // definition that will go in #/parameters. Inlined parameters do not go in
   // this map.
-  let params: Map<ModelProperty, OpenAPI2Parameter>;
+  const params: Map<ModelProperty, OpenAPI2Parameter> = new Map();
 
   // Keep track of models that have had properties spread into parameters. We won't
   // consider these unreferenced when emitting unreferenced types.
-  let paramModels: Set<Type>;
+  const paramModels: Set<Type> = new Set();
 
   // De-dupe the per-endpoint tags that will be added into the #/tags
-  let tags: Set<string>;
+  const tags: Set<string> = new Set();
 
   // The set of produces/consumes values found in all operations
   const globalProduces = new Set<string>(["application/json"]);
   const globalConsumes = new Set<string>(["application/json"]);
 
-  let operationExamplesMap: Map<string, { [title: string]: string }>;
-  let operationIdsWithExample: Set<string>;
-  let outputFile: string;
-  let jsonView: ProjectedNameView;
-  let clientView: ProjectedNameView;
-  let context: AutorestEmitterContext;
+  const operationIdsWithExample = new Set<string>();
 
-  async function emitOpenAPI() {
-    const services = listServices(program);
-    if (services.length === 0) {
-      services.push({ type: program.getGlobalNamespaceType() });
-    }
-    for (const service of services) {
-      currentService = service;
-      const originalProgram = program;
-      const versions = buildVersionProjections(program, service.type).filter(
-        (v) => !options.version || options.version === v.version
-      );
-      for (const record of versions) {
-        let projectedProgram;
-        if (record.projections.length > 0) {
-          projectedProgram = program = projectProgram(originalProgram, record.projections);
+  const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
+  program.reportDiagnostics(diagnostics);
+
+  const services = ignoreDiagnostics(getAllHttpServices(program));
+  const routes = services[0].operations;
+  reportIfNoRoutes(program, routes);
+
+  routes.forEach(emitOperation);
+
+  emitParameters();
+  emitSchemas(service.type);
+  emitTags();
+
+  // Finalize global produces/consumes
+  if (globalProduces.size > 0) {
+    root.produces = [...globalProduces.values()];
+  } else {
+    delete root.produces;
+  }
+  if (globalConsumes.size > 0) {
+    root.consumes = [...globalConsumes.values()];
+  } else {
+    delete root.consumes;
+  }
+
+  // Clean up empty entries
+  if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
+    delete root["x-ms-paths"];
+  }
+  if (root.security && Object.keys(root.security).length === 0) {
+    delete root["security"];
+  }
+  if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
+    delete root["securityDefinitions"];
+  }
+
+  return {
+    document: root,
+    operationExamples: [...operationIdsWithExample]
+      .map((operationId) => {
+        const data = exampleMap.get(operationId);
+        if (data) {
+          return { operationId, examples: Object.values(data) };
+        } else {
+          return undefined;
         }
-        jsonView = createProjectedNameProgram(program, "json");
-        clientView = createProjectedNameProgram(program, "client");
-        context = {
-          program,
-          service,
-          version: record.version,
-          getClientName,
-        };
-        const projectedServiceNs: Namespace = projectedProgram
-          ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
-          : service.type;
-        await emitOpenAPIFromVersion(
-          projectedServiceNs === program.getGlobalNamespaceType()
-            ? { type: program.getGlobalNamespaceType() }
-            : getService(program, projectedServiceNs)!,
-          services.length > 1,
-          record.version
-        );
-      }
-    }
-  }
-  return { emitOpenAPI };
-
-  function initializeEmitter(service: Service, multipleService: boolean, version?: string) {
-    const auth = processAuth(service.type);
-
-    const info = resolveInfo(program, service.type);
-    root = {
-      swagger: "2.0",
-      info: {
-        title: "(title)",
-        ...info,
-        version: version ?? info?.version ?? "0000-00-00",
-        "x-typespec-generated": getEmitterDetails(program),
-      },
-      schemes: ["https"],
-      ...resolveHost(program, service.type),
-      externalDocs: getExternalDocs(program, service.type),
-      produces: [], // Pre-initialize produces and consumes so that
-      consumes: [], // they show up at the top of the document
-      security: auth?.security,
-      securityDefinitions: auth?.securitySchemes ?? {},
-      tags: [],
-      paths: {},
-      "x-ms-paths": {},
-      definitions: {},
-      parameters: {},
-    };
-
-    pendingSchemas = new TwoLevelMap();
-    refs = new TwoLevelMap();
-    metadataInfo = createMetadataInfo(program, {
-      canonicalVisibility: Visibility.Read,
-      canShareProperty: canSharePropertyUsingReadonlyOrXMSMutability,
-    });
-    inProgressInlineTypes = new Set();
-    params = new Map();
-    paramModels = new Set();
-    tags = new Set();
-    operationExamplesMap = new Map();
-    operationIdsWithExample = new Set();
-
-    outputFile = resolveOutputFile(program, service, multipleService, options, version);
-  }
+      })
+      .filter((x) => x) as any,
+  };
 
   function resolveHost(
     program: Program,
@@ -443,7 +395,10 @@ function createOAPIEmitter(
     }
     const parameters: OpenAPI2PathParameter[] = [];
     for (const prop of server.parameters.values()) {
-      const param = getOpenAPI2Parameter(prop, "path", Visibility.Read);
+      const param = getOpenAPI2Parameter(prop, "path", {
+        visibility: Visibility.Read,
+        ignoreMetadataAnnotations: false,
+      });
       if (
         prop.type.kind === "Scalar" &&
         ignoreDiagnostics(
@@ -466,92 +421,6 @@ function createOAPIEmitter(
         parameters,
       },
     };
-  }
-
-  async function emitOpenAPIFromVersion(
-    service: Service,
-    multipleService: boolean,
-    version?: string
-  ) {
-    initializeEmitter(service, multipleService, version);
-
-    try {
-      await loadExamples(version);
-      const services = ignoreDiagnostics(getAllHttpServices(program));
-      const routes = services[0].operations;
-      reportIfNoRoutes(program, routes);
-
-      routes.forEach(emitOperation);
-
-      emitParameters();
-      emitSchemas(service.type);
-      emitTags();
-
-      // Finalize global produces/consumes
-      if (globalProduces.size > 0) {
-        root.produces = [...globalProduces.values()];
-      } else {
-        delete root.produces;
-      }
-      if (globalConsumes.size > 0) {
-        root.consumes = [...globalConsumes.values()];
-      } else {
-        delete root.consumes;
-      }
-
-      // Clean up empty entries
-      if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
-        delete root["x-ms-paths"];
-      }
-      if (root.security && Object.keys(root.security).length === 0) {
-        delete root["security"];
-      }
-      if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
-        delete root["securityDefinitions"];
-      }
-
-      if (!program.compilerOptions.noEmit && !program.hasError()) {
-        // Sort the document
-        const sortedRoot = sortOpenAPIDocument(root);
-
-        // Write out the OpenAPI document to the output path
-        await emitFile(program, {
-          path: outputFile,
-          content: prettierOutput(JSON.stringify(sortedRoot, null, 2)),
-          newLine: options.newLine,
-        });
-
-        // Copy examples to the output directory
-        if (options.examplesDirectory && operationIdsWithExample.size > 0) {
-          const examplesPath = resolvePath(getDirectoryPath(outputFile), "examples");
-          const exampleDir = version
-            ? resolvePath(options.examplesDirectory, version)
-            : resolvePath(options.examplesDirectory);
-          await program.host.mkdirp(examplesPath);
-          for (const operationId of operationIdsWithExample) {
-            const examples = operationExamplesMap.get(operationId);
-            if (examples) {
-              for (const [_, fileName] of Object.entries(examples)) {
-                const content = await program.host.readFile(resolvePath(exampleDir, fileName));
-                await emitFile(program, {
-                  path: resolvePath(examplesPath, fileName),
-                  content: content.text,
-                  newLine: options.newLine,
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      if (err instanceof ErrorTypeFoundError) {
-        // Return early, there must be a parse error if an ErrorType was
-        // inserted into the TypeSpec output
-        return;
-      } else {
-        throw err;
-      }
-    }
   }
 
   function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
@@ -707,12 +576,12 @@ function createOAPIEmitter(
     }
 
     if (options.examplesDirectory) {
-      const examples = operationExamplesMap.get(currentEndpoint.operationId as string);
+      const examples = exampleMap.get(currentEndpoint.operationId);
       if (examples && currentEndpoint.operationId) {
         operationIdsWithExample.add(currentEndpoint.operationId);
         currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, fileName] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${fileName}` };
+        for (const [title, example] of Object.entries(examples)) {
+          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
         }
       }
     }
@@ -845,7 +714,7 @@ function createOAPIEmitter(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: Type | undefined;
+    let body: HttpOperationResponseBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -855,20 +724,25 @@ function createOAPIEmitter(
       }
 
       if (data.body) {
-        if (body && body !== data.body.type) {
+        if (body && body.type !== data.body.type) {
           reportDiagnostic(program, {
             code: "duplicate-body-types",
             target: response.type,
           });
         }
-        body = data.body.type;
+        body = data.body;
         contentTypes.push(...data.body.contentTypes);
       }
     }
 
     if (body) {
-      const isBinary = contentTypes.every((t) => isBinaryPayload(body!, t));
-      openapiResponse.schema = isBinary ? { type: "file" } : getSchemaOrRef(body, Visibility.Read);
+      const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
+      openapiResponse.schema = isBinary
+        ? { type: "file" }
+        : getSchemaOrRef(body.type, {
+            visibility: Visibility.Read,
+            ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
+          });
     }
 
     for (const contentType of contentTypes) {
@@ -880,7 +754,10 @@ function createOAPIEmitter(
 
   function getResponseHeader(prop: ModelProperty): OpenAPI2HeaderDefinition {
     const header: any = {};
-    populateParameter(header, prop, "header", Visibility.Read);
+    populateParameter(header, prop, "header", {
+      visibility: Visibility.Read,
+      ignoreMetadataAnnotations: false,
+    });
     delete header.in;
     delete header.name;
     delete header.required;
@@ -895,10 +772,10 @@ function createOAPIEmitter(
     if (getRootLength(absoluteRef) === 0) {
       return absoluteRef; // It is already relative.
     }
-    return getRelativePathFromDirectory(getDirectoryPath(outputFile), absoluteRef, false);
+    return getRelativePathFromDirectory(getDirectoryPath(context.outputFile), absoluteRef, false);
   }
 
-  function getSchemaOrRef(type: Type, visibility: Visibility): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
     const refUrl = getRef(program, type, { version: context.version, service: context.service });
     if (refUrl) {
       return {
@@ -932,14 +809,14 @@ function createOAPIEmitter(
     }
 
     if (type.kind === "ModelProperty") {
-      return resolveProperty(type, visibility);
+      return resolveProperty(type, schemaContext);
     }
 
-    type = metadataInfo.getEffectivePayloadType(type, visibility);
+    type = metadataInfo.getEffectivePayloadType(type, schemaContext.visibility);
     const name = getOpenAPITypeName(program, type, typeNameOptions);
 
     if (shouldInline(program, type)) {
-      const schema = getSchemaForInlineType(type, name, visibility);
+      const schema = getSchemaForInlineType(type, name, schemaContext);
 
       if (schema === undefined && isErrorType(type)) {
         // Exit early so that syntax errors are exposed.  This error will
@@ -954,18 +831,18 @@ function createOAPIEmitter(
       return schema;
     } else {
       // Use shared schema when type is not transformed by visibility from the canonical read visibility.
-      if (!metadataInfo.isTransformed(type, visibility)) {
-        visibility = Visibility.Read;
+      if (!metadataInfo.isTransformed(type, schemaContext.visibility)) {
+        schemaContext = { ...schemaContext, visibility: Visibility.Read };
       }
-      const pending = pendingSchemas.getOrAdd(type, visibility, () => ({
+      const pending = pendingSchemas.getOrAdd(type, schemaContext.visibility, () => ({
         type,
-        visibility,
-        ref: refs.getOrAdd(type, visibility, () => new Ref()),
+        visibility: schemaContext.visibility,
+        ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
       }));
       return { $ref: pending.ref };
     }
   }
-  function getSchemaForInlineType(type: Type, name: string, visibility: Visibility) {
+  function getSchemaForInlineType(type: Type, name: string, context: SchemaContext) {
     if (inProgressInlineTypes.has(type)) {
       reportDiagnostic(program, {
         code: "inline-cycle",
@@ -975,7 +852,7 @@ function createOAPIEmitter(
       return {};
     }
     inProgressInlineTypes.add(type);
-    const schema = getSchemaForType(type, visibility);
+    const schema = getSchemaForType(type, context);
     inProgressInlineTypes.delete(type);
     return schema;
   }
@@ -1019,19 +896,13 @@ function createOAPIEmitter(
     return placeholder;
   }
 
-  function getJsonName(type: Type & { name: string }) {
-    const viaProjection = jsonView.getProjectedName(type);
+  function getJsonName(type: Type & { name: string }): string {
+    const viaProjection = getProjectedName(program, type, "json");
 
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? viaProjection : encodedName;
-  }
-
-  function getClientName(type: Type & { name: string }): string {
-    const viaProjection = clientView.getProjectedName(type);
-    const clientName = getClientNameOverride(tcgcSdkContext, type);
-    return clientName ?? viaProjection;
+    return encodedName === type.name ? viaProjection ?? type.name : encodedName;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1046,7 +917,12 @@ function createOAPIEmitter(
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
-      emitParameter(httpOpParam.param, httpOpParam.type, visibility, httpOpParam.name);
+      emitParameter(
+        httpOpParam.param,
+        httpOpParam.type,
+        { visibility, ignoreMetadataAnnotations: false },
+        httpOpParam.name
+      );
     }
 
     if (consumes.length === 0 && methodParams.body) {
@@ -1062,9 +938,14 @@ function createOAPIEmitter(
 
     if (methodParams.body && !isVoidType(methodParams.body.type)) {
       const isBinary = isBinaryPayload(methodParams.body.type, consumes);
+      const schemaContext = {
+        visibility,
+        ignoreMetadataAnnotations:
+          methodParams.body.isExplicit && methodParams.body.containsMetadataAnnotations,
+      };
       const schema = isBinary
         ? { type: "string", format: "binary" }
-        : getSchemaOrRef(methodParams.body.type, visibility);
+        : getSchemaOrRef(methodParams.body.type, schemaContext);
 
       if (currentConsumes.has("multipart/form-data")) {
         const bodyModelType = methodParams.body.type;
@@ -1072,14 +953,14 @@ function createOAPIEmitter(
         compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
         if (bodyModelType) {
           for (const param of bodyModelType.properties.values()) {
-            emitParameter(param, "formData", visibility, getJsonName(param));
+            emitParameter(param, "formData", schemaContext, getJsonName(param));
           }
         }
       } else if (methodParams.body.parameter) {
         emitParameter(
           methodParams.body.parameter,
           "body",
-          visibility,
+          { visibility, ignoreMetadataAnnotations: false },
           getJsonName(methodParams.body.parameter),
           schema
         );
@@ -1113,7 +994,7 @@ function createOAPIEmitter(
   function emitParameter(
     param: ModelProperty,
     kind: OpenAPI2ParameterType,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     name?: string,
     typeOverride?: any
   ) {
@@ -1126,17 +1007,17 @@ function createOAPIEmitter(
 
     // If the parameter already has a $ref, don't bother populating it
     if (!("$ref" in ph)) {
-      populateParameter(ph, param, kind, visibility, name, typeOverride);
+      populateParameter(ph, param, kind, schemaContext, name, typeOverride);
     }
   }
 
   function getSchemaForPrimitiveItems(
     type: Type,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     paramName: string,
     multipart?: boolean
   ): PrimitiveItems | undefined {
-    const fullSchema = getSchemaForType(type, visibility);
+    const fullSchema = getSchemaForType(type, schemaContext);
     if (fullSchema === undefined) {
       return undefined;
     }
@@ -1154,7 +1035,7 @@ function createOAPIEmitter(
 
   function getFormDataSchema(
     type: Type,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     paramName: string
   ): Omit<OpenAPI2FormDataParameter, "in" | "name"> | undefined {
     if (isBytes(type)) {
@@ -1166,7 +1047,7 @@ function createOAPIEmitter(
       if (isBytes(elementType)) {
         return { type: "array", items: { type: "string", format: "binary" } };
       }
-      const schema = getSchemaForPrimitiveItems(elementType, visibility, paramName, true);
+      const schema = getSchemaForPrimitiveItems(elementType, schemaContext, paramName, true);
       if (schema === undefined) {
         return undefined;
       }
@@ -1178,7 +1059,7 @@ function createOAPIEmitter(
         items: schema,
       };
     } else {
-      const schema = getSchemaForPrimitiveItems(type, visibility, paramName, true);
+      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, true);
 
       if (schema === undefined) {
         return undefined;
@@ -1191,7 +1072,7 @@ function createOAPIEmitter(
   function getOpenAPI2Parameter<T extends OpenAPI2ParameterType>(
     param: ModelProperty,
     kind: T,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     name?: string,
     bodySchema?: any
   ): OpenAPI2Parameter & { in: T } {
@@ -1212,7 +1093,7 @@ function createOAPIEmitter(
       compilerAssert(bodySchema, "bodySchema argument is required to populate body parameter");
       ph.schema = bodySchema;
     } else if (ph.in === "formData") {
-      Object.assign(ph, getFormDataSchema(param.type, visibility, ph.name));
+      Object.assign(ph, getFormDataSchema(param.type, schemaContext, ph.name));
     } else {
       const collectionFormat = (
         kind === "query"
@@ -1231,12 +1112,12 @@ function createOAPIEmitter(
       if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
         ph.type = "array";
         const schema = {
-          ...getSchemaForPrimitiveItems(param.type.indexer.value, visibility, ph.name),
+          ...getSchemaForPrimitiveItems(param.type.indexer.value, schemaContext, ph.name),
         };
         delete (schema as any).description;
         ph.items = schema;
       } else {
-        Object.assign(ph, getSchemaForPrimitiveItems(param.type, visibility, ph.name));
+        Object.assign(ph, getSchemaForPrimitiveItems(param.type, schemaContext, ph.name));
       }
     }
 
@@ -1254,11 +1135,11 @@ function createOAPIEmitter(
     ph: OpenAPI2Parameter,
     param: ModelProperty,
     kind: OpenAPI2ParameterType,
-    visibility: Visibility,
+    schemaContext: SchemaContext,
     name?: string,
     bodySchema?: any
   ) {
-    Object.assign(ph, getOpenAPI2Parameter(param, kind, visibility, name, bodySchema));
+    Object.assign(ph, getOpenAPI2Parameter(param, kind, schemaContext, name, bodySchema));
   }
 
   function emitParameters() {
@@ -1315,7 +1196,10 @@ function createOAPIEmitter(
           for (const [visibility, pending] of group) {
             processedSchemas.getOrAdd(type, visibility, () => ({
               ...pending,
-              schema: getSchemaForType(type, visibility),
+              schema: getSchemaForType(type, {
+                visibility: visibility,
+                ignoreMetadataAnnotations: false,
+              }),
             }));
           }
           pendingSchemas.delete(type);
@@ -1325,8 +1209,13 @@ function createOAPIEmitter(
 
     function processUnreferencedSchemas() {
       const addSchema = (type: Type) => {
-        if (!processedSchemas.has(type) && !paramModels.has(type) && !shouldInline(program, type)) {
-          getSchemaOrRef(type, Visibility.Read);
+        if (
+          !processedSchemas.has(type) &&
+          !paramModels.has(type) &&
+          !shouldInline(program, type) &&
+          !shouldOmitThisUnreachableType(type)
+        ) {
+          getSchemaOrRef(type, { visibility: Visibility.Read, ignoreMetadataAnnotations: false });
         }
       };
       const skipSubNamespaces = isGlobalNamespace(program, serviceNamespace);
@@ -1342,6 +1231,25 @@ function createOAPIEmitter(
       );
       processSchemas();
     }
+
+    function shouldOmitThisUnreachableType(type: Type): boolean {
+      if (
+        options.versionEnumStrategy !== "include" &&
+        type.kind === "Enum" &&
+        isVersionEnum(program, type)
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function isVersionEnum(program: Program, enumObj: Enum): boolean {
+      const versions = getVersionsForEnum(program, enumObj);
+      if (versions !== undefined && versions.length > 0) {
+        return true;
+      }
+      return false;
+    }
   }
 
   function emitTags() {
@@ -1350,68 +1258,7 @@ function createOAPIEmitter(
     }
   }
 
-  async function loadExamples(version?: string) {
-    if (options.examplesDirectory) {
-      const exampleDir = version
-        ? resolvePath(options.examplesDirectory, version)
-        : resolvePath(options.examplesDirectory);
-      try {
-        if (!(await program.host.stat(exampleDir)).isDirectory()) return;
-      } catch (err) {
-        reportDiagnostic(program, {
-          code: "example-loading",
-          messageId: "noDirectory",
-          format: { directory: exampleDir },
-          target: NoTarget,
-        });
-        return;
-      }
-      const exampleFiles = await program.host.readDir(exampleDir);
-      for (const fileName of exampleFiles) {
-        try {
-          const exampleFile = await program.host.readFile(resolvePath(exampleDir, fileName));
-          const example = JSON.parse(exampleFile.text);
-          if (!example.operationId || !example.title) {
-            reportDiagnostic(program, {
-              code: "example-loading",
-              messageId: "noOperationId",
-              format: { filename: fileName },
-              target: NoTarget,
-            });
-            continue;
-          }
-
-          if (!operationExamplesMap.has(example.operationId)) {
-            operationExamplesMap.set(example.operationId, {});
-          }
-          const examples = operationExamplesMap.get(example.operationId)!;
-
-          if (example.title in examples) {
-            reportDiagnostic(program, {
-              code: "duplicate-example-file",
-              target: NoTarget,
-              format: {
-                filename: fileName,
-                operationId: example.operationId,
-                title: example.title,
-              },
-            });
-          }
-
-          examples[example.title] = fileName;
-        } catch (err) {
-          reportDiagnostic(program, {
-            code: "example-loading",
-            messageId: "default",
-            format: { filename: fileName, error: err?.toString() ?? "" },
-            target: NoTarget,
-          });
-        }
-      }
-    }
-  }
-
-  function getSchemaForType(type: Type, visibility: Visibility): OpenAPI2Schema | undefined {
+  function getSchemaForType(type: Type, schemaContext: SchemaContext): OpenAPI2Schema | undefined {
     const builtinType = getSchemaForLiterals(type);
     if (builtinType !== undefined) {
       return builtinType;
@@ -1421,15 +1268,15 @@ function createOAPIEmitter(
       case "Intrinsic":
         return getSchemaForIntrinsicType(type);
       case "Model":
-        return getSchemaForModel(type, visibility);
+        return getSchemaForModel(type, schemaContext);
       case "ModelProperty":
-        return getSchemaForType(type.type, visibility);
+        return getSchemaForType(type.type, schemaContext);
       case "Scalar":
         return getSchemaForScalar(type);
       case "Union":
-        return getSchemaForUnion(type, visibility);
+        return getSchemaForUnion(type, schemaContext);
       case "UnionVariant":
-        return getSchemaForUnionVariant(type, visibility);
+        return getSchemaForUnionVariant(type, schemaContext);
       case "Enum":
         return getSchemaForEnum(type);
       case "Tuple":
@@ -1543,7 +1390,7 @@ function createOAPIEmitter(
     return applyIntrinsicDecorators(union, schema);
   }
 
-  function getSchemaForUnion(union: Union, visibility: Visibility): OpenAPI2Schema {
+  function getSchemaForUnion(union: Union, schemaContext: SchemaContext): OpenAPI2Schema {
     const nonNullOptions = [...union.variants.values()]
       .map((x) => x.type)
       .filter((t) => !isNullType(t));
@@ -1557,7 +1404,7 @@ function createOAPIEmitter(
       const type = nonNullOptions[0];
 
       // Get the schema for the model type
-      const schema = getSchemaOrRef(type, visibility);
+      const schema = getSchemaOrRef(type, schemaContext);
       if (schema.$ref) {
         if (type.kind === "Model") {
           return { type: "object", allOf: [schema], "x-nullable": nullable };
@@ -1591,8 +1438,11 @@ function createOAPIEmitter(
     );
   }
 
-  function getSchemaForUnionVariant(variant: UnionVariant, visibility: Visibility): OpenAPI2Schema {
-    return getSchemaForType(variant.type, visibility)!;
+  function getSchemaForUnionVariant(
+    variant: UnionVariant,
+    schemaContext: SchemaContext
+  ): OpenAPI2Schema {
+    return getSchemaForType(variant.type, schemaContext)!;
   }
 
   function getDefaultValue(type: Type | Value): any {
@@ -1636,8 +1486,31 @@ function createOAPIEmitter(
     );
   }
 
-  function getSchemaForModel(model: Model, visibility: Visibility) {
-    const array = getArrayType(model, visibility);
+  function getDiscriminatorValue(model: Model): string | undefined {
+    let discriminator;
+    let current = model;
+    while (current.baseModel) {
+      discriminator = getDiscriminator(program, current.baseModel);
+      if (discriminator) {
+        break;
+      }
+      current = current.baseModel;
+    }
+    if (discriminator === undefined) {
+      return undefined;
+    }
+    const prop = getProperty(model, discriminator.propertyName);
+    if (prop) {
+      const values = getStringValues(prop.type);
+      if (values.length === 1) {
+        return values[0];
+      }
+    }
+    return undefined;
+  }
+
+  function getSchemaForModel(model: Model, schemaContext: SchemaContext) {
+    const array = getArrayType(model, schemaContext);
     if (array) {
       return array;
     }
@@ -1648,17 +1521,11 @@ function createOAPIEmitter(
     };
 
     if (model.baseModel) {
-      const discriminator = getDiscriminator(program, model.baseModel);
-      if (discriminator) {
-        const prop = getProperty(model, discriminator.propertyName);
-        if (prop) {
-          const values = getStringValues(prop.type);
-          if (values.length === 1) {
-            const extensions = getExtensions(program, model);
-            if (!extensions.has("x-ms-discriminator-value")) {
-              modelSchema["x-ms-discriminator-value"] = values[0];
-            }
-          }
+      const discriminatorValue = getDiscriminatorValue(model);
+      if (discriminatorValue) {
+        const extensions = getExtensions(program, model);
+        if (!extensions.has("x-ms-discriminator-value")) {
+          modelSchema["x-ms-discriminator-value"] = discriminatorValue;
         }
       }
     }
@@ -1666,14 +1533,14 @@ function createOAPIEmitter(
     const properties: OpenAPI2Schema["properties"] = {};
 
     if (isRecordModelType(program, model)) {
-      modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, visibility);
+      modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, schemaContext);
     }
 
     const derivedModels = model.derivedModels.filter(includeDerivedModel);
 
     // getSchemaOrRef on all children to push them into components.schemas
     for (const child of derivedModels) {
-      getSchemaOrRef(child, visibility);
+      getSchemaOrRef(child, schemaContext);
     }
 
     const discriminator = getDiscriminator(program, model);
@@ -1694,7 +1561,13 @@ function createOAPIEmitter(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
-      if (!metadataInfo.isPayloadProperty(prop, visibility)) {
+      if (
+        !metadataInfo.isPayloadProperty(
+          prop,
+          schemaContext.visibility,
+          schemaContext.ignoreMetadataAnnotations
+        )
+      ) {
         continue;
       }
 
@@ -1704,7 +1577,7 @@ function createOAPIEmitter(
       }
 
       const jsonName = getJsonName(prop);
-      const clientName = getClientName(prop);
+      const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
 
@@ -1716,7 +1589,10 @@ function createOAPIEmitter(
         }
       }
 
-      if (!metadataInfo.isOptional(prop, visibility) || prop.name === discriminator?.propertyName) {
+      if (
+        !metadataInfo.isOptional(prop, schemaContext.visibility) ||
+        prop.name === discriminator?.propertyName
+      ) {
         if (!modelSchema.required) {
           modelSchema.required = [];
         }
@@ -1724,7 +1600,7 @@ function createOAPIEmitter(
       }
 
       // Apply decorators on the property to the type's schema
-      properties[jsonName] = resolveProperty(prop, visibility);
+      properties[jsonName] = resolveProperty(prop, schemaContext);
       const property: OpenAPI2SchemaProperty = properties[jsonName];
       if (jsonName !== clientName) {
         property["x-ms-client-name"] = clientName;
@@ -1774,10 +1650,10 @@ function createOAPIEmitter(
     ) {
       // Take the base model schema but carry across the documentation property
       // that we set before
-      const baseSchema = getSchemaForType(model.baseModel, visibility);
+      const baseSchema = getSchemaForType(model.baseModel, schemaContext);
       Object.assign(modelSchema, baseSchema, { description: modelSchema.description });
     } else if (model.baseModel) {
-      const baseSchema = getSchemaOrRef(model.baseModel, visibility);
+      const baseSchema = getSchemaOrRef(model.baseModel, schemaContext);
       modelSchema.allOf = [baseSchema];
     }
 
@@ -1803,7 +1679,7 @@ function createOAPIEmitter(
     return true;
   }
 
-  function resolveProperty(prop: ModelProperty, visibility: Visibility): OpenAPI2SchemaProperty {
+  function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
     let propSchema;
     if (prop.type.kind === "Enum" && prop.default) {
       propSchema = getSchemaForEnum(prop.type);
@@ -1812,10 +1688,10 @@ function createOAPIEmitter(
       if (asEnum) {
         propSchema = getSchemaForUnionEnum(prop.type, asEnum);
       } else {
-        propSchema = getSchemaOrRef(prop.type, visibility);
+        propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, visibility);
+      propSchema = getSchemaOrRef(prop.type, context);
     }
 
     return applyIntrinsicDecorators(prop, propSchema);
@@ -1826,6 +1702,12 @@ function createOAPIEmitter(
     const extensions = getExtensions(program, type);
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Scalar") {
+      const ext = getArmResourceIdentifierConfig(program, type);
+      if (ext) {
+        emitObject["x-ms-arm-id-details"] = ext;
+      }
     }
     if (extensions) {
       for (const key of extensions.keys()) {
@@ -1950,7 +1832,7 @@ function createOAPIEmitter(
 
     if (
       typespecType.kind === "ModelProperty" &&
-      shouldFlattenProperty(tcgcSdkContext, typespecType)
+      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
     ) {
       newTarget["x-ms-client-flatten"] = true;
     }
@@ -2087,11 +1969,14 @@ function createOAPIEmitter(
   /**
    * If the model is an array model return the OpenAPI2Schema for the array type.
    */
-  function getArrayType(typespecType: Model, visibility: Visibility): OpenAPI2Schema | undefined {
+  function getArrayType(typespecType: Model, context: SchemaContext): OpenAPI2Schema | undefined {
     if (isArrayModelType(program, typespecType)) {
       const array: OpenAPI2Schema = {
         type: "array",
-        items: getSchemaOrRef(typespecType.indexer.value!, visibility | Visibility.Item),
+        items: getSchemaOrRef(typespecType.indexer.value!, {
+          ...context,
+          visibility: context.visibility | Visibility.Item,
+        }),
       };
       if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
@@ -2270,7 +2155,7 @@ function createOAPIEmitter(
         reportDiagnostic(program, {
           code: "unsupported-auth",
           format: { authType: (auth as any).type },
-          target: currentService.type,
+          target: service.type,
         });
         return undefined;
     }
@@ -2293,10 +2178,6 @@ function createOAPIEmitter(
   }
 }
 
-function prettierOutput(output: string) {
-  return output + "\n";
-}
-
 class ErrorTypeFoundError extends Error {
   constructor() {
     super("Error type found in evaluated TypeSpec output");
@@ -2314,31 +2195,88 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
-function resolveOutputFile(
-  program: Program,
-  service: Service,
-  multipleServices: boolean,
-  options: ResolvedAutorestEmitterOptions,
+interface LoadedExample {
+  readonly relativePath: string;
+  readonly file: SourceFile;
+  readonly data: any;
+}
+async function loadExamples(
+  host: CompilerHost,
+  options: AutorestDocumentEmitterOptions,
   version?: string
-): string {
-  const azureResourceProviderFolder = options.azureResourceProviderFolder;
-  if (azureResourceProviderFolder) {
-    const info = resolveInfo(program, service.type);
-    version = version ?? info?.version ?? "0000-00-00";
+): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
+  const diagnostics = createDiagnosticCollector();
+  if (!options.examplesDirectory) {
+    return diagnostics.wrap(new Map());
   }
-  const interpolated = interpolatePath(options.outputFile, {
-    "azure-resource-provider-folder": azureResourceProviderFolder,
-    "service-name":
-      multipleServices || azureResourceProviderFolder
-        ? getNamespaceFullName(service.type)
-        : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
-    version,
-  });
+  const exampleDir = version
+    ? resolvePath(options.examplesDirectory, version)
+    : resolvePath(options.examplesDirectory);
+  try {
+    if (!(await host.stat(exampleDir)).isDirectory()) return diagnostics.wrap(new Map());
+  } catch (err) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "example-loading",
+        messageId: "noDirectory",
+        format: { directory: exampleDir },
+        target: NoTarget,
+      })
+    );
+    return diagnostics.wrap(new Map());
+  }
+  const map = new Map<string, Record<string, LoadedExample>>();
+  const exampleFiles = await host.readDir(exampleDir);
+  for (const fileName of exampleFiles) {
+    try {
+      const exampleFile = await host.readFile(resolvePath(exampleDir, fileName));
+      const example = JSON.parse(exampleFile.text);
+      if (!example.operationId || !example.title) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "example-loading",
+            messageId: "noOperationId",
+            format: { filename: fileName },
+            target: NoTarget,
+          })
+        );
+        continue;
+      }
 
-  return resolvePath(options.outputDir, interpolated);
+      if (!map.has(example.operationId)) {
+        map.set(example.operationId, {});
+      }
+      const examples = map.get(example.operationId)!;
+
+      if (example.title in examples) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "duplicate-example-file",
+            target: NoTarget,
+            format: {
+              filename: fileName,
+              operationId: example.operationId,
+              title: example.title,
+            },
+          })
+        );
+      }
+
+      examples[example.title] = {
+        relativePath: fileName,
+        file: exampleFile,
+        data: example,
+      };
+    } catch (err) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "default",
+          format: { filename: fileName, error: err?.toString() ?? "" },
+          target: NoTarget,
+        })
+      );
+    }
+  }
+  return diagnostics.wrap(map);
 }

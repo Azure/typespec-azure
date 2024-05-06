@@ -519,7 +519,7 @@ op ArmResourceActionAsyncBase<
   ...Parameters,
 
   @doc("The content of the action request")
-  @body
+  @bodyRoot
   body: Request,
 ): Response | Error;
 
@@ -581,7 +581,7 @@ op ArmResourceActionSync<
   ...Parameters,
 
   @doc("The content of the action request")
-  @body
+  @bodyRoot
   body: Request,
 ): Response | Error;
 
@@ -666,7 +666,7 @@ op ArmResourceActionNoContentSync<
   ...Parameters,
 
   @doc("The content of the action request")
-  @body
+  @bodyRoot
   body: Request,
 ): ArmNoContentResponse<"Action completed successfully."> | Error;
 

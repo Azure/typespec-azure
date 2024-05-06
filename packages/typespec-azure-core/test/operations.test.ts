@@ -29,7 +29,7 @@ describe("typespec-azure-core: operation templates", () => {
         data: string;
       };
 
-      @test op resourceUpsert is Azure.Core.ResourceCreateOrUpdate<TestModel>;
+      @test op resourceUpsert is StandardResourceOperations.ResourceCreateOrUpdate<TestModel>;
       `
     );
 
@@ -109,8 +109,8 @@ describe("typespec-azure-core: operation templates", () => {
         name: string;
       };
 
-      @test op create is Azure.Core.LongRunningResourceCreateWithServiceProvidedName<TestModel>;
-      @test op createReplace is Azure.Core.LongRunningResourceCreateOrReplace<TestModel>;
+      @test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel>;
+      @test op createReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel>;
       @test op delete is Azure.Core.LongRunningResourceDelete<TestModel>;
 
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
@@ -192,7 +192,7 @@ describe("typespec-azure-core: operation templates", () => {
       }
 
       op read is Azure.Core.ResourceRead<NoKeyModel>;
-      op create is Azure.Core.ResourceCreateOrUpdate<NoSegmentModel>;
+      op create is StandardResourceOperations.ResourceCreateOrUpdate<NoSegmentModel>;
     `);
 
     expectDiagnostics(diagnostics, [
@@ -409,7 +409,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateWithServiceProvidedName", async () => {
     const operation = await compileResourceOperation(
-      `@test op create is Azure.Core.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
+      `@test op create is StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
     );
 
     deepStrictEqual(operation, {
@@ -426,7 +426,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateOrUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrUpdate is Azure.Core.ResourceCreateOrUpdate<TestModel, Customizations>;`
+      `@test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`
     );
 
     const params = [...expectedParamsWithName];
@@ -449,7 +449,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op update is Azure.Core.ResourceUpdate<TestModel, Customizations>;`
+      `@test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`
     );
 
     const params = [...expectedParamsWithName];
@@ -472,7 +472,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateOrReplace", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrReplace is Azure.Core.ResourceCreateOrReplace<TestModel, Customizations>;`
+      `@test op createOrReplace is StandardResourceOperations.ResourceCreateOrReplace<TestModel, Customizations>;`
     );
 
     deepStrictEqual(operation, {
@@ -506,7 +506,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateWithServiceProvidedName", async () => {
     const operation = await compileResourceOperation(
-      `@test op create is Azure.Core.LongRunningResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
+      `@test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
     );
 
     deepStrictEqual(operation, {
@@ -523,7 +523,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateOrUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrUpdate is Azure.Core.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`
+      `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`
     );
 
     const params = [...expectedParamsWithName];
@@ -546,7 +546,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateOrReplace", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrReplace is Azure.Core.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`
+      `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`
     );
 
     deepStrictEqual(operation, {
@@ -861,7 +861,7 @@ describe("typespec-azure-core: operation templates", () => {
   describe("LongRunningOperation", () => {
     it("Gets Lro for standard Async CreateOrUpdate", async () => {
       const [_, metadata] = await compileLroOperation(
-        `@test op createOrUpdate is Azure.Core.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`
+        `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -884,10 +884,10 @@ describe("typespec-azure-core: operation templates", () => {
     it("Gets Lro for standard Async CreateOrUpdate with polling reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        op poll is Azure.Core.GetResourceOperationStatus<TestModel>;
+        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
   
         @Azure.Core.pollingOperation(poll)
-        @test op createOrUpdate is Azure.Core.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
+        @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
         "createOrUpdate"
       );
       ok(metadata);
@@ -910,7 +910,7 @@ describe("typespec-azure-core: operation templates", () => {
 
     it("Gets Lro for standard Async CreateOrReplace", async () => {
       const [_, metadata] = await compileLroOperation(
-        `@test op createOrReplace is Azure.Core.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`
+        `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`
       );
 
       ok(metadata);
@@ -935,10 +935,10 @@ describe("typespec-azure-core: operation templates", () => {
     it("Gets Lro for standard Async CreateOrReplace with polling reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        op poll is Azure.Core.GetResourceOperationStatus<TestModel>;
+        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
   
         @Azure.Core.pollingOperation(poll)
-        @test op createOrReplace is Azure.Core.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
+        @test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
         "createOrReplace"
       );
 
@@ -991,7 +991,7 @@ describe("typespec-azure-core: operation templates", () => {
     it("Gets Lro for standard Async Delete with polling reference", async () => {
       const [_, metadata, runner] = await compileLroOperation(
         `
-        op poll is Azure.Core.GetResourceOperationStatus<TestModel, never>;
+        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel, never>;
   
         @Azure.Core.pollingOperation(poll)
         @test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
@@ -1048,7 +1048,7 @@ describe("typespec-azure-core: operation templates", () => {
     it("Gets Lro for standard Async Update with polling reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-         op poll is Azure.Core.GetResourceOperationStatus<TestModel>;
+         op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
   
         
          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
@@ -1118,7 +1118,7 @@ describe("typespec-azure-core: operation templates", () => {
         model OpResponse is CustomResponseProperties {
           message: string;
         }
-        op poll is Azure.Core.GetResourceOperationStatus<TestModel>;
+        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
   
         @Azure.Core.pollingOperation(poll)
         @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
@@ -1356,7 +1356,7 @@ describe("typespec-azure-core: operation templates", () => {
             @header("operation-id") operate: string,
             @finalLocation @header("Location") location: ResourceLocation<SimpleWidget>,
             @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @body body?: SimpleWidget
+            @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1412,7 +1412,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
             @finalLocation(SimpleWidget)
             @header location: string;
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1466,7 +1466,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1513,7 +1513,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1565,7 +1565,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
             @finalLocation(SimpleWidget)
             @header location: string;
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1621,7 +1621,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1671,7 +1671,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 201;
             @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1728,7 +1728,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
             @finalLocation(SimpleWidget)
             @header location: string;
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1782,7 +1782,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 202;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1830,7 +1830,7 @@ describe("typespec-azure-core: operation templates", () => {
           {
             @statusCode statusCode: 202;
             @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @body body?: SimpleWidget
+            @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -1973,7 +1973,7 @@ describe("typespec-azure-core: operation templates", () => {
             @header id: string,
             @header("operation-id") operate: string,
             @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @body body?: SimpleWidget
+            @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -2032,7 +2032,7 @@ describe("typespec-azure-core: operation templates", () => {
             @header id: string,
             @header("operation-id") operate: string,
             @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @body body?: SimpleWidget
+            @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
         "createWidget"
@@ -2093,7 +2093,7 @@ describe("typespec-azure-core: operation templates", () => {
           @header id: string;
           @header("operation-id") operate: string;
           @pollingLocation @header("Operation-Location") opLink: string;
-          @lroResult @body body?: SimpleWidget;
+          @lroResult @bodyRoot body?: SimpleWidget;
         };
         `,
         "mungeWidget"
@@ -2853,7 +2853,7 @@ describe("typespec-azure-core: operation templates", () => {
         op customCollectionAction is Azure.Core.StandardResourceOperations.ResourceCollectionAction<Widget, {}, Foo | Bar>;
         op rpcAction is Azure.Core.RpcOperation<{}, Foo | Bar>;
   
-        op poll is Azure.Core.GetResourceOperationStatus<Widget>;
+        op poll is StandardResourceOperations.GetResourceOperationStatus<Widget>;
   
         @Azure.Core.pollingOperation(poll)
         op lroCustomAction is Azure.Core.StandardResourceOperations.LongRunningResourceAction<Widget, {}, Bar | Foo>;
@@ -2896,5 +2896,24 @@ describe("typespec-azure-core: operation templates", () => {
         },
       ]);
     });
+  });
+
+  // Regression test for https://github.com/Azure/typespec-azure/issues/332
+  it("doesn't crash when passing non model to ServiceTraits", async () => {
+    const [_, diagnostics] = await getOperations(`
+      alias Operations = Azure.Core.ResourceOperations<abc>;
+    `);
+    expectDiagnostics(
+      diagnostics.filter((x) => x.severity === "error"),
+      [
+        {
+          code: "unknown-identifier",
+          message: "Unknown identifier abc",
+        },
+        {
+          code: "unassignable",
+        },
+      ]
+    );
   });
 });

@@ -24,12 +24,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("A ContosoProviderHub resource")
 model Employee is TrackedResource<EmployeeProperties> {
-  @doc("The first and last name fo the employee")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 
 @doc("The rp-specific properties of the employee")
@@ -54,18 +49,19 @@ interface Employees extends TrackedResourceOperations<Employee, EmployeeProperti
 
 @doc("The provisioning state of a resource.")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("The resource is being provisioned")
-  Provisioning,
+  Provisioning: "Provisioning",
 
   @doc("The resource is updating")
-  Updating,
+  Updating: "Updating",
 
   @doc("The resource is being deleted")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("The resource create request has been accepted")
-  Accepted,
+  Accepted: "Accepted",
 }

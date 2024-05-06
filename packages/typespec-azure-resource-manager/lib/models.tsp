@@ -7,6 +7,28 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
+/**
+ * Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+ * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+ * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+ * @template Resource The ARM resource this name parameter is applying to.
+ * @template KeyName Override default key name of the resource.
+ * @template SegmentName Override default segment name of the resource.
+ * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ */
+model ResourceNameParameter<
+  Resource extends ArmResource,
+  KeyName extends valueof string = "",
+  SegmentName extends valueof string = "",
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+> {
+  @doc("The name of the {name}", Resource)
+  @pattern(NamePattern)
+  @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
+  @path
+  name: string;
+}
+
 //#region Standard Resource Operation Interfaces
 /**
  * Concrete tracked resource types can be created by aliasing this type using a specific property type.
@@ -90,68 +112,43 @@ model ProviderNamespace<Resource extends {}> {
 //#region Common Azure Resource Manager type definitions
 
 /**
- * A type definition that refers the id to an Azure Resource Manager resource.
- *
- * Sample usage:
- *   otherArmId: ResourceIdentifier;
- *   networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
- *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
- * @template AllowedResourceTypes An array of allowed resource types for the resource reference
+ * Use Azure.Core.armResourceIdentifier<AllowedResourceTypes>
  */
-@doc("A type definition that refers the id to an Azure Resource Manager resource.")
-@format("arm-id")
-@OpenAPI.extension(
-  "x-ms-arm-id-details",
-  {
-    allowedResources: AllowedResourceTypes,
-  }
-)
-scalar ResourceIdentifier<AllowedResourceTypes extends ResourceIdentifierAllowedResource[] = []>
-  extends string;
+#deprecated "Use Azure.Core.armResourceIdentifier<AllowedResourceTypes> instead."
+alias ResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierAllowedResource[] = never> = Azure.Core.armResourceIdentifier<AllowedResourceTypes>;
+
+#deprecated "Use ArmResourceIdentifierAllowedResource instead."
+alias ResourceIdentifierAllowedResource = ArmResourceIdentifierAllowedResource;
 
 /**
- * Used in ResourceIdentifier definition to represent a particular type of Azure Resource Manager resource, enabling constraints based on resource type.
- * See [link](https://github.com/Azure/autorest/tree/main/docs/extensions#schema)
- */
-@doc("Optional definition represents a particular type of Azure Resource Manager resource which can be referred to by a ResourceIdentifier.")
-model ResourceIdentifierAllowedResource {
-  @doc("The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.")
-  type: string;
-
-  @doc("""
-    An array of scopes. If not specified, the default scope is ["ResourceGroup"].
-    See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). 
-    """)
-  scopes?: string[] = #[];
-}
-
-/**
- * Standard terminal provisioning state of resource type. You can spread into your
+ * Standard terminal provisioning state of resource type. You can include in your
  * custom provision state to avoid duplication and ensure consistency
  *
  * @example
  *
  * ```typespec
- * enum FooProvisioningState {
- *   ...ResourceProvisioningState,  // include standard provisioning states
- *   starting,
- *   started,
- *   stopping,
- *   stopped,
+ * union FooProvisioningState {
+ *   ResourceProvisioningState,  // include standard provisioning states
+ *   starting: "starting",
+ *   started: "started",
+ *   stopping: "stopping",
+ *   stopped: "stopped",
  * }
  * ```
  */
 @doc("The provisioning state of a resource type.")
 @Azure.Core.lroStatus
-enum ResourceProvisioningState {
+union ResourceProvisioningState {
   @doc("Resource has been created.")
-  Succeeded,
+  Succeeded: "Succeeded",
 
   @doc("Resource creation failed.")
-  Failed,
+  Failed: "Failed",
 
   @doc("Resource creation was canceled.")
-  Canceled,
+  Canceled: "Canceled",
+
+  string,
 }
 
 /**
@@ -172,6 +169,20 @@ model DefaultProvisioningStateProperty {
   @doc("The provisioning state of the resource.")
   @visibility("read")
   provisioningState?: ResourceProvisioningState;
+}
+
+/** The standard evenlop definition of ExtendedLocation.
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ * ...ResourceNameParameter<Employee>;
+ * ...ExtendedLocationProperty;
+ * }
+ * ```
+ */
+model ExtendedLocationProperty {
+  extendedLocation: Foundations.ExtendedLocation;
 }
 
 /**

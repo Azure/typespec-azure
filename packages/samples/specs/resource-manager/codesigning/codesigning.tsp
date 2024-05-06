@@ -24,12 +24,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("A CodeSignAccount resource")
 model CodeSignAccount is TrackedResource<CodeSignAccountProperties> {
-  @doc("Code Signing account name")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("accountName")
-  @segment("codeSignAccounts")
-  @path
-  name: string;
+  ...ResourceNameParameter<CodeSignAccount>;
 }
 
 @armResourceOperations
@@ -59,64 +54,66 @@ model CodeSignAccountPatch {
 }
 
 @doc("Current verification information.")
-enum VerificationStatus {
+union VerificationStatus {
+  string,
+
   @doc("Verification is completed.")
-  Completed,
+  Completed: "Completed",
 
   @doc("Verification is in progress.")
-  InProgress,
+  InProgress: "InProgress",
 
   @doc("Verification is not completed.")
-  NotCompleted,
+  NotCompleted: "NotCompleted",
 }
 
 @doc("The rotation policy for the profile.")
-enum RotationPolicy {
+union RotationPolicy {
+  string,
+
   @doc("Monthly rotation policy.")
-  Monthly,
+  Monthly: "Monthly",
 }
 
 @doc("The type of the profile.")
-enum ProfileType {
+union ProfileType {
+  string,
+
   @doc("Test profile.")
-  Test,
+  Test: "Test",
 
   @doc("Trial profile.")
-  Trial,
+  Trial: "Trial",
 
   @doc("Private trust profile.")
-  PrivateTrust,
+  PrivateTrust: "PrivateTrust",
 
   @doc("Public trust profile.")
-  PublicTrust,
+  PublicTrust: "PublicTrust",
 }
 
 @doc("The status of the current operation.")
 @Azure.Core.lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
 
   @doc("The resource is being provisioned.")
-  Provisioning,
+  Provisioning: "Provisioning",
 
   @doc("The resource is updating.")
-  Updating,
+  Updating: "Updating",
 
   @doc("The resource is being deleted.")
-  Deleting,
+  Deleting: "Deleting",
 
   @doc("The resource create request has been accepted.")
-  Accepted,
+  Accepted: "Accepted",
 }
 
 @parentResource(CodeSignAccount)
 model CertificateProfile is ProxyResource<CertificateProfileProperties> {
-  @doc("Certificate profile name")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("profileName")
-  @segment("certificateProfiles")
-  @path
-  name: string;
+  ...ResourceNameParameter<CertificateProfile>;
 }
 
 @armResourceOperations

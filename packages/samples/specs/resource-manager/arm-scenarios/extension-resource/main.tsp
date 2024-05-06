@@ -27,13 +27,7 @@ enum Versions {
 
 /** A ContosoProviderHub resource */
 model RoleAssignment is ExtensionResource<RoleAssignmentProperties> {
-  /** Name of roleAssignment */
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @key("roleAssignmentName")
-  @path
-  @segment("roleAssignments")
-  @visibility("read")
-  name: string;
+  ...ResourceNameParameter<RoleAssignment>;
 }
 
 /** RoleAssignment properties */
@@ -49,20 +43,22 @@ model RoleAssignmentProperties {
 
 /** The provisioning state of a resource. */
 @lroStatus
-enum ProvisioningState {
-  ...ResourceProvisioningState,
+union ProvisioningState {
+  ResourceProvisioningState,
 
   /** The resource is being provisioned */
-  Provisioning,
+  Provisioning: "Provisioning",
 
   /** The resource is updating */
-  Updating,
+  Updating: "Updating",
 
   /** The resource is being deleted */
-  Deleting,
+  Deleting: "Deleting",
 
   /** The resource create request has been accepted */
-  Accepted,
+  Accepted: "Accepted",
+
+  string,
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}

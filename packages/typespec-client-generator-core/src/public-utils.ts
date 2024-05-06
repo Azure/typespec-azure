@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  Enum,
   Interface,
   Model,
   ModelProperty,
@@ -19,7 +20,6 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
-  HttpOperationParameter,
   getHeaderFieldName,
   getHttpOperation,
   getPathParamName,
@@ -62,12 +62,10 @@ export function getDefaultApiVersion(
  * @param parameter
  * @returns
  */
-export function isApiVersion(
-  context: TCGCContext,
-  parameter: HttpOperationParameter | ModelProperty
-): boolean {
+export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
   return (
-    parameter.name.toLowerCase() === "apiversion" || parameter.name.toLowerCase() === "api-version"
+    type.name.toLowerCase().includes("apiversion") ||
+    type.name.toLowerCase().includes("api-version")
   );
 }
 
@@ -125,7 +123,9 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
  * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
  */
 export function getEmitterTargetName(context: TCGCContext): string {
-  return parseEmitterName(context.program.emitters[0]?.metadata?.name); // eslint-disable-line deprecation/deprecation
+  return ignoreDiagnostics(
+    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name)
+  ); // eslint-disable-line deprecation/deprecation
 }
 
 /**
@@ -174,7 +174,16 @@ export function getLibraryName(
 
   // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
-    return type.name + type.templateMapper.args.map((arg) => (arg as Model).name).join("");
+    return (
+      type.name +
+      type.templateMapper.args
+        .filter(
+          (arg): arg is Model | Enum =>
+            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+        )
+        .map((arg) => pascalCase(arg.name))
+        .join("")
+    );
   }
 
   return typeof type.name === "string" ? type.name : "";
@@ -199,13 +208,16 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @param type
  * @returns
  */
-export function getCrossLanguageDefinitionId(type: {
-  name: string;
-  kind: string;
-  interface?: Interface;
-  namespace?: Namespace;
-}): string {
-  let retval = type.name;
+export function getCrossLanguageDefinitionId(
+  type: {
+    name?: string;
+    kind: string;
+    interface?: Interface;
+    namespace?: Namespace;
+  },
+  name?: string
+): string {
+  let retval = type.name ? type.name : name ?? "";
   if (type.kind === "Operation" && type.interface) {
     retval = `${type.interface.name}.${retval}`;
   }
@@ -248,13 +260,15 @@ export function getGeneratedName(
   operation?: Operation
 ): string {
   if (!context.generatedNames) {
-    context.generatedNames = new Set<string>();
+    context.generatedNames = new Map<Union | Model, string>();
   }
+  const generatedName = context.generatedNames.get(type);
+  if (generatedName) return generatedName;
 
   const contextPath = operation
     ? getContextPath(context, operation, type)
     : findContextPath(context, type);
-  const createdName = buildNameFromContextPaths(context, contextPath);
+  const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
 }
 
@@ -396,7 +410,13 @@ function getContextPath(
     if (currentType === expectedType) {
       result.push({ displayName: pascalCase(displayName), type: currentType });
       return true;
-    } else if (currentType.kind === "Model" && currentType.indexer) {
+    } else if (
+      currentType.kind === "Model" &&
+      currentType.indexer &&
+      currentType.properties.size === 0 &&
+      ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+        currentType.indexer.key.name === "integer")
+    ) {
       // handle array or dict
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
@@ -409,6 +429,35 @@ function getContextPath(
         // use property.name as displayName
         const result = dfsModelProperties(expectedType, property.type, property.name);
         if (result) return true;
+      }
+      // handle additional properties type: model MyModel is Record<> {}
+      if (currentType.sourceModel?.kind === "Model" && currentType.sourceModel?.name === "Record") {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.sourceModel!.indexer!.value!,
+          "AdditionalProperty"
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel { ...Record<>}
+      if (currentType.indexer) {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.indexer.value,
+          "AdditionalProperty"
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel extends Record<> {}
+      if (currentType.baseModel) {
+        if (currentType.baseModel.name === "Record") {
+          const result = dfsModelProperties(
+            expectedType,
+            currentType.baseModel.indexer!.value!,
+            "AdditionalProperty"
+          );
+          if (result) return true;
+        }
       }
       result.pop();
       if (currentType.baseModel) {
@@ -445,7 +494,11 @@ function getContextPath(
  * @param contextPaths
  * @returns
  */
-function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNode[]): string {
+function buildNameFromContextPaths(
+  context: TCGCContext,
+  type: Union | Model,
+  contextPath: ContextNode[]
+): string {
   // fallback to empty name for corner case
   if (contextPath.length === 0) {
     return "";
@@ -478,13 +531,14 @@ function buildNameFromContextPaths(context: TCGCContext, contextPath: ContextNod
   // 3. simplely handle duplication
   let duplicateCount = 1;
   const rawCreateName = createName;
-  while (context.generatedNames?.has(createName)) {
+  const generatedNames = [...(context.generatedNames?.values() ?? [])];
+  while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
   if (context.generatedNames) {
-    context.generatedNames.add(createName);
+    context.generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Set<string>([createName]);
+    context.generatedNames = new Map<Union | Model, string>([[type, createName]]);
   }
   return createName;
 }

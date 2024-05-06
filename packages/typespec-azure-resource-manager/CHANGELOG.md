@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.41.0
+
+### Bug Fixes
+
+- [#410](https://github.com/Azure/typespec-azure/pull/410) Fixing ArmDeleteLroResponse missing Retry-After header
+
+### Bump dependencies
+
+- [#437](https://github.com/Azure/typespec-azure/pull/437) Update dependencies
+
+### Features
+
+- [376](https://github.com/Azure/typespec-azure/pull/376) `RetryAfter` header was moved to be in the default `LroHeaders` for LRO operations. If you were overriding the `LroHeaders` template parmater previously you might need to add `& Azure.Core.FoundationsRetryAfterHeader`
+- [#495](https://github.com/Azure/typespec-azure/pull/495) Made `delegatedIdentityClientId` optional `CustomerManagedKeyEncryption` to align with the common types definition.
+- [#514](https://github.com/Azure/typespec-azure/pull/514) Add `lro-location-header` rule.
+- [#369](https://github.com/Azure/typespec-azure/pull/369) Add `arm-put-operation-response-codes` and `arm-post-operation-response-codes` rules.
+- [#359](https://github.com/Azure/typespec-azure/pull/359) ARM: add `arm-resource-name-pattern` rule to allow disabling LintDiff `ResourceNamePattern` rule
+
+### Deprecations
+
+- [#407](https://github.com/Azure/typespec-azure/pull/407) Deprecate `ResourceIdentifier` in favor of new `Azure.Core.armResourceIdentifier`
+
+
 ## 0.40.0
 
 ### Bug Fixes

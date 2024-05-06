@@ -225,11 +225,29 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   name: string;
 }
 
-enum EmployeeProvisioningState {
-  Creating,
-  GeneratingId,
-  ...ResourceProvisioningState,
-  Deleting,
+union EmployeeProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
 }
 
 @minValue(50)
@@ -237,7 +255,7 @@ enum EmployeeProvisioningState {
 scalar EmployeeLevel extends int32;
 
 scalar EmployeeResourceId
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.HR/employees",
     }
@@ -343,14 +361,14 @@ It is often the case that resources need to reference other resources to provide
 
 ```typespec
 scalar EmployeeResourceId
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.HR/employees",
     }
   ]>;
 
 scalar NetworkInterfaceId
-  extends ResourceIdentifier<[
+  extends Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Network/networkInterfaces",
     },

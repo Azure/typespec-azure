@@ -21,7 +21,6 @@ model Page<Resource extends TypeSpec.Reflection.Model> {
 
   @doc("The link to the next page of items")
   @nextLink
-  @visibility("read")
   nextLink?: ResourceLocation<Resource>;
 }
 
@@ -355,3 +354,48 @@ scalar eTag extends string;
  * ```
  */
 scalar azureLocation extends string;
+
+/**
+ * A type definition that refers the id to an Azure Resource Manager resource.
+ *
+ * Sample usage:
+ *   otherArmId: ResourceIdentifier;
+ *   networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
+ *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
+ * @template AllowedResourceTypes An array of allowed resource types for the resource reference
+ */
+@doc("A type definition that refers the id to an Azure Resource Manager resource.")
+@format("arm-id")
+@Azure.Core.Foundations.Private.armResourceIdentifierConfig({
+  allowedResources: AllowedResourceTypes,
+})
+scalar armResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierAllowedResource[] = never>
+  extends string;
+
+// Consider replacing `*`
+union ArmResourceDeploymentScope {
+  "tenant",
+  "subscription",
+  "resourceGroup",
+  "managementGroup",
+  "extension",
+}
+
+alias AllArmResourceDeploymentScopes = [
+  "tenant",
+  "subscription",
+  "resourceGroup",
+  "managementGroup",
+  "extension"
+];
+
+model ArmResourceIdentifierAllowedResource {
+  /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
+  type: string;
+
+  /**
+   * An array of scopes. If not specified, the default scope is ["ResourceGroup"].
+   * See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes).
+   */
+  scopes?: ArmResourceDeploymentScope[];
+}
