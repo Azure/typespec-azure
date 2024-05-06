@@ -240,6 +240,10 @@ export function isAcceptHeader(param: SdkModelPropertyType): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
+export function isContentTypeHeader(param: SdkModelPropertyType): boolean {
+  return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
+}
+
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
   const httpOperation = getHttpOperationWithCache(context, operation);
