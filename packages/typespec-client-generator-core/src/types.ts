@@ -28,7 +28,7 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
-  isValueType,
+  isType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -1140,8 +1140,8 @@ function checkAndGetClientType(
     if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
       if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
         effectivePayloadType.templateMapper.args
+          .filter(isType)
           .filter((arg) => arg.kind === "Model" && arg.name)
-          .filter((x): x is Type => !isValueType(x))
           .forEach((arg) => {
             retval.push(...diagnostics.pipe(checkAndGetClientType(context, arg, operation)));
           });

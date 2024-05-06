@@ -1085,8 +1085,8 @@ export async function getOpenAPIForService(
     if (param.name !== ph.name) {
       ph["x-ms-client-name"] = param.name;
     }
-    if (param.default) {
-      ph.default = getDefaultValue(param.default);
+    if (param.defaultValue) {
+      ph.default = getDefaultValue(param.defaultValue);
     }
 
     if (ph.in === "body") {
@@ -1445,34 +1445,25 @@ export async function getOpenAPIForService(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(type: Type | Value): any {
-    switch (type.kind) {
-      case "String":
-        return type.value;
-      case "Number":
-        return type.value;
-      case "Boolean":
-        return type.value;
-      case "Tuple":
-      case "TupleLiteral":
-        return type.values.map(getDefaultValue);
-      case "EnumMember":
-        return type.value ?? type.name;
-      case "Intrinsic":
-        return isNullType(type)
-          ? null
-          : reportDiagnostic(program, {
-              code: "invalid-default",
-              format: { type: type.kind },
-              target: type,
-            });
-      case "UnionVariant":
-        return getDefaultValue(type.type);
+  function getDefaultValue(defaultType: Value): any {
+    switch (defaultType.valueKind) {
+      case "StringValue":
+        return defaultType.value;
+      case "NumericValue":
+        return defaultType.value.asNumber() ?? undefined;
+      case "BooleanValue":
+        return defaultType.value;
+      case "ArrayValue":
+        return defaultType.values.map((x) => getDefaultValue(x));
+      case "NullValue":
+        return null;
+      case "EnumValue":
+        return defaultType.value.value ?? defaultType.value.name;
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
-          format: { type: type.kind },
-          target: type,
+          format: { type: defaultType.valueKind },
+          target: defaultType,
         });
     }
   }
@@ -1609,8 +1600,8 @@ export async function getOpenAPIForService(
         property.description = description;
       }
 
-      if (prop.default && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.default);
+      if (prop.defaultValue && !("$ref" in property)) {
+        property.default = getDefaultValue(prop.defaultValue);
       }
 
       if (isReadonlyProperty(program, prop)) {
