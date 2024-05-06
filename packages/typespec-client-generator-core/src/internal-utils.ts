@@ -398,3 +398,8 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
 export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
   return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }
+
+export function getLocationOfOperation(operation: Operation): Namespace | Interface {
+  // have to check interface first, because interfaces are more granular than namespaces
+  return (operation.interface || operation.namespace)!;
+}

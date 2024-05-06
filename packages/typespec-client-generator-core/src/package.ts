@@ -88,7 +88,7 @@ function getSdkServiceOperation<
   const httpOperation = getHttpOperationWithCache(context, operation);
   if (httpOperation) {
     const sdkHttpOperation = diagnostics.pipe(
-      getSdkHttpOperation(context, client, httpOperation, methodParameters)
+      getSdkHttpOperation(context, httpOperation, methodParameters)
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
@@ -309,7 +309,7 @@ function getSdkBasicServiceMethod<
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
       return ignoreDiagnostics(
-        getCorrespondingMethodParams(context, client, name, methodParameters, serviceParam)
+        getCorrespondingMethodParams(context, operation, methodParameters, serviceParam)
       );
     },
     getResponseMapping: function getResponseMapping(): string | undefined {

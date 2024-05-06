@@ -976,7 +976,7 @@ export function getSdkModelPropertyTypeBase(
     apiVersions: getAvailableApiVersions(
       context,
       type,
-      operation?.namespace || type.model?.namespace
+      operation?.interface || operation?.namespace || type.model?.namespace
     ),
     type: propertyType,
     nameInClient: name,
