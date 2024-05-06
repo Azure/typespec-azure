@@ -571,10 +571,18 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+interface CreateSdkContextOptions {
+  readonly versionStrategy?: "ignore";
+}
+
 export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+>(
+  context: EmitContext<TOptions>,
+  emitterName?: string,
+  options?: CreateSdkContextOptions
+): SdkContext<TOptions, TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
@@ -594,7 +602,7 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     diagnostics: diagnostics.diagnostics,
-    apiVersion: context.options["api-version"],
+    apiVersion: options?.versionStrategy === "ignore" ? "all" : context.options["api-version"],
     originalProgram: context.program,
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
