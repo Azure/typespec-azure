@@ -172,10 +172,7 @@ function getSdkHttpParameters(
       )
     );
   }
-  if (
-    retval.bodyParam &&
-    !headerParams.some((h) => isContentTypeHeader(h))
-  ) {
+  if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(retval.bodyParam),
@@ -358,12 +355,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-    {
-      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-    },
-    readonly Diagnostic[],
-  ] {
+  {
+    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  },
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
