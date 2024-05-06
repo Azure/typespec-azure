@@ -61,6 +61,12 @@ export interface AutorestEmitterOptions {
   "omit-unreachable-types"?: boolean;
 
   /**
+   * Decide how to deal with the Version enum when when `omit-unreachable-types` is not set.
+   * @default "omit"
+   */
+  "version-enum-strategy"?: "omit" | "include";
+
+  /**
    * If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
    * This extension is meant for debugging and should not be depended on.
    * @default "never"
@@ -151,6 +157,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       description:
         "Omit unreachable types. By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.",
+    },
+    "version-enum-strategy": {
+      type: "string",
+      nullable: true,
+      description:
+        "Decide how to deal with the Version enum when when `omit-unreachable-types` is not set. Default to 'omit'",
+      default: "omit",
     },
     "include-x-typespec-name": {
       type: "string",

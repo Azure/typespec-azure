@@ -366,16 +366,6 @@
         "status",
         "id"
       ]
-    },
-    "Versions": {
-      "type": "string",
-      "enum": [
-        "2022-11-01-preview"
-      ],
-      "x-ms-enum": {
-        "name": "Versions",
-        "modelAsString": true
-      }
     }
   },
   "parameters": {}

@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.9
+
+### Bug Fixes
+
+- [#745](https://github.com/Azure/typespec-azure/pull/745) allow callers of createSdkContext to ignore default version projection
+- [#778](https://github.com/Azure/typespec-azure/pull/778) tie api version information to clients so we can have diff api version information per client
+- [#780](https://github.com/Azure/typespec-azure/pull/780) fix duplicated content type parameter for rpc lro
+
+
 ## 0.41.8
 
 ### Bug Fixes

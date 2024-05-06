@@ -112,17 +112,6 @@
         "name",
         "favoriteToys"
       ]
-    },
-    "Versions": {
-      "type": "string",
-      "enum": [
-        "v1",
-        "v2"
-      ],
-      "x-ms-enum": {
-        "name": "Versions",
-        "modelAsString": true
-      }
     }
   },
   "parameters": {
