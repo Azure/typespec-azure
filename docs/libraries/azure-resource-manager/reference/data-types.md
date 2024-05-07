@@ -122,10 +122,10 @@ model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 
 #### Properties
 
-| Name       | Type           | Description                                         |
-| ---------- | -------------- | --------------------------------------------------- |
-| statusCode | `201`          | The status code.                                    |
-| body       | `ResponseBody` | The body type of the operation request or response. |
+| Name       | Type           | Description      |
+| ---------- | -------------- | ---------------- |
+| statusCode | `201`          | The status code. |
+| body       | `ResponseBody` |                  |
 
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 
@@ -901,9 +901,9 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 
 #### Properties
 
-| Name     | Type                             | Description                              |
-| -------- | -------------------------------- | ---------------------------------------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ResourceKind` {#Azure.ResourceManager.ResourceKind}
 
@@ -992,9 +992,9 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 
 #### Properties
 
-| Name     | Type                             | Description                              |
-| -------- | -------------------------------- | ---------------------------------------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource. |
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ResourcePlan` {#Azure.ResourceManager.ResourcePlan}
 
