@@ -48,6 +48,31 @@ export function $omitIfEmpty(context: DecoratorContext, entity: Model, propertyN
   }
 }
 
+export function $enforceConstraint(
+  context: DecoratorContext,
+  entity: Operation | Model,
+  sourceType: Model,
+  constraintType: Model
+) {
+  if (sourceType !== undefined && constraintType !== undefined) {
+    // walk the baseModel chain until find a match or fail
+    let baseType: Model | undefined = sourceType;
+    do {
+      if (baseType === constraintType) return;
+    } while ((baseType = baseType.baseModel) !== undefined);
+
+    reportDiagnostic(context.program, {
+      code: "template-type-constraint-no-met",
+      target: entity,
+      format: {
+        entity: entity.name,
+        sourceType: sourceType.name,
+        constraintType: constraintType.name,
+      },
+    });
+  }
+}
+
 export function $resourceBaseParametersOf(
   context: DecoratorContext,
   entity: Model,

@@ -43,7 +43,7 @@ interface Operations {
  */
 #deprecated "Use Azure.ResourceManager.TrackedResourceOperations instead"
 interface ResourceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > extends TrackedResourceOperations<Resource, Properties, BaseParameters> {}
@@ -59,7 +59,7 @@ interface ResourceOperations<
  *
  */
 interface TrackedResourceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 >
@@ -79,7 +79,7 @@ interface TrackedResourceOperations<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface ProxyResourceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 >
   extends ResourceRead<Resource, BaseParameters>,
@@ -100,7 +100,7 @@ interface ProxyResourceOperations<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface TenantResourceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 >
   extends TenantResourceRead<Resource>,
@@ -118,7 +118,7 @@ interface TenantResourceOperations<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface ResourceInstanceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   PatchModel = ResourceUpdateModel<Resource, Properties>
@@ -134,7 +134,7 @@ interface ResourceInstanceOperations<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCollectionOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > extends ResourceListByParent<Resource, BaseParameters>, ResourceListBySubscription<Resource> {}
 
@@ -142,7 +142,7 @@ interface ResourceCollectionOperations<
  * An interface for resources with can be listed by subscription.
  * @template Resource The ArmResource that provides these operations
  */
-interface ResourceListBySubscription<Resource extends Private.ArmResourceTypeConstraint> {
+interface ResourceListBySubscription<Resource extends Foundations.Resource> {
   /**
    * @dev List resources by subscription.
    * @template Resource The ArmResource to list.
@@ -158,7 +158,7 @@ interface ResourceListBySubscription<Resource extends Private.ArmResourceTypeCon
  * @template ParentFriendlyName The friendly name of the parent resource
  */
 interface ResourceListByParent<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = ""
@@ -179,7 +179,7 @@ interface ResourceListByParent<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceRead<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
@@ -196,7 +196,7 @@ interface ResourceRead<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCreateSync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
@@ -213,7 +213,7 @@ interface ResourceCreateSync<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCreateAsync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
@@ -233,7 +233,7 @@ interface ResourceCreateAsync<
 #deprecated "This should be deprecated in a future release"
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteAsync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
@@ -251,7 +251,7 @@ interface ResourceDeleteAsync<
  */
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteWithoutOkAsync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
@@ -269,7 +269,7 @@ interface ResourceDeleteWithoutOkAsync<
  */
 @doc("Delete a resource")
 interface ResourceDeleteSync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
@@ -288,7 +288,7 @@ interface ResourceDeleteSync<
  */
 @doc("Asynchronous resource update")
 interface ResourceUpdateAsync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
@@ -313,7 +313,7 @@ interface ResourceUpdateAsync<
  */
 @doc("Synchronous resource update")
 interface ResourceUpdateSync<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
@@ -333,7 +333,7 @@ interface ResourceUpdateSync<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface ExtensionResourceInstanceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 >
   extends ExtensionResourceRead<Resource>,
@@ -345,7 +345,7 @@ interface ExtensionResourceInstanceOperations<
  * A composite interface for resource collections that include a paginated list operation.
  * @template Resource The ArmResource that provides these operations
  */
-interface ExtensionResourceCollectionOperations<Resource extends Private.ArmResourceTypeConstraint>
+interface ExtensionResourceCollectionOperations<Resource extends Foundations.Resource>
   extends ExtensionResourceList<Resource> {}
 
 /**
@@ -354,84 +354,84 @@ interface ExtensionResourceCollectionOperations<Resource extends Private.ArmReso
  * @template Properties RP-specific property bag for the resource
  */
 interface ExtensionResourceOperations<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 >
   extends ExtensionResourceInstanceOperations<Resource, Properties>,
     ExtensionResourceCollectionOperations<Resource> {}
 
 alias ResourceCreate<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceCreateAsync<Resource, BaseParameters>;
 
 alias ResourceUpdate<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceUpdateSync<Resource, Properties, BaseParameters>;
 
 #suppress "deprecated" "This should be deprecated in a future release"
 alias ResourceDelete<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceDeleteAsync<Resource, BaseParameters>;
 
 alias ProxyResourceUpdate<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties>;
 
-alias ExtensionResourceRead<Resource extends Private.ArmResourceTypeConstraint> = ResourceRead<
+alias ExtensionResourceRead<Resource extends Foundations.Resource> = ResourceRead<
   Resource,
   ExtensionBaseParameters
 >;
 
-alias ExtensionResourceCreate<Resource extends Private.ArmResourceTypeConstraint> = ResourceCreate<
+alias ExtensionResourceCreate<Resource extends Foundations.Resource> = ResourceCreate<
   Resource,
   ExtensionBaseParameters
 >;
 
 alias ExtensionResourceUpdate<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties, ExtensionBaseParameters>;
 
 #suppress "deprecated" "This should be deprecated in a future release"
-alias ExtensionResourceDelete<Resource extends Private.ArmResourceTypeConstraint> = ResourceDelete<
+alias ExtensionResourceDelete<Resource extends Foundations.Resource> = ResourceDelete<
   Resource,
   ExtensionBaseParameters
 >;
 
-alias ExtensionResourceList<Resource extends Private.ArmResourceTypeConstraint> = ResourceListByParent<
+alias ExtensionResourceList<Resource extends Foundations.Resource> = ResourceListByParent<
   Resource,
   ExtensionBaseParameters,
   "Extension",
   "parent"
 >;
 
-alias TenantResourceRead<Resource extends Private.ArmResourceTypeConstraint> = ResourceRead<
+alias TenantResourceRead<Resource extends Foundations.Resource> = ResourceRead<
   Resource,
   TenantBaseParameters
 >;
 
-alias TenantResourceCreate<Resource extends Private.ArmResourceTypeConstraint> = ResourceCreateAsync<
+alias TenantResourceCreate<Resource extends Foundations.Resource> = ResourceCreateAsync<
   Resource,
   TenantBaseParameters
 >;
 
 #suppress "deprecated" "This should be deprecated in a future release"
-alias TenantResourceDelete<Resource extends Private.ArmResourceTypeConstraint> = ResourceDelete<
+alias TenantResourceDelete<Resource extends Foundations.Resource> = ResourceDelete<
   Resource,
   TenantBaseParameters
 >;
 
 alias TenantResourceUpdate<
-  Resource extends Private.ArmResourceTypeConstraint,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties, TenantBaseParameters>;
 
-alias TenantResourceListByParent<Resource extends Private.ArmResourceTypeConstraint> = ResourceListByParent<
+alias TenantResourceListByParent<Resource extends Foundations.Resource> = ResourceListByParent<
   Resource,
   TenantBaseParameters,
   "Tenant",
