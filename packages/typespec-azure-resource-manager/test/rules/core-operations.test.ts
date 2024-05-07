@@ -104,7 +104,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
             @segment("foo")
             @path
             name: string;
-            ...ManagedServiceIdentity;
+            ...ManagedServiceIdentityProperty;
           }
     
           @armResourceOperations
@@ -163,7 +163,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
             @segment("foo")
             @path
             name: string;
-            ...ManagedServiceIdentity;
+            ...ManagedServiceIdentityProperty;
           }
           model MyResourceCommonParameters<TResource extends {}> {
             ...SubscriptionIdParameter;

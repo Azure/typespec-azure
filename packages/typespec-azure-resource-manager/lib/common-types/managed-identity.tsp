@@ -2,6 +2,8 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
 
+#deprecated "Please change ManagedIdentityProperties to ManagedServiceIdentity."
+alias ManagedIdentityProperties = ManagedServiceIdentity;
 /**
  * The properties of the managed service identities assigned to this resource.
  */
@@ -18,8 +20,7 @@ namespace Azure.ResourceManager.Foundations;
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "managedidentity.json"
 )
-@doc("The properties of the managed service identities assigned to this resource.")
-model ManagedIdentityProperties {
+model ManagedServiceIdentity {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
@@ -32,9 +33,14 @@ model ManagedIdentityProperties {
   type: ManagedServiceIdentityType;
 
   @doc("The identities assigned to this resource by the user.")
-  userAssignedIdentities?: Record<UserAssignedIdentity>;
+  userAssignedIdentities?: UserAssignedIdentities;
 }
 
+/** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.", */
+model UserAssignedIdentities is Record<UserAssignedIdentity>;
+
+#deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
+alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 /**
  * The properties of the service-assigned identity associated with this resource.
  */
@@ -51,8 +57,7 @@ model ManagedIdentityProperties {
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "managedidentity.json"
 )
-@doc("The properties of the service-assigned identity associated with this resource.")
-model ManagedSystemIdentityProperties {
+model SystemAssignedServiceIdentity {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
