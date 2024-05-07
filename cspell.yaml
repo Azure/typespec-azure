@@ -16,6 +16,11 @@ ignorePaths:
   - pnpm-lock.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
+  - ".git/**"
+  - ".gitignore"
+  - ".vscode/**"
+  - ".editorconfig"
+  - .github/CODEOWNERS
 useGitignore: true
 enableFiletypes:
   - tsp
