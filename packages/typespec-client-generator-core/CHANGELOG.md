@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.41.10
+
+### Bug Fixes
+
+- [#788](https://github.com/Azure/typespec-azure/pull/788) fix wrong default version for interface from extends
+
+
 ## 0.41.9
 
 ### Bug Fixes
