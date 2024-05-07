@@ -985,7 +985,11 @@ export function getSdkModelPropertyTypeBase(
     isGeneratedName: false,
     optional: type.optional,
     nullable: isNullable(type.type),
-    ...updateWithApiVersionInformation(context, type, operation ? getLocationOfOperation(operation) : undefined),
+    ...updateWithApiVersionInformation(
+      context,
+      type,
+      operation ? getLocationOfOperation(operation) : undefined
+    ),
   });
 }
 
