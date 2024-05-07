@@ -97,7 +97,7 @@ export const $lib = createTypeSpecLibrary({
     "template-type-constraint-no-met": {
       severity: "error",
       messages: {
-        default: paramMessage`The template parameter "${"sourceType"}" for "${"entity"}" does not satisfy the constraint type "${"constraintType"}".`,
+        default: paramMessage`The template parameter "${"sourceType"}" for "${"entity"}" does not extend the constraint type "${"constraintType"}". ${"actionMessage"}`,
       },
     },
   },

@@ -68,6 +68,7 @@ export function $enforceConstraint(
         entity: entity.name,
         sourceType: sourceType.name,
         constraintType: constraintType.name,
+        actionMessage: `Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
       },
     });
   }

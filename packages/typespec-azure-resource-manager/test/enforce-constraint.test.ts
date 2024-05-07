@@ -19,9 +19,13 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       model WidgetProperties {
          size: int32;
       }
+      
+      @doc("Direct extended resource")
+      model CustomResource extends Foundations.Resource {};
 
       interface Widgets {
         create is ArmResourceCreateOrReplaceSync<Widget>;
+        delete is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
   `);
     expectDiagnosticEmpty(diagnostics);
@@ -59,18 +63,30 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
          size: int32;
       }
 
+      @doc("Custom Mix in resource")
+      model CustomResource is Foundations.Resource {};
+
       interface Widgets {
         create is ArmResourceCreateOrReplaceSync<Widget>;
+        delete is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
   `);
     expectDiagnostics(diagnostics, [
       {
         code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message: `The template parameter "Widget" for "ArmResourceCreateOrReplaceSync" does not satisfy the constraint type "Resource".`,
+        message: `The template parameter "Widget" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message: `The template parameter "Widget" for "create" does not satisfy the constraint type "Resource".`,
+        message: `The template parameter "Widget" for "create" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+        message: `The template parameter "CustomResource" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+        message: `The template parameter "CustomResource" for "delete" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
       },
     ]);
   });
