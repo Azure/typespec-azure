@@ -7,7 +7,7 @@ namespace Azure.ResourceManager.Foundations;
  */
 @armCommonDefinition(
   "ManagedServiceIdentity",
-  {
+  #{
     version: Azure.ResourceManager.CommonTypes.Versions.v4,
     isDefault: true,
   },
@@ -40,7 +40,7 @@ model ManagedIdentityProperties {
  */
 @armCommonDefinition(
   "SystemAssignedServiceIdentity",
-  {
+  #{
     version: Azure.ResourceManager.CommonTypes.Versions.v4,
     isDefault: true,
   },

@@ -31,7 +31,7 @@ alias ArmCommonTypeVersionSpec = {
 extern dec armCommonDefinition(
   target: Model,
   definitionName?: valueof string,
-  version?: EnumMember | ArmCommonTypeVersionSpec | (valueof string),
+  version?: valueof EnumMember | ArmCommonTypeVersionSpec | string,
   referenceFile?: valueof string
 );
 
@@ -43,7 +43,7 @@ extern dec armCommonDefinition(
 extern dec armCommonParameter(
   target: ModelProperty,
   definitionName?: valueof string,
-  version?: EnumMember | ArmCommonTypeVersionSpec | (valueof string),
+  version?: valueof EnumMember | ArmCommonTypeVersionSpec | string,
   referenceFile?: valueof string
 );
 
