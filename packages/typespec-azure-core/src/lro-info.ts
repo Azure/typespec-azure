@@ -357,8 +357,12 @@ export function getLroOperationInfo(
       );
       return;
     }
-    const sourceProperty = propMap.templateMapper!.args[0];
-    compilerAssert(isType(sourceProperty), "Lro Template Arg should be a Type", sourceProperty);
+    let sourceProperty = propMap.templateMapper!.args[0];
+    if ("metaKind" in sourceProperty && sourceProperty.metaKind === "Indeterminate") {
+      sourceProperty = sourceProperty.type;
+    } else if (!isType(sourceProperty)) {
+      compilerAssert(false, "Lro Template Arg should be a Type", propMap);
+    }
     switch (sourceProperty.kind) {
       case "String":
         const sourcePropertyName = sourceProperty.value;
