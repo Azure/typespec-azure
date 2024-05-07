@@ -3218,6 +3218,56 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.isApiVersionParam, true);
     });
+
+    it("default api version for interface extends", async () => {
+      await runner.compile(`
+        namespace Azure.ResourceManager {
+          interface Operations {
+            @get
+            list(@query "api-version": string): void;
+          }
+        }
+        
+        @service({})
+        @versioned(Versions)
+        namespace Test {
+          enum Versions {
+            v1,
+            v2,
+          }
+        
+          interface Operations extends Azure.ResourceManager.Operations {}
+        }      
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+    });
+
+    it("default api version for operation is", async () => {
+      await runner.compile(`
+        namespace Azure.ResourceManager {
+          interface Operations {
+            @get
+            list(@query "api-version": string): void;
+          }
+        }
+        
+        @service({})
+        @versioned(Versions)
+        namespace Test {
+          enum Versions {
+            v1,
+            v2,
+          }
+        
+          op list is Azure.ResourceManager.Operations.list;
+        }      
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+    });
   });
 });
 

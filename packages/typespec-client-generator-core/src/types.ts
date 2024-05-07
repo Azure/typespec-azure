@@ -78,6 +78,7 @@ import {
   createGeneratedName,
   getAvailableApiVersions,
   getDocHelper,
+  getLocationOfOperation,
   getNonNullOptions,
   getSdkTypeBaseHelper,
   intOrFloat,
@@ -984,7 +985,7 @@ export function getSdkModelPropertyTypeBase(
     isGeneratedName: false,
     optional: type.optional,
     nullable: isNullable(type.type),
-    ...updateWithApiVersionInformation(context, type, operation?.namespace),
+    ...updateWithApiVersionInformation(context, type, operation ? getLocationOfOperation(operation) : undefined),
   });
 }
 
@@ -1026,7 +1027,6 @@ export function getSdkModelPropertyType(
     serializedName: getPropertyNames(context, type)[1],
     isMultipartFileInput: isBytesInput && operationIsMultipart,
     flatten: shouldFlattenProperty(context, type),
-    ...updateWithApiVersionInformation(context, type, operation?.namespace),
   });
 }
 
