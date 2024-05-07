@@ -102,7 +102,7 @@ extern dec operationGroup(target: Namespace | Interface, scope?: valueof string)
  * ```typespec
  * @exclude("python")
  * model ModelToExclude {
- *   prop: valueof string
+ *   prop: string;
  * }
  * ```
  */
@@ -120,7 +120,7 @@ extern dec exclude(target: Model, scope?: valueof string);
  * ```typespec
  * @include("python")
  * model ModelToInclude {
- *   prop: valueof string
+ *   prop: string;
  * }
  * ```
  */
@@ -278,7 +278,7 @@ enum Access {
  * // Access.internal
  * @access(Access.internal)
  * model ModelToHide {
- *   prop: valueof string
+ *   prop: string;
  * }
  * // Access.internal
  * @access(Access.internal)

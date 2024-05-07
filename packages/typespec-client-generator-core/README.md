@@ -332,7 +332,7 @@ all models that are included in operations.
 ```typespec
 @exclude("python")
 model ModelToExclude {
-  prop: valueof string;
+prop: valueof string
 }
 ```
 
@@ -390,7 +390,7 @@ all models that are included in operations.
 ```typespec
 @include("python")
 model ModelToInclude {
-  prop: valueof string;
+  prop: string;
 }
 ```
 
