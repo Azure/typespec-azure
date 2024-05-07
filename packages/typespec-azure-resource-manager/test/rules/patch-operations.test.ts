@@ -102,8 +102,6 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     @armProviderNamespace
     namespace Microsoft.Foo;
 
-      using Azure.ResourceManager.Foundations;
-
       @doc(".")
       enum Versions {
         @doc(".")
@@ -131,7 +129,8 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       @doc("A bad patch")
       model MyBadPatch {
         ...ManagedServiceIdentityProperty;
-        ...ArmTagsProperty;
+        ...Foundations.ArmTagsProperty;
+
         @doc("Blah?")
         blah?: string;
         @doc("Blahdeeblah?")

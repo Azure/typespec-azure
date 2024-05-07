@@ -8,7 +8,6 @@ using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.ResourceManager;
-using Azure.ResourceManager.Foundations;
 using Autorest;
 
 @armProviderNamespace
@@ -164,7 +163,7 @@ interface MarketplaceAgreements extends ResourceListBySubscription<ConfluentAgre
   @doc("Create a new marketplace agreement.")
   @armResourceCreateOrUpdate(ConfluentAgreementResource)
   create(
-    ...SubscriptionScope<ConfluentAgreementResource>,
+    ...Foundations.SubscriptionScope<ConfluentAgreementResource>,
     ...KeysOf<ConfluentAgreementResource>,
 
     @doc("The agreement details.")

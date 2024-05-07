@@ -17,7 +17,7 @@ namespace Azure.ResourceManager;
  * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
  */
 model ResourceNameParameter<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
@@ -39,7 +39,7 @@ model ResourceNameParameter<
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model TrackedResource<Properties extends {}> extends TrackedResourceBase {
+model TrackedResource<Properties extends {}> extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
@@ -55,7 +55,7 @@ model TrackedResource<Properties extends {}> extends TrackedResourceBase {
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ProxyResource<Properties extends {}> extends ProxyResourceBase {
+model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
@@ -72,7 +72,7 @@ model ProxyResource<Properties extends {}> extends ProxyResourceBase {
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ExtensionResource<Properties extends {}> extends ExtensionResourceBase {
+model ExtensionResource<Properties extends {}> extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
@@ -184,7 +184,8 @@ model DefaultProvisioningStateProperty {
  * ```
  */
 model ExtendedLocationProperty {
-  extendedLocation: Foundations.ExtendedLocation;
+  @visibility("read", "create")
+  extendedLocation?: Foundations.ExtendedLocation;
 }
 
 #deprecated "Please change ManagedServiceIdentity to ManagedServiceIdentityProperty."
@@ -281,7 +282,7 @@ model ResourceKindProperty {
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
 
 #deprecated "`ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead."
 alias ResourcePlan = ResourcePlanProperty;
@@ -301,7 +302,7 @@ alias ResourcePlan = ResourcePlanProperty;
 @doc("The resource plan property envelope.")
 model ResourcePlanProperty {
   @doc("Details of the resource plan.")
-  plan?: ResourcePlanType;
+  plan?: Plan;
 }
 
 #deprecated "`ResourceSku` will be deprecated. Please use `ResourceSkuProperty` instead."
@@ -322,7 +323,7 @@ alias ResourceSku = ResourceSkuProperty;
 @doc("The SKU (Stock Keeping Unit) assigned to this resource.")
 model ResourceSkuProperty {
   @doc("The SKU (Stock Keeping Unit) assigned to this resource.")
-  sku?: ResourceSkuType;
+  sku?: Sku;
 }
 
 #deprecated "`ManagedBy` will be deprecated. Please use `ManagedByProperty` instead."

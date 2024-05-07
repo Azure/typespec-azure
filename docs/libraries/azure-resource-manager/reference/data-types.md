@@ -513,9 +513,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 #### Properties
 
-| Name             | Type                                                                                     | Description |
-| ---------------- | ---------------------------------------------------------------------------------------- | ----------- |
-| extendedLocation | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocation) |             |
+| Name              | Type                                                                                     | Description |
+| ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocation) |             |
 
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
@@ -1039,9 +1039,9 @@ model Foo is TrackedResource<FooProperties> {
 
 #### Properties
 
-| Name  | Type                                                                                     | Description                   |
-| ----- | ---------------------------------------------------------------------------------------- | ----------------------------- |
-| plan? | [`ResourcePlanType`](./data-types.md#Azure.ResourceManager.Foundations.ResourcePlanType) | Details of the resource plan. |
+| Name  | Type                                                             | Description                   |
+| ----- | ---------------------------------------------------------------- | ----------------------------- |
+| plan? | [`Plan`](./data-types.md#Azure.ResourceManager.Foundations.Plan) | Details of the resource plan. |
 
 ### `ResourceSkuProperty` {#Azure.ResourceManager.ResourceSkuProperty}
 
@@ -1063,9 +1063,9 @@ model Foo is TrackedResource<FooProperties> {
 
 #### Properties
 
-| Name | Type                                                                                   | Description                                             |
-| ---- | -------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| sku? | [`ResourceSkuType`](./data-types.md#Azure.ResourceManager.Foundations.ResourceSkuType) | The SKU (Stock Keeping Unit) assigned to this resource. |
+| Name | Type                                                           | Description                                             |
+| ---- | -------------------------------------------------------------- | ------------------------------------------------------- |
+| sku? | [`Sku`](./data-types.md#Azure.ResourceManager.Foundations.Sku) | The SKU (Stock Keeping Unit) assigned to this resource. |
 
 ### `ResourceUriParameter` {#Azure.ResourceManager.ResourceUriParameter}
 
@@ -1220,35 +1220,6 @@ enum Azure.ResourceManager.CommonTypes.Versions
 
 ## Azure.ResourceManager.Foundations
 
-### `ArmResource` {#Azure.ResourceManager.Foundations.ArmResource}
-
-Base model that defines common properties for all Azure Resource Manager resources.
-
-```typespec
-model Azure.ResourceManager.Foundations.ArmResource
-```
-
-#### Properties
-
-| Name        | Type                                                                         | Description                                                                                                                                                                               |
-| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id          | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
-| name        | `string`                                                                     | The name of the resource                                                                                                                                                                  |
-| type        | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
-| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
-
-### `ArmResourceBase` {#Azure.ResourceManager.Foundations.ArmResourceBase}
-
-Base class used for type definitions
-
-```typespec
-model Azure.ResourceManager.Foundations.ArmResourceBase
-```
-
-#### Properties
-
-None
-
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}
 
 Standard type definition for Azure Resource Manager Tags property.
@@ -1264,6 +1235,20 @@ model Azure.ResourceManager.Foundations.ArmTagsProperty
 | Name  | Type             | Description    |
 | ----- | ---------------- | -------------- |
 | tags? | `Record<string>` | Resource tags. |
+
+### `AzureEntityResource` {#Azure.ResourceManager.Foundations.AzureEntityResource}
+
+The resource model definition for an Azure Resource Manager resource with an etag.
+
+```typespec
+model Azure.ResourceManager.Foundations.AzureEntityResource
+```
+
+#### Properties
+
+| Name | Type     | Description    |
+| ---- | -------- | -------------- |
+| etag | `string` | Resource Etag. |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest}
 
@@ -1383,12 +1368,12 @@ model Azure.ResourceManager.Foundations.ExtensionBaseParameters
 | apiVersion  | `string` | The API version to use for this operation.                             |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
 
-### `ExtensionResourceBase` {#Azure.ResourceManager.Foundations.ExtensionResourceBase}
+### `ExtensionResource` {#Azure.ResourceManager.Foundations.ExtensionResource}
 
 The base extension resource.
 
 ```typespec
-model Azure.ResourceManager.Foundations.ExtensionResourceBase
+model Azure.ResourceManager.Foundations.ExtensionResource
 ```
 
 #### Properties
@@ -1558,12 +1543,30 @@ model Azure.ResourceManager.Foundations.OperationStatusResult
 | operations       | `ResourceManager.Foundations.OperationStatusResult[]`                          | The operations list.                        |
 | error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | If present, details of the operation error. |
 
-### `ProxyResourceBase` {#Azure.ResourceManager.Foundations.ProxyResourceBase}
+### `Plan` {#Azure.ResourceManager.Foundations.Plan}
+
+Details of the resource plan.
+
+```typespec
+model Azure.ResourceManager.Foundations.Plan
+```
+
+#### Properties
+
+| Name           | Type     | Description                                                                                                                                                 |
+| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name           | `string` | A user defined name of the 3rd Party Artifact that is being procured.                                                                                       |
+| publisher      | `string` | The publisher of the 3rd Party Artifact that is being bought. E.g. NewRelic                                                                                 |
+| product        | `string` | The 3rd Party artifact that is being procured. E.g. NewRelic. Product maps to the OfferID specified for the artifact at the time of Data Market onboarding. |
+| promotionCode? | `string` | A publisher provided promotion code as provisioned in Data Market for the said product/artifact.                                                            |
+| version?       | `string` | The version of the desired product/artifact.                                                                                                                |
+
+### `ProxyResource` {#Azure.ResourceManager.Foundations.ProxyResource}
 
 The base proxy resource.
 
 ```typespec
-model Azure.ResourceManager.Foundations.ProxyResourceBase
+model Azure.ResourceManager.Foundations.ProxyResource
 ```
 
 #### Properties
@@ -1590,6 +1593,23 @@ model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<Resource, Prope
 | Name        | Type                                                                              | Description |
 | ----------- | --------------------------------------------------------------------------------- | ----------- |
 | properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
+
+### `Resource` {#Azure.ResourceManager.Foundations.Resource}
+
+Base model that defines common properties for all Azure Resource Manager resources.
+
+```typespec
+model Azure.ResourceManager.Foundations.Resource
+```
+
+#### Properties
+
+| Name        | Type                                                                         | Description                                                                                                                                                                               |
+| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id?         | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
+| type?       | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
+| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
 ### `ResourceGroupBaseParameters` {#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters}
 
@@ -1632,42 +1652,6 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
 | provider          | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
 
-### `ResourcePlanType` {#Azure.ResourceManager.Foundations.ResourcePlanType}
-
-Details of the resource plan.
-
-```typespec
-model Azure.ResourceManager.Foundations.ResourcePlanType
-```
-
-#### Properties
-
-| Name           | Type     | Description                                                                                                                                                 |
-| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name           | `string` | A user defined name of the 3rd Party Artifact that is being procured.                                                                                       |
-| publisher      | `string` | The publisher of the 3rd Party Artifact that is being bought. E.g. NewRelic                                                                                 |
-| product        | `string` | The 3rd Party artifact that is being procured. E.g. NewRelic. Product maps to the OfferID specified for the artifact at the time of Data Market onboarding. |
-| promotionCode? | `string` | A publisher provided promotion code as provisioned in Data Market for the said product/artifact.                                                            |
-| version?       | `string` | The version of the desired product/artifact.                                                                                                                |
-
-### `ResourceSkuType` {#Azure.ResourceManager.Foundations.ResourceSkuType}
-
-The SKU (Stock Keeping Unit) assigned to this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ResourceSkuType
-```
-
-#### Properties
-
-| Name      | Type                                                                   | Description                                                                                                                                          |
-| --------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name      | `string`                                                               | The name of the SKU, usually a combination of letters and numbers, for example, 'P3'                                                                 |
-| tier?     | [`SkuTier`](./data-types.md#Azure.ResourceManager.Foundations.SkuTier) | This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.               |
-| size?     | `string`                                                               | The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code.                                |
-| family?   | `string`                                                               | If the service has different generations of hardware, for the same SKU, then that can be captured here.                                              |
-| capacity? | `int32`                                                                | If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted. |
-
 ### `ResourceUpdateModel` {#Azure.ResourceManager.Foundations.ResourceUpdateModel}
 
 Defines a model type used to create named resource update models
@@ -1709,6 +1693,24 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, 
 #### Properties
 
 None
+
+### `Sku` {#Azure.ResourceManager.Foundations.Sku}
+
+The SKU (Stock Keeping Unit) assigned to this resource.
+
+```typespec
+model Azure.ResourceManager.Foundations.Sku
+```
+
+#### Properties
+
+| Name      | Type                                                                   | Description                                                                                                                                          |
+| --------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name      | `string`                                                               | The name of the SKU, usually a combination of letters and numbers, for example, 'P3'                                                                 |
+| tier?     | [`SkuTier`](./data-types.md#Azure.ResourceManager.Foundations.SkuTier) | This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.               |
+| size?     | `string`                                                               | The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code.                                |
+| family?   | `string`                                                               | If the service has different generations of hardware, for the same SKU, then that can be captured here.                                              |
+| capacity? | `int32`                                                                | If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted. |
 
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 
@@ -1837,12 +1839,12 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 | apiVersion | `string`                         | The API version to use for this operation. |
 | provider   | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
 
-### `TrackedResourceBase` {#Azure.ResourceManager.Foundations.TrackedResourceBase}
+### `TrackedResource` {#Azure.ResourceManager.Foundations.TrackedResource}
 
 The base tracked resource.
 
 ```typespec
-model Azure.ResourceManager.Foundations.TrackedResourceBase
+model Azure.ResourceManager.Foundations.TrackedResource
 ```
 
 #### Properties

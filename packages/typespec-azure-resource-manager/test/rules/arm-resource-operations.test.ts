@@ -29,8 +29,6 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
         @armProviderNamespace
         namespace Microsoft.Foo;
 
-        using Azure.ResourceManager.Foundations;
-
         model FooResource is TrackedResource<{}> {
           @key("foo") @segment("foo") @path
           name: string;
@@ -45,7 +43,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
         interface FooResources {
           @get @armResourceRead(FooResource) get(@key("foo") name: string): ArmResponse<BarResource> | ErrorResponse;
           @put @armResourceCreateOrUpdate(FooResource) create(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<FooResource> | ErrorResponse;
-          @get @armResourceList(FooResource) listBySubscription(...SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<FooResource>> | ErrorResponse;
+          @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<FooResource>> | ErrorResponse;
         }
       `
       )
@@ -92,8 +90,6 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
         @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
         @armProviderNamespace
         namespace Microsoft.Foo;
-
-        using Azure.ResourceManager.Foundations;
         
         model FooResource is TrackedResource<{}> {
           @key("foo") @segment("foo") @path
@@ -107,7 +103,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
 
         @armResourceOperations
         interface FooResources {
-          @get @armResourceList(FooResource) listBySubscription(...SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
+          @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
         }
       `
       )
