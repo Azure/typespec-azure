@@ -139,6 +139,8 @@ title: "[P] JS API"
 - [isReadOnly](functions/isReadOnly.md)
 - [isSdkBuiltInKind](functions/isSdkBuiltInKind.md)
 - [isSdkDatetimeEncodings](functions/isSdkDatetimeEncodings.md)
+- [isSdkFloatKind](functions/isSdkFloatKind.md)
+- [isSdkIntKind](functions/isSdkIntKind.md)
 - [listClients](functions/listClients.md)
 - [listOperationGroups](functions/listOperationGroups.md)
 - [listOperationsInOperationGroup](functions/listOperationsInOperationGroup.md)

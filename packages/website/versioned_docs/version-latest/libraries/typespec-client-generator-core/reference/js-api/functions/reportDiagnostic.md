@@ -29,7 +29,12 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"encoding-multipart-bytes"`
   \| `"unsupported-kind"`
   \| `"multiple-services"`
-  \| `"server-param-not-path"` |
+  \| `"server-param-not-path"`
+  \| `"unexpected-http-param-type"`
+  \| `"multiple-response-types"`
+  \| `"no-corresponding-method-param"`
+  \| `"unsupported-protocol"`
+  \| `"no-emitter-name"` |
 | `M` extends `string` \| `number` \| `symbol` |
 
 ## Parameters
