@@ -2072,30 +2072,6 @@
         "value"
       ]
     },
-    "Versions": {
-      "type": "string",
-      "description": "Dynatrace Monitor Resource version",
-      "enum": [
-        "2021-06-13-preview",
-        "2022-04-30-preview"
-      ],
-      "x-ms-enum": {
-        "name": "Versions",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "2021-06-13-preview",
-            "value": "2021-06-13-preview",
-            "description": "Version 2021-06-13-preview"
-          },
-          {
-            "name": "2022-04-30-preview",
-            "value": "2022-04-30-preview",
-            "description": "Version 2021-07-01-preview"
-          }
-        ]
-      }
-    },
     "email": {
       "type": "string",
       "description": "Reusable representation of an email address",

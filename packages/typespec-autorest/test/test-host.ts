@@ -14,8 +14,8 @@ import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { ok } from "assert";
 import { AutorestEmitterOptions } from "../src/lib.js";
+import { OpenAPI2Document } from "../src/openapi2-document.js";
 import { AutorestTestLibrary } from "../src/testing/index.js";
-import { OpenAPI2Document } from "../src/types.js";
 
 export async function createAutorestTestHost() {
   return createTestHost({

@@ -492,8 +492,8 @@ function addDiscriminatorToModelType(
       isGeneratedName: false,
       onClient: false,
       apiVersions: discriminatorProperty
-        ? getAvailableApiVersions(context, discriminatorProperty.__raw!)
-        : getAvailableApiVersions(context, type),
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type.namespace)
+        : getAvailableApiVersions(context, type, type.namespace),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -537,7 +537,7 @@ export function getSdkModelWithDiagnostics(
       access: undefined, // dummy value since we need to update models map before we can set this
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type, name),
-      apiVersions: getAvailableApiVersions(context, type),
+      apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
     };
@@ -662,7 +662,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
-      apiVersions: getAvailableApiVersions(context, type),
+      apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isUnionAsEnum: false,
     };
     for (const member of type.members.values()) {
@@ -718,7 +718,7 @@ function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Oper
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: undefined, // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union, name),
-      apiVersions: getAvailableApiVersions(context, type.union),
+      apiVersions: getAvailableApiVersions(context, type.union, type.union.namespace),
       isUnionAsEnum: true,
     };
     sdkType.values = getSdkUnionEnumValues(context, type, sdkType);
@@ -756,7 +756,7 @@ function getKnownValuesEnum(
         usage: UsageFlags.None, // We will add usage as we loop through the operations
         access: undefined, // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
-        apiVersions: getAvailableApiVersions(context, type),
+        apiVersions: getAvailableApiVersions(context, type, type.namespace),
         isUnionAsEnum: false,
       };
       for (const member of knownValues.members.values()) {
@@ -946,7 +946,7 @@ export function getSdkCredentialParameter(
     name,
     isGeneratedName: true,
     description: "Credential used to authenticate requests to the service.",
-    apiVersions: getAvailableApiVersions(context, client.service),
+    apiVersions: getAvailableApiVersions(context, client.service, client.type),
     onClient: true,
     optional: false,
     isApiVersionParam: false,
@@ -973,14 +973,18 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
-    apiVersions: getAvailableApiVersions(context, type),
+    apiVersions: getAvailableApiVersions(
+      context,
+      type,
+      operation?.interface || operation?.namespace || type.model?.namespace
+    ),
     type: propertyType,
     nameInClient: name,
     name,
     isGeneratedName: false,
     optional: type.optional,
     nullable: isNullable(type.type),
-    ...updateWithApiVersionInformation(context, type),
+    ...updateWithApiVersionInformation(context, type, operation?.namespace),
   });
 }
 
@@ -990,9 +994,9 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
-  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type);
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
   // I'm a body model property
   let operationIsMultipart = false;
   if (operation) {
@@ -1022,7 +1026,7 @@ export function getSdkModelPropertyType(
     serializedName: getPropertyNames(context, type)[1],
     isMultipartFileInput: isBytesInput && operationIsMultipart,
     flatten: shouldFlattenProperty(context, type),
-    ...updateWithApiVersionInformation(context, type),
+    ...updateWithApiVersionInformation(context, type, operation?.namespace),
   });
 }
 

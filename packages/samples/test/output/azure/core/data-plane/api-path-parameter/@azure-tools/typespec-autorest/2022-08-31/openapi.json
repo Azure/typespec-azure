@@ -1139,24 +1139,6 @@
         "value"
       ]
     },
-    "Versions": {
-      "type": "string",
-      "description": "The Contoso Widget Manager service version.",
-      "enum": [
-        "2022-08-31"
-      ],
-      "x-ms-enum": {
-        "name": "Versions",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "2022-08-31",
-            "value": "2022-08-31",
-            "description": "Version 2022-08-31"
-          }
-        ]
-      }
-    },
     "Widget": {
       "type": "object",
       "description": "A widget.",

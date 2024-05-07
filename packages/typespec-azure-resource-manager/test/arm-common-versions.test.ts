@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OpenAPI2Document } from "../../typespec-autorest/src/types.js";
+import { OpenAPI2Document } from "../../typespec-autorest/src/openapi2-document.js";
 import { openApiForVersions } from "./test-host.js";
 
 describe("typespec-azure-resource-manager: arm-common-versions", () => {

@@ -7,7 +7,7 @@ import {
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { AutorestEmitterOptions } from "../src/lib.js";
-import { OpenAPI2Document } from "../src/types.js";
+import { OpenAPI2Document } from "../src/openapi2-document.js";
 import { createAutorestTestRunner, ignoreDiagnostics } from "./test-host.js";
 
 async function openapiWithOptions(
@@ -222,6 +222,28 @@ op test(): void;
         }
       );
       deepStrictEqual(Object.keys(output.definitions!), ["Referenced"]);
+    });
+  });
+
+  describe("version-enum-strategy", () => {
+    const code = `
+      @service
+      @versioned(Versions)
+      namespace My {
+        enum Versions {v1, v2}
+        model NotReferenced {}
+      }
+    `;
+    it("doesn't include version enum by default", async () => {
+      const output = await openapiWithOptions(code, {});
+      deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced"]);
+    });
+
+    it("include version enum when set to 'include'", async () => {
+      const output = await openapiWithOptions(code, {
+        "version-enum-strategy": "include",
+      });
+      deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced", "Versions"]);
     });
   });
 
