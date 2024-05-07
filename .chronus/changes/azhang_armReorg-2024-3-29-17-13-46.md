@@ -1,5 +1,5 @@
 ---
-changeKind: internal
+changeKind: deprecation
 packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
