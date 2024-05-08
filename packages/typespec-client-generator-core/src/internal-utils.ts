@@ -168,7 +168,7 @@ export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
   namespace?: Namespace | Interface,
-  wrapperApiVersions?: string[],
+  wrapperApiVersions?: string[]
 ): string[] {
   let cachedApiVersions: string[] = [];
   if (namespace) {

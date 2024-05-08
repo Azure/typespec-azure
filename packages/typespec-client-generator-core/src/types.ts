@@ -984,7 +984,7 @@ export function getSdkModelPropertyTypeBase(
       context,
       type,
       operation?.interface || operation?.namespace || type.model?.namespace,
-      wrapperApiVersions,
+      wrapperApiVersions
     ),
     type: propertyType,
     nameInClient: name,
@@ -1003,16 +1003,16 @@ export function getSdkModelPropertyTypeBase(
 export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
+  wrapperApiVersions: string[],
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let modelApiVersions: string[] = [];
-  if (type.model) {
-    modelApiVersions = getAvailableApiVersions(context, type.model, type.model.namespace);
-  }
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, modelApiVersions, operation));
+  const base = diagnostics.pipe(
+    getSdkModelPropertyTypeBase(context, type, wrapperApiVersions, operation)
+  );
 
-  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
+  if (isSdkHttpParameter(context, type))
+    return getSdkHttpParameter(context, type, wrapperApiVersions, operation!);
   // I'm a body model property
   let operationIsMultipart = false;
   if (operation) {
@@ -1052,6 +1052,7 @@ function addPropertiesToModelType(
   operation?: Operation
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const modelApiVersions = getAvailableApiVersions(context, type, type.namespace);
   for (const property of type.properties.values()) {
     if (
       isStatusCode(context.program, property) ||
@@ -1060,7 +1061,9 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+    const clientProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, property, modelApiVersions, operation)
+    );
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {

@@ -60,7 +60,7 @@ export function getSdkHttpOperation(
   context: TCGCContext,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
-  operationApiVersions: string[],
+  operationApiVersions: string[]
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
@@ -70,7 +70,13 @@ export function getSdkHttpOperation(
     .concat([...exceptions.values()])
     .filter((r) => r.type);
   const parameters = diagnostics.pipe(
-    getSdkHttpParameters(context, httpOperation, methodParameters, operationApiVersions, responsesWithBodies[0])
+    getSdkHttpParameters(
+      context,
+      httpOperation,
+      methodParameters,
+      operationApiVersions,
+      responsesWithBodies[0]
+    )
   );
   return diagnostics.wrap({
     __raw: httpOperation,
@@ -113,7 +119,9 @@ function getSdkHttpParameters(
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type))
+      diagnostics.pipe(
+        getSdkHttpParameter(context, x.param, operationApiVersions, httpOperation.operation, x.type)
+      )
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
@@ -130,7 +138,13 @@ function getSdkHttpParameters(
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter && !isNeverOrVoidType(tspBody.parameter.type)) {
       const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.parameter, httpOperation.operation, "body")
+        getSdkHttpParameter(
+          context,
+          tspBody.parameter,
+          operationApiVersions,
+          httpOperation.operation,
+          "body"
+        )
       );
       if (getParamResponse.kind !== "body") {
         diagnostics.add(
@@ -307,7 +321,9 @@ export function getSdkHttpParameter(
   location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operationApiVersions, operation));
+  const base = diagnostics.pipe(
+    getSdkModelPropertyTypeBase(context, type, operationApiVersions, operation)
+  );
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, type) || location === "path") {
@@ -374,7 +390,7 @@ export function getSdkHttpParameter(
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  operationApiVersions: string[],
+  operationApiVersions: string[]
 ): [
   {
     responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
@@ -441,7 +457,7 @@ function getSdkHttpResponseAndExceptions(
         context,
         httpOperation.operation,
         httpOperation.operation.namespace,
-        operationApiVersions,
+        operationApiVersions
       ),
       nullable: body ? isNullable(body) : true,
     };

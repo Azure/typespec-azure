@@ -84,7 +84,7 @@ function getSdkServiceOperation<
   context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation,
   methodParameters: SdkMethodParameter[],
-  operationApiVersions: string[],
+  operationApiVersions: string[]
 ): [TServiceOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const httpOperation = getHttpOperationWithCache(context, operation);
@@ -147,7 +147,7 @@ function getSdkPagingServiceMethod<
             context,
             pagedMetadata.nextLinkOperation,
             basic.parameters,
-            basic.apiVersions,
+            basic.apiVersions
           )
         )
       : undefined,
@@ -189,7 +189,7 @@ function getSdkLroServiceMethod<
         context,
         metadata.operation,
         basicServiceMethod.parameters,
-        basicServiceMethod.apiVersions,
+        basicServiceMethod.apiVersions
       )
     ),
     getResponseMapping(): string | undefined {
@@ -252,12 +252,16 @@ function getSdkBasicServiceMethod<
   // path/query/header parameters
   for (const param of parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation, apiVersions)));
+    methodParameters.push(
+      diagnostics.pipe(getSdkMethodParameter(context, param.param, operation, apiVersions))
+    );
   }
   // body parameters
   if (parameters.body?.parameter && !isNeverOrVoidType(parameters.body.parameter.type)) {
     methodParameters.push(
-      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter, operation, apiVersions))
+      diagnostics.pipe(
+        getSdkMethodParameter(context, parameters.body?.parameter, operation, apiVersions)
+      )
     );
   } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
     if (parameters.body.type.kind === "Model") {
@@ -265,20 +269,31 @@ function getSdkBasicServiceMethod<
       // spread case
       if (type.name === "") {
         for (const prop of type.properties.values()) {
-          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop, operation, apiVersions)));
+          methodParameters.push(
+            diagnostics.pipe(getSdkMethodParameter(context, prop, operation, apiVersions))
+          );
         }
       } else {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, type, operation, apiVersions)));
+        methodParameters.push(
+          diagnostics.pipe(getSdkMethodParameter(context, type, operation, apiVersions))
+        );
       }
     } else {
       methodParameters.push(
-        diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type, operation, apiVersions))
+        diagnostics.pipe(
+          getSdkMethodParameter(context, parameters.body.type, operation, apiVersions)
+        )
       );
     }
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters, apiVersions)
+    getSdkServiceOperation<TOptions, TServiceOperation>(
+      context,
+      operation,
+      methodParameters,
+      apiVersions
+    )
   );
   const response = getSdkMethodResponse(operation, serviceOperation);
   const name = getLibraryName(context, operation);
@@ -397,7 +412,7 @@ function getSdkMethodParameter(
   context: TCGCContext,
   type: Type,
   operation: Operation,
-  operationApiVersions: string[],
+  operationApiVersions: string[]
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (type.kind !== "ModelProperty") {
@@ -408,7 +423,12 @@ function getSdkMethodParameter(
       kind: "method",
       description: getDocHelper(context, type).description,
       details: getDocHelper(context, type).details,
-      apiVersions: getAvailableApiVersions(context, type, getLocationOfOperation(operation), operationApiVersions),
+      apiVersions: getAvailableApiVersions(
+        context,
+        type,
+        getLocationOfOperation(operation),
+        operationApiVersions
+      ),
       type: propertyType,
       nameInClient: name,
       name,
@@ -422,7 +442,7 @@ function getSdkMethodParameter(
     });
   }
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
+    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operationApiVersions, operation)),
     kind: "method",
   });
 }
@@ -430,7 +450,7 @@ function getSdkMethodParameter(
 function getSdkMethods<TOptions extends object, TServiceOperation extends SdkServiceOperation>(
   context: SdkContext<TOptions, TServiceOperation>,
   client: SdkClient | SdkOperationGroup,
-  clientApiVersions: string[],
+  clientApiVersions: string[]
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
@@ -466,7 +486,7 @@ function getSdkEndpointParameter(
   const servers = getServers(context.program, client.service);
   let type: SdkEndpointType;
   let optional: boolean = false;
-  const apiVersions = getAvailableApiVersions(context, client.service, client.type)
+  const apiVersions = getAvailableApiVersions(context, client.service, client.type);
   if (servers === undefined || servers.length > 1) {
     // if there is no defined server url, or if there are more than one
     // we will return a mandatory endpoint parameter in initialization
@@ -507,7 +527,9 @@ function getSdkEndpointParameter(
       templateArguments,
     };
     for (const param of servers[0].parameters.values()) {
-      const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, apiVersions, undefined, "path"));
+      const sdkParam = diagnostics.pipe(
+        getSdkHttpParameter(context, param, apiVersions, undefined, "path")
+      );
       if (sdkParam.kind === "path") {
         templateArguments.push(sdkParam);
         sdkParam.description = sdkParam.description ?? servers[0].description;
