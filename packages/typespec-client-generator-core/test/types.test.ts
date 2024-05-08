@@ -3282,6 +3282,26 @@ describe("typespec-client-generator-core: types", () => {
         ["ValidResponse"]
       );
     });
+
+    it("never or void property", async () => {
+      await runner.compileAndDiagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          model Test{
+            prop1: never;
+            prop2: void;
+          }
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      strictEqual(models[0].name, "Test");
+      strictEqual(models[0].properties.length, 0);
+    });
   });
 
   describe("SdkArrayType", () => {

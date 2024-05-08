@@ -15,7 +15,9 @@ import {
   getNamespaceFullName,
   getSummary,
   ignoreDiagnostics,
+  isNeverType,
   isNullType,
+  isVoidType,
 } from "@typespec/compiler";
 import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
@@ -406,4 +408,8 @@ export function onClient(context: TCGCContext, parameter: { name: string }): boo
 export function getLocationOfOperation(operation: Operation): Namespace | Interface {
   // have to check interface first, because interfaces are more granular than namespaces
   return (operation.interface || operation.namespace)!;
+}
+
+export function isNeverOrVoidType(type: Type): boolean {
+  return isNeverType(type) || isVoidType(type);
 }

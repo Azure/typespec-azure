@@ -85,6 +85,7 @@ import {
   isAzureCoreModel,
   isMultipartFormData,
   isMultipartOperation,
+  isNeverOrVoidType,
   isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -1044,7 +1045,7 @@ function addPropertiesToModelType(
   for (const property of type.properties.values()) {
     if (
       isStatusCode(context.program, property) ||
-      isNeverType(property.type) ||
+      isNeverOrVoidType(property.type) ||
       sdkType.kind !== "model"
     ) {
       continue;
@@ -1240,6 +1241,7 @@ function updateTypesFromOperation(
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
+    if (isNeverOrVoidType(param.type)) continue;
     const paramTypes = diagnostics.pipe(checkAndGetClientType(context, param.type, operation));
     if (generateConvenient) {
       paramTypes.forEach((paramType) => {
@@ -1248,6 +1250,7 @@ function updateTypesFromOperation(
     }
   }
   for (const param of httpOperation.parameters.parameters) {
+    if (isNeverOrVoidType(param.param.type)) continue;
     const paramTypes = diagnostics.pipe(
       checkAndGetClientType(context, param.param.type, operation)
     );
@@ -1258,7 +1261,7 @@ function updateTypesFromOperation(
     }
   }
   const httpBody = httpOperation.parameters.body;
-  if (httpBody) {
+  if (httpBody && !isNeverOrVoidType(httpBody.type)) {
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
@@ -1282,7 +1285,7 @@ function updateTypesFromOperation(
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
-      if (innerResponse.body?.type) {
+      if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
         const responseBodies = diagnostics.pipe(
           checkAndGetClientType(context, innerResponse.body.type, operation)
         );
