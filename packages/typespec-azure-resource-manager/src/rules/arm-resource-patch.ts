@@ -9,6 +9,7 @@ import {
   getEffectiveModelType,
   getProperty,
   isErrorType,
+  isType,
   paramMessage,
 } from "@typespec/compiler";
 import {
@@ -106,7 +107,7 @@ function getResourceModel(program: Program, operation: Operation): Model | undef
         }
         if (modelCandidate.templateMapper !== undefined) {
           for (const arg of modelCandidate.templateMapper.args) {
-            if (arg.kind === "Model" && getArmResource(program, arg)) {
+            if (isType(arg) && arg.kind === "Model" && getArmResource(program, arg)) {
               return arg;
             }
           }

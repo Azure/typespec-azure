@@ -2029,6 +2029,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "string");
       strictEqual(sdkType.value, "json");
+      strictEqual(sdkType.name, "TestPropJson");
+      strictEqual(sdkType.isGeneratedName, true);
     });
     it("boolean", async function () {
       await runner.compileWithBuiltInService(`
@@ -2043,6 +2045,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "boolean");
       strictEqual(sdkType.value, true);
+      strictEqual(sdkType.name, "TestPropTrue");
+      strictEqual(sdkType.isGeneratedName, true);
     });
     it("number", async function () {
       await runner.compileWithBuiltInService(`
@@ -2057,6 +2061,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "int32");
       strictEqual(sdkType.value, 4);
+      strictEqual(sdkType.name, "TestProp4");
+      strictEqual(sdkType.isGeneratedName, true);
     });
   });
   describe("SdkModelType", () => {
@@ -3369,6 +3375,26 @@ describe("typespec-client-generator-core: types", () => {
         validModel.map((x) => x.name),
         ["ValidResponse"]
       );
+    });
+
+    it("never or void property", async () => {
+      await runner.compileAndDiagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          model Test{
+            prop1: never;
+            prop2: void;
+          }
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      strictEqual(models[0].name, "Test");
+      strictEqual(models[0].properties.length, 0);
     });
   });
 
