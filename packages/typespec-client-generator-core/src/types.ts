@@ -389,7 +389,8 @@ export function getSdkUnionWithDiagnostics(
 
 function getSdkConstantWithDiagnostics(
   context: TCGCContext,
-  type: StringLiteral | NumericLiteral | BooleanLiteral
+  type: StringLiteral | NumericLiteral | BooleanLiteral,
+  operation?: Operation
 ): [SdkConstantType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   switch (type.kind) {
@@ -401,15 +402,18 @@ function getSdkConstantWithDiagnostics(
         ...getSdkTypeBaseHelper(context, type, "constant"),
         value: type.value,
         valueType,
+        name: getGeneratedName(context, type, operation),
+        isGeneratedName: true,
       });
   }
 }
 
 export function getSdkConstant(
   context: TCGCContext,
-  type: StringLiteral | NumericLiteral | BooleanLiteral
+  type: StringLiteral | NumericLiteral | BooleanLiteral,
+  operation?: Operation
 ): SdkConstantType {
-  return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type));
+  return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type, operation));
 }
 
 function addDiscriminatorToModelType(

@@ -187,7 +187,7 @@ function getSdkHttpParameters(
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(retval.bodyParam),
+      ...createContentTypeOrAcceptHeader(httpOperation, retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -206,7 +206,7 @@ function getSdkHttpParameters(
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
     // If our operation returns a body, we add an accept header if none exist
     const acceptBase = {
-      ...createContentTypeOrAcceptHeader(responseBody),
+      ...createContentTypeOrAcceptHeader(httpOperation, responseBody),
     };
     if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
@@ -230,6 +230,7 @@ function getSdkHttpParameters(
 }
 
 function createContentTypeOrAcceptHeader(
+  httpOperation: HttpOperation,
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
@@ -256,6 +257,8 @@ function createContentTypeOrAcceptHeader(
       kind: "constant",
       value: bodyObject.contentTypes[0],
       valueType: type,
+      name: `${httpOperation.operation.name}ContentType`,
+      isGeneratedName: true,
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
