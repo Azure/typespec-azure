@@ -1,12 +1,15 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  BooleanLiteral,
   Diagnostic,
   Interface,
   Model,
   Namespace,
+  NumericLiteral,
   Operation,
   Program,
   ProjectedProgram,
+  StringLiteral,
   Type,
   Union,
   createDiagnosticCollector,
@@ -282,6 +285,9 @@ export function isMultipartOperation(context: TCGCContext, operation?: Operation
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
   return obj?.kind === "Operation" && getHttpOperationWithCache(context, obj) !== undefined;
 }
+
+export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
+
 export interface TCGCContext {
   program: Program;
   emitterName: string;
@@ -293,7 +299,7 @@ export interface TCGCContext {
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model, string>;
+  generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
