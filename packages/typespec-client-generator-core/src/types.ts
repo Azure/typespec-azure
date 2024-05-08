@@ -498,8 +498,8 @@ function addDiscriminatorToModelType(
       isGeneratedName: false,
       onClient: false,
       apiVersions: discriminatorProperty
-        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type.namespace)
-        : getAvailableApiVersions(context, type, type.namespace),
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
+        : getAvailableApiVersions(context, type, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -963,10 +963,15 @@ export function getSdkCredentialParameter(
 export function getSdkModelPropertyTypeBase(
   context: TCGCContext,
   type: ModelProperty,
-  wrapperApiVersions: string[],
   operation?: Operation
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  // get api version info so we can cache info about its api versions before we get to property type level
+  const apiVersions = getAvailableApiVersions(
+    context,
+    type,
+    operation || type.model,
+  )
   let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
@@ -980,12 +985,7 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
-    apiVersions: getAvailableApiVersions(
-      context,
-      type,
-      operation?.interface || operation?.namespace || type.model?.namespace,
-      wrapperApiVersions
-    ),
+    apiVersions,
     type: propertyType,
     nameInClient: name,
     name,
@@ -1003,16 +1003,15 @@ export function getSdkModelPropertyTypeBase(
 export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
-  wrapperApiVersions: string[],
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(
-    getSdkModelPropertyTypeBase(context, type, wrapperApiVersions, operation)
+    getSdkModelPropertyTypeBase(context, type, operation)
   );
 
   if (isSdkHttpParameter(context, type))
-    return getSdkHttpParameter(context, type, wrapperApiVersions, operation!);
+    return getSdkHttpParameter(context, type, operation!);
   // I'm a body model property
   let operationIsMultipart = false;
   if (operation) {
@@ -1052,7 +1051,6 @@ function addPropertiesToModelType(
   operation?: Operation
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const modelApiVersions = getAvailableApiVersions(context, type, type.namespace);
   for (const property of type.properties.values()) {
     if (
       isStatusCode(context.program, property) ||
@@ -1062,7 +1060,7 @@ function addPropertiesToModelType(
       continue;
     }
     const clientProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, property, modelApiVersions, operation)
+      getSdkModelPropertyType(context, property, operation)
     );
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);

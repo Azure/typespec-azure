@@ -3291,6 +3291,109 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
     });
+    it("add method", async() => {
+      await runner.compileWithVersionedService(`
+      @route("/v1")
+      @post
+      @added(Versions.v2)
+      op v2(@header headerV2: string): void;
+      `)
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+      deepStrictEqual(method.apiVersions, ["v2"]);
+      strictEqual(method.parameters.length, 1);
+      const methodParam = sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(methodParam.name, "headerV2");
+      strictEqual(methodParam.kind, "method");
+      deepStrictEqual(methodParam.apiVersions, ["v2"]);
+
+      strictEqual(method.operation.parameters.length, 1);
+      const headerParam = method.operation.parameters[0];
+      strictEqual(headerParam.name, "headerV2");
+      strictEqual(headerParam.kind, "header");
+      deepStrictEqual(headerParam.apiVersions, ["v2"]);
+    })
+    it("add parameter", async() => {
+      await runner.compileWithVersionedService(`
+      @route("/v1")
+      @post
+      op v1(@added(Versions.v2) @header headerV2: string): void;
+      `)
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+      deepStrictEqual(method.apiVersions, ["v1", "v2"]);
+      strictEqual(method.parameters.length, 1);
+      const methodParam = sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(methodParam.name, "headerV2");
+      strictEqual(methodParam.kind, "method");
+      deepStrictEqual(methodParam.apiVersions, ["v2"]);
+
+      strictEqual(method.operation.parameters.length, 1);
+      const headerParam = method.operation.parameters[0];
+      strictEqual(headerParam.name, "headerV2");
+      strictEqual(headerParam.kind, "header");
+      deepStrictEqual(headerParam.apiVersions, ["v2"]);
+    })
+
+    it("model existing then used in later added operation", async() => {
+      await runner.compileWithVersionedService(`
+      @usage(Usage.output)
+      @access(Access.public)
+      model Pet {
+        name: string;
+      }
+
+      @added(Versions.v2)
+      @put
+      op v2(): Pet;
+      `)
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const pet = sdkPackage.models[0];
+      strictEqual(pet.name, "Pet");
+      deepStrictEqual(pet.apiVersions, ["v1", "v2"])
+    })
+
+    it("model used in old and new operation", async() => {
+      await runner.compileWithVersionedService(`
+      model Pet {
+        name: string;
+      }
+
+      op v1(): Pet;
+
+      @added(Versions.v2)
+      @put
+      op v2(): Pet;
+      `)
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const pet = sdkPackage.models[0];
+      strictEqual(pet.name, "Pet");
+      deepStrictEqual(pet.apiVersions, ["v1", "v2"])
+    })
+    it("model used only in new operation", async() => {
+      await runner.compileWithVersionedService(`
+      model Pet {
+        name: string;
+      }
+
+      @added(Versions.v2)
+      @put
+      op v2(): Pet;
+      `)
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const pet = sdkPackage.models[0];
+      strictEqual(pet.name, "Pet");
+      deepStrictEqual(pet.apiVersions, ["v2"])
+    });
   });
 });
 

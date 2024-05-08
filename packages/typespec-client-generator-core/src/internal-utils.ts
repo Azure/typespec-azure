@@ -167,12 +167,11 @@ export function filterApiVersionsWithDecorators(
 export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
-  namespace?: Namespace | Interface,
-  wrapperApiVersions?: string[]
+  wrapper?: Type,
 ): string[] {
   let cachedApiVersions: string[] = [];
-  if (namespace) {
-    cachedApiVersions = context.__namespaceToApiVersions.get(namespace) || [];
+  if (wrapper) {
+    cachedApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
   }
 
   const apiVersions =
@@ -180,8 +179,13 @@ export function getAvailableApiVersions(
     getVersions(context.program, type)[1]
       ?.getVersions()
       .map((x) => x.value);
-  if (!apiVersions) return wrapperApiVersions || [];
-  return filterApiVersionsWithDecorators(context, type, apiVersions);
+  if (!apiVersions) return [];
+  const retval = filterApiVersionsWithDecorators(context, type, apiVersions);
+  // we take the union of all of the api versions that the type is available on
+  // if it's called multiple times with diff wrappers, we want to make sure we have
+  // all of the possible api versions listed
+  context.__tspTypeToApiVersions.set(type, retval);
+  return retval;
 }
 
 interface DocWrapper {
@@ -304,7 +308,7 @@ export interface TCGCContext {
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __namespaceToApiVersions: Map<Interface | Namespace, string[]>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
   __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
@@ -322,7 +326,7 @@ export function createTCGCContext(program: Program): TCGCContext {
     diagnostics: [],
     originalProgram: program,
     __namespaceToApiVersionParameter: new Map(),
-    __namespaceToApiVersions: new Map(),
+    __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
   };
 }
