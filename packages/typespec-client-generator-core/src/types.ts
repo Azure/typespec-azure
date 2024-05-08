@@ -958,6 +958,7 @@ export function getSdkCredentialParameter(
 export function getSdkModelPropertyTypeBase(
   context: TCGCContext,
   type: ModelProperty,
+  wrapperApiVersions: string[],
   operation?: Operation
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -977,7 +978,8 @@ export function getSdkModelPropertyTypeBase(
     apiVersions: getAvailableApiVersions(
       context,
       type,
-      operation?.interface || operation?.namespace || type.model?.namespace
+      operation?.interface || operation?.namespace || type.model?.namespace,
+      wrapperApiVersions,
     ),
     type: propertyType,
     nameInClient: name,
@@ -999,7 +1001,11 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  let modelApiVersions: string[] = [];
+  if (type.model) {
+    modelApiVersions = getAvailableApiVersions(context, type.model, type.model.namespace);
+  }
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, modelApiVersions, operation));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
   // I'm a body model property

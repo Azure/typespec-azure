@@ -162,7 +162,8 @@ export function filterApiVersionsWithDecorators(
 export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
-  namespace?: Namespace | Interface
+  namespace?: Namespace | Interface,
+  wrapperApiVersions?: string[],
 ): string[] {
   let cachedApiVersions: string[] = [];
   if (namespace) {
@@ -174,7 +175,7 @@ export function getAvailableApiVersions(
     getVersions(context.program, type)[1]
       ?.getVersions()
       .map((x) => x.value);
-  if (!apiVersions) return [];
+  if (!apiVersions) return wrapperApiVersions || [];
   return filterApiVersionsWithDecorators(context, type, apiVersions);
 }
 
@@ -407,3 +408,4 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
   // have to check interface first, because interfaces are more granular than namespaces
   return (operation.interface || operation.namespace)!;
 }
+

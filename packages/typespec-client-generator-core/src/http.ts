@@ -58,17 +58,18 @@ import {
 export function getSdkHttpOperation(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  methodParameters: SdkMethodParameter[]
+  methodParameters: SdkMethodParameter[],
+  operationApiVersions: string[],
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
-    getSdkHttpResponseAndExceptions(context, httpOperation)
+    getSdkHttpResponseAndExceptions(context, httpOperation, operationApiVersions)
   );
   const responsesWithBodies = [...responses.values()]
     .concat([...exceptions.values()])
     .filter((r) => r.type);
   const parameters = diagnostics.pipe(
-    getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0])
+    getSdkHttpParameters(context, httpOperation, methodParameters, operationApiVersions, responsesWithBodies[0])
   );
   return diagnostics.wrap({
     __raw: httpOperation,
@@ -100,6 +101,7 @@ function getSdkHttpParameters(
   context: TCGCContext,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
+  operationApiVersions: string[],
   responseBody?: SdkHttpResponse
 ): [SdkHttpParameters, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -162,7 +164,8 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(
           context,
           tspBody.type,
-          httpOperation.operation.namespace
+          httpOperation.operation.namespace,
+          operationApiVersions
         ),
         type,
         optional: false,
@@ -292,11 +295,12 @@ function addContentTypeInfoToBodyParam(
 export function getSdkHttpParameter(
   context: TCGCContext,
   type: ModelProperty,
+  operationApiVersions: string[],
   operation?: Operation,
   location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operationApiVersions, operation));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, type) || location === "path") {
@@ -362,7 +366,8 @@ export function getSdkHttpParameter(
 
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
-  httpOperation: HttpOperation
+  httpOperation: HttpOperation,
+  operationApiVersions: string[],
 ): [
   {
     responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
@@ -415,7 +420,6 @@ function getSdkHttpResponseAndExceptions(
         body = innerResponse.body.type;
       }
     }
-
     const sdkResponse: SdkHttpResponse = {
       __raw: response,
       kind: "http",
@@ -428,7 +432,8 @@ function getSdkHttpResponseAndExceptions(
       apiVersions: getAvailableApiVersions(
         context,
         httpOperation.operation,
-        httpOperation.operation.namespace
+        httpOperation.operation.namespace,
+        operationApiVersions,
       ),
       nullable: body ? isNullable(body) : true,
     };
