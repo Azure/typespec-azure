@@ -1710,6 +1710,82 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(enums[0].values.map(x => x.value), ["v1", "v2"]);
+    });
+
+    it("versioned enums with all", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "all",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(enums[0].values.map(x => x.value), ["v1", "v2"]);
+    });
+
+    it("versioned enums with latest", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "latest",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(enums[0].values.map(x => x.value), ["v1", "v2"]);
+    });
+
+    it("versioned enums with specific version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(enums[0].values.map(x => x.value), ["v1"]);
     });
 
     it("usage propagation for enum value", async () => {
