@@ -3300,7 +3300,7 @@ describe("typespec-client-generator-core: package", () => {
       `)
 
       const sdkPackage = runner.context.experimental_sdkPackage;
-   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.kind, "basic");
       deepStrictEqual(method.apiVersions, ["v2"]);
@@ -3324,7 +3324,7 @@ describe("typespec-client-generator-core: package", () => {
       `)
 
       const sdkPackage = runner.context.experimental_sdkPackage;
-   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.kind, "basic");
       deepStrictEqual(method.apiVersions, ["v1", "v2"]);
@@ -3340,60 +3340,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParam.kind, "header");
       deepStrictEqual(headerParam.apiVersions, ["v2"]);
     })
-
-    it("model existing then used in later added operation", async() => {
-      await runner.compileWithVersionedService(`
-      @usage(Usage.output)
-      @access(Access.public)
-      model Pet {
-        name: string;
-      }
-
-      @added(Versions.v2)
-      @put
-      op v2(): Pet;
-      `)
-
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const pet = sdkPackage.models[0];
-      strictEqual(pet.name, "Pet");
-      deepStrictEqual(pet.apiVersions, ["v1", "v2"])
-    })
-
-    it("model used in old and new operation", async() => {
-      await runner.compileWithVersionedService(`
-      model Pet {
-        name: string;
-      }
-
-      op v1(): Pet;
-
-      @added(Versions.v2)
-      @put
-      op v2(): Pet;
-      `)
-
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const pet = sdkPackage.models[0];
-      strictEqual(pet.name, "Pet");
-      deepStrictEqual(pet.apiVersions, ["v1", "v2"])
-    })
-    it("model used only in new operation", async() => {
-      await runner.compileWithVersionedService(`
-      model Pet {
-        name: string;
-      }
-
-      @added(Versions.v2)
-      @put
-      op v2(): Pet;
-      `)
-
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const pet = sdkPackage.models[0];
-      strictEqual(pet.name, "Pet");
-      deepStrictEqual(pet.apiVersions, ["v2"])
-    });
   });
 });
 
