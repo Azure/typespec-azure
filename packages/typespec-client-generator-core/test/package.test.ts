@@ -1679,6 +1679,29 @@ describe("typespec-client-generator-core: package", () => {
         ["apiVersion", "generationOptions", "contentType", "accept"]
       );
     });
+
+    it("never void parameter or response", async () => {
+      await runner.compileWithBuiltInService(`
+        op TestTemplate<
+          headerType,
+          queryType,
+          bodyType,
+          responseHeaderType,
+          responseBodyType
+        >(@header h: headerType, @query q: queryType, @body b: bodyType): {
+          @header h: responseHeaderType;
+          @body b: responseBodyType;
+        };
+        op test is TestTemplate<void, void, void, void, void>;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.parameters.length, 0);
+      strictEqual(method.response.type, undefined);
+      strictEqual(method.operation.parameters.length, 0);
+      strictEqual(method.operation.responses.get(200)?.headers.length, 0);
+      strictEqual(method.operation.responses.get(200)?.type, undefined);
+    });
   });
 
   describe("Responses", () => {
