@@ -358,7 +358,7 @@ export function getLroOperationInfo(
       return;
     }
     let sourceProperty = propMap.templateMapper!.args[0];
-    if ("metaKind" in sourceProperty && sourceProperty.metaKind === "Indeterminate") {
+    if (sourceProperty.entityKind === "Indeterminate") {
       sourceProperty = sourceProperty.type;
     } else if (!isType(sourceProperty)) {
       compilerAssert(false, "Lro Template Arg should be a Type", propMap);
