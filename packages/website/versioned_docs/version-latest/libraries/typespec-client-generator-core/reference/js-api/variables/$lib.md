@@ -33,10 +33,18 @@ const $lib: TypeSpecLibrary<Object, Record<string, any>, never>;
 | `invalid-encode.wrongType` | `CallableMessage`<[`string`, `string`]\> | - |
 | `invalid-usage` | `Object` | - |
 | `invalid-usage.default` | `string` | - |
+| `multiple-response-types` | `Object` | - |
+| `multiple-response-types.default` | `CallableMessage`<[`string`, `string`]\> | - |
 | `multiple-services` | `Object` | - |
 | `multiple-services.default` | `CallableMessage`<[`string`]\> | - |
+| `no-corresponding-method-param` | `Object` | - |
+| `no-corresponding-method-param.default` | `string` | - |
+| `no-emitter-name` | `Object` | - |
+| `no-emitter-name.default` | `CallableMessage`<[]\> | - |
 | `server-param-not-path` | `Object` | - |
 | `server-param-not-path.default` | `CallableMessage`<[`string`, `string`]\> | - |
+| `unexpected-http-param-type` | `Object` | - |
+| `unexpected-http-param-type.default` | `CallableMessage`<[`string`, `string`, `string`]\> | - |
 | `union-null` | `Object` | - |
 | `union-null.default` | `string` | "Cannot have a union containing only null types." |
 | `union-unsupported` | `Object` | - |
@@ -46,6 +54,8 @@ const $lib: TypeSpecLibrary<Object, Record<string, any>, never>;
 | `unknown-client-format.default` | `CallableMessage`<[`string`, `string`]\> | - |
 | `unsupported-kind` | `Object` | - |
 | `unsupported-kind.default` | `CallableMessage`<[`string`]\> | - |
+| `unsupported-protocol` | `Object` | - |
+| `unsupported-protocol.default` | `CallableMessage`<[]\> | - |
 | `use-enum-instead` | `Object` | - |
 | `use-enum-instead.default` | `string` | "Use enum instead of union of string or number literals. Falling back to the literal type." |
 | `wrong-client-decorator` | `Object` | - |

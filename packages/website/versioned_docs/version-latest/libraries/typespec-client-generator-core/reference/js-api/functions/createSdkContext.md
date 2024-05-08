@@ -4,7 +4,10 @@ title: "[F] createSdkContext"
 
 ---
 ```ts
-createSdkContext<TOptions, TServiceOperation>(context, emitterName?): SdkContext<TOptions, TServiceOperation>
+createSdkContext<TOptions, TServiceOperation>(
+   context, 
+   emitterName?, 
+options?): SdkContext<TOptions, TServiceOperation>
 ```
 
 ## Type parameters
@@ -20,6 +23,7 @@ createSdkContext<TOptions, TServiceOperation>(context, emitterName?): SdkContext
 | :------ | :------ |
 | `context` | `EmitContext`<`TOptions`\> |
 | `emitterName`? | `string` |
+| `options`? | `CreateSdkContextOptions` |
 
 ## Returns
 
