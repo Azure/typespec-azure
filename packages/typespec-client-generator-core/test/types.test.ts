@@ -1710,7 +1710,10 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(enums[0].values.map(x => x.value), ["v1", "v2"]);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
     });
 
     it("versioned enums with all", async () => {
@@ -1735,7 +1738,10 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(enums[0].values.map(x => x.value), ["v1", "v2"]);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
     });
 
     it("versioned enums with latest", async () => {
@@ -1760,7 +1766,10 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(enums[0].values.map(x => x.value), ["v1", "v2"]);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
     });
 
     it("versioned enums with specific version", async () => {
@@ -1785,7 +1794,10 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(enums[0].values.map(x => x.value), ["v1"]);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1"]
+      );
     });
 
     it("usage propagation for enum value", async () => {

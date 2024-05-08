@@ -165,7 +165,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         @service({})
         @test namespace MyService {};
       `);
-      const defaultApiVersion = getDefaultApiVersion(runnerWithVersion.context, MyService as Namespace);
+      const defaultApiVersion = getDefaultApiVersion(
+        runnerWithVersion.context,
+        MyService as Namespace
+      );
       ok(defaultApiVersion);
       strictEqual(defaultApiVersion.value, "1.1.0");
     });
@@ -187,7 +190,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         @service({})
         @test namespace MyService {};
       `);
-      const defaultApiVersion = getDefaultApiVersion(runnerWithVersion.context, MyService as Namespace);
+      const defaultApiVersion = getDefaultApiVersion(
+        runnerWithVersion.context,
+        MyService as Namespace
+      );
       ok(defaultApiVersion);
       strictEqual(defaultApiVersion.value, "1.1.0");
     });
@@ -209,7 +215,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         @service({})
         @test namespace MyService {};
       `);
-      const defaultApiVersion = getDefaultApiVersion(runnerWithVersion.context, MyService as Namespace);
+      const defaultApiVersion = getDefaultApiVersion(
+        runnerWithVersion.context,
+        MyService as Namespace
+      );
       ok(defaultApiVersion);
       strictEqual(defaultApiVersion.value, "1.0.1");
     });
