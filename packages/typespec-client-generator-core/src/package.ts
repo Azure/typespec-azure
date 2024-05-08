@@ -56,6 +56,7 @@ import {
   getHashForType,
   getLocationOfOperation,
   getSdkTypeBaseHelper,
+  isNeverOrVoidType,
   isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -250,14 +251,15 @@ function getSdkBasicServiceMethod<
   const parameters = httpOperation.parameters;
   // path/query/header parameters
   for (const param of parameters.parameters) {
+    if (isNeverOrVoidType(param.param.type)) continue;
     methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation, apiVersions)));
   }
   // body parameters
-  if (parameters.body?.parameter) {
+  if (parameters.body?.parameter && !isNeverOrVoidType(parameters.body.parameter.type)) {
     methodParameters.push(
       diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter, operation, apiVersions))
     );
-  } else if (parameters.body) {
+  } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
     if (parameters.body.type.kind === "Model") {
       const type = getEffectivePayloadType(context, parameters.body.type);
       // spread case
