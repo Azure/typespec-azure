@@ -11,11 +11,12 @@ title: "[I] SdkPackage"
 
 ## Properties
 
-| Property | Type |
-| :------ | :------ |
-| `clients` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\>[] |
-| `diagnostics` | readonly `Diagnostic`[] |
-| `enums` | [`SdkEnumType`](SdkEnumType.md)[] |
-| `models` | [`SdkModelType`](SdkModelType.md)[] |
-| `name` | `string` |
-| `rootNamespace` | `string` |
+| Property | Type | Description |
+| :------ | :------ | :------ |
+| `clients` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\>[] | - |
+| `crossLanguagePackageId` | `string` | - |
+| ~~`diagnostics`~~ | readonly `Diagnostic`[] | **Deprecated**<br />This property is deprecated. Look at `.diagnostics` on SdkContext instead |
+| `enums` | [`SdkEnumType`](SdkEnumType.md)[] | - |
+| `models` | [`SdkModelType`](SdkModelType.md)[] | - |
+| `name` | `string` | - |
+| `rootNamespace` | `string` | - |

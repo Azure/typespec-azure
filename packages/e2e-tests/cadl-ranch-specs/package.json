@@ -1,7 +1,7 @@
 {
   "name": "@azure-tools/typespec-e2e-cadl-ranch-specs",
   "dependencies": {
-    "@azure-tools/cadl-ranch-specs": "0.33.3"
+    "@azure-tools/cadl-ranch-specs": "0.33.4"
   },
   "type": "module",
   "private": true

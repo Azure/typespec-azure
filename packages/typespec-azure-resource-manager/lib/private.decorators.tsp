@@ -93,3 +93,14 @@ extern dec defaultResourceKeySegmentName(
   keyName: valueof string,
   segment: valueof string
 );
+
+/**
+ * Provides strict contraint type check.
+ *
+ * Due to TypeSpec language and all optional properties of `Foundations.Resource`,
+ * the `Resource extends Foundations.Resource` on many of the standard ARM templates is
+ * essentially equal to `Resource extends {}` and does not enforce the containt.
+ *
+ * Note, this is intended for internal use only for now.
+ */
+extern dec enforceConstraint(target: Operation | Model, sourceType: Model, constraintType: Model);

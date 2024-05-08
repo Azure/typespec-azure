@@ -21,6 +21,7 @@ title: "[I] SdkPagingServiceMethod"
 | `__raw_paged_metadata` | `PagedResultMetadata` | `SdkPagingServiceMethodOptions.__raw_paged_metadata` |
 | `access` | `undefined` \| [`AccessFlags`](../type-aliases/AccessFlags.md) | `SdkServiceMethodBase.access` |
 | `apiVersions` | `string`[] | `SdkServiceMethodBase.apiVersions` |
+| `crossLanguageDefintionId` | `string` | `SdkServiceMethodBase.crossLanguageDefintionId` |
 | `description?` | `string` | `SdkServiceMethodBase.description` |
 | `details?` | `string` | `SdkServiceMethodBase.details` |
 | `exception?` | [`SdkMethodResponse`](SdkMethodResponse.md) | `SdkServiceMethodBase.exception` |

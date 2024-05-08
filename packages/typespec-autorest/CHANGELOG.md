@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.42.0
+
+### Bug Fixes
+
+- [#745](https://github.com/Azure/typespec-azure/pull/745) prevent tcgc versioning projection
+- [#293](https://github.com/Azure/typespec-azure/pull/293) Add support for new `@body` `@bodyRoot` and `@bodyIgnore` decorators
+
+### Bump dependencies
+
+- [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
+
+### Features
+
+- [#765](https://github.com/Azure/typespec-azure/pull/765) [API] Refactor to provide functions to get the OpenAPI programtically
+
+### Breaking Changes
+
+- [#774](https://github.com/Azure/typespec-azure/pull/774) Version enum is now omitted by default. Use `version-enum-strategy: include` to revert behavior.
+
+
 ## 0.41.1
 
 ### Bug Fixes

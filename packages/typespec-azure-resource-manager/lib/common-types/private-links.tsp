@@ -33,7 +33,7 @@ model PrivateEndpoint {
 }
 
 /** The private endpoint connection resource */
-model PrivateEndpointConnection extends Azure.ResourceManager.Foundations.ProxyResourceBase {
+model PrivateEndpointConnection extends Azure.ResourceManager.Foundations.ProxyResource {
   /** The private endpoint connection properties */
   properties?: PrivateEndpointConnectionProperties;
 }
@@ -111,7 +111,7 @@ union PrivateEndpointServiceConnectionStatus {
   string,
 }
 
-model PrivateLinkResource extends Azure.ResourceManager.Foundations.ProxyResourceBase {
+model PrivateLinkResource extends Azure.ResourceManager.Foundations.ProxyResource {
   /** Properties of the private link resource. */
   properties?: PrivateLinkResourceProperties;
 }
