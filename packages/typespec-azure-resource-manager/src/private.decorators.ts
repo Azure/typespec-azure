@@ -5,6 +5,7 @@ import {
   DecoratorContext,
   Enum,
   EnumMember,
+  EnumValue,
   Interface,
   Model,
   ModelProperty,
@@ -223,7 +224,7 @@ function storeCommonTypeRecord(
   kind: "definitions" | "parameters",
   stateKey: symbol,
   name?: string,
-  version?: string | EnumMember | Model,
+  version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ): void {
   const getCommonTypeRecords = (
@@ -237,9 +238,9 @@ function storeCommonTypeRecord(
 
   // NOTE: Right now we don't try to prevent multiple versions from declaring that they are the default
   let isDefault = false;
-  if (version && typeof version !== "string" && version.kind === "Model") {
-    isDefault = !!version.properties.get("isDefault");
-    version = version.properties.get("version")?.type as any;
+  if (version && typeof version !== "string" && !("valueKind" in version)) {
+    isDefault = !!version.isDefault;
+    version = version.version;
   }
 
   // for backward compatibility, skip if we are trying to access a non-default file and emit the type
@@ -247,7 +248,7 @@ function storeCommonTypeRecord(
   if (!version) version = ArmCommonTypesDefaultVersion;
   if (!referenceFile) referenceFile = "types.json";
 
-  const versionStr = typeof version === "string" ? version : version.name;
+  const versionStr = typeof version === "string" ? version : version.value.name;
   const records = context.program.stateMap(stateKey).get(entity) ?? {
     records: {},
   };
@@ -319,6 +320,11 @@ function storeCommonTypeRecord(
   setRefProducer(context.program, entity, refProducer);
 }
 
+interface ArmCommonTypeVersionSpec {
+  version: string | EnumValue;
+  isDefault: boolean;
+}
+
 /**
  * Refer an model property to be a common ARM parameter
  * @param {DecoratorContext} context DecoratorContext object
@@ -332,7 +338,7 @@ export function $armCommonParameter(
   context: DecoratorContext,
   entity: ModelProperty,
   parameterName?: string,
-  version?: string | EnumMember | Model,
+  version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ): void {
   // Use the name of the model type if not specified
@@ -364,7 +370,7 @@ export function $armCommonDefinition(
   context: DecoratorContext,
   entity: Model,
   definitionName?: string,
-  version?: string | EnumMember | Model,
+  version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ): void {
   // Use the name of the model type if not specified
