@@ -110,7 +110,7 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
         if (format != "J")
         {
             throw new FormatException($"The model {nameof(Foo)} does not support writing '{format}' format.");
-        }   
+        }
 
         writer.WriteStartObject();
         writer.WritePropertyName("properties"u8);
@@ -144,10 +144,8 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
                     if (property0.NameEquals("name"u8))
                     {
                         name = property0.Value.GetString();
-                        continue;
                     }
                 }
-                continue;
             }
         }
         return new Foo(name);
