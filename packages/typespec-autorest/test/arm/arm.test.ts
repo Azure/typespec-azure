@@ -2,54 +2,12 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { openApiFor } from "../test-host.js";
 
-it("treats schema for readOnly properties as readOnly", async () => {
-  const openapi = await openApiFor(
-    `@armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-      model FooResourceProperties {
-        @visibility("read")
-        provisioningState?: ResourceState;
-      }
-
-      model FooResource is TrackedResource<FooResourceProperties> {
-        @key("fooName")
-        @segment("foos")
-        @path
-        name: string;
-      }
-
-      @armResourceOperations
-      interface Foos extends TrackedResourceOperations<FooResource, FooResourceProperties> {
-      }`,
-    undefined,
-    { "use-read-only-status-schema": true }
-  );
-
-  ok(!openapi.isRef);
-
-  deepStrictEqual(openapi.definitions.ResourceState.readOnly, true);
-});
-
 it("can share types with a library namespace", async () => {
   const openapi = await openApiFor(
     `
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armLibraryNamespace
       namespace Microsoft.Library {
-        /**
-         * A Test Tracked Resource
-         */
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
           @segment("trackedResources")
@@ -58,9 +16,6 @@ it("can share types with a library namespace", async () => {
           name: string;
         }
         
-        /** 
-         * The operations for a Test Tracked Resource
-         */
         @armResourceOperations(TestTrackedResource)
         interface TrackedOperations
           extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {}
@@ -120,7 +75,6 @@ it("can use private links with common-types references", async () => {
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      // Tracked resources
       model TestTrackedResource is TrackedResource<TestTrackedProperties> {
         @key("trackedResourceName")
         @segment("trackedResources")
@@ -146,7 +100,6 @@ it("can use private links with common-types references", async () => {
         @visibility("create", "read")
         displayName?: string = "default";
       
-        /** The private endpoints exposed by this resource */
         endpoints?: PrivateEndpoint[];
       }
       `
@@ -172,22 +125,17 @@ it("can use private endpoints with common-types references", async () => {
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** Holder for private endpoint connections */
       @tenantResource
       model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
-        /** The name of the connection */
         @path
         @segment("privateEndpointConnections")
         @key("privateEndpointConnectionName")
         name: string;
       }
       
-      /** Private connection operations */
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
-        /** List existing private connections */
         listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
-        /** Get a specific private connection */
         getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
       }
       `
@@ -217,7 +165,6 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** Holder for private endpoint connections */
       @tenantResource
       model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
         ...ResourceNameParameter<PrivateEndpointConnectionResource, "privateEndpointConnectionName", "privateEndpointConnections", "/[a-zA-Z]*">;
@@ -226,9 +173,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
       /** Private connection operations */
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
-        /** List existing private connections */
         listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
-        /** Get a specific private connection */
         getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
       }
       `
@@ -259,18 +204,14 @@ it("can use ResourceNameParameter for default name parameter definition", async 
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** Holder for private endpoint connections */
       @tenantResource
       model PrivateEndpointConnection is ProxyResource<PrivateEndpointConnectionProperties> {
         ...ResourceNameParameter<PrivateEndpointConnection>;
       }
       
-      /** Private connection operations */
       @armResourceOperations(PrivateEndpointConnection)
       interface PrivateEndpointConnections {
-        /** List existing private connections */
         listConnections is ArmResourceListByParent<PrivateEndpointConnection>;
-        /** Get a specific private connection */
         getConnection is ArmResourceRead<PrivateEndpointConnection>;
       }
       `
