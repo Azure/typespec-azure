@@ -1739,6 +1739,41 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.response.type, undefined);
       strictEqual(method.response.resultPath, undefined);
     });
+    it("basic returning void and error model has status code", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @error
+        model Error {
+          @statusCode _: 403;
+          code: int32;
+          message: string;
+        }
+        @delete op delete(@path id: string): void | Error;
+        `
+      );
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "delete");
+      const serviceResponses = method.operation.responses;
+      strictEqual(serviceResponses.size, 1);
+
+      const voidResponse = serviceResponses.get(204);
+      ok(voidResponse);
+      strictEqual(voidResponse.kind, "http");
+      strictEqual(voidResponse.type, undefined);
+      strictEqual(voidResponse.headers.length, 0);
+
+      const errorResponse = method.operation.exceptions.get(403);
+      ok(errorResponse);
+      strictEqual(errorResponse.kind, "http");
+      ok(errorResponse.type);
+      strictEqual(errorResponse.type.kind, "model");
+      strictEqual(errorResponse.type, sdkPackage.models[0]);
+
+      strictEqual(method.response.type, undefined);
+      strictEqual(method.response.resultPath, undefined);
+    });
     it("basic returning model", async () => {
       await runner.compileWithBuiltInService(
         `

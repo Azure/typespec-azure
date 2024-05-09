@@ -49,6 +49,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -434,7 +435,10 @@ function getSdkHttpResponseAndExceptions(
           );
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body = innerResponse.body.type;
+        body =
+          innerResponse.body.type.kind === "Model"
+            ? getEffectivePayloadType(context, innerResponse.body.type)
+            : innerResponse.body.type;
       }
     }
     const sdkResponse: SdkHttpResponse = {

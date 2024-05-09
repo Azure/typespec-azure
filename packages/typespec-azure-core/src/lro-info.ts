@@ -7,9 +7,11 @@ import {
   Program,
   Union,
   UnionVariant,
+  compilerAssert,
   createDiagnosticCollector,
   getEffectiveModelType,
   isErrorType,
+  isType,
 } from "@typespec/compiler";
 import {
   HttpOperationResponse,
@@ -355,7 +357,12 @@ export function getLroOperationInfo(
       );
       return;
     }
-    const sourceProperty = propMap.templateMapper!.args[0];
+    let sourceProperty = propMap.templateMapper!.args[0];
+    if (sourceProperty.entityKind === "Indeterminate") {
+      sourceProperty = sourceProperty.type;
+    } else if (!isType(sourceProperty)) {
+      compilerAssert(false, "Lro Template Arg should be a Type", propMap);
+    }
     switch (sourceProperty.kind) {
       case "String":
         const sourcePropertyName = sourceProperty.value;

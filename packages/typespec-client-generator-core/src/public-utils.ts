@@ -15,6 +15,7 @@ import {
   getProjectedName,
   ignoreDiagnostics,
   isErrorModel,
+  isType,
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -54,7 +55,18 @@ export function getDefaultApiVersion(
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
-    const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    let versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    // filter with specific api version
+    if (
+      context.apiVersion !== undefined &&
+      context.apiVersion !== "latest" &&
+      context.apiVersion !== "all"
+    ) {
+      const index = versions.findIndex((version) => version.value === context.apiVersion);
+      if (index >= 0) {
+        versions = versions.slice(0, index + 1);
+      }
+    }
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {
@@ -184,7 +196,7 @@ export function getLibraryName(
       type.templateMapper.args
         .filter(
           (arg): arg is Model | Enum =>
-            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+            isType(arg) && (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
         )
         .map((arg) => pascalCase(arg.name))
         .join("")

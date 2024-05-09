@@ -2,6 +2,7 @@ import {
   DecoratorContext,
   Enum,
   EnumMember,
+  EnumValue,
   Namespace,
   Program,
   Type,
@@ -44,11 +45,11 @@ export function isArmCommonType(entity: Type): boolean {
 export function $armCommonTypesVersion(
   context: DecoratorContext,
   entity: Namespace | EnumMember,
-  version: string | EnumMember
+  version: string | EnumValue
 ) {
   context.program
     .stateMap(ArmStateKeys.armCommonTypesVersion)
-    .set(entity, typeof version === "string" ? version : version.name);
+    .set(entity, typeof version === "string" ? version : version.value.name);
 }
 
 /**
