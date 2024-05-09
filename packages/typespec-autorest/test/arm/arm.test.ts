@@ -1,7 +1,6 @@
-import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getOpenApiAndDiagnostics, openApiFor } from "./test-host.js";
+import { openApiFor } from "../test-host.js";
 
 describe("typespec-azure-resource-manager: autorest output", () => {
   it("defines simple resource identifier models", async () => {
@@ -247,6 +246,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       @armResourceOperations
       interface Foos extends TrackedResourceOperations<FooResource, FooResourceProperties> {
       }`,
+      undefined,
       { "use-read-only-status-schema": true }
     );
 
@@ -256,7 +256,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
   });
 
   it("can share types with a library namespace", async () => {
-    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+    const openapi = await openApiFor(
       `
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armLibraryNamespace
@@ -313,7 +313,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/trackedResources/{trackedResourceName}";
 
-    expectDiagnosticEmpty(diagnostics);
     ok(openapi.definitions["Microsoft.Library.TestTrackedResource"]);
     ok(openapi.definitions["Microsoft.Library.TestTrackedProperties"]);
     ok(openapi.definitions.TestTrackedResourceListResult);
@@ -332,7 +331,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
   });
 
   it("can use private links with common-types references", async () => {
-    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+    const openapi = await openApiFor(
       `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -379,7 +378,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/trackedResources/{trackedResourceName}/createConnection";
     const listPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/trackedResources/{trackedResourceName}/listConnections";
-    expectDiagnosticEmpty(diagnostics);
     ok(openapi.paths[createPath]);
     deepStrictEqual(openapi.paths[createPath].post.parameters.length, 5);
     ok(openapi.paths[createPath].post.parameters[4].schema);
@@ -389,7 +387,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
   });
 
   it("can use private endpoints with common-types references", async () => {
-    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+    const openapi = await openApiFor(
       `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -420,7 +418,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
     const privateEndpointGet =
       "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
-    expectDiagnosticEmpty(diagnostics);
     ok(openapi.paths[privateEndpointList]);
     ok(openapi.paths[privateEndpointList].get);
     deepStrictEqual(
@@ -435,7 +432,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
   });
 
   it("can use ResourceNameParameter for custom name parameter definition", async () => {
-    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+    const openapi = await openApiFor(
       `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -462,7 +459,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
     const privateEndpointGet =
       "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
-    expectDiagnosticEmpty(diagnostics);
     ok(openapi.paths[privateEndpointList]);
     ok(openapi.paths[privateEndpointList].get);
     deepStrictEqual(
@@ -478,7 +474,7 @@ describe("typespec-azure-resource-manager: autorest output", () => {
   });
 
   it("can use ResourceNameParameter for default name parameter definition", async () => {
-    const [openapi, diagnostics] = await getOpenApiAndDiagnostics(
+    const openapi = await openApiFor(
       `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -505,7 +501,6 @@ describe("typespec-azure-resource-manager: autorest output", () => {
     const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
     const privateEndpointGet =
       "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
-    expectDiagnosticEmpty(diagnostics);
     ok(openapi.paths[privateEndpointList]);
     ok(openapi.paths[privateEndpointList].get);
     deepStrictEqual(

@@ -9,6 +9,10 @@ import {
   getUnionAsEnum,
   isFixed,
 } from "@azure-tools/typespec-azure-core";
+import {
+  getArmCommonTypeOpenAPIRef,
+  isArmCommonType,
+} from "@azure-tools/typespec-azure-resource-manager";
 import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
@@ -764,7 +768,7 @@ export async function getOpenAPIForService(
     return header;
   }
 
-  function resolveRef(ref: string) {
+  function expandRef(ref: string) {
     const absoluteRef = interpolatePath(ref, {
       "arm-types-dir": options.armTypesDir,
     });
@@ -775,12 +779,31 @@ export async function getOpenAPIForService(
     return getRelativePathFromDirectory(getDirectoryPath(context.outputFile), absoluteRef, false);
   }
 
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
-    const refUrl = getRef(program, type, { version: context.version, service: context.service });
+  function resolveExternalRef(type: Type) {
+    const refUrl = getRef(program, type);
     if (refUrl) {
       return {
-        $ref: resolveRef(refUrl),
+        $ref: expandRef(refUrl),
       };
+    }
+
+    if (isArmCommonType(type) && (type.kind === "Model" || type.kind === "ModelProperty")) {
+      const ref = getArmCommonTypeOpenAPIRef(program, type, {
+        version: context.version,
+        service: context.service,
+      });
+      if (ref) {
+        return {
+          $ref: expandRef(ref),
+        };
+      }
+    }
+    return undefined;
+  }
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+    const ref = resolveExternalRef(type);
+    if (ref) {
+      return ref;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -870,14 +893,9 @@ export async function getOpenAPIForService(
       }
     }
 
-    const refUrl = getRef(program, property, {
-      version: context.version,
-      service: context.service,
-    });
-    if (refUrl) {
-      return {
-        $ref: resolveRef(refUrl),
-      };
+    const ref = resolveExternalRef(property);
+    if (ref) {
+      return ref;
     }
 
     const parameter = params.get(property);

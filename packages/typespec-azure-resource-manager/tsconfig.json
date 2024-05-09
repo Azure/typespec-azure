@@ -1,6 +1,5 @@
 {
   "extends": "../../core/tsconfig.base.json",
-  "composite": true,
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.json" },
     { "path": "../../core/packages/rest/tsconfig.json" },
