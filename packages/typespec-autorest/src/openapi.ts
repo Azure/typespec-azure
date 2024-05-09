@@ -1690,7 +1690,6 @@ export async function getOpenAPIForService(
 
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
     let propSchema;
-    console.log("Test this is reported");
     if (prop.type.kind === "Enum" && prop.defaultValue) {
       propSchema = getSchemaForEnum(prop.type);
     } else if (prop.type.kind === "Union" && prop.defaultValue) {
