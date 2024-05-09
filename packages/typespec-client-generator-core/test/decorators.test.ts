@@ -3010,7 +3010,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2"]
       );
     });
 
@@ -3099,7 +3099,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1"]
       );
     });
 
