@@ -2,10 +2,11 @@
   "extends": "../../core/tsconfig.base.json",
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.json" },
+    { "path": "../../core/packages/http/tsconfig.json" },
     { "path": "../../core/packages/rest/tsconfig.json" },
     { "path": "../../core/packages/openapi/tsconfig.json" },
-    { "path": "../typespec-azure-core/tsconfig.json" },
-    { "path": "../typespec-autorest/tsconfig.json" }
+    { "path": "../../core/packages/versioning/tsconfig.json" },
+    { "path": "../typespec-azure-core/tsconfig.json" }
   ],
   "compilerOptions": {
     "outDir": "dist",
