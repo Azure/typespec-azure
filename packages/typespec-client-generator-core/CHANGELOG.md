@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.42.1
+
+### Bug Fixes
+
+- [#766](https://github.com/Azure/typespec-azure/pull/766) add generated names for constants
+- [#808](https://github.com/Azure/typespec-azure/pull/808) Fix error response when error model has statusCode
+- [#797](https://github.com/Azure/typespec-azure/pull/797) add void and never handling for parameter and return types
+- [#805](https://github.com/Azure/typespec-azure/pull/805) propagate api version from parent if not explicitly set
+- [#801](https://github.com/Azure/typespec-azure/pull/801) `getDefaultApiVersion` and service version enum hornor api version config
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
+
+
 ## 0.42.0
 
 ### Bug Fixes
