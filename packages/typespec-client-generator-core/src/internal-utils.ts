@@ -157,6 +157,11 @@ export function filterApiVersionsWithDecorators(
   return retval;
 }
 
+function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
+  const union = Array.from(new Set([...a, ...b]));
+  return apiVersions.filter((item) => union.includes(item));
+}
+
 /**
  *
  * @param context
@@ -167,20 +172,32 @@ export function filterApiVersionsWithDecorators(
 export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
-  namespace?: Namespace | Interface
+  wrapper?: Type
 ): string[] {
-  let cachedApiVersions: string[] = [];
-  if (namespace) {
-    cachedApiVersions = context.__namespaceToApiVersions.get(namespace) || [];
+  let wrapperApiVersions: string[] = [];
+  if (wrapper) {
+    wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
   }
 
-  const apiVersions =
-    cachedApiVersions ||
+  const allApiVersions =
     getVersions(context.program, type)[1]
       ?.getVersions()
-      .map((x) => x.value);
+      .map((x) => x.value) || [];
+
+  const apiVersions = wrapperApiVersions.length ? wrapperApiVersions : allApiVersions;
   if (!apiVersions) return [];
-  return filterApiVersionsWithDecorators(context, type, apiVersions);
+  const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
+  if (explicitlyDecorated.length) {
+    context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
+    return explicitlyDecorated;
+  }
+  // we take the union of all of the api versions that the type is available on
+  // if it's called multiple times with diff wrappers, we want to make sure we have
+  // all of the possible api versions listed
+  const existing = context.__tspTypeToApiVersions.get(type) || [];
+  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
+  context.__tspTypeToApiVersions.set(type, retval);
+  return retval;
 }
 
 interface DocWrapper {
@@ -303,7 +320,7 @@ export interface TCGCContext {
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __namespaceToApiVersions: Map<Interface | Namespace, string[]>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
   __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
@@ -321,7 +338,7 @@ export function createTCGCContext(program: Program): TCGCContext {
     diagnostics: [],
     originalProgram: program,
     __namespaceToApiVersionParameter: new Map(),
-    __namespaceToApiVersions: new Map(),
+    __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
   };
 }
