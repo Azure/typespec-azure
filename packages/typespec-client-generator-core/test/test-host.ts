@@ -188,23 +188,24 @@ export async function createSdkTestRunner(
 
   // compile with versioned service
   sdkTestRunner.compileWithVersionedService = async function (code) {
-    const result = await baseCompile(
-      `@service
+    const result = await baseCompile(`
+      @service
       @versioned(Versions)
       @server(
-        "{endpoint}/versioning/added/api-version:{version}",
+        "{endpoint}/versioning/api-version:{version}",
         "Testserver endpoint",
         {
           endpoint: url,
           version: Versions,
         }
       )
-      namespace Versioning.Added;
+      namespace Versioning;
       enum Versions {
         v1: "v1",
         v2: "v2",
       }
-    ${code}`,
+      
+      ${code}`,
       {
         noEmit: true,
       }

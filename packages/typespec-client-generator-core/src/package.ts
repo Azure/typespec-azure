@@ -142,12 +142,12 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TOptions, TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters,
-          )
+        getSdkServiceOperation<TOptions, TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters,
         )
+      )
       : undefined,
     getResponseMapping(): string | undefined {
       return basic.response.resultPath;
@@ -398,7 +398,7 @@ function getSdkInitializationType<
     usage: UsageFlags.Input,
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-    apiVersions: getAvailableApiVersions(context, client.service, client.type),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
     isError: false,
   });
@@ -477,7 +477,6 @@ function getSdkEndpointParameter(
   const servers = getServers(context.program, client.service);
   let type: SdkEndpointType;
   let optional: boolean = false;
-  const apiVersions = getAvailableApiVersions(context, client.service, client.type);
   if (servers === undefined || servers.length > 1) {
     // if there is no defined server url, or if there are more than one
     // we will return a mandatory endpoint parameter in initialization
@@ -504,7 +503,7 @@ function getSdkEndpointParameter(
             encode: "string",
           },
           isApiVersionParam: false,
-          apiVersions,
+          apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
         },
       ],
     };
@@ -525,10 +524,10 @@ function getSdkEndpointParameter(
         templateArguments.push(sdkParam);
         sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
-        sdkParam.apiVersions = context.__tspTypeToApiVersions.get(client.type) || [];
         const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
         sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+        sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
       } else {
         diagnostics.add(
           createDiagnostic({
@@ -553,7 +552,7 @@ function getSdkEndpointParameter(
     description: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: getAvailableApiVersions(context, client.service, client.type),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     optional,
     isApiVersionParam: false,
     nullable: false,
@@ -570,8 +569,6 @@ function createSdkClientType<
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
   const clientName = isClient ? client.name : client.type.name;
-  const apiVersions = getAvailableApiVersions(context, client.service, client.type);
-
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client));
   const docWrapper = getDocHelper(context, client.type);
@@ -581,7 +578,7 @@ function createSdkClientType<
     description: docWrapper.description,
     details: docWrapper.details,
     methods: methods,
-    apiVersions,
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     initialization: diagnostics.pipe(
       getSdkInitializationType<TOptions, TServiceOperation>(context, client)

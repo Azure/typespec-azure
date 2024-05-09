@@ -189,7 +189,7 @@ export function getAvailableApiVersions(
   if (explicitlyDecorated.length) {
     context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
     return explicitlyDecorated
-  };
+  }
   // we take the union of all of the api versions that the type is available on
   // if it's called multiple times with diff wrappers, we want to make sure we have
   // all of the possible api versions listed
