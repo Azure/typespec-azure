@@ -90,7 +90,7 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
-  it("using @summary sets the title on definitions and", async () => {
+  it("using @summary sets the title on definitions and properties", async () => {
     const res = await oapiForModel(
       "Foo",
       `
