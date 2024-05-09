@@ -188,7 +188,8 @@ export async function createSdkTestRunner(
 
   // compile with versioned service
   sdkTestRunner.compileWithVersionedService = async function (code) {
-    const result = await baseCompile(`
+    const result = await baseCompile(
+      `
       @service
       @versioned(Versions)
       @server(
@@ -216,7 +217,7 @@ export async function createSdkTestRunner(
       options.emitterName
     );
     return result;
-  }
+  };
 
   // compile and diagnose with client.tsp
   sdkTestRunner.compileAndDiagnoseWithCustomization = async function (mainCode, clientCode) {

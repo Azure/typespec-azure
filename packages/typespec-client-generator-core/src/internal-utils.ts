@@ -159,7 +159,7 @@ export function filterApiVersionsWithDecorators(
 
 function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
   const union = Array.from(new Set([...a, ...b]));
-  return apiVersions.filter(item => union.includes(item));
+  return apiVersions.filter((item) => union.includes(item));
 }
 
 /**
@@ -172,29 +172,30 @@ function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]
 export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
-  wrapper?: Type,
+  wrapper?: Type
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
     wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
   }
 
-  const allApiVersions = getVersions(context.program, type)[1]
-  ?.getVersions()
-  .map((x) => x.value) || [];
+  const allApiVersions =
+    getVersions(context.program, type)[1]
+      ?.getVersions()
+      .map((x) => x.value) || [];
 
   const apiVersions = wrapperApiVersions.length ? wrapperApiVersions : allApiVersions;
   if (!apiVersions) return [];
   const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
   if (explicitlyDecorated.length) {
     context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
-    return explicitlyDecorated
+    return explicitlyDecorated;
   }
   // we take the union of all of the api versions that the type is available on
   // if it's called multiple times with diff wrappers, we want to make sure we have
   // all of the possible api versions listed
   const existing = context.__tspTypeToApiVersions.get(type) || [];
-  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions)
+  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
   context.__tspTypeToApiVersions.set(type, retval);
   return retval;
 }

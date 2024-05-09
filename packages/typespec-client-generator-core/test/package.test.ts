@@ -3326,13 +3326,13 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
     });
-    it("add method", async() => {
+    it("add method", async () => {
       await runner.compileWithVersionedService(`
       @route("/v1")
       @post
       @added(Versions.v2)
       op v2(@header headerV2: string): void;
-      `)
+      `);
 
       const sdkPackage = runner.context.experimental_sdkPackage;
       deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
@@ -3350,13 +3350,13 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParam.name, "headerV2");
       strictEqual(headerParam.kind, "header");
       deepStrictEqual(headerParam.apiVersions, ["v2"]);
-    })
-    it("add parameter", async() => {
+    });
+    it("add parameter", async () => {
       await runner.compileWithVersionedService(`
       @route("/v1")
       @post
       op v1(@added(Versions.v2) @header headerV2: string): void;
-      `)
+      `);
 
       const sdkPackage = runner.context.experimental_sdkPackage;
       deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
@@ -3374,7 +3374,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParam.name, "headerV2");
       strictEqual(headerParam.kind, "header");
       deepStrictEqual(headerParam.apiVersions, ["v2"]);
-    })
+    });
   });
 });
 

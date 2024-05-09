@@ -968,11 +968,7 @@ export function getSdkModelPropertyTypeBase(
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
-  const apiVersions = getAvailableApiVersions(
-    context,
-    type,
-    operation || type.model,
-  )
+  const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
   let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
@@ -1007,12 +1003,9 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(
-    getSdkModelPropertyTypeBase(context, type, operation)
-  );
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
-  if (isSdkHttpParameter(context, type))
-    return getSdkHttpParameter(context, type, operation!);
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
   // I'm a body model property
   let operationIsMultipart = false;
   if (operation) {
@@ -1060,9 +1053,7 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, property, operation)
-    );
+    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
