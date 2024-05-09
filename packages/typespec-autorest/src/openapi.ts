@@ -1740,6 +1740,11 @@ export async function getOpenAPIForService(
       newTarget.description = docStr;
     }
 
+    const title = getSummary(program, typespecType);
+    if (title) {
+      target.title = title;
+    }
+
     const formatStr = getFormat(program, typespecType);
     if (isString && formatStr) {
       const allowedStringFormats = [
