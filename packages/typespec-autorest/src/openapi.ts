@@ -43,6 +43,7 @@ import {
   Value,
   compilerAssert,
   createDiagnosticCollector,
+  explainStringTemplateNotSerializable,
   getAllTags,
   getDirectoryPath,
   getDiscriminator,
@@ -84,7 +85,6 @@ import {
   navigateTypesInNamespace,
   resolveEncodedName,
   resolvePath,
-  stringTemplateToString,
 } from "@typespec/compiler";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
@@ -1566,7 +1566,7 @@ export async function getOpenAPIForService(
         modelSchema.required = [propertyName];
       }
     }
-
+    applySummary(model, modelSchema);
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
@@ -1589,7 +1589,6 @@ export async function getOpenAPIForService(
       const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
-
       // if this property is a discriminator property, remove it to keep autorest validation happy
       if (model.baseModel) {
         const { propertyName } = getDiscriminator(program, model.baseModel) || {};
@@ -1617,6 +1616,7 @@ export async function getOpenAPIForService(
       if (description) {
         property.description = description;
       }
+      applySummary(prop, property);
 
       if (prop.defaultValue && !("$ref" in property)) {
         property.default = getDefaultValue(prop.defaultValue);
@@ -1690,9 +1690,10 @@ export async function getOpenAPIForService(
 
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
     let propSchema;
-    if (prop.type.kind === "Enum" && prop.default) {
+    console.log("Test this is reported");
+    if (prop.type.kind === "Enum" && prop.defaultValue) {
       propSchema = getSchemaForEnum(prop.type);
-    } else if (prop.type.kind === "Union" && prop.default) {
+    } else if (prop.type.kind === "Union" && prop.defaultValue) {
       const [asEnum, _] = getUnionAsEnum(prop.type);
       if (asEnum) {
         propSchema = getSchemaForUnionEnum(prop.type, asEnum);
@@ -1908,6 +1909,12 @@ export async function getOpenAPIForService(
     }
   }
 
+  function applySummary(typespecType: Type, target: { title?: string }) {
+    const summary = getSummary(program, typespecType);
+    if (summary) {
+      target.title = summary;
+    }
+  }
   function applyExternalDocs(typespecType: Type, target: Record<string, unknown>) {
     const externalDocs = getExternalDocs(program, typespecType);
     if (externalDocs) {
@@ -1954,12 +1961,16 @@ export async function getOpenAPIForService(
   }
 
   function getSchemaForStringTemplate(stringTemplate: StringTemplate) {
-    const [value, diagnostics] = stringTemplateToString(stringTemplate);
-    if (diagnostics.length > 0) {
-      program.reportDiagnostics(diagnostics.map((x) => ({ ...x, severity: "warning" })));
+    if (stringTemplate.stringValue === undefined) {
+      program.reportDiagnostics(
+        explainStringTemplateNotSerializable(stringTemplate).map((x) => ({
+          ...x,
+          severity: "warning",
+        }))
+      );
       return { type: "string" };
     }
-    return { type: "string", enum: [value] };
+    return { type: "string", enum: [stringTemplate.stringValue] };
   }
   // Map an TypeSpec type to an OA schema. Returns undefined when the resulting
   // OA schema is just a regular object schema.
