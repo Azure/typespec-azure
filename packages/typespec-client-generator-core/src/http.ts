@@ -162,11 +162,7 @@ function getSdkHttpParameters(
         contentTypes: [],
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
-        apiVersions: getAvailableApiVersions(
-          context,
-          tspBody.type,
-          httpOperation.operation.namespace
-        ),
+        apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: false,
         nullable: isNullable(tspBody.type),
@@ -427,7 +423,6 @@ function getSdkHttpResponseAndExceptions(
             : innerResponse.body.type;
       }
     }
-
     const sdkResponse: SdkHttpResponse = {
       __raw: response,
       kind: "http",
@@ -440,7 +435,7 @@ function getSdkHttpResponseAndExceptions(
       apiVersions: getAvailableApiVersions(
         context,
         httpOperation.operation,
-        httpOperation.operation.namespace
+        httpOperation.operation
       ),
       nullable: body ? isNullable(body) : true,
     };
