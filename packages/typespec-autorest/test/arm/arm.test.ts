@@ -27,7 +27,6 @@ it("can share types with a library namespace", async () => {
           @visibility("create", "read")
           displayName?: string = "default";
         }
-        
       }
 
       @useLibraryNamespace(Microsoft.Library)
