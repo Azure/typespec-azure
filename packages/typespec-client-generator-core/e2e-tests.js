@@ -27,6 +27,7 @@ function cleanTcgcDirectory() {
 }
 
 function packPackages() {
+  run("pnpm", ["install"], { cwd: tcgcTestDir });
   run("pnpm", ["-w", "pack:all"], { cwd: repoRoot });
   run("pnpm", ["-w", "pack:all"], { cwd: coreRepoRoot });
   const azureOutputFolder = join(repoRoot, "/temp/artifacts");
