@@ -1,10 +1,9 @@
-import { join } from "path";
 import { readdirSync, rmSync } from "fs";
-import { repoRoot, run } from "../../eng/scripts/helpers.js";
+import { join } from "path";
+import { repoRoot, coreRepoRoot, run } from "../../eng/scripts/helpers.js";
 
 const tcgcTestDir = join(repoRoot, "packages", "typespec-client-generator-core");
 const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
-
 
 function main() {
   printInfo();
@@ -27,7 +26,7 @@ function cleanTcgcDirectory() {
 
 function packPackages() {
   run("pnpm", ["-w", "pack:all"], { cwd: repoRoot });
-  run("pnpm", ["-w", "pack:all"], { cwd: repoRoot })
+  run("pnpm", ["-w", "pack:all"], { cwd: coreRepoRoot });
   const azureOutputFolder = join(repoRoot, "/temp/artifacts");
   const coreOutputFolder = join(repoRoot, "/core/temp/artifacts");
   const files = readdirSync(azureOutputFolder).concat(readdirSync(coreOutputFolder));
@@ -52,7 +51,9 @@ function packPackages() {
     "@typespec/versioning": resolvePackage("typespec-versioning-"),
     "@azure-tools/typespec-azure-core": resolvePackage("azure-tools-typespec-azure-core-"),
     "@azure-tools/typespec-autorest": resolvePackage("azure-tools-typespec-autorest-"),
-    "@azure-tools/typespec-azure-resource-manager": resolvePackage("azure-tools-typespec-azure-resource-manager-"),
+    "@azure-tools/typespec-azure-resource-manager": resolvePackage(
+      "azure-tools-typespec-azure-resource-manager-"
+    ),
   };
 }
 
@@ -72,13 +73,9 @@ function testBasicLatest(packages) {
   console.log("Installed basic-latest dependencies");
 
   console.log("Running tsp compile .");
-  runTypeSpec(
-    packages["@typespec/compiler"],
-    ["compile", ".", "--emit", "@typespec/openapi3"],
-    {
-      cwd: basicLatestDir,
-    }
-  );
+  runTypeSpec(packages["@typespec/compiler"], ["compile", ".", "--emit", "@typespec/openapi3"], {
+    cwd: basicLatestDir,
+  });
   console.log("Completed tsp compile .");
 
   expectOpenApiOutput(outputDir);
