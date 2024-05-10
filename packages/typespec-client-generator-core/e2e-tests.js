@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { readdirSync, rmSync } from "fs";
 import { join } from "path";
 import { coreRepoRoot, repoRoot, run } from "../../eng/scripts/helpers.js";
@@ -14,7 +16,7 @@ function main() {
 main();
 
 function printInfo() {
-  console.log("-".repeat(100));
+  console.log("-".repeat(100)); //
   console.log("Npm Version: ");
   run("npm", ["-v"]);
   console.log("-".repeat(100));
