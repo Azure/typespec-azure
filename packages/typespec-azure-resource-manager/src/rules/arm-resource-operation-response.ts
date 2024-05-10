@@ -6,7 +6,6 @@ import {
   createRule,
   getEffectiveModelType,
   isErrorType,
-  isType,
 } from "@typespec/compiler";
 
 import { ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
@@ -61,12 +60,12 @@ function checkArmResourceOperationReturnType(
           if (modelCandidate.templateMapper !== undefined) {
             // ArmResponse<FooResource>
             for (const arg of modelCandidate.templateMapper.args) {
-              if (isType(arg) && arg.kind === "Model") {
+              if (arg.kind === "Model") {
                 checkIfArmModel(context, operation, model, arg);
                 if (arg.templateMapper !== undefined) {
                   // ArmResponse<ResourceListResult<FooResource>>
                   for (const type of arg.templateMapper.args) {
-                    if (isType(type) && type.kind === "Model") {
+                    if (type.kind === "Model") {
                       checkIfArmModel(context, operation, model, type);
                     }
                   }

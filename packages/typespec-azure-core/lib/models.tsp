@@ -242,7 +242,7 @@ model EmbeddingVector<Element extends numeric = float32> is Array<Element>;
 model StatusMonitorPollingOptions<
   PollingModel extends TypeSpec.Reflection.Model | void = never,
   FinalResult extends TypeSpec.Reflection.Model | void = never,
-  FinalProperty extends TypeSpec.Reflection.ModelProperty | string = never
+  FinalProperty extends TypeSpec.Reflection.ModelProperty | (valueof string) = never
 > extends StatusMonitorOptions {
   /** The kind of polling options */
   kind: PollingOptionKind.statusMonitor;
@@ -263,7 +263,7 @@ model StatusMonitorOptions extends PollingOptions {
   kind: PollingOptionKind.statusMonitor;
 
   /** A reference to or name of the property of the status monitor that contains the response */
-  finalProperty?: TypeSpec.Reflection.ModelProperty | string;
+  finalProperty?: TypeSpec.Reflection.ModelProperty | (valueof string);
 }
 
 /** Generic polling options for LRO operations. */

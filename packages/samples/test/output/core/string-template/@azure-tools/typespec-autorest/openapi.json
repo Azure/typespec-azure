@@ -25,12 +25,18 @@
       "type": "object",
       "description": "Animal named: Cat",
       "properties": {
-        "named": {
-          "type": "string"
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Cat"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
         }
       },
       "required": [
-        "named"
+        "kind"
       ]
     },
     "Person": {

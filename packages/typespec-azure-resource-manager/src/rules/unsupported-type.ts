@@ -1,4 +1,4 @@
-import { DiagnosticTarget, Type, createRule, isType, paramMessage } from "@typespec/compiler";
+import { DiagnosticTarget, Type, createRule, paramMessage } from "@typespec/compiler";
 
 const UnsupportedIntrinsicModel = new Set(["int8", "int16", "uint8", "uint16", "uint32", "uint64"]);
 /**
@@ -36,9 +36,7 @@ export const unsupportedTypeRule = createRule({
       }
       if (type.templateMapper) {
         for (const templateArg of type.templateMapper.args) {
-          if (isType(templateArg)) {
-            checkUnsupportedType(templateArg, target);
-          }
+          checkUnsupportedType(templateArg, target);
         }
       }
     }

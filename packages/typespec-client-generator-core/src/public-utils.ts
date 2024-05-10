@@ -15,7 +15,6 @@ import {
   getProjectedName,
   ignoreDiagnostics,
   isErrorModel,
-  isType,
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -196,7 +195,7 @@ export function getLibraryName(
       type.templateMapper.args
         .filter(
           (arg): arg is Model | Enum =>
-            isType(arg) && (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
         )
         .map((arg) => pascalCase(arg.name))
         .join("")

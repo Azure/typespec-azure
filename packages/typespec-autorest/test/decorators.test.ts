@@ -77,6 +77,7 @@ describe("typespec-autorest: decorators", () => {
 
       expectDiagnostics(ignoreUseStandardOps(diagnostics), {
         code: "invalid-argument",
+        message: "Argument '123' is not assignable to parameter of type 'valueof string'",
       });
     });
 

@@ -36,7 +36,6 @@ import {
   TypeNameOptions,
   Union,
   UnionVariant,
-  Value,
   compilerAssert,
   createDiagnosticCollector,
   getAllTags,
@@ -1085,8 +1084,8 @@ export async function getOpenAPIForService(
     if (param.name !== ph.name) {
       ph["x-ms-client-name"] = param.name;
     }
-    if (param.defaultValue) {
-      ph.default = getDefaultValue(param.defaultValue);
+    if (param.default) {
+      ph.default = getDefaultValue(param.default);
     }
 
     if (ph.in === "body") {
@@ -1445,25 +1444,33 @@ export async function getOpenAPIForService(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(defaultType: Value): any {
-    switch (defaultType.valueKind) {
-      case "StringValue":
-        return defaultType.value;
-      case "NumericValue":
-        return defaultType.value.asNumber() ?? undefined;
-      case "BooleanValue":
-        return defaultType.value;
-      case "ArrayValue":
-        return defaultType.values.map((x) => getDefaultValue(x));
-      case "NullValue":
-        return null;
-      case "EnumValue":
-        return defaultType.value.value ?? defaultType.value.name;
+  function getDefaultValue(type: Type): any {
+    switch (type.kind) {
+      case "String":
+        return type.value;
+      case "Number":
+        return type.value;
+      case "Boolean":
+        return type.value;
+      case "Tuple":
+        return type.values.map(getDefaultValue);
+      case "EnumMember":
+        return type.value ?? type.name;
+      case "Intrinsic":
+        return isNullType(type)
+          ? null
+          : reportDiagnostic(program, {
+              code: "invalid-default",
+              format: { type: type.kind },
+              target: type,
+            });
+      case "UnionVariant":
+        return getDefaultValue(type.type);
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
-          format: { type: defaultType.valueKind },
-          target: defaultType,
+          format: { type: type.kind },
+          target: type,
         });
     }
   }
@@ -1600,8 +1607,8 @@ export async function getOpenAPIForService(
         property.description = description;
       }
 
-      if (prop.defaultValue && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.defaultValue);
+      if (prop.default && !("$ref" in property)) {
+        property.default = getDefaultValue(prop.default);
       }
 
       if (isReadonlyProperty(program, prop)) {

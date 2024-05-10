@@ -64,7 +64,7 @@ op Azure.ResourceManager.ExtensionResourceInstanceOperations.update(apiVersion: 
 #### `ExtensionResourceInstanceOperations.delete` {#Azure.ResourceManager.ExtensionResourceInstanceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceInstanceOperations.delete(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceInstanceOperations.delete(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ExtensionResourceOperations` {#Azure.ResourceManager.ExtensionResourceOperations}
@@ -103,7 +103,7 @@ op Azure.ResourceManager.ExtensionResourceOperations.update(apiVersion: string, 
 #### `ExtensionResourceOperations.delete` {#Azure.ResourceManager.ExtensionResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ExtensionResourceOperations.delete(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ExtensionResourceOperations.delete(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.listByParent` {#Azure.ResourceManager.ExtensionResourceOperations.listByParent}
@@ -167,7 +167,7 @@ op Azure.ResourceManager.ProxyResourceOperations.createOrUpdate(provider: "Micro
 #### `ProxyResourceOperations.delete` {#Azure.ResourceManager.ProxyResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ProxyResourceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ProxyResourceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ProxyResourceOperations.listByParent` {#Azure.ResourceManager.ProxyResourceOperations.listByParent}
@@ -261,7 +261,7 @@ interface Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>
 #### `ResourceDeleteAsync.delete` {#Azure.ResourceManager.ResourceDeleteAsync.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceDeleteAsync.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceDeleteAsync.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceDeleteSync` {#Azure.ResourceManager.ResourceDeleteSync}
@@ -301,7 +301,7 @@ interface Azure.ResourceManager.ResourceDeleteWithoutOkAsync<Resource, BaseParam
 #### `ResourceDeleteWithoutOkAsync.delete` {#Azure.ResourceManager.ResourceDeleteWithoutOkAsync.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceDeleteWithoutOkAsync.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceDeleteWithoutOkAsync.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceInstanceOperations` {#Azure.ResourceManager.ResourceInstanceOperations}
@@ -342,7 +342,7 @@ op Azure.ResourceManager.ResourceInstanceOperations.update(provider: "Microsoft.
 #### `ResourceInstanceOperations.delete` {#Azure.ResourceManager.ResourceInstanceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceInstanceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceInstanceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceListByParent` {#Azure.ResourceManager.ResourceListByParent}
@@ -423,7 +423,7 @@ op Azure.ResourceManager.ResourceOperations.update(provider: "Microsoft.ThisWill
 #### `ResourceOperations.delete` {#Azure.ResourceManager.ResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.ResourceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `ResourceOperations.listByParent` {#Azure.ResourceManager.ResourceOperations.listByParent}
@@ -476,7 +476,7 @@ interface Azure.ResourceManager.ResourceUpdateAsync<Resource, Properties, BasePa
 #### `ResourceUpdateAsync.update` {#Azure.ResourceManager.ResourceUpdateAsync.update}
 
 ```typespec
-op Azure.ResourceManager.ResourceUpdateAsync.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<"Resource update request accepted.", Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.ResourceUpdateAsync.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<"Resource update request accepted.", Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ResourceUpdateSync` {#Azure.ResourceManager.ResourceUpdateSync}
@@ -543,7 +543,7 @@ op Azure.ResourceManager.TenantResourceOperations.update(apiVersion: string, pro
 #### `TenantResourceOperations.delete` {#Azure.ResourceManager.TenantResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.TenantResourceOperations.delete(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TenantResourceOperations.delete(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TenantResourceOperations.listByParent` {#Azure.ResourceManager.TenantResourceOperations.listByParent}
@@ -592,7 +592,7 @@ op Azure.ResourceManager.TrackedResourceOperations.update(provider: "Microsoft.T
 #### `TrackedResourceOperations.delete` {#Azure.ResourceManager.TrackedResourceOperations.delete}
 
 ```typespec
-op Azure.ResourceManager.TrackedResourceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.TrackedResourceOperations.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.(anonymous model)> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.listByParent` {#Azure.ResourceManager.TrackedResourceOperations.listByParent}
