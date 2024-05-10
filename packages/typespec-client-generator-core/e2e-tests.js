@@ -1,6 +1,6 @@
 import { readdirSync, rmSync } from "fs";
 import { join } from "path";
-import { repoRoot, coreRepoRoot, run } from "../../eng/scripts/helpers.js";
+import { coreRepoRoot, repoRoot, run } from "../../eng/scripts/helpers.js";
 
 const tcgcTestDir = join(repoRoot, "packages", "typespec-client-generator-core");
 const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
