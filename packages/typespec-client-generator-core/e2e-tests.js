@@ -1,12 +1,14 @@
 import { join } from "path";
-import { readdirSync } from "fs";
+import { readdirSync, rmSync } from "fs";
 import { repoRoot, run } from "../../eng/scripts/helpers.js";
 
 const tcgcTestDir = join(repoRoot, "packages", "typespec-client-generator-core");
+const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
+
 
 function main() {
   printInfo();
-  // await cleanTcgcDirectory();
+  cleanTcgcDirectory();
   const packages = packPackages();
   testBasicLatest(packages);
 }
@@ -25,8 +27,11 @@ function cleanTcgcDirectory() {
 
 function packPackages() {
   run("pnpm", ["-w", "pack:all"], { cwd: repoRoot });
-  const outputFolder = join(repoRoot, "/temp/artifacts");
-  const files = readdirSync(outputFolder);
+  run("pnpm", ["-w", "pack:all"], { cwd: repoRoot })
+  const azureOutputFolder = join(repoRoot, "/temp/artifacts");
+  const coreOutputFolder = join(repoRoot, "/core/temp/artifacts");
+  const files = readdirSync(azureOutputFolder).concat(readdirSync(coreOutputFolder));
+
   console.log("Built packages:", files);
 
   function resolvePackage(start) {
@@ -34,6 +39,7 @@ function packPackages() {
     if (pkgName === undefined) {
       throw new Error(`Cannot resolve package starting with "${start}"`);
     }
+    const outputFolder = start.startsWith("azure-tools") ? azureOutputFolder : coreOutputFolder;
     return join(outputFolder, pkgName);
   }
 
@@ -44,9 +50,9 @@ function packPackages() {
     "@typespec/http": resolvePackage("typespec-http-"),
     "@typespec/rest": resolvePackage("typespec-rest-"),
     "@typespec/versioning": resolvePackage("typespec-versioning-"),
-    "@azure-tools/typespec-azure-core": resolvePackage("typespec-azure-core-"),
-    "@azure-tools/typespec-autorest": resolvePackage("typespec-autorest-"),
-    "@azure-tools/typespec-azure-resource-manager": resolvePackage("typespec-azure-resource-manager-"),
+    "@azure-tools/typespec-azure-core": resolvePackage("azure-tools-typespec-azure-core-"),
+    "@azure-tools/typespec-autorest": resolvePackage("azure-tools-typespec-autorest-"),
+    "@azure-tools/typespec-azure-resource-manager": resolvePackage("azure-tools-typespec-azure-resource-manager-"),
   };
 }
 
