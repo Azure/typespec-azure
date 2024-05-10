@@ -1739,6 +1739,41 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.response.type, undefined);
       strictEqual(method.response.resultPath, undefined);
     });
+    it("basic returning void and error model has status code", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @error
+        model Error {
+          @statusCode _: 403;
+          code: int32;
+          message: string;
+        }
+        @delete op delete(@path id: string): void | Error;
+        `
+      );
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "delete");
+      const serviceResponses = method.operation.responses;
+      strictEqual(serviceResponses.size, 1);
+
+      const voidResponse = serviceResponses.get(204);
+      ok(voidResponse);
+      strictEqual(voidResponse.kind, "http");
+      strictEqual(voidResponse.type, undefined);
+      strictEqual(voidResponse.headers.length, 0);
+
+      const errorResponse = method.operation.exceptions.get(403);
+      ok(errorResponse);
+      strictEqual(errorResponse.kind, "http");
+      ok(errorResponse.type);
+      strictEqual(errorResponse.type.kind, "model");
+      strictEqual(errorResponse.type, sdkPackage.models[0]);
+
+      strictEqual(method.response.type, undefined);
+      strictEqual(method.response.resultPath, undefined);
+    });
     it("basic returning model", async () => {
       await runner.compileWithBuiltInService(
         `
@@ -3290,6 +3325,55 @@ describe("typespec-client-generator-core: package", () => {
 
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+    });
+    it("add method", async () => {
+      await runner.compileWithVersionedService(`
+      @route("/v1")
+      @post
+      @added(Versions.v2)
+      op v2(@header headerV2: string): void;
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+      deepStrictEqual(method.apiVersions, ["v2"]);
+      strictEqual(method.parameters.length, 1);
+      const methodParam = sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(methodParam.name, "headerV2");
+      strictEqual(methodParam.kind, "method");
+      deepStrictEqual(methodParam.apiVersions, ["v2"]);
+
+      strictEqual(method.operation.parameters.length, 1);
+      const headerParam = method.operation.parameters[0];
+      strictEqual(headerParam.name, "headerV2");
+      strictEqual(headerParam.kind, "header");
+      deepStrictEqual(headerParam.apiVersions, ["v2"]);
+    });
+    it("add parameter", async () => {
+      await runner.compileWithVersionedService(`
+      @route("/v1")
+      @post
+      op v1(@added(Versions.v2) @header headerV2: string): void;
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+      deepStrictEqual(method.apiVersions, ["v1", "v2"]);
+      strictEqual(method.parameters.length, 1);
+      const methodParam = sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(methodParam.name, "headerV2");
+      strictEqual(methodParam.kind, "method");
+      deepStrictEqual(methodParam.apiVersions, ["v2"]);
+
+      strictEqual(method.operation.parameters.length, 1);
+      const headerParam = method.operation.parameters[0];
+      strictEqual(headerParam.name, "headerV2");
+      strictEqual(headerParam.kind, "header");
+      deepStrictEqual(headerParam.apiVersions, ["v2"]);
     });
   });
 });

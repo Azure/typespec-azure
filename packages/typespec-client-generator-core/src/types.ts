@@ -499,8 +499,8 @@ function addDiscriminatorToModelType(
       isGeneratedName: false,
       onClient: false,
       apiVersions: discriminatorProperty
-        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type.namespace)
-        : getAvailableApiVersions(context, type, type.namespace),
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
+        : getAvailableApiVersions(context, type, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -967,6 +967,8 @@ export function getSdkModelPropertyTypeBase(
   operation?: Operation
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  // get api version info so we can cache info about its api versions before we get to property type level
+  const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
   let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
@@ -980,11 +982,7 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
-    apiVersions: getAvailableApiVersions(
-      context,
-      type,
-      operation?.interface || operation?.namespace || type.model?.namespace
-    ),
+    apiVersions,
     type: propertyType,
     nameInClient: name,
     name,
@@ -1479,6 +1477,16 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
+      if (
+        context.apiVersion !== undefined &&
+        context.apiVersion !== "latest" &&
+        context.apiVersion !== "all"
+      ) {
+        const index = sdkVersionsEnum.values.findIndex((v) => v.value === context.apiVersion);
+        if (index >= 0) {
+          sdkVersionsEnum.values = sdkVersionsEnum.values.slice(0, index + 1);
+        }
+      }
       updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }

@@ -2,7 +2,7 @@
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
 changeKind: feature
 packages:
-  - "@azure-tools/typespec-client-generator-core"
+  - "@azure-tools/typespec-autorest"
 ---
 
-Add support for values
+Add dependency on typespec-azure-resource-manager to resolve the spec repo common types paths

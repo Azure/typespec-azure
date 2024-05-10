@@ -1,10 +1,8 @@
-import { RefProducerParams, setRefProducer } from "@azure-tools/typespec-autorest";
 import {
   $key,
   $visibility,
   DecoratorContext,
   Enum,
-  EnumMember,
   EnumValue,
   Interface,
   Model,
@@ -17,10 +15,8 @@ import {
   getTypeName,
 } from "@typespec/compiler";
 import { $segment, getSegment } from "@typespec/rest";
-import { getVersion } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
-import { getArmCommonTypesVersion, getArmCommonTypesVersions } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -35,7 +31,7 @@ import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
-const ArmCommonTypesDefaultVersion = "v3";
+export const ArmCommonTypesDefaultVersion = "v3";
 
 export function $omitIfEmpty(context: DecoratorContext, entity: Model, propertyName: string) {
   const modelProp = getProperty(entity, propertyName);
@@ -164,56 +160,6 @@ function isResourceParameterBaseForInternal(
   return false;
 }
 
-interface CommonTypesVersion {
-  selectedVersion?: string;
-  allVersions: EnumMember[];
-}
-
-function resolveCommonTypesVersion(
-  program: Program,
-  params: RefProducerParams
-): CommonTypesVersion {
-  let selectedVersion: string | undefined;
-  const { allVersions } = getArmCommonTypesVersions(program) ?? {};
-
-  if (params.service) {
-    const versionMap = getVersion(program, params.service.type);
-
-    // If the service is versioned, extract the common-types version from the
-    // service version enum
-    if (params.version && versionMap) {
-      const versionEnumMember = versionMap
-        .getVersions()
-        .find((x) => x.value === params.version)?.enumMember;
-      if (versionEnumMember) {
-        selectedVersion = getArmCommonTypesVersion(program, versionEnumMember);
-      }
-    }
-
-    // Extract the version from the service namespace instead
-    if (selectedVersion === undefined) {
-      selectedVersion = getArmCommonTypesVersion(program, params.service.type);
-    }
-  }
-
-  return {
-    selectedVersion,
-    allVersions: allVersions ?? [],
-  };
-}
-
-interface ArmCommonTypeRecord {
-  name: string;
-  version: string;
-  basePath: string;
-  referenceFile?: string;
-}
-
-interface ArmCommonTypeRecords {
-  records: { [key: string]: ArmCommonTypeRecord };
-  defaultKey?: string;
-}
-
 function getArmTypesPath(program: Program): string {
   return program.getOption("arm-types-path") || "{arm-types-dir}";
 }
@@ -222,18 +168,10 @@ function storeCommonTypeRecord(
   context: DecoratorContext,
   entity: Model | ModelProperty,
   kind: "definitions" | "parameters",
-  stateKey: symbol,
-  name?: string,
+  name: string,
   version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ): void {
-  const getCommonTypeRecords = (
-    program: Program,
-    entity: Model | ModelProperty
-  ): ArmCommonTypeRecords => {
-    return program.stateMap(stateKey).get(entity) ?? { records: {} };
-  };
-
   const basePath: string = getArmTypesPath(context.program).trim();
 
   // NOTE: Right now we don't try to prevent multiple versions from declaring that they are the default
@@ -249,12 +187,11 @@ function storeCommonTypeRecord(
   if (!referenceFile) referenceFile = "types.json";
 
   const versionStr = typeof version === "string" ? version : version.value.name;
-  const records = context.program.stateMap(stateKey).get(entity) ?? {
-    records: {},
-  };
+  const records = getCommonTypeRecords(context.program, entity);
 
   records.records[versionStr] = {
     name,
+    kind,
     version: versionStr,
     basePath,
     referenceFile,
@@ -262,62 +199,27 @@ function storeCommonTypeRecord(
   if (isDefault) {
     records.defaultKey = versionStr;
   }
-  context.program.stateMap(stateKey).set(entity, records);
+  context.program.stateMap(ArmStateKeys.armCommonDefinitions).set(entity, records);
+}
 
-  const refProducer = (
-    program: Program,
-    entity: Model | ModelProperty,
-    params: RefProducerParams
-  ): string | undefined => {
-    const { records, defaultKey } = getCommonTypeRecords(program, entity);
-    const commonTypes = resolveCommonTypesVersion(program, params);
-    const selectedVersion = commonTypes.selectedVersion;
+export interface ArmCommonTypeRecord {
+  name: string;
+  kind: "definitions" | "parameters";
+  version: string;
+  basePath: string;
+  referenceFile?: string;
+}
 
-    // Find closest version that matches the dependency (based on version enum order)
-    let record: ArmCommonTypeRecord | undefined;
-    if (selectedVersion) {
-      let foundSelectedVersion = false;
-      for (const version of commonTypes.allVersions) {
-        if (!foundSelectedVersion) {
-          if (selectedVersion !== version.name) {
-            continue;
-          }
+export interface ArmCommonTypeRecords {
+  records: { [key: string]: ArmCommonTypeRecord };
+  defaultKey?: string;
+}
 
-          foundSelectedVersion = true;
-        }
-
-        const maybeRecord = records[version.name];
-        if (maybeRecord) {
-          record = maybeRecord;
-          break;
-        }
-      }
-    } else {
-      // If no version was found, use the default version
-      record = records[defaultKey ?? ArmCommonTypesDefaultVersion];
-    }
-
-    if (record) {
-      return record.basePath.endsWith(".json")
-        ? `${record.basePath}#/${kind}/${record.name}`
-        : `${record.basePath}/${record.version}/${record.referenceFile}#/${kind}/${record.name}`;
-    } else {
-      reportDiagnostic(program, {
-        code: "arm-common-types-incompatible-version",
-        target: entity,
-        format: {
-          selectedVersion: selectedVersion ?? ArmCommonTypesDefaultVersion,
-          supportedVersions: Object.keys(records).join(", "),
-        },
-      });
-    }
-
-    return undefined;
-  };
-
-  // Instead of applying $useRef, call setRefProducer directly to set a function
-  // that can generate the ref depending on how the service spec is configured
-  setRefProducer(context.program, entity, refProducer);
+export function getCommonTypeRecords(
+  program: Program,
+  entity: Model | ModelProperty
+): ArmCommonTypeRecords {
+  return program.stateMap(ArmStateKeys.armCommonDefinitions).get(entity) ?? { records: {} };
 }
 
 interface ArmCommonTypeVersionSpec {
@@ -346,15 +248,7 @@ export function $armCommonParameter(
     parameterName = entity.name;
   }
 
-  storeCommonTypeRecord(
-    context,
-    entity,
-    "parameters",
-    ArmStateKeys.armCommonParameters,
-    parameterName,
-    version,
-    referenceFile
-  );
+  storeCommonTypeRecord(context, entity, "parameters", parameterName, version, referenceFile);
 }
 
 /**
@@ -378,15 +272,7 @@ export function $armCommonDefinition(
     definitionName = entity.name;
   }
 
-  storeCommonTypeRecord(
-    context,
-    entity,
-    "definitions",
-    ArmStateKeys.armCommonDefinitions,
-    definitionName,
-    version,
-    referenceFile
-  );
+  storeCommonTypeRecord(context, entity, "definitions", definitionName, version, referenceFile);
 }
 
 /**

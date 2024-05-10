@@ -87,9 +87,70 @@ print(f.name)  # Flattened access is dynamically supported, but not documented
 </TabItem>
 <TabItem value="csharp" label="CSharp" >
 
+CSharp will generate the model with properties being flattened. During serialization/deserialization, the model will be serialized/deserialized as a non-flattened model.
+
 ```csharp
-// Please note that this feature is not supported right now, and the model will be generated un-flattened.
-// Please comment and follow work status on: https://github.com/Azure/autorest.csharp/issues/4040
+public partial class Foo
+{
+    public Foo(string name)
+    {
+        Argument.AssertNotNull(name, nameof(name));
+
+        Name = name;
+    }
+
+    public string Name { get; set; }
+}
+
+public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
+{
+    void IJsonModel<Foo>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+    {
+        var format = options.Format == "W" ? ((IPersistableModel<Foo>)this).GetFormatFromOptions(options) : options.Format;
+        if (format != "J")
+        {
+            throw new FormatException($"The model {nameof(Foo)} does not support writing '{format}' format.");
+        }
+
+        writer.WriteStartObject();
+        writer.WritePropertyName("properties"u8);
+        writer.WriteStartObject();
+        writer.WritePropertyName("name"u8);
+        writer.WriteStringValue(Name);
+        writer.WriteEndObject();
+        writer.WriteEndObject();
+    }
+
+    internal static Foo DeserializeFoo(JsonElement element, ModelReaderWriterOptions options = null)
+    {
+        options ??= ModelSerializationExtensions.WireOptions;
+
+        if (element.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+        string name = default;
+        foreach (var property in element.EnumerateObject())
+        {
+            if (property.NameEquals("properties"u8))
+            {
+                if (property.Value.ValueKind == JsonValueKind.Null)
+                {
+                    property.ThrowNonNullablePropertyIsNull();
+                    continue;
+                }
+                foreach (var property0 in property.Value.EnumerateObject())
+                {
+                    if (property0.NameEquals("name"u8))
+                    {
+                        name = property0.Value.GetString();
+                    }
+                }
+            }
+        }
+        return new Foo(name);
+    }
+}
 ```
 
 </TabItem>
