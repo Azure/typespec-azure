@@ -8,13 +8,6 @@
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
-## Prerequisites
-
-Please note that these prerequisites apply on the repository where the client library is going to be generated. Repo owners should make sure to follow these prerequisites. Users working within a repository that already accepts this tool can continue to the [Usage](#usage) section.
-
-- Add an emitter-package.json to the repo following this [configuration](#emitter-packagejson).
-- Add the [TempTypeSpecFiles](#TempTypeSpecFiles) directory to the .gitignore file for your repository.
-
 ## Usage
 
 ```
@@ -137,22 +130,29 @@ additionalDirectories:
   - specification/contosowidgetmanager/Contoso.WidgetManager.Shared/
 ```
 
+## Per repository set up
+
+Each repository that intends to support `tsp-client` for generating and updating client libraries will need to set up an `emitter-package.json` file under the `eng/` directory at the root of the repository. Client libraries generated with this tool will be outputted based on the information in the tspconfig.yaml file of the TypeSpec specification. The service directory is specified through the `parameters.service-dir.default` parameter in tspconfig.yaml, additionally the `package-dir` option for the specific emitter is appended to the end of the path.
+
+See the following example of a valid tspconfig.yaml file: https://github.com/Azure/azure-rest-api-specs/blob/main/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
+
+Using the tspconfig.yaml linked above, by default, the client libraries will be generated in the following directory for C#: `<repo>/sdk/contosowidgetmanager/Azure.Template.Contoso/`.
+
+### Required set up
+
+Please note that these requirements apply on the repository where the client library is going to be generated. Repo owners should make sure to follow these requirements. Users working within a repository that already accepts this tool can refer to the [Usage](#usage) section.
+
+- Add an emitter-package.json to the repo following this [configuration](#emitter-packagejson).
+- Add the [TempTypeSpecFiles](#TempTypeSpecFiles) directory to the .gitignore file for your repository.
+
 ### TempTypeSpecFiles
 
-This tool creates a `TempTypeSpecFiles` directory when syncing a TypeSpec project to your local repository. This temporary folder will contain a copy of the TypeSpec project specified by the parameters set in the tsp-location.yaml file. If you pass the `--save-inputs` flag to the commandline tool, this directory will not be deleted. You should add a new entry in the .gitignore of your repo so that none of these files are accidentally checked in if `--save-inputs` flag is passed in.
+This tool creates a `TempTypeSpecFiles` directory when syncing a TypeSpec project to your local repository. This temporary folder will contain a copy of the TypeSpec project specified by the parameters set in the tsp-location.yaml file. If you pass the `--save-inputs` flag to the commandline tool, this directory will not be deleted. Repositories should add an entry in the .gitignore so that none of these files are accidentally checked in if `--save-inputs` flag is passed in.
 
 ```text
 # .gitignore file
 TempTypeSpecFiles/
 ```
-
-## Per repository set up
-
-Each repository that intends to support `tsp-client` for generating and updating client libraries will need to set up an `emitter-package.json` file under the `eng/` directory at the root of the repository. Client libraries generated with this tool will be outputted based on the information in the tspconfig.yaml file of the TypeSpec specification. The service directory is specified through the `parameters.service-dir.default` parameter in the tspconfig.yaml, additionally the `package-dir` option for the specific emitter is appended to the end of the path.
-
-See the following example of a valid tspconfig.yaml file: https://github.com/Azure/azure-rest-api-specs/blob/main/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
-
-Using the tspconfig.yaml linked above, by default, the client libraries will be generated in the following directory for C#: `<repo>/sdk/contosowidgetmanager/Azure.Template.Contoso/`.
 
 ### emitter-package.json (Required)
 
