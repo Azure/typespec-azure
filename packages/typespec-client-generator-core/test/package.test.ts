@@ -3379,7 +3379,7 @@ describe("typespec-client-generator-core: package", () => {
     });
   });
 
-  describe("lro", ()=> {
+  describe("lro", () => {
     it("customized lro delete", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],

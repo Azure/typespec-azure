@@ -904,7 +904,9 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 2);
-      const model = models.filter((x) => x.name === "RelationshipOriginInformationDependencyOfOrigins")[0];
+      const model = models.filter(
+        (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins"
+      )[0];
       ok(model);
     });
   });
