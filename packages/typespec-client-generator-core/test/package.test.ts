@@ -2736,6 +2736,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
+      strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 0);
+      strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -3374,6 +3376,57 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParam.name, "headerV2");
       strictEqual(headerParam.kind, "header");
       deepStrictEqual(headerParam.apiVersions, ["v2"]);
+    });
+  });
+
+  describe("lro", ()=> {
+    it("customized lro delete", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(`
+        @versioned(MyVersions)
+        @server("http://localhost:3000", "endpoint")
+        @service({name: "Service"})
+        namespace My.Service;
+
+        enum MyVersions {
+          @useDependency(Versions.v1_0_Preview_2)
+          v1: "v1",
+        }
+
+        op delete(): {
+          ...AcceptedResponse,
+          @header("Location")
+          @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>)
+          @Azure.Core.finalLocation(void)
+          location?: string;
+        };
+
+        @Azure.Core.lroStatus
+        union ResourceProvisioningState {
+          Succeeded: "Succeeded",
+          Failed: "Failed",
+          Canceled: "Canceled",
+          string,
+        }
+
+        model ArmOperationStatus {
+          @Azure.Core.lroStatus
+          status: ResourceProvisioningState;
+          @key
+          @path
+          @segment("operationStatuses")
+          id: Azure.Core.uuid;
+          @visibility("read")
+          name?: string;
+        }
+      `);
+      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 0);
+      strictEqual(sdkPackage.enums.length, 1);
     });
   });
 });

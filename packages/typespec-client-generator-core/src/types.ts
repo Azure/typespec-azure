@@ -1302,22 +1302,24 @@ function updateTypesFromOperation(
   }
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData && generateConvenient) {
-    const logicalResults = diagnostics.pipe(
-      checkAndGetClientType(context, lroMetaData.logicalResult, operation)
-    );
-    logicalResults.forEach((logicalResult) => {
-      updateUsageOfModel(context, UsageFlags.Output, logicalResult);
-    });
-
-    if (!context.arm) {
-      // TODO: currently skipping adding of envelopeResult due to arm error
-      // https://github.com/Azure/typespec-azure/issues/311
-      const envelopeResults = diagnostics.pipe(
-        checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+    if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
+      const finalResults = diagnostics.pipe(
+        checkAndGetClientType(context, lroMetaData.finalResult, operation)
       );
-      envelopeResults.forEach((envelopeResult) => {
-        updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+      finalResults.forEach((finalResult) => {
+        updateUsageOfModel(context, UsageFlags.Output, finalResult);
       });
+
+      if (!context.arm) {
+        // TODO: currently skipping adding of envelopeResult due to arm error
+        // https://github.com/Azure/typespec-azure/issues/311
+        const envelopeResults = diagnostics.pipe(
+          checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+        );
+        envelopeResults.forEach((envelopeResult) => {
+          updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+        });
+      }
     }
   }
   return diagnostics.wrap(undefined);
