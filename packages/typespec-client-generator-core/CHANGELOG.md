@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.42.2
+
+### Bug Fixes
+
+- [#818](https://github.com/Azure/typespec-azure/pull/818) Fix: Crash due to using api from next version of the compiler
+
+
 ## 0.42.1
 
 ### Bug Fixes
