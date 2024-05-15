@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.42.1
+
+### Bug Fixes
+
+- [#839](https://github.com/Azure/typespec-azure/pull/839) Do not omit unreferenced non version enum when `omit-unreachable-types` is not set to true
+
+
 ## 0.42.0
 
 ### Bug Fixes
