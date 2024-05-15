@@ -2599,6 +2599,63 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindType.isFixed, false);
     });
 
+    it("string discriminator map to enum value", async () => {
+      await runner.compileWithBuiltInService(`
+      union KindType {
+        string,
+        shark: "shark",
+        salmon: "salmon"
+      };
+
+      @discriminator("kind")
+      model Fish {
+        kind: KindType;
+        age: int32;
+      }
+
+      model Shark extends Fish {
+        kind: "shark";
+        hasFin: boolean;
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
+        norweigan: boolean;
+      }
+
+      @get
+      op getModel(): Fish;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 3);
+      const fish = models.find((x) => x.name === "Fish");
+      ok(fish);
+      let kindTypeProperty = fish.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enum");
+      strictEqual(kindTypeProperty.type.isUnionAsEnum, true);
+      strictEqual(fish.discriminatorProperty, kindTypeProperty);
+      const shark = models.find((x) => x.name === "Shark");
+      ok(shark);
+      strictEqual(shark.discriminatorValue, "shark");
+      kindTypeProperty = shark.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      const salmon = models.find((x) => x.name === "Salmon");
+      ok(salmon);
+      kindTypeProperty = salmon.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      strictEqual(salmon.discriminatorValue, "salmon");
+
+      strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
+      const kindType = runner.context.experimental_sdkPackage.enums.find(
+        (x) => x.name === "KindType"
+      );
+      ok(kindType);
+      strictEqual(kindType.isFixed, false);
+    });
+
     it("discriminator rename", async () => {
       await runner.compileWithBuiltInService(`
       @discriminator("kind")

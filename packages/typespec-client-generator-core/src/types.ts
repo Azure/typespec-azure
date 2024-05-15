@@ -424,6 +424,14 @@ function addDiscriminatorToModelType(
   const discriminator = getDiscriminator(context.program, type);
   const diagnostics = createDiagnosticCollector();
   if (discriminator) {
+    let discriminatorType: SdkType | undefined = undefined;
+    for (let i = 0; i < model.properties.length; i++) {
+      const property = model.properties[i];
+      if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
+        discriminatorType = property.type;
+      }
+    }
+
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
       const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
@@ -450,12 +458,20 @@ function addDiscriminatorToModelType(
                 })
               );
             } else {
-              childModelSdkType.discriminatorValue = property.type.value;
+              // map string value type to enum value type
+              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+                for (const value of discriminatorType.values) {
+                  if (value.value === property.type.value) {
+                    property.type = value;
+                  }
+                }
+              }
+              childModelSdkType.discriminatorValue = property.type.value as string;
               property.discriminator = true;
               if (model.discriminatedSubtypes === undefined) {
                 model.discriminatedSubtypes = {};
               }
-              model.discriminatedSubtypes[property.type.value] = childModelSdkType;
+              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
               discriminatorProperty = property;
             }
           }
@@ -470,7 +486,7 @@ function addDiscriminatorToModelType(
         return diagnostics.wrap(undefined);
       }
     }
-    let discriminatorType: SdkType;
+
     if (discriminatorProperty) {
       if (discriminatorProperty.type.kind === "constant") {
         discriminatorType = { ...discriminatorProperty.type.valueType };
