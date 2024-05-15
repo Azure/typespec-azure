@@ -245,6 +245,19 @@ op test(): void;
       });
       deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced", "Versions"]);
     });
+
+    it("doesn't omit other enums", async () => {
+      const output = await openapiWithOptions(
+        `@service
+        @versioned(Versions)
+        namespace My {
+          enum Versions {v1, v2}
+          enum NotReferenced {a, b}
+        }`,
+        {}
+      );
+      deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced"]);
+    });
   });
 
   describe("include-x-typespec-name", () => {

@@ -1243,8 +1243,8 @@ export async function getOpenAPIForService(
     }
 
     function isVersionEnum(program: Program, enumObj: Enum): boolean {
-      const versions = getVersionsForEnum(program, enumObj);
-      if (versions !== undefined && versions.length > 0) {
+      const [_, map] = getVersionsForEnum(program, enumObj);
+      if (map !== undefined && map.getVersions()[0].enumMember.enum === enumObj) {
         return true;
       }
       return false;
