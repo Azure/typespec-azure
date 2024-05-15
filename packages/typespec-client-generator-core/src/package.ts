@@ -56,6 +56,7 @@ import {
   getHashForType,
   getLocationOfOperation,
   getSdkTypeBaseHelper,
+  isNeverOrVoidType,
   isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -236,19 +237,26 @@ function getSdkBasicServiceMethod<
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const methodParameters: SdkMethodParameter[] = [];
-
+  // we have to calculate apiVersions first, so that the information is put
+  // in __tspTypeToApiVersions before we call parameters since method wraps parameter
+  const apiVersions = getAvailableApiVersions(
+    context,
+    operation,
+    getLocationOfOperation(operation)
+  );
   const httpOperation = getHttpOperationWithCache(context, operation);
   const parameters = httpOperation.parameters;
   // path/query/header parameters
   for (const param of parameters.parameters) {
+    if (isNeverOrVoidType(param.param.type)) continue;
     methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation)));
   }
   // body parameters
-  if (parameters.body?.parameter) {
+  if (parameters.body?.parameter && !isNeverOrVoidType(parameters.body.parameter.type)) {
     methodParameters.push(
       diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter, operation))
     );
-  } else if (parameters.body) {
+  } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
     if (parameters.body.type.kind === "Model") {
       const type = getEffectivePayloadType(context, parameters.body.type);
       // spread case
@@ -281,7 +289,7 @@ function getSdkBasicServiceMethod<
     details: getDocHelper(context, operation).details,
     operation: serviceOperation,
     response,
-    apiVersions: getAvailableApiVersions(context, operation, getLocationOfOperation(operation)),
+    apiVersions,
     getParameterMapping: function getParameterMapping(
       serviceParam: SdkServiceParameter
     ): SdkModelPropertyType[] {
@@ -376,7 +384,7 @@ function getSdkInitializationType<
     usage: UsageFlags.Input,
     nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-    apiVersions: getAvailableApiVersions(context, client.service, client.type),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
     isError: false,
   });
@@ -391,12 +399,14 @@ function getSdkMethodParameter(
   if (type.kind !== "ModelProperty") {
     const libraryName = getLibraryName(context, type);
     const name = camelCase(libraryName ?? "body");
+    // call before creating property type, so we can pass apiVersions of param onto its type
+    const apiVersions = getAvailableApiVersions(context, type, operation);
     const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type, operation));
     return diagnostics.wrap({
       kind: "method",
       description: getDocHelper(context, type).description,
       details: getDocHelper(context, type).details,
-      apiVersions: getAvailableApiVersions(context, type, getLocationOfOperation(operation)),
+      apiVersions,
       type: propertyType,
       nameInClient: name,
       name,
@@ -479,7 +489,7 @@ function getSdkEndpointParameter(
             encode: "string",
           },
           isApiVersionParam: false,
-          apiVersions: getAvailableApiVersions(context, client.service, client.type),
+          apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
         },
       ],
     };
@@ -498,10 +508,10 @@ function getSdkEndpointParameter(
         templateArguments.push(sdkParam);
         sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
-        sdkParam.apiVersions = context.__namespaceToApiVersions.get(client.type) || [];
         const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
         sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+        sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
       } else {
         diagnostics.add(
           createDiagnostic({
@@ -526,7 +536,7 @@ function getSdkEndpointParameter(
     description: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: getAvailableApiVersions(context, client.service, client.type),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     optional,
     isApiVersionParam: false,
     nullable: false,
@@ -543,7 +553,6 @@ function createSdkClientType<
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
   const clientName = isClient ? client.name : client.type.name;
-
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client));
   const docWrapper = getDocHelper(context, client.type);
@@ -553,7 +562,7 @@ function createSdkClientType<
     description: docWrapper.description,
     details: docWrapper.details,
     methods: methods,
-    apiVersions: getAvailableApiVersions(context, client.type, client.type),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     initialization: diagnostics.pipe(
       getSdkInitializationType<TOptions, TServiceOperation>(context, client)
@@ -570,7 +579,7 @@ function populateApiVersionInformation(context: SdkContext): void {
     let clientApiVersions = resolveVersions(context.program, client.service)
       .filter((x) => x.rootVersion)
       .map((x) => x.rootVersion!.value);
-    context.__namespaceToApiVersions.set(
+    context.__tspTypeToApiVersions.set(
       client.type,
       filterApiVersionsWithDecorators(context, client.type, clientApiVersions)
     );
@@ -583,7 +592,7 @@ function populateApiVersionInformation(context: SdkContext): void {
       clientApiVersions = resolveVersions(context.program, og.service)
         .filter((x) => x.rootVersion)
         .map((x) => x.rootVersion!.value);
-      context.__namespaceToApiVersions.set(
+      context.__tspTypeToApiVersions.set(
         og.type,
         filterApiVersionsWithDecorators(context, og.type, clientApiVersions)
       );

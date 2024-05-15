@@ -9,10 +9,7 @@ alias ManagedIdentityProperties = ManagedServiceIdentity;
  */
 @armCommonDefinition(
   "ManagedServiceIdentity",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "managedidentity.json"
 )
 @armCommonDefinition(
@@ -46,10 +43,7 @@ alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
  */
 @armCommonDefinition(
   "SystemAssignedServiceIdentity",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "managedidentity.json"
 )
 @armCommonDefinition(

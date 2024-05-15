@@ -33,6 +33,7 @@ export interface SdkTestRunner extends BasicTestRunner {
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
+  compileWithVersionedService(code: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
     mainCode: string,
     clientCode: string
@@ -177,6 +178,39 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compile("./client.tsp");
+    sdkTestRunner.context = createSdkContextTestHelper(
+      sdkTestRunner.program,
+      options,
+      options.emitterName
+    );
+    return result;
+  };
+
+  // compile with versioned service
+  sdkTestRunner.compileWithVersionedService = async function (code) {
+    const result = await baseCompile(
+      `
+      @service
+      @versioned(Versions)
+      @server(
+        "{endpoint}/versioning/api-version:{version}",
+        "Testserver endpoint",
+        {
+          endpoint: url,
+          version: Versions,
+        }
+      )
+      namespace Versioning;
+      enum Versions {
+        v1: "v1",
+        v2: "v2",
+      }
+      
+      ${code}`,
+      {
+        noEmit: true,
+      }
+    );
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,

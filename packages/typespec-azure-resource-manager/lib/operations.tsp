@@ -1,7 +1,6 @@
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
-using Autorest;
 using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;
