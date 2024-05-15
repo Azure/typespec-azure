@@ -73,3 +73,7 @@ core/packages/compiler/templates/__snapshots__/
 
 # Tm Grammars generated files
 core/grammars/
+
+
+# Client emitters not part of workspace that shouldn't be needed in this repo
+packages/http-client-csharp/
