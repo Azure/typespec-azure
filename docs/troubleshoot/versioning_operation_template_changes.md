@@ -2,7 +2,7 @@
 
 ## Symtoms
 
-If you are switching to a different operation template in a new version, you may run into compliation errors if you only leverage `@added` and `@removed` versioning decorators.
+If you are switching to a different operation template in a new version, you may run into compilation errors if you only leverage `@added` and `@removed` versioning decorators.
 
 ## Workaround
 
