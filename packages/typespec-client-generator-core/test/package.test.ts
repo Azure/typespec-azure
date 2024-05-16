@@ -1679,6 +1679,29 @@ describe("typespec-client-generator-core: package", () => {
         ["apiVersion", "generationOptions", "contentType", "accept"]
       );
     });
+
+    it("never void parameter or response", async () => {
+      await runner.compileWithBuiltInService(`
+        op TestTemplate<
+          headerType,
+          queryType,
+          bodyType,
+          responseHeaderType,
+          responseBodyType
+        >(@header h: headerType, @query q: queryType, @body b: bodyType): {
+          @header h: responseHeaderType;
+          @body b: responseBodyType;
+        };
+        op test is TestTemplate<void, void, void, void, void>;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.parameters.length, 0);
+      strictEqual(method.response.type, undefined);
+      strictEqual(method.operation.parameters.length, 0);
+      strictEqual(method.operation.responses.get(200)?.headers.length, 0);
+      strictEqual(method.operation.responses.get(200)?.type, undefined);
+    });
   });
 
   describe("Responses", () => {
@@ -1707,6 +1730,41 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(voidResponse.headers.length, 0);
 
       const errorResponse = method.operation.exceptions.get("*");
+      ok(errorResponse);
+      strictEqual(errorResponse.kind, "http");
+      ok(errorResponse.type);
+      strictEqual(errorResponse.type.kind, "model");
+      strictEqual(errorResponse.type, sdkPackage.models[0]);
+
+      strictEqual(method.response.type, undefined);
+      strictEqual(method.response.resultPath, undefined);
+    });
+    it("basic returning void and error model has status code", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @error
+        model Error {
+          @statusCode _: 403;
+          code: int32;
+          message: string;
+        }
+        @delete op delete(@path id: string): void | Error;
+        `
+      );
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(method.name, "delete");
+      const serviceResponses = method.operation.responses;
+      strictEqual(serviceResponses.size, 1);
+
+      const voidResponse = serviceResponses.get(204);
+      ok(voidResponse);
+      strictEqual(voidResponse.kind, "http");
+      strictEqual(voidResponse.type, undefined);
+      strictEqual(voidResponse.headers.length, 0);
+
+      const errorResponse = method.operation.exceptions.get(403);
       ok(errorResponse);
       strictEqual(errorResponse.kind, "http");
       ok(errorResponse.type);
@@ -2678,6 +2736,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
+      strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 0);
+      strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -3217,6 +3277,156 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.isApiVersionParam, true);
+    });
+
+    it("default api version for interface extends", async () => {
+      await runner.compile(`
+        namespace Azure.ResourceManager {
+          interface Operations {
+            @get
+            list(@query "api-version": string): void;
+          }
+        }
+        
+        @service({})
+        @versioned(Versions)
+        namespace Test {
+          enum Versions {
+            v1,
+            v2,
+          }
+        
+          interface Operations extends Azure.ResourceManager.Operations {}
+        }      
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+    });
+
+    it("default api version for operation is", async () => {
+      await runner.compile(`
+        namespace Azure.ResourceManager {
+          interface Operations {
+            @get
+            list(@query "api-version": string): void;
+          }
+        }
+        
+        @service({})
+        @versioned(Versions)
+        namespace Test {
+          enum Versions {
+            v1,
+            v2,
+          }
+        
+          op list is Azure.ResourceManager.Operations.list;
+        }      
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+    });
+    it("add method", async () => {
+      await runner.compileWithVersionedService(`
+      @route("/v1")
+      @post
+      @added(Versions.v2)
+      op v2(@header headerV2: string): void;
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+      deepStrictEqual(method.apiVersions, ["v2"]);
+      strictEqual(method.parameters.length, 1);
+      const methodParam = sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(methodParam.name, "headerV2");
+      strictEqual(methodParam.kind, "method");
+      deepStrictEqual(methodParam.apiVersions, ["v2"]);
+
+      strictEqual(method.operation.parameters.length, 1);
+      const headerParam = method.operation.parameters[0];
+      strictEqual(headerParam.name, "headerV2");
+      strictEqual(headerParam.kind, "header");
+      deepStrictEqual(headerParam.apiVersions, ["v2"]);
+    });
+    it("add parameter", async () => {
+      await runner.compileWithVersionedService(`
+      @route("/v1")
+      @post
+      op v1(@added(Versions.v2) @header headerV2: string): void;
+      `);
+
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+      deepStrictEqual(method.apiVersions, ["v1", "v2"]);
+      strictEqual(method.parameters.length, 1);
+      const methodParam = sdkPackage.clients[0].methods[0].parameters[0];
+      strictEqual(methodParam.name, "headerV2");
+      strictEqual(methodParam.kind, "method");
+      deepStrictEqual(methodParam.apiVersions, ["v2"]);
+
+      strictEqual(method.operation.parameters.length, 1);
+      const headerParam = method.operation.parameters[0];
+      strictEqual(headerParam.name, "headerV2");
+      strictEqual(headerParam.kind, "header");
+      deepStrictEqual(headerParam.apiVersions, ["v2"]);
+    });
+  });
+
+  describe("lro", () => {
+    it("customized lro delete", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(`
+        @versioned(MyVersions)
+        @server("http://localhost:3000", "endpoint")
+        @service({name: "Service"})
+        namespace My.Service;
+
+        enum MyVersions {
+          @useDependency(Versions.v1_0_Preview_2)
+          v1: "v1",
+        }
+
+        op delete(): {
+          ...AcceptedResponse,
+          @header("Location")
+          @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>)
+          @Azure.Core.finalLocation(void)
+          location?: string;
+        };
+
+        @Azure.Core.lroStatus
+        union ResourceProvisioningState {
+          Succeeded: "Succeeded",
+          Failed: "Failed",
+          Canceled: "Canceled",
+          string,
+        }
+
+        model ArmOperationStatus {
+          @Azure.Core.lroStatus
+          status: ResourceProvisioningState;
+          @key
+          @path
+          @segment("operationStatuses")
+          id: Azure.Core.uuid;
+          @visibility("read")
+          name?: string;
+        }
+      `);
+      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 0);
+      strictEqual(sdkPackage.enums.length, 1);
     });
   });
 });

@@ -1,5 +1,12 @@
 # Changelog - @azure-tools/typespec-azure-portal-core
 
+## 0.42.0
+
+### Bump dependencies
+
+- [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
+
+
 ## 0.41.0
 
 ### Bump dependencies

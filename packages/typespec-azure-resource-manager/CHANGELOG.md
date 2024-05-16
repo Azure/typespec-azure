@@ -1,5 +1,104 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.42.0
+
+### Bug Fixes
+
+- [#605](https://github.com/Azure/typespec-azure/pull/605) Specify the fully qualified name of `@OpenAPI.extension` decorator in `missing-x-ms-identifiers` linter warning.
+- [#400](https://github.com/Azure/typespec-azure/pull/400) Updated `ManagedIndentity` and `CustomerManagedKey` TypeSpec model definition to be consistent with Swagger commont-types
+- [#567](https://github.com/Azure/typespec-azure/pull/567) Enable `arm-common-types-version` rule by default.
+- [#751](https://github.com/Azure/typespec-azure/pull/751) Allow `@pattern` to be provided on a scalar
+- [#702](https://github.com/Azure/typespec-azure/pull/702) Fix `arm-resource-name-pattern` rule codefix producing invalid syntax
+- [#293](https://github.com/Azure/typespec-azure/pull/293) Update to support new meaning of `@body`
+
+### Bump dependencies
+
+- [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
+
+### Features
+
+- [#661](https://github.com/Azure/typespec-azure/pull/661) Fixing ArmResource base model and add an easier way to define Resource Name parameter
+- [#736](https://github.com/Azure/typespec-azure/pull/736) Adding standard ExtendedLocation definition for ARM library
+
+### Deprecations
+
+- [#762](https://github.com/Azure/typespec-azure/pull/762) Renaming internal TypeSpec ARM foundation model names to be consistent with ARM common-type definitions.
+However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
+
+- Deprecate `Foundations.ArmResource`. `Foundations.Resource` should be used instead.
+
+- Deprecate `Foundations.ResourceSkuType`. `Foundations.Sku` should be used instead.
+
+- Deprecate `Foundations.ResourcePlanType`. `Foundations.Plan` should be used instead.
+
+- Deprecate `Foundations.TrackedResourceBase`. `Foundations.TrackedResource` should be used instead.
+
+- Deprecate `Foundations.ProxyResourceBase`. `Foundations.ProxyResource` should be used instead.
+
+- Deprecate `Foundations.ExtensionResourceBase`. `Foundations.ExtensionResource` should be used instead.
+- [#768](https://github.com/Azure/typespec-azure/pull/768) Standardizing mix-in model names with consistent `Property` suffix.
+
+- Deprecate `ManagedServiceIdentity`. `ManagedServiceIdentityProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...ManagedServiceIdentity;
+  +...ManagedServiceIdentityProperty;
+  ```
+
+- Deprecate `ManagedSystemAssignedIdentity`. `ManagedSystemAssignedIdentityProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...ManagedSystemAssignedIdentity;
+  +...ManagedSystemAssignedIdentityProperty;
+  ```
+
+- Deprecate `EntityTag`. `EntityTagProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...EntityTag;
+  +...EntityTagProperty;
+  ```
+
+- Deprecate `ResourceKind`. `ResourceKindProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...ResourceKind;
+  +...ResourceKindProperty;
+  ```
+
+- Deprecate `ResourcePlan`. `ResourcePlanProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...ResourcePlan;
+  +...ResourcePlanProperty;
+  ```
+
+- Deprecate `ResourceSku`. `ResourceSkuProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...ResourceSku;
+  +...ResourceSkuProperty;
+  ```
+
+- Deprecate `ManagedBy`. `ManagedByProperty` should be used instead.
+
+  Example:
+  ```diff
+  -...ManagedBy;
+  +...ManagedByProperty;
+  ```
+
+### Breaking Changes
+
+- [#521](https://github.com/Azure/typespec-azure/pull/521) Switching ProvisioningState from enum to Open union
+
+
 ## 0.41.0
 
 ### Bug Fixes

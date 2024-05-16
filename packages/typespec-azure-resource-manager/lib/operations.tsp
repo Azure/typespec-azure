@@ -1,7 +1,6 @@
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
-using Autorest;
 using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;
@@ -21,8 +20,9 @@ namespace Azure.ResourceManager;
 @segmentOf(Resource)
 @armResourceList(Resource)
 @get
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmListBySubscription<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
   Error extends {} = ErrorResponse
@@ -44,8 +44,9 @@ op ArmListBySubscription<
 @segmentOf(Resource)
 @armRenameListByOperation(Resource, ParentName, ParentFriendlyName) // This must come before @armResourceList!
 @armResourceList(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListByParent<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = "",
@@ -72,8 +73,9 @@ op ArmResourceListByParent<
 @segmentOf(Resource)
 @armRenameListByOperation(Resource) // This must come before @armResourceList!
 @armResourceList(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListAtScope<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
@@ -97,7 +99,7 @@ op ArmResourceListAtScope<
 @get
 @armResourceRead(Resource)
 op ArmResourceRead<
-  Resource extends ArmResourceBase,
+  Resource extends {},
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
@@ -120,7 +122,7 @@ op ArmResourceRead<
 @doc("Check for the existence of a {name}", Resource)
 @head
 op ArmResourceCheckExistence<
-  Resource extends ArmResourceBase,
+  Resource extends {},
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
@@ -150,9 +152,10 @@ op ArmResourceCheckExistence<
   }
 )
 @armResourceCreateOrUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @put
 op ArmResourceCreateOrUpdateAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
@@ -180,9 +183,10 @@ op ArmResourceCreateOrUpdateAsync<
 @autoRoute
 @doc("Create a {name}", Resource)
 @armResourceCreateOrUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @put
 op ArmResourceCreateOrUpdateSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
@@ -205,9 +209,10 @@ op ArmResourceCreateOrUpdateSync<
 @autoRoute
 @doc("Create a {name}", Resource)
 @armResourceCreateOrUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @put
 op ArmResourceCreateOrReplaceSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
@@ -228,8 +233,9 @@ op ArmResourceCreateOrReplaceSync<
  * @template Response Optional. The success response for the createOrReplace operation
  * @template Error Optional. The error response, if non-standard.
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceCreateOrReplaceAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
@@ -254,8 +260,9 @@ op ArmResourceCreateOrReplaceAsync<
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Properties extends {} = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -281,8 +288,9 @@ op ArmTagsPatchAsync<
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -320,9 +328,10 @@ op ArmResourcePatchAsync<
   }
 )
 @armResourceUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @patch
 op ArmCustomPatchAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -350,8 +359,9 @@ op ArmCustomPatchAsync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {}
 > is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters, Parameters>;
@@ -363,8 +373,9 @@ op ArmTagsPatchSync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {}
@@ -387,9 +398,10 @@ op ArmResourcePatchSync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @patch
 op ArmCustomPatchSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
@@ -420,9 +432,10 @@ op ArmCustomPatchSync<
   }
 )
 @armResourceDelete(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @delete
 op ArmResourceDeleteAsyncBase<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
@@ -439,8 +452,9 @@ op ArmResourceDeleteAsyncBase<
  * @template Error Optional. The error response, if non-standard.
  */
 #deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceDeleteAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
@@ -458,8 +472,9 @@ op ArmResourceDeleteAsync<
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceDeleteWithoutOkAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
@@ -479,9 +494,10 @@ op ArmResourceDeleteWithoutOkAsync<
 @autoRoute
 @doc("Delete a {name}", Resource)
 @armResourceDelete(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @delete
 op ArmResourceDeleteSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
@@ -506,9 +522,10 @@ op ArmResourceDeleteSync<
   }
 )
 @armResourceAction(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @post
 op ArmResourceActionAsyncBase<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model,
@@ -534,8 +551,9 @@ op ArmResourceActionAsyncBase<
  * @template Error Optional. The error response, if non-standard.
  */
 @returnsDoc("Azure operation completed successfully.")
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
@@ -567,10 +585,11 @@ op ArmResourceActionAsync<
  */
 @autoRoute
 @armResourceAction(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @post
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -594,8 +613,9 @@ op ArmResourceActionSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoContentAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
@@ -623,8 +643,9 @@ op ArmResourceActionNoContentAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  */
+@Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoResponseContentAsync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -654,9 +675,10 @@ op ArmResourceActionNoResponseContentAsync<
  */
 @autoRoute
 @armResourceAction(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
 @post
 op ArmResourceActionNoContentSync<
-  Resource extends ArmResource,
+  Resource extends Foundations.Resource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},

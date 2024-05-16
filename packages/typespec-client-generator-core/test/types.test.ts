@@ -1710,6 +1710,94 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
+    });
+
+    it("versioned enums with all", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "all",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
+    });
+
+    it("versioned enums with latest", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "latest",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
+    });
+
+    it("versioned enums with specific version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1"]
+      );
     });
 
     it("usage propagation for enum value", async () => {
@@ -1941,6 +2029,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "string");
       strictEqual(sdkType.value, "json");
+      strictEqual(sdkType.name, "TestPropJson");
+      strictEqual(sdkType.isGeneratedName, true);
     });
     it("boolean", async function () {
       await runner.compileWithBuiltInService(`
@@ -1955,6 +2045,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "boolean");
       strictEqual(sdkType.value, true);
+      strictEqual(sdkType.name, "TestPropTrue");
+      strictEqual(sdkType.isGeneratedName, true);
     });
     it("number", async function () {
       await runner.compileWithBuiltInService(`
@@ -1969,6 +2061,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "int32");
       strictEqual(sdkType.value, 4);
+      strictEqual(sdkType.name, "TestProp4");
+      strictEqual(sdkType.isGeneratedName, true);
     });
   });
   describe("SdkModelType", () => {
@@ -2469,6 +2563,63 @@ describe("typespec-client-generator-core: types", () => {
 
       model Salmon extends Fish {
         kind: KindType.salmon;
+        norweigan: boolean;
+      }
+
+      @get
+      op getModel(): Fish;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 3);
+      const fish = models.find((x) => x.name === "Fish");
+      ok(fish);
+      let kindTypeProperty = fish.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enum");
+      strictEqual(kindTypeProperty.type.isUnionAsEnum, true);
+      strictEqual(fish.discriminatorProperty, kindTypeProperty);
+      const shark = models.find((x) => x.name === "Shark");
+      ok(shark);
+      strictEqual(shark.discriminatorValue, "shark");
+      kindTypeProperty = shark.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      const salmon = models.find((x) => x.name === "Salmon");
+      ok(salmon);
+      kindTypeProperty = salmon.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      strictEqual(salmon.discriminatorValue, "salmon");
+
+      strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
+      const kindType = runner.context.experimental_sdkPackage.enums.find(
+        (x) => x.name === "KindType"
+      );
+      ok(kindType);
+      strictEqual(kindType.isFixed, false);
+    });
+
+    it("string discriminator map to enum value", async () => {
+      await runner.compileWithBuiltInService(`
+      union KindType {
+        string,
+        shark: "shark",
+        salmon: "salmon"
+      };
+
+      @discriminator("kind")
+      model Fish {
+        kind: KindType;
+        age: int32;
+      }
+
+      model Shark extends Fish {
+        kind: "shark";
+        hasFin: boolean;
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
         norweigan: boolean;
       }
 
@@ -3281,6 +3432,26 @@ describe("typespec-client-generator-core: types", () => {
         validModel.map((x) => x.name),
         ["ValidResponse"]
       );
+    });
+
+    it("never or void property", async () => {
+      await runner.compileAndDiagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          model Test{
+            prop1: never;
+            prop2: void;
+          }
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      strictEqual(models[0].name, "Test");
+      strictEqual(models[0].properties.length, 0);
     });
   });
 

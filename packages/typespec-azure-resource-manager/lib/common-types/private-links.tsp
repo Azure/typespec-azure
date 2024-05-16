@@ -2,7 +2,6 @@ import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
-import "@azure-tools/typespec-autorest";
 import "@azure-tools/typespec-azure-core";
 
 using TypeSpec.Http;
@@ -15,10 +14,7 @@ namespace Azure.ResourceManager;
 /** The private endpoint resource */
 @armCommonDefinition(
   "PrivateEndpoint",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 )
 @armCommonDefinition(
@@ -36,7 +32,7 @@ model PrivateEndpoint {
 }
 
 /** The private endpoint connection resource */
-model PrivateEndpointConnection extends Azure.ResourceManager.Foundations.ProxyResourceBase {
+model PrivateEndpointConnection extends Azure.ResourceManager.Foundations.ProxyResource {
   /** The private endpoint connection properties */
   properties?: PrivateEndpointConnectionProperties;
 }
@@ -44,10 +40,7 @@ model PrivateEndpointConnection extends Azure.ResourceManager.Foundations.ProxyR
 /** Properties of he private endpoint connection resource */
 @armCommonDefinition(
   "PrivateEndpointConnectionProperties",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 )
 @armCommonDefinition(
@@ -73,10 +66,7 @@ model PrivateEndpointConnectionProperties {
 /** A collection of information about the state of the connection between service consumer and provider. */
 @armCommonDefinition(
   "PrivateLinkServiceConnectionState",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 )
 @armCommonDefinition(
@@ -120,7 +110,7 @@ union PrivateEndpointServiceConnectionStatus {
   string,
 }
 
-model PrivateLinkResource extends Azure.ResourceManager.Foundations.ProxyResourceBase {
+model PrivateLinkResource extends Azure.ResourceManager.Foundations.ProxyResource {
   /** Properties of the private link resource. */
   properties?: PrivateLinkResourceProperties;
 }
@@ -129,10 +119,7 @@ model PrivateLinkResource extends Azure.ResourceManager.Foundations.ProxyResourc
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "Matches current common code"
 @armCommonDefinition(
   "PrivateLinkResourceProperties",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 )
 @armCommonDefinition(
@@ -174,10 +161,7 @@ model PrivateEndpointConnectionParameter<Segment extends valueof string = "priva
   @path
   @armCommonParameter(
     "PrivateEndpointConnectionName",
-    {
-      version: Azure.ResourceManager.CommonTypes.Versions.v4,
-      isDefault: true,
-    },
+    #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
     "privatelinks.json"
   )
   @armCommonParameter(

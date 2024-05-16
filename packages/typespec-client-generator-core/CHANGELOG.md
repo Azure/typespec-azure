@@ -1,5 +1,40 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.42.3
+
+### Bug Fixes
+
+- [#834](https://github.com/Azure/typespec-azure/pull/834) map discriminator string value type to enum value type
+- [#826](https://github.com/Azure/typespec-azure/pull/826) change from using logical result to final result
+- [#826](https://github.com/Azure/typespec-azure/pull/826) add union support for templated model naming
+
+
+## 0.42.2
+
+### Bug Fixes
+
+- [#818](https://github.com/Azure/typespec-azure/pull/818) Fix: Crash due to using api from next version of the compiler
+
+
+## 0.42.1
+
+### Bug Fixes
+
+- [#766](https://github.com/Azure/typespec-azure/pull/766) add generated names for constants
+- [#808](https://github.com/Azure/typespec-azure/pull/808) Fix error response when error model has statusCode
+- [#797](https://github.com/Azure/typespec-azure/pull/797) add void and never handling for parameter and return types
+- [#805](https://github.com/Azure/typespec-azure/pull/805) propagate api version from parent if not explicitly set
+- [#801](https://github.com/Azure/typespec-azure/pull/801) `getDefaultApiVersion` and service version enum hornor api version config
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
+
+
+## 0.42.0
+
+### Bug Fixes
+
+- [#788](https://github.com/Azure/typespec-azure/pull/788) fix wrong default version for interface from extends
+
+
 ## 0.41.9
 
 ### Bug Fixes
