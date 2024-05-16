@@ -56,12 +56,12 @@ it("emits a warning @discriminator points to a property that is not a union", as
     ]);
 });
 
-it("allows the version enum", async () => {
+it("doesn't warn when using an extensible union as the type", async () => {
   await tester
     .expect(
       `       
         @discriminator("kind")
-        model Pet { kind: string; }
+        model Pet { kind: PetKind; }
 
         model Cat extends Pet { kind: "cat" }
 
