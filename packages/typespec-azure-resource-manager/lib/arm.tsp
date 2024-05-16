@@ -3,11 +3,16 @@ import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
-import "@azure-tools/typespec-autorest";
 import "@azure-tools/typespec-azure-core";
 
 import "./arm.foundations.tsp";
-import "./common-types.tsp";
+import "./common-types/common-types.tsp";
+import "./common-types/backcompat.tsp";
+import "./common-types/types.tsp";
+import "./common-types/managed-identity.tsp";
+import "./common-types/private-links.tsp";
+import "./common-types/customer-managed-keys.tsp";
+import "./common-types/extended-location.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";
@@ -15,14 +20,11 @@ import "./decorators.tsp";
 import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
-import "./private-links.tsp";
-import "./customer-managed-keys.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using TypeSpec.OpenAPI;
-using Autorest;
 using Azure.ResourceManager.Foundations;
 
 @versioned(Azure.ResourceManager.Versions)

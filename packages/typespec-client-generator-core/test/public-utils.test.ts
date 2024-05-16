@@ -2,6 +2,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   ignoreDiagnostics,
   listServices,
@@ -145,6 +146,81 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       const serviceNamespace = getServiceNamespace();
       ok(!getDefaultApiVersion(runner.context, serviceNamespace));
+    });
+
+    it("get with all", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "all",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      const { MyService } = await runnerWithVersion.compile(`
+        enum Versions {
+          v1_0_0: "1.0",
+          v1_0_1: "1.0.1",
+          v1_1_0: "1.1.0",
+        }
+
+        @versioned(Versions)
+        @service({})
+        @test namespace MyService {};
+      `);
+      const defaultApiVersion = getDefaultApiVersion(
+        runnerWithVersion.context,
+        MyService as Namespace
+      );
+      ok(defaultApiVersion);
+      strictEqual(defaultApiVersion.value, "1.1.0");
+    });
+
+    it("get with latest", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "latest",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      const { MyService } = await runnerWithVersion.compile(`
+        enum Versions {
+          v1_0_0: "1.0",
+          v1_0_1: "1.0.1",
+          v1_1_0: "1.1.0",
+        }
+
+        @versioned(Versions)
+        @service({})
+        @test namespace MyService {};
+      `);
+      const defaultApiVersion = getDefaultApiVersion(
+        runnerWithVersion.context,
+        MyService as Namespace
+      );
+      ok(defaultApiVersion);
+      strictEqual(defaultApiVersion.value, "1.1.0");
+    });
+
+    it("get with specific version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "1.0.1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      const { MyService } = await runnerWithVersion.compile(`
+        enum Versions {
+          v1_0_0: "1.0",
+          v1_0_1: "1.0.1",
+          v1_1_0: "1.1.0",
+        }
+
+        @versioned(Versions)
+        @service({})
+        @test namespace MyService {};
+      `);
+      const defaultApiVersion = getDefaultApiVersion(
+        runnerWithVersion.context,
+        MyService as Namespace
+      );
+      ok(defaultApiVersion);
+      strictEqual(defaultApiVersion.value, "1.0.1");
     });
   });
   describe("isApiVersion", () => {
@@ -802,6 +878,35 @@ describe("typespec-client-generator-core: public-utils", () => {
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 2);
       const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
+      ok(model);
+    });
+
+    it("template without @friendlyName renaming for union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      union DependencyOfOrigins {
+        serviceExplicitlyCreated: "ServiceExplicitlyCreated",
+        userExplicitlyCreated: "UserExplicitlyCreated",
+        string,
+      }
+
+      model DependencyOfRelationshipProperties
+        is BaseRelationshipProperties<DependencyOfOrigins>;
+
+      model BaseRelationshipProperties<TOrigin> {
+        originInformation: RelationshipOriginInformation<TOrigin>;
+      }
+
+      model RelationshipOriginInformation<TOrigin = string> {
+        relationshipOriginType: TOrigin;
+      }
+
+      op test(): DependencyOfRelationshipProperties;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const model = models.filter(
+        (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins"
+      )[0];
       ok(model);
     });
   });

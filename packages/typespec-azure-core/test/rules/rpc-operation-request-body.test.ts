@@ -20,6 +20,38 @@ describe("typespec-azure-core: rpc-operation-request-body", () => {
     );
   });
 
+  it("allow RPCOperation with `@get` and empty body", async () => {
+    await tester
+      .expect(
+        `
+        model Widget {
+          name: string;
+        }
+
+        @get
+        @route ("/")
+        op getWidget is RpcOperation<{}, Widget>;
+      `
+      )
+      .toBeValid();
+  });
+
+  it("allow RPCOperation with `@delete` and empty body", async () => {
+    await tester
+      .expect(
+        `
+        model Widget {
+          name: string;
+        }
+
+        @delete
+        @route ("/")
+        op deleteWidget is RpcOperation<{}, Widget>;
+      `
+      )
+      .toBeValid();
+  });
+
   it("emits warning when RPCOperation is marked with `@get` and has a request body", async () => {
     await tester
       .expect(

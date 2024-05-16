@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-resource-manager",
-  "version": "0.41.0",
+  "version": "0.42.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Resource Manager library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -47,12 +47,15 @@
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/libraries/azure-resource-manager/reference"
   },
   "files": [
-    "lib/*.tsp",
+    "lib/**/*.tsp",
     "dist/**",
     "!dist/test/**"
   ],
+  "dependencies": {
+    "change-case": "~5.4.4",
+    "pluralize": "^8.0.0"
+  },
   "peerDependencies": {
-    "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
@@ -61,9 +64,9 @@
     "@typespec/versioning": "workspace:~"
   },
   "devDependencies": {
-    "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@types/node": "~18.11.19",
+    "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/library-linter": "workspace:~",

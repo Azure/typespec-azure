@@ -57,8 +57,8 @@ union ProvisioningState {
   string,
 }
 
-@doc("The properties of UserResource")
-model UserResourceProperties {
+@doc("The properties of User Resource")
+model UserProperties {
   @doc("The user's full name")
   fullName: string;
 
@@ -69,8 +69,8 @@ model UserResourceProperties {
   provisioningState?: ProvisioningState;
 }
 
-@doc("A UserResource")
-model UserResource is TrackedResource<UserResourceProperties> {
+@doc("A User Resource")
+model User is TrackedResource<UserProperties> {
   @key("userName")
   @segment("users")
   @doc("Address name")
@@ -89,25 +89,21 @@ model NotificationDetails {
 
 @armResourceOperations
 interface Users {
-  get is ArmResourceRead<UserResource>;
-  create is ArmResourceCreateOrUpdateAsync<UserResource>;
-  update is ArmResourcePatchSync<UserResource, UserResourceProperties>;
-  delete is ArmResourceDeleteSync<UserResource>;
-  listByResourceGroup is ArmResourceListByParent<UserResource>;
-  listBySubscription is ArmListBySubscription<UserResource>;
+  get is ArmResourceRead<User>;
+  create is ArmResourceCreateOrReplaceAsync<User>;
+  update is ArmResourcePatchSync<User, UserProperties>;
+  delete is ArmResourceDeleteSync<User>;
+  listByResourceGroup is ArmResourceListByParent<User>;
+  listBySubscription is ArmListBySubscription<User>;
   @doc("Send a notification to the user")
   @segment("notify")
-  NotifyUser is ArmResourceActionNoContentSync<UserResource, NotificationDetails>;
+  NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 
 @doc("An address resource belonging to a user resource.")
-@parentResource(UserResource)
+@parentResource(User)
 model AddressResource is ProxyResource<AddressResourceProperties> {
-  @doc("Address name")
-  @key("addressName")
-  @segment("addresses")
-  @path
-  name: string;
+  ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
 }
 
 @doc("The properties of AddressResource")

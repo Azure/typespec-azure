@@ -7,6 +7,28 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
+/**
+ * Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
+ * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
+ * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+ * @template Resource The ARM resource this name parameter is applying to.
+ * @template KeyName Override default key name of the resource.
+ * @template SegmentName Override default segment name of the resource.
+ * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ */
+model ResourceNameParameter<
+  Resource extends Foundations.Resource,
+  KeyName extends valueof string = "",
+  SegmentName extends valueof string = "",
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+> {
+  @doc("The name of the {name}", Resource)
+  @pattern(NamePattern)
+  @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
+  @path
+  name: string;
+}
+
 //#region Standard Resource Operation Interfaces
 /**
  * Concrete tracked resource types can be created by aliasing this type using a specific property type.
@@ -17,7 +39,7 @@ namespace Azure.ResourceManager;
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model TrackedResource<Properties extends {}> extends TrackedResourceBase {
+model TrackedResource<Properties extends {}> extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
@@ -33,7 +55,7 @@ model TrackedResource<Properties extends {}> extends TrackedResourceBase {
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ProxyResource<Properties extends {}> extends ProxyResourceBase {
+model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
@@ -50,7 +72,7 @@ model ProxyResource<Properties extends {}> extends ProxyResourceBase {
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ExtensionResource<Properties extends {}> extends ExtensionResourceBase {
+model ExtensionResource<Properties extends {}> extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
   @visibility("read", "create")
   @extension("x-ms-client-flatten", true)
@@ -150,55 +172,104 @@ model DefaultProvisioningStateProperty {
 }
 
 /**
- * Standard Azure Resource Manager definition of ManagedServiceIdentity
+ * Model representing the standard `extendedLocation` envelope property for a resource.
+ * Spread this model into a Resource Model, if the resource supports extended locations
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ * ...ResourceNameParameter<Employee>;
+ * ...ExtendedLocationProperty;
+ * }
+ * ```
+ */
+model ExtendedLocationProperty {
+  @visibility("read", "create")
+  extendedLocation?: Foundations.ExtendedLocation;
+}
+
+#deprecated "Please change ManagedServiceIdentity to ManagedServiceIdentityProperty."
+alias ManagedServiceIdentity = ManagedServiceIdentityProperty;
+
+/**
+ * Model representing the standard `ManagedServiceIdentity` envelope property for a resource.
+ * Spread this model into a resource model if the resource supports both system-assigned and user-assigned managed identities.
+ *
+ * @example
+ *
+ * ```typespec
+ * model Foo is TrackedResource<FooProperties> {
+ *   ...ResourceNameParameter<Foo>;
+ *   ...ManagedServiceIdentityProperty;
+ * }
+ * ```
  */
 @doc("The managed service identities envelope.")
-model ManagedServiceIdentity {
+model ManagedServiceIdentityProperty {
   @doc("The managed service identities assigned to this resource.")
-  identity?: ManagedIdentityProperties;
+  identity?: Foundations.ManagedServiceIdentity;
 }
 
+#deprecated "Please change ManagedSystemAssignedIdentity to ManagedSystemAssignedIdentityProperty."
+alias ManagedSystemAssignedIdentity = ManagedSystemAssignedIdentityProperty;
 /**
- * Standard Azure Resource Manager definition of ManagedServiceIdentity for services
- * that only support system-defined identities
+ * Model representing the standard `SystemAssignedServiceIdentity` envelope property for a resource.
+ * Spread this model into a resource model if the resource supports system-assigned managed identities
+ * but does not support user-assigned managed identities.
+ *
+ * @example
+ *
+ * ```typespec
+ * model Foo is TrackedResource<FooProperties> {
+ *   ...ResourceNameParameter<Foo>;
+ *   ...ManagedSystemAssignedIdentityProperty;
+ * }
+ * ```
  */
 @doc("Managed identity for services that are constrained to system-assigned managed identities.")
-model ManagedSystemAssignedIdentity {
+model ManagedSystemAssignedIdentityProperty {
   @doc("The managed service identities assigned to this resource.")
-  identity?: ManagedSystemIdentityProperties;
+  identity?: Foundations.SystemAssignedServiceIdentity;
 }
 
+#deprecated "`EntityTag` will be deprecated. Please use `EntityTagProperty` instead."
+alias EntityTag = EntityTagProperty;
 /**
  * Model used only to spread in the standard `eTag` envelope property for a resource
+ *
  * @example
  *
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...EntityTag;
+ *   ...EntityTagProperty;
  * }
  * ```
  */
 @doc("The eTag property envelope.")
-model EntityTag {
+model EntityTagProperty {
   @doc("If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.")
   @visibility("read")
   eTag?: string;
 }
 
+#deprecated "`ResourceKind` will be deprecated. Please use `ResourceKindProperty` instead."
+alias ResourceKind = ResourceKindProperty;
 /**
- * Model used only to spread in the standard `kind` envelope property for a resource
+ * Model representing the standard `kind` envelope property for a resource.
+ * Spread this model into a resource model if the resource support ARM `kind`.
+ *
  * @example
  *
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ResourceKind;
+ *   ...ResourceKindProperty;
  * }
  * ```
  */
 @doc("The resource kind property envelope.")
-model ResourceKind {
+model ResourceKindProperty {
   @doc("Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.")
   @pattern("^[-\\w\\._,\\(\\\\\\)]+$")
   @visibility("read", "create")
@@ -211,55 +282,67 @@ model ResourceKind {
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends ArmResource> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
 
+#deprecated "`ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead."
+alias ResourcePlan = ResourcePlanProperty;
 /**
- * Model used only to spread in the standard `plan` envelope property for a resource
+ * Model representing the standard `plan` envelope property for a resource.
+ * Spread this model into a resource Model if the resource supports ARM `plan`.
+ *
  * @example
  *
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ResourcePlan;
+ *   ...ResourcePlanProperty;
  * }
  * ```
  */
 @doc("The resource plan property envelope.")
-model ResourcePlan {
+model ResourcePlanProperty {
   @doc("Details of the resource plan.")
-  plan?: ResourcePlanType;
+  plan?: Plan;
 }
 
+#deprecated "`ResourceSku` will be deprecated. Please use `ResourceSkuProperty` instead."
+alias ResourceSku = ResourceSkuProperty;
 /**
- * Model used only to spread in the standard `sku` envelope property for a resource
+ * Model representing the standard `sku` envelope property for a resource.
+ * Spread this model into a resource model if the resource supports standard ARM `sku`.
+ *
  * @example
  *
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ResourceSku;
+ *   ...ResourceSkuProperty;
  * }
  * ```
  */
 @doc("The SKU (Stock Keeping Unit) assigned to this resource.")
-model ResourceSku {
+model ResourceSkuProperty {
   @doc("The SKU (Stock Keeping Unit) assigned to this resource.")
-  sku?: ResourceSkuType;
+  sku?: Sku;
 }
 
+#deprecated "`ManagedBy` will be deprecated. Please use `ManagedByProperty` instead."
+alias ManagedBy = ManagedByProperty;
 /**
- * Model used only to spread in the standard `managedBy` envelope property for a resource
+ * Model representing the standard `managedBy` envelope property for a resource.
+ * Spread this model into a resource model if the resource is managed by another entity.
+ *
  * @example
  *
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
  *   // Only have standard Succeeded, Failed, Cancelled states
- *   ...ManagedBy;
+ *   ...ManagedByProperty;
  * }
  * ```
  */
 @doc("The managedBy property envelope.")
-model ManagedBy {
+model ManagedByProperty {
   @doc("The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.")
   managedBy?: string;
 }

@@ -28,12 +28,7 @@ enum Versions {
 /** A ContosoProviderHub resource */
 @singleton("default")
 model Employee is TrackedResource<EmployeeProperties> {
-  /** Name of employee */
-  @key("employeeName")
-  @path
-  @segment("employees")
-  @visibility("read")
-  name: "default";
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */

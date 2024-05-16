@@ -1,5 +1,89 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.42.3
+
+### Bug Fixes
+
+- [#834](https://github.com/Azure/typespec-azure/pull/834) map discriminator string value type to enum value type
+- [#826](https://github.com/Azure/typespec-azure/pull/826) change from using logical result to final result
+- [#826](https://github.com/Azure/typespec-azure/pull/826) add union support for templated model naming
+
+
+## 0.42.2
+
+### Bug Fixes
+
+- [#818](https://github.com/Azure/typespec-azure/pull/818) Fix: Crash due to using api from next version of the compiler
+
+
+## 0.42.1
+
+### Bug Fixes
+
+- [#766](https://github.com/Azure/typespec-azure/pull/766) add generated names for constants
+- [#808](https://github.com/Azure/typespec-azure/pull/808) Fix error response when error model has statusCode
+- [#797](https://github.com/Azure/typespec-azure/pull/797) add void and never handling for parameter and return types
+- [#805](https://github.com/Azure/typespec-azure/pull/805) propagate api version from parent if not explicitly set
+- [#801](https://github.com/Azure/typespec-azure/pull/801) `getDefaultApiVersion` and service version enum hornor api version config
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
+
+
+## 0.42.0
+
+### Bug Fixes
+
+- [#788](https://github.com/Azure/typespec-azure/pull/788) fix wrong default version for interface from extends
+
+
+## 0.41.9
+
+### Bug Fixes
+
+- [#745](https://github.com/Azure/typespec-azure/pull/745) allow callers of createSdkContext to ignore default version projection
+- [#778](https://github.com/Azure/typespec-azure/pull/778) tie api version information to clients so we can have diff api version information per client
+- [#780](https://github.com/Azure/typespec-azure/pull/780) fix duplicated content type parameter for rpc lro
+
+
+## 0.41.8
+
+### Bug Fixes
+
+- [#753](https://github.com/Azure/typespec-azure/pull/753) fix usage propagation from sub types
+
+
+## 0.41.7
+
+### Bug Fixes
+
+- [#748](https://github.com/Azure/typespec-azure/pull/748) add crossLanguageDefinitionId onto method types
+
+
+## 0.41.6
+
+### Bug Fixes
+
+- [#741](https://github.com/Azure/typespec-azure/pull/741) use correct default api version when projecting to a specific version
+
+
+## 0.41.5
+
+### Bug Fixes
+
+- [#727](https://github.com/Azure/typespec-azure/pull/727) export int and float type judgement function
+- [#731](https://github.com/Azure/typespec-azure/pull/731) fix `@clientName` lost after adding versioning support
+- [#726](https://github.com/Azure/typespec-azure/pull/726) fix additional property union naming problem
+
+
+## 0.41.4
+
+### Bug Fixes
+
+- [#692](https://github.com/Azure/typespec-azure/pull/692) fix wrong judgement for array type
+- [#559](https://github.com/Azure/typespec-azure/pull/559) take lroMetadata.finalResult into consideration
+- [#700](https://github.com/Azure/typespec-azure/pull/700) support get common models for specific api version, default to latest api version which may include breaking changes
+- [#713](https://github.com/Azure/typespec-azure/pull/713) enhance versioning and add tests
+
+
 ## 0.41.3
 
 ### Bug Fixes

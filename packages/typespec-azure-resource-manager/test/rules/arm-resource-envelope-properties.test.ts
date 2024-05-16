@@ -28,7 +28,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
 
         model FooResource is TrackedResource<{}> {
           @key @segment("foo") name: string;
-          ...ManagedServiceIdentity;
+          ...ManagedServiceIdentityProperty;
         }
       `
       )

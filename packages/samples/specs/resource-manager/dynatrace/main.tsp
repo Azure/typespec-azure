@@ -42,7 +42,7 @@ model MonitorResource is TrackedResource<MonitorProperties> {
   @path
   name: string;
 
-  ...ManagedServiceIdentity; // change here to use the standard definition
+  ...ManagedServiceIdentityProperty; // change here to use the standard definition
 }
 
 @armResourceOperations

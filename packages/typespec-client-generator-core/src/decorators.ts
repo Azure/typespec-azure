@@ -184,7 +184,9 @@ export function getClient(
   type: Namespace | Interface
 ): SdkClient | undefined {
   if (hasExplicitClientOrOperationGroup(context)) {
-    return getScopedDecoratorData(context, clientKey, type);
+    let client = getScopedDecoratorData(context, clientKey, type);
+    if (client && (client.type as Type).kind === "Intrinsic") client = undefined;
+    return client;
   }
 
   // if there is no explicit client or operation group,
@@ -259,6 +261,15 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
   client.service = projectedService;
 }
 
+function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
+  if (context.apiVersion !== "all") {
+    clients.map((client) => serviceVersioningProjection(context, client));
+    // filter all the clients not existed in the current version
+    return clients.filter((client) => (client.type as Type).kind !== "Intrinsic");
+  }
+  return clients;
+}
+
 /**
  * List all the clients.
  *
@@ -270,13 +281,8 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
-    if (context.apiVersion !== "all") {
-      for (const client of explicitClients as SdkClient[]) {
-        serviceVersioningProjection(context, client);
-      }
-    }
-    context.__rawClients = explicitClients;
-    return explicitClients;
+    context.__rawClients = getClientsWithVersioning(context, explicitClients);
+    return context.__rawClients;
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
@@ -302,11 +308,8 @@ export function listClients(context: TCGCContext): SdkClient[] {
     } as SdkClient;
   });
 
-  if (context.apiVersion !== "all") {
-    clients.map((client) => serviceVersioningProjection(context, client));
-  }
-  context.__rawClients = clients;
-  return clients;
+  context.__rawClients = getClientsWithVersioning(context, clients);
+  return context.__rawClients;
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");
@@ -568,10 +571,18 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+interface CreateSdkContextOptions {
+  readonly versionStrategy?: "ignore";
+}
+
 export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+>(
+  context: EmitContext<TOptions>,
+  emitterName?: string,
+  options?: CreateSdkContextOptions
+): SdkContext<TOptions, TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
@@ -591,8 +602,11 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     diagnostics: diagnostics.diagnostics,
-    apiVersion: context.options["api-version"],
+    apiVersion: options?.versionStrategy === "ignore" ? "all" : context.options["api-version"],
     originalProgram: context.program,
+    __namespaceToApiVersionParameter: new Map(),
+    __tspTypeToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
@@ -943,7 +957,7 @@ export function $clientName(
           context.program.checker.resolveTypeReference(
             (context.decoratorTarget as AugmentDecoratorStatementNode).targetType
           )
-        ) !== entity
+        )?.node !== entity.node
       ) {
         return;
       }

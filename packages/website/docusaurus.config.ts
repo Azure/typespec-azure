@@ -224,7 +224,7 @@ const config: Config = {
     prism: {
       theme: themes.oneLight,
       darkTheme: themes.oneDark,
-      additionalLanguages: ["csharp", "java", "python"],
+      additionalLanguages: ["csharp", "java", "python", "rust", "cpp", "go", "diff"],
     },
     algolia: {
       // cspell:disable-next-line

@@ -10,16 +10,16 @@ import {
   isFixed,
 } from "@azure-tools/typespec-azure-core";
 import {
-  SdkContext,
-  createSdkContext,
-  getClientNameOverride,
-  shouldFlattenProperty,
-} from "@azure-tools/typespec-client-generator-core";
+  getArmCommonTypeOpenAPIRef,
+  isArmCommonType,
+} from "@azure-tools/typespec-azure-resource-manager";
+import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
+  CompilerHost,
+  Diagnostic,
   DiagnosticTarget,
-  EmitContext,
   Enum,
   EnumMember,
   IntrinsicScalarName,
@@ -32,17 +32,17 @@ import {
   Operation,
   Program,
   Scalar,
-  Service,
+  SourceFile,
   StringLiteral,
   StringTemplate,
   SyntaxKind,
-  TwoLevelMap,
   Type,
   TypeNameOptions,
   Union,
   UnionVariant,
+  Value,
   compilerAssert,
-  emitFile,
+  createDiagnosticCollector,
   getAllTags,
   getDirectoryPath,
   getDiscriminator,
@@ -56,14 +56,12 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
-  getNamespaceFullName,
   getPattern,
   getProjectedName,
   getProperty,
   getPropertyType,
   getRelativePathFromDirectory,
   getRootLength,
-  getService,
   getSummary,
   getVisibility,
   ignoreDiagnostics,
@@ -83,13 +81,12 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
-  listServices,
   navigateTypesInNamespace,
-  projectProgram,
   resolveEncodedName,
   resolvePath,
   stringTemplateToString,
 } from "@typespec/compiler";
+import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
   HttpAuth,
@@ -125,11 +122,11 @@ import {
   resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
-import { buildVersionProjections } from "@typespec/versioning";
+import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
-import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2Document,
   OpenAPI2FormDataParameter,
@@ -147,89 +144,46 @@ import {
   OpenAPI2StatusCode,
   PrimitiveItems,
   Refable,
-} from "./types.js";
-import { AutorestEmitterContext, resolveOperationId } from "./utils.js";
+} from "./openapi2-document.js";
+import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 
 interface SchemaContext {
   readonly visibility: Visibility;
   readonly ignoreMetadataAnnotations: boolean;
 }
-const defaultOptions = {
-  "output-file":
-    "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
-  "new-line": "lf",
-  "include-x-typespec-name": "never",
-} as const;
 
-export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
-  const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
-  const armTypesDir = interpolatePath(
-    resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
-    {
-      "project-root": context.program.projectRoot,
-      "emitter-output-dir": context.emitterOutputDir,
-    }
-  );
-  const options: ResolvedAutorestEmitterOptions = {
-    outputFile: resolvedOptions["output-file"],
-    outputDir: context.emitterOutputDir,
-    azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
-    examplesDirectory: resolvedOptions["examples-directory"],
-    version: resolvedOptions["version"],
-    newLine: resolvedOptions["new-line"],
-    omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
-    includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
-    armTypesDir,
-    useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
-  };
-
-  const emitter = createOAPIEmitter(context.program, tcgcSdkContext, options);
-  await emitter.emitOpenAPI();
-}
-
-// TODO: When emitter options are available per emitter, add these to the interface
-interface EmitterDetails {
-  emitter: string;
-}
-
-function getEmitterDetails(program: Program): EmitterDetails[] {
-  return [{ emitter: "@azure-tools/typespec-autorest" }];
-}
-
-export interface ResolvedAutorestEmitterOptions {
-  outputDir: string;
-  outputFile: string;
-  examplesDirectory?: string;
-  version?: string;
-  azureResourceProviderFolder?: string;
-
-  /**
-   * Set the newline character for emitting files.
-   * @default lf
-   */
-  newLine?: "crlf" | "lf";
+/**
+ * Options to configure the behavior of the Autorest document emitter.
+ */
+export interface AutorestDocumentEmitterOptions {
+  readonly examplesDirectory?: string;
 
   /**
    * Omit unreachable types.
    * By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.
    */
-  omitUnreachableTypes?: boolean;
+  readonly omitUnreachableTypes?: boolean;
 
   /**
    * If the x-typespec-name extension should be included
    */
-  includeXTypeSpecName: "inline-only" | "never";
+  readonly includeXTypeSpecName: "inline-only" | "never";
 
   /**
    * Arm types dir
    */
-  armTypesDir: string;
+  readonly armTypesDir: string;
 
   /**
    * readOnly property schema behavior
    */
-  useReadOnlyStatusSchema?: boolean;
+  readonly useReadOnlyStatusSchema?: boolean;
+
+  /**
+   * Decide how to deal with the version enum when `omitUnreachableTypes` is not set.
+   * @default "omit"
+   */
+  readonly versionEnumStrategy?: "omit" | "include";
 }
 
 /**
@@ -274,136 +228,138 @@ interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
 }
 
-function createOAPIEmitter(
-  program: Program,
-  tcgcSdkContext: SdkContext,
-  options: ResolvedAutorestEmitterOptions
-) {
-  const tracer = getTracer(program);
-  tracer.trace("options", JSON.stringify(options, null, 2));
+export interface OperationExamples {
+  readonly operationId: string;
+  readonly examples: LoadedExample[];
+}
+
+export interface AutorestEmitterResult {
+  readonly document: OpenAPI2Document;
+  readonly operationExamples: OperationExamples[];
+}
+
+export async function getOpenAPIForService(
+  context: AutorestEmitterContext,
+  options: AutorestDocumentEmitterOptions
+): Promise<AutorestEmitterResult> {
+  const { program, service } = context;
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
       return !isService(program, ns);
     },
   };
-  let root: OpenAPI2Document;
-  let currentService: Service;
+  const info = resolveInfo(program, service.type);
+  const auth = processAuth(service.type);
+
+  const root: OpenAPI2Document = {
+    swagger: "2.0",
+    info: {
+      title: "(title)",
+      ...info,
+      version: context.version ?? info?.version ?? "0000-00-00",
+      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
+    },
+    schemes: ["https"],
+    ...resolveHost(program, service.type),
+    externalDocs: getExternalDocs(program, service.type),
+    produces: [], // Pre-initialize produces and consumes so that
+    consumes: [], // they show up at the top of the document
+    security: auth?.security,
+    securityDefinitions: auth?.securitySchemes ?? {},
+    tags: [],
+    paths: {},
+    "x-ms-paths": {},
+    definitions: {},
+    parameters: {},
+  };
+
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
   let currentProduces: Set<string>;
-  let metadataInfo: MetadataInfo;
+  const metadataInfo: MetadataInfo = createMetadataInfo(program, {
+    canonicalVisibility: Visibility.Read,
+    canShareProperty: canSharePropertyUsingReadonlyOrXMSMutability,
+  });
 
   // Keep a map of all Types+Visibility combinations that were encountered
   // that need schema definitions.
-  let pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
+  const pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
 
   // Reuse a single ref object per Type+Visibility combination.
-  let refs = new TwoLevelMap<Type, Visibility, Ref>();
+  const refs = new TwoLevelMap<Type, Visibility, Ref>();
 
   // Keep track of inline types still in the process of having their schema computed
   // This is used to detect cycles in inline types, which is an
-  let inProgressInlineTypes = new Set<Type>();
+  const inProgressInlineTypes = new Set<Type>();
 
   // Map model properties that represent shared parameters to their parameter
   // definition that will go in #/parameters. Inlined parameters do not go in
   // this map.
-  let params: Map<ModelProperty, OpenAPI2Parameter>;
+  const params: Map<ModelProperty, OpenAPI2Parameter> = new Map();
 
   // Keep track of models that have had properties spread into parameters. We won't
   // consider these unreferenced when emitting unreferenced types.
-  let paramModels: Set<Type>;
+  const paramModels: Set<Type> = new Set();
 
   // De-dupe the per-endpoint tags that will be added into the #/tags
-  let tags: Set<string>;
+  const tags: Set<string> = new Set();
 
   // The set of produces/consumes values found in all operations
   const globalProduces = new Set<string>(["application/json"]);
   const globalConsumes = new Set<string>(["application/json"]);
 
-  let operationExamplesMap: Map<string, { [title: string]: string }>;
-  let operationIdsWithExample: Set<string>;
-  let outputFile: string;
-  let context: AutorestEmitterContext;
+  const operationIdsWithExample = new Set<string>();
 
-  async function emitOpenAPI() {
-    const services = listServices(program);
-    if (services.length === 0) {
-      services.push({ type: program.getGlobalNamespaceType() });
-    }
-    for (const service of services) {
-      currentService = service;
-      const originalProgram = program;
-      const versions = buildVersionProjections(program, service.type).filter(
-        (v) => !options.version || options.version === v.version
-      );
-      for (const record of versions) {
-        let projectedProgram;
-        if (record.projections.length > 0) {
-          projectedProgram = program = projectProgram(originalProgram, record.projections);
+  const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
+  program.reportDiagnostics(diagnostics);
+
+  const services = ignoreDiagnostics(getAllHttpServices(program));
+  const routes = services[0].operations;
+  reportIfNoRoutes(program, routes);
+
+  routes.forEach(emitOperation);
+
+  emitParameters();
+  emitSchemas(service.type);
+  emitTags();
+
+  // Finalize global produces/consumes
+  if (globalProduces.size > 0) {
+    root.produces = [...globalProduces.values()];
+  } else {
+    delete root.produces;
+  }
+  if (globalConsumes.size > 0) {
+    root.consumes = [...globalConsumes.values()];
+  } else {
+    delete root.consumes;
+  }
+
+  // Clean up empty entries
+  if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
+    delete root["x-ms-paths"];
+  }
+  if (root.security && Object.keys(root.security).length === 0) {
+    delete root["security"];
+  }
+  if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
+    delete root["securityDefinitions"];
+  }
+
+  return {
+    document: root,
+    operationExamples: [...operationIdsWithExample]
+      .map((operationId) => {
+        const data = exampleMap.get(operationId);
+        if (data) {
+          return { operationId, examples: Object.values(data) };
+        } else {
+          return undefined;
         }
-        context = {
-          program,
-          service,
-          version: record.version,
-          getClientName,
-        };
-        const projectedServiceNs: Namespace = projectedProgram
-          ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
-          : service.type;
-        await emitOpenAPIFromVersion(
-          projectedServiceNs === program.getGlobalNamespaceType()
-            ? { type: program.getGlobalNamespaceType() }
-            : getService(program, projectedServiceNs)!,
-          services.length > 1,
-          record.version
-        );
-      }
-    }
-  }
-  return { emitOpenAPI };
-
-  function initializeEmitter(service: Service, multipleService: boolean, version?: string) {
-    const auth = processAuth(service.type);
-
-    const info = resolveInfo(program, service.type);
-    root = {
-      swagger: "2.0",
-      info: {
-        title: "(title)",
-        ...info,
-        version: version ?? info?.version ?? "0000-00-00",
-        "x-typespec-generated": getEmitterDetails(program),
-      },
-      schemes: ["https"],
-      ...resolveHost(program, service.type),
-      externalDocs: getExternalDocs(program, service.type),
-      produces: [], // Pre-initialize produces and consumes so that
-      consumes: [], // they show up at the top of the document
-      security: auth?.security,
-      securityDefinitions: auth?.securitySchemes ?? {},
-      tags: [],
-      paths: {},
-      "x-ms-paths": {},
-      definitions: {},
-      parameters: {},
-    };
-
-    pendingSchemas = new TwoLevelMap();
-    refs = new TwoLevelMap();
-    metadataInfo = createMetadataInfo(program, {
-      canonicalVisibility: Visibility.Read,
-      canShareProperty: canSharePropertyUsingReadonlyOrXMSMutability,
-    });
-    inProgressInlineTypes = new Set();
-    params = new Map();
-    paramModels = new Set();
-    tags = new Set();
-    operationExamplesMap = new Map();
-    operationIdsWithExample = new Set();
-
-    outputFile = resolveOutputFile(program, service, multipleService, options, version);
-  }
+      })
+      .filter((x) => x) as any,
+  };
 
   function resolveHost(
     program: Program,
@@ -469,92 +425,6 @@ function createOAPIEmitter(
         parameters,
       },
     };
-  }
-
-  async function emitOpenAPIFromVersion(
-    service: Service,
-    multipleService: boolean,
-    version?: string
-  ) {
-    initializeEmitter(service, multipleService, version);
-
-    try {
-      await loadExamples(version);
-      const services = ignoreDiagnostics(getAllHttpServices(program));
-      const routes = services[0].operations;
-      reportIfNoRoutes(program, routes);
-
-      routes.forEach(emitOperation);
-
-      emitParameters();
-      emitSchemas(service.type);
-      emitTags();
-
-      // Finalize global produces/consumes
-      if (globalProduces.size > 0) {
-        root.produces = [...globalProduces.values()];
-      } else {
-        delete root.produces;
-      }
-      if (globalConsumes.size > 0) {
-        root.consumes = [...globalConsumes.values()];
-      } else {
-        delete root.consumes;
-      }
-
-      // Clean up empty entries
-      if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
-        delete root["x-ms-paths"];
-      }
-      if (root.security && Object.keys(root.security).length === 0) {
-        delete root["security"];
-      }
-      if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
-        delete root["securityDefinitions"];
-      }
-
-      if (!program.compilerOptions.noEmit && !program.hasError()) {
-        // Sort the document
-        const sortedRoot = sortOpenAPIDocument(root);
-
-        // Write out the OpenAPI document to the output path
-        await emitFile(program, {
-          path: outputFile,
-          content: prettierOutput(JSON.stringify(sortedRoot, null, 2)),
-          newLine: options.newLine,
-        });
-
-        // Copy examples to the output directory
-        if (options.examplesDirectory && operationIdsWithExample.size > 0) {
-          const examplesPath = resolvePath(getDirectoryPath(outputFile), "examples");
-          const exampleDir = version
-            ? resolvePath(options.examplesDirectory, version)
-            : resolvePath(options.examplesDirectory);
-          await program.host.mkdirp(examplesPath);
-          for (const operationId of operationIdsWithExample) {
-            const examples = operationExamplesMap.get(operationId);
-            if (examples) {
-              for (const [_, fileName] of Object.entries(examples)) {
-                const content = await program.host.readFile(resolvePath(exampleDir, fileName));
-                await emitFile(program, {
-                  path: resolvePath(examplesPath, fileName),
-                  content: content.text,
-                  newLine: options.newLine,
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      if (err instanceof ErrorTypeFoundError) {
-        // Return early, there must be a parse error if an ErrorType was
-        // inserted into the TypeSpec output
-        return;
-      } else {
-        throw err;
-      }
-    }
   }
 
   function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
@@ -710,12 +580,12 @@ function createOAPIEmitter(
     }
 
     if (options.examplesDirectory) {
-      const examples = operationExamplesMap.get(currentEndpoint.operationId as string);
+      const examples = exampleMap.get(currentEndpoint.operationId);
       if (examples && currentEndpoint.operationId) {
         operationIdsWithExample.add(currentEndpoint.operationId);
         currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, fileName] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${fileName}` };
+        for (const [title, example] of Object.entries(examples)) {
+          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
         }
       }
     }
@@ -898,7 +768,7 @@ function createOAPIEmitter(
     return header;
   }
 
-  function resolveRef(ref: string) {
+  function expandRef(ref: string) {
     const absoluteRef = interpolatePath(ref, {
       "arm-types-dir": options.armTypesDir,
     });
@@ -906,15 +776,34 @@ function createOAPIEmitter(
     if (getRootLength(absoluteRef) === 0) {
       return absoluteRef; // It is already relative.
     }
-    return getRelativePathFromDirectory(getDirectoryPath(outputFile), absoluteRef, false);
+    return getRelativePathFromDirectory(getDirectoryPath(context.outputFile), absoluteRef, false);
   }
 
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
-    const refUrl = getRef(program, type, { version: context.version, service: context.service });
+  function resolveExternalRef(type: Type) {
+    const refUrl = getRef(program, type);
     if (refUrl) {
       return {
-        $ref: resolveRef(refUrl),
+        $ref: expandRef(refUrl),
       };
+    }
+
+    if (isArmCommonType(type) && (type.kind === "Model" || type.kind === "ModelProperty")) {
+      const ref = getArmCommonTypeOpenAPIRef(program, type, {
+        version: context.version,
+        service: context.service,
+      });
+      if (ref) {
+        return {
+          $ref: expandRef(ref),
+        };
+      }
+    }
+    return undefined;
+  }
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+    const ref = resolveExternalRef(type);
+    if (ref) {
+      return ref;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -1004,14 +893,9 @@ function createOAPIEmitter(
       }
     }
 
-    const refUrl = getRef(program, property, {
-      version: context.version,
-      service: context.service,
-    });
-    if (refUrl) {
-      return {
-        $ref: resolveRef(refUrl),
-      };
+    const ref = resolveExternalRef(property);
+    if (ref) {
+      return ref;
     }
 
     const parameter = params.get(property);
@@ -1037,12 +921,6 @@ function createOAPIEmitter(
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
     return encodedName === type.name ? viaProjection ?? type.name : encodedName;
-  }
-
-  function getClientName(type: Type & { name: string }): string {
-    const viaProjection = getProjectedName(program, type, "client");
-    const clientName = getClientNameOverride(tcgcSdkContext, type);
-    return clientName ?? viaProjection ?? type.name;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1225,8 +1103,8 @@ function createOAPIEmitter(
     if (param.name !== ph.name) {
       ph["x-ms-client-name"] = param.name;
     }
-    if (param.default) {
-      ph.default = getDefaultValue(param.default);
+    if (param.defaultValue) {
+      ph.default = getDefaultValue(param.defaultValue);
     }
 
     if (ph.in === "body") {
@@ -1349,7 +1227,12 @@ function createOAPIEmitter(
 
     function processUnreferencedSchemas() {
       const addSchema = (type: Type) => {
-        if (!processedSchemas.has(type) && !paramModels.has(type) && !shouldInline(program, type)) {
+        if (
+          !processedSchemas.has(type) &&
+          !paramModels.has(type) &&
+          !shouldInline(program, type) &&
+          !shouldOmitThisUnreachableType(type)
+        ) {
           getSchemaOrRef(type, { visibility: Visibility.Read, ignoreMetadataAnnotations: false });
         }
       };
@@ -1366,72 +1249,30 @@ function createOAPIEmitter(
       );
       processSchemas();
     }
+
+    function shouldOmitThisUnreachableType(type: Type): boolean {
+      if (
+        options.versionEnumStrategy !== "include" &&
+        type.kind === "Enum" &&
+        isVersionEnum(program, type)
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function isVersionEnum(program: Program, enumObj: Enum): boolean {
+      const [_, map] = getVersionsForEnum(program, enumObj);
+      if (map !== undefined && map.getVersions()[0].enumMember.enum === enumObj) {
+        return true;
+      }
+      return false;
+    }
   }
 
   function emitTags() {
     for (const tag of tags) {
       root.tags!.push({ name: tag });
-    }
-  }
-
-  async function loadExamples(version?: string) {
-    if (options.examplesDirectory) {
-      const exampleDir = version
-        ? resolvePath(options.examplesDirectory, version)
-        : resolvePath(options.examplesDirectory);
-      try {
-        if (!(await program.host.stat(exampleDir)).isDirectory()) return;
-      } catch (err) {
-        reportDiagnostic(program, {
-          code: "example-loading",
-          messageId: "noDirectory",
-          format: { directory: exampleDir },
-          target: NoTarget,
-        });
-        return;
-      }
-      const exampleFiles = await program.host.readDir(exampleDir);
-      for (const fileName of exampleFiles) {
-        try {
-          const exampleFile = await program.host.readFile(resolvePath(exampleDir, fileName));
-          const example = JSON.parse(exampleFile.text);
-          if (!example.operationId || !example.title) {
-            reportDiagnostic(program, {
-              code: "example-loading",
-              messageId: "noOperationId",
-              format: { filename: fileName },
-              target: NoTarget,
-            });
-            continue;
-          }
-
-          if (!operationExamplesMap.has(example.operationId)) {
-            operationExamplesMap.set(example.operationId, {});
-          }
-          const examples = operationExamplesMap.get(example.operationId)!;
-
-          if (example.title in examples) {
-            reportDiagnostic(program, {
-              code: "duplicate-example-file",
-              target: NoTarget,
-              format: {
-                filename: fileName,
-                operationId: example.operationId,
-                title: example.title,
-              },
-            });
-          }
-
-          examples[example.title] = fileName;
-        } catch (err) {
-          reportDiagnostic(program, {
-            code: "example-loading",
-            messageId: "default",
-            format: { filename: fileName, error: err?.toString() ?? "" },
-            target: NoTarget,
-          });
-        }
-      }
     }
   }
 
@@ -1622,33 +1463,25 @@ function createOAPIEmitter(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(type: Type): any {
-    switch (type.kind) {
-      case "String":
-        return type.value;
-      case "Number":
-        return type.value;
-      case "Boolean":
-        return type.value;
-      case "Tuple":
-        return type.values.map(getDefaultValue);
-      case "EnumMember":
-        return type.value ?? type.name;
-      case "Intrinsic":
-        return isNullType(type)
-          ? null
-          : reportDiagnostic(program, {
-              code: "invalid-default",
-              format: { type: type.kind },
-              target: type,
-            });
-      case "UnionVariant":
-        return getDefaultValue(type.type);
+  function getDefaultValue(defaultType: Value): any {
+    switch (defaultType.valueKind) {
+      case "StringValue":
+        return defaultType.value;
+      case "NumericValue":
+        return defaultType.value.asNumber() ?? undefined;
+      case "BooleanValue":
+        return defaultType.value;
+      case "ArrayValue":
+        return defaultType.values.map((x) => getDefaultValue(x));
+      case "NullValue":
+        return null;
+      case "EnumValue":
+        return defaultType.value.value ?? defaultType.value.name;
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
-          format: { type: type.kind },
-          target: type,
+          format: { type: defaultType.valueKind },
+          target: defaultType,
         });
     }
   }
@@ -1753,7 +1586,7 @@ function createOAPIEmitter(
       }
 
       const jsonName = getJsonName(prop);
-      const clientName = getClientName(prop);
+      const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
 
@@ -1785,8 +1618,8 @@ function createOAPIEmitter(
         property.description = description;
       }
 
-      if (prop.default && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.default);
+      if (prop.defaultValue && !("$ref" in property)) {
+        property.default = getDefaultValue(prop.defaultValue);
       }
 
       if (isReadonlyProperty(program, prop)) {
@@ -2008,7 +1841,7 @@ function createOAPIEmitter(
 
     if (
       typespecType.kind === "ModelProperty" &&
-      shouldFlattenProperty(tcgcSdkContext, typespecType)
+      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
     ) {
       newTarget["x-ms-client-flatten"] = true;
     }
@@ -2331,7 +2164,7 @@ function createOAPIEmitter(
         reportDiagnostic(program, {
           code: "unsupported-auth",
           format: { authType: (auth as any).type },
-          target: currentService.type,
+          target: service.type,
         });
         return undefined;
     }
@@ -2354,10 +2187,6 @@ function createOAPIEmitter(
   }
 }
 
-function prettierOutput(output: string) {
-  return output + "\n";
-}
-
 class ErrorTypeFoundError extends Error {
   constructor() {
     super("Error type found in evaluated TypeSpec output");
@@ -2375,31 +2204,88 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
-function resolveOutputFile(
-  program: Program,
-  service: Service,
-  multipleServices: boolean,
-  options: ResolvedAutorestEmitterOptions,
+interface LoadedExample {
+  readonly relativePath: string;
+  readonly file: SourceFile;
+  readonly data: any;
+}
+async function loadExamples(
+  host: CompilerHost,
+  options: AutorestDocumentEmitterOptions,
   version?: string
-): string {
-  const azureResourceProviderFolder = options.azureResourceProviderFolder;
-  if (azureResourceProviderFolder) {
-    const info = resolveInfo(program, service.type);
-    version = version ?? info?.version ?? "0000-00-00";
+): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
+  const diagnostics = createDiagnosticCollector();
+  if (!options.examplesDirectory) {
+    return diagnostics.wrap(new Map());
   }
-  const interpolated = interpolatePath(options.outputFile, {
-    "azure-resource-provider-folder": azureResourceProviderFolder,
-    "service-name":
-      multipleServices || azureResourceProviderFolder
-        ? getNamespaceFullName(service.type)
-        : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
-    version,
-  });
+  const exampleDir = version
+    ? resolvePath(options.examplesDirectory, version)
+    : resolvePath(options.examplesDirectory);
+  try {
+    if (!(await host.stat(exampleDir)).isDirectory()) return diagnostics.wrap(new Map());
+  } catch (err) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "example-loading",
+        messageId: "noDirectory",
+        format: { directory: exampleDir },
+        target: NoTarget,
+      })
+    );
+    return diagnostics.wrap(new Map());
+  }
+  const map = new Map<string, Record<string, LoadedExample>>();
+  const exampleFiles = await host.readDir(exampleDir);
+  for (const fileName of exampleFiles) {
+    try {
+      const exampleFile = await host.readFile(resolvePath(exampleDir, fileName));
+      const example = JSON.parse(exampleFile.text);
+      if (!example.operationId || !example.title) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "example-loading",
+            messageId: "noOperationId",
+            format: { filename: fileName },
+            target: NoTarget,
+          })
+        );
+        continue;
+      }
 
-  return resolvePath(options.outputDir, interpolated);
+      if (!map.has(example.operationId)) {
+        map.set(example.operationId, {});
+      }
+      const examples = map.get(example.operationId)!;
+
+      if (example.title in examples) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "duplicate-example-file",
+            target: NoTarget,
+            format: {
+              filename: fileName,
+              operationId: example.operationId,
+              title: example.title,
+            },
+          })
+        );
+      }
+
+      examples[example.title] = {
+        relativePath: fileName,
+        file: exampleFile,
+        data: example,
+      };
+    } catch (err) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "default",
+          format: { filename: fileName, error: err?.toString() ?? "" },
+          target: NoTarget,
+        })
+      );
+    }
+  }
+  return diagnostics.wrap(map);
 }

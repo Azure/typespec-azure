@@ -169,7 +169,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -209,7 +209,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -275,7 +275,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -324,7 +324,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -364,7 +364,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -406,7 +406,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -463,7 +463,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -517,7 +517,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -556,7 +556,7 @@
           {
             "name": "employeeName",
             "in": "path",
-            "description": "Name of employee",
+            "description": "The name of the Employee",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -734,24 +734,6 @@
         ]
       },
       "readOnly": true
-    },
-    "Versions": {
-      "type": "string",
-      "description": "Contoso API versions",
-      "enum": [
-        "2021-10-01-preview"
-      ],
-      "x-ms-enum": {
-        "name": "Versions",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "2021-10-01-preview",
-            "value": "2021-10-01-preview",
-            "description": "2021-10-01-preview version"
-          }
-        ]
-      }
     }
   },
   "parameters": {}

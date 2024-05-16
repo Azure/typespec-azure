@@ -14,6 +14,7 @@ title: "[I] SdkModelType"
 | `__raw?` | `Type` | - | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
 | `access?` | [`AccessFlags`](../type-aliases/AccessFlags.md) | - | - | - |
 | `additionalProperties?` | [`SdkType`](../type-aliases/SdkType.md) | - | - | - |
+| `additionalPropertiesNullable?` | `boolean` | - | - | - |
 | `apiVersions` | `string`[] | - | - | - |
 | `baseModel?` | [`SdkModelType`](SdkModelType.md) | - | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - | - |

@@ -1,4 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { SdkTestLibrary as TcgcTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
 import { Diagnostic } from "@typespec/compiler";
 import {
@@ -14,8 +15,8 @@ import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { ok } from "assert";
 import { AutorestEmitterOptions } from "../src/lib.js";
+import { OpenAPI2Document } from "../src/openapi2-document.js";
 import { AutorestTestLibrary } from "../src/testing/index.js";
-import { OpenAPI2Document } from "../src/types.js";
 
 export async function createAutorestTestHost() {
   return createTestHost({
@@ -26,6 +27,7 @@ export async function createAutorestTestHost() {
       AutorestTestLibrary,
       VersioningTestLibrary,
       AzureCoreTestLibrary,
+      AzureResourceManagerTestLibrary,
       TcgcTestLibrary,
     ],
   });
@@ -44,6 +46,7 @@ export async function createAutorestTestRunner(
       "TypeSpec.OpenAPI",
       "Autorest",
       "Azure.Core",
+      "Azure.ResourceManager",
       "Azure.ClientGenerator.Core",
     ],
     compilerOptions: {
