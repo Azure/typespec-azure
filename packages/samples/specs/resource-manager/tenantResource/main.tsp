@@ -32,9 +32,9 @@ model Building is TrackedResource<BuildingProperties> {
   @TypeSpec.Http.path
   name: string;
 
-  ...ManagedServiceIdentity;
-  ...ResourceSku;
-  ...ManagedBy;
+  ...ManagedServiceIdentityProperty;
+  ...ResourceSkuProperty;
+  ...ManagedByProperty;
 }
 
 @doc("The rp-specific building properties")

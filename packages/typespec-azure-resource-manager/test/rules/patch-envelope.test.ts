@@ -53,10 +53,10 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
-        ...ManagedBy;
-        ...ResourceSku;
-        ...ResourcePlan;
+        ...ManagedServiceIdentityProperty;
+        ...ManagedByProperty;
+        ...ResourceSkuProperty;
+        ...ResourcePlanProperty;
       }
 
       @doc("Patch model")
@@ -122,10 +122,10 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
-        ...ManagedBy;
-        ...ResourceSku;
-        ...ResourcePlan;
+        ...ManagedServiceIdentityProperty;
+        ...ManagedByProperty;
+        ...ResourceSkuProperty;
+        ...ResourcePlanProperty;
       }
 
       @doc("Patch model")

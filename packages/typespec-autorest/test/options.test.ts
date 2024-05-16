@@ -225,6 +225,41 @@ op test(): void;
     });
   });
 
+  describe("version-enum-strategy", () => {
+    const code = `
+      @service
+      @versioned(Versions)
+      namespace My {
+        enum Versions {v1, v2}
+        model NotReferenced {}
+      }
+    `;
+    it("doesn't include version enum by default", async () => {
+      const output = await openapiWithOptions(code, {});
+      deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced"]);
+    });
+
+    it("include version enum when set to 'include'", async () => {
+      const output = await openapiWithOptions(code, {
+        "version-enum-strategy": "include",
+      });
+      deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced", "Versions"]);
+    });
+
+    it("doesn't omit other enums", async () => {
+      const output = await openapiWithOptions(
+        `@service
+        @versioned(Versions)
+        namespace My {
+          enum Versions {v1, v2}
+          enum NotReferenced {a, b}
+        }`,
+        {}
+      );
+      deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced"]);
+    });
+  });
+
   describe("include-x-typespec-name", () => {
     it("doesn't include x-typespec-name by default", async () => {
       const output = await openapiWithOptions(

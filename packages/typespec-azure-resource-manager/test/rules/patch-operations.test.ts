@@ -49,7 +49,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
       }
 
       #suppress "@azure-tools/typespec-azure-resource-manager/patch-envelope" "Testing"
@@ -102,8 +102,6 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     @armProviderNamespace
     namespace Microsoft.Foo;
 
-      using Azure.ResourceManager.Foundations;
-
       @doc(".")
       enum Versions {
         @doc(".")
@@ -124,14 +122,15 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
+        ...ManagedServiceIdentityProperty;
       }
 
       #suppress "@azure-tools/typespec-azure-resource-manager/patch-envelope" "Testing"
       @doc("A bad patch")
       model MyBadPatch {
-        ...ManagedServiceIdentity;
-        ...ArmTagsProperty;
+        ...ManagedServiceIdentityProperty;
+        ...Foundations.ArmTagsProperty;
+
         @doc("Blah?")
         blah?: string;
         @doc("Blahdeeblah?")
@@ -187,10 +186,10 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         @segment("foo")
         @path
         name: string;
-        ...ManagedServiceIdentity;
-        ...ManagedBy;
-        ...ResourceSku;
-        ...ResourcePlan;
+        ...ManagedServiceIdentityProperty;
+        ...ManagedByProperty;
+        ...ResourceSkuProperty;
+        ...ResourcePlanProperty;
       }
 
       @doc("Patch model")

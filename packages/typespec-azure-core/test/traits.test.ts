@@ -309,7 +309,7 @@ describe("typespec-azure-core: service traits", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "unassignable",
+        code: "invalid-argument",
       });
     });
   });
@@ -342,7 +342,7 @@ describe("typespec-azure-core: service traits", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "unassignable",
+        code: "invalid-argument",
       });
     });
   });

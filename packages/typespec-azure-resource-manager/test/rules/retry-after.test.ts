@@ -24,6 +24,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
     await tester
       .expect(
         `
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
         @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
         @armProviderNamespace
         namespace Microsoft.Foo;

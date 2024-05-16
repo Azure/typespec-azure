@@ -7,6 +7,7 @@ title: "[I] AutorestCanonicalEmitterOptions"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
+| `arm-types-dir?` | `string` | Path to the common-types.json file folder.<br /><br />**Default**<br />` "${project-root}/../../common-types/resource-management" ` |
 | `azure-resource-provider-folder?` | `string` | - |
 | `include-x-typespec-name?` | `"never"` \| `"inline-only"` | If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.<br />This extension is meant for debugging and should not be depended on.<br /><br />**Default**<br />` "never" ` |
 | `new-line?` | `"lf"` \| `"crlf"` | Set the newline character for emitting files.<br /><br />**Default**<br />` lf ` |

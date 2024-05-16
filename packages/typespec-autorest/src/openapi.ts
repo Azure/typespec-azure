@@ -8,6 +8,10 @@ import {
   getPagedResult,
   getUnionAsEnum,
 } from "@azure-tools/typespec-azure-core";
+import {
+  getArmCommonTypeOpenAPIRef,
+  isArmCommonType,
+} from "@azure-tools/typespec-azure-resource-manager";
 import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
@@ -35,6 +39,7 @@ import {
   TypeNameOptions,
   Union,
   UnionVariant,
+  Value,
   compilerAssert,
   createDiagnosticCollector,
   getAllTags,
@@ -116,6 +121,7 @@ import {
   resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
+import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -171,6 +177,12 @@ export interface AutorestDocumentEmitterOptions {
    * readOnly property schema behavior
    */
   readonly useReadOnlyStatusSchema?: boolean;
+
+  /**
+   * Decide how to deal with the version enum when `omitUnreachableTypes` is not set.
+   * @default "omit"
+   */
+  readonly versionEnumStrategy?: "omit" | "include";
 }
 
 /**
@@ -755,7 +767,7 @@ export async function getOpenAPIForService(
     return header;
   }
 
-  function resolveRef(ref: string) {
+  function expandRef(ref: string) {
     const absoluteRef = interpolatePath(ref, {
       "arm-types-dir": options.armTypesDir,
     });
@@ -766,12 +778,31 @@ export async function getOpenAPIForService(
     return getRelativePathFromDirectory(getDirectoryPath(context.outputFile), absoluteRef, false);
   }
 
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
-    const refUrl = getRef(program, type, { version: context.version, service: context.service });
+  function resolveExternalRef(type: Type) {
+    const refUrl = getRef(program, type);
     if (refUrl) {
       return {
-        $ref: resolveRef(refUrl),
+        $ref: expandRef(refUrl),
       };
+    }
+
+    if (isArmCommonType(type) && (type.kind === "Model" || type.kind === "ModelProperty")) {
+      const ref = getArmCommonTypeOpenAPIRef(program, type, {
+        version: context.version,
+        service: context.service,
+      });
+      if (ref) {
+        return {
+          $ref: expandRef(ref),
+        };
+      }
+    }
+    return undefined;
+  }
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+    const ref = resolveExternalRef(type);
+    if (ref) {
+      return ref;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -861,14 +892,9 @@ export async function getOpenAPIForService(
       }
     }
 
-    const refUrl = getRef(program, property, {
-      version: context.version,
-      service: context.service,
-    });
-    if (refUrl) {
-      return {
-        $ref: resolveRef(refUrl),
-      };
+    const ref = resolveExternalRef(property);
+    if (ref) {
+      return ref;
     }
 
     const parameter = params.get(property);
@@ -1076,8 +1102,8 @@ export async function getOpenAPIForService(
     if (param.name !== ph.name) {
       ph["x-ms-client-name"] = param.name;
     }
-    if (param.default) {
-      ph.default = getDefaultValue(param.default);
+    if (param.defaultValue) {
+      ph.default = getDefaultValue(param.defaultValue);
     }
 
     if (ph.in === "body") {
@@ -1200,7 +1226,12 @@ export async function getOpenAPIForService(
 
     function processUnreferencedSchemas() {
       const addSchema = (type: Type) => {
-        if (!processedSchemas.has(type) && !paramModels.has(type) && !shouldInline(program, type)) {
+        if (
+          !processedSchemas.has(type) &&
+          !paramModels.has(type) &&
+          !shouldInline(program, type) &&
+          !shouldOmitThisUnreachableType(type)
+        ) {
           getSchemaOrRef(type, { visibility: Visibility.Read, ignoreMetadataAnnotations: false });
         }
       };
@@ -1216,6 +1247,25 @@ export async function getOpenAPIForService(
         { skipSubNamespaces }
       );
       processSchemas();
+    }
+
+    function shouldOmitThisUnreachableType(type: Type): boolean {
+      if (
+        options.versionEnumStrategy !== "include" &&
+        type.kind === "Enum" &&
+        isVersionEnum(program, type)
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function isVersionEnum(program: Program, enumObj: Enum): boolean {
+      const [_, map] = getVersionsForEnum(program, enumObj);
+      if (map !== undefined && map.getVersions()[0].enumMember.enum === enumObj) {
+        return true;
+      }
+      return false;
     }
   }
 
@@ -1412,33 +1462,25 @@ export async function getOpenAPIForService(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(type: Type): any {
-    switch (type.kind) {
-      case "String":
-        return type.value;
-      case "Number":
-        return type.value;
-      case "Boolean":
-        return type.value;
-      case "Tuple":
-        return type.values.map(getDefaultValue);
-      case "EnumMember":
-        return type.value ?? type.name;
-      case "Intrinsic":
-        return isNullType(type)
-          ? null
-          : reportDiagnostic(program, {
-              code: "invalid-default",
-              format: { type: type.kind },
-              target: type,
-            });
-      case "UnionVariant":
-        return getDefaultValue(type.type);
+  function getDefaultValue(defaultType: Value): any {
+    switch (defaultType.valueKind) {
+      case "StringValue":
+        return defaultType.value;
+      case "NumericValue":
+        return defaultType.value.asNumber() ?? undefined;
+      case "BooleanValue":
+        return defaultType.value;
+      case "ArrayValue":
+        return defaultType.values.map((x) => getDefaultValue(x));
+      case "NullValue":
+        return null;
+      case "EnumValue":
+        return defaultType.value.value ?? defaultType.value.name;
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
-          format: { type: type.kind },
-          target: type,
+          format: { type: defaultType.valueKind },
+          target: defaultType,
         });
     }
   }
@@ -1575,8 +1617,8 @@ export async function getOpenAPIForService(
         property.description = description;
       }
 
-      if (prop.default && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.default);
+      if (prop.defaultValue && !("$ref" in property)) {
+        property.default = getDefaultValue(prop.defaultValue);
       }
 
       if (isReadonlyProperty(program, prop)) {

@@ -4,7 +4,7 @@ title: "[F] getCrossLanguageDefinitionId"
 
 ---
 ```ts
-getCrossLanguageDefinitionId(type): string
+getCrossLanguageDefinitionId(type, name?): string
 ```
 
 Helper function to return cross language definition id for a type
@@ -15,9 +15,10 @@ Helper function to return cross language definition id for a type
 | :------ | :------ | :------ |
 | `type` | `Object` |  |
 | `type.interface`? | `Interface` | - |
-| `type.kind` | `string` | - |
-| `type.name` | `string` | - |
+| `type.kind`? | `string` | - |
+| `type.name`? | `string` | - |
 | `type.namespace`? | `Namespace` | - |
+| `name`? | `string` | - |
 
 ## Returns
 

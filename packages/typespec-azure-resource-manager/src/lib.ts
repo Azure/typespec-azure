@@ -94,6 +94,12 @@ export const $lib = createTypeSpecLibrary({
         default: "Resource types must have a property with '@path` and '@segment' decorators.",
       },
     },
+    "template-type-constraint-no-met": {
+      severity: "error",
+      messages: {
+        default: paramMessage`The template parameter "${"sourceType"}" for "${"entity"}" does not extend the constraint type "${"constraintType"}". ${"actionMessage"}`,
+      },
+    },
   },
 });
 
