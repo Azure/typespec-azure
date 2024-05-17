@@ -70,7 +70,7 @@ union ProvisioningState {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-#suppress "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation" "Singelton resource"
+#suppress "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation" "Singelton resource https://github.com/Azure/azure-rest-api-specs/issues/29144"
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;

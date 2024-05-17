@@ -82,7 +82,7 @@ interface Employees {
   actionSync is ArmResourceActionSync<Employee, void, void>;
 
   /** Sample async action with no request body */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes" "FIXME: Should response allow 204?"
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes" "https://github.com/Azure/azure-rest-api-specs/issues/29145"
   actionAsync is ArmResourceActionAsync<Employee, void, void>;
 
   /** Sample sync action with no request body and response */
