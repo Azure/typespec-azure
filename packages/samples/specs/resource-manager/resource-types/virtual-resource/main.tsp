@@ -36,11 +36,11 @@ enum Versions {
 @armVirtualResource
 model Division {
   /** The identifier of the division */
+  #suppress "@azure-tools/typespec-azure-core/key-visibility-required" "Virtual"
   @path
   @minLength(1)
   @segment("divisions")
   @key
-  @visibility("read")
   divisionId: string;
 }
 
@@ -49,11 +49,11 @@ model Division {
 @armVirtualResource
 model Group {
   /** The identifier of the group */
+  #suppress "@azure-tools/typespec-azure-core/key-visibility-required" "Virtual"
   @path
   @minLength(1)
   @segment("groups")
   @key
-  @visibility("read")
   groupId: string;
 }
 
