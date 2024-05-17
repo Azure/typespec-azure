@@ -42,7 +42,7 @@
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@azure-tools/typespec-azure-spec-rulesets": "workspace:~",
+    "@azure-tools/typespec-azure-specs-rulesets": "workspace:~",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/openapi": "workspace:~",
