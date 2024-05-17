@@ -880,6 +880,35 @@ describe("typespec-client-generator-core: public-utils", () => {
       const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
       ok(model);
     });
+
+    it("template without @friendlyName renaming for union as enum", async () => {
+      await runner.compileWithBuiltInService(`
+      union DependencyOfOrigins {
+        serviceExplicitlyCreated: "ServiceExplicitlyCreated",
+        userExplicitlyCreated: "UserExplicitlyCreated",
+        string,
+      }
+
+      model DependencyOfRelationshipProperties
+        is BaseRelationshipProperties<DependencyOfOrigins>;
+
+      model BaseRelationshipProperties<TOrigin> {
+        originInformation: RelationshipOriginInformation<TOrigin>;
+      }
+
+      model RelationshipOriginInformation<TOrigin = string> {
+        relationshipOriginType: TOrigin;
+      }
+
+      op test(): DependencyOfRelationshipProperties;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      const model = models.filter(
+        (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins"
+      )[0];
+      ok(model);
+    });
   });
 
   describe("getGeneratedName", () => {

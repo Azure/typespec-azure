@@ -28,7 +28,6 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
-  isType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -425,6 +424,14 @@ function addDiscriminatorToModelType(
   const discriminator = getDiscriminator(context.program, type);
   const diagnostics = createDiagnosticCollector();
   if (discriminator) {
+    let discriminatorType: SdkType | undefined = undefined;
+    for (let i = 0; i < model.properties.length; i++) {
+      const property = model.properties[i];
+      if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
+        discriminatorType = property.type;
+      }
+    }
+
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
       const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
@@ -451,12 +458,20 @@ function addDiscriminatorToModelType(
                 })
               );
             } else {
-              childModelSdkType.discriminatorValue = property.type.value;
+              // map string value type to enum value type
+              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+                for (const value of discriminatorType.values) {
+                  if (value.value === property.type.value) {
+                    property.type = value;
+                  }
+                }
+              }
+              childModelSdkType.discriminatorValue = property.type.value as string;
               property.discriminator = true;
               if (model.discriminatedSubtypes === undefined) {
                 model.discriminatedSubtypes = {};
               }
-              model.discriminatedSubtypes[property.type.value] = childModelSdkType;
+              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
               discriminatorProperty = property;
             }
           }
@@ -471,7 +486,7 @@ function addDiscriminatorToModelType(
         return diagnostics.wrap(undefined);
       }
     }
-    let discriminatorType: SdkType;
+
     if (discriminatorProperty) {
       if (discriminatorProperty.type.kind === "constant") {
         discriminatorType = { ...discriminatorProperty.type.valueType };
@@ -1147,7 +1162,7 @@ function checkAndGetClientType(
     if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
       if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
         effectivePayloadType.templateMapper.args
-          .filter(isType)
+          .filter((arg): arg is Type => "kind" in arg)
           .filter((arg) => arg.kind === "Model" && arg.name)
           .forEach((arg) => {
             retval.push(...diagnostics.pipe(checkAndGetClientType(context, arg, operation)));
@@ -1303,22 +1318,24 @@ function updateTypesFromOperation(
   }
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData && generateConvenient) {
-    const logicalResults = diagnostics.pipe(
-      checkAndGetClientType(context, lroMetaData.logicalResult, operation)
-    );
-    logicalResults.forEach((logicalResult) => {
-      updateUsageOfModel(context, UsageFlags.Output, logicalResult);
-    });
-
-    if (!context.arm) {
-      // TODO: currently skipping adding of envelopeResult due to arm error
-      // https://github.com/Azure/typespec-azure/issues/311
-      const envelopeResults = diagnostics.pipe(
-        checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+    if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
+      const finalResults = diagnostics.pipe(
+        checkAndGetClientType(context, lroMetaData.finalResult, operation)
       );
-      envelopeResults.forEach((envelopeResult) => {
-        updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+      finalResults.forEach((finalResult) => {
+        updateUsageOfModel(context, UsageFlags.Output, finalResult);
       });
+
+      if (!context.arm) {
+        // TODO: currently skipping adding of envelopeResult due to arm error
+        // https://github.com/Azure/typespec-azure/issues/311
+        const envelopeResults = diagnostics.pipe(
+          checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+        );
+        envelopeResults.forEach((envelopeResult) => {
+          updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+        });
+      }
     }
   }
   return diagnostics.wrap(undefined);
