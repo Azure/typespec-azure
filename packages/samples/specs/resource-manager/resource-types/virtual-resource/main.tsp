@@ -40,6 +40,7 @@ model Division {
   @minLength(1)
   @segment("divisions")
   @key
+  @visibility("read")
   divisionId: string;
 }
 
@@ -52,6 +53,7 @@ model Group {
   @minLength(1)
   @segment("groups")
   @key
+  @visibility("read")
   groupId: string;
 }
 

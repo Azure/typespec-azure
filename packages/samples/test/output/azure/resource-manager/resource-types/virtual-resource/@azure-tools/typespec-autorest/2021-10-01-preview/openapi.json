@@ -524,7 +524,8 @@
         "divisionId": {
           "type": "string",
           "description": "The identifier of the division",
-          "minLength": 1
+          "minLength": 1,
+          "readOnly": true
         }
       },
       "required": [
@@ -641,7 +642,8 @@
         "groupId": {
           "type": "string",
           "description": "The identifier of the group",
-          "minLength": 1
+          "minLength": 1,
+          "readOnly": true
         }
       },
       "required": [

@@ -122,4 +122,8 @@ model DependentProperties {
 
   /** Gender of dependent */
   gender: string;
+
+  /** The status of the last operation. */
+  @visibility("read")
+  provisioningState?: ProvisioningState;
 }

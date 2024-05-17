@@ -70,6 +70,7 @@ union ProvisioningState {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
+#suppress "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation" "Singelton resource"
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
