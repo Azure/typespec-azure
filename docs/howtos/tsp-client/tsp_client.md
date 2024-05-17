@@ -27,7 +27,9 @@ Initialize the client library directory using a tspconfig.yaml. When running thi
 
 The `init` command generates a directory structure following the standard pattern used across Azure SDK language repositories, creates a [tsp-location.yaml](#tsp-locationyaml) file to control generation, and performs an initial generation of the client library. If you want to skip client library generation, then pass the `--skip-sync-and-generate` flag.
 
-> IMPORTANT: This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`.
+:::warning
+This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`
+:::
 
 Example:
 
@@ -109,7 +111,9 @@ Each project will need to have a configuration file called tsp-location.yaml tha
 
 This file is created through the `tsp-client init` command or you can manually create it under the project directory to run other commands supported by this tool.
 
-> NOTE: This file should live under the project directory for each service.
+:::info
+This file should live under the project directory for each service.
+:::
 
 The file has the following properties:
 
@@ -170,7 +174,9 @@ Example:
 }
 ```
 
-> NOTE: tsp compile currently requires the "main" line to be there.
+:::note
+tsp compile currently requires the "main" line to be there.
+:::
 
 This file replaces the package.json checked into the `azure-rest-api-spec` repository.
 
@@ -179,4 +185,6 @@ This file replaces the package.json checked into the `azure-rest-api-spec` repos
 `emitter-package-lock.json` will be used the same as a `package-lock.json`. The tool will run a clean npm installation before generating client libraries. This file allows consistent dependency trees and allows each repository to control their dependency installation.
 The file should be checked into this location: `<root of repo>/eng/emitter-package-lock.json`
 
-> NOTE: The tool will run `npm ci` to install dependencies, so ensure that the `emitter-package-lock.json` and `emitter-package.json` files both exist and are in sync with each other.
+:::warning
+The tool will run `npm ci` to install dependencies, so ensure that the `emitter-package-lock.json` and `emitter-package.json` files both exist and are in sync with each other.
+:::
