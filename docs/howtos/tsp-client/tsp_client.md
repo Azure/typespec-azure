@@ -27,7 +27,7 @@ Initialize the client library directory using a tspconfig.yaml. When running thi
 
 The `init` command generates a directory structure following the standard pattern used across Azure SDK language repositories, creates a [tsp-location.yaml](#tsp-locationyaml) file to control generation, and performs an initial generation of the client library. If you want to skip client library generation, then pass the `--skip-sync-and-generate` flag.
 
-> IMPORTANT: This command should be run from the root of the repository.
+> IMPORTANT: This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`.
 
 Example:
 
@@ -37,7 +37,7 @@ azure-sdk-for-python> tsp-client init -c https://github.com/Azure/azure-rest-api
 
 ### update
 
-Sync and generate client libraries from a TypeSpec project. The `update` command will look for a [tsp-location.yaml](#tsp-locationyaml) file in your current directory to sync a TypeSpec project and generate a client library.
+The `update` command will look for a [tsp-location.yaml](#tsp-locationyaml) file in your current directory to sync a TypeSpec project and generate a client library. The update flow calls the `sync` and `generate` commands internally, so if you need to separate these steps, use the `sync` and `generate` commands separately instead.
 
 Example:
 
