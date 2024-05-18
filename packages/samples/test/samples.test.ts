@@ -27,7 +27,7 @@ describe("TypeSpec Samples (With autorest emitter)", () => {
 });
 
 describe("TypeSpec Azure Samples", () => {
-  describe("openapi3 emitter", () => {
+  describe("Data plane", () => {
     defineSampleSnaphotTests({
       sampleDir: azureSamplesPath,
       outputDir: resolvePath(rootOutputDir, "azure/core"),

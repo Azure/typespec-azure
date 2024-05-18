@@ -4,5 +4,3 @@ emit:
 linter:
   extends:
     - "@azure-tools/typespec-azure-specs-rulesets/data-plane"
-  enable:
-    "@azure-tools/typespec-azure-core/no-enum": true
