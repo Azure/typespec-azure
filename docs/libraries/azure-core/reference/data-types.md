@@ -984,7 +984,7 @@ model Azure.Core.Foundations.RetryAfterHeader
 Enum describing allowed operation states.
 
 ```typespec
-enum Azure.Core.Foundations.OperationState
+union Azure.Core.Foundations.OperationState
 ```
 
 ## Azure.Core.Traits
