@@ -216,7 +216,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -269,7 +269,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -394,7 +394,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -609,7 +609,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -791,7 +791,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1056,7 +1056,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1127,7 +1127,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1205,7 +1205,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1412,15 +1412,6 @@ components:
             - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
           description: Inner error.
       description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
-    Azure.Core.Foundations.OperationState:
-      type: string
-      enum:
-        - NotStarted
-        - Running
-        - Succeeded
-        - Failed
-        - Canceled
-      description: Enum describing allowed operation states.
     Azure.Core.eTag:
       type: string
       format: eTag
@@ -1457,6 +1448,17 @@ components:
           description: The entity tag for this resource.
           readOnly: true
       description: A manufacturer of widgets.
+    OperationState:
+      anyOf:
+        - type: string
+          enum:
+            - NotStarted
+            - Running
+            - Succeeded
+            - Failed
+            - Canceled
+        - type: string
+      description: Enum describing allowed operation states.
     PagedManufacturer:
       type: object
       required:
