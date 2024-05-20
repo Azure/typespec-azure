@@ -26,6 +26,7 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
@@ -343,7 +344,7 @@ export function createTCGCContext(program: Program): TCGCContext {
   };
 }
 
-function getNonNullOptions(type: Union): Type[] {
+export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
@@ -436,4 +437,12 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
 
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
+}
+
+export function getAnyType(): SdkBuiltInType {
+  return {
+    kind: "any",
+    encode: "string",
+    nullable: true, // any is nullable
+  };
 }

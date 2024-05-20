@@ -35,14 +35,17 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkType } from "./interfaces.js";
+import { SdkType, SdkUnionType } from "./interfaces.js";
 import {
   TCGCContext,
   TspLiteralType,
+  getAnyType,
   getClientNamespaceStringHelper,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { getSdkUnionEnum } from "./types.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -623,4 +626,31 @@ export function isNullable(type: SdkType): boolean {
     }
   }
   return nullCount > 0 && nonNullCount > 0;
+}
+
+/**
+ * Since we don't remove null types from the values of a union type, this helper function helps return the type without null unioned in.
+ * @param type 
+ */
+export function removeNullFromUnionType(context: TCGCContext, type: SdkUnionType): [SdkType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const nonNullValues = type.values.filter((value) => value.kind !== "null");
+  if (nonNullValues.length === 0) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "union-null",
+        target: type.__raw!,
+      })
+    );
+    return diagnostics.wrap(getAnyType());
+  }
+  if (nonNullValues.length === 1) {
+    return diagnostics.wrap(nonNullValues[0]);
+  }
+  // const raw = type.__raw;
+  // if (raw?.kind === "Union" && getUnionAsEnum(raw)) {
+  //   const unionEnum = ignoreDiagnostics(getUnionAsEnum(raw));
+  //   if (unionEnum) return diagnostics.wrap(getSdkUnionEnum(context, unionEnum))
+  // }
+  return diagnostics.wrap({ ...type, values: type.values.filter((value) => value.kind !== "null") });
 }

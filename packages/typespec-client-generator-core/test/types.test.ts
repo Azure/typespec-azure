@@ -1,18 +1,19 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Model, Union } from "@typespec/compiler";
+import { Enum, Model, Union, ignoreDiagnostics } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   SdkArrayType,
   SdkBodyModelPropertyType,
+  SdkBuiltInType,
   SdkEnumType,
   SdkModelType,
   SdkType,
   SdkUnionType,
   UsageFlags,
 } from "../src/interfaces.js";
-import { isErrorOrChildOfError } from "../src/public-utils.js";
+import { isErrorOrChildOfError, isNullable, removeNullFromUnionType } from "../src/public-utils.js";
 import {
   getAllModels,
   getAllModelsWithDiagnostics,
@@ -477,16 +478,24 @@ describe("typespec-client-generator-core: types", () => {
         }
       `
       );
-      const sdkType = getSdkTypeHelper(runner);
+      const sdkTypeWithNull = getSdkTypeHelper(runner);
+      strictEqual(sdkTypeWithNull.kind, "union");
+      strictEqual(sdkTypeWithNull.values.length, 2);
+      strictEqual(sdkTypeWithNull.values[0].kind, "utcDateTime");
+      strictEqual(sdkTypeWithNull.values[1].kind, "null");
+      const sdkType = ignoreDiagnostics(removeNullFromUnionType(runner.context, sdkTypeWithNull));
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
+      strictEqual(isNullable(sdkType), true);
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
+      strictEqual(isNullable(sdkType.wireType), true);
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, true);
+      strictEqual(isNullable(nameProp.type), true);
     });
 
     it("unixTimestamp array", async function () {
@@ -543,10 +552,16 @@ describe("typespec-client-generator-core: types", () => {
       `);
 
       const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "float32");
+      strictEqual(sdkType.kind, "union");
+      strictEqual(sdkType.values.length, 2);
+      strictEqual(sdkType.values[0].kind, "float32");
+      strictEqual(sdkType.values[1].kind, "null");
+      strictEqual(isNullable(sdkType), true);
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, sdkType)).kind, "float32");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(isNullable(nameProp.type), true);
       strictEqual(nameProp.nullable, true);
     });
 
@@ -561,12 +576,21 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "union");
-      strictEqual(sdkType.values.length, 2);
+      strictEqual(sdkType.values.length, 3);
       strictEqual(sdkType.values[0].kind, "string");
       strictEqual(sdkType.values[1].kind, "float32");
+      strictEqual(sdkType.values[2].kind, "null");
+      strictEqual(isNullable(sdkType), true);
+      
+      const sdkTypeWithoutNull = ignoreDiagnostics(removeNullFromUnionType(runner.context, sdkType));
+      strictEqual(sdkTypeWithoutNull.kind, "union");
+      strictEqual(sdkTypeWithoutNull.values.length, 2);
+      strictEqual(sdkTypeWithoutNull.values[0].kind, "string");
+      strictEqual(sdkTypeWithoutNull.values[1].kind, "float32");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(isNullable(nameProp.type), true);
       strictEqual(nameProp.nullable, true);
     });
 
@@ -582,10 +606,16 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
-      strictEqual(elementType.kind, "float32");
+      strictEqual(elementType.kind, "union");
+      strictEqual(elementType.values.length, 2);
+      strictEqual(elementType.values[0].kind, "float32");
+      strictEqual(elementType.values[1].kind, "null");
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, elementType)).kind, "float32");
+      strictEqual(isNullable(elementType), true);
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
+      strictEqual(isNullable(nameProp.type), false);
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
     });
@@ -603,13 +633,17 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "union");
-      strictEqual(elementType.values.length, 2);
+      strictEqual(elementType.values.length, 3);
       strictEqual(elementType.values[0].kind, "string");
       strictEqual(elementType.values[1].kind, "float32");
+      strictEqual(elementType.values[2].kind, "null");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
+      strictEqual(isNullable(elementType), true);
+
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
+      strictEqual(isNullable(nameProp.type), false);
       strictEqual(sdkType.nullableValues, true);
     });
 
@@ -625,12 +659,15 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
       const elementType = sdkType.valueType;
-      strictEqual(elementType.kind, "float32");
+      strictEqual(elementType.kind, "union");
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, elementType)).kind, "float32");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
+      strictEqual(isNullable(nameProp.type), false);
       strictEqual(sdkType.nullableValues, true);
+      strictEqual(isNullable(elementType), true);
     });
 
     it("array with nullable with more types", async function () {
@@ -646,14 +683,18 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "array");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "union");
-      strictEqual(elementType.values.length, 2);
+      strictEqual(elementType.values.length, 3);
       strictEqual(elementType.values[0].kind, "string");
       strictEqual(elementType.values[1].kind, "float32");
+      strictEqual(elementType.values[2].kind, "null")
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
+      strictEqual(isNullable(nameProp.type), false);
+      strictEqual(isNullable(elementType), true);
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, elementType)).kind, "union");
     });
 
     it("additional property is nullable", async function () {
@@ -684,26 +725,38 @@ describe("typespec-client-generator-core: types", () => {
       const extendsType = models.find((x) => x.name === "TestExtends");
       ok(extendsType);
       strictEqual(extendsType.kind, "model");
-      strictEqual(extendsType.additionalProperties?.kind, "string");
+      const additionalProperties = extendsType.additionalProperties;
+      ok(additionalProperties);
+      strictEqual(additionalProperties.kind, "union");
+      strictEqual(isNullable(additionalProperties), true);
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(extendsType.additionalProperties?.nullable, true);
       strictEqual(extendsType.additionalPropertiesNullable, true);
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, additionalProperties)).kind, "string");
 
       const isType = models.find((x) => x.name === "TestIs");
       ok(isType);
       strictEqual(isType.kind, "model");
-      strictEqual(isType.additionalProperties?.kind, "string");
+      const isTypeAdditionalProperties = isType.additionalProperties;
+      ok(isTypeAdditionalProperties);
+      strictEqual(isTypeAdditionalProperties.kind, "union");
+      strictEqual(isNullable(isTypeAdditionalProperties), true);
       // eslint-disable-next-line deprecation/deprecation
-      strictEqual(isType.additionalProperties?.nullable, true);
+      strictEqual(isTypeAdditionalProperties.nullable, true);
       strictEqual(isType.additionalPropertiesNullable, true);
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, isTypeAdditionalProperties)).kind, "string");
 
       const spreadType = models.find((x) => x.name === "TestSpread");
       ok(spreadType);
       strictEqual(spreadType.kind, "model");
-      strictEqual(spreadType.additionalProperties?.kind, "string");
+      const spreadTypeAdditionalProperties = spreadType.additionalProperties;
+      ok(spreadTypeAdditionalProperties);
+      strictEqual(spreadTypeAdditionalProperties.kind, "union");
       // eslint-disable-next-line deprecation/deprecation
-      strictEqual(spreadType.additionalProperties?.nullable, true);
+      strictEqual(spreadTypeAdditionalProperties.nullable, true);
       strictEqual(spreadType.additionalPropertiesNullable, true);
+      strictEqual(isNullable(spreadTypeAdditionalProperties), true);
+      strictEqual(ignoreDiagnostics(removeNullFromUnionType(runner.context, spreadTypeAdditionalProperties)).kind, "string");
     });
 
     it("additional property nullable with more types", async function () {
@@ -861,12 +914,22 @@ describe("typespec-client-generator-core: types", () => {
       }
       `);
 
-      const sdkType = getSdkTypeHelper(runner);
+      const sdkTypeWithNull = getSdkTypeHelper(runner);
+      strictEqual(sdkTypeWithNull.kind, "union");
+      strictEqual(sdkTypeWithNull.values.length, 2);
+      strictEqual(sdkTypeWithNull.values[0].kind, "enum");
+      strictEqual(sdkTypeWithNull.values[0].name, "PetKind");
+      strictEqual(sdkTypeWithNull.values[1].kind, "null");
+      // eslint-disable-next-line deprecation/deprecation
+      strictEqual(sdkTypeWithNull.nullable, true);
+      strictEqual(isNullable(sdkTypeWithNull), true);
+
+      const sdkType = ignoreDiagnostics(removeNullFromUnionType(runner.context, sdkTypeWithNull));
       strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkTypeWithNull.values[0], sdkType);
       strictEqual(sdkType.isUnionAsEnum, false);
       strictEqual(sdkType.name, "PetKind");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
+      
       const pet = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(pet.nullable, true);
       const values = sdkType.values;
@@ -892,12 +955,18 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 2);
       const model = models.find((x) => x.kind === "model" && x.name === "Test");
       ok(model);
-      const sdkType = model.properties[0].type;
+      const sdkTypeWithNull = model.properties[0].type;
+      strictEqual(sdkTypeWithNull.kind, "union");
+      strictEqual(sdkTypeWithNull.values.length, 2);
+      strictEqual(sdkTypeWithNull.values[0].kind, "model");
+      strictEqual(sdkTypeWithNull.values[0].name, "PropertyModel");
+      strictEqual(sdkTypeWithNull.values[1].kind, "null");
+
+      const sdkType = ignoreDiagnostics(removeNullFromUnionType(runner.context, sdkTypeWithNull));
       strictEqual(sdkType.kind, "model");
       strictEqual(sdkType.name, "PropertyModel");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
       strictEqual(model.properties[0].nullable, true);
+      strictEqual(sdkTypeWithNull.values[0], sdkType)
     });
 
     it("mix types", async function () {
@@ -931,6 +1000,7 @@ describe("typespec-client-generator-core: types", () => {
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.properties[0].type.nullable, false);
       strictEqual(model.properties[0].nullable, false);
+      strictEqual(isNullable(model.properties[0].type), false);
       const unionType = model.properties[0].type;
       strictEqual(unionType.kind, "union");
       for (const v of unionType.values) {
@@ -944,7 +1014,13 @@ describe("typespec-client-generator-core: types", () => {
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(nullableModel.properties[0].type.nullable, true);
       strictEqual(nullableModel.properties[0].nullable, true);
-      for (const v of nullableModel.properties[0].type.values) {
+      strictEqual(nullableModel.properties[0].type.values.length, 4);
+      strictEqual(nullableModel.properties[0].type.values[3].kind, "null")
+
+      // now check without null with help of helper function
+      const sdkTypeWithoutNull = ignoreDiagnostics(removeNullFromUnionType(runner.context, nullableModel.properties[0].type));
+      strictEqual(sdkTypeWithoutNull.kind, "union");
+      for (const v of sdkTypeWithoutNull.values) {
         if (v.kind === "model") {
           strictEqual(v.name, "ModelType");
         } else {
@@ -1521,7 +1597,14 @@ describe("typespec-client-generator-core: types", () => {
       `
       )) as { Test: Union };
 
-      const enumType = getClientType(runner.context, Test);
+      const enumTypeWithNull = getClientType(runner.context, Test);
+      strictEqual(enumTypeWithNull.kind, "union");
+      strictEqual(enumTypeWithNull.name, "Test");
+      strictEqual(isNullable(enumTypeWithNull), true);
+      strictEqual(enumTypeWithNull.values.length, 4);
+      strictEqual(enumTypeWithNull.values[3].kind, "null");
+
+      const enumType = ignoreDiagnostics(removeNullFromUnionType(runner.context, enumTypeWithNull));
       strictEqual(enumType.kind, "enum");
       strictEqual(enumType.name, "Test");
       // eslint-disable-next-line deprecation/deprecation
@@ -1573,12 +1656,21 @@ describe("typespec-client-generator-core: types", () => {
       )) as { Test: Union };
 
       const unionType = getClientType(runner.context, Test);
+      
       strictEqual(unionType.kind, "union");
       strictEqual(unionType.name, "Test");
       // eslint-disable-next-line deprecation/deprecation
       strictEqual(unionType.nullable, true);
+      strictEqual(isNullable(unionType), true);
+
+      const unionTypeWithoutNull = ignoreDiagnostics(removeNullFromUnionType(runner.context, unionType));
+      strictEqual(unionTypeWithoutNull.kind, "union");
+      strictEqual(unionTypeWithoutNull.values.length, 3);
+      strictEqual(unionTypeWithoutNull.name, "Test");
+      strictEqual(isNullable(unionTypeWithoutNull), false);
+
       const values = unionType.values;
-      strictEqual(values.length, 3);
+      strictEqual(values.length, 4);
       const a = values[0] as SdkEnumType;
       strictEqual(a.name, "A");
       strictEqual(a.kind, "enum");
@@ -1588,12 +1680,18 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(a.values[1].name, "A2");
       strictEqual(a.values[1].value, "A2");
 
+      // make sure values are the same after removing null
+      strictEqual(values[0], unionTypeWithoutNull.values[0]);
+
       const b = values[1] as SdkEnumType;
       strictEqual(b.name, "B");
       strictEqual(b.kind, "enum");
       strictEqual(b.isUnionAsEnum, true);
       strictEqual(b.values[0].name, "B");
       strictEqual(b.values[0].value, "B");
+      
+      // make sure values are the same after removing null
+      strictEqual(values[1], unionTypeWithoutNull.values[1]);
 
       const c = values[2] as SdkEnumType;
       strictEqual(c.name, "C");
@@ -1601,6 +1699,12 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(c.isUnionAsEnum, false);
       strictEqual(c.values[0].name, "C");
       strictEqual(c.values[0].value, "C");
+
+      // make sure values are the same after removing null
+      strictEqual(values[2], unionTypeWithoutNull.values[2]);
+
+      const d = values[3] as SdkBuiltInType;
+      strictEqual(d.kind, "null");
     });
 
     it("anonymous union as enum with hierarchy", async () => {

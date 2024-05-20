@@ -76,6 +76,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
+  getAnyType,
   getAvailableApiVersions,
   getDocHelper,
   getLocationOfOperation,
@@ -103,12 +104,7 @@ import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/uni
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { TCGCContext } from "./internal-utils.js";
 
-function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
-  return {
-    ...getSdkTypeBaseHelper(context, type, "any"),
-    encode: getEncodeHelper(context, type, "any"),
-  };
-}
+
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
@@ -192,7 +188,7 @@ export function addEncodeInfo(
  * @param scalar the original typespec scalar
  * @returns the corresponding sdk built in kind
  */
-function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
+function getScalarKind(scalar: Scalar | IntrinsicType): SdkBuiltInKinds {
   if (isSdkBuiltInKind(scalar.name)) {
     return scalar.name;
   }
@@ -212,7 +208,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
-    if (type.kind === "Scalar") {
+    if (type.kind === "Scalar" || type.kind === "Intrinsic") {
       if (isSdkBuiltInKind(type.name)) {
         kind = getScalarKind(type);
       }
@@ -242,7 +238,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   diagnostics.add(
     createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
   );
-  return diagnostics.wrap(getAnyType(context, type));
+  return diagnostics.wrap(getAnyType());
 }
 
 export function getSdkBuiltInType(
@@ -353,19 +349,15 @@ export function getSdkUnionWithDiagnostics(
     })
   ) {
     const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-    if (unionAsEnum) {
+    if (unionAsEnum && !isNullableInternal(type)) {
       return diagnostics.wrap(getSdkUnionEnum(context, unionAsEnum, operation));
     }
   }
-
-  const values = [...type.variants.values()].map((x) =>
-    diagnostics.pipe(getClientTypeWithDiagnostics(context, x.type))
-  );
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, "union"),
     name: getLibraryName(context, type) || getGeneratedName(context, type),
     isGeneratedName: !type.name,
-    values,
+    values: [...type.variants.values()].map((x) => diagnostics.pipe(getClientTypeWithDiagnostics(context, x.type, operation))),
     nullable: isNullableInternal(type), // eslint-disable-line deprecation/deprecation
   });
 }
@@ -701,7 +693,7 @@ function getSdkUnionEnumValues(
   return values;
 }
 
-function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Operation) {
+export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation?: Operation) {
   let sdkType = context.modelsMap?.get(type.union) as SdkEnumType | undefined;
   if (!sdkType) {
     const union = type.union;
@@ -862,7 +854,7 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkEnumValue(context, enumType, type);
       break;
     default:
-      retval = getAnyType(context, type);
+      retval = getAnyType();
       diagnostics.add(
         createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
       );
