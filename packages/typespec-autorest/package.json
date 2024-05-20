@@ -67,7 +67,7 @@
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
-   "@types/node": "~18.11.19",
+    "@types/node": "~18.11.19",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/json-schema": "workspace:~",

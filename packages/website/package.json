@@ -44,7 +44,7 @@
     "@docusaurus/module-type-aliases": "^3.3.2",
     "@docusaurus/tsconfig": "^3.3.2",
     "@docusaurus/types": "^3.3.2",
-   "@types/node": "~18.11.19",
+    "@types/node": "~18.11.19",
     "@types/react": "~18.3.2",
     "@typespec/tspd": "workspace:~",
     "dotenv": "~16.4.5",
