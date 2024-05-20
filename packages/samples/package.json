@@ -50,7 +50,7 @@
     "@typespec/versioning": "workspace:~"
   },
   "devDependencies": {
-    "@types/node": "~20.12.12",
+   "@types/node": "~18.11.19",
     "@typespec/internal-build-utils": "workspace:~",
     "@typespec/samples": "workspace:~",
     "@vitest/coverage-v8": "^1.6.0",
