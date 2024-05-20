@@ -33,10 +33,23 @@ model ManagedServiceIdentity {
   type: ManagedServiceIdentityType;
 
   @doc("The identities assigned to this resource by the user.")
-  userAssignedIdentities?: UserAssignedIdentities;
+  userAssignedIdentities?: Record<UserAssignedIdentity>;
 }
 
 /** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.", */
+@armCommonDefinition(
+  "UserAssignedIdentities",
+  {
+    version: Azure.ResourceManager.CommonTypes.Versions.v4,
+    isDefault: true,
+  },
+  "managedidentity.json"
+)
+@armCommonDefinition(
+  "UserAssignedIdentities",
+  Azure.ResourceManager.CommonTypes.Versions.v5,
+  "managedidentity.json"
+)
 model UserAssignedIdentities is Record<UserAssignedIdentity>;
 
 #deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
@@ -76,6 +89,19 @@ alias ManagedIdentityType = ManagedServiceIdentityType;
 /**
  * A managed identity assigned by the user.
  */
+@armCommonDefinition(
+  "UserAssignedIdentity",
+  {
+    version: Azure.ResourceManager.CommonTypes.Versions.v4,
+    isDefault: true,
+  },
+  "managedidentity.json"
+)
+@armCommonDefinition(
+  "UserAssignedIdentity",
+  Azure.ResourceManager.CommonTypes.Versions.v5,
+  "managedidentity.json"
+)
 @doc("A managed identity assigned by the user.")
 model UserAssignedIdentity {
   @doc("The active directory client identifier for this principal.")
