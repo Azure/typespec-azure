@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Use union for open enum OperationState
+Convert `OperationState` enum  to an open union
