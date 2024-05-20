@@ -28,6 +28,7 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
+  isNullType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -80,6 +81,7 @@ import {
   getAvailableApiVersions,
   getDocHelper,
   getLocationOfOperation,
+  getNonNullOptions,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
@@ -339,6 +341,34 @@ export function getSdkUnionWithDiagnostics(
   operation?: Operation
 ): [SdkType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const nonNullOptions = getNonNullOptions(type);
+  if (nonNullOptions.length === 0) {
+    diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
+    return diagnostics.wrap(getAnyType());
+  }
+  // convert to normal type if the union is type | null
+  if (nonNullOptions.length === 1) {
+    const clientType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
+    );
+    const nullType: SdkBuiltInType = {
+      ...clientType,
+      kind: "null",
+      nullable: true,
+      encode: "string",
+    };
+
+    const name = clientType.kind === "union" ? clientType.name : "";
+    const isGeneratedName = clientType.kind === "union" ? clientType.isGeneratedName : true;
+    return diagnostics.wrap({
+      ...clientType,
+      kind: "union",
+      values: [clientType, nullType],
+      name,
+      isGeneratedName,
+      nullable: true,
+    })
+  }
   // judge if the union can be converted to enum
   // if language does not need flatten union as enum
   // need to filter the case that union is composed of union or enum

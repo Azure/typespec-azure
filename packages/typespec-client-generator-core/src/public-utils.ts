@@ -630,27 +630,13 @@ export function isNullable(type: SdkType): boolean {
 
 /**
  * Since we don't remove null types from the values of a union type, this helper function helps return the type without null unioned in.
+ * 
+ * Only call after first making sure the type isNullable with our helper function
  * @param type 
  */
-export function removeNullFromUnionType(context: TCGCContext, type: SdkUnionType): [SdkType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const nonNullValues = type.values.filter((value) => value.kind !== "null");
-  if (nonNullValues.length === 0) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "union-null",
-        target: type.__raw!,
-      })
-    );
-    return diagnostics.wrap(getAnyType());
+export function removeNullFromUnionType(type: SdkUnionType): SdkType {
+  return {
+    ...type,
+    values: type.values.filter((value) => value.kind !== "null"),
   }
-  if (nonNullValues.length === 1) {
-    return diagnostics.wrap(nonNullValues[0]);
-  }
-  // const raw = type.__raw;
-  // if (raw?.kind === "Union" && getUnionAsEnum(raw)) {
-  //   const unionEnum = ignoreDiagnostics(getUnionAsEnum(raw));
-  //   if (unionEnum) return diagnostics.wrap(getSdkUnionEnum(context, unionEnum))
-  // }
-  return diagnostics.wrap({ ...type, values: type.values.filter((value) => value.kind !== "null") });
 }
