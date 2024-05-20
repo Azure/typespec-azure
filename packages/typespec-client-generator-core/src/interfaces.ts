@@ -155,6 +155,7 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   plainDate = "plainDate",
   plainTime = "plainTime",
   any = "any",
+  null = "null",
 }
 
 export type SdkBuiltInKinds =

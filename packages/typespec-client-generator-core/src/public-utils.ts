@@ -35,6 +35,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
+import { SdkType } from "./interfaces.js";
 import {
   TCGCContext,
   TspLiteralType,
@@ -603,4 +604,23 @@ export function getHttpOperationWithCache(
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
   context.httpOperationCache.set(operation, httpOperation);
   return httpOperation;
+}
+
+/**
+ * Determines if a type is nullable.
+ * @param type
+ * @returns
+ */
+export function isNullable(type: SdkType): boolean {
+  if (type.kind !== "union") return false;
+  let nullCount = 0;
+  let nonNullCount = 0;
+  for (const value of type.values) {
+    if (value.kind === "null") {
+      nullCount++;
+    } else {
+      nonNullCount++;
+    }
+  }
+  return nullCount > 0 && nonNullCount > 0;
 }

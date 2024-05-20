@@ -45,7 +45,7 @@ import {
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
-  isNullableDeprecated,
+  isNullableInternal,
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -165,7 +165,7 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: false,
-        nullable: isNullableDeprecated(tspBody.type), // eslint-disable-line deprecation/deprecation
+        nullable: isNullableInternal(tspBody.type), // eslint-disable-line deprecation/deprecation
         correspondingMethodParams,
       };
     }
@@ -397,7 +397,7 @@ function getSdkHttpResponseAndExceptions(
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
-          nullable: isNullableDeprecated(header.type), // eslint-disable-line deprecation/deprecation
+          nullable: isNullableInternal(header.type), // eslint-disable-line deprecation/deprecation
         });
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -437,7 +437,7 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
         httpOperation.operation
       ),
-      nullable: body ? isNullableDeprecated(body) : true, // eslint-disable-line deprecation/deprecation
+      nullable: body ? isNullableInternal(body) : true, // eslint-disable-line deprecation/deprecation
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.set(response.statusCodes, sdkResponse);

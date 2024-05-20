@@ -57,7 +57,7 @@ import {
   getLocationOfOperation,
   getSdkTypeBaseHelper,
   isNeverOrVoidType,
-  isNullableDeprecated,
+  isNullableInternal,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -214,7 +214,7 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable: isNullableDeprecated(sdkOperation),
+      nullable: isNullableInternal(sdkOperation),
       name: createGeneratedName(operation, "UnionResponse"),
       isGeneratedName: true,
     };
@@ -224,7 +224,7 @@ function getSdkMethodResponse(
   return {
     kind: "method",
     type,
-    nullable: isNullableDeprecated(sdkOperation),
+    nullable: isNullableInternal(sdkOperation),
   };
 }
 

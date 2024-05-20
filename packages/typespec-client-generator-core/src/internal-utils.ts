@@ -343,7 +343,7 @@ export function createTCGCContext(program: Program): TCGCContext {
   };
 }
 
-export function getNonNullOptions(type: Union): Type[] {
+function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
@@ -380,7 +380,7 @@ export function getAllResponseBodies(
  * @param type
  * @returns
  */
-export function isNullableDeprecated(type: Type | SdkServiceOperation): boolean {
+export function isNullableInternal(type: Type | SdkServiceOperation): boolean {
   if (type.kind === "Union") {
     if (getNonNullOptions(type).length < type.variants.size) return true;
     return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
