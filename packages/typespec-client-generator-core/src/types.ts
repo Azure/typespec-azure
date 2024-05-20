@@ -86,7 +86,7 @@ import {
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
-  isNullable,
+  isNullableDeprecated,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -157,7 +157,7 @@ export function addEncodeInfo(
     propertyType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type)
     ) as SdkBuiltInType;
-    if (type.kind === "ModelProperty" && isNullable(type.type)) {
+    if (type.kind === "ModelProperty" && isNullableDeprecated(type.type)) {
       // eslint-disable-next-line deprecation/deprecation
       propertyType.wireType.nullable = true;
     }
@@ -171,7 +171,7 @@ export function addEncodeInfo(
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
       propertyType.encode = "rfc7231";
     }
-    if (type.kind === "ModelProperty" && isNullable(type.type)) {
+    if (type.kind === "ModelProperty" && isNullableDeprecated(type.type)) {
       // eslint-disable-next-line deprecation/deprecation
       propertyType.wireType.nullable = true;
     }
@@ -297,14 +297,14 @@ export function getSdkArrayOrDictWithDiagnostics(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
           valueType,
-          nullableValues: isNullable(type.indexer.value!),
+          nullableValues: isNullableDeprecated(type.indexer.value!),
         });
       } else if (name === "integer") {
         // only array's index key name is integer
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
-          nullableValues: isNullable(type.indexer.value!),
+          nullableValues: isNullableDeprecated(type.indexer.value!),
         });
       }
     }
@@ -356,7 +356,7 @@ export function getSdkUnionWithDiagnostics(
       getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)
     );
     // eslint-disable-next-line deprecation/deprecation
-    clientType.nullable = isNullable(type);
+    clientType.nullable = isNullableDeprecated(type);
     clientType.__raw = type;
     return diagnostics.wrap(clientType);
   }
@@ -383,7 +383,7 @@ export function getSdkUnionWithDiagnostics(
     values: nonNullOptions.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
     ),
-    nullable: isNullable(type),
+    nullable: isNullableDeprecated(type),
   });
 }
 
@@ -570,14 +570,14 @@ export function getSdkModelWithDiagnostics(
       sdkType.additionalProperties = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.sourceModel!.indexer!.value!, operation)
       );
-      sdkType.additionalPropertiesNullable = isNullable(type.sourceModel!.indexer!.value!);
+      sdkType.additionalPropertiesNullable = isNullableDeprecated(type.sourceModel!.indexer!.value!);
     }
     // model MyModel { ...Record<>} should be model with additional properties
     if (type.indexer) {
       sdkType.additionalProperties = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.indexer.value, operation)
       );
-      sdkType.additionalPropertiesNullable = isNullable(type.indexer.value);
+      sdkType.additionalPropertiesNullable = isNullableDeprecated(type.indexer.value);
     }
     // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
@@ -590,7 +590,7 @@ export function getSdkModelWithDiagnostics(
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
           sdkType.additionalProperties = baseModel.valueType;
-          sdkType.additionalPropertiesNullable = isNullable(baseModel.valueType.__raw!);
+          sdkType.additionalPropertiesNullable = isNullableDeprecated(baseModel.valueType.__raw!);
         } else {
           sdkType.baseModel = baseModel;
         }
@@ -1003,7 +1003,7 @@ export function getSdkModelPropertyTypeBase(
     name,
     isGeneratedName: false,
     optional: type.optional,
-    nullable: isNullable(type.type),
+    nullable: isNullableDeprecated(type.type),
     ...updateWithApiVersionInformation(
       context,
       type,

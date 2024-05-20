@@ -376,10 +376,11 @@ export function getAllResponseBodies(
 
 /**
  * Determines if a type is nullable.
+ * @deprecated We want to move away from .nullable on SdkPropertyTypes and have people pass the type to `isNullable` instead.
  * @param type
  * @returns
  */
-export function isNullable(type: Type | SdkServiceOperation): boolean {
+export function isNullableDeprecated(type: Type | SdkServiceOperation): boolean {
   if (type.kind === "Union") {
     if (getNonNullOptions(type).length < type.variants.size) return true;
     return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);

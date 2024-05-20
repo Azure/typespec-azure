@@ -81,8 +81,7 @@ interface SdkTypeBase {
   __raw?: Type;
   kind: string;
   /**
-   * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
-   * https://github.com/Azure/typespec-azure/issues/448
+   * @deprecated Use helper function `isNullable` instead
    */
   nullable: boolean;
   deprecation?: string;
@@ -230,6 +229,9 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
+  /**
+   * @deprecated Pass `valueType`` to `isNullable` instead
+   */
   nullableValues: boolean;
 }
 
@@ -242,6 +244,9 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  /**
+   * @deprecated Pass `valueType`` to `isNullable` instead
+   */
   nullableValues: boolean;
 }
 
@@ -289,7 +294,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData nad the `.usage` property on this model
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model
    */
   isFormDataType: boolean;
   /**
@@ -300,6 +305,9 @@ export interface SdkModelType extends SdkTypeBase {
   access?: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
+  /**
+   * @deprecated This property is deprecated. Pass the type of the additionalProperties to `isNullable` instead
+   */
   additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
@@ -337,6 +345,9 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  /**
+   * @deprecated se exported helper function `isNullable` instead, and pass the type of the property to the function.
+   */
   nullable: boolean;
 }
 
@@ -421,12 +432,18 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
+  /**
+   * @deprecated This property is deprecated. Pass the type of response header to `isNullable` instead
+   */
   nullable: boolean;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
+  /**
+   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead
+   */
   nullable: boolean;
   resultPath?: string; // if exists, tells you how to get from the service response to the method response
 }
@@ -435,6 +452,9 @@ export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
+  /**
+   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead
+   */
   nullable: boolean;
 }
 
