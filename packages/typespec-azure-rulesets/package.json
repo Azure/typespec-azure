@@ -1,10 +1,10 @@
 {
-  "name": "@azure-tools/typespec-azure-specs-rulesets",
+  "name": "@azure-tools/typespec-azure-rulesets",
   "version": "0.42.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec ruleset for Azure specs",
   "homepage": "https://azure.github.io/typespec-azure",
-  "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-specs-rulesets/README.md",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-rulesets/README.md",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-azure-specs-rulesets/reference"
+    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-azure-rulesets/reference"
   },
   "files": [
     "dist/**",

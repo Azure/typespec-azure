@@ -3,4 +3,4 @@ emit:
   - "@typespec/openapi3"
 linter:
   extends:
-    - "@azure-tools/typespec-azure-specs-rulesets/data-plane"
+    - "@azure-tools/typespec-azure-rulesets/data-plane"

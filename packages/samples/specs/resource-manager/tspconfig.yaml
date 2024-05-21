@@ -6,4 +6,4 @@ options:
     arm-types-dir: "{project-root}/common-types"
 linter:
   extends:
-    - "@azure-tools/typespec-azure-specs-rulesets/resource-manager"
+    - "@azure-tools/typespec-azure-rulesets/resource-manager"

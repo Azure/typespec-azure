@@ -1507,9 +1507,9 @@ importers:
       '@azure-tools/typespec-azure-resource-manager':
         specifier: workspace:~
         version: link:../typespec-azure-resource-manager
-      '@azure-tools/typespec-azure-specs-rulesets':
+      '@azure-tools/typespec-azure-rulesets':
         specifier: workspace:~
-        version: link:../typespec-azure-specs-rulesets
+        version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~
         version: link:../typespec-client-generator-core
@@ -1925,7 +1925,7 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@18.11.19)(@vitest/ui@1.6.0)(happy-dom@14.11.0)
 
-  packages/typespec-azure-specs-rulesets:
+  packages/typespec-azure-rulesets:
     devDependencies:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
@@ -1947,10 +1947,10 @@ importers:
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: ^1.5.0
-        version: 1.5.0(vitest@1.5.0)
+        version: 1.6.0(vitest@1.6.0)
       '@vitest/ui':
         specifier: ^1.5.0
-        version: 1.5.0(vitest@1.5.0)
+        version: 1.6.0(vitest@1.6.0)
       c8:
         specifier: ^9.1.0
         version: 9.1.0
@@ -1959,13 +1959,13 @@ importers:
         version: 5.4.4
       rimraf:
         specifier: ~5.0.5
-        version: 5.0.5
+        version: 5.0.7
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
       vitest:
         specifier: ^1.5.0
-        version: 1.5.0(@types/node@18.11.19)(@vitest/ui@1.5.0)(happy-dom@14.7.1)
+        version: 1.6.0(@types/node@18.11.19)(@vitest/ui@1.6.0)(happy-dom@14.11.0)
 
   packages/typespec-client-generator-core:
     dependencies:
@@ -2658,7 +2658,7 @@ packages:
     resolution: {integrity: sha512-viKb0F9f2s0BCS22QSF308z/+1YWKV/76mwt61NBzS5izMzDPwdq1pTrzf+Li3npBWX9KdQbkeCt1jSAM7lZqg==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.24.0
+      '@babel/types': 7.24.5
 
   /@babel/helper-module-transforms@7.24.5(@babel/core@7.24.5):
     resolution: {integrity: sha512-9GxeY8c2d2mdQUP1Dye0ks3VDyIMS98kt/llQ2nUId8IsWqTF0l1LkSX0/uP7l7MCDrzXS009Hyhe2gzTiGW8A==}
@@ -2775,13 +2775,6 @@ packages:
       chalk: 2.4.2
       js-tokens: 4.0.0
       picocolors: 1.0.1
-
-  /@babel/parser@7.24.4:
-    resolution: {integrity: sha512-zTvEBcghmeBma9QIGunWevvBAp4/Qu9Bdq+2k0Ot4fVMD6v3dsC9WOcRSKk7tRRyBM/53yKMJko9xOatGQAwSg==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-    dependencies:
-      '@babel/types': 7.24.0
 
   /@babel/parser@7.24.5:
     resolution: {integrity: sha512-EOv5IK8arwh3LI47dz1b0tKUb/1uhHAnHJOrjgtQMIpu1uXd9mlFrJg9IUgGUgZ41Ch0K8REPTYpO7B76b4vJg==}
@@ -3847,14 +3840,6 @@ packages:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
-
-  /@babel/types@7.24.0:
-    resolution: {integrity: sha512-+j7a5c253RfKh8iABBhywc8NSfP5LURe7Uh4qpsh6jc+aLJguvmIUBdjSdEMQv2bENrCR5MfRdjGo7vzS/ob7w==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/helper-string-parser': 7.24.1
-      '@babel/helper-validator-identifier': 7.22.20
-      to-fast-properties: 2.0.0
 
   /@babel/types@7.24.5:
     resolution: {integrity: sha512-6mQNsaLeXTw0nxYUYu+NSa4Hx4BlF1x1x8/PMFbiR+GBSr+2DkECc69b8hgy2frEodNcvPffeH8YfWd3LI6jhQ==}
@@ -9338,8 +9323,8 @@ packages:
   /@types/babel__core@7.20.5:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
     dependencies:
-      '@babel/parser': 7.24.4
-      '@babel/types': 7.24.0
+      '@babel/parser': 7.24.5
+      '@babel/types': 7.24.5
       '@types/babel__generator': 7.6.8
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.5
@@ -9347,18 +9332,18 @@ packages:
   /@types/babel__generator@7.6.8:
     resolution: {integrity: sha512-ASsj+tpEDsEiFr1arWrlN6V3mdfjRMZt6LtK/Vp/kreFLnr5QH5+DhvD5nINYZXzwJvXeGq+05iUXcAzVrqWtw==}
     dependencies:
-      '@babel/types': 7.24.0
+      '@babel/types': 7.24.5
 
   /@types/babel__template@7.4.4:
     resolution: {integrity: sha512-h/NUaSyG5EyxBIp8YRxo4RMe2/qQgvyowRwVMzhYhBCONbW8PUsg4lkFMrhgZhUe5z3L3MiLDuvyJ/CaPa2A8A==}
     dependencies:
       '@babel/parser': 7.24.5
-      '@babel/types': 7.24.0
+      '@babel/types': 7.24.5
 
   /@types/babel__traverse@7.20.5:
     resolution: {integrity: sha512-WXCyOcRtH37HAUkpXhUduaxdm82b4GSlyTqajXviN4EfiuPgNYR109xMCKvpl6zPIpua0DGlMEDCq+g8EdoheQ==}
     dependencies:
-      '@babel/types': 7.24.0
+      '@babel/types': 7.24.5
 
   /@types/body-parser@1.19.5:
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}

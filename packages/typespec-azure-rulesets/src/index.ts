@@ -3,7 +3,7 @@ import dataPlaneRuleset from "./rulesets/data-plane.js";
 import resourceManagerRuleset from "./rulesets/resource-manager.js";
 
 export const $lib = createTypeSpecLibrary({
-  name: "@azure-tools/typespec-azure-specs-rulesets",
+  name: "@azure-tools/typespec-azure-rulesets",
   diagnostics: {},
 });
 

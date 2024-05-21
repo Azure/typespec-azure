@@ -1,12 +1,16 @@
----
-title: "Linter usage"
-toc_min_heading_level: 2
-toc_max_heading_level: 3
----
+# @azure-tools/typespec-azure-rulesets
 
-# Linter
+TypeSpec ruleset for azure specs
 
-## Usage
+## Install
+
+```bash
+npm install @azure-tools/typespec-azure-rulesets
+```
+
+## Linter
+
+### Usage
 
 Add the following in `tspconfig.yaml`:
 
@@ -16,14 +20,14 @@ linter:
     - "@azure-tools/typespec-azure-rulesets/data-plane"
 ```
 
-## RuleSets
+### RuleSets
 
 Available ruleSets:
 
 - `@azure-tools/typespec-azure-rulesets/data-plane`
 - `@azure-tools/typespec-azure-rulesets/resource-manager`
 
-## Rules
+### Rules
 
 | Name | Description |
 | ---- | ----------- |
