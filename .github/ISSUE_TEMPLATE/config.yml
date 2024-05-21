@@ -1,4 +1,4 @@
 contact_links:
   - name: TypeSpec Core Language and Libraries Issue
-    url: https://github.com/Microsoft/typespec/new/choose
+    url: https://github.com/Microsoft/typespec/issues/new/choose
     about: For bug and feature request on the TypeSpec language or core libraries go here.
