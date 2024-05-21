@@ -714,16 +714,11 @@ model Animal {
     }
   ],
   "additionalProperties": {
-    "kind": "union",
-    "values": [
-      {
+    "kind": "nullable",
+    "valueType": {
         "kind": "string",
         "encode": "string"
-      },
-      {
-        "kind": "null"
-      }
-    ]
+    }
   }
 }
 ```
@@ -803,10 +798,6 @@ public final class Animal implements JsonSerializable<Animal> {
 TypeSpec uses `| null` to represent nullable types. Nullability is handled differently in languages, but emitter authors will find information
 about nullability by inspecting the type of a property.
 
-A nullable type will always be a union type where null is unioned with actual types. TCGC has added helper functions `isNullable` and `getUnderlyingNullableType` to inspect these types.
-
-If a type `isNullable` and you want to determine what the value of the `SdkType` is, then you call `getUnderlyingNullableType` to get the underlying type.
-
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
@@ -824,6 +815,8 @@ model Bar {
 </TabItem>
 <TabItem value="tcgc" label="TCGC">
 
+A nullable type has kind `nullable` and property `valueType`. The kind of the type tells you the property is nullable, while the `valueType` tells you the underlying type you want to generate.
+
 ```json
 {
   "kind": "model",
@@ -835,17 +828,11 @@ model Bar {
       "serializedName": "basicNullableProperty",
       "optional": false,
       "type": {
-        "kind": "union",
-        "name": "",
-        "values": [
-          {
-            "kind": "string",
-            "encode": "string"
-          },
-          {
-            "kind": "null"
-          }
-        ]
+        "kind": "nullable",
+        "valueType": {
+          "kind": "string",
+          "encode": "string"
+        }
       }
     },
     {
@@ -854,10 +841,8 @@ model Bar {
       "serializedName": "modelNullableProperty",
       "optional": false,
       "type": {
-        "kind": "union",
-        "name": "",
-        "values": [
-          {
+        "kind": "nullable",
+        "valueType": {
             "kind": "model",
             "name": "Bar",
             "properties": [
@@ -873,12 +858,8 @@ model Bar {
               }
             ]
           },
-          {
-            "kind": "null"
-          }
-        ]
-      }
-    }
+        }
+     }
   ]
 }
 ```
@@ -886,7 +867,7 @@ model Bar {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python treat nullable as optional.
+Python treat nullable as optional. If you actually want to send the value `null` to the service without the property being ignored, you can send in `corehttp.serialization.NULL`. Python does not restrict you from setting any property to this value.
 
 ```python
 class Bar(_model_base.Model):
