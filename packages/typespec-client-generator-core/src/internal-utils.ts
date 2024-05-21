@@ -383,6 +383,7 @@ export function getAllResponseBodies(
 /**
  * Determines if a type is nullable.
  * @deprecated We want to move away from .nullable on SdkPropertyTypes and have people pass the type to `isNullable` instead.
+ * https://github.com/Azure/typespec-azure/issues/891
  * @param type
  * @returns
  */
