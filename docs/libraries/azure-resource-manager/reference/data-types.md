@@ -1537,7 +1537,7 @@ model Azure.ResourceManager.Foundations.OperationStatusResult
 | id?              | `string`                                                                       | Fully qualified ID for the async operation. |
 | name?            | `string`                                                                       | Name of the async operation.                |
 | status           | `string`                                                                       | Operation status.                           |
-| percentComplete? | `int32`                                                                        | Percent of the operation that is complete.  |
+| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
 | startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
 | endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
 | operations       | `ResourceManager.Foundations.OperationStatusResult[]`                          | The operations list.                        |
