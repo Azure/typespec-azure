@@ -214,7 +214,7 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable: isNullableInternal(sdkOperation),
+      nullable: isNullableInternal(sdkOperation), // eslint-disable-line deprecation/deprecation
       name: createGeneratedName(operation, "UnionResponse"),
       isGeneratedName: true,
     };
@@ -224,7 +224,7 @@ function getSdkMethodResponse(
   return {
     kind: "method",
     type,
-    nullable: isNullableInternal(sdkOperation),
+    nullable: isNullableInternal(sdkOperation), // eslint-disable-line deprecation/deprecation
   };
 }
 

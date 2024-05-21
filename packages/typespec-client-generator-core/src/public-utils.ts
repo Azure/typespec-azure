@@ -35,17 +35,14 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkType, SdkUnionType } from "./interfaces.js";
+import { SdkType } from "./interfaces.js";
 import {
   TCGCContext,
   TspLiteralType,
-  getAnyType,
   getClientNamespaceStringHelper,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
-import { getSdkUnionEnum } from "./types.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -630,13 +627,18 @@ export function isNullable(type: SdkType): boolean {
 
 /**
  * Since we don't remove null types from the values of a union type, this helper function helps return the type without null unioned in.
- * 
+ *
  * Only call after first making sure the type isNullable with our helper function
- * @param type 
+ * @param type
  */
-export function removeNullFromUnionType(type: SdkUnionType): SdkType {
-  return {
-    ...type,
-    values: type.values.filter((value) => value.kind !== "null"),
+export function removeNullFromUnionType(type: SdkType): SdkType {
+  if (type.kind !== "union") return type;
+  const values = type.values.filter((value) => value.kind !== "null");
+  if (values.length === 1) return values[0];
+  else {
+    return {
+      ...type,
+      values,
+    };
   }
 }

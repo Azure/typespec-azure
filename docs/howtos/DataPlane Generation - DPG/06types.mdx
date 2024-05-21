@@ -39,7 +39,6 @@ model Foo {
       "serializedName": "prop",
       "flatten": true,
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "model",
         "name": "Properties",
@@ -50,7 +49,6 @@ model Foo {
             "serializedName": "name",
             "flatten": false,
             "optional": false,
-            "nullable": false,
             "type": {
               "kind": "string",
               "encode": "string"
@@ -224,7 +222,6 @@ model Animal is Record<unknown> {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -235,7 +232,6 @@ model Animal is Record<unknown> {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -244,8 +240,7 @@ model Animal is Record<unknown> {
   ],
   "additionalProperties": {
     "kind": "any"
-  },
-  "additionalPropertiesNullable": false
+  }
 }
 ```
 
@@ -353,7 +348,6 @@ model Animal {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -364,7 +358,6 @@ model Animal {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -380,7 +373,6 @@ model Animal {
         "name": "category",
         "serializedName": "category",
         "optional": false,
-        "nullable": false,
         "type": {
           "kind": "string",
           "encode": "string"
@@ -391,16 +383,13 @@ model Animal {
         "name": "value",
         "serializedName": "value",
         "optional": false,
-        "nullable": false,
         "type": {
           "kind": "any"
         }
       }
     ],
-    "additionalProperties": undefined,
-    "additionalPropertiesNullable": undefined
-  },
-  "additionalPropertiesNullable": false
+    "additionalProperties": undefined
+  }
 }
 ```
 
@@ -581,7 +570,6 @@ model Animal {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -592,7 +580,6 @@ model Animal {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -612,8 +599,7 @@ model Animal {
         "kind": "int32"
       }
     ]
-  },
-  "additionalPropertiesNullable": false
+  }
 }
 ```
 
@@ -711,7 +697,6 @@ model Animal {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -722,7 +707,6 @@ model Animal {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -730,9 +714,17 @@ model Animal {
     }
   ],
   "additionalProperties": {
-    "kind": "string"
-  },
-  "additionalPropertiesNullable": true
+    "kind": "union",
+    "values": [
+      {
+        "kind": "string",
+        "encode": "string"
+      },
+      {
+        "kind": "null"
+      }
+    ]
+  }
 }
 ```
 

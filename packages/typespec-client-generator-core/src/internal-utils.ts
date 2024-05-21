@@ -348,6 +348,10 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
+export function getNullOption(type: Union): Type | undefined {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
+}
+
 function getAllResponseBodiesAndNonBodyExists(
   responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
 ): {
@@ -359,6 +363,7 @@ function getAllResponseBodiesAndNonBodyExists(
   for (const response of responses.values()) {
     if (response.type) {
       if (response.nullable) {
+        // eslint-disable-line deprecation/deprecation
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);
@@ -383,7 +388,7 @@ export function getAllResponseBodies(
  */
 export function isNullableInternal(type: Type | SdkServiceOperation): boolean {
   if (type.kind === "Union") {
-    if (getNonNullOptions(type).length < type.variants.size) return true;
+    if (getNullOption(type) !== undefined) return true;
     return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
   }
   if (type.kind === "http") {

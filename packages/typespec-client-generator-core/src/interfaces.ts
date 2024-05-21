@@ -81,7 +81,7 @@ interface SdkTypeBase {
   __raw?: Type;
   kind: string;
   /**
-   * @deprecated Use helper function `isNullable` instead
+   * @deprecated Use helper function `isNullable` instead.
    */
   nullable: boolean;
   deprecation?: string;
@@ -231,7 +231,7 @@ export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
   /**
-   * @deprecated Pass `valueType`` to `isNullable` instead
+   * @deprecated Pass `valueType` to `isNullable` instead.
    */
   nullableValues: boolean;
 }
@@ -246,7 +246,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
   keyType: SdkType;
   valueType: SdkType;
   /**
-   * @deprecated Pass `valueType`` to `isNullable` instead
+   * @deprecated Pass `valueType` to `isNullable` instead.
    */
   nullableValues: boolean;
 }
@@ -295,7 +295,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */
   isFormDataType: boolean;
   /**
@@ -307,7 +307,7 @@ export interface SdkModelType extends SdkTypeBase {
   usage: UsageFlags;
   additionalProperties?: SdkType;
   /**
-   * @deprecated This property is deprecated. Pass the type of the additionalProperties to `isNullable` instead
+   * @deprecated This property is deprecated. Pass the type of the additionalProperties to `isNullable` instead.
    */
   additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
@@ -334,7 +334,6 @@ export interface SdkModelPropertyTypeBase {
   type: SdkType;
   /**
    * @deprecated This property is deprecated. Use `.name` instead.
-   * https://github.com/Azure/typespec-azure/issues/446
    */
   nameInClient: string;
   name: string;
@@ -347,7 +346,7 @@ export interface SdkModelPropertyTypeBase {
   isApiVersionParam: boolean;
   optional: boolean;
   /**
-   * @deprecated se exported helper function `isNullable` instead, and pass the type of the property to the function.
+   * @deprecated Use exported helper function `isNullable` instead, and pass the type of the property to the function.
    */
   nullable: boolean;
 }
@@ -434,7 +433,7 @@ export interface SdkServiceResponseHeader {
   description?: string;
   details?: string;
   /**
-   * @deprecated This property is deprecated. Pass the type of response header to `isNullable` instead
+   * @deprecated This property is deprecated. Pass the type of response header to `isNullable` instead.
    */
   nullable: boolean;
 }
@@ -443,10 +442,10 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   /**
-   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead
+   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead.
    */
   nullable: boolean;
-  resultPath?: string; // if exists, tells you how to get from the service response to the method response
+  resultPath?: string; // if exists, tells you how to get from the service response to the method response.
 }
 
 export interface SdkServiceResponse {
@@ -454,7 +453,7 @@ export interface SdkServiceResponse {
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
   /**
-   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead
+   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead.
    */
   nullable: boolean;
 }
@@ -502,16 +501,16 @@ interface SdkMethodBase {
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
   /**
-   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
    * @param serviceParam
    */
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
   /**
-   * @deprecated This property is deprecated. Access .resultPath on the method response instead
+   * @deprecated This property is deprecated. Access .resultPath on the method response instead.
    */
-  getResponseMapping(): string | undefined; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
+  getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
 }
@@ -576,7 +575,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   models: SdkModelType[];
   enums: SdkEnumType[];
   /**
-   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
+   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead.
    */
   diagnostics: readonly Diagnostic[];
   crossLanguagePackageId: string;
@@ -594,8 +593,8 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
-  // Input will also be set when JsonMergePatch is set
+  // Input will also be set when JsonMergePatch is set.
   JsonMergePatch = 1 << 4,
-  // Input will also be set when MultipartFormData is set
+  // Input will also be set when MultipartFormData is set.
   MultipartFormData = 1 << 5,
 }
