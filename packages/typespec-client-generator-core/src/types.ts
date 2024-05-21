@@ -66,6 +66,7 @@ import {
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
+  SdkNullableType,
   SdkOperationGroup,
   SdkTupleType,
   SdkType,
@@ -99,13 +100,13 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
-  getUnderlyingNullableType,
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { TCGCContext } from "./internal-utils.js";
+import { get } from "http";
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
@@ -128,8 +129,7 @@ export function addFormatInfo(
   propertyType: SdkType
 ): void {
   const format = getFormat(context.program, type) ?? "";
-  const innerType = getUnderlyingNullableType(propertyType);
-  if (isSdkBuiltInKind(format)) innerType.kind = format;
+  if (isSdkBuiltInKind(format)) propertyType.kind = format;
 }
 
 /**
@@ -147,40 +147,39 @@ export function addEncodeInfo(
   defaultContentType?: string
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const innerType = getUnderlyingNullableType(propertyType);
   const encodeData = getEncode(context.program, type);
-  if (innerType.kind === "duration") {
+  if (propertyType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);
-    innerType.encode = encodeData.encoding as DurationKnownEncoding;
-    innerType.wireType = diagnostics.pipe(
+    propertyType.encode = encodeData.encoding as DurationKnownEncoding;
+    propertyType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type)
     ) as SdkBuiltInType;
     // eslint-disable-next-line deprecation/deprecation
     if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
+      propertyType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
-  if (innerType.kind === "utcDateTime" || innerType.kind === "offsetDateTime") {
+  if (propertyType.kind === "utcDateTime" || propertyType.kind === "offsetDateTime") {
     if (encodeData) {
-      innerType.encode = encodeData.encoding as DateTimeKnownEncoding;
-      innerType.wireType = diagnostics.pipe(
+      propertyType.encode = encodeData.encoding as DateTimeKnownEncoding;
+      propertyType.wireType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, encodeData.type)
       ) as SdkBuiltInType;
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
-      innerType.encode = "rfc7231";
+      propertyType.encode = "rfc7231";
     }
     // eslint-disable-next-line deprecation/deprecation
     if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
+      propertyType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
-  if (innerType.kind === "bytes") {
+  if (propertyType.kind === "bytes") {
     if (encodeData) {
-      innerType.encode = encodeData.encoding as BytesKnownEncoding;
+      propertyType.encode = encodeData.encoding as BytesKnownEncoding;
     } else if (!defaultContentType || defaultContentType === "application/json") {
-      innerType.encode = "base64";
+      propertyType.encode = "base64";
     } else {
-      innerType.encode = "bytes";
+      propertyType.encode = "bytes";
     }
   }
   return diagnostics.wrap(undefined);
@@ -191,7 +190,7 @@ export function addEncodeInfo(
  * @param scalar the original typespec scalar
  * @returns the corresponding sdk built in kind
  */
-function getScalarKind(scalar: Scalar | IntrinsicType): SdkBuiltInKinds {
+function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
   if (isSdkBuiltInKind(scalar.name)) {
     return scalar.name;
   }
@@ -211,7 +210,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
     let kind: SdkBuiltInKinds = "any";
-    if (type.kind === "Scalar" || type.kind === "Intrinsic") {
+    if (type.kind === "Scalar") {
       if (isSdkBuiltInKind(type.name)) {
         kind = getScalarKind(type);
       }
@@ -353,16 +352,9 @@ export function getSdkUnionWithDiagnostics(
   // convert type only with one non-null variant
   if (nullOption && nonNullOptions.length === 1) {
     return diagnostics.wrap({
-      ...getSdkTypeBaseHelper(context, type, "union"),
-      name: getLibraryName(context, type) || getGeneratedName(context, type),
-      isGeneratedName: !type.name,
-      kind: "union",
-      values: [
-        diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)),
-        diagnostics.pipe(getClientTypeWithDiagnostics(context, nullOption, operation)),
-      ],
-      nullable: true,
-    });
+      ...getSdkTypeBaseHelper(context, type, "nullable"),
+      valueType: diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)),
+    })
   }
 
   // judge if the union can be converted to enum

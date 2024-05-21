@@ -97,6 +97,7 @@ export type SdkType =
   | SdkArrayType
   | SdkTupleType
   | SdkDictionaryType
+  | SdkNullableType
   | SdkEnumType
   | SdkEnumValueType
   | SdkConstantType
@@ -156,7 +157,6 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   plainDate = "plainDate",
   plainTime = "plainTime",
   any = "any",
-  null = "null",
 }
 
 export type SdkBuiltInKinds =
@@ -252,6 +252,11 @@ export interface SdkDictionaryType extends SdkTypeBase {
    * https://github.com/Azure/typespec-azure/issues/891
    */
   nullableValues: boolean;
+}
+
+export interface SdkNullableType extends SdkTypeBase {
+  kind: "nullable";
+  valueType: SdkType;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
