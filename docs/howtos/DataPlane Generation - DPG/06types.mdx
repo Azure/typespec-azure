@@ -798,6 +798,119 @@ public final class Animal implements JsonSerializable<Animal> {
 </TabItem>
 </Tabs>
 
+### Nullable
+
+TypeSpec use `| null` to represent nullable types. Different languages have different logic for nullable types.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Foo {
+  basicNullableProperty: string | null;
+  modelNullableProperty: Bar | null;
+}
+
+model Bar {
+  prop: string;
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "model",
+  "name": "Foo",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "basicNullableProperty",
+      "serializedName": "basicNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "union",
+        "name": "",
+        "values": [
+          {
+            "kind": "string",
+            "encode": "string"
+          },
+          {
+            "kind": "null"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "property",
+      "name": "modelNullableProperty",
+      "serializedName": "modelNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "union",
+        "name": "",
+        "values": [
+          {
+            "kind": "model",
+            "name": "Bar",
+            "properties": [
+              {
+                "kind": "property",
+                "name": "prop",
+                "serializedName": "prop",
+                "optional": false,
+                "type": {
+                  "kind": "string",
+                  "encode": "string"
+                }
+              }
+            ]
+          },
+          {
+            "kind": "null"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python treat nullable as optional.
+
+```python
+class Bar(_model_base.Model):
+    prop: Optional[str] = rest_field()
+
+class Foo(_model_base.Model):
+    basicNullableProperty: Optional[str] = rest_field()
+    modelNullableProperty: Optional["_models.Bar"] = rest_field()
+
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+TODO
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
+
+</TabItem>
+</Tabs>
+
 ## Unions
 
 ### Union of literals with same type
