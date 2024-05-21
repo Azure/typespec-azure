@@ -1,6 +1,0 @@
-extends: ../tspconfig.yaml
-emit:
-  - "@azure-tools/typespec-autorest"
-options:
-  "@azure-tools/typespec-autorest":
-    arm-types-dir: "{project-root}/../common-types"

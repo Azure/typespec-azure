@@ -44,11 +44,7 @@ async function generateSDK(lang, swagger) {
   }
 }
 
-const ignoreSwagger = [
-  // BUG https://github.com/Azure/typespec-azure/issues/1750
-  "resource-manager/dynatrace/2021-06-13-preview/openapi.json",
-  "resource-manager/dynatrace/2022-04-30-preview/openapi.json",
-];
+const ignoreSwagger = [];
 async function main() {
   const lang = process.argv[2]; // python/javascript
   const roots = process.argv[3].split(";");
