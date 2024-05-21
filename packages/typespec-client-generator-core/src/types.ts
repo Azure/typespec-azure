@@ -99,7 +99,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
-  removeNullFromUnionType,
+  getUnderlyingNullableType,
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
@@ -128,7 +128,7 @@ export function addFormatInfo(
   propertyType: SdkType
 ): void {
   const format = getFormat(context.program, type) ?? "";
-  const innerType = removeNullFromUnionType(propertyType);
+  const innerType = getUnderlyingNullableType(propertyType);
   if (isSdkBuiltInKind(format)) innerType.kind = format;
 }
 
@@ -147,7 +147,7 @@ export function addEncodeInfo(
   defaultContentType?: string
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const innerType = removeNullFromUnionType(propertyType);
+  const innerType = getUnderlyingNullableType(propertyType);
   const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);

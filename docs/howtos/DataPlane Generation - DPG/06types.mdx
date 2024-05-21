@@ -800,7 +800,12 @@ public final class Animal implements JsonSerializable<Animal> {
 
 ### Nullable
 
-TypeSpec use `| null` to represent nullable types. Different languages have different logic for nullable types.
+TypeSpec uses `| null` to represent nullable types. Nullability is handled differently in languages, but emitter authors will find information
+about nullability by inspecting the type of a property.
+
+A nullable type will always be a union type where null is unioned with actual types. TCGC has added helper functions `isNullable` and `getUnderlyingNullableType` to inspect these types.
+
+If a type `isNullable` and you want to determine what the value of the `SdkType` is, then you call `getUnderlyingNullableType` to get the underlying type.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>

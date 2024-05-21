@@ -631,7 +631,7 @@ export function isNullable(type: SdkType): boolean {
  * Only call after first making sure the type isNullable with our helper function
  * @param type
  */
-export function removeNullFromUnionType(type: SdkType): SdkType {
+export function getUnderlyingNullableType(type: SdkType): SdkType {
   if (type.kind !== "union") return type;
   const values = type.values.filter((value) => value.kind !== "null");
   if (values.length === 1) return values[0];
