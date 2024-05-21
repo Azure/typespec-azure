@@ -1946,10 +1946,10 @@ importers:
         specifier: workspace:~
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
-        specifier: ^1.5.0
+        specifier: ^1.6.0
         version: 1.6.0(vitest@1.6.0)
       '@vitest/ui':
-        specifier: ^1.5.0
+        specifier: ^1.6.0
         version: 1.6.0(vitest@1.6.0)
       c8:
         specifier: ^9.1.0
@@ -1958,13 +1958,13 @@ importers:
         specifier: ~5.4.4
         version: 5.4.4
       rimraf:
-        specifier: ~5.0.5
+        specifier: ~5.0.7
         version: 5.0.7
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
       vitest:
-        specifier: ^1.5.0
+        specifier: ^1.6.0
         version: 1.6.0(@types/node@18.11.19)(@vitest/ui@1.6.0)(happy-dom@14.11.0)
 
   packages/typespec-client-generator-core:
