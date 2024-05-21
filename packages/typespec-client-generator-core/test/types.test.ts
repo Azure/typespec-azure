@@ -1830,6 +1830,26 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums[1].name, "UD");
       strictEqual(enums[1].usage, UsageFlags.Input);
     });
+
+    it("mix type enums", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        enum MixTypeEnum {
+          One: 1,
+	        Two: "2",
+          Three: 3.2,
+        }
+      `
+      );
+      const enums = runner.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "MixTypeEnum");
+      strictEqual(enums[0].valueType.kind, "union");
+      strictEqual(enums[0].valueType.values[0].kind, "string");
+      strictEqual(enums[0].valueType.values[1].kind, "float32");
+    });
   });
 
   describe("SdkBodyModelPropertyType", () => {

@@ -609,10 +609,13 @@ function getSdkEnumValueType(
     | IterableIterator<EnumMember>
     | IterableIterator<UnionEnumVariant<string>>
     | IterableIterator<UnionEnumVariant<number>>
-): SdkBuiltInType {
-  let kind: "string" | "int32" | "float32" = "string";
-  let type: EnumMember | UnionVariant;
+): SdkBuiltInType | SdkUnionType {
+  let stringType: SdkBuiltInType | undefined = undefined;
+  let numberType: SdkBuiltInType | undefined = undefined;
+
   for (const value of values) {
+    let type: EnumMember | UnionVariant;
+
     if ((value as EnumMember).kind) {
       type = value as EnumMember;
     } else {
@@ -620,20 +623,32 @@ function getSdkEnumValueType(
     }
 
     if (typeof value.value === "number") {
-      kind = intOrFloat(value.value);
-      if (kind === "float32") {
-        break;
+      const calType = intOrFloat(value.value);
+      if (numberType === undefined || (numberType.kind === "int32" && calType === "float32")) {
+        numberType = {
+          ...getSdkTypeBaseHelper(context, type!, calType),
+          encode: calType,
+        };
       }
-    } else if (typeof value.value === "string") {
-      kind = "string";
-      break;
+    } else {
+      stringType = {
+        ...getSdkTypeBaseHelper(context, type!, "string"),
+        encode: "string",
+      };
     }
   }
 
-  return {
-    ...getSdkTypeBaseHelper(context, type!, kind!),
-    encode: kind!,
-  };
+  if (stringType === undefined || numberType === undefined) {
+    return stringType ?? numberType!;
+  } else {
+    return {
+      kind: "union",
+      values: [stringType, numberType],
+      nullable: false,
+      name: "",
+      isGeneratedName: false,
+    };
+  }
 }
 
 function getUnionAsEnumValueType(context: TCGCContext, union: Union): SdkBuiltInType | undefined {
