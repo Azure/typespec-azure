@@ -62,7 +62,7 @@ the access result is undefined.
 // Access.internal
 @access(Access.internal)
 model ModelToHide {
-prop: string;
+  prop: string;
 }
 // Access.internal
 @access(Access.internal)
