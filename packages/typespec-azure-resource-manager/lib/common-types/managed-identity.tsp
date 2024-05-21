@@ -36,6 +36,23 @@ model ManagedServiceIdentity {
   userAssignedIdentities?: Record<UserAssignedIdentity>;
 }
 
+/** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.", */
+#deprecated "Please use `Record<UserAssignedIdentity>` directly for better SDK API."
+@armCommonDefinition(
+  "UserAssignedIdentities",
+  {
+    version: Azure.ResourceManager.CommonTypes.Versions.v4,
+    isDefault: true,
+  },
+  "managedidentity.json"
+)
+@armCommonDefinition(
+  "UserAssignedIdentities",
+  Azure.ResourceManager.CommonTypes.Versions.v5,
+  "managedidentity.json"
+)
+model UserAssignedIdentities is Record<UserAssignedIdentity>;
+
 #deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
 alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 /**
