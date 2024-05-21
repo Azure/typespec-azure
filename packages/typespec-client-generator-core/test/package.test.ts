@@ -1676,7 +1676,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.parameters.length, 4);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["apiVersion", "generationOptions", "contentType", "accept"]
+        ["apiVersion", "prompt", "contentType", "accept"]
       );
     });
 

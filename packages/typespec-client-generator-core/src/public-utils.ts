@@ -20,11 +20,8 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
-  getHeaderFieldName,
   getHttpOperation,
-  getPathParamName,
-  getQueryParamName,
-  isStatusCode,
+  isMetadata,
 } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { capitalCase, pascalCase } from "change-case";
@@ -118,16 +115,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  function isSchemaProperty(property: ModelProperty) {
-    const program = context.program;
-    const headerInfo = getHeaderFieldName(program, property);
-    const queryInfo = getQueryParamName(program, property);
-    const pathInfo = getPathParamName(program, property);
-    const statusCodeinfo = isStatusCode(program, property);
-    return !(headerInfo || queryInfo || pathInfo || statusCodeinfo);
-  }
-
-  const effective = getEffectiveModelType(program, type, isSchemaProperty);
+  const effective = getEffectiveModelType(program, type, (t) => isMetadata(context.program, t));
   if (effective.name) {
     return effective;
   }
@@ -443,7 +431,6 @@ function getContextPath(
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
     } else if (currentType.kind === "Model") {
-      currentType = getEffectivePayloadType(context, currentType);
       // handle model
       result.push({ displayName: pascalCase(displayName), type: currentType });
       for (const property of currentType.properties.values()) {

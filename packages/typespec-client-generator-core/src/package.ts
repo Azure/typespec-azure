@@ -258,14 +258,13 @@ function getSdkBasicServiceMethod<
     );
   } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
     if (parameters.body.type.kind === "Model") {
-      const type = getEffectivePayloadType(context, parameters.body.type);
       // spread case
-      if (type.name === "") {
-        for (const prop of type.properties.values()) {
+      if (parameters.body.type.name === "") {
+        for (const prop of parameters.body.type.properties.values()) {
           methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop, operation)));
         }
       } else {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, type, operation)));
+        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type, operation)));
       }
     } else {
       methodParameters.push(

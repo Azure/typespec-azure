@@ -49,7 +49,6 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -368,12 +367,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-  {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-  },
-  readonly Diagnostic[],
-] {
+    {
+      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+    },
+    readonly Diagnostic[],
+  ] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
@@ -417,10 +416,7 @@ function getSdkHttpResponseAndExceptions(
           );
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type)
-            : innerResponse.body.type;
+        body = innerResponse.body.type;
       }
     }
     const sdkResponse: SdkHttpResponse = {

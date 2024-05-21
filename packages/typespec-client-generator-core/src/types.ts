@@ -35,7 +35,7 @@ import {
   getAuthentication,
   getServers,
   isHeader,
-  isStatusCode,
+  isMetadata,
 } from "@typespec/http";
 import {
   getAccessOverride,
@@ -92,7 +92,6 @@ import {
 import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
-  getEffectivePayloadType,
   getGeneratedName,
   getHttpOperationWithCache,
   getLibraryName,
@@ -540,7 +539,6 @@ export function getSdkModelWithDiagnostics(
   operation?: Operation
 ): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
 
   if (sdkType) {
@@ -1062,7 +1060,7 @@ function addPropertiesToModelType(
   const diagnostics = createDiagnosticCollector();
   for (const property of type.properties.values()) {
     if (
-      isStatusCode(context.program, property) ||
+      isMetadata(context.program, property) ||
       isNeverOrVoidType(property.type) ||
       sdkType.kind !== "model"
     ) {
@@ -1158,10 +1156,9 @@ function checkAndGetClientType(
   const retval: SdkType[] = [];
   if (type.kind === "Model") {
     if (isExclude(context, type)) return diagnostics.wrap([]); // eslint-disable-line deprecation/deprecation
-    const effectivePayloadType = getEffectivePayloadType(context, type);
-    if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
-      if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
-        effectivePayloadType.templateMapper.args
+    if (context.filterOutCoreModels && isAzureCoreModel(type)) {
+      if (type.templateMapper && type.name) {
+        type.templateMapper.args
           .filter((arg): arg is Type => "kind" in arg)
           .filter((arg) => arg.kind === "Model" && arg.name)
           .forEach((arg) => {
@@ -1284,8 +1281,6 @@ function updateTypesFromOperation(
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
-        // spread body model should be none usage
-        if (body.kind === "model" && body.isGeneratedName) return;
         updateUsageOfModel(context, UsageFlags.Input, body);
       });
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
