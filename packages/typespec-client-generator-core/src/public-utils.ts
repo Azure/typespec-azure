@@ -35,7 +35,6 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkType } from "./interfaces.js";
 import {
   TCGCContext,
   TspLiteralType,

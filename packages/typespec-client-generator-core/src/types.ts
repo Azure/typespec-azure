@@ -28,6 +28,7 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
+  isNullType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -66,7 +67,6 @@ import {
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
-  SdkNullableType,
   SdkOperationGroup,
   SdkTupleType,
   SdkType,
@@ -82,7 +82,6 @@ import {
   getDocHelper,
   getLocationOfOperation,
   getNonNullOptions,
-  getNullOption,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
@@ -106,7 +105,6 @@ import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { TCGCContext } from "./internal-utils.js";
-import { get } from "http";
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
@@ -147,39 +145,40 @@ export function addEncodeInfo(
   defaultContentType?: string
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const innerType = propertyType.kind === "nullable" ? propertyType.valueType : propertyType;
   const encodeData = getEncode(context.program, type);
-  if (propertyType.kind === "duration") {
+  if (innerType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);
-    propertyType.encode = encodeData.encoding as DurationKnownEncoding;
-    propertyType.wireType = diagnostics.pipe(
+    innerType.encode = encodeData.encoding as DurationKnownEncoding;
+    innerType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type)
     ) as SdkBuiltInType;
     // eslint-disable-next-line deprecation/deprecation
     if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      propertyType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
+      innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
-  if (propertyType.kind === "utcDateTime" || propertyType.kind === "offsetDateTime") {
+  if (innerType.kind === "utcDateTime" || innerType.kind === "offsetDateTime") {
     if (encodeData) {
-      propertyType.encode = encodeData.encoding as DateTimeKnownEncoding;
-      propertyType.wireType = diagnostics.pipe(
+      innerType.encode = encodeData.encoding as DateTimeKnownEncoding;
+      innerType.wireType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, encodeData.type)
       ) as SdkBuiltInType;
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
-      propertyType.encode = "rfc7231";
+      innerType.encode = "rfc7231";
     }
     // eslint-disable-next-line deprecation/deprecation
     if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      propertyType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
+      innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
-  if (propertyType.kind === "bytes") {
+  if (innerType.kind === "bytes") {
     if (encodeData) {
-      propertyType.encode = encodeData.encoding as BytesKnownEncoding;
+      innerType.encode = encodeData.encoding as BytesKnownEncoding;
     } else if (!defaultContentType || defaultContentType === "application/json") {
-      propertyType.encode = "base64";
+      innerType.encode = "base64";
     } else {
-      propertyType.encode = "bytes";
+      innerType.encode = "bytes";
     }
   }
   return diagnostics.wrap(undefined);
@@ -342,25 +341,22 @@ export function getSdkUnionWithDiagnostics(
 ): [SdkType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const nonNullOptions = getNonNullOptions(type);
-  const nullOption = getNullOption(type);
+  let retval: SdkType | undefined = undefined;
 
   if (nonNullOptions.length === 0) {
     diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
     return diagnostics.wrap(getAnyType());
   }
-
-  // convert type only with one non-null variant
-  if (nullOption && nonNullOptions.length === 1) {
-    return diagnostics.wrap({
-      ...getSdkTypeBaseHelper(context, type, "nullable"),
-      valueType: diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation)),
-    })
+  const nullable = Boolean(
+    [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0]
+  );
+  if (nonNullOptions.length === 1) {
+    retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
   }
-
   // judge if the union can be converted to enum
   // if language does not need flatten union as enum
   // filter the case that union is composed of union or enum
-  if (
+  else if (
     context.flattenUnionAsEnum ||
     ![...type.variants.values()].some((variant) => {
       return variant.type.kind === "Union" || variant.type.kind === "Enum";
@@ -368,35 +364,30 @@ export function getSdkUnionWithDiagnostics(
   ) {
     const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
     if (unionAsEnum) {
-      const enumType = getSdkUnionEnum(context, unionAsEnum, operation);
-      if (nullOption === undefined) {
-        return diagnostics.wrap(enumType);
-      } else {
-        return diagnostics.wrap({
-          ...getSdkTypeBaseHelper(context, type, "union"),
-          name: getLibraryName(context, type) || getGeneratedName(context, type),
-          isGeneratedName: !type.name,
-          kind: "union",
-          values: [
-            enumType,
-            diagnostics.pipe(getClientTypeWithDiagnostics(context, nullOption, operation)),
-          ],
-          nullable: true,
-        });
-      }
+      retval = getSdkUnionEnum(context, unionAsEnum, operation);
     }
+  }
+  if (retval === undefined) {
+    retval = {
+      ...getSdkTypeBaseHelper(context, type, "union"),
+      name: getLibraryName(context, type) || getGeneratedName(context, type),
+      isGeneratedName: !type.name,
+      values: nonNullOptions.map((x) =>
+        diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
+      ),
+      nullable: isNullableInternal(type), // eslint-disable-line deprecation/deprecation
+    };
+  }
+  if (nullable) {
+    retval = {
+      ...getSdkTypeBaseHelper(context, type, "nullable"),
+      nullable,
+      valueType: retval,
+    };
   }
 
   // other cases
-  return diagnostics.wrap({
-    ...getSdkTypeBaseHelper(context, type, "union"),
-    name: getLibraryName(context, type) || getGeneratedName(context, type),
-    isGeneratedName: !type.name,
-    values: [...type.variants.values()].map((x) =>
-      diagnostics.pipe(getClientTypeWithDiagnostics(context, x.type, operation))
-    ),
-    nullable: isNullableInternal(type), // eslint-disable-line deprecation/deprecation
-  });
+  return diagnostics.wrap(retval);
 }
 
 function getSdkConstantWithDiagnostics(
@@ -1205,8 +1196,9 @@ function updateUsageOfModel(
   options = options ?? {};
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
-  if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
-    return;
+  // if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
+  //   return;
+  if (!type) return;
   if (options?.seenModelNames === undefined) {
     options.seenModelNames = new Set<SdkType>();
   }
@@ -1222,6 +1214,10 @@ function updateUsageOfModel(
   }
   if (type.kind === "enumvalue") {
     updateUsageOfModel(context, usage, type.enumType, options);
+    return;
+  }
+  if (type.kind === "nullable") {
+    updateUsageOfModel(context, usage, type.valueType, options);
     return;
   }
   if (type.kind !== "model" && type.kind !== "enum") return;

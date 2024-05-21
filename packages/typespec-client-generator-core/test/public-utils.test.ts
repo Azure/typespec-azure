@@ -1370,9 +1370,9 @@ describe("typespec-client-generator-core: public-utils", () => {
         ok(
           models.find(
             (x) =>
-              x.name === "AB1" &&
+              x.name === "AB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.AB1"
+              x.crossLanguageDefinitionId === "TestService.AB"
           )
         );
       });

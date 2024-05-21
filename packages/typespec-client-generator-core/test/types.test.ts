@@ -7,16 +7,13 @@ import { beforeEach, describe, it } from "vitest";
 import {
   SdkArrayType,
   SdkBodyModelPropertyType,
-  SdkBuiltInType,
   SdkEnumType,
   SdkModelType,
   SdkType,
   SdkUnionType,
   UsageFlags,
 } from "../src/interfaces.js";
-import {
-  isErrorOrChildOfError,
-} from "../src/public-utils.js";
+import { isErrorOrChildOfError } from "../src/public-utils.js";
 import {
   getAllModels,
   getAllModelsWithDiagnostics,
@@ -552,7 +549,6 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = nullableType.valueType;
       strictEqual(sdkType.kind, "float32");
-      strictEqual(sdkType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, true);
     });
@@ -615,7 +611,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const elementTypeValueType = elementType.valueType;
       strictEqual(elementTypeValueType.kind, "union");
-      strictEqual(elementTypeValueType.values.length, 3);
+      strictEqual(elementTypeValueType.values.length, 2);
       strictEqual(elementTypeValueType.values[0].kind, "string");
       strictEqual(elementTypeValueType.values[1].kind, "float32");
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
@@ -793,7 +789,10 @@ describe("typespec-client-generator-core: types", () => {
 
       const spreadTypeAdditionalPropertiesUnderlyingType = spreadTypeAdditionalProperties.valueType;
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.kind, "union");
-      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.name, "TestSpreadAdditionalProperty");
+      strictEqual(
+        spreadTypeAdditionalPropertiesUnderlyingType.name,
+        "TestSpreadAdditionalProperty"
+      );
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.isGeneratedName, true);
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values.length, 2);
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
@@ -1001,7 +1000,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(nullableProp.type.nullable, true);
       strictEqual(nullableProp.nullable, true);
       strictEqual(nullableProp.type.valueType.kind, "union");
-      strictEqual(nullableProp.type.valueType.values.length, 4);
+      strictEqual(nullableProp.type.valueType.values.length, 3);
 
       // now check without null with help of helper function
       strictEqual(nullableModel.properties[0].type.kind, "nullable");
@@ -1646,7 +1645,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(unionType.nullable, true);
 
       const values = unionType.values;
-      strictEqual(values.length, 4);
+      strictEqual(values.length, 3);
       const a = values[0] as SdkEnumType;
       strictEqual(a.name, "A");
       strictEqual(a.kind, "enum");
@@ -1669,9 +1668,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(c.isUnionAsEnum, false);
       strictEqual(c.values[0].name, "C");
       strictEqual(c.values[0].value, "C");
-
-      const d = values[3] as SdkBuiltInType;
-      strictEqual(d.kind, "null");
     });
 
     it("anonymous union as enum with hierarchy", async () => {
