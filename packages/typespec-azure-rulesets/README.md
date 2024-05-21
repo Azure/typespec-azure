@@ -1,6 +1,6 @@
 # @azure-tools/typespec-azure-rulesets
 
-TypeSpec ruleset for azure specs
+TypeSpec ruleset for Azure specs
 
 ## Install
 
