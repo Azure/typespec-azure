@@ -85,6 +85,7 @@ import {
   isAzureCoreModel,
   isMultipartFormData,
   isMultipartOperation,
+  isNeverOrVoidType,
   isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -388,7 +389,8 @@ export function getSdkUnionWithDiagnostics(
 
 function getSdkConstantWithDiagnostics(
   context: TCGCContext,
-  type: StringLiteral | NumericLiteral | BooleanLiteral
+  type: StringLiteral | NumericLiteral | BooleanLiteral,
+  operation?: Operation
 ): [SdkConstantType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   switch (type.kind) {
@@ -400,15 +402,18 @@ function getSdkConstantWithDiagnostics(
         ...getSdkTypeBaseHelper(context, type, "constant"),
         value: type.value,
         valueType,
+        name: getGeneratedName(context, type, operation),
+        isGeneratedName: true,
       });
   }
 }
 
 export function getSdkConstant(
   context: TCGCContext,
-  type: StringLiteral | NumericLiteral | BooleanLiteral
+  type: StringLiteral | NumericLiteral | BooleanLiteral,
+  operation?: Operation
 ): SdkConstantType {
-  return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type));
+  return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type, operation));
 }
 
 function addDiscriminatorToModelType(
@@ -419,6 +424,14 @@ function addDiscriminatorToModelType(
   const discriminator = getDiscriminator(context.program, type);
   const diagnostics = createDiagnosticCollector();
   if (discriminator) {
+    let discriminatorType: SdkType | undefined = undefined;
+    for (let i = 0; i < model.properties.length; i++) {
+      const property = model.properties[i];
+      if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
+        discriminatorType = property.type;
+      }
+    }
+
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
       const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
@@ -445,12 +458,20 @@ function addDiscriminatorToModelType(
                 })
               );
             } else {
-              childModelSdkType.discriminatorValue = property.type.value;
+              // map string value type to enum value type
+              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+                for (const value of discriminatorType.values) {
+                  if (value.value === property.type.value) {
+                    property.type = value;
+                  }
+                }
+              }
+              childModelSdkType.discriminatorValue = property.type.value as string;
               property.discriminator = true;
               if (model.discriminatedSubtypes === undefined) {
                 model.discriminatedSubtypes = {};
               }
-              model.discriminatedSubtypes[property.type.value] = childModelSdkType;
+              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
               discriminatorProperty = property;
             }
           }
@@ -465,7 +486,7 @@ function addDiscriminatorToModelType(
         return diagnostics.wrap(undefined);
       }
     }
-    let discriminatorType: SdkType;
+
     if (discriminatorProperty) {
       if (discriminatorProperty.type.kind === "constant") {
         discriminatorType = { ...discriminatorProperty.type.valueType };
@@ -482,6 +503,7 @@ function addDiscriminatorToModelType(
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
       kind: "property",
+      description: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
       serializedName: discriminatorProperty
@@ -493,8 +515,8 @@ function addDiscriminatorToModelType(
       isGeneratedName: false,
       onClient: false,
       apiVersions: discriminatorProperty
-        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type.namespace)
-        : getAvailableApiVersions(context, type, type.namespace),
+        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
+        : getAvailableApiVersions(context, type, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -961,6 +983,8 @@ export function getSdkModelPropertyTypeBase(
   operation?: Operation
 ): [SdkModelPropertyTypeBase, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  // get api version info so we can cache info about its api versions before we get to property type level
+  const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
   let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
@@ -974,11 +998,7 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
-    apiVersions: getAvailableApiVersions(
-      context,
-      type,
-      operation?.interface || operation?.namespace || type.model?.namespace
-    ),
+    apiVersions,
     type: propertyType,
     nameInClient: name,
     name,
@@ -1044,7 +1064,7 @@ function addPropertiesToModelType(
   for (const property of type.properties.values()) {
     if (
       isStatusCode(context.program, property) ||
-      isNeverType(property.type) ||
+      isNeverOrVoidType(property.type) ||
       sdkType.kind !== "model"
     ) {
       continue;
@@ -1143,6 +1163,7 @@ function checkAndGetClientType(
     if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
       if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
         effectivePayloadType.templateMapper.args
+          .filter((arg): arg is Type => "kind" in arg)
           .filter((arg) => arg.kind === "Model" && arg.name)
           .forEach((arg) => {
             retval.push(...diagnostics.pipe(checkAndGetClientType(context, arg, operation)));
@@ -1240,6 +1261,7 @@ function updateTypesFromOperation(
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
+    if (isNeverOrVoidType(param.type)) continue;
     const paramTypes = diagnostics.pipe(checkAndGetClientType(context, param.type, operation));
     if (generateConvenient) {
       paramTypes.forEach((paramType) => {
@@ -1248,6 +1270,7 @@ function updateTypesFromOperation(
     }
   }
   for (const param of httpOperation.parameters.parameters) {
+    if (isNeverOrVoidType(param.param.type)) continue;
     const paramTypes = diagnostics.pipe(
       checkAndGetClientType(context, param.param.type, operation)
     );
@@ -1258,7 +1281,7 @@ function updateTypesFromOperation(
     }
   }
   const httpBody = httpOperation.parameters.body;
-  if (httpBody) {
+  if (httpBody && !isNeverOrVoidType(httpBody.type)) {
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
       bodies.forEach((body) => {
@@ -1282,7 +1305,7 @@ function updateTypesFromOperation(
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
-      if (innerResponse.body?.type) {
+      if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
         const responseBodies = diagnostics.pipe(
           checkAndGetClientType(context, innerResponse.body.type, operation)
         );
@@ -1296,22 +1319,24 @@ function updateTypesFromOperation(
   }
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData && generateConvenient) {
-    const logicalResults = diagnostics.pipe(
-      checkAndGetClientType(context, lroMetaData.logicalResult, operation)
-    );
-    logicalResults.forEach((logicalResult) => {
-      updateUsageOfModel(context, UsageFlags.Output, logicalResult);
-    });
-
-    if (!context.arm) {
-      // TODO: currently skipping adding of envelopeResult due to arm error
-      // https://github.com/Azure/typespec-azure/issues/311
-      const envelopeResults = diagnostics.pipe(
-        checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+    if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
+      const finalResults = diagnostics.pipe(
+        checkAndGetClientType(context, lroMetaData.finalResult, operation)
       );
-      envelopeResults.forEach((envelopeResult) => {
-        updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+      finalResults.forEach((finalResult) => {
+        updateUsageOfModel(context, UsageFlags.Output, finalResult);
       });
+
+      if (!context.arm) {
+        // TODO: currently skipping adding of envelopeResult due to arm error
+        // https://github.com/Azure/typespec-azure/issues/311
+        const envelopeResults = diagnostics.pipe(
+          checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+        );
+        envelopeResults.forEach((envelopeResult) => {
+          updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
+        });
+      }
     }
   }
   return diagnostics.wrap(undefined);
@@ -1470,6 +1495,16 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
+      if (
+        context.apiVersion !== undefined &&
+        context.apiVersion !== "latest" &&
+        context.apiVersion !== "all"
+      ) {
+        const index = sdkVersionsEnum.values.findIndex((v) => v.value === context.apiVersion);
+        if (index >= 0) {
+          sdkVersionsEnum.values = sdkVersionsEnum.values.slice(0, index + 1);
+        }
+      }
       updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }

@@ -62,7 +62,7 @@ the access result is undefined.
 // Access.internal
 @access(Access.internal)
 model ModelToHide {
-prop: valueof string
+  prop: string;
 }
 // Access.internal
 @access(Access.internal)
@@ -332,7 +332,7 @@ all models that are included in operations.
 ```typespec
 @exclude("python")
 model ModelToExclude {
-  prop: valueof string;
+  prop: string;
 }
 ```
 
@@ -390,7 +390,7 @@ all models that are included in operations.
 ```typespec
 @include("python")
 model ModelToInclude {
-  prop: valueof string;
+  prop: string;
 }
 ```
 

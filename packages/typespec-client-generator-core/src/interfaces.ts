@@ -271,6 +271,8 @@ export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
   value: string | number | boolean | null;
   valueType: SdkBuiltInType;
+  name: string;
+  isGeneratedName: boolean;
 }
 
 export interface SdkUnionType extends SdkTypeBase {

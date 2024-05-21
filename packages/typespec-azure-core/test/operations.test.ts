@@ -2865,34 +2865,22 @@ describe("typespec-azure-core: operation templates", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "unassignable",
-          message:
-            "Type 'Azure.MyService.Foo | Azure.MyService.Bar' is not assignable to type 'Model'",
+          code: "invalid-argument",
         },
         {
-          code: "unassignable",
-          message:
-            "Type 'Azure.MyService.Foo | Azure.MyService.Bar' is not assignable to type 'Model'",
+          code: "invalid-argument",
         },
         {
-          code: "unassignable",
-          message:
-            "Type 'Azure.MyService.Foo | Azure.MyService.Bar' is not assignable to type 'Model'",
+          code: "invalid-argument",
         },
         {
-          code: "unassignable",
-          message:
-            "Type 'Azure.MyService.Bar | Azure.MyService.Foo' is not assignable to type 'Model'",
+          code: "invalid-argument",
         },
         {
-          code: "unassignable",
-          message:
-            "Type 'Azure.MyService.Bar | Azure.MyService.Foo' is not assignable to type 'Model'",
+          code: "invalid-argument",
         },
         {
-          code: "unassignable",
-          message:
-            "Type 'Azure.MyService.Bar | Azure.MyService.Foo' is not assignable to type 'Model'",
+          code: "invalid-argument",
         },
       ]);
     });
@@ -2911,7 +2899,7 @@ describe("typespec-azure-core: operation templates", () => {
           message: "Unknown identifier abc",
         },
         {
-          code: "unassignable",
+          code: "invalid-argument",
         },
       ]
     );

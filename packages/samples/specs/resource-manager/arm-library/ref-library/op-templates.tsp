@@ -16,6 +16,7 @@ namespace Microsoft.OperationsTest;
 
 // Tracked resources
 model TestTrackedResource2 is TrackedResource<TestTrackedProperties2> {
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
   @doc("The name of the Tracked resource.")
   @key("trackedResourceName")
   @segment("trackedResource2s")
@@ -36,7 +37,8 @@ interface Tracked2Operations {
 @doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties2 {
   @doc("The status of the last operation performed on this resource.")
-  provisioningState: ResourceProvisioningState;
+  @visibility("read")
+  provisioningState?: ResourceProvisioningState;
 
   @doc("Name of the resource")
   displayName?: string = "default";
