@@ -82,6 +82,7 @@ interface SdkTypeBase {
   kind: string;
   /**
    * @deprecated Use helper function `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullable: boolean;
   deprecation?: string;
@@ -232,6 +233,7 @@ export interface SdkArrayType extends SdkTypeBase {
   valueType: SdkType;
   /**
    * @deprecated Pass `valueType` to `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullableValues: boolean;
 }
@@ -247,6 +249,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
   valueType: SdkType;
   /**
    * @deprecated Pass `valueType` to `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullableValues: boolean;
 }
@@ -308,6 +311,7 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   /**
    * @deprecated This property is deprecated. Pass the type of the additionalProperties to `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
@@ -347,6 +351,7 @@ export interface SdkModelPropertyTypeBase {
   optional: boolean;
   /**
    * @deprecated Use exported helper function `isNullable` instead, and pass the type of the property to the function.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullable: boolean;
 }
@@ -434,6 +439,7 @@ export interface SdkServiceResponseHeader {
   details?: string;
   /**
    * @deprecated This property is deprecated. Pass the type of response header to `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullable: boolean;
 }
@@ -443,6 +449,7 @@ export interface SdkMethodResponse {
   type?: SdkType;
   /**
    * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullable: boolean;
   resultPath?: string; // if exists, tells you how to get from the service response to the method response.
@@ -454,6 +461,7 @@ export interface SdkServiceResponse {
   apiVersions: string[];
   /**
    * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead.
+   * https://github.com/Azure/typespec-azure/issues/891
    */
   nullable: boolean;
 }
