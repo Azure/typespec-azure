@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -126,7 +127,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(client.initialization.properties.length, 1);
       const endpointParam = client.initialization.properties[0];
       strictEqual(endpointParam.kind, "endpoint");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(endpointParam.nameInClient, "endpoint");
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.onClient, true);
@@ -160,7 +160,6 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
       strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
@@ -201,7 +200,6 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
       strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
@@ -247,7 +245,6 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
       strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
@@ -304,7 +301,6 @@ describe("typespec-client-generator-core: package", () => {
       )[0];
       strictEqual(endpointParam.clientDefaultValue, undefined);
       strictEqual(endpointParam.urlEncode, false);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(endpointParam.nameInClient, "endpoint");
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.type.kind, "endpoint");
@@ -324,7 +320,6 @@ describe("typespec-client-generator-core: package", () => {
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
       )[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
       strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
@@ -374,7 +369,6 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = endpointParams[0];
       strictEqual(endpointParam.clientDefaultValue, undefined);
       strictEqual(endpointParam.urlEncode, false);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(endpointParam.nameInClient, "endpoint");
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.onClient, true);
@@ -395,7 +389,6 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = endpointParamType.templateArguments[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
       strictEqual(apiVersionParam.urlEncode, true);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
@@ -407,7 +400,6 @@ describe("typespec-client-generator-core: package", () => {
         (p): p is SdkCredentialParameter => p.kind === "credential"
       );
       ok(credentialParam);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(credentialParam.nameInClient, "credential");
       strictEqual(credentialParam.name, "credential");
       strictEqual(credentialParam.onClient, true);
@@ -477,7 +469,6 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = client.initialization.properties.filter(
         (p) => p.isApiVersionParam
       )[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
@@ -544,7 +535,6 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = client.initialization.properties.filter(
         (p) => p.isApiVersionParam
       )[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
@@ -595,7 +585,6 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(mainClient.methods.length, 1);
       strictEqual(mainClient.initialization.properties.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(mainClient.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
 
@@ -642,7 +631,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(mainClient.methods.length, 2);
       ok(mainClient.initialization);
       strictEqual(mainClient.initialization.properties.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(mainClient.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
 
@@ -726,7 +714,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization.properties.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(client.initialization.properties[0].name, "endpoint");
 
@@ -757,11 +744,9 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0];
 
       strictEqual(client.initialization.properties.length, 2);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(client.initialization.properties[0].name, "endpoint");
       const clientApiVersionParam = client.initialization.properties[1];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
       strictEqual(clientApiVersionParam.name, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
@@ -806,7 +791,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization.properties.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(client.initialization.properties[0].name, "endpoint");
 
@@ -838,12 +822,10 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization.properties.length, 2);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(client.initialization.properties[0].name, "endpoint");
 
       const clientApiVersionParam = client.initialization.properties[1];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
       strictEqual(clientApiVersionParam.name, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
@@ -893,12 +875,10 @@ describe("typespec-client-generator-core: package", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization.properties.length, 2);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(client.initialization.properties[0].nameInClient, "endpoint");
       strictEqual(client.initialization.properties[0].name, "endpoint");
 
       const clientApiVersionParam = client.initialization.properties[1];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(clientApiVersionParam.nameInClient, "apiVersion");
       strictEqual(clientApiVersionParam.name, "apiVersion");
       strictEqual(clientApiVersionParam.onClient, true);
@@ -924,7 +904,6 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = withApiVersion.operation.parameters[0];
       strictEqual(apiVersionParam.kind, "path");
       strictEqual(apiVersionParam.serializedName, "apiVersion");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.isApiVersionParam, true);
@@ -951,7 +930,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "path");
       strictEqual(methodParam.name, "path");
       strictEqual(methodParam.optional, false);
@@ -969,7 +947,6 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "path");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "path");
       strictEqual(pathParam.name, "path");
       strictEqual(pathParam.optional, false);
@@ -983,7 +960,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = pathParam.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(pathParam.name, correspondingMethodParams[0].name);
     });
@@ -1066,7 +1042,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "header");
       strictEqual(methodParam.name, "header");
       strictEqual(methodParam.optional, false);
@@ -1084,7 +1059,6 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(headerParam.kind, "header");
       strictEqual(headerParam.serializedName, "header");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(headerParam.nameInClient, "header");
       strictEqual(headerParam.name, "header");
       strictEqual(headerParam.optional, false);
@@ -1096,7 +1070,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = headerParam.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(headerParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(headerParam.name, correspondingMethodParams[0].name);
     });
@@ -1150,7 +1123,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "query");
       strictEqual(methodParam.name, "query");
       strictEqual(methodParam.optional, false);
@@ -1167,7 +1139,6 @@ describe("typespec-client-generator-core: package", () => {
       const queryParam = serviceOperation.parameters[0];
       strictEqual(queryParam.kind, "query");
       strictEqual(queryParam.serializedName, "query");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, "query");
       strictEqual(queryParam.name, "query");
       strictEqual(queryParam.optional, false);
@@ -1179,7 +1150,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = queryParam.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(queryParam.name, correspondingMethodParams[0].name);
     });
@@ -1266,13 +1236,11 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(bodyParameter.name, correspondingMethodParams[0].name);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const contentTypeParam = serviceOperation.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(contentTypeParam.nameInClient, "contentType");
       strictEqual(contentTypeParam.name, "contentType");
       strictEqual(contentTypeParam.serializedName, "Content-Type");
@@ -1353,13 +1321,11 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(bodyParameter.name, correspondingMethodParams[0].name);
 
       strictEqual(serviceOperation.parameters.length, 1);
       const contentTypeParam = serviceOperation.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(contentTypeParam.nameInClient, "contentType");
       strictEqual(contentTypeParam.name, "contentType");
       strictEqual(contentTypeParam.serializedName, "Content-Type");
@@ -1396,7 +1362,6 @@ describe("typespec-client-generator-core: package", () => {
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "header");
       strictEqual(methodParam.name, "header");
       strictEqual(methodParam.optional, false);
@@ -1406,7 +1371,6 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[1];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "query");
       strictEqual(methodParam.name, "query");
       strictEqual(methodParam.optional, false);
@@ -1416,7 +1380,6 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[2];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "body");
       strictEqual(methodParam.name, "body");
       strictEqual(methodParam.optional, false);
@@ -1426,7 +1389,6 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[3];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "contentType");
       strictEqual(methodParam.name, "contentType");
       strictEqual(methodParam.optional, false);
@@ -1440,7 +1402,6 @@ describe("typespec-client-generator-core: package", () => {
       ok(serviceOperation.bodyParam);
       const correspondingBodyParams = serviceOperation.bodyParam.correspondingMethodParams;
       strictEqual(correspondingBodyParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingBodyParams[0].nameInClient, "body");
       strictEqual(correspondingBodyParams[0].name, "body");
 
@@ -1451,13 +1412,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(headerParams.length, 2);
       let correspondingHeaderParams = headerParams[0].correspondingMethodParams;
       strictEqual(correspondingHeaderParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingHeaderParams[0].nameInClient, "header");
       strictEqual(correspondingHeaderParams[0].name, "header");
 
       correspondingHeaderParams = headerParams[1].correspondingMethodParams;
       strictEqual(correspondingHeaderParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingHeaderParams[0].nameInClient, "contentType");
       strictEqual(correspondingHeaderParams[0].name, "contentType");
 
@@ -1465,7 +1424,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(queryParams.length, 1);
       const correspondingQueryParams = queryParams[0].correspondingMethodParams;
       strictEqual(correspondingQueryParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingQueryParams[0].nameInClient, "query");
       strictEqual(correspondingQueryParams[0].name, "query");
     });
@@ -1483,7 +1441,6 @@ describe("typespec-client-generator-core: package", () => {
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "body");
       strictEqual(methodParam.name, "body");
       strictEqual(methodParam.optional, false);
@@ -1493,7 +1450,6 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[1];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "contentType");
       strictEqual(methodParam.name, "contentType");
       strictEqual(methodParam.optional, false);
@@ -1508,14 +1464,12 @@ describe("typespec-client-generator-core: package", () => {
       ok(serviceOperation.bodyParam);
       const correspondingBodyParams = serviceOperation.bodyParam.correspondingMethodParams;
       strictEqual(correspondingBodyParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingBodyParams[0].nameInClient, "body");
       strictEqual(correspondingBodyParams[0].name, "body");
 
       strictEqual(serviceOperation.parameters.length, 1);
       const correspondingHeaderParams = serviceOperation.parameters[0].correspondingMethodParams;
       strictEqual(correspondingHeaderParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(correspondingHeaderParams[0].nameInClient, "contentType");
       strictEqual(correspondingHeaderParams[0].name, "contentType");
     });
@@ -1531,13 +1485,11 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.parameters.length, 2);
       const methodBodyParam = method.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodBodyParam.nameInClient, "body");
       strictEqual(methodBodyParam.name, "body");
       strictEqual(methodBodyParam.type, sdkPackage.models[0]);
 
       const methodContentTypeParam = method.parameters[1];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodContentTypeParam.nameInClient, "contentType");
       strictEqual(methodContentTypeParam.name, "contentType");
 
@@ -1552,7 +1504,6 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(serviceOperation.parameters.length, 1);
       const serviceContentTypeParam = serviceOperation.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceContentTypeParam.nameInClient, "contentType");
       strictEqual(serviceContentTypeParam.name, "contentType");
       strictEqual(serviceContentTypeParam.serializedName, "Content-Type");
@@ -1575,14 +1526,12 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.parameters.length, 1);
       const methodAcceptParam = method.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodAcceptParam.nameInClient, "accept");
       strictEqual(methodAcceptParam.name, "accept");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.parameters.length, 1);
       const serviceContentTypeParam = serviceOperation.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceContentTypeParam.nameInClient, "accept");
       strictEqual(serviceContentTypeParam.name, "accept");
       strictEqual(serviceContentTypeParam.serializedName, "Accept");
@@ -1619,14 +1568,12 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(method.parameters.length, 1);
       const methodAcceptParam = method.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodAcceptParam.nameInClient, "accept");
       strictEqual(methodAcceptParam.name, "accept");
 
       const serviceOperation = method.operation;
       strictEqual(serviceOperation.parameters.length, 1);
       const serviceContentTypeParam = serviceOperation.parameters[0];
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceContentTypeParam.nameInClient, "accept");
       strictEqual(serviceContentTypeParam.name, "accept");
       strictEqual(serviceContentTypeParam.serializedName, "Accept");
@@ -1999,7 +1946,6 @@ describe("typespec-client-generator-core: package", () => {
       const bodyParameter = method.operation.bodyParam;
       ok(bodyParameter);
       strictEqual(bodyParameter.kind, "body");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.nameInClient, "widget");
       strictEqual(bodyParameter.name, "widget");
       strictEqual(bodyParameter.onClient, false);
@@ -2072,7 +2018,6 @@ describe("typespec-client-generator-core: package", () => {
       ok(pathParam);
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "id");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "id");
       strictEqual(pathParam.name, "id");
       strictEqual(pathParam.optional, false);
@@ -2090,7 +2035,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = pathParam.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(pathParam.name, correspondingMethodParams[0].name);
     });
@@ -2105,7 +2049,6 @@ describe("typespec-client-generator-core: package", () => {
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "id");
       strictEqual(methodParam.name, "id");
       strictEqual(methodParam.optional, false);
@@ -2115,7 +2058,6 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[1];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "widget");
       strictEqual(methodParam.name, "widget");
       strictEqual(methodParam.optional, false);
@@ -2139,7 +2081,6 @@ describe("typespec-client-generator-core: package", () => {
       ok(pathParam);
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "id");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "id");
       strictEqual(pathParam.name, "id");
       strictEqual(pathParam.optional, false);
@@ -2195,7 +2136,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "id");
       strictEqual(methodParam.name, "id");
       strictEqual(methodParam.optional, false);
@@ -2209,7 +2149,6 @@ describe("typespec-client-generator-core: package", () => {
       ok(pathParam);
       strictEqual(pathParam.kind, "path");
       strictEqual(pathParam.serializedName, "id");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "id");
       strictEqual(pathParam.name, "id");
       strictEqual(pathParam.optional, false);
@@ -2219,7 +2158,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const correspondingMethodParams = pathParam.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, correspondingMethodParams[0].nameInClient);
       strictEqual(pathParam.name, correspondingMethodParams[0].name);
     });
@@ -2458,7 +2396,6 @@ describe("typespec-client-generator-core: package", () => {
       const pathParam = method.operation.parameters.find((x) => x.kind === "path");
       ok(pathParam);
       strictEqual(pathParam.kind, "path");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam.nameInClient, "widgetName");
       strictEqual(pathParam.name, "widgetName");
       strictEqual(pathParam.serializedName, "widgetName");
@@ -2469,7 +2406,6 @@ describe("typespec-client-generator-core: package", () => {
       const queryParam = method.operation.parameters.find((x) => x.kind === "query");
       ok(queryParam);
       strictEqual(queryParam.isApiVersionParam, true);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(queryParam.nameInClient, "apiVersion");
       strictEqual(queryParam.name, "apiVersion");
       strictEqual(queryParam.serializedName, "api-version");
@@ -2574,7 +2510,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const pathParam1 = pathParams[0];
       strictEqual(pathParam1.kind, "path");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam1.nameInClient, "widgetName");
       strictEqual(pathParam1.name, "widgetName");
       strictEqual(pathParam1.serializedName, "widgetName");
@@ -2584,7 +2519,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const pathParam2 = pathParams[1];
       strictEqual(pathParam2.kind, "path");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(pathParam2.nameInClient, "operationId");
       strictEqual(pathParam2.name, "operationId");
       strictEqual(pathParam2.serializedName, "operationId");
@@ -2595,7 +2529,6 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersionParam = getStatus.operation.parameters.find((x) => x.kind === "query");
       ok(apiVersionParam);
       strictEqual(apiVersionParam.isApiVersionParam, true);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersionParam.nameInClient, "apiVersion");
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.serializedName, "api-version");
@@ -2609,7 +2542,6 @@ describe("typespec-client-generator-core: package", () => {
 
       const operationAcceptParam = getStatus.operation.parameters.find((x) => x.kind === "header");
       ok(operationAcceptParam);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(operationAcceptParam.nameInClient, "accept");
       strictEqual(operationAcceptParam.name, "accept");
       strictEqual(operationAcceptParam.clientDefaultValue, undefined);
@@ -2673,7 +2605,6 @@ describe("typespec-client-generator-core: package", () => {
       ok(queryParam);
       strictEqual(queryParam.serializedName, "api-version");
       ok(serviceOperation.bodyParam);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(serviceOperation.bodyParam.nameInClient, "resource");
       strictEqual(serviceOperation.bodyParam.name, "resource");
       strictEqual(serviceOperation.bodyParam.type, widgetModel);
@@ -2787,7 +2718,6 @@ describe("typespec-client-generator-core: package", () => {
       const apiVersion = operation.parameters.find((x) => x.isApiVersionParam);
       ok(apiVersion);
       strictEqual(apiVersion.kind, "query");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(apiVersion.nameInClient, "apiVersion");
       strictEqual(apiVersion.name, "apiVersion");
       strictEqual(apiVersion.serializedName, "api-version");
@@ -2925,7 +2855,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
       strictEqual(bodyParameter.type.properties.length, 1);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.type.properties[0].nameInClient, "name");
       strictEqual(bodyParameter.type.properties[0].name, "name");
 
@@ -2933,8 +2862,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(correspondingMethodParams.length, 1);
 
       strictEqual(
-        bodyParameter.type.properties[0].nameInClient, //eslint-disable-line deprecation/deprecation
-        correspondingMethodParams[0].nameInClient //eslint-disable-line deprecation/deprecation
+        bodyParameter.type.properties[0].nameInClient,
+        correspondingMethodParams[0].nameInClient
       );
       strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
     });
@@ -2989,10 +2918,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
       strictEqual(bodyParameter.type.properties.length, 2);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.type.properties[0].nameInClient, "kind");
       strictEqual(bodyParameter.type.properties[0].name, "kind");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(bodyParameter.type.properties[1].nameInClient, "name");
       strictEqual(bodyParameter.type.properties[1].name, "name");
 

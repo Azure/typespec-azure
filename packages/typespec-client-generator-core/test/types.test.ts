@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Enum, Model, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
@@ -246,7 +247,6 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `
       );
-      // eslint-disable-next-line deprecation/deprecation
       expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, []);
       expectDiagnostics(runner.context.diagnostics, []);
       const m = runner.context.experimental_sdkPackage.models.find((x) => x.name === "TestModel");
@@ -375,7 +375,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.wireType.kind, "float");
       strictEqual(sdkType.encode, "seconds");
       strictEqual(isNullable(sdkType.wireType), false);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, true);
@@ -495,10 +494,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
       strictEqual(isNullable(sdkType), false);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, false);
       strictEqual(isNullable(sdkType.wireType), false);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, true);
@@ -565,7 +562,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.values[1].kind, "null");
       strictEqual(isNullable(sdkType), true);
       strictEqual(removeNullFromUnionType(sdkType).kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(isNullable(nameProp.type), true);
@@ -594,7 +590,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkTypeWithoutNull.values.length, 2);
       strictEqual(sdkTypeWithoutNull.values[0].kind, "string");
       strictEqual(sdkTypeWithoutNull.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(isNullable(nameProp.type), true);
@@ -619,7 +614,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementType.values[1].kind, "null");
       strictEqual(removeNullFromUnionType(elementType).kind, "float32");
       strictEqual(isNullable(elementType), true);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(isNullable(nameProp.type), false);
@@ -644,7 +638,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementType.values[0].kind, "string");
       strictEqual(elementType.values[1].kind, "float32");
       strictEqual(elementType.values[2].kind, "null");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       strictEqual(isNullable(elementType), true);
 
@@ -668,7 +661,6 @@ describe("typespec-client-generator-core: types", () => {
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "union");
       strictEqual(removeNullFromUnionType(elementType).kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
@@ -694,7 +686,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementType.values[0].kind, "string");
       strictEqual(elementType.values[1].kind, "float32");
       strictEqual(elementType.values[2].kind, "null");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(elementType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
@@ -736,7 +727,6 @@ describe("typespec-client-generator-core: types", () => {
       ok(additionalProperties);
       strictEqual(additionalProperties.kind, "union");
       strictEqual(isNullable(additionalProperties), true);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(additionalProperties.nullable, true);
       strictEqual(extendsType.additionalPropertiesNullable, true);
       strictEqual(removeNullFromUnionType(additionalProperties).kind, "string");
@@ -748,7 +738,6 @@ describe("typespec-client-generator-core: types", () => {
       ok(isTypeAdditionalProperties);
       strictEqual(isTypeAdditionalProperties.kind, "union");
       strictEqual(isNullable(isTypeAdditionalProperties), true);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(isTypeAdditionalProperties.nullable, true);
       strictEqual(isType.additionalPropertiesNullable, true);
       strictEqual(removeNullFromUnionType(isTypeAdditionalProperties).kind, "string");
@@ -759,7 +748,6 @@ describe("typespec-client-generator-core: types", () => {
       const spreadTypeAdditionalProperties = spreadType.additionalProperties;
       ok(spreadTypeAdditionalProperties);
       strictEqual(spreadTypeAdditionalProperties.kind, "union");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(spreadTypeAdditionalProperties.nullable, true);
       strictEqual(spreadType.additionalPropertiesNullable, true);
       strictEqual(isNullable(spreadTypeAdditionalProperties), true);
@@ -805,7 +793,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(extendsTypeAdditionalProperties.values[1].kind, "float32");
       strictEqual(extendsTypeAdditionalProperties.values[2].kind, "null");
       strictEqual(isNullable(extendsTypeAdditionalProperties), true);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(extendsTypeAdditionalProperties.nullable, true);
       strictEqual(extendsType.additionalPropertiesNullable, true);
       strictEqual(removeNullFromUnionType(extendsTypeAdditionalProperties).kind, "union");
@@ -823,7 +810,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(isTypeAdditionalProperties.values[1].kind, "float32");
       strictEqual(isTypeAdditionalProperties.values[2].kind, "null");
       strictEqual(isNullable(isTypeAdditionalProperties), true);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(isTypeAdditionalProperties.nullable, true);
       strictEqual(isType.additionalPropertiesNullable, true);
       strictEqual(removeNullFromUnionType(isTypeAdditionalProperties).kind, "union");
@@ -842,7 +828,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(spreadTypeAdditionalProperties.values[1].kind, "float32");
       strictEqual(spreadTypeAdditionalProperties.values[2].kind, "null");
       strictEqual(isNullable(spreadTypeAdditionalProperties), true);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(spreadTypeAdditionalProperties.nullable, true);
       strictEqual(spreadType.additionalPropertiesNullable, true);
       strictEqual(removeNullFromUnionType(spreadTypeAdditionalProperties).kind, "union");
@@ -946,7 +931,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkTypeWithNull.values[0].kind, "enum");
       strictEqual(sdkTypeWithNull.values[0].name, "PetKind");
       strictEqual(sdkTypeWithNull.values[1].kind, "null");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkTypeWithNull.nullable, true);
       strictEqual(isNullable(sdkTypeWithNull), true);
 
@@ -977,7 +961,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkTypeWithNull.values[0].kind, "enum");
       strictEqual(sdkTypeWithNull.values[0].name, "HomePet");
       strictEqual(sdkTypeWithNull.values[1].kind, "null");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(sdkTypeWithNull.nullable, true);
       strictEqual(isNullable(sdkTypeWithNull), true);
 
@@ -1054,7 +1037,6 @@ describe("typespec-client-generator-core: types", () => {
       const nullableModel = models.find((x) => x.kind === "model" && x.name === "TestNullable");
       ok(nullableModel);
       strictEqual(model.properties[0].type.kind, "union");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.properties[0].type.nullable, false);
       strictEqual(model.properties[0].nullable, false);
       strictEqual(isNullable(model.properties[0].type), false);
@@ -1068,7 +1050,6 @@ describe("typespec-client-generator-core: types", () => {
         }
       }
       strictEqual(nullableModel.properties[0].type.kind, "union");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(nullableModel.properties[0].type.nullable, true);
       strictEqual(nullableModel.properties[0].nullable, true);
       strictEqual(nullableModel.properties[0].type.values.length, 4);
@@ -1665,7 +1646,6 @@ describe("typespec-client-generator-core: types", () => {
       const enumType = removeNullFromUnionType(enumTypeWithNull);
       strictEqual(enumType.kind, "enum");
       strictEqual(enumType.name, "Test");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(enumType.nullable, true);
       strictEqual(enumType.isUnionAsEnum, true);
       const values = enumType.values;
@@ -1717,7 +1697,6 @@ describe("typespec-client-generator-core: types", () => {
 
       strictEqual(unionType.kind, "union");
       strictEqual(unionType.name, "Test");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(unionType.nullable, true);
       strictEqual(isNullable(unionType), true);
 
@@ -2089,7 +2068,6 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "encodedWireName"
       );
       ok(jsonEncodedProp);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
       strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
@@ -2098,7 +2076,6 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "realWireName"
       );
       ok(jsonProjectedProp);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(jsonProjectedProp.nameInClient, "jsonProjectedName");
       strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
@@ -2107,7 +2084,6 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "regular"
       );
       ok(regularProp);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(regularProp.nameInClient, "regular");
       strictEqual(regularProp.name, "regular");
     });
@@ -2359,7 +2335,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(recursiveModel.properties.length, 1);
       const prop = recursiveModel.properties[0];
       strictEqual(prop.kind, "property");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(prop.nameInClient, "prop");
       strictEqual(prop.name, "prop");
       strictEqual(prop.type.kind, "model");
@@ -3539,12 +3514,10 @@ describe("typespec-client-generator-core: types", () => {
       const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw;
       ok(rawModel);
       strictEqual(rawModel.kind, "Model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
     });
 
@@ -3580,7 +3553,6 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
-      // eslint-disable-next-line deprecation/deprecation
       const errorModels = models.filter((x) => x.kind === "model" && x.isError);
       deepStrictEqual(errorModels.map((x) => x.name).sort(), [
         "ApiError",
@@ -3588,7 +3560,6 @@ describe("typespec-client-generator-core: types", () => {
         "FourHundredError",
         "FourZeroFourError",
       ]);
-      // eslint-disable-next-line deprecation/deprecation
       const validModel = models.filter((x) => x.kind === "model" && !x.isError);
       deepStrictEqual(
         validModel.map((x) => x.name),
@@ -3661,7 +3632,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const model = models[0];
       strictEqual(model.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.isFormDataType, true);
       ok((model.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(model.name, "MultiPartRequest");
@@ -3713,7 +3683,6 @@ describe("typespec-client-generator-core: types", () => {
       const modelA = models.find((x) => x.name === "A");
       ok(modelA);
       strictEqual(modelA.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelA.isFormDataType, true);
       ok((modelA.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(modelA.properties.length, 1);
@@ -3724,7 +3693,6 @@ describe("typespec-client-generator-core: types", () => {
       const modelB = models.find((x) => x.name === "B");
       ok(modelB);
       strictEqual(modelB.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelB.isFormDataType, false);
       ok((modelB.usage & UsageFlags.MultipartFormData) === 0);
       strictEqual(modelB.properties.length, 1);
@@ -3812,14 +3780,12 @@ describe("typespec-client-generator-core: types", () => {
 
       const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
       ok(pictureWrapper);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(pictureWrapper.isFormDataType, true);
       ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
       const errorResponse = models.find((x) => x.name === "ErrorResponse");
       ok(errorResponse);
       strictEqual(errorResponse.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(errorResponse.isFormDataType, false);
       ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
     });

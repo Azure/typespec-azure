@@ -362,8 +362,8 @@ function getAllResponseBodiesAndNonBodyExists(
   let nonBodyExists = false;
   for (const response of responses.values()) {
     if (response.type) {
+      // eslint-disable-next-line deprecation/deprecation
       if (response.nullable) {
-        // eslint-disable-line deprecation/deprecation
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);

@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,
@@ -1426,7 +1427,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         const diagnostics = runner.context.diagnostics;
         ok(diagnostics);
-        // eslint-disable-next-line deprecation/deprecation
         deepStrictEqual(diagnostics, runner.context.experimental_sdkPackage.diagnostics);
         strictEqual(models.length, 4);
         const union = models[0].properties[0].type;

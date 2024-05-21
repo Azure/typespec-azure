@@ -155,8 +155,8 @@ export function addEncodeInfo(
     innerType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type)
     ) as SdkBuiltInType;
+    // eslint-disable-next-line deprecation/deprecation
     if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      // eslint-disable-line deprecation/deprecation
       innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
@@ -169,8 +169,8 @@ export function addEncodeInfo(
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
       innerType.encode = "rfc7231";
     }
+    // eslint-disable-next-line deprecation/deprecation
     if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      // eslint-disable-line deprecation/deprecation
       innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
