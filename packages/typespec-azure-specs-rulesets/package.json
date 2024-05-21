@@ -2,7 +2,7 @@
   "name": "@azure-tools/typespec-azure-specs-rulesets",
   "version": "0.42.0",
   "author": "Microsoft Corporation",
-  "description": "TypeSpec ruleset for azure specs",
+  "description": "TypeSpec ruleset for Azure specs",
   "homepage": "https://azure.github.io/typespec-azure",
   "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-specs-rulesets/README.md",
   "license": "MIT",
