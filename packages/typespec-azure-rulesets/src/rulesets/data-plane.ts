@@ -16,7 +16,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-error-status-codes": true,
     "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": true,
     "@azure-tools/typespec-azure-core/no-fixed-enum-discriminator": true,
-    "@azure-tools/typespec-azure-core/non-breaking-versioning": true,
     "@azure-tools/typespec-azure-core/no-generic-numeric": true,
     "@azure-tools/typespec-azure-core/no-nullable": true,
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
@@ -38,5 +37,8 @@ export default {
     "@azure-tools/typespec-azure-core/use-standard-names": true,
     "@azure-tools/typespec-azure-core/use-standard-operations": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
+
+    // Azure core rules enabled via an optional rulesets
+    "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
   },
 } satisfies LinterRuleSet;

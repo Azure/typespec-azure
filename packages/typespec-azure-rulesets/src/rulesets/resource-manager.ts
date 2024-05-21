@@ -17,7 +17,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-error-status-codes": true,
     "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": true,
     "@azure-tools/typespec-azure-core/no-fixed-enum-discriminator": true,
-    "@azure-tools/typespec-azure-core/non-breaking-versioning": true,
     "@azure-tools/typespec-azure-core/no-generic-numeric": true,
     "@azure-tools/typespec-azure-core/no-nullable": true,
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
@@ -41,6 +40,9 @@ export default {
 
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,
+
+    // Azure core rules enabled via an optional rulesets
+    "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
 
     // Azure resource manager
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
