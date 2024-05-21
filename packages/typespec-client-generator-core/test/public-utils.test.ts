@@ -1599,10 +1599,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "ResponseWithAnonymousUnionRepeatabilityResult");
+        strictEqual(unionEnum.name, "TestResponse1");
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "ResponseWithAnonymousUnionRepeatabilityResult"
+          "TestResponse1"
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1626,10 +1626,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
+        strictEqual(unionEnum.name, "TestRequest");
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "RequestParameterWithAnonymousUnionRepeatabilityResult"
+          "TestRequest"
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1659,11 +1659,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].kind, "enumvalue");
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.valueType.kind, "string");
-        strictEqual(stringType.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
+        strictEqual(stringType.name, "TestRequest");
         strictEqual(stringType.isGeneratedName, true);
         strictEqual(
           stringType.crossLanguageDefinitionId,
-          "RequestParameterWithAnonymousUnionRepeatabilityResult"
+          "TestRequest"
         );
       });
     });
@@ -1734,12 +1734,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runnerWithCore.compile(lroCode);
         runnerWithCore.context.filterOutCoreModels = false;
         const models = getAllModels(runnerWithCore.context);
-        strictEqual(models.length, 9);
+        strictEqual(models.length, 8);
         // there should only be one non-core model
         deepStrictEqual(
           models.map((x) => x.name).sort(),
           [
-            "ResourceOperationStatusUserExportedUserError",
             "OperationState",
             "Error",
             "InnerError",
