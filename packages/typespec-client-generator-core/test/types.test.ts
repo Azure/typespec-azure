@@ -14,7 +14,11 @@ import {
   SdkUnionType,
   UsageFlags,
 } from "../src/interfaces.js";
-import { isErrorOrChildOfError, isNullable, getUnderlyingNullableType } from "../src/public-utils.js";
+import {
+  getUnderlyingNullableType,
+  isErrorOrChildOfError,
+  isNullable,
+} from "../src/public-utils.js";
 import {
   getAllModels,
   getAllModelsWithDiagnostics,
