@@ -1456,7 +1456,7 @@ model Azure.ResourceManager.Foundations.ManagedServiceIdentity
 | tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
 | principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
 | type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
+| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity> \| null`                                           | The identities assigned to this resource by the user.   |
 
 ### `Operation` {#Azure.ResourceManager.Foundations.Operation}
 
@@ -1853,20 +1853,6 @@ model Azure.ResourceManager.Foundations.TrackedResource
 | -------- | ---------------- | ----------------------------------------- |
 | location | `string`         | The geo-location where the resource lives |
 | tags?    | `Record<string>` | Resource tags.                            |
-
-### `UserAssignedIdentities` {#Azure.ResourceManager.Foundations.UserAssignedIdentities}
-
-The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
-
-```typespec
-model Azure.ResourceManager.Foundations.UserAssignedIdentities
-```
-
-#### Properties
-
-| Name | Type                                                                                             | Description           |
-| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
-|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentity) | Additional properties |
 
 ### `UserAssignedIdentity` {#Azure.ResourceManager.Foundations.UserAssignedIdentity}
 

@@ -17,3 +17,10 @@ alias ResourceSkuType = Sku;
 
 #deprecated "Please use Foundations.Plan instead of Foundations.ResourcePlanType"
 alias ResourcePlanType = Plan;
+
+// NOTE: Keeping this in separate file to avoid naming conflict when generating Common-Type swaggers
+/** The set of user assigned identities associated with the resource. The userAssignedIdentities
+ * dictionary keys will be ARM resource ids in the form:
+ * '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
+ */
+alias UserAssignedIdentities = Record<UserAssignedIdentity>;
