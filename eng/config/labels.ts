@@ -7,6 +7,10 @@ import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels
  * Labels that are used to categorize issue for which area they belong to.
  */
 export const AreaLabels = defineLabels({
+  "lib:tcgc": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-client-generator-core library",
+  },
   "lib:azure-core": {
     color: "957300",
     description: "Issues for @azure-tools/typespec-azure-core library",
@@ -34,6 +38,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-core": ["packages/typespec-azure-core/"],
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-azurerest/"],
+  "lib:tcgc": ["packages/typespec-client-generator-core/"],
 };
 
 export default defineConfig({
