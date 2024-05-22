@@ -1085,26 +1085,6 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getParameter(
-    param: ModelProperty,
-    kind: OpenAPI2ParameterType,
-    schemaContext: SchemaContext,
-    name?: string,
-    typeOverride?: any
-  ) {
-    if (isNeverType(param.type)) {
-      return;
-    }
-
-    const ph = getParamPlaceholder(param);
-
-    // If the parameter already has a $ref, don't bother populating it
-    if (!("$ref" in ph)) {
-      populateParameter(ph, param, kind, schemaContext, name, typeOverride);
-    }
-    return ph;
-  }
-
   function getSchemaForPrimitiveItems(
     type: Type,
     schemaContext: SchemaContext,
