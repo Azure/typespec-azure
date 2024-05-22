@@ -267,12 +267,13 @@ TypeSpec repo use labels to help categorize and manage issues and PRs. The follo
 
 Area of the codebase
 
-| Name                         | Color   | Description                                         |
-| ---------------------------- | ------- | --------------------------------------------------- |
-| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library |
-| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library |
-| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter   |
-| `eng`                        | #65bfff |                                                     |
+| Name                         | Color   | Description                                                    |
+| ---------------------------- | ------- | -------------------------------------------------------------- |
+| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library |
+| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library            |
+| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library            |
+| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter              |
+| `eng`                        | #65bfff |                                                                |
 
 #### issue_kinds
 
@@ -321,5 +322,14 @@ Misc labels
 | Name               | Color   | Description        |
 | ------------------ | ------- | ------------------ |
 | `good first issue` | #7057ff | Good for newcomers |
+
+#### external
+
+External tools
+
+| Name                         | Color   | Description                                  |
+| ---------------------------- | ------- | -------------------------------------------- |
+| `external:swagger-converter` | #7057ff | Issues related to the swagger-converter tool |
+| `external:mgmt`              | #7057ff |                                              |
 
 <!-- LABEL GENERATED REF END -->

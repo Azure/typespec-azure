@@ -40,3 +40,9 @@ configuration:
             then:
               - addLabel:
                   label: emitter:autorest
+          - if:
+              - filesMatchPattern:
+                  pattern: packages/typespec-client-generator-core/.*
+            then:
+              - addLabel:
+                  label: lib:tcgc

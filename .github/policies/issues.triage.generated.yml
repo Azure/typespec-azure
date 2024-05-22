@@ -18,6 +18,8 @@ configuration:
           - not:
               or:
                 - hasLabel:
+                    label: lib:tcgc
+                - hasLabel:
                     label: lib:azure-core
                 - hasLabel:
                     label: lib:azure-resource-manager
@@ -35,6 +37,8 @@ configuration:
               label: needs-area
           - isOpen
           - or:
+              - labelAdded:
+                  label: lib:tcgc
               - labelAdded:
                   label: lib:azure-core
               - labelAdded:
@@ -55,6 +59,8 @@ configuration:
           - isOpen
           - or:
               - labelRemoved:
+                  label: lib:tcgc
+              - labelRemoved:
                   label: lib:azure-core
               - labelRemoved:
                   label: lib:azure-resource-manager
@@ -64,6 +70,8 @@ configuration:
                   label: eng
           - not:
               or:
+                - hasLabel:
+                    label: lib:tcgc
                 - hasLabel:
                     label: lib:azure-core
                 - hasLabel:
