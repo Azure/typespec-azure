@@ -1456,7 +1456,7 @@ model Azure.ResourceManager.Foundations.ManagedServiceIdentity
 | tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
 | principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
 | type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | [`UserAssignedIdentities`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentities)         | The identities assigned to this resource by the user.   |
+| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
 
 ### `Operation` {#Azure.ResourceManager.Foundations.Operation}
 
@@ -1537,7 +1537,7 @@ model Azure.ResourceManager.Foundations.OperationStatusResult
 | id?              | `string`                                                                       | Fully qualified ID for the async operation. |
 | name?            | `string`                                                                       | Name of the async operation.                |
 | status           | `string`                                                                       | Operation status.                           |
-| percentComplete? | `int32`                                                                        | Percent of the operation that is complete.  |
+| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
 | startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
 | endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
 | operations       | `ResourceManager.Foundations.OperationStatusResult[]`                          | The operations list.                        |

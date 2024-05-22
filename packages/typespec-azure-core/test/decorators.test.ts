@@ -1,8 +1,6 @@
 import { Enum, Interface, Model, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "@typespec/compiler/testing";
@@ -15,16 +13,13 @@ import {
   getPagedResult,
   isFixed,
 } from "../src/decorators.js";
-import { extensibleEnumRule } from "../src/rules/extensible-enums.js";
 import { createAzureCoreTestRunner } from "./test-host.js";
 
 describe("typespec-azure-core: decorators", () => {
   let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
 
   beforeEach(async () => {
     runner = await createAzureCoreTestRunner();
-    tester = createLinterRuleTester(runner, extensibleEnumRule, "@azure-tools/typespec-azure-core");
   });
 
   describe("@pagedResult", () => {
@@ -802,25 +797,6 @@ describe("typespec-azure-core: decorators", () => {
   });
 
   describe("@fixed", () => {
-    it("issues warning for `@fixed` enum", async () => {
-      await tester
-        .expect(
-          `
-          @test @fixed enum FixedEnum {
-            A,
-            B,
-            C,
-          }
-          `
-        )
-        .toEmitDiagnostics([
-          {
-            code: "@azure-tools/typespec-azure-core/use-extensible-enum",
-            message: "Enums should be defined without the `@fixed` decorator.",
-          },
-        ]);
-    });
-
     it("marks `@fixed` enum correctly", async () => {
       const result = await runner.compile(
         `
