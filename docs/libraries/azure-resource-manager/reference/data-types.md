@@ -1456,7 +1456,7 @@ model Azure.ResourceManager.Foundations.ManagedServiceIdentity
 | tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
 | principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
 | type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | [`UserAssignedIdentities`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentities)         | The identities assigned to this resource by the user.   |
+| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
 
 ### `Operation` {#Azure.ResourceManager.Foundations.Operation}
 
