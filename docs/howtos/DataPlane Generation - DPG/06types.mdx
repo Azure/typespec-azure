@@ -805,10 +805,21 @@ about nullability by inspecting the type of a property.
 model Foo {
   basicNullableProperty: string | null;
   modelNullableProperty: Bar | null;
+  unionNullableProperty: Bar | Baz | null;
+  enumNullableProperty: LR | null;
 }
 
 model Bar {
   prop: string;
+}
+
+model Baz {
+  prop: int32;
+}
+
+enum LR {
+  left,
+  right,
 }
 ```
 
@@ -859,6 +870,83 @@ A nullable type has kind `nullable` and property `valueType`. The kind of the ty
           ]
         }
       }
+    },
+    {
+      "kind": "property",
+      "name": "unionNullableProperty",
+      "serializedName": "unionNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "nullable",
+        "valueType": {
+          "kind": "union",
+          "values": [
+            {
+              "kind": "model",
+              "name": "Bar",
+              "properties": [
+                {
+                  "kind": "property",
+                  "name": "prop",
+                  "serializedName": "prop",
+                  "optional": false,
+                  "type": {
+                    "kind": "string",
+                    "encode": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "model",
+              "name": "Baz",
+              "properties": [
+                {
+                  "kind": "property",
+                  "name": "prop",
+                  "serializedName": "prop",
+                  "optional": false,
+                  "type": {
+                    "kind": "int32",
+                    "encode": "int32"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "property",
+      "name": "enumNullableProperty",
+      "serializedName": "enumNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "nullable",
+        "valueType": {
+          "kind": "enum",
+          "name": "LR",
+          "generatedName": false,
+          "valueType": {
+            "kind": "string"
+          },
+          "values": [
+            {
+              "kind": "enumvalue",
+              "name": "left",
+              "value": "left"
+            },
+            {
+              "kind": "enumvalue",
+              "name": "right",
+              "value": "right"
+            }
+          ],
+          "isFixed": true,
+          "isUnionAsEnum": false
+        }
+      }
     }
   ]
 }
@@ -870,12 +958,24 @@ A nullable type has kind `nullable` and property `valueType`. The kind of the ty
 Python treat nullable as optional. If you actually want to send the value `null` to the service without the property being ignored, you can send in `corehttp.serialization.NULL`. Python does not restrict you from setting any property to this value.
 
 ```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
 class Bar(_model_base.Model):
-    prop: Optional[str] = rest_field()
+  prop: Optional[str] = rest_field()
+
+class Baz(_model_base.Model):
+  prop: Optional[str] = rest_field()
+
+class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
 
 class Foo(_model_base.Model):
-    basicNullableProperty: Optional[str] = rest_field()
-    modelNullableProperty: Optional["_models.Bar"] = rest_field()
+  basicNullableProperty: Optional[str] = rest_field()
+  modelNullableProperty: Optional["_models.Bar"] = rest_field()
+  unionNullableProperty: Optional[Union["_models.Bar", "_models.Baz"]] = rest_field()
+  enumNullableProperty: Optional["LR"] = rest_field()
 
 ```
 

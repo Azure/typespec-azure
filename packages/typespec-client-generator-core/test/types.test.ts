@@ -366,12 +366,13 @@ describe("typespec-client-generator-core: types", () => {
       const nullableType = getSdkTypeHelper(runner);
       strictEqual(nullableType.kind, "nullable");
       strictEqual(nullableType.nullable, true);
-      const durationType = nullableType.valueType;
 
-      strictEqual(durationType.kind, "duration");
-      strictEqual(durationType.wireType.kind, "float");
-      strictEqual(durationType.encode, "seconds");
-      strictEqual(durationType.wireType.nullable, true);
+      const sdkType = nullableType.valueType;
+      strictEqual(sdkType.kind, "duration");
+      strictEqual(sdkType.wireType.kind, "float");
+      strictEqual(sdkType.encode, "seconds");
+      strictEqual(sdkType.nullable, true);
+      strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, true);
     });
@@ -485,7 +486,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
-      strictEqual(sdkType.nullable, false);
+      strictEqual(sdkType.nullable, true);
       strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, true);
@@ -614,6 +615,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementTypeValueType.values.length, 2);
       strictEqual(elementTypeValueType.values[0].kind, "string");
       strictEqual(elementTypeValueType.values[1].kind, "float32");
+      strictEqual(elementTypeValueType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
@@ -634,6 +636,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementType.kind, "nullable");
       strictEqual(elementType.nullable, true);
       strictEqual(elementType.valueType.kind, "float32");
+      strictEqual(elementType.valueType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
@@ -659,6 +662,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementTypeValueType.values.length, 2);
       strictEqual(elementTypeValueType.values[0].kind, "string");
       strictEqual(elementTypeValueType.values[1].kind, "float32");
+      strictEqual(elementTypeValueType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
       strictEqual(nameProp.nullable, false);
       strictEqual(sdkType.nullableValues, true);
@@ -698,6 +702,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(additionalProperties.nullable, true);
       strictEqual(extendsType.additionalPropertiesNullable, true);
       strictEqual(additionalProperties.valueType.kind, "string");
+      strictEqual(additionalProperties.valueType.nullable, true);
 
       const isType = models.find((x) => x.name === "TestIs");
       ok(isType);
@@ -708,6 +713,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(isTypeAdditionalProperties.nullable, true);
       strictEqual(isType.additionalPropertiesNullable, true);
       strictEqual(isTypeAdditionalProperties.valueType.kind, "string");
+      strictEqual(isTypeAdditionalProperties.valueType.nullable, true);
 
       const spreadType = models.find((x) => x.name === "TestSpread");
       ok(spreadType);
@@ -718,6 +724,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(spreadTypeAdditionalProperties.nullable, true);
       strictEqual(spreadType.additionalPropertiesNullable, true);
       strictEqual(spreadTypeAdditionalProperties.valueType.kind, "string");
+      strictEqual(spreadTypeAdditionalProperties.valueType.nullable, true);
     });
 
     it("additional property nullable with more types", async function () {
@@ -759,6 +766,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(extendsAdPropUnderlyingType.values.length, 2);
       strictEqual(extendsAdPropUnderlyingType.values[0].kind, "string");
       strictEqual(extendsAdPropUnderlyingType.values[1].kind, "float32");
+      strictEqual(extendsAdPropUnderlyingType.nullable, true);
       strictEqual(extendsTypeAdditionalProperties.nullable, true);
       strictEqual(extendsType.additionalPropertiesNullable, true);
 
@@ -776,6 +784,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(isTypeAdditionalPropertiesUnderlyingType.values.length, 2);
       strictEqual(isTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
       strictEqual(isTypeAdditionalPropertiesUnderlyingType.values[1].kind, "float32");
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.nullable, true);
       strictEqual(isTypeAdditionalProperties.nullable, true);
       strictEqual(isType.additionalPropertiesNullable, true);
 
@@ -797,6 +806,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values.length, 2);
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[1].kind, "float32");
+      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.nullable, true);
       strictEqual(spreadTypeAdditionalProperties.nullable, true);
       strictEqual(spreadType.additionalPropertiesNullable, true);
     });

@@ -28,7 +28,6 @@ import {
   ignoreDiagnostics,
   isErrorModel,
   isNeverType,
-  isNullType,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -82,6 +81,7 @@ import {
   getDocHelper,
   getLocationOfOperation,
   getNonNullOptions,
+  getNullOption,
   getSdkTypeBaseHelper,
   intOrFloat,
   isAzureCoreModel,
@@ -126,8 +126,9 @@ export function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
+  const innerType = propertyType.kind === "nullable" ? propertyType.valueType : propertyType;
   const format = getFormat(context.program, type) ?? "";
-  if (isSdkBuiltInKind(format)) propertyType.kind = format;
+  if (isSdkBuiltInKind(format)) innerType.kind = format;
 }
 
 /**
@@ -341,22 +342,20 @@ export function getSdkUnionWithDiagnostics(
 ): [SdkType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const nonNullOptions = getNonNullOptions(type);
+  const nullOption = getNullOption(type);
   let retval: SdkType | undefined = undefined;
 
   if (nonNullOptions.length === 0) {
     diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
     return diagnostics.wrap(getAnyType());
   }
-  const nullable = Boolean(
-    [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0]
-  );
+
   if (nonNullOptions.length === 1) {
     retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
-  }
-  // judge if the union can be converted to enum
-  // if language does not need flatten union as enum
-  // filter the case that union is composed of union or enum
-  else if (
+  } else if (
+    // judge if the union can be converted to enum
+    // if language does not need flatten union as enum
+    // filter the case that union is composed of union or enum
     context.flattenUnionAsEnum ||
     ![...type.variants.values()].some((variant) => {
       return variant.type.kind === "Union" || variant.type.kind === "Enum";
@@ -367,6 +366,8 @@ export function getSdkUnionWithDiagnostics(
       retval = getSdkUnionEnum(context, unionAsEnum, operation);
     }
   }
+
+  // other cases
   if (retval === undefined) {
     retval = {
       ...getSdkTypeBaseHelper(context, type, "union"),
@@ -375,18 +376,19 @@ export function getSdkUnionWithDiagnostics(
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
       ),
-      nullable: isNullableInternal(type), // eslint-disable-line deprecation/deprecation
+      nullable: false,
     };
   }
-  if (nullable) {
+
+  if (nullOption !== undefined) {
+    retval.nullable = true; // eslint-disable-line deprecation/deprecation
     retval = {
       ...getSdkTypeBaseHelper(context, type, "nullable"),
-      nullable,
+      nullable: true,
       valueType: retval,
     };
   }
 
-  // other cases
   return diagnostics.wrap(retval);
 }
 
@@ -640,13 +642,13 @@ function getSdkEnumValueType(
 }
 
 function getUnionAsEnumValueType(context: TCGCContext, union: Union): SdkBuiltInType | undefined {
-  for (const variant of union.variants.values()) {
-    const variantType = variant.type;
-    if (variantType.kind === "Union") {
-      const ret = getUnionAsEnumValueType(context, variantType);
+  const nonNullOptions = getNonNullOptions(union);
+  for (const option of nonNullOptions) {
+    if (option.kind === "Union") {
+      const ret = getUnionAsEnumValueType(context, option);
       if (ret) return ret;
-    } else if (variantType.kind === "Scalar") {
-      return getClientType(context, variantType) as SdkBuiltInType;
+    } else if (option.kind === "Scalar") {
+      return getClientType(context, option) as SdkBuiltInType;
     }
   }
 
