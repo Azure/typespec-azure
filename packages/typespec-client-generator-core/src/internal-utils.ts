@@ -347,7 +347,7 @@ export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
 }
 
-function getAllResponseBodiesAndNonBodyExists(
+export function getAllResponseBodiesAndNonBodyExists(
   responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
 ): {
   allResponseBodies: SdkType[];

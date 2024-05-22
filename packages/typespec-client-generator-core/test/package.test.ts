@@ -1849,8 +1849,12 @@ describe("typespec-client-generator-core: package", () => {
 
       const noContentResponse = serviceResponses.get(204);
       ok(noContentResponse);
-      strictEqual(noContentResponse.type?.kind, "nullable");
+      strictEqual(noContentResponse.type, undefined);
       strictEqual(method.response.type?.kind, "nullable");
+      strictEqual(
+        method.response.type?.valueType,
+        sdkPackage.models.find((x) => x.name === "Widget")
+      );
     });
 
     it("NoContentResponse", async () => {
@@ -1863,7 +1867,7 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "delete");
-      strictEqual(method.response.type?.kind, "nullale");
+      strictEqual(method.response.type, undefined);
       const serviceResponses = method.operation.responses;
       strictEqual(serviceResponses.size, 1);
 

@@ -41,7 +41,6 @@ import {
   SdkServiceMethod,
   SdkServiceOperation,
   SdkServiceParameter,
-  SdkServiceResponseHeader,
   SdkType,
   UsageFlags,
 } from "./interfaces.js";
@@ -49,7 +48,7 @@ import {
   TCGCContext,
   createGeneratedName,
   filterApiVersionsWithDecorators,
-  getAllResponseBodies,
+  getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
@@ -200,11 +199,7 @@ function getSdkMethodResponse(
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
   // TODO: put head as bool here
-  const headers: SdkServiceResponseHeader[] = [];
-  for (const response of Object.values(responses)) {
-    headers.push(...response.headers);
-  }
-  const allResponseBodies = getAllResponseBodies(responses);
+  const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (responseTypes.size > 1) {
@@ -218,6 +213,12 @@ function getSdkMethodResponse(
     };
   } else if (responseTypes) {
     type = allResponseBodies[0];
+  }
+  if (nonBodyExists && type) {
+    type = {
+      kind: "nullable",
+      valueType: type,
+    };
   }
   return {
     kind: "method",
