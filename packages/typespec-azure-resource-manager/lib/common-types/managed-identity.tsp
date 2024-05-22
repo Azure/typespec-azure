@@ -37,7 +37,7 @@ model ManagedServiceIdentity {
 #deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
 @armCommonDefinition(
   "UserAssignedIdentities",
-  {
+  #{
     version: Azure.ResourceManager.CommonTypes.Versions.v4,
     isDefault: true,
   },
@@ -86,7 +86,7 @@ alias ManagedIdentityType = ManagedServiceIdentityType;
  */
 @armCommonDefinition(
   "UserAssignedIdentity",
-  {
+  #{
     version: Azure.ResourceManager.CommonTypes.Versions.v4,
     isDefault: true,
   },
