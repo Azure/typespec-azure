@@ -1,4 +1,4 @@
-// cspell:ignore bfff
+// cspell:ignore bfff mgmt
 
 import { CommonLabels } from "../../core/eng/common/config/labels.js";
 import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.js";
@@ -59,6 +59,19 @@ export default defineConfig({
         "good first issue": {
           color: "7057ff",
           description: "Good for newcomers",
+        },
+      },
+    },
+    external: {
+      description: "External tools",
+      labels: {
+        "external:swagger-converter": {
+          color: "7057ff",
+          description: "Issues related to the swagger-converter tool",
+        },
+        "external:mgmt": {
+          color: "7057ff",
+          description: "",
         },
       },
     },
