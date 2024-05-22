@@ -11,14 +11,14 @@ await buildSamples_experimental(packageRoot, resolve(__dirname, "dist/samples.ts
     filename: "samples/arm.tsp",
     preferredEmitter: "@azure-tools/typespec-autorest",
     compilerOptions: {
-      linterRuleSet: { extends: ["@azure-tools/typespec-azure-resource-manager/all"] },
+      linterRuleSet: { extends: ["@azure-tools/typespec-azure-rulesets/resource-manager"] },
     },
   },
   "Azure Core Data Plane Service": {
     filename: "samples/azure-core.tsp",
     preferredEmitter: "@azure-tools/typespec-autorest",
     compilerOptions: {
-      linterRuleSet: { extends: ["@azure-tools/typespec-azure-core/all"] },
+      linterRuleSet: { extends: ["@azure-tools/typespec-azure-rulesets/data-plane"] },
     },
   },
 });
