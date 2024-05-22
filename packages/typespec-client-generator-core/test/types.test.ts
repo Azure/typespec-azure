@@ -2029,7 +2029,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "string");
       strictEqual(sdkType.value, "json");
-      strictEqual(sdkType.name, "TestPropJson");
+      strictEqual(sdkType.name, "TestProp");
       strictEqual(sdkType.isGeneratedName, true);
     });
     it("boolean", async function () {
@@ -2045,7 +2045,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "boolean");
       strictEqual(sdkType.value, true);
-      strictEqual(sdkType.name, "TestPropTrue");
+      strictEqual(sdkType.name, "TestProp");
       strictEqual(sdkType.isGeneratedName, true);
     });
     it("number", async function () {
@@ -2061,7 +2061,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "int32");
       strictEqual(sdkType.value, 4);
-      strictEqual(sdkType.name, "TestProp4");
+      strictEqual(sdkType.name, "TestProp");
       strictEqual(sdkType.isGeneratedName, true);
     });
   });
