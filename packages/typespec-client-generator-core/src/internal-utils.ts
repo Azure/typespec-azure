@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   Diagnostic,
@@ -17,7 +16,6 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
-  ignoreDiagnostics,
   isNeverType,
   isNullType,
   isVoidType,
@@ -33,7 +31,6 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkParameter,
-  SdkServiceOperation,
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
