@@ -1,6 +1,7 @@
 // cspell:ignore bfff
 
 import { CommonLabels } from "../../core/eng/common/config/labels.js";
+import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.js";
 
 /**
  * Labels that are used to categorize issue for which area they belong to.
@@ -25,25 +26,37 @@ export const AreaLabels = defineLabels({
   },
 });
 
-export default {
-  area: {
-    description: "Area of the codebase",
-    labels: AreaLabels,
+/**
+ * Set the paths that each area applies to.
+ */
+export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
+  eng: ["eng/", ".github/"],
+  "lib:azure-core": ["packages/typespec-azure-core/"],
+  "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
+  "emitter:autorest": ["packages/typespec-azurerest/"],
+};
+
+export default defineConfig({
+  repo: {
+    owner: "Azure",
+    repo: "typespec-azure",
   },
-  ...CommonLabels,
-  misc: {
-    description: "Misc labels",
-    labels: {
-      "good first issue": {
-        color: "7057ff",
-        description: "Good for newcomers",
+  areaLabels: AreaLabels,
+  areaPaths: AreaPaths,
+  labels: {
+    area: {
+      description: "Area of the codebase",
+      labels: AreaLabels,
+    },
+    ...CommonLabels,
+    misc: {
+      description: "Misc labels",
+      labels: {
+        "good first issue": {
+          color: "7057ff",
+          description: "Good for newcomers",
+        },
       },
     },
   },
-} as const;
-
-export function defineLabels<const T extends string>(
-  labels: Record<T, { color: string; description: string }>
-) {
-  return labels;
-}
+});

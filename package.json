@@ -30,7 +30,7 @@
     "test": "pnpm run-all run test",
     "update-latest-docs": "pnpm run-all run update-latest-docs",
     "watch": "tsc --build ./tsconfig.ws.json --watch",
-    "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config-dir ./eng/config"
+    "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts"
   },
   "devDependencies": {
     "@chronus/chronus": "^0.10.2",
