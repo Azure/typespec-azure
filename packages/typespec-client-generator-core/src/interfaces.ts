@@ -80,11 +80,6 @@ export interface SdkOperationGroup {
 interface SdkTypeBase {
   __raw?: Type;
   kind: string;
-  /**
-   * @deprecated Use helper function `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullable: boolean;
   deprecation?: string;
   description?: string;
   details?: string;
@@ -231,11 +226,6 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
-  /**
-   * @deprecated Pass `valueType` to `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullableValues: boolean;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -247,11 +237,6 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
-  /**
-   * @deprecated Pass `valueType` to `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullableValues: boolean;
 }
 
 export interface SdkNullableType extends SdkTypeBase {
@@ -314,11 +299,6 @@ export interface SdkModelType extends SdkTypeBase {
   access?: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
-  /**
-   * @deprecated This property is deprecated. Pass the type of the additionalProperties to `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   discriminatorProperty?: SdkModelPropertyType;
@@ -354,11 +334,6 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
-  /**
-   * @deprecated Use exported helper function `isNullable` instead, and pass the type of the property to the function.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullable: boolean;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
@@ -442,21 +417,11 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
-  /**
-   * @deprecated This property is deprecated. Pass the type of response header to `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullable: boolean;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
-  /**
-   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullable: boolean;
   resultPath?: string; // if exists, tells you how to get from the service response to the method response.
 }
 
@@ -464,11 +429,6 @@ export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
-  /**
-   * @deprecated This property is deprecated. Pass the type of response to `isNullable` instead.
-   * https://github.com/Azure/typespec-azure/issues/891
-   */
-  nullable: boolean;
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {

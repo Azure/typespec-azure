@@ -57,7 +57,6 @@ import {
   getLocationOfOperation,
   getSdkTypeBaseHelper,
   isNeverOrVoidType,
-  isNullableInternal,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -214,7 +213,6 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable: isNullableInternal(sdkOperation), // eslint-disable-line deprecation/deprecation
       name: createGeneratedName(operation, "UnionResponse"),
       isGeneratedName: true,
     };
@@ -224,7 +222,6 @@ function getSdkMethodResponse(
   return {
     kind: "method",
     type,
-    nullable: isNullableInternal(sdkOperation), // eslint-disable-line deprecation/deprecation
   };
 }
 
@@ -382,7 +379,6 @@ function getSdkInitializationType<
     isGeneratedName: true,
     access: client.kind === "SdkClient" ? "public" : "internal",
     usage: UsageFlags.Input,
-    nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
@@ -412,7 +408,6 @@ function getSdkMethodParameter(
       name,
       isGeneratedName: Boolean(libraryName),
       optional: false,
-      nullable: false,
       discriminator: false,
       serializedName: name,
       isApiVersionParam: false,
@@ -469,7 +464,6 @@ function getSdkEndpointParameter(
     const name = "endpoint";
     type = {
       kind: "endpoint",
-      nullable: false,
       serverUrl: "{endpoint}",
       templateArguments: [
         {
@@ -479,7 +473,6 @@ function getSdkEndpointParameter(
           description: "Service host",
           kind: "path",
           onClient: true,
-          nullable: false,
           urlEncode: false,
           optional: false,
           serializedName: "endpoint",
@@ -498,7 +491,6 @@ function getSdkEndpointParameter(
     const templateArguments: SdkPathParameter[] = [];
     type = {
       kind: "endpoint",
-      nullable: false,
       serverUrl: servers[0].url,
       templateArguments,
     };
@@ -539,7 +531,6 @@ function getSdkEndpointParameter(
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     optional,
     isApiVersionParam: false,
-    nullable: false,
   });
 }
 

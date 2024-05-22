@@ -365,16 +365,12 @@ describe("typespec-client-generator-core: types", () => {
       );
       const nullableType = getSdkTypeHelper(runner);
       strictEqual(nullableType.kind, "nullable");
-      strictEqual(nullableType.nullable, true);
 
       const sdkType = nullableType.valueType;
       strictEqual(sdkType.kind, "duration");
       strictEqual(sdkType.wireType.kind, "float");
       strictEqual(sdkType.encode, "seconds");
-      strictEqual(sdkType.nullable, true);
-      strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("float seconds decorated scalar", async function () {
@@ -486,10 +482,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
-      strictEqual(sdkType.nullable, true);
-      strictEqual(sdkType.wireType.nullable, true);
       const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("unixTimestamp array", async function () {
@@ -550,8 +543,6 @@ describe("typespec-client-generator-core: types", () => {
 
       const sdkType = nullableType.valueType;
       strictEqual(sdkType.kind, "float32");
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("nullable with more types", async function () {
@@ -571,9 +562,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.values.length, 2);
       strictEqual(sdkType.values[0].kind, "string");
       strictEqual(sdkType.values[1].kind, "float32");
-      strictEqual(sdkType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("record with nullable", async function () {
@@ -590,10 +578,6 @@ describe("typespec-client-generator-core: types", () => {
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "nullable");
       strictEqual(elementType.valueType.kind, "float32");
-      strictEqual(elementType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
     });
 
     it("record with nullable with more types", async function () {
@@ -615,10 +599,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(elementTypeValueType.values.length, 2);
       strictEqual(elementTypeValueType.values[0].kind, "string");
       strictEqual(elementTypeValueType.values[1].kind, "float32");
-      strictEqual(elementTypeValueType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
     });
 
     it("array with nullable", async function () {
@@ -634,12 +614,7 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "array");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "nullable");
-      strictEqual(elementType.nullable, true);
       strictEqual(elementType.valueType.kind, "float32");
-      strictEqual(elementType.valueType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
     });
 
     it("array with nullable with more types", async function () {
@@ -655,17 +630,11 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "array");
       const elementType = sdkType.valueType;
       strictEqual(elementType.kind, "nullable");
-      strictEqual(elementType.nullable, true);
-
       const elementTypeValueType = elementType.valueType;
       strictEqual(elementTypeValueType.kind, "union");
       strictEqual(elementTypeValueType.values.length, 2);
       strictEqual(elementTypeValueType.values[0].kind, "string");
       strictEqual(elementTypeValueType.values[1].kind, "float32");
-      strictEqual(elementTypeValueType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
     });
 
     it("additional property is nullable", async function () {
@@ -699,10 +668,7 @@ describe("typespec-client-generator-core: types", () => {
       const additionalProperties = extendsType.additionalProperties;
       ok(additionalProperties);
       strictEqual(additionalProperties.kind, "nullable");
-      strictEqual(additionalProperties.nullable, true);
-      strictEqual(extendsType.additionalPropertiesNullable, true);
       strictEqual(additionalProperties.valueType.kind, "string");
-      strictEqual(additionalProperties.valueType.nullable, true);
 
       const isType = models.find((x) => x.name === "TestIs");
       ok(isType);
@@ -710,10 +676,7 @@ describe("typespec-client-generator-core: types", () => {
       const isTypeAdditionalProperties = isType.additionalProperties;
       ok(isTypeAdditionalProperties);
       strictEqual(isTypeAdditionalProperties.kind, "nullable");
-      strictEqual(isTypeAdditionalProperties.nullable, true);
-      strictEqual(isType.additionalPropertiesNullable, true);
       strictEqual(isTypeAdditionalProperties.valueType.kind, "string");
-      strictEqual(isTypeAdditionalProperties.valueType.nullable, true);
 
       const spreadType = models.find((x) => x.name === "TestSpread");
       ok(spreadType);
@@ -721,10 +684,7 @@ describe("typespec-client-generator-core: types", () => {
       const spreadTypeAdditionalProperties = spreadType.additionalProperties;
       ok(spreadTypeAdditionalProperties);
       strictEqual(spreadTypeAdditionalProperties.kind, "nullable");
-      strictEqual(spreadTypeAdditionalProperties.nullable, true);
-      strictEqual(spreadType.additionalPropertiesNullable, true);
       strictEqual(spreadTypeAdditionalProperties.valueType.kind, "string");
-      strictEqual(spreadTypeAdditionalProperties.valueType.nullable, true);
     });
 
     it("additional property nullable with more types", async function () {
@@ -766,9 +726,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(extendsAdPropUnderlyingType.values.length, 2);
       strictEqual(extendsAdPropUnderlyingType.values[0].kind, "string");
       strictEqual(extendsAdPropUnderlyingType.values[1].kind, "float32");
-      strictEqual(extendsAdPropUnderlyingType.nullable, true);
-      strictEqual(extendsTypeAdditionalProperties.nullable, true);
-      strictEqual(extendsType.additionalPropertiesNullable, true);
 
       const isType = models.find((x) => x.name === "TestIs");
       ok(isType);
@@ -784,9 +741,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(isTypeAdditionalPropertiesUnderlyingType.values.length, 2);
       strictEqual(isTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
       strictEqual(isTypeAdditionalPropertiesUnderlyingType.values[1].kind, "float32");
-      strictEqual(isTypeAdditionalPropertiesUnderlyingType.nullable, true);
-      strictEqual(isTypeAdditionalProperties.nullable, true);
-      strictEqual(isType.additionalPropertiesNullable, true);
 
       const spreadType = models.find((x) => x.name === "TestSpread");
       ok(spreadType);
@@ -806,9 +760,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values.length, 2);
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
       strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[1].kind, "float32");
-      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.nullable, true);
-      strictEqual(spreadTypeAdditionalProperties.nullable, true);
-      strictEqual(spreadType.additionalPropertiesNullable, true);
     });
 
     it("model with simple union property", async function () {
@@ -909,8 +860,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.isUnionAsEnum, false);
       strictEqual(sdkType.name, "PetKind");
 
-      const pet = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(pet.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
     });
@@ -932,8 +881,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.isUnionAsEnum, true);
       strictEqual(sdkType.name, "HomePet");
 
-      const pet = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(pet.nullable, true);
       const values = sdkType.values;
       strictEqual(values.length, 3);
     });
@@ -963,7 +910,6 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = nullableType.valueType;
       strictEqual(sdkType.kind, "model");
       strictEqual(sdkType.name, "PropertyModel");
-      strictEqual(model.properties[0].nullable, true);
     });
 
     it("mix types", async function () {
@@ -994,8 +940,6 @@ describe("typespec-client-generator-core: types", () => {
       const nullableModel = models.find((x) => x.kind === "model" && x.name === "TestNullable");
       ok(nullableModel);
       strictEqual(model.properties[0].type.kind, "union");
-      strictEqual(model.properties[0].type.nullable, false);
-      strictEqual(model.properties[0].nullable, false);
       const unionType = model.properties[0].type;
       strictEqual(unionType.kind, "union");
       for (const v of unionType.values) {
@@ -1007,8 +951,6 @@ describe("typespec-client-generator-core: types", () => {
       }
       const nullableProp = nullableModel.properties[0];
       strictEqual(nullableProp.type.kind, "nullable");
-      strictEqual(nullableProp.type.nullable, true);
-      strictEqual(nullableProp.nullable, true);
       strictEqual(nullableProp.type.valueType.kind, "union");
       strictEqual(nullableProp.type.valueType.values.length, 3);
 
@@ -1599,7 +1541,6 @@ describe("typespec-client-generator-core: types", () => {
       const enumType = nullableType.valueType;
       strictEqual(enumType.kind, "enum");
       strictEqual(enumType.name, "Test");
-      strictEqual(enumType.nullable, true);
       strictEqual(enumType.isUnionAsEnum, true);
       const values = enumType.values;
       strictEqual(values.length, 4);
@@ -1652,7 +1593,6 @@ describe("typespec-client-generator-core: types", () => {
 
       strictEqual(unionType.kind, "union");
       strictEqual(unionType.name, "Test");
-      strictEqual(unionType.nullable, true);
 
       const values = unionType.values;
       strictEqual(values.length, 3);

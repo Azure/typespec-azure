@@ -243,13 +243,12 @@ export function getHashForType(type: SdkType): string {
 
 interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
-  nullable: boolean;
   deprecation?: string;
   kind: TKind;
 }
 
 /**
- * Helper function to return default values for nullable, encode etc
+ * Helper function to return default values for encode etc
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
@@ -259,7 +258,6 @@ export function getSdkTypeBaseHelper<TKind>(
 ): DefaultSdkTypeBase<TKind> {
   return {
     __raw: type,
-    nullable: false,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
   };
@@ -362,8 +360,7 @@ function getAllResponseBodiesAndNonBodyExists(
   let nonBodyExists = false;
   for (const response of responses.values()) {
     if (response.type) {
-      // eslint-disable-next-line deprecation/deprecation
-      if (response.nullable) {
+      if (response.type.kind === "nullable") {
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);
@@ -380,23 +377,6 @@ export function getAllResponseBodies(
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
-/**
- * Determines if a type is nullable.
- * @deprecated We want to move away from .nullable on SdkPropertyTypes and have people pass the type to `isNullable` instead.
- * https://github.com/Azure/typespec-azure/issues/891
- * @param type
- * @returns
- */
-export function isNullableInternal(type: Type | SdkServiceOperation): boolean {
-  if (type.kind === "Union") {
-    if (getNullOption(type) !== undefined) return true;
-    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
-  }
-  if (type.kind === "http") {
-    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
-  }
-  return false;
-}
 /**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
@@ -449,6 +429,5 @@ export function getAnyType(): SdkBuiltInType {
   return {
     kind: "any",
     encode: "string",
-    nullable: true, // any is nullable
   };
 }

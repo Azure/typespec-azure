@@ -88,7 +88,6 @@ import {
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
-  isNullableInternal,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -154,10 +153,6 @@ export function addEncodeInfo(
     innerType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type)
     ) as SdkBuiltInType;
-    // eslint-disable-next-line deprecation/deprecation
-    if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
-    }
   }
   if (innerType.kind === "utcDateTime" || innerType.kind === "offsetDateTime") {
     if (encodeData) {
@@ -167,10 +162,6 @@ export function addEncodeInfo(
       ) as SdkBuiltInType;
     } else if (type.kind === "ModelProperty" && isHeader(context.program, type)) {
       innerType.encode = "rfc7231";
-    }
-    // eslint-disable-next-line deprecation/deprecation
-    if (type.kind === "ModelProperty" && isNullableInternal(type.type)) {
-      innerType.wireType.nullable = true; // eslint-disable-line deprecation/deprecation
     }
   }
   if (innerType.kind === "bytes") {
@@ -294,14 +285,12 @@ export function getSdkArrayOrDictWithDiagnostics(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
           valueType,
-          nullableValues: isNullableInternal(type.indexer.value!), // eslint-disable-line deprecation/deprecation
         });
       } else if (name === "integer") {
         // only array's index key name is integer
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           valueType,
-          nullableValues: isNullableInternal(type.indexer.value!), // eslint-disable-line deprecation/deprecation
         });
       }
     }
@@ -376,15 +365,12 @@ export function getSdkUnionWithDiagnostics(
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
       ),
-      nullable: false,
     };
   }
 
   if (nullOption !== undefined) {
-    retval.nullable = true; // eslint-disable-line deprecation/deprecation
     retval = {
       ...getSdkTypeBaseHelper(context, type, "nullable"),
-      nullable: true,
       valueType: retval,
     };
   }
@@ -500,7 +486,6 @@ function addDiscriminatorToModelType(
       }
     } else {
       discriminatorType = {
-        nullable: false,
         kind: "string",
         encode: "string",
       };
@@ -525,7 +510,6 @@ function addDiscriminatorToModelType(
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
-      nullable: false,
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -576,14 +560,12 @@ export function getSdkModelWithDiagnostics(
       sdkType.additionalProperties = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.sourceModel!.indexer!.value!, operation)
       );
-      sdkType.additionalPropertiesNullable = isNullableInternal(type.sourceModel!.indexer!.value!); // eslint-disable-line deprecation/deprecation
     }
     // model MyModel { ...Record<>} should be model with additional properties
     if (type.indexer) {
       sdkType.additionalProperties = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, type.indexer.value, operation)
       );
-      sdkType.additionalPropertiesNullable = isNullableInternal(type.indexer.value); // eslint-disable-line deprecation/deprecation
     }
     // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
@@ -596,7 +578,6 @@ export function getSdkModelWithDiagnostics(
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
           sdkType.additionalProperties = baseModel.valueType;
-          sdkType.additionalPropertiesNullable = isNullableInternal(baseModel.valueType.__raw!); // eslint-disable-line deprecation/deprecation
         } else {
           sdkType.baseModel = baseModel;
         }
@@ -718,7 +699,6 @@ function getSdkUnionEnumValues(
       value: member.value,
       valueType: enumType.valueType,
       enumType,
-      nullable: false,
     });
   }
   return values;
@@ -740,7 +720,6 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
         getUnionAsEnumValueType(context, type.union) ??
         getSdkEnumValueType(context, type.flattenedMembers.values()),
       values: [],
-      nullable: type.nullable,
       isFixed: !type.open,
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
@@ -943,7 +922,6 @@ function getSdkCredentialType(
         __raw: client.service,
         kind: "credential",
         scheme: scheme,
-        nullable: false,
       });
     }
   }
@@ -952,7 +930,6 @@ function getSdkCredentialType(
       __raw: client.service,
       kind: "union",
       values: credentialTypes,
-      nullable: false,
       name: createGeneratedName(client.service, "CredentialUnion"),
       isGeneratedName: true,
     };
@@ -978,7 +955,6 @@ export function getSdkCredentialParameter(
     onClient: true,
     optional: false,
     isApiVersionParam: false,
-    nullable: false,
   };
 }
 
@@ -1009,7 +985,6 @@ export function getSdkModelPropertyTypeBase(
     name,
     isGeneratedName: false,
     optional: type.optional,
-    nullable: isNullableInternal(type.type), // eslint-disable-line deprecation/deprecation
     ...updateWithApiVersionInformation(
       context,
       type,
