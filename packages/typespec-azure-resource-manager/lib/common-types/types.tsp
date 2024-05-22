@@ -217,7 +217,7 @@ model OperationStatusResult {
   @doc("Percent of the operation that is complete.")
   @minValue(0)
   @maxValue(100)
-  percentComplete?: int32;
+  percentComplete?: float64;
 
   @doc("The start time of the operation.")
   startTime?: utcDateTime;

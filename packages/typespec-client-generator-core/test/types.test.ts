@@ -2314,6 +2314,7 @@ describe("typespec-client-generator-core: types", () => {
       const kindProperty = fish.properties[0];
       ok(kindProperty);
       strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.description, "Discriminator property for Fish.");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -2325,6 +2326,7 @@ describe("typespec-client-generator-core: types", () => {
       const sharktypeProperty = shark.properties[0];
       ok(sharktypeProperty);
       strictEqual(sharktypeProperty.name, "sharktype");
+      strictEqual(sharktypeProperty.description, "Discriminator property for Shark.");
       strictEqual(sharktypeProperty.kind, "property");
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
@@ -2355,6 +2357,7 @@ describe("typespec-client-generator-core: types", () => {
       const kindProperty = fish.properties[0];
       ok(kindProperty);
       strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.description, "Discriminator property for Fish.");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -2386,6 +2389,7 @@ describe("typespec-client-generator-core: types", () => {
       const kindProperty = fish.properties[0];
       ok(kindProperty);
       strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.description, "Discriminator property for Fish.");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -2571,6 +2575,7 @@ describe("typespec-client-generator-core: types", () => {
       const dogKindProperty = dog.properties[0];
       ok(dogKindProperty);
       strictEqual(dogKindProperty.type, dogKind);
+      strictEqual(dogKindProperty.description, "Discriminator property for Dog.");
     });
 
     it("discriminator", async () => {
