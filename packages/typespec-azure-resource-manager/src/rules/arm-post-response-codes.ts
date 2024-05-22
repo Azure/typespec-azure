@@ -25,7 +25,10 @@ export const armPostResponseCodesRule = createRule({
       if (response.responses.length > 1) {
         throw new Error("Multiple responses are not supported.");
       }
-      if (response.responses[0].body !== undefined) {
+      if (
+        response.responses[0].body !== undefined &&
+        response.responses[0].body.bodyKind === "single"
+      ) {
         return response.responses[0].body;
       }
       return undefined;

@@ -252,7 +252,11 @@ function getSdkBasicServiceMethod<
     methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation)));
   }
   // body parameters
-  if (parameters.body?.parameter && !isNeverOrVoidType(parameters.body.parameter.type)) {
+  if (
+    parameters.body?.bodyKind !== "multipart" &&
+    parameters.body?.parameter &&
+    !isNeverOrVoidType(parameters.body.parameter.type)
+  ) {
     methodParameters.push(
       diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter, operation))
     );
