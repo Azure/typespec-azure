@@ -6,8 +6,9 @@
   "packageManager": "pnpm@8.13.1",
   "scripts": {
     "run-all": "pnpm -r --filter=!./core/",
-    "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build ",
+    "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build && pnpm check:eng",
     "check-version-mismatch": "syncpack list-mismatches",
+    "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
     "change": "chronus",
     "clean": "pnpm run-all run clean",
     "cspell": "cspell --no-progress .",
