@@ -27,7 +27,7 @@ import {
   isStatusCode,
 } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
-import { capitalCase, pascalCase } from "change-case";
+import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   getClientNameOverride,
@@ -551,7 +551,7 @@ function buildNameFromContextPaths(
       currContextPathType?.kind === "Number" ||
       currContextPathType?.kind === "Boolean"
     ) {
-      createName = `${createName}${contextPath[j].displayName}${capitalCase(String(currContextPathType.value))}`;
+      createName = `${createName}${contextPath[j].displayName}`;
     } else if (!currContextPathType?.name) {
       // is anonymous model node
       createName = `${createName}${contextPath[j].displayName}`;

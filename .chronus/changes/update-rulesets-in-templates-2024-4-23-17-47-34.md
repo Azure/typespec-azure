@@ -1,8 +1,8 @@
 ---
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
-changeKind: internal
+changeKind: fix
 packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Initial version
+Add `tspMain` for playground bundling

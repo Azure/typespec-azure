@@ -6,8 +6,9 @@
   "packageManager": "pnpm@8.13.1",
   "scripts": {
     "run-all": "pnpm -r --filter=!./core/",
-    "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build ",
+    "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build && pnpm check:eng",
     "check-version-mismatch": "syncpack list-mismatches",
+    "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
     "change": "chronus",
     "clean": "pnpm run-all run clean",
     "cspell": "cspell --no-progress .",
@@ -28,7 +29,8 @@
     "test:e2e": "pnpm run-all run test:e2e",
     "test": "pnpm run-all run test",
     "update-latest-docs": "pnpm run-all run update-latest-docs",
-    "watch": "tsc --build ./tsconfig.ws.json --watch"
+    "watch": "tsc --build ./tsconfig.ws.json --watch",
+    "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts"
   },
   "devDependencies": {
     "@chronus/chronus": "^0.10.2",
@@ -49,6 +51,7 @@
     "prettier-plugin-organize-imports": "~3.2.4",
     "rimraf": "~5.0.7",
     "syncpack": "^12.3.2",
+    "tsx": "^4.10.5",
     "typescript": "~5.4.5",
     "typescript-eslint": "^7.9.0",
     "vitest": "^1.6.0"

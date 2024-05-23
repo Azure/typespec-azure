@@ -22,5 +22,6 @@ await bundleAndUploadPackages({
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-client-generator-core",
     "@azure-tools/typespec-azure-resource-manager",
+    "@azure-tools/typespec-azure-rulesets",
   ],
 });
