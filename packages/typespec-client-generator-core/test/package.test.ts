@@ -1392,39 +1392,48 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 4);
+      strictEqual(method.parameters.length, 2);
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
       //eslint-disable-next-line deprecation/deprecation
-      strictEqual(methodParam.nameInClient, "header");
-      strictEqual(methodParam.name, "header");
+      strictEqual(methodParam.nameInClient, "options");
+      strictEqual(methodParam.name, "options");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.type.kind, "model");
+      strictEqual(methodParam.type.properties.length, 3);
+
+      const model = methodParam.type;
+      strictEqual(model.properties[0].kind, "header");
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(model.properties[0].nameInClient, "header");
+      strictEqual(model.properties[0].name, "header");
+      strictEqual(model.properties[0].optional, false);
+      strictEqual(model.properties[0].onClient, false);
+      strictEqual(model.properties[0].isApiVersionParam, false);
+      strictEqual(model.properties[0].type.kind, "string");
+
+      strictEqual(model.properties[1].kind, "query");
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(model.properties[1].nameInClient, "query");
+      strictEqual(model.properties[1].name, "query");
+      strictEqual(model.properties[1].optional, false);
+      strictEqual(model.properties[1].onClient, false);
+      strictEqual(model.properties[1].isApiVersionParam, false);
+      strictEqual(model.properties[1].type.kind, "string");
+
+      strictEqual(model.properties[2].kind, "body");
+      //eslint-disable-next-line deprecation/deprecation
+      strictEqual(model.properties[2].nameInClient, "body");
+      strictEqual(model.properties[2].name, "body");
+      strictEqual(model.properties[2].optional, false);
+      strictEqual(model.properties[2].onClient, false);
+      strictEqual(model.properties[2].isApiVersionParam, false);
+      strictEqual(model.properties[2].type.kind, "string");
 
       methodParam = method.parameters[1];
-      strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(methodParam.nameInClient, "query");
-      strictEqual(methodParam.name, "query");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
-
-      methodParam = method.parameters[2];
-      strictEqual(methodParam.kind, "method");
-      //eslint-disable-next-line deprecation/deprecation
-      strictEqual(methodParam.nameInClient, "body");
-      strictEqual(methodParam.name, "body");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
-
-      methodParam = method.parameters[3];
       strictEqual(methodParam.kind, "method");
       //eslint-disable-next-line deprecation/deprecation
       strictEqual(methodParam.nameInClient, "contentType");
@@ -1748,7 +1757,7 @@ describe("typespec-client-generator-core: package", () => {
           code: int32;
           message: string;
         }
-        @delete op delete(@path id: string): void | Error;
+        @delete op delete(@path id: string): void | { @bodyRoot error: Error };
         `
       );
       const sdkPackage = runner.context.experimental_sdkPackage;
@@ -1791,12 +1800,12 @@ describe("typespec-client-generator-core: package", () => {
         code: int32;
         message: string;
       }
-      @post op create(...Widget): Widget | Error;
+      @post op create(...Widget): Widget | { @bodyRoot error: Error };
       `
       );
       const sdkPackage = runner.context.experimental_sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 2);
+      strictEqual(sdkPackage.models.length, 3);
       strictEqual(method.name, "create");
       const serviceResponses = method.operation.responses;
       strictEqual(serviceResponses.size, 1);
@@ -1830,11 +1839,23 @@ describe("typespec-client-generator-core: package", () => {
       await runner.compileWithBuiltInService(
         `
       model Widget {
-        @header id: string;
         weight: int32;
       }
 
-      op operation(): Widget;
+      op operation(): {@header id: string, @body body: Widget};
+
+      model Outer {
+        @header
+        p: string;
+        outer: string;
+        inner: Inner;
+      }
+      model Inner {
+        @header
+        h: string;
+        prop: string;
+      }
+      op foo(@query q: string, outer: string, inner: Inner): Outer;
       `
       );
       const sdkPackage = runner.context.experimental_sdkPackage;

@@ -66,7 +66,6 @@ import {
   getCrossLanguageDefinitionId,
   getCrossLanguagePackageId,
   getDefaultApiVersion,
-  getEffectivePayloadType,
   getHttpOperationWithCache,
   getLibraryName,
 } from "./public-utils.js";
@@ -142,12 +141,12 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TOptions, TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters
-          )
+        getSdkServiceOperation<TOptions, TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters
         )
+      )
       : undefined,
     getResponseMapping(): string | undefined {
       return basic.response.resultPath;
@@ -244,33 +243,10 @@ function getSdkBasicServiceMethod<
     operation,
     getLocationOfOperation(operation)
   );
-  const httpOperation = getHttpOperationWithCache(context, operation);
-  const parameters = httpOperation.parameters;
-  // path/query/header parameters
-  for (const param of parameters.parameters) {
-    if (isNeverOrVoidType(param.param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation)));
-  }
-  // body parameters
-  if (parameters.body?.parameter && !isNeverOrVoidType(parameters.body.parameter.type)) {
-    methodParameters.push(
-      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter, operation))
-    );
-  } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
-    if (parameters.body.type.kind === "Model") {
-      // spread case
-      if (parameters.body.type.name === "") {
-        for (const prop of parameters.body.type.properties.values()) {
-          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop, operation)));
-        }
-      } else {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type, operation)));
-      }
-    } else {
-      methodParameters.push(
-        diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type, operation))
-      );
-    }
+
+  for (const param of operation.parameters.properties.values()) {
+    if (isNeverOrVoidType(param.type)) continue;
+    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
   }
 
   const serviceOperation = diagnostics.pipe(
