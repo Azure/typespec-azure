@@ -21,7 +21,6 @@
     "@docusaurus/plugin-content-docs": "~3.3.2",
     "@docusaurus/preset-classic": "^3.3.2",
     "@docusaurus/theme-common": "~3.3.2",
-    
     "@fluentui/react-components": "~9.52.0",
     "@mdx-js/react": "^3.0.1",
     "@typespec/playground": "workspace:~",
