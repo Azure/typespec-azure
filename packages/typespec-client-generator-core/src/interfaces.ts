@@ -249,7 +249,7 @@ export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
-  valueType: SdkBuiltInType;
+  valueType: SdkBuiltInType | SdkUnionType;
   values: SdkEnumValueType[];
   isFixed: boolean;
   isFlags: boolean;
@@ -265,7 +265,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkBuiltInType;
+  valueType: SdkBuiltInType | SdkUnionType;
 }
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
