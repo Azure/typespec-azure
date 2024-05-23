@@ -1059,10 +1059,7 @@ function addPropertiesToModelType(
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const property of type.properties.values()) {
-    if (
-      isNeverOrVoidType(property.type) ||
-      sdkType.kind !== "model"
-    ) {
+    if (isNeverOrVoidType(property.type) || sdkType.kind !== "model") {
       continue;
     }
     const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));

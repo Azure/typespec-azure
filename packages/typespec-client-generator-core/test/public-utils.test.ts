@@ -1600,10 +1600,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "TestResponse1");
-        strictEqual(
-          unionEnum.crossLanguageDefinitionId,
-          "TestResponse1"
-        );
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestResponse1");
         ok(unionEnum.isGeneratedName);
       });
 
@@ -1627,10 +1624,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "TestRequest");
-        strictEqual(
-          unionEnum.crossLanguageDefinitionId,
-          "TestRequest"
-        );
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestRequest");
         ok(unionEnum.isGeneratedName);
       });
 
@@ -1661,10 +1655,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.valueType.kind, "string");
         strictEqual(stringType.name, "TestRequest");
         strictEqual(stringType.isGeneratedName, true);
-        strictEqual(
-          stringType.crossLanguageDefinitionId,
-          "TestRequest"
-        );
+        strictEqual(stringType.crossLanguageDefinitionId, "TestRequest");
       });
     });
 

@@ -18,11 +18,7 @@ import {
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  getHttpOperation,
-  isMetadata,
-} from "@typespec/http";
+import { HttpOperation, getHttpOperation, isMetadata } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";

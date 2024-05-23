@@ -30,7 +30,6 @@ import {
   SdkHttpResponse,
   SdkMethodParameter,
   SdkModelPropertyType,
-  SdkModelType,
   SdkParameter,
   SdkPathParameter,
   SdkQueryParameter,
@@ -367,12 +366,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-    {
-      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-    },
-    readonly Diagnostic[],
-  ] {
+  {
+    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  },
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();

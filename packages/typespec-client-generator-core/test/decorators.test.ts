@@ -3252,8 +3252,14 @@ describe("typespec-client-generator-core: decorators", () => {
         "stableFunctionality"
       );
       strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 2);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "PreviewFunctionalityRequest");
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[1].name, "StableFunctionalityRequest");
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.models[0].name,
+        "PreviewFunctionalityRequest"
+      );
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.models[1].name,
+        "StableFunctionalityRequest"
+      );
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -3268,7 +3274,10 @@ describe("typespec-client-generator-core: decorators", () => {
         "stableFunctionality"
       );
       strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "StableFunctionalityRequest");
+      strictEqual(
+        runnerWithVersion.context.experimental_sdkPackage.models[0].name,
+        "StableFunctionalityRequest"
+      );
     });
     it("add client", async () => {
       await runner.compile(

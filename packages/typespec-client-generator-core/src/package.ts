@@ -141,12 +141,12 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-        getSdkServiceOperation<TOptions, TServiceOperation>(
-          context,
-          pagedMetadata.nextLinkOperation,
-          basic.parameters
+          getSdkServiceOperation<TOptions, TServiceOperation>(
+            context,
+            pagedMetadata.nextLinkOperation,
+            basic.parameters
+          )
         )
-      )
       : undefined,
     getResponseMapping(): string | undefined {
       return basic.response.resultPath;
