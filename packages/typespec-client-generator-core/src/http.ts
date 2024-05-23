@@ -503,62 +503,44 @@ export function getCorrespondingMethodParams(
     }
     return diagnostics.wrap([context.__subscriptionIdParameter]);
   }
-  const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
-  if (correspondingMethodParameter) {
-    return diagnostics.wrap([correspondingMethodParameter]);
-  }
 
-  const serviceParamType = serviceParam.type;
-  if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
-    const serviceParamPropertyNames = Array.from(serviceParamType.properties.values())
-      .filter((x) => x.kind === "property")
-      .map((x) => x.name);
-    // Here we have a spread method parameter
-
-    // easy case is if the spread method parameter directly has the entire body as a property
-    const directBodyProperty = methodParameters
-      .map((x) => x.type)
-      .filter((x): x is SdkModelType => x.kind === "model")
-      .flatMap((x) => x.properties)
-      .find((x) => x.type === serviceParamType);
-    if (directBodyProperty) return diagnostics.wrap([directBodyProperty]);
-    let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
-      serviceParamPropertyNames.includes(x.name)
-    );
-    for (const methodParam of methodParameters) {
-      const methodParamIterable =
-        methodParam.type.kind === "model" ? methodParam.type.properties : [methodParam];
-      correspondingProperties = correspondingProperties.concat(
-        methodParamIterable.filter(
-          (x) =>
-            serviceParamPropertyNames.includes(x.name) &&
-            !correspondingProperties.find((e) => e.name === x.name)
-        )
-      );
+  // to see if the service parameter is a method parameter or a property of a method parameter
+  const queue: SdkModelPropertyType[] = [...methodParameters];
+  while (queue.length > 0) {
+    const methodParam = queue.shift()!;
+    if (methodParam.__raw === serviceParam.__raw) {
+      return diagnostics.wrap([methodParam]);
     }
-    if (correspondingProperties.length === serviceParamPropertyNames.length)
-      return diagnostics.wrap(correspondingProperties);
-    diagnostics.add(
-      createDiagnostic({
-        code: "no-corresponding-method-param",
-        target: serviceParam.__raw!,
-        format: {
-          paramName: serviceParam.name,
-          methodName: operation.name,
-        },
-      })
-    );
-    return diagnostics.wrap([]);
-  }
-  for (const methodParam of methodParameters) {
     if (methodParam.type.kind === "model") {
       for (const prop of methodParam.type.properties) {
-        if (prop.name === serviceParam.name) {
-          return diagnostics.wrap([prop]);
-        }
+        queue.push(prop);
       }
     }
   }
+
+  // to see if all the property of service parameter is a method parameter or a property of a method parameter
+  if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
+    const retVal = [];
+    for (const serviceParamProp of serviceParam.type.properties) {
+      const queue: SdkModelPropertyType[] = [...methodParameters];
+      while (queue.length > 0) {
+        const methodParam = queue.shift()!;
+        if (methodParam.__raw === serviceParamProp.__raw) {
+          retVal.push(methodParam);
+          break;
+        }
+        if (methodParam.type.kind === "model") {
+          for (const prop of methodParam.type.properties) {
+            queue.push(prop);
+          }
+        }
+      }
+    }
+    if (retVal.length === serviceParam.type.properties.length) {
+      return diagnostics.wrap(retVal);
+    }
+  }
+
   diagnostics.add(
     createDiagnostic({
       code: "no-corresponding-method-param",

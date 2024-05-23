@@ -35,7 +35,6 @@ import {
   getAuthentication,
   getServers,
   isHeader,
-  isMetadata,
 } from "@typespec/http";
 import {
   getAccessOverride,
@@ -1061,7 +1060,6 @@ function addPropertiesToModelType(
   const diagnostics = createDiagnosticCollector();
   for (const property of type.properties.values()) {
     if (
-      isMetadata(context.program, property) ||
       isNeverOrVoidType(property.type) ||
       sdkType.kind !== "model"
     ) {
