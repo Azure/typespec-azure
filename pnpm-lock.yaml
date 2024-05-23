@@ -1736,6 +1736,9 @@ importers:
       '@azure-tools/typespec-azure-resource-manager':
         specifier: workspace:~
         version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:~
+        version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~
         version: link:../typespec-client-generator-core
@@ -2140,6 +2143,9 @@ importers:
       '@azure-tools/typespec-azure-resource-manager':
         specifier: workspace:~
         version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:~
+        version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~
         version: link:../typespec-client-generator-core

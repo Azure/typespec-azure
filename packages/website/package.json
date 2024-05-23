@@ -21,6 +21,7 @@
     "@docusaurus/plugin-content-docs": "~3.3.2",
     "@docusaurus/preset-classic": "^3.3.2",
     "@docusaurus/theme-common": "~3.3.2",
+    
     "@fluentui/react-components": "~9.52.0",
     "@mdx-js/react": "^3.0.1",
     "@typespec/playground": "workspace:~",
@@ -41,6 +42,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@azure-tools/typespec-service-csharp": "workspace:~",
+    "@azure-tools/typespec-azure-rulesets": "workspace:~",
     "@docusaurus/module-type-aliases": "^3.3.2",
     "@docusaurus/tsconfig": "^3.3.2",
     "@docusaurus/types": "^3.3.2",
