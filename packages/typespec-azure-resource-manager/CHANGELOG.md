@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.42.1
+
+### Bug Fixes
+
+- [#868](https://github.com/Azure/typespec-azure/pull/868) Changing back `ManagedServiceIdentity.userAssignedIdentities` back to `Record<UserAssignedIdentity`. Adding ARM common-type references for on all Managed Identity models.
+
+
 ## 0.42.0
 
 ### Bug Fixes
