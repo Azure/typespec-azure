@@ -1,4 +1,4 @@
-// cspell:ignore bfff mgmt
+// cspell:ignore bfff
 
 import { CommonLabels } from "../../core/eng/common/config/labels.js";
 import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.js";
