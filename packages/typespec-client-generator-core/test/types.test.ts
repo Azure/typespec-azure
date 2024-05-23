@@ -370,7 +370,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "duration");
       strictEqual(sdkType.wireType.kind, "float");
       strictEqual(sdkType.encode, "seconds");
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
     });
 
     it("float seconds decorated scalar", async function () {
@@ -482,7 +481,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
     });
 
     it("unixTimestamp array", async function () {
