@@ -103,7 +103,7 @@
           ],
           "x-ms-enum": {
             "name": "MyEnum",
-            "modelAsString": true
+            "modelAsString": false
           }
         }
       }
@@ -116,7 +116,7 @@
       ],
       "x-ms-enum": {
         "name": "MyEnum",
-        "modelAsString": true
+        "modelAsString": false
       }
     }
   },

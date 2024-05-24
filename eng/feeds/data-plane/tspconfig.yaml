@@ -33,4 +33,4 @@ options:
     namespace: com.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}
 linter:
   extends:
-    - "@azure-tools/typespec-azure-core/all"
+    - "@azure-tools/typespec-azure-rulesets/data-plane"

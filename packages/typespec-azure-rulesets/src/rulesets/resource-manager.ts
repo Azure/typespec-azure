@@ -37,10 +37,12 @@ export default {
     "@azure-tools/typespec-azure-core/use-standard-names": true,
     "@azure-tools/typespec-azure-core/use-standard-operations": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
-    "@azure-tools/typespec-azure-core/non-breaking-versioning": true,
 
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,
+
+    // Azure core rules enabled via an optional rulesets
+    "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
 
     // Azure resource manager
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
