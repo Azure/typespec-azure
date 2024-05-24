@@ -7,7 +7,6 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
-  isFixed,
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
@@ -1925,7 +1924,7 @@ export async function getOpenAPIForService(
     if (type.node && type.node.parent && type.node.parent.kind === SyntaxKind.ModelStatement) {
       schema["x-ms-enum"] = {
         name: type.node.parent.id.sv,
-        modelAsString: true,
+        modelAsString: false,
       };
     } else if (type.kind === "String") {
       schema["x-ms-enum"] = {
@@ -1934,7 +1933,7 @@ export async function getOpenAPIForService(
     } else if (type.kind === "Enum") {
       schema["x-ms-enum"] = {
         name: type.name,
-        modelAsString: isFixed(program, type) ? false : true,
+        modelAsString: false,
       };
 
       const values = [];
