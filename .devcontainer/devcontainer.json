@@ -3,6 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "postCreateCommand": "git submodule update --recursive --init",
   "customizations": {
     // Configure properties specific to VS Code.
     "vscode": {
