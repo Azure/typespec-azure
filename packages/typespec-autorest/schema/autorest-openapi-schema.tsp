@@ -6,9 +6,9 @@ import "@typespec/json-schema";
 
 using TypeSpec.JsonSchema;
 
-@jsonSchema
 namespace AutorestOpenAPISchema;
 
+@jsonSchema
 model AutorestOpenAPISchema {
   swagger: "2.0";
   info: Info;
