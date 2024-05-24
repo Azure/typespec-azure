@@ -83,15 +83,17 @@ model KeyValue {
   ...Value;
 }
 
-enum KeyField {
-  key,
-  label,
-  content_type,
-  value,
-  last_modified,
-  tags,
+union KeyField {
+  "key",
+  "label",
+  "content_type",
+  "value",
+  "last_modified",
+  "tags",
+  string,
 }
 
-enum LabelField {
-  name,
+union LabelField {
+  "name",
+  string,
 }
