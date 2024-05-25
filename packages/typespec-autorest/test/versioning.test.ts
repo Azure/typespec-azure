@@ -1,8 +1,66 @@
 import { deepStrictEqual, strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
+import { OpenAPI2Document } from "../src/openapi2-document.js";
 import { openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: versioning", () => {
+  it("if version enum is referenced only include current member and mark it with modelAsString: true", async () => {
+    const { v1, v2 } = (await openApiFor(
+      `
+      @service
+      @versioned(Versions)
+      @server(
+        "https://example.com/{apiVersion}",
+        "Doc",
+        {
+          @path apiVersion: Versions,
+        }
+      )
+      namespace MyService {
+        enum Versions {
+          v1,
+          v2,
+        }
+      }
+    `,
+      ["v1", "v2"]
+    )) as { v1: OpenAPI2Document; v2: OpenAPI2Document };
+    expect(v1["x-ms-parameterized-host"]?.parameters?.[0]).toEqual({
+      enum: ["v1"],
+      in: "path",
+      name: "apiVersion",
+      required: true,
+      type: "string",
+      "x-ms-enum": {
+        modelAsString: true,
+        name: "Versions",
+        values: [
+          {
+            name: "v1",
+            value: "v1",
+          },
+        ],
+      },
+    });
+    expect(v2["x-ms-parameterized-host"]?.parameters?.[0]).toEqual({
+      enum: ["v2"],
+      in: "path",
+      name: "apiVersion",
+      required: true,
+      type: "string",
+      "x-ms-enum": {
+        modelAsString: true,
+        name: "Versions",
+        values: [
+          {
+            name: "v2",
+            value: "v2",
+          },
+        ],
+      },
+    });
+  });
+
   it("works with models", async () => {
     const { v1, v2, v3 } = await openApiFor(
       `
