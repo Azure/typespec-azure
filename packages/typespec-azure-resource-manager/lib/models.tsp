@@ -15,18 +15,20 @@ namespace Azure.ResourceManager;
  * @template KeyName Override default key name of the resource.
  * @template SegmentName Override default segment name of the resource.
  * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ * @template NameType The type of the name property. Default type is string. However you can pass an union with string values.
  */
 model ResourceNameParameter<
   Resource extends Foundations.Resource,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
-  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
+  NameType extends string = string
 > {
   @doc("The name of the {name}", Resource)
   @pattern(NamePattern)
   @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
   @path
-  name: string;
+  name: NameType;
 }
 
 //#region Standard Resource Operation Interfaces

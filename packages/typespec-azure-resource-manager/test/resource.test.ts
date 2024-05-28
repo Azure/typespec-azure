@@ -1,4 +1,4 @@
-import { Model } from "@typespec/compiler";
+import { Model, ModelProperty } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
@@ -651,5 +651,39 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     expectDiagnosticEmpty(diagnostics);
     strictEqual(resources.length, 1);
     ok(resources[0].typespecType.properties.has("extendedLocation"));
+  });
+
+  it("emits correct fixed union name parameter for resource", async () => {
+    const { program, diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget, NameType=WidgetNameType>;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+
+      /** different type of widget used on resource path */
+      union WidgetNameType {
+        string,
+        /** small widget */
+        Small: "Small",
+        /** large widget */        
+        Large: "Large"
+      }
+  `);
+    const resources = getArmResources(program);
+    expectDiagnosticEmpty(diagnostics);
+    strictEqual(resources.length, 1);
+    ok(resources[0].typespecType.properties.has("name"));
+    const nameProperty = resources[0].typespecType.properties.get("name");
+    strictEqual(nameProperty?.type.kind, "Union");
+    strictEqual(nameProperty?.type.name, "WidgetNameType");
   });
 });

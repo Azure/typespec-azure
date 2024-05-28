@@ -979,23 +979,24 @@ is specified, the resource name will be properly camel cased and pluralized for 
 automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
 
 ```typespec
-model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern>
+model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern, NameType>
 ```
 
 #### Template Parameters
 
-| Name        | Description                                                       |
-| ----------- | ----------------------------------------------------------------- |
-| Resource    | The ARM resource this name parameter is applying to.              |
-| KeyName     | Override default key name of the resource.                        |
-| SegmentName | Override default segment name of the resource.                    |
-| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`. |
+| Name        | Description                                                                                              |
+| ----------- | -------------------------------------------------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.                                                     |
+| KeyName     | Override default key name of the resource.                                                               |
+| SegmentName | Override default segment name of the resource.                                                           |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                        |
+| NameType    | The type of the name property. Default type is string. However you can pass an union with string values. |
 
 #### Properties
 
-| Name | Type     | Description |
-| ---- | -------- | ----------- |
-| name | `string` |             |
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| name | `NameType` |             |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
