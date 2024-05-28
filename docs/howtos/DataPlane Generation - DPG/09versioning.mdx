@@ -55,7 +55,24 @@ preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 1,
+}
 
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api_version will be "2023-11-01"
+
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01);
+ServiceClient client = new ServiceClient(endpoint, options);
+//You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01"
 ```
 
 </TabItem>
@@ -174,7 +191,23 @@ with pytest.expect(AttributeError):
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1,
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 2,
+}
 
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api-version will be "2023-11-01"
+
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+//neither PreviewModel nor PreviewFunctionality will be generated
 ```
 
 </TabItem>
@@ -301,7 +334,24 @@ preview_client.preview_functionality(preview_model) # call goes through
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+// ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1
+}
 
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+// client's api-version will be "2023-11-01-preview"
+
+//call PreviewFunctionality
+PreviewModel previewModel = new PreviewModel("<betaFeature>");
+Response response = client.PreviewFunctionality(previewModel);
+
+//call StableFunctionality
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
 ```
 
 </TabItem>
@@ -434,7 +484,31 @@ preview_client.preview_functionality(preview_model) # call goes through
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1,
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 2,
+}
 
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api_version will be "2023-11-01"
+
+//call PreviewFunctionality
+PreviewModel previewModel = new PreviewModel("<betaFeature>");
+Response response = client.PreviewFunctionality(previewModel);
+
+//call StableFunctionality
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01_Preview);
+ServiceClient client = new ServiceClient(endpoint, options);
+//You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01-preview"
 ```
 
 </TabItem>
