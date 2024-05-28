@@ -350,7 +350,7 @@ describe("typespec-autorest: parameters", () => {
               required: true,
               type: "string",
               enum: ["one", "two"],
-              "x-ms-enum": { modelAsString: true, name: "Foo" },
+              "x-ms-enum": { modelAsString: false, name: "Foo" },
             });
           });
 
@@ -364,7 +364,7 @@ describe("typespec-autorest: parameters", () => {
               items: {
                 type: "string",
                 enum: ["one", "two"],
-                "x-ms-enum": { modelAsString: true, name: "Foo" },
+                "x-ms-enum": { modelAsString: false, name: "Foo" },
               },
             });
           });
