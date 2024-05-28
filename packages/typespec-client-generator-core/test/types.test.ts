@@ -2462,6 +2462,25 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.type, kind);
     });
 
+    it("response header with enum value", async () => {
+      await runner.compileWithBuiltInService(`
+      model RepeatableResponse {
+        @visibility("read")
+        @header("Repeatability-Result")
+        repeatabilityResult?: "accepted" | "rejected";
+      }
+      op foo(): RepeatableResponse;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 0);
+      strictEqual(sdkPackage.enums.length, 1);
+      strictEqual(sdkPackage.enums[0].name, "FooResponse");
+      deepStrictEqual(
+        sdkPackage.enums[0].values.map((x) => x.name),
+        ["accepted", "rejected"]
+      );
+    });
+
     it("enum discriminator model without base discriminator property", async () => {
       await runner.compileWithBuiltInService(`
       enum DogKind {
