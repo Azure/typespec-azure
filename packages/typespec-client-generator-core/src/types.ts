@@ -557,7 +557,7 @@ export function getSdkModelWithDiagnostics(
       details: docWrapper.details,
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
-      access: "public", // dummy value since we need to update models map before we can set this
+      access: "public",
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type, name),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
