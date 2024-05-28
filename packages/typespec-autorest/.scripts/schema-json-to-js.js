@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const jsonFilename = resolve(__dirname, "../schema/dist/schema.json");
+const jsonFilename = resolve(__dirname, "../schema/dist/AutorestOpenAPISchema.json");
 const jsFilename = resolve(__dirname, "../schema/dist/schema.js");
 console.log("Reading json schema at:", jsonFilename);
 const content = await readFile(jsonFilename);

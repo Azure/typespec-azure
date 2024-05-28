@@ -617,32 +617,9 @@ describe("typespec-autorest: enums", () => {
     type: "string",
     enum: ["foo", "bar"],
   });
+
   it("create basic enum without values", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `
-        enum Foo {foo, bar}
-      `
-    );
-
-    const schema = res.defs.Foo;
-    deepStrictEqual(schema, {
-      ...enumBase,
-      "x-ms-enum": {
-        modelAsString: true,
-        name: "Foo",
-      },
-    });
-  });
-
-  it("create fixed enum", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `
-        @fixed
-        enum Foo {foo, bar}
-      `
-    );
+    const res = await oapiForModel("Foo", `enum Foo {foo, bar}`);
 
     const schema = res.defs.Foo;
     deepStrictEqual(schema, {
@@ -652,6 +629,13 @@ describe("typespec-autorest: enums", () => {
         name: "Foo",
       },
     });
+  });
+
+  it("enums are marked with modelAsString false by default", async () => {
+    const res = await oapiForModel("Foo", `enum Foo {foo, bar}`);
+
+    const schema = res.defs.Foo;
+    deepStrictEqual(schema["x-ms-enum"].modelAsString, false);
   });
 
   it("create enum with doc on a member", async () => {
@@ -670,7 +654,7 @@ describe("typespec-autorest: enums", () => {
     deepStrictEqual(schema, {
       ...enumBase,
       "x-ms-enum": {
-        modelAsString: true,
+        modelAsString: false,
         name: "Foo",
         values: [
           {
@@ -702,7 +686,7 @@ describe("typespec-autorest: enums", () => {
     deepStrictEqual(schema, {
       ...enumBase,
       "x-ms-enum": {
-        modelAsString: true,
+        modelAsString: false,
         name: "Foo",
         values: [
           {
@@ -734,7 +718,7 @@ describe("typespec-autorest: enums", () => {
       type: "number",
       enum: [0, 1],
       "x-ms-enum": {
-        modelAsString: true,
+        modelAsString: false,
         name: "Test",
         values: [
           {
