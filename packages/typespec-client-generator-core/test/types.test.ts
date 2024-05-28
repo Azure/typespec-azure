@@ -3084,7 +3084,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const Test3 = models.find((x) => x.name === "Test3");
       ok(Test3);
-      strictEqual(Test3.access, undefined);
+      strictEqual(Test3.access, "public");
 
       const Test4 = models.find((x) => x.name === "Test4");
       ok(Test4);
@@ -3096,7 +3096,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const Test6 = models.find((x) => x.name === "Test6");
       ok(Test6);
-      strictEqual(Test6.access, undefined);
+      strictEqual(Test6.access, "public");
     });
     it("additionalProperties of same type", async () => {
       await runner.compileWithBuiltInService(`
