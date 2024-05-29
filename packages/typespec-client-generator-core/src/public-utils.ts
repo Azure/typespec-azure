@@ -364,7 +364,9 @@ function getContextPath(
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
       visited.clear();
       result = [{ displayName: pascalCase(root.name) }];
-      if (dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)) {
+      if (
+        dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)
+      ) {
         return result;
       }
     }
