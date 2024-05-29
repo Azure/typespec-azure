@@ -1318,6 +1318,19 @@ function updateTypesFromOperation(
           });
         }
       }
+      if (innerResponse.headers) {
+        for (const header of Object.values(innerResponse.headers)) {
+          if (isNeverOrVoidType(header.type)) continue;
+          const headerTypes = diagnostics.pipe(
+            checkAndGetClientType(context, header.type, operation)
+          );
+          if (generateConvenient) {
+            headerTypes.forEach((headerType) => {
+              updateUsageOfModel(context, UsageFlags.Output, headerType);
+            });
+          }
+        }
+      }
     }
   }
   const lroMetaData = getLroMetadata(program, operation);
