@@ -2879,6 +2879,32 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.filter((x) => x.usage === UsageFlags.None).length, 0);
     });
 
+    it("readonly usage", async () => {
+      await runner.compileWithBuiltInService(`
+        model ResultModel {
+          name: string;
+        }
+      
+        model RoundTripModel {
+          @visibility("read")
+          result: ResultModel;
+        }
+      
+        @route("/modelInReadOnlyProperty")
+        @put
+        op modelInReadOnlyProperty(@body body: RoundTripModel): {
+          @body body: RoundTripModel;
+        };
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(
+        models.find((x) => x.name === "RoundTripModel")?.usage,
+        UsageFlags.Input | UsageFlags.Output
+      );
+      strictEqual(models.find((x) => x.name === "ResultModel")?.usage, UsageFlags.Output);
+    });
+
     it("usage propagation", async () => {
       await runner.compileWithBuiltInService(`
         @discriminator("kind")

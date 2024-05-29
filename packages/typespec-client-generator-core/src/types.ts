@@ -1247,6 +1247,9 @@ function updateUsageOfModel(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
+    if (property.kind === "property" && isReadOnly(property) && usage === UsageFlags.Input) {
+      continue;
+    }
     updateUsageOfModel(context, usage, property.type, options);
     options.ignoreSubTypeStack.pop();
   }
