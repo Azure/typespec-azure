@@ -2879,6 +2879,29 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.filter((x) => x.usage === UsageFlags.None).length, 0);
     });
 
+    it("readonly usage", async () => {
+      await runner.compileWithBuiltInService(`
+        model ResultModel {
+          name: string;
+        }
+      
+        model RoundTripModel {
+          @visibility("read")
+          result: ResultModel;
+        }
+      
+        @route("/modelInReadOnlyProperty")
+        @put
+        op modelInReadOnlyProperty(@body body: RoundTripModel): {
+          @body body: RoundTripModel;
+        };
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(models.find((x) => x.name === "RoundTripModel")?.usage, UsageFlags.Input | UsageFlags.Output);
+      strictEqual(models.find((x) => x.name === "ResultModel")?.usage, UsageFlags.Output);
+    });
+
     it("usage propagation", async () => {
       await runner.compileWithBuiltInService(`
         @discriminator("kind")
@@ -3136,9 +3159,9 @@ describe("typespec-client-generator-core: types", () => {
       );
       ok(
         AdditionalPropertiesModel &&
-          AdditionalPropertiesModel2 &&
-          AdditionalPropertiesModel3 &&
-          NonAdditionalPropertiesModel
+        AdditionalPropertiesModel2 &&
+        AdditionalPropertiesModel3 &&
+        NonAdditionalPropertiesModel
       );
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
       strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -3188,10 +3211,10 @@ describe("typespec-client-generator-core: types", () => {
       const Test2 = models.find((x) => x.name === "Test2");
       ok(
         AdditionalPropertiesModel &&
-          AdditionalPropertiesModel2 &&
-          AdditionalPropertiesModel3 &&
-          Test &&
-          Test2
+        AdditionalPropertiesModel2 &&
+        AdditionalPropertiesModel3 &&
+        Test &&
+        Test2
       );
 
       strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
