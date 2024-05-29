@@ -2462,21 +2462,26 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.type, kind);
     });
 
-    it("response header with enum value", async () => {
+    it("request/response header with enum value", async () => {
       await runner.compileWithBuiltInService(`
       model RepeatableResponse {
         @visibility("read")
         @header("Repeatability-Result")
         repeatabilityResult?: "accepted" | "rejected";
       }
-      op foo(): RepeatableResponse;
+      op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
       `);
       const sdkPackage = runner.context.experimental_sdkPackage;
       strictEqual(sdkPackage.models.length, 0);
-      strictEqual(sdkPackage.enums.length, 1);
-      strictEqual(sdkPackage.enums[0].name, "FooResponse");
+      strictEqual(sdkPackage.enums.length, 2);
+      strictEqual(sdkPackage.enums[0].name, "FooRequestRepeatabilityResult");
+      strictEqual(sdkPackage.enums[1].name, "FooResponseRepeatabilityResult");
       deepStrictEqual(
         sdkPackage.enums[0].values.map((x) => x.name),
+        ["accepted", "rejected"]
+      );
+      deepStrictEqual(
+        sdkPackage.enums[1].values.map((x) => x.name),
         ["accepted", "rejected"]
       );
     });
