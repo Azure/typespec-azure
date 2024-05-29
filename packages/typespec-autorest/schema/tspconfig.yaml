@@ -5,4 +5,3 @@ options:
   "@typespec/json-schema":
     emitter-output-dir: "{project-root}/dist"
     file-type: json
-    bundleId: schema.json

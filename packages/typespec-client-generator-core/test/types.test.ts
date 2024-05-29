@@ -2462,6 +2462,30 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.type, kind);
     });
 
+    it("request/response header with enum value", async () => {
+      await runner.compileWithBuiltInService(`
+      model RepeatableResponse {
+        @visibility("read")
+        @header("Repeatability-Result")
+        repeatabilityResult?: "accepted" | "rejected";
+      }
+      op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 0);
+      strictEqual(sdkPackage.enums.length, 2);
+      strictEqual(sdkPackage.enums[0].name, "FooRequestRepeatabilityResult");
+      strictEqual(sdkPackage.enums[1].name, "FooResponseRepeatabilityResult");
+      deepStrictEqual(
+        sdkPackage.enums[0].values.map((x) => x.name),
+        ["accepted", "rejected"]
+      );
+      deepStrictEqual(
+        sdkPackage.enums[1].values.map((x) => x.name),
+        ["accepted", "rejected"]
+      );
+    });
+
     it("enum discriminator model without base discriminator property", async () => {
       await runner.compileWithBuiltInService(`
       enum DogKind {
@@ -2877,6 +2901,32 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.filter((x) => (x.usage & UsageFlags.Output) > 0).length, 1);
       strictEqual(models.filter((x) => (x.usage & UsageFlags.Input) > 0).length, 1);
       strictEqual(models.filter((x) => x.usage === UsageFlags.None).length, 0);
+    });
+
+    it("readonly usage", async () => {
+      await runner.compileWithBuiltInService(`
+        model ResultModel {
+          name: string;
+        }
+      
+        model RoundTripModel {
+          @visibility("read")
+          result: ResultModel;
+        }
+      
+        @route("/modelInReadOnlyProperty")
+        @put
+        op modelInReadOnlyProperty(@body body: RoundTripModel): {
+          @body body: RoundTripModel;
+        };
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(
+        models.find((x) => x.name === "RoundTripModel")?.usage,
+        UsageFlags.Input | UsageFlags.Output
+      );
+      strictEqual(models.find((x) => x.name === "ResultModel")?.usage, UsageFlags.Output);
     });
 
     it("usage propagation", async () => {
