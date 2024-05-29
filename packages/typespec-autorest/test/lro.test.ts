@@ -63,6 +63,15 @@ describe("typespec-autorest: Long-running Operations", () => {
       true
     );
     deepStrictEqual(
+      openapi.paths["/widgets/{widgetName}"].patch["x-ms-long-running-operation-options"],
+      {
+        "final-state-via": "operation-location",
+        "final-state-schema": {
+          $ref: "#/definitions/Widget",
+        },
+      }
+    );
+    deepStrictEqual(
       openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get[
         "x-ms-long-running-operation"
       ],

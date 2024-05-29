@@ -451,6 +451,21 @@ export type OpenAPI2Operation = Extensions & {
   "x-ms-examples"?: Record<string, Ref<unknown>>;
 
   "x-ms-long-running-operation"?: boolean;
+
+  "x-ms-long-running-operation-options"?: XMSLongRunningOperationOptions;
+};
+
+export type XMSLongRunningFinalState =
+  | "azure-async-operation"
+  | "location"
+  | "original-uri"
+  | "operation-location"
+  | "final-state-schema";
+
+export type XMSLongRunningOperationOptions = {
+  "final-state-via": XMSLongRunningFinalState;
+
+  "final-state-schema"?: Refable<OpenAPI2Schema>;
 };
 
 export type OpenAPI2StatusCode = string | "default" | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";
