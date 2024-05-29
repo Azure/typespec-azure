@@ -49,7 +49,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getEffectivePayloadType } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -167,6 +167,7 @@ function getSdkHttpParameters(
         optional: false,
         nullable: isNullable(tspBody.type),
         correspondingMethodParams,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`
       };
     }
     if (retval.bodyParam) {
@@ -184,7 +185,7 @@ function getSdkHttpParameters(
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(httpOperation, retval.bodyParam),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -203,7 +204,7 @@ function getSdkHttpParameters(
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
     // If our operation returns a body, we add an accept header if none exist
     const acceptBase = {
-      ...createContentTypeOrAcceptHeader(httpOperation, responseBody),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, responseBody),
     };
     if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
@@ -227,6 +228,7 @@ function getSdkHttpParameters(
 }
 
 function createContentTypeOrAcceptHeader(
+  context: TCGCContext,
   httpOperation: HttpOperation,
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
@@ -269,6 +271,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     nullable: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`
   };
 }
 

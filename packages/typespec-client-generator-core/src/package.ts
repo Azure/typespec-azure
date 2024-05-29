@@ -195,7 +195,11 @@ function getSdkLroServiceMethod<
   });
 }
 
-function getSdkMethodResponse(
+function getSdkMethodResponse<
+TOptions extends object,
+TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation,
   sdkOperation: SdkServiceOperation
 ): SdkMethodResponse {
@@ -215,7 +219,7 @@ function getSdkMethodResponse(
       kind: "union",
       values: allResponseBodies,
       nullable: isNullable(sdkOperation),
-      name: createGeneratedName(operation, "UnionResponse"),
+      name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
     };
   } else if (responseTypes) {
@@ -277,7 +281,7 @@ function getSdkBasicServiceMethod<
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
-  const response = getSdkMethodResponse(operation, serviceOperation);
+  const response = getSdkMethodResponse(context, operation, serviceOperation);
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
@@ -300,7 +304,7 @@ function getSdkBasicServiceMethod<
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
     },
-    crossLanguageDefintionId: getCrossLanguageDefinitionId({ ...operation, name }),
+    crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
   });
 }
 
@@ -417,6 +421,7 @@ function getSdkMethodParameter(
       serializedName: name,
       isApiVersionParam: false,
       onClient: false,
+      crossLanguageDefinitionId: "anonymous",
     });
   }
   return diagnostics.wrap({
@@ -449,7 +454,7 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefintionId: getCrossLanguageDefinitionId({ ...operationGroup.type, name }),
+      crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
     });
   }
   return diagnostics.wrap(retval);
@@ -490,6 +495,7 @@ function getSdkEndpointParameter(
           },
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
         },
       ],
     };
@@ -540,6 +546,7 @@ function getSdkEndpointParameter(
     optional,
     isApiVersionParam: false,
     nullable: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
   });
 }
 

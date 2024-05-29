@@ -338,6 +338,7 @@ export interface SdkModelPropertyTypeBase {
   isApiVersionParam: boolean;
   optional: boolean;
   nullable: boolean;
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {

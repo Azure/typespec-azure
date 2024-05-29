@@ -6,6 +6,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  Scalar,
   Type,
   Union,
   createDiagnosticCollector,
@@ -228,20 +229,34 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @returns
  */
 export function getCrossLanguageDefinitionId(
-  type: {
-    name?: string;
-    kind: string;
-    interface?: Interface;
-    namespace?: Namespace;
-  },
-  name?: string
+  context: TCGCContext,
+  type: Union | Model | Enum | ModelProperty | Operation | Namespace | Interface | Scalar,
+  appendNamespace: boolean = true
 ): string {
-  let retval = type.name ? type.name : name ?? "";
-  if (type.kind === "Operation" && type.interface) {
-    retval = `${type.interface.name}.${retval}`;
+  let retval = type.name || "anonymous";
+  const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  switch (type.kind) {
+    case "Model":
+      if (retval === "anonymous") {
+        retval = findContextPath(context, type).map(n => n.name).join(".") + "." + retval;
+      } else {
+        retval = findContextPath(context, type).map(n => n.name).join(".");
+      }
+      
+      break;
+    case "ModelProperty":
+      if (type.model) {
+        retval = `${getCrossLanguageDefinitionId(context, type.model, false)}.${retval}`;
+      }
+      break;
+    case "Operation":
+      if (type.interface) {
+        retval = `${getCrossLanguageDefinitionId(context, type.interface, false)}.${retval}`;
+      }
+      break;
   }
-  if (type.namespace) {
-    retval = `${getNamespaceFullName(type.namespace!)}.${retval}`;
+  if (appendNamespace && namespace && getNamespaceFullName(namespace)) {
+    retval = `${getNamespaceFullName(namespace)}.${retval}`;
   }
   return retval;
 }
@@ -330,7 +345,7 @@ function findContextPath(
 }
 
 interface ContextNode {
-  displayName: string;
+  name: string
   type?: Model | Union | TspLiteralType;
 }
 
@@ -355,7 +370,7 @@ function getContextPath(
 
     if (httpOperation.parameters.body) {
       visited.clear();
-      result = [{ displayName: pascalCase(root.name) }];
+      result = [{ name: root.name }];
       if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type, "Request")) {
         return result;
       }
@@ -363,7 +378,7 @@ function getContextPath(
 
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
       visited.clear();
-      result = [{ displayName: pascalCase(root.name) }];
+      result = [{ name: root.name }];
       if (dfsModelProperties(typeToFind, parameter.param.type, "Request")) {
         return result;
       }
@@ -373,7 +388,7 @@ function getContextPath(
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
           visited.clear();
-          result = [{ displayName: pascalCase(root.name) }];
+          result = [{ name: root.name }];
           if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response")) {
             return result;
           }
@@ -382,7 +397,7 @@ function getContextPath(
         if (innerResponse.headers) {
           for (const header of Object.values(innerResponse.headers)) {
             visited.clear();
-            result = [{ displayName: pascalCase(root.name) }];
+            result = [{ name: root.name }];
             if (dfsModelProperties(typeToFind, header.type, "Response")) {
               return result;
             }
@@ -430,7 +445,7 @@ function getContextPath(
     visited.add(currentType);
 
     if (currentType === expectedType) {
-      result.push({ displayName: pascalCase(displayName), type: currentType });
+      result.push({ name: displayName, type: currentType });
       return true;
     } else if (
       currentType.kind === "Model" &&
@@ -445,7 +460,7 @@ function getContextPath(
     } else if (currentType.kind === "Model") {
       currentType = getEffectivePayloadType(context, currentType);
       // handle model
-      result.push({ displayName: pascalCase(displayName), type: currentType });
+      result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
         // traverse model property
         // use property.name as displayName
@@ -551,10 +566,10 @@ function buildNameFromContextPaths(
       currContextPathType?.kind === "Number" ||
       currContextPathType?.kind === "Boolean"
     ) {
-      createName = `${createName}${contextPath[j].displayName}${capitalCase(String(currContextPathType.value))}`;
+      createName = `${createName}${pascalCase(contextPath[j].name)}${capitalCase(String(currContextPathType.value))}`;
     } else if (!currContextPathType?.name) {
       // is anonymous model node
-      createName = `${createName}${contextPath[j].displayName}`;
+      createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else {
       // is non-anonymous model, use type name
       createName = `${createName}${currContextPathType!.name!}`;

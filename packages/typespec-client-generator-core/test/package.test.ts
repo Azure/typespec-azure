@@ -605,7 +605,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(clientAccessor.name, "getMyOperationGroup");
       strictEqual(clientAccessor.parameters.length, 0);
       strictEqual(clientAccessor.response, operationGroup);
-      strictEqual(clientAccessor.crossLanguageDefintionId, "TestService.getMyOperationGroup");
+      strictEqual(clientAccessor.crossLanguageDefintionId, "TestService.MyOperationGroup");
 
       strictEqual(operationGroup.initialization.properties.length, 1);
       strictEqual(operationGroup.initialization.access, "internal");
