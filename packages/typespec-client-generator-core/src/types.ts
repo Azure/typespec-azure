@@ -1255,6 +1255,9 @@ function updateUsageOfModel(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
+    if (property.kind === "property" && isReadOnly(property) && usage === UsageFlags.Input) {
+      continue;
+    }
     updateUsageOfModel(context, usage, property.type, options);
     options.ignoreSubTypeStack.pop();
   }
@@ -1321,6 +1324,19 @@ function updateTypesFromOperation(
           responseBodies.forEach((responseBody) => {
             updateUsageOfModel(context, UsageFlags.Output, responseBody);
           });
+        }
+      }
+      if (innerResponse.headers) {
+        for (const header of Object.values(innerResponse.headers)) {
+          if (isNeverOrVoidType(header.type)) continue;
+          const headerTypes = diagnostics.pipe(
+            checkAndGetClientType(context, header.type, operation)
+          );
+          if (generateConvenient) {
+            headerTypes.forEach((headerType) => {
+              updateUsageOfModel(context, UsageFlags.Output, headerType);
+            });
+          }
         }
       }
     }

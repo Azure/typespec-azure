@@ -149,12 +149,17 @@
       "required": true,
       "type": "string",
       "enum": [
-        "v1",
         "v2"
       ],
       "x-ms-enum": {
         "name": "Versions",
-        "modelAsString": true
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "v2",
+            "value": "v2"
+          }
+        ]
       },
       "x-ms-parameter-location": "method",
       "x-ms-client-name": "apiVersion"

@@ -41,6 +41,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@azure-tools/typespec-service-csharp": "workspace:~",
+    "@azure-tools/typespec-azure-rulesets": "workspace:~",
     "@docusaurus/module-type-aliases": "^3.3.2",
     "@docusaurus/tsconfig": "^3.3.2",
     "@docusaurus/types": "^3.3.2",
