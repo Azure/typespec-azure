@@ -3,7 +3,6 @@ import {
   Diagnostic,
   Enum,
   EnumMember,
-  EnumValue,
   Model,
   ModelProperty,
   Namespace,
@@ -56,11 +55,11 @@ export function isArmCommonType(entity: Type): boolean {
 export function $armCommonTypesVersion(
   context: DecoratorContext,
   entity: Namespace | EnumMember,
-  version: EnumValue
+  version: EnumMember
 ) {
-  context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, version.value.name);
+  context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, version.name as string);
 
-  context.call($useDependency, entity, version.value);
+  context.call($useDependency, entity, version);
 }
 
 /**

@@ -17,26 +17,6 @@ using Azure.ResourceManager.Private;
 namespace Azure.ResourceManager.Foundations;
 
 /**
- * An internal enum to indicate the resource support for various path types
- */
-enum ResourceHome {
-  @doc("The resource is bound to a tenant")
-  Tenant,
-
-  @doc("The resource is bound to a subscription")
-  Subscription,
-
-  @doc("The resource is bound to a location")
-  Location,
-
-  @doc("The resource is bound to a resource group")
-  ResourceGroup,
-
-  @doc("The resource is bound to an extension")
-  Extension,
-}
-
-/**
  * Base parameters for a resource.
  *
  * @template Resource The type of the resource.

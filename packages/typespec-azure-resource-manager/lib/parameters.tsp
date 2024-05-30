@@ -11,43 +11,12 @@ namespace Azure.ResourceManager;
 /**
  * The default api-version parameter type.
  */
-@doc("The default api-version parameter type.")
-model ApiVersionParameter {
-  @query("api-version")
-  @minLength(1)
-  @doc("The API version to use for this operation.")
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
-  @resourceParameterBaseFor(
-    [
-      ResourceHome.ResourceGroup,
-      ResourceHome.Subscription,
-      ResourceHome.Location,
-      ResourceHome.Tenant,
-      ResourceHome.Extension
-    ]
-  )
-  apiVersion: string;
-}
+alias ApiVersionParameter = CommonTypes.ApiVersionParameter;
 
 /**
  * The default subscriptionId parameter type.
  */
-@doc("The default subscriptionId parameter type.")
-model SubscriptionIdParameter {
-  @path
-  @minLength(1)
-  @segment("subscriptions")
-  @doc("The ID of the target subscription.")
-  @armCommonParameter("SubscriptionIdParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("SubscriptionIdParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("SubscriptionIdParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
-  @resourceParameterBaseFor(
-    [ResourceHome.ResourceGroup, ResourceHome.Subscription, ResourceHome.Location]
-  )
-  subscriptionId: string;
-}
+alias SubscriptionIdParameter = CommonTypes.SubscriptionIdParameter;
 
 /**
  * DEPRECATED - DO NOT USE

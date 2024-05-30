@@ -1,8 +1,10 @@
 using TypeSpec.Http;
+using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
 using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager.Private;
+using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
@@ -416,4 +418,42 @@ union CheckNameAvailabilityReason {
   AlreadyExists: "AlreadyExists",
 
   string,
+}
+
+/**
+ * The default api-version parameter type.
+ */
+@doc("The default api-version parameter type.")
+model ApiVersionParameter {
+  @query("api-version")
+  @minLength(1)
+  @doc("The API version to use for this operation.")
+  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
+  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
+  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
+  @resourceParameterBaseFor(
+    [
+      ResourceHome.ResourceGroup,
+      ResourceHome.Subscription,
+      ResourceHome.Location,
+      ResourceHome.Tenant,
+      ResourceHome.Extension
+    ]
+  )
+  apiVersion: string;
+}
+
+/**
+ * The default subscriptionId parameter type.
+ */
+@doc("The default subscriptionId parameter type.")
+model SubscriptionIdParameter {
+  @path
+  @minLength(1)
+  @segment("subscriptions")
+  @doc("The ID of the target subscription.")
+  @resourceParameterBaseFor(
+    [ResourceHome.ResourceGroup, ResourceHome.Subscription, ResourceHome.Location]
+  )
+  subscriptionId: string;
 }
