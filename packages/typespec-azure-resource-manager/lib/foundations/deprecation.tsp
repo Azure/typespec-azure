@@ -17,3 +17,14 @@ alias ResourceSkuType = Sku;
 
 #deprecated "Please use Foundations.Plan instead of Foundations.ResourcePlanType"
 alias ResourcePlanType = Plan;
+
+// managed-identity
+#deprecated "Please change ManagedIdentityProperties to ManagedServiceIdentity."
+alias ManagedIdentityProperties = ManagedServiceIdentity;
+
+#deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
+alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
+
+/** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
+#deprecated "Please change to ManagedServiceIdentityType."
+alias ManagedIdentityType = ManagedServiceIdentityType;

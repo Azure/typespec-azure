@@ -3,6 +3,8 @@ using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
+using Azure.ResourceManager.CommonTypes;
+using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager;
 

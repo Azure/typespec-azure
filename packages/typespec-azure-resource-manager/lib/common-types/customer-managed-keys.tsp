@@ -1,14 +1,15 @@
 using Azure.Core;
-using Azure.ResourceManager.Private;
+using TypeSpec.Versioning;
 
-namespace Azure.ResourceManager;
+namespace Azure.ResourceManager.CommonTypes;
 
-@doc("(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.")
+/** (Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled. */
+@added(CommonTypes.Versions.v4)
 union InfrastructureEncryption {
-  @doc("Encryption is enabled")
+  /** Encryption is enabled */
   Enabled: "enabled",
 
-  @doc("Encryption is disabled")
+  /** Encryption is disabled */
   Disabled: "disabled",
 
   string,
@@ -17,53 +18,51 @@ union InfrastructureEncryption {
 /** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
 alias KeyEncryptionIdentity = KeyEncryptionKeyIdentity;
 
-@doc("The type of identity to use.")
+/** The type of identity to use. */
+@added(CommonTypes.Versions.v4)
 union KeyEncryptionKeyIdentity {
-  @doc("System assigned identity")
+  /** System assigned identity */
   SystemAssignedIdentity: "systemAssignedIdentity",
 
-  @doc("User assigned identity")
+  /** User assigned identity */
   UserAssignedIdentity: "userAssignedIdentity",
 
-  @doc("Delegated identity")
+  /** Delegated identity */
   DelegatedResourceIdentity: "delegatedResourceIdentity",
 
   string,
 }
 
-@doc("Customer-managed key encryption properties for the resource.")
+/** Customer-managed key encryption properties for the resource. */
+@added(CommonTypes.Versions.v4)
 model CustomerManagedKeyEncryption {
-  @doc("The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.")
+  /** The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity. */
   keyEncryptionKeyIdentity?: KeyEncryptionKeyIdentity;
 
-  @doc("User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.")
+  /** User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity. */
   userAssignedIdentityResourceId?: Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.ManagedIdentity/userAssignedIdentities";
     }
   ]>;
 
-  @doc("application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540")
+  /** application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540 */
   federatedClientId?: uuid;
 
-  @doc("delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only.")
+  /** delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. */
   delegatedIdentityClientId?: uuid;
 }
 
-@doc("All encryption configuration for a resource.")
-@armCommonDefinition(
-  "encryption",
-  Azure.ResourceManager.CommonTypes.Versions.v5,
-  "customermanagedkeys.json"
-)
+/** All encryption configuration for a resource. */
+@added(CommonTypes.Versions.v4)
 model EncryptionConfiguration {
-  @doc("Indicates if infrastructure encryption is enabled or disabled.")
+  /** Indicates if infrastructure encryption is enabled or disabled. */
   infrastructureEncryption?: InfrastructureEncryption;
 
-  @doc("All customer-managed key encryption properties for the resource.")
+  /** All customer-managed key encryption properties for the resource. */
   customerManagedKeyEncryption?: CustomerManagedKeyEncryption;
 
-  @doc("key encryption key Url, versioned or unversioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek.")
+  /** key encryption key Url, versioned or unversioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. */
   keyEncryptionKeyUrl?: string;
 }
 
@@ -77,8 +76,9 @@ model EncryptionConfiguration {
  * }
  * ```
  */
-@doc("All encryption configuration for a resource.")
+/** All encryption configuration for a resource. */
+@added(CommonTypes.Versions.v4)
 model Encryption {
-  @doc("All encryption configuration for a resource.")
+  /** All encryption configuration for a resource. */
   encryption: EncryptionConfiguration;
 }

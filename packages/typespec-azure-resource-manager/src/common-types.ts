@@ -12,13 +12,13 @@ import {
   Type,
   isTypeSpecValueTypeOf,
 } from "@typespec/compiler";
-import { getVersion } from "@typespec/versioning";
-import { createDiagnostic } from "./lib.js";
+import { $useDependency, getVersion } from "@typespec/versioning";
 import {
   ArmCommonTypeRecord,
   ArmCommonTypesDefaultVersion,
   getCommonTypeRecords,
-} from "./private.decorators.js";
+} from "./commontypes.private.decorators.js";
+import { createDiagnostic } from "./lib.js";
 import { ArmStateKeys } from "./state.js";
 
 export interface ArmCommonTypeVersions {
@@ -56,11 +56,11 @@ export function isArmCommonType(entity: Type): boolean {
 export function $armCommonTypesVersion(
   context: DecoratorContext,
   entity: Namespace | EnumMember,
-  version: string | EnumValue
+  version: EnumValue
 ) {
-  context.program
-    .stateMap(ArmStateKeys.armCommonTypesVersion)
-    .set(entity, typeof version === "string" ? version : version.value.name);
+  context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, version.value.name);
+
+  context.call($useDependency, entity, version.value);
 }
 
 /**

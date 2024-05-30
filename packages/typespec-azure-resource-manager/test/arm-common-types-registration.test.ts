@@ -3,7 +3,7 @@ import { getService } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { describe, expect, it } from "vitest";
 import { findArmCommonTypeRecord } from "../src/common-types.js";
-import type { ArmCommonTypeRecord } from "../src/private.decorators.js";
+import type { ArmCommonTypeRecord } from "../src/commontypes.private.decorators.js";
 import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
 function boilerplate(version: string | undefined) {

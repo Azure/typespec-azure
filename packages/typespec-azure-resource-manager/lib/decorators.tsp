@@ -180,12 +180,9 @@ extern dec armResourceOperations(target: Interface, _?: unknown);
  * This decorator is used either on a namespace or a version enum value to indicate
  * the version of the Azure Resource Manager common-types to use for refs in emitted Swagger files.
  *
- * @param version The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value.
+ * @param version The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version.
  */
-extern dec armCommonTypesVersion(
-  target: Namespace | EnumMember,
-  version: valueof string | EnumMember
-);
+extern dec armCommonTypesVersion(target: Namespace | EnumMember, version: EnumMember);
 
 /**
  * This decorator is used on Azure Resource Manager resources that are not based on

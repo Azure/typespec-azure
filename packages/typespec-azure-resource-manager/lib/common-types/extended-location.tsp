@@ -1,4 +1,5 @@
-namespace Azure.ResourceManager.Foundations {
+
+namespace Azure.ResourceManager.CommonTypes;
   /** The complex type of the extended location. */
   model ExtendedLocation {
     /** The name of the extended location. */
@@ -18,4 +19,4 @@ namespace Azure.ResourceManager.Foundations {
 
     string,
   }
-}
+

@@ -1,6 +1,17 @@
+import "@typespec/openapi";
+import "@typespec/http";
+import "@typespec/rest";
+
+import "./backcompat.tsp";
+import "./deprecation.tsp";
+import "../common-types/common-types.tsp";
+import "../decorators.tsp";
+import "../responses.tsp";
+import "../private.decorators.tsp";
+import "../parameters.tsp";
+
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
-using TypeSpec.Versioning;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
