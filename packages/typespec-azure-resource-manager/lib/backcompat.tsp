@@ -7,7 +7,6 @@ namespace Azure.ResourceManager {
   alias KeyEncryptionKeyIdentity = CommonTypes.KeyEncryptionKeyIdentity;
   alias CustomerManagedKeyEncryption = CommonTypes.CustomerManagedKeyEncryption;
   alias EncryptionConfiguration = CommonTypes.EncryptionConfiguration;
-  alias Encryption = CommonTypes.Encryption;
 
   // private-links
   alias PrivateEndpoint = CommonTypes.PrivateEndpoint;

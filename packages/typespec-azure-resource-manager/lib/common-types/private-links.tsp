@@ -86,6 +86,16 @@ union PrivateEndpointServiceConnectionStatus {
 model PrivateEndpointConnectionParameter<Segment extends valueof string = "privateEndpointConnections"> {
   /** The name of the private endpoint connection associated with the Azure resource. */
   @path
+  @CommonTypes.Private.armCommonParameter(
+    "PrivateEndpointConnectionName",
+    #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+    "privatelinks.json"
+  )
+  @CommonTypes.Private.armCommonParameter(
+    "PrivateEndpointConnectionName",
+    Azure.ResourceManager.CommonTypes.Versions.v5,
+    "privatelinks.json"
+  )
   @TypeSpec.Rest.segment(Segment)
   @key("privateEndpointConnectionName")
   name: string;

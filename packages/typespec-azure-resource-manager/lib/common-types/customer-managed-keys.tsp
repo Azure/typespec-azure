@@ -65,20 +65,3 @@ model EncryptionConfiguration {
   /** key encryption key Url, versioned or unversioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. */
   keyEncryptionKeyUrl?: string;
 }
-
-/**
- * Model used only to spread in the `encryption` envelope property for a resource.
- * @example
- *
- * ```typespec
- * model Foo is TrackedResource<FooProperties> {
- *   ...Encryption;
- * }
- * ```
- */
-/** All encryption configuration for a resource. */
-@added(CommonTypes.Versions.v4)
-model Encryption {
-  /** All encryption configuration for a resource. */
-  encryption: EncryptionConfiguration;
-}
