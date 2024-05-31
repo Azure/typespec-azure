@@ -575,6 +575,7 @@ function buildNameFromContextPaths(
       currContextPathType?.kind === "Number" ||
       currContextPathType?.kind === "Boolean"
     ) {
+      // constant type
       createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else if (!currContextPathType?.name) {
       // is anonymous model node
