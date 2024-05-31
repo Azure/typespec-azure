@@ -395,7 +395,11 @@ export function isNullable(type: Type | SdkServiceOperation): boolean {
  * Otherwise, you should use the `getGeneratedName` function.
  * @param context
  */
-export function createGeneratedName(context: TCGCContext, type: Namespace | Operation, suffix: string): string {
+export function createGeneratedName(
+  context: TCGCContext,
+  type: Namespace | Operation,
+  suffix: string
+): string {
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 

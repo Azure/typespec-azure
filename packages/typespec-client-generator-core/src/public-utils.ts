@@ -238,11 +238,18 @@ export function getCrossLanguageDefinitionId(
   switch (type.kind) {
     case "Model":
       if (retval === "anonymous") {
-        retval = findContextPath(context, type).map(n => n.name).join(".") + "." + retval;
+        retval =
+          findContextPath(context, type)
+            .map((n) => n.name)
+            .join(".") +
+          "." +
+          retval;
       } else {
-        retval = findContextPath(context, type).map(n => n.name).join(".");
+        retval = findContextPath(context, type)
+          .map((n) => n.name)
+          .join(".");
       }
-      
+
       break;
     case "ModelProperty":
       if (type.model) {
@@ -345,7 +352,7 @@ function findContextPath(
 }
 
 interface ContextNode {
-  name: string
+  name: string;
   type?: Model | Union | TspLiteralType;
 }
 

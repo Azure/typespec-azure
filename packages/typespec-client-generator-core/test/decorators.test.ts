@@ -323,7 +323,10 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.SubNamespace.Widgets.one");
+      strictEqual(
+        getCrossLanguageDefinitionId(runner.context, one),
+        "MyClient.SubNamespace.Widgets.one"
+      );
     });
 
     it("crossLanguagePackageId", async () => {

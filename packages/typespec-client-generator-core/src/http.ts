@@ -167,7 +167,7 @@ function getSdkHttpParameters(
         optional: false,
         nullable: isNullable(tspBody.type),
         correspondingMethodParams,
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
       };
     }
     if (retval.bodyParam) {
@@ -271,7 +271,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     nullable: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
   };
 }
 

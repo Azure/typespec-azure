@@ -56,7 +56,6 @@ import {
   SdkBuiltInType,
   SdkClient,
   SdkConstantType,
-  SdkContext,
   SdkCredentialParameter,
   SdkCredentialType,
   SdkDatetimeType,
@@ -68,7 +67,6 @@ import {
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkOperationGroup,
-  SdkServiceOperation,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -523,7 +521,7 @@ function addDiscriminatorToModelType(
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       nullable: false,
-      crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`
+      crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
     });
     model.discriminatorProperty = model.properties[0];
   }

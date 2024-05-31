@@ -196,8 +196,8 @@ function getSdkLroServiceMethod<
 }
 
 function getSdkMethodResponse<
-TOptions extends object,
-TServiceOperation extends SdkServiceOperation,
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
 >(
   context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation,
