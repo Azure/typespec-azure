@@ -28,7 +28,7 @@ import {
   isStatusCode,
 } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
-import { capitalCase, pascalCase } from "change-case";
+import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   getClientNameOverride,
@@ -379,7 +379,9 @@ function getContextPath(
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
       visited.clear();
       result = [{ name: root.name }];
-      if (dfsModelProperties(typeToFind, parameter.param.type, "Request")) {
+      if (
+        dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)
+      ) {
         return result;
       }
     }
@@ -398,7 +400,7 @@ function getContextPath(
           for (const header of Object.values(innerResponse.headers)) {
             visited.clear();
             result = [{ name: root.name }];
-            if (dfsModelProperties(typeToFind, header.type, "Response")) {
+            if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {
               return result;
             }
           }
@@ -566,7 +568,7 @@ function buildNameFromContextPaths(
       currContextPathType?.kind === "Number" ||
       currContextPathType?.kind === "Boolean"
     ) {
-      createName = `${createName}${pascalCase(contextPath[j].name)}${capitalCase(String(currContextPathType.value))}`;
+      createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else if (!currContextPathType?.name) {
       // is anonymous model node
       createName = `${createName}${pascalCase(contextPath[j].name)}`;

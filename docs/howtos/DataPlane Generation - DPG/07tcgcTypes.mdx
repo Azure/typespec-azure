@@ -488,7 +488,7 @@ They each extend from the shared `SdkMethodBase`
 interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   __raw?: Operation;
   name: string;
-  access: AccessFlags | undefined;
+  access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
   description?: string;
@@ -1360,7 +1360,7 @@ export interface SdkModelType extends SdkTypeBase {
   generatedName: string;
   description?: string;
   details?: string;
-  access?: AccessFlags;
+  access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
   discriminatorValue?: string;
@@ -1387,7 +1387,9 @@ export enum UsageFlags {
 
 ### AccessFlags
 
-We have the `.access` property on a model etc. as optional, so emitters can choose what to default to.
+We default the value of `.access` property on model, enum, and method types to be `"public"`. So if the `@access` decorator isn't explicitly applied to one of these definitions, its value will be `"public"`.
+
+If you want to know if a tsp author explicitly set the value with an `@access` decorator, you can call `getAccessOverride`
 
 ```ts
 export type AccessFlags = "internal" | "public";

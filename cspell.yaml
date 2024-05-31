@@ -16,10 +16,10 @@ ignorePaths:
   - pnpm-lock.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
-  - ".git/**"
-  - ".gitignore"
-  - ".vscode/**"
-  - ".editorconfig"
+  - .git/**
+  - .gitignore
+  - .vscode/**
+  - .editorconfig
   - .github/CODEOWNERS
 useGitignore: true
 enableFiletypes:
@@ -53,6 +53,7 @@ words:
   - lropaging
   - Lucene
   - MACVMIMAGE
+  - mgmt
   - msazure
   - msdata
   - mylocation
@@ -60,9 +61,9 @@ words:
   - odata
   - Onco
   - oncophenotype
-  - psscriptanalyzer
   - PAYG
   - prismjs
+  - psscriptanalyzer
   - qnas
   - regionality
   - Reranker
