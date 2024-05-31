@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   Diagnostic,
@@ -17,7 +16,6 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
-  ignoreDiagnostics,
   isNeverType,
   isNullType,
   isVoidType,
@@ -26,13 +24,13 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
   SdkParameter,
-  SdkServiceOperation,
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
@@ -242,13 +240,12 @@ export function getHashForType(type: SdkType): string {
 
 interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
-  nullable: boolean;
   deprecation?: string;
   kind: TKind;
 }
 
 /**
- * Helper function to return default values for nullable, encode etc
+ * Helper function to return default values for encode etc
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
@@ -258,7 +255,6 @@ export function getSdkTypeBaseHelper<TKind>(
 ): DefaultSdkTypeBase<TKind> {
   return {
     __raw: type,
-    nullable: false,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
   };
@@ -347,7 +343,11 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(
+export function getNullOption(type: Union): Type | undefined {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
+}
+
+export function getAllResponseBodiesAndNonBodyExists(
   responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
 ): {
   allResponseBodies: SdkType[];
@@ -357,7 +357,7 @@ function getAllResponseBodiesAndNonBodyExists(
   let nonBodyExists = false;
   for (const response of responses.values()) {
     if (response.type) {
-      if (response.nullable) {
+      if (response.type.kind === "nullable") {
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);
@@ -374,21 +374,6 @@ export function getAllResponseBodies(
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
-/**
- * Determines if a type is nullable.
- * @param type
- * @returns
- */
-export function isNullable(type: Type | SdkServiceOperation): boolean {
-  if (type.kind === "Union") {
-    if (getNonNullOptions(type).length < type.variants.size) return true;
-    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
-  }
-  if (type.kind === "http") {
-    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
-  }
-  return false;
-}
 /**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
@@ -439,4 +424,11 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
 
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
+}
+
+export function getAnyType(): SdkBuiltInType {
+  return {
+    kind: "any",
+    encode: "string",
+  };
 }

@@ -45,7 +45,6 @@ import {
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
-  isNullable,
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -165,7 +164,6 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: false,
-        nullable: isNullable(tspBody.type),
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
       };
@@ -236,7 +234,6 @@ function createContentTypeOrAcceptHeader(
   let type: SdkType = {
     kind: "string",
     encode: "string",
-    nullable: false,
   };
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
@@ -252,7 +249,6 @@ function createContentTypeOrAcceptHeader(
   ) {
     // in this case, we just want a content type of application/json
     type = {
-      nullable: false,
       kind: "constant",
       value: bodyObject.contentTypes[0],
       valueType: type,
@@ -270,7 +266,6 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: false,
-    nullable: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
   };
 }
@@ -400,7 +395,6 @@ function getSdkHttpResponseAndExceptions(
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
-          nullable: isNullable(header.type),
         });
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -440,7 +434,6 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
         httpOperation.operation
       ),
-      nullable: body ? isNullable(body) : true,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.set(response.statusCodes, sdkResponse);
