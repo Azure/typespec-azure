@@ -546,7 +546,7 @@ export function getSdkModelWithDiagnostics(
       details: docWrapper.details,
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
-      access: undefined, // dummy value since we need to update models map before we can set this
+      access: "public",
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type, name),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
@@ -669,7 +669,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
-      access: undefined, // Dummy value until we update models map
+      access: "public", // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isUnionAsEnum: false,
@@ -723,7 +723,7 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
       isFixed: !type.open,
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
-      access: undefined, // Dummy value until we update models map
+      access: "public", // Dummy value until we update models map
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(union, name),
       apiVersions: getAvailableApiVersions(context, type.union, type.union.namespace),
       isUnionAsEnum: true,
@@ -761,7 +761,7 @@ function getKnownValuesEnum(
         isFixed: false,
         isFlags: false,
         usage: UsageFlags.None, // We will add usage as we loop through the operations
-        access: undefined, // Dummy value until we update models map
+        access: "public", // Dummy value until we update models map
         crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
         apiVersions: getAvailableApiVersions(context, type, type.namespace),
         isUnionAsEnum: false,
@@ -1232,6 +1232,9 @@ function updateUsageOfModel(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
+    if (property.kind === "property" && isReadOnly(property) && usage === UsageFlags.Input) {
+      continue;
+    }
     updateUsageOfModel(context, usage, property.type, options);
     options.ignoreSubTypeStack.pop();
   }
@@ -1298,6 +1301,19 @@ function updateTypesFromOperation(
           responseBodies.forEach((responseBody) => {
             updateUsageOfModel(context, UsageFlags.Output, responseBody);
           });
+        }
+      }
+      if (innerResponse.headers) {
+        for (const header of Object.values(innerResponse.headers)) {
+          if (isNeverOrVoidType(header.type)) continue;
+          const headerTypes = diagnostics.pipe(
+            checkAndGetClientType(context, header.type, operation)
+          );
+          if (generateConvenient) {
+            headerTypes.forEach((headerType) => {
+              updateUsageOfModel(context, UsageFlags.Output, headerType);
+            });
+          }
         }
       }
     }

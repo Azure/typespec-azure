@@ -892,10 +892,10 @@ export function getAccessOverride(
 export function getAccess(
   context: TCGCContext,
   entity: Model | Enum | Operation | Union
-): AccessFlags | undefined {
+): AccessFlags {
   const override = getScopedDecoratorData(context, accessKey, entity);
   if (override || entity.kind === "Operation") {
-    return override;
+    return override || "public";
   }
 
   switch (entity.kind) {
@@ -908,7 +908,7 @@ export function getAccess(
       if (type.kind === "enum" || type.kind === "model") {
         return type.access;
       }
-      return undefined;
+      return "public";
   }
 }
 

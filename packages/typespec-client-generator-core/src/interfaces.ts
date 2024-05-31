@@ -253,7 +253,7 @@ export interface SdkEnumType extends SdkTypeBase {
   isFixed: boolean;
   isFlags: boolean;
   usage: UsageFlags;
-  access?: AccessFlags;
+  access: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
   isUnionAsEnum: boolean;
@@ -296,7 +296,7 @@ export interface SdkModelType extends SdkTypeBase {
    */
   isError: boolean;
   isGeneratedName: boolean;
-  access?: AccessFlags;
+  access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
   discriminatorValue?: string;
@@ -463,7 +463,7 @@ export type SdkServiceParameter = SdkHttpParameter;
 interface SdkMethodBase {
   __raw?: Operation;
   name: string;
-  access: AccessFlags | undefined;
+  access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
   description?: string;
