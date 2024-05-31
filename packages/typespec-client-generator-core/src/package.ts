@@ -217,7 +217,7 @@ function getSdkMethodResponse(
   if (nonBodyExists && type) {
     type = {
       kind: "nullable",
-      valueType: type,
+      type: type,
     };
   }
   return {

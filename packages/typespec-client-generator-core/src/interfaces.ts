@@ -241,7 +241,7 @@ export interface SdkDictionaryType extends SdkTypeBase {
 
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
-  valueType: SdkType;
+  type: SdkType;
 }
 
 export interface SdkEnumType extends SdkTypeBase {

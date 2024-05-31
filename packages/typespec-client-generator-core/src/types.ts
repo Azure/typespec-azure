@@ -125,7 +125,7 @@ export function addFormatInfo(
   type: ModelProperty | Scalar,
   propertyType: SdkType
 ): void {
-  const innerType = propertyType.kind === "nullable" ? propertyType.valueType : propertyType;
+  const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
   const format = getFormat(context.program, type) ?? "";
   if (isSdkBuiltInKind(format)) innerType.kind = format;
 }
@@ -145,7 +145,7 @@ export function addEncodeInfo(
   defaultContentType?: string
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const innerType = propertyType.kind === "nullable" ? propertyType.valueType : propertyType;
+  const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
   const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);
@@ -371,7 +371,7 @@ export function getSdkUnionWithDiagnostics(
   if (nullOption !== undefined) {
     retval = {
       ...getSdkTypeBaseHelper(context, type, "nullable"),
-      valueType: retval,
+      type: retval,
     };
   }
 
@@ -1195,7 +1195,7 @@ function updateUsageOfModel(
     return;
   }
   if (type.kind === "nullable") {
-    updateUsageOfModel(context, usage, type.valueType, options);
+    updateUsageOfModel(context, usage, type.type, options);
     return;
   }
   if (type.kind !== "model" && type.kind !== "enum") return;

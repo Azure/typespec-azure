@@ -1852,7 +1852,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(noContentResponse.type, undefined);
       strictEqual(method.response.type?.kind, "nullable");
       strictEqual(
-        method.response.type?.valueType,
+        method.response.type?.type,
         sdkPackage.models.find((x) => x.name === "Widget")
       );
     });
