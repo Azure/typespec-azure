@@ -922,7 +922,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
-        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.anonymous");
+        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
         ok(models[0].isGeneratedName);
       });
 
@@ -933,7 +933,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestResponse");
-        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.anonymous");
+        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Response.anonymous");
         ok(models[0].isGeneratedName);
       });
 
@@ -948,7 +948,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "TestRequest" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.test.anonymous"
+              x.crossLanguageDefinitionId === "TestService.test.Request.anonymous"
           )
         );
         ok(
@@ -956,7 +956,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "TestResponse" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.test.anonymous"
+              x.crossLanguageDefinitionId === "TestService.test.Response.anonymous"
           )
         );
       });
@@ -1062,7 +1062,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
-        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.anonymous");
+        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
         ok(models[0].isGeneratedName);
       });
 
@@ -1075,7 +1075,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
-        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.anonymous");
+        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Response.anonymous");
         ok(models[0].isGeneratedName);
       });
 
@@ -1395,7 +1395,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "AStatus");
         ok(unionEnum.isGeneratedName);
-        strictEqual(unionEnum.crossLanguageDefinitionId, "");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "A.status.anonymous");
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
@@ -1459,7 +1459,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 2);
         const test1 = models.find(
-          (x) => x.name === "AChoice" && x.isGeneratedName && x.crossLanguageDefinitionId === ""
+          (x) =>
+            x.name === "AChoice" &&
+            x.isGeneratedName &&
+            x.crossLanguageDefinitionId === "A.choices.anonymous"
         );
         ok(test1);
         strictEqual(test1.properties[0].type.kind, "enum");
@@ -1500,7 +1503,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(models.length, 3);
         ok(
           models.find(
-            (x) => x.name === "BPForB" && x.isGeneratedName && x.crossLanguageDefinitionId === ""
+            (x) =>
+              x.name === "BPForB" &&
+              x.isGeneratedName &&
+              x.crossLanguageDefinitionId === "B.pForB.anonymous"
           )
         );
       });
@@ -1552,7 +1558,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.name, "AStatus");
         ok(unionEnum.isGeneratedName);
         // not a defined type in tsp, so no crossLanguageDefinitionId
-        strictEqual(unionEnum.crossLanguageDefinitionId, "");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "A.status.anonymous");
       });
     });
 
@@ -1605,7 +1611,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "ResponseWithAnonymousUnionRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
-        strictEqual(unionEnum.crossLanguageDefinitionId, "");
+        strictEqual(
+          unionEnum.crossLanguageDefinitionId,
+          "ResponseWithAnonymousUnion.repeatabilityResult.anonymous"
+        );
         ok(unionEnum.isGeneratedName);
       });
 
@@ -1630,7 +1639,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
-        strictEqual(unionEnum.crossLanguageDefinitionId, "");
+        strictEqual(
+          unionEnum.crossLanguageDefinitionId,
+          "RequestParameterWithAnonymousUnion.repeatabilityResult.anonymous"
+        );
         ok(unionEnum.isGeneratedName);
       });
 
@@ -1661,7 +1673,10 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.valueType.kind, "string");
         strictEqual(stringType.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
         strictEqual(stringType.isGeneratedName, true);
-        strictEqual(stringType.crossLanguageDefinitionId, "");
+        strictEqual(
+          stringType.crossLanguageDefinitionId,
+          "RequestParameterWithAnonymousUnion.repeatabilityResult.anonymous"
+        );
       });
     });
 

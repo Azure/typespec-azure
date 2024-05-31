@@ -36,6 +36,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
+import { SdkClient } from "./interfaces.js";
 import {
   TCGCContext,
   TspLiteralType,
@@ -237,17 +238,27 @@ export function getCrossLanguageDefinitionId(
   const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
   switch (type.kind) {
     case "Model":
-      if (retval === "anonymous") {
-        retval =
-          findContextPath(context, type)
-            .map((n) => n.name)
-            .join(".") +
-          "." +
-          retval;
-      } else {
-        retval = findContextPath(context, type)
+    case "Union":
+      let contextPath: string | undefined = undefined;
+      // we do it with separate calls to findContextPath because we want to prioritize finding
+      // the context path through models over the context path through operations
+      for (const client of listClients(context)) {
+        contextPath = findContextPathThroughModels(context, client, type)
+          ?.map((n) => n.name)
+          .join(".");
+        if (contextPath) {
+          break;
+        }
+      }
+      contextPath =
+        contextPath ||
+        findContextPath(context, type)
           .map((n) => n.name)
           .join(".");
+      if (retval === "anonymous") {
+        retval = contextPath + "." + retval;
+      } else if (contextPath) {
+        retval = contextPath;
       }
 
       break;
@@ -313,6 +324,22 @@ export function getGeneratedName(
   return createdName;
 }
 
+function findContextPathThroughModels(
+  context: TCGCContext,
+  client: SdkClient,
+  type: Model | Union | TspLiteralType
+): ContextNode[] | undefined {
+  if (client.service) {
+    for (const model of client.service.models.values()) {
+      const result = getContextPath(context, model, type);
+      if (result.length > 0) {
+        return result;
+      }
+    }
+  }
+  return undefined;
+}
+
 /**
  * Traverse each operation and model to find one possible context path for the given type.
  * @param context
@@ -339,13 +366,9 @@ function findContextPath(
       }
     }
     // orphan models
-    if (client.service) {
-      for (const model of client.service.models.values()) {
-        const result = getContextPath(context, model, type);
-        if (result.length > 0) {
-          return result;
-        }
-      }
+    const modelContextPath = findContextPathThroughModels(context, client, type);
+    if (modelContextPath) {
+      return modelContextPath;
     }
   }
   return [];

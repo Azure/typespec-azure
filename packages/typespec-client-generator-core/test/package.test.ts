@@ -648,7 +648,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const fooAccessor = mainClient.methods[0];
       strictEqual(fooAccessor.kind, "clientaccessor");
-      strictEqual(fooAccessor.crossLanguageDefintionId, "TestService.getFoo");
+      strictEqual(fooAccessor.crossLanguageDefintionId, "TestService.Foo");
       strictEqual(fooAccessor.access, "internal");
       strictEqual(fooAccessor.name, "getFoo");
       strictEqual(fooAccessor.parameters.length, 0);
@@ -658,7 +658,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(barAccessor.kind, "clientaccessor");
       strictEqual(barAccessor.access, "internal");
       strictEqual(barAccessor.name, "getBar");
-      strictEqual(barAccessor.crossLanguageDefintionId, "TestService.getBar");
+      strictEqual(barAccessor.crossLanguageDefintionId, "TestService.Bar");
       strictEqual(barAccessor.parameters.length, 0);
       strictEqual(barAccessor.response, barClient);
 
