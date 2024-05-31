@@ -1048,7 +1048,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AMember" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.members.anonymous"
+              x.crossLanguageDefinitionId === "TestService.A.member.anonymous"
           )
         );
       });
@@ -1075,7 +1075,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.experimental_sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
-        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Response.anonymous");
+        strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
         ok(models[0].isGeneratedName);
       });
 
@@ -1095,7 +1095,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AMember" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.members.anonymous"
+              x.crossLanguageDefinitionId === "TestService.A.member.anonymous"
           )
         );
         ok(
@@ -1103,7 +1103,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AMemberName" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.members.anonymous.name"
+              x.crossLanguageDefinitionId === "TestService.A.member.name.anonymous"
           )
         );
       });
@@ -1287,7 +1287,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AAdditionalProperty" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.anonymous"
+              x.crossLanguageDefinitionId === "TestService.A.AdditionalProperty.anonymous"
           )
         );
       });
@@ -1350,7 +1350,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "APForAName" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous.name"
+              x.crossLanguageDefinitionId === "TestService.A.pForA.name.anonymous"
           )
         );
       });
@@ -1462,14 +1462,14 @@ describe("typespec-client-generator-core: public-utils", () => {
           (x) =>
             x.name === "AChoice" &&
             x.isGeneratedName &&
-            x.crossLanguageDefinitionId === "A.choices.anonymous"
+            x.crossLanguageDefinitionId === "TestService.A.choice.anonymous"
         );
         ok(test1);
         strictEqual(test1.properties[0].type.kind, "enum");
         const unionEnum = test1.properties[0].type;
         strictEqual(unionEnum.name, "AChoiceStatus");
         ok(unionEnum.isGeneratedName);
-        strictEqual(unionEnum.crossLanguageDefinitionId, "AChoiceStatus");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "A.choice.status.anonymous");
       });
     });
 
@@ -1506,7 +1506,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "BPForB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "B.pForB.anonymous"
+              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous"
           )
         );
       });
