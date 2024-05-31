@@ -1,5 +1,3 @@
-using Azure.ResourceManager.CommonTypes;
-
 namespace Azure.ResourceManager.Foundations {
   // extended-location
   alias ExtendedLocation = CommonTypes.ExtendedLocation;

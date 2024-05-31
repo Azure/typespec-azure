@@ -72,8 +72,9 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     `
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
-        message: "Each resource interface must have an @armResourceOperations decorator.",
+        code: "@typespec/versioning/using-versioned-library",
+        message:
+          "Namespace 'Microsoft.Foo' is referencing types from versioned namespace 'Azure.ResourceManager.CommonTypes' but didn't specify which versions with @useDependency.",
       });
   });
 });

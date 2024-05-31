@@ -428,9 +428,6 @@ model ApiVersionParameter {
   @query("api-version")
   @minLength(1)
   @doc("The API version to use for this operation.")
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor(
     [
       ResourceHome.ResourceGroup,

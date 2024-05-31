@@ -59,6 +59,14 @@ export function $armCommonTypesVersion(
 ) {
   context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, version.name as string);
 
+  if (entity.kind === "Namespace") {
+    const versioned = entity.decorators.find((x) => x.definition?.name === "@versioned");
+    // If it is versioned namespace, we will skip adding @useDependency to namespace
+    if (versioned) {
+      return;
+    }
+  }
+  // Add @useDependency on version enum members or on unversioned namespace
   context.call($useDependency, entity, version);
 }
 

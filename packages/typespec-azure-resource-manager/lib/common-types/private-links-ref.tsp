@@ -5,43 +5,36 @@ using Azure.ResourceManager.CommonTypes.Private;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** The private endpoint resource */
-@@armCommonDefinition(
-  PrivateEndpoint,
+@@armCommonDefinition(PrivateEndpoint,
   "PrivateEndpoint",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(
-  PrivateEndpoint,
+@@armCommonDefinition(PrivateEndpoint,
   "PrivateEndpoint",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
 
-
 /** Properties of he private endpoint connection resource */
-@@armCommonDefinition(
-  PrivateEndpointConnectionProperties,
+@@armCommonDefinition(PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(
-  PrivateEndpointConnectionProperties,
+@@armCommonDefinition(PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
 
 /** A collection of information about the state of the connection between service consumer and provider. */
-@@armCommonDefinition(
-  PrivateLinkServiceConnectionState,
+@@armCommonDefinition(PrivateLinkServiceConnectionState,
   "PrivateLinkServiceConnectionState",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(
-  PrivateLinkServiceConnectionState,
+@@armCommonDefinition(PrivateLinkServiceConnectionState,
   "PrivateLinkServiceConnectionState",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
@@ -49,16 +42,13 @@ namespace Azure.ResourceManager.CommonTypes;
 
 /** Properties of a private link resource. */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "Matches current common code"
-@@armCommonDefinition(
-  PrivateLinkResourceProperties,
+@@armCommonDefinition(PrivateLinkResourceProperties,
   "PrivateLinkResourceProperties",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(
-  PrivateLinkResourceProperties,
+@@armCommonDefinition(PrivateLinkResourceProperties,
   "PrivateLinkResourceProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-

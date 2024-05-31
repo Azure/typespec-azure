@@ -44,9 +44,9 @@ describe("common definition", () => {
     it.each(["v3", "v4", "v5"])("link to %s", async (version) => {
       const [ref, diagnostics] = await compute(
         `
-          @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v3, "foo.json")
-          @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
-          @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
+          @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v3, "foo.json")
+          @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
+          @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
         `,
         version
       );
@@ -63,8 +63,8 @@ describe("common definition", () => {
 
   describe("type added in v4", () => {
     const decorators = `
-      @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
-      @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
+      @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
+      @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
     `;
     it.each(["v3"])("using in %s emits diagnostics", async () => {
       const [_, diagnostics] = await compute(decorators, "v3");
@@ -89,7 +89,7 @@ describe("common definition", () => {
 
   describe("type added in v5", () => {
     const decorators = `
-      @Azure.ResourceManager.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
+      @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
     `;
     it.each(["v3", "v4"])("using in %s emits diagnostics", async () => {
       const [_, diagnostics] = await compute(decorators, "v3");
@@ -137,9 +137,9 @@ describe("common parameters", () => {
     it.each(["v3", "v4", "v5"])("using %s link to version", async (version) => {
       const [ref, diagnostics] = await compute(
         `
-          @Azure.ResourceManager.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v3, "foo.json")
-          @Azure.ResourceManager.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
-          @Azure.ResourceManager.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
+          @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v3, "foo.json")
+          @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
+          @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
         `,
         version
       );
@@ -156,8 +156,8 @@ describe("common parameters", () => {
 
   describe("type added in v4", () => {
     const decorators = `
-      @Azure.ResourceManager.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
-      @Azure.ResourceManager.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
+      @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
+      @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
     `;
     it.each(["v3"])("using in %s emits diagnostics", async () => {
       const [_, diagnostics] = await compute(decorators, "v3");
@@ -182,7 +182,7 @@ describe("common parameters", () => {
 
   describe("type added in v5", () => {
     const decorators = `
-      @Azure.ResourceManager.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
+      @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
     `;
     it.each(["v3", "v4"])("using in %s emits diagnostics", async () => {
       const [_, diagnostics] = await compute(decorators, "v3");
