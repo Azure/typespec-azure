@@ -119,6 +119,15 @@ namespace Azure.Core {
   extern dec finalOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
 
   /**
+   * Overrides the final state value for an operation
+   * @param finalState
+   */
+  extern dec useFinalStateVia(
+    entity: Operation,
+    finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation"
+  );
+
+  /**
    * Identifies that an operation is used to retrieve the next page for paged operations.
    * @param linkedOperation The linked Operation
    * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will

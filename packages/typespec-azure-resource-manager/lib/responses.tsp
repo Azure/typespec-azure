@@ -139,7 +139,7 @@ model ArmAsyncOperationHeader<
 > {
   /** A link to the status monitor */
   @header("Azure-AsyncOperation")
-  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
+  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<PollingModel = StatusMonitor>)
   azureAsyncOperation?: UrlValue;
 }
 
@@ -150,9 +150,10 @@ model ArmAsyncOperationHeader<
  * @template UrlValue The value type for the location header
  */
 model ArmLroLocationHeader<
-  LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+  LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<PollingModel = ArmOperationStatus>,
   FinalResult extends {} | void = void,
-  UrlValue extends string = string
+  UrlValue extends string = string,
+  OverrideFinalState extends boolean = false
 > {
   /** The Location header contains the URL where the status of the long running operation can be checked. */
   @header("Location")

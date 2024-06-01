@@ -332,6 +332,12 @@
             }
           }
         },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "operation-location",
+          "final-state-schema": {
+            "$ref": "#/definitions/Manufacturer"
+          }
+        },
         "x-ms-long-running-operation": true
       }
     },
@@ -689,6 +695,12 @@
             }
           }
         },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "operation-location",
+          "final-state-schema": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
         "x-ms-long-running-operation": true
       },
       "delete": {
@@ -788,6 +800,12 @@
                 "description": "String error code indicating what went wrong."
               }
             }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "operation-location",
+          "final-state-schema": {
+            "$ref": "#/definitions/Widget"
           }
         },
         "x-ms-long-running-operation": true

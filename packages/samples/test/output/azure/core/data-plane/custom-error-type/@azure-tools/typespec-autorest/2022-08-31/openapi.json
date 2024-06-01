@@ -275,6 +275,12 @@
             }
           }
         },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "operation-location",
+          "final-state-schema": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
         "x-ms-long-running-operation": true
       },
       "delete": {
@@ -380,6 +386,12 @@
             "schema": {
               "$ref": "#/definitions/WidgetServiceErrorResponse"
             }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "operation-location",
+          "final-state-schema": {
+            "$ref": "#/definitions/Widget"
           }
         },
         "x-ms-long-running-operation": true

@@ -33,7 +33,7 @@ import {
 } from "@typespec/compiler";
 import { getHttpOperation, getRoutePath } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
-import { OperationLink } from "./lro-helpers.js";
+import { FinalStateValue, OperationLink } from "./lro-helpers.js";
 import {
   extractStatusMonitorInfo,
   getLroOperationInfo,
@@ -743,6 +743,7 @@ function extractPollingLocationInfo(
     pollingModel?: Model | IntrinsicType;
     finalResult?: Model | IntrinsicType;
     target: ModelProperty;
+    useForFinalState?: boolean;
   } = { target: target };
   const pollingModel = options.properties.get(pollingModelKey)?.type;
   if (pollingModel && pollingModel.kind === "Model") pollingInfo.pollingModel = pollingModel;
@@ -765,6 +766,7 @@ function extractStatusMonitorLocationInfo(
     pollingModel?: Model | IntrinsicType;
     finalResult?: Model | IntrinsicType;
     target: ModelProperty;
+    useForFInalState?: boolean;
   }
 ): StatusMonitorPollingLocationInfo | undefined {
   const kind = options.properties.get(optionsKindKey);
@@ -843,6 +845,106 @@ export function getFinalLocationValue(
   entity: ModelProperty
 ): Model | IntrinsicType | undefined {
   return program.stateMap(finalLocationResultsKey).get(entity);
+}
+
+const finalStateOverrideKey = createStateSymbol("finalStateOverride");
+/**
+ * overrides the final state for an lro
+ * @param context The execution context for the decorator
+ * @param entity The decorated operation
+ * @param finalState The desired value for final-state-via
+ */
+export function $useFinalStateVia(
+  context: DecoratorContext,
+  entity: Operation,
+  finalState: string
+) {
+  const { program } = context;
+  let finalStateValue: FinalStateValue;
+  switch (finalState?.toLowerCase()) {
+    case "original-uri":
+      finalStateValue = FinalStateValue.originalUri;
+      break;
+    case "operation-location":
+      finalStateValue = FinalStateValue.operationLocation;
+      break;
+    case "location":
+      finalStateValue = FinalStateValue.location;
+      break;
+    case "azure-async-operation":
+      finalStateValue = FinalStateValue.azureAsyncOperation;
+      break;
+    default:
+      reportDiagnostic(program, {
+        code: "invalid-final-state",
+        target: entity,
+        messageId: "badValue",
+        format: { finalStateValue: finalState },
+      });
+      return;
+  }
+  validateFinalState(program, entity, finalStateValue);
+  program.stateMap(finalStateOverrideKey).set(entity, finalStateValue);
+}
+
+function validateFinalState(
+  program: Program,
+  operation: Operation,
+  finalState: FinalStateValue
+): void {
+  const httpOp = ignoreDiagnostics(getHttpOperation(program, operation));
+  if (finalState === FinalStateValue.originalUri) {
+    if (httpOp.verb !== "put") {
+      reportDiagnostic(program, {
+        code: "invalid-final-state",
+        target: operation,
+        messageId: "notPut",
+      });
+    }
+
+    return;
+  }
+  for (const response of httpOp.responses) {
+    for (const content of response.responses) {
+      let compare: string;
+      switch (finalState) {
+        case FinalStateValue.azureAsyncOperation:
+          compare = "azure-asyncoperation";
+          break;
+        case FinalStateValue.location:
+          compare = "location";
+          break;
+        case FinalStateValue.operationLocation:
+          compare = "operation-location";
+          break;
+        default:
+          return;
+      }
+      if (content.headers !== undefined) {
+        const allHeaders = Object.keys(content.headers).flatMap((e) => e.toLowerCase());
+        if (allHeaders?.includes(compare)) return;
+      }
+    }
+  }
+  reportDiagnostic(program, {
+    code: "invalid-final-state",
+    target: operation,
+    messageId: "noHeader",
+    format: { finalStateValue: finalState },
+  });
+}
+
+/**
+ * Get the overridden final state value for this operation, if any
+ * @param program The program to proecess
+ * @param operation The operation to check for an override value
+ * @returns The FInalStateValue if it exists, otherwise undefined
+ */
+export function getFinalStateOverride(
+  program: Program,
+  operation: Operation
+): FinalStateValue | undefined {
+  return program.stateMap(finalStateOverrideKey).get(operation);
 }
 
 export function $omitKeyProperties(context: DecoratorContext, entity: Model) {
