@@ -2242,11 +2242,7 @@ class ErrorTypeFoundError extends Error {
 export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   // Doing this to make sure the classes with toJSON are resolved.
   const unsorted = JSON.parse(JSON.stringify(doc));
-  const sorted = sortWithJsonSchema(
-    unsorted,
-    AutorestOpenAPISchema,
-    "#/$defs/AutorestOpenAPISchema"
-  );
+  const sorted = sortWithJsonSchema(unsorted, AutorestOpenAPISchema);
   return sorted;
 }
 
