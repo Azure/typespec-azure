@@ -10,7 +10,7 @@ using TypeSpec.Versioning;
 using TypeSpec.OpenAPI;
 
 @versioned(Azure.ResourceManager.Foundations.Versions)
-@service()
+@service
 namespace Azure.ResourceManager.Foundations;
 
 /**
