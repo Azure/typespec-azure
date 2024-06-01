@@ -69,6 +69,7 @@ it("can share types with a library namespace", async () => {
 it("can use private links with common-types references", async () => {
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+     @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
       

@@ -156,10 +156,6 @@ function isResourceParameterBaseForInternal(
   return false;
 }
 
-function getArmTypesPath(program: Program): string {
-  return program.getOption("arm-types-path") || "{arm-types-dir}";
-}
-
 /**
  * This decorator dynamically assigns the serviceNamespace from the containing
  * namespace to the string literal value of the path parameter to which this

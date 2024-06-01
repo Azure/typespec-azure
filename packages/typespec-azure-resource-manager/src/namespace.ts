@@ -13,10 +13,17 @@ import {
 import * as http from "@typespec/http";
 import { getAuthentication, setAuthentication, setRouteOptionsForNamespace } from "@typespec/http";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
+import { $useDependency } from "@typespec/versioning";
 import { $armCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
+
+function getArmCommonTypeV3Enum(context: DecoratorContext): EnumMember {
+  return context.program.resolveTypeReference(
+    "Azure.ResourceManager.CommonTypes.Versions.v3"
+  )[0] as EnumMember;
+}
 
 /**
  * Mark the target namespace as containign only ARM library types.  This is used to create libraries to share among RPs
@@ -31,6 +38,7 @@ export function $armLibraryNamespace(context: DecoratorContext, entity: Namespac
   __unsupported_enable_checkStandardOperations(false);
 
   program.stateMap(ArmStateKeys.armLibraryNamespaces).set(entity, true);
+  context.call($useDependency, entity, getArmCommonTypeV3Enum(context));
 }
 
 /**
@@ -131,18 +139,13 @@ export function $armProviderNamespace(
   }
 
   // Determine whether to set a default ARM CommonTypes.Version
-  const v3EnumMember = context.program.resolveTypeReference(
-    "Azure.ResourceManager.CommonTypes.Versions.v3"
-  )[0] as EnumMember;
-  if (v3EnumMember) {
-    const armCommonTypesVersion = entity.decorators.find(
-      (x) => x.definition?.name === "@armCommonTypesVersion"
-    );
-    // if no existing @armCommonTypesVersion decorator, add default.
-    // This will NOT cause error if overrode on version enum.
-    if (!armCommonTypesVersion) {
-      context.call($armCommonTypesVersion, entity, v3EnumMember);
-    }
+  const armCommonTypesVersion = entity.decorators.find(
+    (x) => x.definition?.name === "@armCommonTypesVersion"
+  );
+  // if no existing @armCommonTypesVersion decorator, add default.
+  // This will NOT cause error if overrode on version enum.
+  if (!armCommonTypesVersion) {
+    context.call($armCommonTypesVersion, entity, getArmCommonTypeV3Enum(context));
   }
 
   // 'namespace' is optional, use the actual namespace string if omitted

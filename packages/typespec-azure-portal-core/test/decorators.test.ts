@@ -296,10 +296,12 @@ export function createTestSpec(
     enum Versions {
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       v2022_09_02_preview: "2022-09-02-preview",
     
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       v2024_02_20_preview: "2024-02-20-preview",
     }
 
