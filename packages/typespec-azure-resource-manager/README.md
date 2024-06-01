@@ -94,7 +94,7 @@ This decorator is used either on a namespace or a version enum value to indicate
 the version of the Azure Resource Manager common-types to use for refs in emitted Swagger files.
 
 ```typespec
-@Azure.ResourceManager.armCommonTypesVersion(version: valueof string | EnumMember)
+@Azure.ResourceManager.armCommonTypesVersion(version: EnumMember)
 ```
 
 ##### Target
@@ -103,9 +103,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 ##### Parameters
 
-| Name    | Type                           | Description                                                                                                        |
-| ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value. |
+| Name    | Type         | Description                                                                          |
+| ------- | ------------ | ------------------------------------------------------------------------------------ |
+| version | `EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version. |
 
 #### `@armLibraryNamespace`
 

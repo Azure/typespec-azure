@@ -128,7 +128,7 @@ interface Azure.ResourceManager.Operations<>
 List the operations for the provider
 
 ```typespec
-op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.Foundations.OperationListResult> | Azure.ResourceManager.ErrorResponse
+op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.CommonTypes.OperationListResult> | Azure.ResourceManager.ErrorResponse
 ```
 
 ### `ProxyResourceOperations` {#Azure.ResourceManager.ProxyResourceOperations}
