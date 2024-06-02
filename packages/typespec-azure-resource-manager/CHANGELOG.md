@@ -6,6 +6,7 @@
 
 - [#868](https://github.com/Azure/typespec-azure/pull/868) Changing back `ManagedServiceIdentity.userAssignedIdentities` back to `Record<UserAssignedIdentity`. Adding ARM common-type references for on all Managed Identity models.
 
+
 ## 0.42.0
 
 ### Bug Fixes
@@ -29,7 +30,7 @@
 ### Deprecations
 
 - [#762](https://github.com/Azure/typespec-azure/pull/762) Renaming internal TypeSpec ARM foundation model names to be consistent with ARM common-type definitions.
-  However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
+However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
 
 - Deprecate `Foundations.ArmResource`. `Foundations.Resource` should be used instead.
 
@@ -47,7 +48,6 @@
 - Deprecate `ManagedServiceIdentity`. `ManagedServiceIdentityProperty` should be used instead.
 
   Example:
-
   ```diff
   -...ManagedServiceIdentity;
   +...ManagedServiceIdentityProperty;
@@ -56,7 +56,6 @@
 - Deprecate `ManagedSystemAssignedIdentity`. `ManagedSystemAssignedIdentityProperty` should be used instead.
 
   Example:
-
   ```diff
   -...ManagedSystemAssignedIdentity;
   +...ManagedSystemAssignedIdentityProperty;
@@ -65,7 +64,6 @@
 - Deprecate `EntityTag`. `EntityTagProperty` should be used instead.
 
   Example:
-
   ```diff
   -...EntityTag;
   +...EntityTagProperty;
@@ -74,7 +72,6 @@
 - Deprecate `ResourceKind`. `ResourceKindProperty` should be used instead.
 
   Example:
-
   ```diff
   -...ResourceKind;
   +...ResourceKindProperty;
@@ -83,7 +80,6 @@
 - Deprecate `ResourcePlan`. `ResourcePlanProperty` should be used instead.
 
   Example:
-
   ```diff
   -...ResourcePlan;
   +...ResourcePlanProperty;
@@ -92,7 +88,6 @@
 - Deprecate `ResourceSku`. `ResourceSkuProperty` should be used instead.
 
   Example:
-
   ```diff
   -...ResourceSku;
   +...ResourceSkuProperty;
@@ -101,7 +96,6 @@
 - Deprecate `ManagedBy`. `ManagedByProperty` should be used instead.
 
   Example:
-
   ```diff
   -...ManagedBy;
   +...ManagedByProperty;
@@ -110,6 +104,7 @@
 ### Breaking Changes
 
 - [#521](https://github.com/Azure/typespec-azure/pull/521) Switching ProvisioningState from enum to Open union
+
 
 ## 0.41.0
 
@@ -133,6 +128,7 @@
 
 - [#407](https://github.com/Azure/typespec-azure/pull/407) Deprecate `ResourceIdentifier` in favor of new `Azure.Core.armResourceIdentifier`
 
+
 ## 0.40.0
 
 ### Bug Fixes
@@ -151,6 +147,7 @@
 - [#298](https://github.com/Azure/typespec-azure/pull/298) ARM: add `arm-delete-response-codes` rule.
 - [#317](https://github.com/Azure/typespec-azure/pull/317) Add ruleset `canonical-versioning` to Azure Resource Manager library.
 
+
 ## 0.39.1
 
 ### Patch Changes
@@ -163,6 +160,7 @@
 
 - ebfe639: Fix Location resource issue, add mechanism for additional path segments
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
+
 
 ## 0.38.0
 
