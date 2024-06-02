@@ -686,4 +686,34 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     strictEqual(nameProperty?.type.kind, "Union");
     strictEqual(nameProperty?.type.name, "WidgetNameType");
   });
+
+  it("emits a scalar string with decorator parameter for resource", async () => {
+    const { program, diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget, NameType=WidgetNameType>;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+
+      @minLength(1)
+      @maxLength(10)
+      @pattern("xxxxxx")
+      scalar WidgetNameType extends string;
+  `);
+    const resources = getArmResources(program);
+    expectDiagnosticEmpty(diagnostics);
+    strictEqual(resources.length, 1);
+    ok(resources[0].typespecType.properties.has("name"));
+    const nameProperty = resources[0].typespecType.properties.get("name");
+    strictEqual(nameProperty?.type.kind, "Scalar");
+    strictEqual(nameProperty?.type.name, "WidgetNameType");
+  });
 });

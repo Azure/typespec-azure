@@ -984,13 +984,13 @@ model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName
 
 #### Template Parameters
 
-| Name        | Description                                                                                              |
-| ----------- | -------------------------------------------------------------------------------------------------------- |
-| Resource    | The ARM resource this name parameter is applying to.                                                     |
-| KeyName     | Override default key name of the resource.                                                               |
-| SegmentName | Override default segment name of the resource.                                                           |
-| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                        |
-| NameType    | The type of the name property. Default type is string. However you can pass an union with string values. |
+| Name        | Description                                                                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resource    | The ARM resource this name parameter is applying to.                                                                                       |
+| KeyName     | Override default key name of the resource.                                                                                                 |
+| SegmentName | Override default segment name of the resource.                                                                                             |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                                                          |
+| NameType    | The type of the name property. Default type is string. However you can pass an union with string values. For additional decorators such as |
 
 #### Properties
 
