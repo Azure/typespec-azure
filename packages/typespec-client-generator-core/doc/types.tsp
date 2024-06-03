@@ -9,13 +9,11 @@ namespace TypeSpec.ClientGenerator.Core;
  *
  * @property __raw: the original TypeSpec type
  * @property kind: the kind of type
- * @property nullable: Whether the type is nullable on the wire
  * @property deprecation: deprecated message if the type is deprecated
  */
 @discriminator("kind")
 model SdkType {
   __raw?: unknown;
-  nullable: boolean;
   deprecation?: string;
 }
 
