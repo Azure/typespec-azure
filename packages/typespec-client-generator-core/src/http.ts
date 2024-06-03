@@ -124,7 +124,7 @@ function getSdkHttpParameters(
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
-  if (tspBody) {
+  if (tspBody && tspBody?.bodyKind !== "multipart") {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter && !isNeverOrVoidType(tspBody.parameter.type)) {
       const getParamResponse = diagnostics.pipe(
