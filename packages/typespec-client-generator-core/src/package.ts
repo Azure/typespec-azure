@@ -252,11 +252,11 @@ function getSdkBasicServiceMethod<
   // body parameters
   if (
     parameters.body?.bodyKind !== "multipart" &&
-    parameters.body?.parameter &&
-    !isNeverOrVoidType(parameters.body.parameter.type)
+    parameters.body?.property &&
+    !isNeverOrVoidType(parameters.body.property.type)
   ) {
     methodParameters.push(
-      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.parameter, operation))
+      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.property, operation))
     );
   } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
     if (parameters.body.type.kind === "Model") {
