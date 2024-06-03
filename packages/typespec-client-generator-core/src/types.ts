@@ -510,6 +510,7 @@ function addDiscriminatorToModelType(
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
+      crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -537,7 +538,8 @@ export function getSdkModelWithDiagnostics(
     updateModelsMap(context, type, sdkType, operation);
   } else {
     const docWrapper = getDocHelper(context, type);
-    const name = getLibraryName(context, type) || getGeneratedName(context, type);
+    const generatedName = getGeneratedName(context, type);
+    const name = getLibraryName(context, type) || generatedName;
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: name,
@@ -548,7 +550,7 @@ export function getSdkModelWithDiagnostics(
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
       usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(type, name),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
       isError: isErrorModel(context.program, type),
@@ -670,7 +672,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: "public", // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isUnionAsEnum: false,
     };
@@ -709,7 +711,8 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
   let sdkType = context.modelsMap?.get(union) as SdkEnumType | undefined;
   if (!sdkType) {
     const docWrapper = getDocHelper(context, union);
-    const name = getLibraryName(context, type.union) || getGeneratedName(context, type.union);
+    const generatedName = getGeneratedName(context, union);
+    const name = getLibraryName(context, type.union) || generatedName;
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name,
@@ -724,7 +727,7 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: "public", // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(union, name),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, union),
       apiVersions: getAvailableApiVersions(context, type.union, type.union.namespace),
       isUnionAsEnum: true,
     };
@@ -762,7 +765,7 @@ function getKnownValuesEnum(
         isFlags: false,
         usage: UsageFlags.None, // We will add usage as we loop through the operations
         access: "public", // Dummy value until we update models map
-        crossLanguageDefinitionId: getCrossLanguageDefinitionId(type),
+        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
         apiVersions: getAvailableApiVersions(context, type, type.namespace),
         isUnionAsEnum: false,
       };
@@ -912,6 +915,7 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
 }
 
 function getSdkCredentialType(
+  context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   authentication: Authentication
 ): SdkCredentialType | SdkUnionType {
@@ -930,7 +934,7 @@ function getSdkCredentialType(
       __raw: client.service,
       kind: "union",
       values: credentialTypes,
-      name: createGeneratedName(client.service, "CredentialUnion"),
+      name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
     };
   }
@@ -945,7 +949,7 @@ export function getSdkCredentialParameter(
   if (!auth) return undefined;
   const name = "credential";
   return {
-    type: getSdkCredentialType(client, auth),
+    type: getSdkCredentialType(context, client, auth),
     kind: "credential",
     nameInClient: name,
     name,
@@ -955,6 +959,7 @@ export function getSdkCredentialParameter(
     onClient: true,
     optional: false,
     isApiVersionParam: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
   };
 }
 
@@ -990,6 +995,7 @@ export function getSdkModelPropertyTypeBase(
       type,
       operation ? getLocationOfOperation(operation) : undefined
     ),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
 
