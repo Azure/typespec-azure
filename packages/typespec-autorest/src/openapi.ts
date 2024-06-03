@@ -7,7 +7,6 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
-  isFixed,
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
@@ -1316,14 +1315,14 @@ export async function getOpenAPIForService(
       }
       return false;
     }
+  }
 
-    function isVersionEnum(program: Program, enumObj: Enum): boolean {
-      const [_, map] = getVersionsForEnum(program, enumObj);
-      if (map !== undefined && map.getVersions()[0].enumMember.enum === enumObj) {
-        return true;
-      }
-      return false;
+  function isVersionEnum(program: Program, enumObj: Enum): boolean {
+    const [_, map] = getVersionsForEnum(program, enumObj);
+    if (map !== undefined && map.getVersions()[0].enumMember.enum === enumObj) {
+      return true;
     }
+    return false;
   }
 
   function emitTags() {
@@ -1379,6 +1378,34 @@ export async function getOpenAPIForService(
     return {};
   }
 
+  /**
+   * Version enum is special so we we just render the current version with modelAsString: true
+   */
+  function getSchemaForVersionEnum(e: Enum, currentVersion: string): OpenAPI2Schema {
+    const member = [...e.members.values()].find((x) => (x.value ?? x.name) === currentVersion);
+    compilerAssert(
+      member,
+      `Version enum ${e.name} does not have a member for ${currentVersion}.`,
+      e
+    );
+    return {
+      type: "string",
+      description: getDoc(program, e),
+      enum: [member.value ?? member.name],
+      "x-ms-enum": {
+        name: e.name,
+        modelAsString: true,
+        values: [
+          {
+            name: member.name,
+            value: member.value ?? member.name,
+            description: getDoc(program, member),
+          },
+        ],
+      },
+    };
+  }
+
   function getSchemaForEnum(e: Enum): OpenAPI2Schema {
     const values = [];
     if (e.members.size === 0) {
@@ -1395,6 +1422,10 @@ export async function getOpenAPIForService(
       }
     }
 
+    // If we are rendering a specific version and trying to render the version enum we should treat it specially to only include the current version.
+    if (isVersionEnum(program, e) && context.version) {
+      return getSchemaForVersionEnum(e, context.version);
+    }
     const schema: OpenAPI2Schema = { type, description: getDoc(program, e) };
     if (values.length > 0) {
       schema.enum = values;
@@ -1981,7 +2012,7 @@ export async function getOpenAPIForService(
     if (type.node && type.node.parent && type.node.parent.kind === SyntaxKind.ModelStatement) {
       schema["x-ms-enum"] = {
         name: type.node.parent.id.sv,
-        modelAsString: true,
+        modelAsString: false,
       };
     } else if (type.kind === "String") {
       schema["x-ms-enum"] = {
@@ -1990,7 +2021,7 @@ export async function getOpenAPIForService(
     } else if (type.kind === "Enum") {
       schema["x-ms-enum"] = {
         name: type.name,
-        modelAsString: isFixed(program, type) ? false : true,
+        modelAsString: false,
       };
 
       const values = [];
@@ -2267,11 +2298,7 @@ class ErrorTypeFoundError extends Error {
 export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   // Doing this to make sure the classes with toJSON are resolved.
   const unsorted = JSON.parse(JSON.stringify(doc));
-  const sorted = sortWithJsonSchema(
-    unsorted,
-    AutorestOpenAPISchema,
-    "#/$defs/AutorestOpenAPISchema"
-  );
+  const sorted = sortWithJsonSchema(unsorted, AutorestOpenAPISchema);
   return sorted;
 }
 
