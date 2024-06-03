@@ -1,7 +1,7 @@
-import { Operation } from "@typespec/compiler";
+import { Operation, ignoreDiagnostics } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { getDocHelper } from "../src/internal-utils.js";
+import { getDocHelper, parseEmitterName } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: internal-utils", () => {
@@ -49,6 +49,19 @@ describe("typespec-client-generator-core: internal-utils", () => {
       const docHelper = getDocHelper(runner.context, func);
       strictEqual(docHelper.description, "This is a summary");
       strictEqual(docHelper.details, "This is a description");
+    });
+  });
+  describe("parseEmitterName", () => {
+    it("@azure-tools/typespec-{language}", async () => {
+      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+      await runner.compile("");
+      strictEqual(runner.context.emitterName, "csharp");
+    });
+
+    it("@typespec/{protocol}-{client|server}-{language}-generator", async () => {
+      const runner = await createSdkTestRunner({ emitterName: "@typespec/http-client-csharp" });
+      await runner.compile("");
+      strictEqual(runner.context.emitterName, "csharp");
     });
   });
 });
