@@ -25,6 +25,7 @@ import {
   getHttpOperation,
   getPathParamName,
   getQueryParamName,
+  isMetadata,
   isStatusCode,
 } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
@@ -36,7 +37,6 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkClient } from "./interfaces.js";
 import {
   TCGCContext,
   TspLiteralType,
@@ -231,36 +231,30 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  */
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
-  type: Union | Model | Enum | ModelProperty | Operation | Namespace | Interface | Scalar,
+  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
   appendNamespace: boolean = true
 ): string {
   let retval = type.name || "anonymous";
   const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
   switch (type.kind) {
-    case "Model":
     case "Union":
-      let contextPath: string | undefined = undefined;
-      // we do it with separate calls to findContextPath because we want to prioritize finding
-      // the context path through models over the context path through operations
-      for (const client of listClients(context)) {
-        contextPath = findContextPathThroughModels(context, client, type)
-          ?.map((n) => n.name)
-          .join(".");
-        if (contextPath) {
-          break;
-        }
+    case "Model":
+      // Enum and Scalar will always have a name
+      if (type.name) {
+        break;
       }
-      contextPath =
-        contextPath ||
-        findContextPath(context, type)
-          .map((n) => n.name)
-          .join(".");
-      if (retval === "anonymous") {
-        retval = contextPath + "." + retval;
-      } else if (contextPath) {
-        retval = contextPath;
-      }
-
+      const contextPath = findContextPath(context, type);
+      retval =
+        contextPath
+          .slice(findLastNonAnonymousModelNode(contextPath))
+          .map((x) =>
+            x.type?.kind === "Model" || x.type?.kind === "Union"
+              ? x.type.name || x.name
+              : x.name || "anonymous"
+          )
+          .join(".") +
+        "." +
+        retval;
       break;
     case "ModelProperty":
       if (type.model) {
@@ -324,22 +318,6 @@ export function getGeneratedName(
   return createdName;
 }
 
-function findContextPathThroughModels(
-  context: TCGCContext,
-  client: SdkClient,
-  type: Model | Union | TspLiteralType
-): ContextNode[] | undefined {
-  if (client.service) {
-    for (const model of client.service.models.values()) {
-      const result = getContextPath(context, model, type);
-      if (result.length > 0) {
-        return result;
-      }
-    }
-  }
-  return undefined;
-}
-
 /**
  * Traverse each operation and model to find one possible context path for the given type.
  * @param context
@@ -351,6 +329,19 @@ function findContextPath(
   type: Model | Union | TspLiteralType
 ): ContextNode[] {
   for (const client of listClients(context)) {
+    // orphan models
+    if (client.service) {
+      for (const model of client.service.models.values()) {
+        if (
+          [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+        )
+          continue;
+        const result = getContextPath(context, model, type);
+        if (result.length > 0) {
+          return result;
+        }
+      }
+    }
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
@@ -364,11 +355,6 @@ function findContextPath(
           return result;
         }
       }
-    }
-    // orphan models
-    const modelContextPath = findContextPathThroughModels(context, client, type);
-    if (modelContextPath) {
-      return modelContextPath;
     }
   }
   return [];
@@ -557,6 +543,23 @@ function getContextPath(
   }
 }
 
+function findLastNonAnonymousModelNode(contextPath: ContextNode[]): number {
+  let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
+  while (lastNonAnonymousModelNodeIndex >= 0) {
+    const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
+    if (
+      !contextPath[lastNonAnonymousModelNodeIndex].type ||
+      (currType?.kind === "Model" && currType.name)
+    ) {
+      // it's nonanonymous model node (if no type defined, it's the operation node)
+      break;
+    } else {
+      --lastNonAnonymousModelNodeIndex;
+    }
+  }
+  return lastNonAnonymousModelNodeIndex;
+}
+
 /**
  * The logic is basically three steps:
  * 1. find the last nonanonymous model node, this node can be operation node or model node which is not anonymous
@@ -576,19 +579,7 @@ function buildNameFromContextPaths(
   }
 
   // 1. find the last nonanonymous model node
-  let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
-  while (lastNonAnonymousModelNodeIndex >= 0) {
-    const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
-    if (
-      !contextPath[lastNonAnonymousModelNodeIndex].type ||
-      (currType?.kind === "Model" && currType.name)
-    ) {
-      // it's nonanonymous model node (if no type defined, it's the operation node)
-      break;
-    } else {
-      --lastNonAnonymousModelNodeIndex;
-    }
-  }
+  const lastNonAnonymousModelNodeIndex = findLastNonAnonymousModelNode(contextPath);
   // 2. build name
   let createName: string = "";
   for (let j = lastNonAnonymousModelNodeIndex; j < contextPath.length; j++) {
