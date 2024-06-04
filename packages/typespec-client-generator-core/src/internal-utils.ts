@@ -62,7 +62,7 @@ export function parseEmitterName(
     );
     return diagnostics.wrap("none");
   }
-  const regex = /(?:cadl|typespec)-([^\\/]*)/;
+  const regex = /(?:cadl|typespec|client|server)-([^\\/-]*)/;
   const match = emitterName.match(regex);
   if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
