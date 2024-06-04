@@ -1,5 +1,9 @@
 # Getting started with `tsp-client`
 
+:::info
+**Short link:** [aka.ms/azsdk/tsp-client](https://aka.ms/azsdk/tsp-client)
+:::
+
 `tsp-client` is a simple command line tool to facilitate generating client libraries from TypeSpec.
 
 ## Installation
