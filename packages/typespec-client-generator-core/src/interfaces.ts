@@ -334,6 +334,7 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
@@ -526,7 +527,6 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkBasicServiceMethod<TServiceOperation>
   | SdkPagingServiceMethod<TServiceOperation>
   | SdkLroServiceMethod<TServiceOperation>
-  | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
 interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
@@ -536,9 +536,6 @@ interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> exten
 
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkServiceMethod<TServiceOperation>
-  | SdkPagingServiceMethod<TServiceOperation>
-  | SdkLroServiceMethod<TServiceOperation>
-  | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkClientAccessor<TServiceOperation>;
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {

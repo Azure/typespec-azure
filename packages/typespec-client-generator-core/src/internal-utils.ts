@@ -62,7 +62,7 @@ export function parseEmitterName(
     );
     return diagnostics.wrap("none");
   }
-  const regex = /(?:cadl|typespec)-([^\\/]*)/;
+  const regex = /(?:cadl|typespec|client|server)-([^\\/-]*)/;
   const match = emitterName.match(regex);
   if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
@@ -380,8 +380,12 @@ export function getAllResponseBodies(
  * Otherwise, you should use the `getGeneratedName` function.
  * @param context
  */
-export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
-  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
+export function createGeneratedName(
+  context: TCGCContext,
+  type: Namespace | Operation,
+  suffix: string
+): string {
+  return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
 function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
