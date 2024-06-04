@@ -13,6 +13,7 @@ import "./common-types/managed-identity.tsp";
 import "./common-types/private-links.tsp";
 import "./common-types/customer-managed-keys.tsp";
 import "./common-types/extended-location.tsp";
+import "./legacy/models.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";
