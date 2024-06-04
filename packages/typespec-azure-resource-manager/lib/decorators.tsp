@@ -182,7 +182,10 @@ extern dec armResourceOperations(target: Interface, _?: unknown);
  *
  * @param version The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version.
  */
-extern dec armCommonTypesVersion(target: Namespace | EnumMember, version: EnumMember);
+extern dec armCommonTypesVersion(
+  target: Namespace | EnumMember,
+  version: valueof string | EnumMember
+);
 
 /**
  * This decorator is used on Azure Resource Manager resources that are not based on

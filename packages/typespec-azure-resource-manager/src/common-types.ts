@@ -3,6 +3,7 @@ import {
   Diagnostic,
   Enum,
   EnumMember,
+  EnumValue,
   Model,
   ModelProperty,
   Namespace,
@@ -25,11 +26,40 @@ export interface ArmCommonTypeVersions {
   allVersions: EnumMember[];
 }
 
-export function getArmCommonTypesVersions(program: Program): ArmCommonTypeVersions | undefined {
+export function getArmCommonTypesVersions(program: Program): ArmCommonTypeVersions {
   // There is a single instance of ArmCommonTypeVersions stored inside of the
   // state map so just pull the first (only) item from the map.
   const map: Map<Type, any> = program.stateMap(ArmStateKeys.armCommonTypesVersions);
   return map?.values().next().value as any;
+}
+
+export function getArmCommonTypesVersionFromString(
+  program: Program,
+  entity: Namespace | EnumMember,
+  versionStr: string
+): [EnumMember | undefined, readonly Diagnostic[]] {
+  const commonTypeVersionEnum = program.resolveTypeReference(
+    `Azure.ResourceManager.CommonTypes.Versions.${versionStr}`
+  )[0] as EnumMember;
+  if (commonTypeVersionEnum === undefined) {
+    return [
+      undefined,
+      [
+        createDiagnostic({
+          code: "arm-common-types-invalid-version",
+          target: entity,
+          format: {
+            versionString: versionStr,
+            supportedVersions: [...getArmCommonTypesVersions(program).type.members.keys()].join(
+              ", "
+            ),
+          },
+        }),
+      ],
+    ];
+  } else {
+    return [commonTypeVersionEnum, []];
+  }
 }
 
 /**
@@ -55,9 +85,26 @@ export function isArmCommonType(entity: Type): boolean {
 export function $armCommonTypesVersion(
   context: DecoratorContext,
   entity: Namespace | EnumMember,
-  version: EnumMember
+  version: string | EnumValue
 ) {
-  context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, version.name as string);
+  // try convert string to EnumMember
+  let versionEnum: EnumMember;
+  if (typeof version === "string") {
+    const [foundEnumMember, diagnostics] = getArmCommonTypesVersionFromString(
+      context.program,
+      entity,
+      version
+    );
+    if (!foundEnumMember) {
+      context.program.reportDiagnostics(diagnostics);
+      return;
+    }
+    versionEnum = foundEnumMember as EnumMember;
+  } else {
+    versionEnum = version.value;
+  }
+
+  context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, versionEnum.name);
 
   if (entity.kind === "Namespace") {
     const versioned = entity.decorators.find((x) => x.definition?.name === "@versioned");
@@ -67,7 +114,7 @@ export function $armCommonTypesVersion(
     }
   }
   // Add @useDependency on version enum members or on unversioned namespace
-  context.call($useDependency, entity, version);
+  context.call($useDependency, entity, versionEnum);
 }
 
 /**
