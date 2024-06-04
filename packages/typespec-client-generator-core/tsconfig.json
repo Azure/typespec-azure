@@ -3,7 +3,9 @@
   "composite": true,
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.json" },
-    { "path": "../../core/packages/rest/tsconfig.json" }
+    { "path": "../../core/packages/http/tsconfig.json" },
+    { "path": "../typespec-azure-core/tsconfig.json" },
+    { "path": "../typespec-azure-resource-manager/tsconfig.json" }
   ],
   "compilerOptions": {
     "outDir": "dist",

@@ -279,7 +279,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @test op one(): void;
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.one");
     });
 
     it("crossLanguageDefinitionId with interface", async () => {
@@ -293,7 +293,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.Widgets.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
     });
 
     it("crossLanguageDefinitionId with subnamespace", async () => {
@@ -307,7 +307,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.Widgets.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
     });
 
     it("crossLanguageDefinitionId with subnamespace and interface", async () => {
@@ -323,7 +323,10 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+      strictEqual(
+        getCrossLanguageDefinitionId(runner.context, one),
+        "MyClient.SubNamespace.Widgets.one"
+      );
     });
 
     it("crossLanguagePackageId", async () => {
