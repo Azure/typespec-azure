@@ -41,7 +41,6 @@ import {
   SdkServiceMethod,
   SdkServiceOperation,
   SdkServiceParameter,
-  SdkServiceResponseHeader,
   SdkType,
   UsageFlags,
 } from "./interfaces.js";
@@ -49,7 +48,7 @@ import {
   TCGCContext,
   createGeneratedName,
   filterApiVersionsWithDecorators,
-  getAllResponseBodies,
+  getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
   getDocHelper,
@@ -57,7 +56,6 @@ import {
   getLocationOfOperation,
   getSdkTypeBaseHelper,
   isNeverOrVoidType,
-  isNullable,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -194,17 +192,17 @@ function getSdkLroServiceMethod<
   });
 }
 
-function getSdkMethodResponse(
+function getSdkMethodResponse<
+  TOptions extends object,
+  TServiceOperation extends SdkServiceOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
   operation: Operation,
   sdkOperation: SdkServiceOperation
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
   // TODO: put head as bool here
-  const headers: SdkServiceResponseHeader[] = [];
-  for (const response of Object.values(responses)) {
-    headers.push(...response.headers);
-  }
-  const allResponseBodies = getAllResponseBodies(responses);
+  const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (responseTypes.size > 1) {
@@ -213,17 +211,21 @@ function getSdkMethodResponse(
       __raw: operation,
       kind: "union",
       values: allResponseBodies,
-      nullable: isNullable(sdkOperation),
-      name: createGeneratedName(operation, "UnionResponse"),
+      name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
     };
   } else if (responseTypes) {
     type = allResponseBodies[0];
   }
+  if (nonBodyExists && type) {
+    type = {
+      kind: "nullable",
+      type: type,
+    };
+  }
   return {
     kind: "method",
     type,
-    nullable: isNullable(sdkOperation),
   };
 }
 
@@ -252,7 +254,7 @@ function getSdkBasicServiceMethod<
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
   );
-  const response = getSdkMethodResponse(operation, serviceOperation);
+  const response = getSdkMethodResponse(context, operation, serviceOperation);
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
@@ -275,7 +277,7 @@ function getSdkBasicServiceMethod<
     getResponseMapping: function getResponseMapping(): string | undefined {
       return undefined; // currently we only return a value for paging or lro
     },
-    crossLanguageDefintionId: getCrossLanguageDefinitionId({ ...operation, name }),
+    crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
   });
 }
 
@@ -357,7 +359,6 @@ function getSdkInitializationType<
     isGeneratedName: true,
     access: client.kind === "SdkClient" ? "public" : "internal",
     usage: UsageFlags.Input,
-    nullable: false,
     crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
@@ -387,11 +388,11 @@ function getSdkMethodParameter(
       name,
       isGeneratedName: Boolean(libraryName),
       optional: false,
-      nullable: false,
       discriminator: false,
       serializedName: name,
       isApiVersionParam: false,
       onClient: false,
+      crossLanguageDefinitionId: "anonymous",
     });
   }
   return diagnostics.wrap({
@@ -424,7 +425,7 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefintionId: getCrossLanguageDefinitionId({ ...operationGroup.type, name }),
+      crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
     });
   }
   return diagnostics.wrap(retval);
@@ -444,7 +445,6 @@ function getSdkEndpointParameter(
     const name = "endpoint";
     type = {
       kind: "endpoint",
-      nullable: false,
       serverUrl: "{endpoint}",
       templateArguments: [
         {
@@ -454,7 +454,6 @@ function getSdkEndpointParameter(
           description: "Service host",
           kind: "path",
           onClient: true,
-          nullable: false,
           urlEncode: false,
           optional: false,
           serializedName: "endpoint",
@@ -465,6 +464,7 @@ function getSdkEndpointParameter(
           },
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
         },
       ],
     };
@@ -473,7 +473,6 @@ function getSdkEndpointParameter(
     const templateArguments: SdkPathParameter[] = [];
     type = {
       kind: "endpoint",
-      nullable: false,
       serverUrl: servers[0].url,
       templateArguments,
     };
@@ -514,7 +513,7 @@ function getSdkEndpointParameter(
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     optional,
     isApiVersionParam: false,
-    nullable: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
   });
 }
 
