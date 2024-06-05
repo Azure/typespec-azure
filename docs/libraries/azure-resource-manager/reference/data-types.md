@@ -210,17 +210,16 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 The default header for lro PUT and DELETE polling
 
 ```typespec
-model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue, OverrideFinalState>
+model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue>
 ```
 
 #### Template Parameters
 
-| Name               | Description                                                     |
-| ------------------ | --------------------------------------------------------------- |
-| LroPollingOptions  | The polling options when polling the url in the location header |
-| FinalResult        | The ultimate final result of the logical operation              |
-| UrlValue           | The value type for the location header                          |
-| OverrideFinalState |                                                                 |
+| Name              | Description                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| LroPollingOptions | The polling options when polling the url in the location header |
+| FinalResult       | The ultimate final result of the logical operation              |
+| UrlValue          | The value type for the location header                          |
 
 #### Properties
 

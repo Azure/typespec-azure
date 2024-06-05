@@ -155,8 +155,7 @@ model ArmAsyncOperationHeader<
 model ArmLroLocationHeader<
   LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<PollingModel = ArmOperationStatus>,
   FinalResult extends {} | void = void,
-  UrlValue extends string = string,
-  OverrideFinalState extends boolean = false
+  UrlValue extends string = string
 > {
   /** The Location header contains the URL where the status of the long running operation can be checked. */
   @header("Location")
