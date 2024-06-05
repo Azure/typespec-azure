@@ -1270,9 +1270,16 @@ function updateTypesFromOperation(
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
     const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
     if (generateConvenient) {
-      bodies.forEach((body) => {
-        updateUsageOfModel(context, UsageFlags.Input, body);
-      });
+      // special logic for spread body model
+      if (httpBody.type.kind === "Model" && httpBody.type.name === "" && !context.spreadModels?.has(httpBody.type)) {
+        bodies.forEach((body) => {
+          context.spreadModels?.set(httpBody.type as Model, body as SdkModelType);
+        });
+      } else {
+        bodies.forEach((body) => {
+          updateUsageOfModel(context, UsageFlags.Input, body);
+        });
+      }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
         bodies.forEach((body) => {
           updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
@@ -1290,8 +1297,16 @@ function updateTypesFromOperation(
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
+        let body = innerResponse.body.type;
+        // special logic for response body with metadata
+        if (innerResponse.body.type.kind === "Model" && innerResponse.body.type.name === "") {
+          const spreads = innerResponse.body.type.sourceModels.filter(t => t.usage === "spread");
+          if (spreads.length === 1) {
+            body = spreads[0].model;
+          }
+        }
         const responseBodies = diagnostics.pipe(
-          checkAndGetClientType(context, innerResponse.body.type, operation)
+          checkAndGetClientType(context, body, operation)
         );
         if (generateConvenient) {
           responseBodies.forEach((responseBody) => {
@@ -1375,6 +1390,18 @@ function updateAccessOfModel(context: TCGCContext): void {
   }
 }
 
+function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
+  for (const sdkType of context.spreadModels?.values() ?? []) {
+    updateUsageOfModel(context, UsageFlags.Spread, sdkType);
+  }
+  for (const sdkType of context.modelsMap?.values() ?? []) {
+    // if a type only has spread usage, then it could be internal
+    if (sdkType.usage === UsageFlags.Spread) {
+      sdkType.access = "internal";
+    }
+  }
+}
+
 interface GetAllModelsOptions {
   input?: boolean;
   output?: boolean;
@@ -1449,6 +1476,9 @@ export function getAllModelsWithDiagnostics(
   if (context.operationModelsMap === undefined) {
     context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
   }
+  if (context.spreadModels === undefined) {
+    context.spreadModels = new Map<Model, SdkModelType>();
+  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
@@ -1507,6 +1537,8 @@ export function getAllModelsWithDiagnostics(
   }
   // update access
   updateAccessOfModel(context);
+  // update spread model
+  updateSpreadModelUsageAndAccess(context);
   let filter = 0;
   if (options.input && options.output) {
     filter = Number.MAX_SAFE_INTEGER;

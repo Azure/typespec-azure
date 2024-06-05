@@ -2,6 +2,7 @@ import {
   Diagnostic,
   ModelProperty,
   Operation,
+  Program,
   Type,
   createDiagnosticCollector,
   ignoreDiagnostics,
@@ -365,12 +366,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-  {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-  },
-  readonly Diagnostic[],
-] {
+    {
+      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+    },
+    readonly Diagnostic[],
+  ] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
@@ -414,6 +415,13 @@ function getSdkHttpResponseAndExceptions(
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body = innerResponse.body.type;
+        // special logic for response body with metadata
+        if (innerResponse.body.type.kind === "Model" && innerResponse.body.type.name === "") {
+          const spreads = innerResponse.body.type.sourceModels.filter(t => t.usage === "spread");
+          if (spreads.length === 1) {
+            body = spreads[0].model;
+          }
+        }
       }
     }
     const sdkResponse: SdkHttpResponse = {
@@ -431,7 +439,7 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation
       ),
     };
-    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+    if (response.statusCodes === "*" || body && isErrorModel(context.program, body)) {
       exceptions.set(response.statusCodes, sdkResponse);
     } else {
       responses.set(response.statusCodes, sdkResponse);
@@ -504,7 +512,13 @@ export function getCorrespondingMethodParams(
   const queue: SdkModelPropertyType[] = [...methodParameters];
   while (queue.length > 0) {
     const methodParam = queue.shift()!;
-    if (methodParam.__raw === serviceParam.__raw) {
+    if (methodParam.__raw && serviceParam.__raw && methodParam.__raw === serviceParam.__raw) {
+      return diagnostics.wrap([methodParam]);
+    }
+    if (serviceParam.kind === "header" && serviceParam.serializedName === "Content-Type" && methodParam.name === "contentType") {
+      return diagnostics.wrap([methodParam]);
+    }
+    if (serviceParam.kind === "header" && serviceParam.serializedName === "Accept" && methodParam.name === "accept") {
       return diagnostics.wrap([methodParam]);
     }
     if (methodParam.type.kind === "model") {
@@ -514,14 +528,22 @@ export function getCorrespondingMethodParams(
     }
   }
 
-  // to see if all the property of service parameter is a method parameter or a property of a method parameter
+  // to see if all the property of service parameter could be mapped to a method parameter or a property of a method parameter
   if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
     const retVal = [];
     for (const serviceParamProp of serviceParam.type.properties) {
       const queue: SdkModelPropertyType[] = [...methodParameters];
       while (queue.length > 0) {
         const methodParam = queue.shift()!;
-        if (methodParam.__raw === serviceParamProp.__raw) {
+        if (methodParam.__raw && serviceParamProp.__raw && (methodParam.__raw === serviceParamProp.__raw || methodParam.__raw === serviceParamProp.__raw.sourceProperty)) {
+          retVal.push(methodParam);
+          break;
+        }
+        if (serviceParamProp.kind === "header" && serviceParamProp.serializedName === "Content-Type" && methodParam.name === "contentType") {
+          retVal.push(methodParam);
+          break;
+        }
+        if (serviceParamProp.kind === "header" && serviceParamProp.serializedName === "Accept" && methodParam.name === "accept") {
           retVal.push(methodParam);
           break;
         }

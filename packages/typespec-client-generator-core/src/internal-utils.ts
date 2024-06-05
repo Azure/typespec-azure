@@ -313,6 +313,7 @@ export interface TCGCContext {
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
