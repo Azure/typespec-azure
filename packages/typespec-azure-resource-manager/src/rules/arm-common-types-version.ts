@@ -1,7 +1,6 @@
 import { Program, SemanticNodeListener, createRule } from "@typespec/compiler";
 import { getAllHttpServices } from "@typespec/http";
 import { getVersion } from "@typespec/versioning";
-import { getArmCommonTypesVersion } from "../common-types.js";
 import { getArmProviderNamespace } from "../namespace.js";
 
 /**
@@ -34,9 +33,16 @@ export const armCommonTypesVersionRule = createRule({
               versionMap &&
               versionMap
                 .getVersions()
-                .every((version) => !!getArmCommonTypesVersion(program, version.enumMember))
+                .every(
+                  (version) =>
+                    !!version.enumMember.decorators.find(
+                      (x) => x.definition?.name === "@armCommonTypesVersion"
+                    )
+                )
             ) &&
-            !getArmCommonTypesVersion(program, service.namespace)
+            !service.namespace.decorators.find(
+              (x) => x.definition?.name === "@armCommonTypesVersion"
+            )
           ) {
             context.reportDiagnostic({
               target: service.namespace,

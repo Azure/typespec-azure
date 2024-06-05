@@ -20,6 +20,42 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
     );
   });
 
+  it("emits diagnostic when a version in the enum is missing a common type version", async () => {
+    await tester
+      .expect(
+        `
+        @service({ title: "Test" })
+        @versioned(Service.Versions)
+        @armProviderNamespace("Contoso.Service")
+        namespace Service;
+
+        enum Versions {
+          v1;
+
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
+          v2;
+        }
+      `
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+      });
+  });
+
+  it("emits diagnostic when unversioned service namespace is missing a common type version", async () => {
+    await tester
+      .expect(
+        `
+        @service({ title: "Test" })
+        @armProviderNamespace("Contoso.Service")
+        namespace Service;
+      `
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+      });
+  });
+
   it("does not emit when the service namespace has a common type version without version on enum values", async () => {
     await tester
       .expect(
