@@ -157,7 +157,7 @@ How to determine the final state of the operation. Possible Values:
     | "operation-location"
     | "final-state-schema";
 
-  `final-state-schema`?: Schema;
+  `final-state-schema`?: string;
 }
 
 /** Describes the 'x-ms-examples' extension. */

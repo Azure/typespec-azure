@@ -591,7 +591,7 @@ export async function getOpenAPIForService(
         const finalSchema = getFinalStateSchema(lroMetadata);
         const options = {
           "final-state-via": finalState,
-          "final-state-schema": finalSchema === undefined ? undefined : finalSchema,
+          "final-state-schema": finalSchema === undefined ? undefined : finalSchema.$ref.value,
         };
 
         currentEndpoint["x-ms-long-running-operation-options"] = options;

@@ -465,7 +465,7 @@ export type XMSLongRunningFinalState =
 export type XMSLongRunningOperationOptions = {
   "final-state-via": XMSLongRunningFinalState;
 
-  "final-state-schema"?: Refable<OpenAPI2Schema>;
+  "final-state-schema"?: string;
 };
 
 export type OpenAPI2StatusCode = string | "default" | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";
