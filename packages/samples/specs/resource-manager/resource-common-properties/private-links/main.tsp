@@ -92,3 +92,6 @@ interface PrivateLinks {
   /** list private links on the given resource */
   list is ArmResourceListByParent<PrivateLinkResource>;
 }
+
+//Fix lro final-state-via for Async PUT
+@@Azure.Core.useFinalStateVia(TrackedOperations.createOrUpdate, "azure-async-operation");

@@ -74,7 +74,12 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  @Azure.Core.useFinalStateVia("azure-async-operation")
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<
+    Employee,
+    LroHeaders = ArmAsyncOperationHeader<FinalResult = Employee> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >;
   update is ArmResourcePatchSync<Employee, EmployeeProperties>;
   delete is ArmResourceDeleteSync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
@@ -104,7 +109,12 @@ model MoveResponse {
 @armResourceOperations
 interface Dependents {
   get is ArmResourceRead<Dependent>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  @Azure.Core.useFinalStateVia("azure-async-operation")
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<
+    Dependent,
+    LroHeaders = ArmAsyncOperationHeader<FinalResult = Dependent> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >;
   update is ArmResourcePatchSync<Dependent, DependentProperties>;
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;

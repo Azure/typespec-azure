@@ -120,7 +120,7 @@ namespace Azure.Core {
 
   /**
    * Overrides the final state value for an operation
-   * @param finalState
+   * @param finalState The desired final state value
    */
   extern dec useFinalStateVia(
     entity: Operation,

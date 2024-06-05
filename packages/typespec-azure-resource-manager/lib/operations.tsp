@@ -1,6 +1,5 @@
 using TypeSpec.Http;
 using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
 using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;
@@ -144,13 +143,6 @@ op ArmResourceCheckExistence<
  */
 @autoRoute
 @doc("Create a {name}", Resource)
-//@extension("x-ms-long-running-operation", true)
-//@extension(
-//  "x-ms-long-running-operation-options",
-//  {
-//    `final-state-via`: "azure-async-operation",
-//  }
-//)
 @armResourceCreateOrUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @put
@@ -158,7 +150,7 @@ op ArmResourceCreateOrUpdateAsync<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    Azure.ResourceManager.ArmAsyncOperationHeader,
+    Azure.ResourceManager.ArmAsyncOperationHeader<FinalResult = Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -321,13 +313,6 @@ op ArmResourcePatchAsync<
  */
 @autoRoute
 @doc("Update a {name}", Resource)
-//@extension("x-ms-long-running-operation", true)
-//@extension(
-//  "x-ms-long-running-operation-options",
-//  {
-//    `final-state-via`: "location",
-//  }
-//)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @patch
@@ -425,13 +410,6 @@ op ArmCustomPatchSync<
  */
 @autoRoute
 @doc("Delete a {name}", Resource)
-//@extension("x-ms-long-running-operation", true)
-//@extension(
-//  "x-ms-long-running-operation-options",
-//  {
-//    `final-state-via`: "location",
-//  }
-//)
 @armResourceDelete(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @delete
@@ -515,13 +493,6 @@ op ArmResourceDeleteSync<
  * @template Error Optional. The error response, if non-standard.
  */
 @autoRoute
-//@extension("x-ms-long-running-operation", true)
-//@extension(
-//  "x-ms-long-running-operation-options",
-//  {
-//    `final-state-via`: "location",
-//  }
-//)
 @armResourceAction(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @post

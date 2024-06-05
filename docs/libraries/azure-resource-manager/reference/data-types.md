@@ -65,7 +65,7 @@ model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 The standard header for asynchronous operation polling
 
 ```typespec
-model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
+model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue, FinalResult>
 ```
 
 #### Template Parameters
@@ -74,6 +74,7 @@ model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
 | ------------- | ------------------------------------------------- |
 | StatusMonitor | The status monitor type for lro polling           |
 | UrlValue      | The value type of the Azure-AsyncOperation header |
+| FinalResult   | The logical final result of the operation         |
 
 #### Properties
 
@@ -209,16 +210,17 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 The default header for lro PUT and DELETE polling
 
 ```typespec
-model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue>
+model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult, UrlValue, OverrideFinalState>
 ```
 
 #### Template Parameters
 
-| Name              | Description                                                     |
-| ----------------- | --------------------------------------------------------------- |
-| LroPollingOptions | The polling options when polling the url in the location header |
-| FinalResult       | The ultimate final result of the logical operation              |
-| UrlValue          | The value type for the location header                          |
+| Name               | Description                                                     |
+| ------------------ | --------------------------------------------------------------- |
+| LroPollingOptions  | The polling options when polling the url in the location header |
+| FinalResult        | The ultimate final result of the logical operation              |
+| UrlValue           | The value type for the location header                          |
+| OverrideFinalState |                                                                 |
 
 #### Properties
 
