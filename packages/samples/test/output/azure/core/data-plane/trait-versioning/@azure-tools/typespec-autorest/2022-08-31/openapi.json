@@ -334,9 +334,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "operation-location",
-          "final-state-schema": {
-            "$ref": "#/definitions/Manufacturer"
-          }
+          "final-state-schema": "#/definitions/Manufacturer"
         },
         "x-ms-long-running-operation": true
       }
@@ -697,9 +695,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "operation-location",
-          "final-state-schema": {
-            "$ref": "#/definitions/Widget"
-          }
+          "final-state-schema": "#/definitions/Widget"
         },
         "x-ms-long-running-operation": true
       },
@@ -804,9 +800,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "operation-location",
-          "final-state-schema": {
-            "$ref": "#/definitions/Widget"
-          }
+          "final-state-schema": "#/definitions/Widget"
         },
         "x-ms-long-running-operation": true
       }

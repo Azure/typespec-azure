@@ -504,7 +504,7 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getFinalStateSchema(metadata: LroMetadata): { $ref: Ref } | undefined {
+  function getFinalStateSchema(metadata: LroMetadata): { "final-state-schema": Ref } | undefined {
     if (metadata.finalResult !== undefined && metadata.finalResult !== "void") {
       const model: Model = metadata.finalResult;
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
@@ -512,14 +512,14 @@ export async function getOpenAPIForService(
       if (schemaOrRef !== undefined) {
         const ref = new Ref();
         ref.value = schemaOrRef.$ref;
-        return { $ref: ref };
+        return { "final-state-schema": ref };
       }
       const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
         type: model,
         visibility: Visibility.Read,
         ref: refs.getOrAdd(model, Visibility.Read, () => new Ref()),
       }));
-      return { $ref: pending.ref };
+      return { "final-state-schema": pending.ref };
     }
     return undefined;
   }
@@ -589,10 +589,16 @@ export async function getOpenAPIForService(
       const finalState = getFinalStateVia(lroMetadata);
       if (finalState !== undefined) {
         const finalSchema = getFinalStateSchema(lroMetadata);
-        const options = {
+        let options = {
           "final-state-via": finalState,
-          "final-state-schema": finalSchema === undefined ? undefined : finalSchema.$ref.value,
         };
+
+        if (finalSchema !== undefined) {
+          options = {
+            "final-state-via": finalState,
+            ...finalSchema,
+          };
+        }
 
         currentEndpoint["x-ms-long-running-operation-options"] = options;
       }

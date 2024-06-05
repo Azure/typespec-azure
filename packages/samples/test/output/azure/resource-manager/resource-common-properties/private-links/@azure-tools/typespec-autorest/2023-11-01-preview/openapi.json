@@ -262,9 +262,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/TestTrackedResource"
-          }
+          "final-state-schema": "#/definitions/TestTrackedResource"
         },
         "x-ms-long-running-operation": true
       },

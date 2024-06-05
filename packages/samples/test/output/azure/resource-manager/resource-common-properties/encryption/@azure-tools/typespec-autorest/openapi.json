@@ -257,9 +257,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/WidgetResource"
-          }
+          "final-state-schema": "#/definitions/WidgetResource"
         },
         "x-ms-long-running-operation": true
       },

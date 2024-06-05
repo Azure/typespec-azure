@@ -66,9 +66,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       openapi.paths["/widgets/{widgetName}"].patch["x-ms-long-running-operation-options"],
       {
         "final-state-via": "operation-location",
-        "final-state-schema": {
-          $ref: "#/definitions/Widget",
-        },
+        "final-state-schema": "#/definitions/Widget",
       }
     );
     deepStrictEqual(
@@ -133,17 +131,13 @@ describe("typespec-autorest: Long-running Operations", () => {
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation-options"], {
       "final-state-via": "azure-async-operation",
-      "final-state-schema": {
-        $ref: "#/definitions/Widget",
-      },
+      "final-state-schema": "#/definitions/Widget",
     });
 
     deepStrictEqual(openapi.paths[itemPath].patch["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].patch["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
-      "final-state-schema": {
-        $ref: "#/definitions/Widget",
-      },
+      "final-state-schema": "#/definitions/Widget",
     });
 
     deepStrictEqual(openapi.paths[itemPath].delete["x-ms-long-running-operation"], true);
@@ -159,9 +153,7 @@ describe("typespec-autorest: Long-running Operations", () => {
     deepStrictEqual(openapi.paths[mungePath].post["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[mungePath].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
-      "final-state-schema": {
-        $ref: "#/definitions/Widget",
-      },
+      "final-state-schema": "#/definitions/Widget",
     });
   });
 });

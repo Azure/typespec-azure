@@ -197,9 +197,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
-          }
+          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
         },
         "x-ms-long-running-operation": true
       },
@@ -463,9 +461,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
-          }
+          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
         },
         "x-ms-long-running-operation": true
       },
@@ -812,9 +808,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/AllPropertiesResource"
-          }
+          "final-state-schema": "#/definitions/AllPropertiesResource"
         },
         "x-ms-long-running-operation": true
       },
@@ -1294,9 +1288,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
-          }
+          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
         },
         "x-ms-long-running-operation": true
       },
@@ -1577,9 +1569,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
-          }
+          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
         },
         "x-ms-long-running-operation": true
       },

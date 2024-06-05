@@ -183,9 +183,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/RoleAssignment"
-          }
+          "final-state-schema": "#/definitions/RoleAssignment"
         },
         "x-ms-long-running-operation": true
       },

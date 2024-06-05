@@ -260,9 +260,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/Employee"
-          }
+          "final-state-schema": "#/definitions/Employee"
         },
         "x-ms-long-running-operation": true
       },
@@ -565,9 +563,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation",
-          "final-state-schema": {
-            "$ref": "#/definitions/Dependent"
-          }
+          "final-state-schema": "#/definitions/Dependent"
         },
         "x-ms-long-running-operation": true
       },
