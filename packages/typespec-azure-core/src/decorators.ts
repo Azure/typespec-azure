@@ -936,7 +936,7 @@ function validateFinalState(
 
 /**
  * Get the overridden final state value for this operation, if any
- * @param program The program to proecess
+ * @param program The program to process
  * @param operation The operation to check for an override value
  * @returns The FInalStateValue if it exists, otherwise undefined
  */
