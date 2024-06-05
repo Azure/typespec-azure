@@ -167,7 +167,7 @@ export function $armProviderNamespace(
     const versionEnum = versioned.args[0].value as Enum;
     versionEnum.members.forEach((v) => {
       if (!getArmCommonTypesVersion(context, v)) {
-        context.call($armCommonTypesVersion, entity, armCommonTypesVersion ?? "v3");
+        context.call($armCommonTypesVersion, v, armCommonTypesVersion ?? "v3");
       }
     });
   } else {
