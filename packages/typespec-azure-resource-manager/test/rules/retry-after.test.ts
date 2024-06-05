@@ -24,9 +24,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
     await tester
       .expect(
         `
-        @service({
-          title: "Microsoft.Foo",
-        })
+        @service
         @armProviderNamespace
         @versioned(Versions)
         namespace Microsoft.Foo;
