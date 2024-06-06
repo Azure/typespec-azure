@@ -75,7 +75,10 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 interface Widgets {
   // Operation Status
   @doc("Gets status of a Widget operation.")
+  @sharedRoute
   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+  @sharedRoute
+  getWidgetDeleteOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   // Widget Operations
   @doc("Creates or updates a Widget asynchronously")
@@ -86,7 +89,7 @@ interface Widgets {
   getWidget is Operations.ResourceRead<Widget>;
 
   @doc("Delete a Widget asynchronously.")
-  @pollingOperation(Widgets.getWidgetOperationStatus)
+  @pollingOperation(Widgets.getWidgetDeleteOperationStatus)
   deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
   @doc("List Widget resources")
@@ -98,7 +101,11 @@ interface Widgets {
 
 interface Manufacturers {
   @doc("Gets status of a Manufacturer operation.")
-  getManufacturerOperationStatus is Operations.GetResourceOperationStatus<Manufacturer>;
+  @sharedRoute
+  getManufacturerDeleteOperationStatus is Operations.GetResourceOperationStatus<
+    Manufacturer,
+    never
+  >;
 
   @doc("Creates or replaces a Manufacturer")
   createOrReplaceManufacturer is Operations.ResourceCreateOrReplace<Manufacturer>;
@@ -107,7 +114,7 @@ interface Manufacturers {
   getManufacturer is Operations.ResourceRead<Manufacturer>;
 
   @doc("Delete a Manufacturer asynchronously.")
-  @pollingOperation(Manufacturers.getManufacturerOperationStatus)
+  @pollingOperation(Manufacturers.getManufacturerDeleteOperationStatus)
   deleteManufacturer is Operations.LongRunningResourceDelete<Manufacturer>;
 
   @doc("List Manufacturer resources")

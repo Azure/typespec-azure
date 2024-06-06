@@ -505,7 +505,11 @@ export async function getOpenAPIForService(
   }
 
   function getFinalStateSchema(metadata: LroMetadata): { "final-state-schema": Ref } | undefined {
-    if (metadata.finalResult !== undefined && metadata.finalResult !== "void") {
+    if (
+      metadata.finalResult !== undefined &&
+      metadata.finalResult !== "void" &&
+      metadata.finalResult.name.length > 0
+    ) {
       const model: Model = metadata.finalResult;
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
 

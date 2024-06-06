@@ -381,16 +381,15 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "operation-location",
-          "final-state-schema": "#/definitions/Manufacturer"
+          "final-state-via": "operation-location"
         },
         "x-ms-long-running-operation": true
       }
     },
     "/manufacturers/{manufacturerId}/operations/{operationId}": {
       "get": {
-        "operationId": "Manufacturers_GetManufacturerOperationStatus",
-        "description": "Gets status of a Manufacturer operation.",
+        "operationId": "Manufacturers_GetManufacturerDeleteOperationStatus",
+        "description": "Gets status of a Manufacturer delete operation.",
         "parameters": [
           {
             "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
@@ -428,10 +427,6 @@
                 "error": {
                   "$ref": "#/definitions/Azure.Core.Foundations.Error",
                   "description": "Error object that describes the error when status is \"Failed\"."
-                },
-                "result": {
-                  "$ref": "#/definitions/Manufacturer",
-                  "description": "The result of the operation."
                 }
               },
               "required": [
@@ -895,8 +890,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "operation-location",
-          "final-state-schema": "#/definitions/Widget"
+          "final-state-via": "operation-location"
         },
         "x-ms-long-running-operation": true
       }
@@ -1020,7 +1014,7 @@
         },
         "x-ms-long-running-operation-options": {
           "final-state-via": "operation-location",
-          "final-state-schema": "#/definitions/Widget"
+          "final-state-schema": "#/definitions/WidgetRepairRequest"
         },
         "x-ms-long-running-operation": true
       }
@@ -1621,7 +1615,7 @@
     },
     "/widgets/{widgetName}/parts/{widgetPartName}/operations/{operationId}": {
       "get": {
-        "operationId": "WidgetParts_GetWidgetPartOperationStatus",
+        "operationId": "WidgetParts_GetWidgetPartReorderOperationStatus",
         "description": "Gets status of a WidgetPart operation.",
         "parameters": [
           {
@@ -1667,10 +1661,6 @@
                 "error": {
                   "$ref": "#/definitions/Azure.Core.Foundations.Error",
                   "description": "Error object that describes the error when status is \"Failed\"."
-                },
-                "result": {
-                  "$ref": "#/definitions/WidgetPart",
-                  "description": "The result of the operation."
                 }
               },
               "required": [
@@ -1803,8 +1793,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "operation-location",
-          "final-state-schema": "#/definitions/WidgetPart"
+          "final-state-via": "operation-location"
         },
         "x-ms-long-running-operation": true
       }
@@ -1850,6 +1839,72 @@
                 "result": {
                   "$ref": "#/definitions/WidgetRepairRequest",
                   "description": "The result of the operation."
+                }
+              },
+              "required": [
+                "id",
+                "status"
+              ]
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Azure.Core.Foundations.ErrorResponse"
+            },
+            "headers": {
+              "x-ms-error-code": {
+                "type": "string",
+                "description": "String error code indicating what went wrong."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-ms-paths": {
+    "/widgets/{widgetName}/operations/{operationId}?_overload=getWidgetDeleteOperationStatus": {
+      "get": {
+        "operationId": "Widgets_GetWidgetDeleteOperationStatus",
+        "description": "Gets status of a Widget delete operation.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The widget name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "operationId",
+            "in": "path",
+            "description": "The unique ID of the operation.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "object",
+              "description": "Provides status details for long running operations.",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The unique ID of the operation."
+                },
+                "status": {
+                  "$ref": "#/definitions/Azure.Core.Foundations.OperationState",
+                  "description": "The status of the operation"
+                },
+                "error": {
+                  "$ref": "#/definitions/Azure.Core.Foundations.Error",
+                  "description": "Error object that describes the error when status is \"Failed\"."
                 }
               },
               "required": [
