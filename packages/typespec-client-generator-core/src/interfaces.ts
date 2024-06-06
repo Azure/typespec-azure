@@ -80,11 +80,6 @@ export interface SdkOperationGroup {
 interface SdkTypeBase {
   __raw?: Type;
   kind: string;
-  /**
-   * @deprecated Moving `.nullable` onto the parameter itself for fidelity.
-   * https://github.com/Azure/typespec-azure/issues/448
-   */
-  nullable: boolean;
   deprecation?: string;
   description?: string;
   details?: string;
@@ -97,6 +92,7 @@ export type SdkType =
   | SdkArrayType
   | SdkTupleType
   | SdkDictionaryType
+  | SdkNullableType
   | SdkEnumType
   | SdkEnumValueType
   | SdkConstantType
@@ -230,7 +226,6 @@ export interface SdkDurationType extends SdkTypeBase {
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   valueType: SdkType;
-  nullableValues: boolean;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -242,7 +237,11 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
-  nullableValues: boolean;
+}
+
+export interface SdkNullableType extends SdkTypeBase {
+  kind: "nullable";
+  type: SdkType;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
@@ -254,7 +253,7 @@ export interface SdkEnumType extends SdkTypeBase {
   isFixed: boolean;
   isFlags: boolean;
   usage: UsageFlags;
-  access?: AccessFlags;
+  access: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
   isUnionAsEnum: boolean;
@@ -271,6 +270,8 @@ export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
   value: string | number | boolean | null;
   valueType: SdkBuiltInType;
+  name: string;
+  isGeneratedName: boolean;
 }
 
 export interface SdkUnionType extends SdkTypeBase {
@@ -287,7 +288,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData nad the `.usage` property on this model
+   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */
   isFormDataType: boolean;
   /**
@@ -295,10 +296,9 @@ export interface SdkModelType extends SdkTypeBase {
    */
   isError: boolean;
   isGeneratedName: boolean;
-  access?: AccessFlags;
+  access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
-  additionalPropertiesNullable?: boolean;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   discriminatorProperty?: SdkModelPropertyType;
@@ -323,7 +323,6 @@ export interface SdkModelPropertyTypeBase {
   type: SdkType;
   /**
    * @deprecated This property is deprecated. Use `.name` instead.
-   * https://github.com/Azure/typespec-azure/issues/446
    */
   nameInClient: string;
   name: string;
@@ -335,7 +334,7 @@ export interface SdkModelPropertyTypeBase {
   clientDefaultValue?: any;
   isApiVersionParam: boolean;
   optional: boolean;
-  nullable: boolean;
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
@@ -419,21 +418,18 @@ export interface SdkServiceResponseHeader {
   type: SdkType;
   description?: string;
   details?: string;
-  nullable: boolean;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
-  nullable: boolean;
-  resultPath?: string; // if exists, tells you how to get from the service response to the method response
+  resultPath?: string; // if exists, tells you how to get from the service response to the method response.
 }
 
 export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
-  nullable: boolean;
 }
 
 export interface SdkHttpResponse extends SdkServiceResponse {
@@ -468,7 +464,7 @@ export type SdkServiceParameter = SdkHttpParameter;
 interface SdkMethodBase {
   __raw?: Operation;
   name: string;
-  access: AccessFlags | undefined;
+  access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
   description?: string;
@@ -479,16 +475,16 @@ interface SdkMethodBase {
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
   /**
-   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
    * @param serviceParam
    */
   getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
   /**
-   * @deprecated This property is deprecated. Access .resultPath on the method response instead
+   * @deprecated This property is deprecated. Access .resultPath on the method response instead.
    */
-  getResponseMapping(): string | undefined; // how to map service response -> method response (e.g. paging). If undefined, it's a 1:1 mapping
+  getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
 }
@@ -531,7 +527,6 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkBasicServiceMethod<TServiceOperation>
   | SdkPagingServiceMethod<TServiceOperation>
   | SdkLroServiceMethod<TServiceOperation>
-  | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
 interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
@@ -541,9 +536,6 @@ interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> exten
 
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkServiceMethod<TServiceOperation>
-  | SdkPagingServiceMethod<TServiceOperation>
-  | SdkLroServiceMethod<TServiceOperation>
-  | SdkLroPagingServiceMethod<TServiceOperation>
   | SdkClientAccessor<TServiceOperation>;
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
@@ -553,7 +545,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   models: SdkModelType[];
   enums: SdkEnumType[];
   /**
-   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead
+   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead.
    */
   diagnostics: readonly Diagnostic[];
   crossLanguagePackageId: string;
@@ -571,8 +563,8 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
-  // Input will also be set when JsonMergePatch is set
+  // Input will also be set when JsonMergePatch is set.
   JsonMergePatch = 1 << 4,
-  // Input will also be set when MultipartFormData is set
+  // Input will also be set when MultipartFormData is set.
   MultipartFormData = 1 << 5,
 }

@@ -7,6 +7,7 @@ title: "[I] SdkEmitterOptions"
 
 | Property | Type |
 | :------ | :------ |
+| `api-version?` | `string` |
 | `filter-out-core-models?` | `boolean` |
 | `flatten-union-as-enum?` | `boolean` |
 | `generate-convenience-methods?` | `boolean` |

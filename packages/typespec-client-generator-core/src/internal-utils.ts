@@ -1,11 +1,14 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
+  BooleanLiteral,
   Diagnostic,
+  Interface,
   Model,
   Namespace,
+  NumericLiteral,
   Operation,
   Program,
   ProjectedProgram,
+  StringLiteral,
   Type,
   Union,
   createDiagnosticCollector,
@@ -13,20 +16,21 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
-  ignoreDiagnostics,
+  isNeverType,
   isNullType,
+  isVoidType,
 } from "@typespec/compiler";
 import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
   SdkParameter,
-  SdkServiceOperation,
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
@@ -58,7 +62,7 @@ export function parseEmitterName(
     );
     return diagnostics.wrap("none");
   }
-  const regex = /(?:cadl|typespec)-([^\\/]*)/;
+  const regex = /(?:cadl|typespec|client|server)-([^\\/-]*)/;
   const match = emitterName.match(regex);
   if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
@@ -97,7 +101,8 @@ export function getClientNamespaceStringHelper(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: { name: string }
+  type: { name: string },
+  namespace?: Namespace | Interface
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -106,24 +111,19 @@ export function updateWithApiVersionInformation(
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
-    clientDefaultValue: isApiVersionParam ? context.__api_version_client_default_value : undefined,
+    clientDefaultValue:
+      isApiVersionParam && namespace
+        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        : undefined,
     onClient: onClient(context, type),
   };
 }
 
-/**
- *
- * @param context
- * @param type
- * @returns All api versions the type is available on
- */
-export function getAvailableApiVersions(context: TCGCContext, type: Type): string[] {
-  const apiVersions =
-    context.__api_versions ||
-    getVersions(context.program, type)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-  if (!apiVersions) return [];
+export function filterApiVersionsWithDecorators(
+  context: TCGCContext,
+  type: Type,
+  apiVersions: string[]
+): string[] {
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   let added: boolean = addedOnVersions.length ? false : true;
@@ -152,6 +152,49 @@ export function getAvailableApiVersions(context: TCGCContext, type: Type): strin
       }
     }
   }
+  return retval;
+}
+
+function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
+  const union = Array.from(new Set([...a, ...b]));
+  return apiVersions.filter((item) => union.includes(item));
+}
+
+/**
+ *
+ * @param context
+ * @param type
+ * @param client If it's associated with a client, meaning it's a param etc, we can see if it's available on that client
+ * @returns All api versions the type is available on
+ */
+export function getAvailableApiVersions(
+  context: TCGCContext,
+  type: Type,
+  wrapper?: Type
+): string[] {
+  let wrapperApiVersions: string[] = [];
+  if (wrapper) {
+    wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
+  }
+
+  const allApiVersions =
+    getVersions(context.program, type)[1]
+      ?.getVersions()
+      .map((x) => x.value) || [];
+
+  const apiVersions = wrapperApiVersions.length ? wrapperApiVersions : allApiVersions;
+  if (!apiVersions) return [];
+  const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
+  if (explicitlyDecorated.length) {
+    context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
+    return explicitlyDecorated;
+  }
+  // we take the union of all of the api versions that the type is available on
+  // if it's called multiple times with diff wrappers, we want to make sure we have
+  // all of the possible api versions listed
+  const existing = context.__tspTypeToApiVersions.get(type) || [];
+  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
+  context.__tspTypeToApiVersions.set(type, retval);
   return retval;
 }
 
@@ -197,13 +240,12 @@ export function getHashForType(type: SdkType): string {
 
 interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
-  nullable: boolean;
   deprecation?: string;
   kind: TKind;
 }
 
 /**
- * Helper function to return default values for nullable, encode etc
+ * Helper function to return default values for encode etc
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
@@ -213,7 +255,6 @@ export function getSdkTypeBaseHelper<TKind>(
 ): DefaultSdkTypeBase<TKind> {
   return {
     __raw: type,
-    nullable: false,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
   };
@@ -240,6 +281,10 @@ export function isAcceptHeader(param: SdkModelPropertyType): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
+export function isContentTypeHeader(param: SdkModelPropertyType): boolean {
+  return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
+}
+
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
   const httpOperation = getHttpOperationWithCache(context, operation);
@@ -253,6 +298,9 @@ export function isMultipartOperation(context: TCGCContext, operation?: Operation
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
   return obj?.kind === "Operation" && getHttpOperationWithCache(context, obj) !== undefined;
 }
+
+export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
+
 export interface TCGCContext {
   program: Program;
   emitterName: string;
@@ -264,12 +312,12 @@ export interface TCGCContext {
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model, string>;
+  generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __api_version_parameter?: SdkParameter;
-  __api_version_client_default_value?: string;
-  __api_versions?: string[];
+  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
+  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
   __subscriptionIdParameter?: SdkParameter;
@@ -285,6 +333,9 @@ export function createTCGCContext(program: Program): TCGCContext {
     emitterName: "__TCGC_INTERNAL__",
     diagnostics: [],
     originalProgram: program,
+    __namespaceToApiVersionParameter: new Map(),
+    __tspTypeToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
   };
 }
 
@@ -292,7 +343,11 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(
+export function getNullOption(type: Union): Type | undefined {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
+}
+
+export function getAllResponseBodiesAndNonBodyExists(
   responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
 ): {
   allResponseBodies: SdkType[];
@@ -302,7 +357,7 @@ function getAllResponseBodiesAndNonBodyExists(
   let nonBodyExists = false;
   for (const response of responses.values()) {
     if (response.type) {
-      if (response.nullable) {
+      if (response.type.kind === "nullable") {
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);
@@ -320,28 +375,17 @@ export function getAllResponseBodies(
 }
 
 /**
- * Determines if a type is nullable.
- * @param type
- * @returns
- */
-export function isNullable(type: Type | SdkServiceOperation): boolean {
-  if (type.kind === "Union") {
-    if (getNonNullOptions(type).length < type.variants.size) return true;
-    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
-  }
-  if (type.kind === "http") {
-    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
-  }
-  return false;
-}
-/**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
  * Otherwise, you should use the `getGeneratedName` function.
  * @param context
  */
-export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
-  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
+export function createGeneratedName(
+  context: TCGCContext,
+  type: Namespace | Operation,
+  suffix: string
+): string {
+  return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
 function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
@@ -371,4 +415,20 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
 
 export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
   return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
+}
+
+export function getLocationOfOperation(operation: Operation): Namespace | Interface {
+  // have to check interface first, because interfaces are more granular than namespaces
+  return (operation.interface || operation.namespace)!;
+}
+
+export function isNeverOrVoidType(type: Type): boolean {
+  return isNeverType(type) || isVoidType(type);
+}
+
+export function getAnyType(): SdkBuiltInType {
+  return {
+    kind: "any",
+    encode: "string",
+  };
 }

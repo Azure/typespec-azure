@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.42.0
+
+### Bug Fixes
+
+- [#619](https://github.com/Azure/typespec-azure/pull/619) Add `no-generic-numeric` rule to disable LintDiff `IntegerTypeMustHaveFormat`
+- [#760](https://github.com/Azure/typespec-azure/pull/760) Fix `rpc-operation-request-body` rule not actually checking for a body parameter.
+- [#694](https://github.com/Azure/typespec-azure/pull/694) Fix crash when `Traits` builders gets passed non model
+- [#710](https://github.com/Azure/typespec-azure/pull/710) Exempt versioning enums and discriminator enum/unions from `documentation-required` rule.
+- [#740](https://github.com/Azure/typespec-azure/pull/740) Require documentation on most unions.
+- [#293](https://github.com/Azure/typespec-azure/pull/293) Update to support new meaning of `@body`
+
+### Bump dependencies
+
+- [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
+
+### Breaking Changes
+
+- [#521](https://github.com/Azure/typespec-azure/pull/521) Switching ProvisioningState from enum to Open union
+
+
 ## 0.41.0
 
 ### Bug Fixes

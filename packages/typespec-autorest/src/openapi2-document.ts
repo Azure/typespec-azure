@@ -110,7 +110,7 @@ export type JsonType = "array" | "boolean" | "integer" | "number" | "object" | "
  * Autorest allows a few properties to be next to $ref of a property.
  */
 export type OpenAPI2SchemaRefProperty = Ref<OpenAPI2Schema> &
-  Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability"> & {
+  Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability" | "title"> & {
     /**
      * Provide a different name to be used in the client.
      */
@@ -283,6 +283,18 @@ export type OpenAPI2Schema = Extensions & {
   minProperties?: number;
 
   "x-ms-mutability"?: string[];
+};
+
+export type OpenAPI2FileSchema = {
+  type: "file";
+  format?: string;
+  title?: string;
+  description?: string;
+  default?: unknown;
+  required?: string[];
+  readonly?: boolean;
+  externalDocs?: OpenAPI2ExternalDocs;
+  example?: unknown;
 };
 
 export type OpenAPI2ParameterType = OpenAPI2Parameter["in"];
@@ -465,7 +477,7 @@ export interface OpenAPI2Response {
   /** A short description of the response. Commonmark syntax can be used for rich text representation */
   description: string;
   /** A definition of the response structure. It can be a primitive, an array or an object. If this field does not exist, it means no content is returned as part of the response. As an extension to the Schema Object, its root type value may also be "file". This SHOULD be accompanied by a relevant produces mime-type. */
-  schema?: OpenAPI2Schema;
+  schema?: OpenAPI2Schema | OpenAPI2FileSchema;
   /** A list of headers that are sent with the response. */
   headers?: Record<string, OpenAPI2HeaderDefinition>;
   /** An example of the response message. */

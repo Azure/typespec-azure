@@ -571,10 +571,18 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+interface CreateSdkContextOptions {
+  readonly versionStrategy?: "ignore";
+}
+
 export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(context: EmitContext<TOptions>, emitterName?: string): SdkContext<TOptions, TServiceOperation> {
+>(
+  context: EmitContext<TOptions>,
+  emitterName?: string,
+  options?: CreateSdkContextOptions
+): SdkContext<TOptions, TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
@@ -594,8 +602,11 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     diagnostics: diagnostics.diagnostics,
-    apiVersion: context.options["api-version"],
+    apiVersion: options?.versionStrategy === "ignore" ? "all" : context.options["api-version"],
     originalProgram: context.program,
+    __namespaceToApiVersionParameter: new Map(),
+    __tspTypeToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
@@ -881,10 +892,10 @@ export function getAccessOverride(
 export function getAccess(
   context: TCGCContext,
   entity: Model | Enum | Operation | Union
-): AccessFlags | undefined {
+): AccessFlags {
   const override = getScopedDecoratorData(context, accessKey, entity);
   if (override || entity.kind === "Operation") {
-    return override;
+    return override || "public";
   }
 
   switch (entity.kind) {
@@ -897,7 +908,7 @@ export function getAccess(
       if (type.kind === "enum" || type.kind === "model") {
         return type.access;
       }
-      return undefined;
+      return "public";
   }
 }
 

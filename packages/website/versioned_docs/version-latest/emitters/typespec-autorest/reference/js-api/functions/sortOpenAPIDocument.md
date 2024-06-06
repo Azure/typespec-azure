@@ -11,8 +11,8 @@ sortOpenAPIDocument(doc): OpenAPI2Document
 
 | Parameter | Type |
 | :------ | :------ |
-| `doc` | `OpenAPI2Document` |
+| `doc` | [`OpenAPI2Document`](../interfaces/OpenAPI2Document.md) |
 
 ## Returns
 
-`OpenAPI2Document`
+[`OpenAPI2Document`](../interfaces/OpenAPI2Document.md)

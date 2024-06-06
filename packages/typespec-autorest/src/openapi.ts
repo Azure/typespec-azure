@@ -7,8 +7,11 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
-  isFixed,
 } from "@azure-tools/typespec-azure-core";
+import {
+  getArmCommonTypeOpenAPIRef,
+  isArmCommonType,
+} from "@azure-tools/typespec-azure-resource-manager";
 import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
@@ -36,8 +39,10 @@ import {
   TypeNameOptions,
   Union,
   UnionVariant,
+  Value,
   compilerAssert,
   createDiagnosticCollector,
+  explainStringTemplateNotSerializable,
   getAllTags,
   getDirectoryPath,
   getDiscriminator,
@@ -79,16 +84,16 @@ import {
   navigateTypesInNamespace,
   resolveEncodedName,
   resolvePath,
-  stringTemplateToString,
 } from "@typespec/compiler";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
   HttpAuth,
   HttpOperation,
+  HttpOperationBody,
+  HttpOperationMultipartBody,
   HttpOperationParameters,
   HttpOperationResponse,
-  HttpOperationResponseBody,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
@@ -117,12 +122,14 @@ import {
   resolveInfo,
   shouldInline,
 } from "@typespec/openapi";
+import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2Document,
+  OpenAPI2FileSchema,
   OpenAPI2FormDataParameter,
   OpenAPI2HeaderDefinition,
   OpenAPI2OAuth2FlowType,
@@ -172,6 +179,12 @@ export interface AutorestDocumentEmitterOptions {
    * readOnly property schema behavior
    */
   readonly useReadOnlyStatusSchema?: boolean;
+
+  /**
+   * Decide how to deal with the version enum when `omitUnreachableTypes` is not set.
+   * @default "omit"
+   */
+  readonly versionEnumStrategy?: "omit" | "include";
 }
 
 /**
@@ -706,7 +719,7 @@ export async function getOpenAPIForService(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: HttpOperationResponseBody | undefined;
+    let body: HttpOperationBody | HttpOperationMultipartBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -728,13 +741,7 @@ export async function getOpenAPIForService(
     }
 
     if (body) {
-      const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
-      openapiResponse.schema = isBinary
-        ? { type: "file" }
-        : getSchemaOrRef(body.type, {
-            visibility: Visibility.Read,
-            ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
-          });
+      openapiResponse.schema = getSchemaForResponseBody(body, contentTypes);
     }
 
     for (const contentType of contentTypes) {
@@ -742,6 +749,24 @@ export async function getOpenAPIForService(
     }
 
     currentEndpoint.responses![statusCode] = openapiResponse;
+  }
+
+  function getSchemaForResponseBody(
+    body: HttpOperationBody | HttpOperationMultipartBody,
+    contentTypes: string[]
+  ): OpenAPI2Schema | OpenAPI2FileSchema {
+    const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
+    if (isBinary) {
+      return { type: "file" };
+    }
+    if (body.bodyKind === "multipart") {
+      // OpenAPI2 doesn't support multipart responses, so we just return a string schema
+      return { type: "string" };
+    }
+    return getSchemaOrRef(body.type, {
+      visibility: Visibility.Read,
+      ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
+    });
   }
 
   function getResponseHeader(prop: ModelProperty): OpenAPI2HeaderDefinition {
@@ -756,7 +781,7 @@ export async function getOpenAPIForService(
     return header;
   }
 
-  function resolveRef(ref: string) {
+  function expandRef(ref: string) {
     const absoluteRef = interpolatePath(ref, {
       "arm-types-dir": options.armTypesDir,
     });
@@ -767,12 +792,31 @@ export async function getOpenAPIForService(
     return getRelativePathFromDirectory(getDirectoryPath(context.outputFile), absoluteRef, false);
   }
 
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
-    const refUrl = getRef(program, type, { version: context.version, service: context.service });
+  function resolveExternalRef(type: Type) {
+    const refUrl = getRef(program, type);
     if (refUrl) {
       return {
-        $ref: resolveRef(refUrl),
+        $ref: expandRef(refUrl),
       };
+    }
+
+    if (isArmCommonType(type) && (type.kind === "Model" || type.kind === "ModelProperty")) {
+      const ref = getArmCommonTypeOpenAPIRef(program, type, {
+        version: context.version,
+        service: context.service,
+      });
+      if (ref) {
+        return {
+          $ref: expandRef(ref),
+        };
+      }
+    }
+    return undefined;
+  }
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+    const ref = resolveExternalRef(type);
+    if (ref) {
+      return ref;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -862,14 +906,9 @@ export async function getOpenAPIForService(
       }
     }
 
-    const refUrl = getRef(program, property, {
-      version: context.version,
-      service: context.service,
-    });
-    if (refUrl) {
-      return {
-        $ref: resolveRef(refUrl),
-      };
+    const ref = resolveExternalRef(property);
+    if (ref) {
+      return ref;
     }
 
     const parameter = params.get(property);
@@ -929,39 +968,81 @@ export async function getOpenAPIForService(
     }
 
     if (methodParams.body && !isVoidType(methodParams.body.type)) {
-      const isBinary = isBinaryPayload(methodParams.body.type, consumes);
-      const schemaContext = {
-        visibility,
-        ignoreMetadataAnnotations:
-          methodParams.body.isExplicit && methodParams.body.containsMetadataAnnotations,
-      };
-      const schema = isBinary
-        ? { type: "string", format: "binary" }
-        : getSchemaOrRef(methodParams.body.type, schemaContext);
+      emitBodyParameters(methodParams.body, visibility);
+    }
+  }
 
-      if (currentConsumes.has("multipart/form-data")) {
-        const bodyModelType = methodParams.body.type;
-        // Assert, this should never happen. Rest library guard against that.
-        compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
-        if (bodyModelType) {
-          for (const param of bodyModelType.properties.values()) {
-            emitParameter(param, "formData", schemaContext, getJsonName(param));
-          }
+  function emitBodyParameters(
+    body: HttpOperationBody | HttpOperationMultipartBody,
+    visibility: Visibility
+  ) {
+    switch (body.bodyKind) {
+      case "single":
+        emitSingleBodyParameters(body, visibility);
+        break;
+      case "multipart":
+        emitMultipartBodyParameters(body, visibility);
+        break;
+    }
+  }
+
+  function emitSingleBodyParameters(body: HttpOperationBody, visibility: Visibility) {
+    const isBinary = isBinaryPayload(body.type, body.contentTypes);
+    const schemaContext = {
+      visibility,
+      ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
+    };
+    const schema = isBinary
+      ? { type: "string", format: "binary" }
+      : getSchemaOrRef(body.type, schemaContext);
+
+    if (currentConsumes.has("multipart/form-data")) {
+      const bodyModelType = body.type;
+      // Assert, this should never happen. Rest library guard against that.
+      compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
+      if (bodyModelType) {
+        for (const param of bodyModelType.properties.values()) {
+          emitParameter(param, "formData", schemaContext, getJsonName(param));
         }
-      } else if (methodParams.body.parameter) {
-        emitParameter(
-          methodParams.body.parameter,
-          "body",
-          { visibility, ignoreMetadataAnnotations: false },
-          getJsonName(methodParams.body.parameter),
-          schema
-        );
-      } else {
+      }
+    } else if (body.property) {
+      emitParameter(
+        body.property,
+        "body",
+        { visibility, ignoreMetadataAnnotations: false },
+        getJsonName(body.property),
+        schema
+      );
+    } else {
+      currentEndpoint.parameters.push({
+        name: "body",
+        in: "body",
+        schema,
+        required: true,
+      });
+    }
+  }
+
+  function emitMultipartBodyParameters(body: HttpOperationMultipartBody, visibility: Visibility) {
+    for (const [index, part] of body.parts.entries()) {
+      const partName = part.name ?? `part${index}`;
+      let schema = getFormDataSchema(
+        part.body.type,
+        { visibility, ignoreMetadataAnnotations: false },
+        partName
+      );
+      if (schema) {
+        if (part.multi) {
+          schema = {
+            type: "array",
+            items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
+          };
+        }
         currentEndpoint.parameters.push({
-          name: "body",
-          in: "body",
-          schema,
-          required: true,
+          name: partName,
+          in: "formData",
+          required: !part.optional,
+          ...schema,
         });
       }
     }
@@ -1077,8 +1158,8 @@ export async function getOpenAPIForService(
     if (param.name !== ph.name) {
       ph["x-ms-client-name"] = param.name;
     }
-    if (param.default) {
-      ph.default = getDefaultValue(param.default);
+    if (param.defaultValue) {
+      ph.default = getDefaultValue(param.defaultValue);
     }
 
     if (ph.in === "body") {
@@ -1201,7 +1282,12 @@ export async function getOpenAPIForService(
 
     function processUnreferencedSchemas() {
       const addSchema = (type: Type) => {
-        if (!processedSchemas.has(type) && !paramModels.has(type) && !shouldInline(program, type)) {
+        if (
+          !processedSchemas.has(type) &&
+          !paramModels.has(type) &&
+          !shouldInline(program, type) &&
+          !shouldOmitThisUnreachableType(type)
+        ) {
           getSchemaOrRef(type, { visibility: Visibility.Read, ignoreMetadataAnnotations: false });
         }
       };
@@ -1218,6 +1304,25 @@ export async function getOpenAPIForService(
       );
       processSchemas();
     }
+
+    function shouldOmitThisUnreachableType(type: Type): boolean {
+      if (
+        options.versionEnumStrategy !== "include" &&
+        type.kind === "Enum" &&
+        isVersionEnum(program, type)
+      ) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  function isVersionEnum(program: Program, enumObj: Enum): boolean {
+    const [_, map] = getVersionsForEnum(program, enumObj);
+    if (map !== undefined && map.getVersions()[0].enumMember.enum === enumObj) {
+      return true;
+    }
+    return false;
   }
 
   function emitTags() {
@@ -1273,6 +1378,34 @@ export async function getOpenAPIForService(
     return {};
   }
 
+  /**
+   * Version enum is special so we we just render the current version with modelAsString: true
+   */
+  function getSchemaForVersionEnum(e: Enum, currentVersion: string): OpenAPI2Schema {
+    const member = [...e.members.values()].find((x) => (x.value ?? x.name) === currentVersion);
+    compilerAssert(
+      member,
+      `Version enum ${e.name} does not have a member for ${currentVersion}.`,
+      e
+    );
+    return {
+      type: "string",
+      description: getDoc(program, e),
+      enum: [member.value ?? member.name],
+      "x-ms-enum": {
+        name: e.name,
+        modelAsString: true,
+        values: [
+          {
+            name: member.name,
+            value: member.value ?? member.name,
+            description: getDoc(program, member),
+          },
+        ],
+      },
+    };
+  }
+
   function getSchemaForEnum(e: Enum): OpenAPI2Schema {
     const values = [];
     if (e.members.size === 0) {
@@ -1289,6 +1422,10 @@ export async function getOpenAPIForService(
       }
     }
 
+    // If we are rendering a specific version and trying to render the version enum we should treat it specially to only include the current version.
+    if (isVersionEnum(program, e) && context.version) {
+      return getSchemaForVersionEnum(e, context.version);
+    }
     const schema: OpenAPI2Schema = { type, description: getDoc(program, e) };
     if (values.length > 0) {
       schema.enum = values;
@@ -1413,33 +1550,25 @@ export async function getOpenAPIForService(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(type: Type): any {
-    switch (type.kind) {
-      case "String":
-        return type.value;
-      case "Number":
-        return type.value;
-      case "Boolean":
-        return type.value;
-      case "Tuple":
-        return type.values.map(getDefaultValue);
-      case "EnumMember":
-        return type.value ?? type.name;
-      case "Intrinsic":
-        return isNullType(type)
-          ? null
-          : reportDiagnostic(program, {
-              code: "invalid-default",
-              format: { type: type.kind },
-              target: type,
-            });
-      case "UnionVariant":
-        return getDefaultValue(type.type);
+  function getDefaultValue(defaultType: Value): any {
+    switch (defaultType.valueKind) {
+      case "StringValue":
+        return defaultType.value;
+      case "NumericValue":
+        return defaultType.value.asNumber() ?? undefined;
+      case "BooleanValue":
+        return defaultType.value;
+      case "ArrayValue":
+        return defaultType.values.map((x) => getDefaultValue(x));
+      case "NullValue":
+        return null;
+      case "EnumValue":
+        return defaultType.value.value ?? defaultType.value.name;
       default:
         reportDiagnostic(program, {
           code: "invalid-default",
-          format: { type: type.kind },
-          target: type,
+          format: { type: defaultType.valueKind },
+          target: defaultType,
         });
     }
   }
@@ -1524,7 +1653,7 @@ export async function getOpenAPIForService(
         modelSchema.required = [propertyName];
       }
     }
-
+    applySummary(model, modelSchema);
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
@@ -1547,7 +1676,6 @@ export async function getOpenAPIForService(
       const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
-
       // if this property is a discriminator property, remove it to keep autorest validation happy
       if (model.baseModel) {
         const { propertyName } = getDiscriminator(program, model.baseModel) || {};
@@ -1575,9 +1703,10 @@ export async function getOpenAPIForService(
       if (description) {
         property.description = description;
       }
+      applySummary(prop, property);
 
-      if (prop.default && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.default);
+      if (prop.defaultValue && !("$ref" in property)) {
+        property.default = getDefaultValue(prop.defaultValue);
       }
 
       if (isReadonlyProperty(program, prop)) {
@@ -1648,9 +1777,9 @@ export async function getOpenAPIForService(
 
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
     let propSchema;
-    if (prop.type.kind === "Enum" && prop.default) {
+    if (prop.type.kind === "Enum" && prop.defaultValue) {
       propSchema = getSchemaForEnum(prop.type);
-    } else if (prop.type.kind === "Union" && prop.default) {
+    } else if (prop.type.kind === "Union" && prop.defaultValue) {
       const [asEnum, _] = getUnionAsEnum(prop.type);
       if (asEnum) {
         propSchema = getSchemaForUnionEnum(prop.type, asEnum);
@@ -1714,6 +1843,11 @@ export async function getOpenAPIForService(
 
     if (docStr) {
       newTarget.description = docStr;
+    }
+
+    const title = getSummary(program, typespecType);
+    if (title) {
+      target.title = title;
     }
 
     const formatStr = getFormat(program, typespecType);
@@ -1861,6 +1995,12 @@ export async function getOpenAPIForService(
     }
   }
 
+  function applySummary(typespecType: Type, target: { title?: string }) {
+    const summary = getSummary(program, typespecType);
+    if (summary) {
+      target.title = summary;
+    }
+  }
   function applyExternalDocs(typespecType: Type, target: Record<string, unknown>) {
     const externalDocs = getExternalDocs(program, typespecType);
     if (externalDocs) {
@@ -1872,7 +2012,7 @@ export async function getOpenAPIForService(
     if (type.node && type.node.parent && type.node.parent.kind === SyntaxKind.ModelStatement) {
       schema["x-ms-enum"] = {
         name: type.node.parent.id.sv,
-        modelAsString: true,
+        modelAsString: false,
       };
     } else if (type.kind === "String") {
       schema["x-ms-enum"] = {
@@ -1881,7 +2021,7 @@ export async function getOpenAPIForService(
     } else if (type.kind === "Enum") {
       schema["x-ms-enum"] = {
         name: type.name,
-        modelAsString: isFixed(program, type) ? false : true,
+        modelAsString: false,
       };
 
       const values = [];
@@ -1907,12 +2047,16 @@ export async function getOpenAPIForService(
   }
 
   function getSchemaForStringTemplate(stringTemplate: StringTemplate) {
-    const [value, diagnostics] = stringTemplateToString(stringTemplate);
-    if (diagnostics.length > 0) {
-      program.reportDiagnostics(diagnostics.map((x) => ({ ...x, severity: "warning" })));
+    if (stringTemplate.stringValue === undefined) {
+      program.reportDiagnostics(
+        explainStringTemplateNotSerializable(stringTemplate).map((x) => ({
+          ...x,
+          severity: "warning",
+        }))
+      );
       return { type: "string" };
     }
-    return { type: "string", enum: [value] };
+    return { type: "string", enum: [stringTemplate.stringValue] };
   }
   // Map an TypeSpec type to an OA schema. Returns undefined when the resulting
   // OA schema is just a regular object schema.
@@ -2154,11 +2298,7 @@ class ErrorTypeFoundError extends Error {
 export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   // Doing this to make sure the classes with toJSON are resolved.
   const unsorted = JSON.parse(JSON.stringify(doc));
-  const sorted = sortWithJsonSchema(
-    unsorted,
-    AutorestOpenAPISchema,
-    "#/$defs/AutorestOpenAPISchema"
-  );
+  const sorted = sortWithJsonSchema(unsorted, AutorestOpenAPISchema);
   return sorted;
 }
 

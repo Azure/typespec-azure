@@ -1,0 +1,66 @@
+{
+  "name": "@azure-tools/typespec-azure-rulesets",
+  "version": "0.42.1",
+  "author": "Microsoft Corporation",
+  "description": "TypeSpec ruleset for Azure specs",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-rulesets/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec",
+    "autorest"
+  ],
+  "type": "module",
+  "main": "dist/src/index.js",
+  "tspMain": "dist/src/index.js",
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./temp",
+    "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test:ui": "vitest --ui",
+    "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
+    "lint": "eslint .  --max-warnings=0",
+    "lint:fix": "eslint . --fix ",
+    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-azure-rulesets/reference"
+  },
+  "files": [
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
+    "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@typespec/compiler": "workspace:~"
+  },
+  "devDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
+    "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@types/node": "~18.11.19",
+    "@typespec/compiler": "workspace:~",
+    "@typespec/tspd": "workspace:~",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/ui": "^1.6.0",
+    "c8": "^9.1.0",
+    "change-case": "~5.4.4",
+    "rimraf": "~5.0.7",
+    "typescript": "~5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

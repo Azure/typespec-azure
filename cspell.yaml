@@ -16,6 +16,11 @@ ignorePaths:
   - pnpm-lock.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
+  - .git/**
+  - .gitignore
+  - .vscode/**
+  - .editorconfig
+  - .github/CODEOWNERS
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -48,6 +53,7 @@ words:
   - lropaging
   - Lucene
   - MACVMIMAGE
+  - mgmt
   - msazure
   - msdata
   - mylocation
@@ -55,10 +61,13 @@ words:
   - odata
   - Onco
   - oncophenotype
-  - psscriptanalyzer
   - PAYG
   - prismjs
+<<<<<<< add_versioning_doc
   - pytest
+=======
+  - psscriptanalyzer
+>>>>>>> main
   - qnas
   - regionality
   - Reranker
@@ -68,3 +77,5 @@ words:
   - tcgc
   - userrp
   - WINDOWSVMIMAGE
+  - contosowidgetmanager
+  - locationyaml

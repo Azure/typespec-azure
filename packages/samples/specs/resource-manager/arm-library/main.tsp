@@ -19,24 +19,26 @@ using Azure.ResourceManager;
 })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
+@armCommonTypesVersion(CommonTypes.Versions.v5)
 @armProviderNamespace
 namespace Microsoft.LibraryTest;
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
 model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
   @doc("The name of the all properties resource.")
   @key("allPropertiesName")
   @segment("allProperties")
   @path
   name: string;
 
-  ...EntityTag;
-  ...ManagedBy;
-  ...ResourceKind;
-  ...ResourcePlan;
-  ...ResourceSku;
-  ...ManagedServiceIdentity;
+  ...EntityTagProperty;
+  ...ManagedByProperty;
+  ...ResourceKindProperty;
+  ...ResourcePlanProperty;
+  ...ResourceSkuProperty;
+  ...ManagedServiceIdentityProperty;
 }
 
 @armResourceOperations
@@ -46,7 +48,8 @@ interface AllProperties
 @doc("rp-specific properties for the resource with all envelope properties")
 model AllPropertiesProperties {
   @doc("The status of the last operation performed on this resource.")
-  provisioningState: SystemEnvelopeProvisioningState;
+  @visibility("read")
+  provisioningState?: SystemEnvelopeProvisioningState;
 
   @doc("Name of the resource")
   displayName?: string = "default";

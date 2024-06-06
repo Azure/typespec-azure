@@ -1,6 +1,7 @@
 import {
   Diagnostic,
   ModelProperty,
+  Operation,
   Type,
   createDiagnosticCollector,
   ignoreDiagnostics,
@@ -15,7 +16,6 @@ import {
   getQueryParamName,
   getQueryParamOptions,
   isBody,
-  isContentTypeHeader,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -41,11 +41,14 @@ import {
   TCGCContext,
   getAvailableApiVersions,
   getDocHelper,
+  getLocationOfOperation,
   isAcceptHeader,
-  isNullable,
+  isContentTypeHeader,
+  isNeverOrVoidType,
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -106,7 +109,10 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
   retval.parameters = httpOperation.parameters.parameters
-    .map((x) => diagnostics.pipe(getSdkHttpParameter(context, x.param, x.type)))
+    .filter((x) => !isNeverOrVoidType(x.param.type))
+    .map((x) =>
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type))
+    )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
         x.kind === "header" || x.kind === "query" || x.kind === "path"
@@ -118,11 +124,11 @@ function getSdkHttpParameters(
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
-  if (tspBody) {
+  if (tspBody && tspBody?.bodyKind !== "multipart") {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
-    if (tspBody.parameter) {
+    if (tspBody.parameter && !isNeverOrVoidType(tspBody.parameter.type)) {
       const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.parameter, "body")
+        getSdkHttpParameter(context, tspBody.parameter, httpOperation.operation, "body")
       );
       if (getParamResponse.kind !== "body") {
         diagnostics.add(
@@ -139,7 +145,7 @@ function getSdkHttpParameters(
         return diagnostics.wrap(retval);
       }
       retval.bodyParam = getParamResponse;
-    } else {
+    } else if (!isNeverOrVoidType(tspBody.type)) {
       const type = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
       );
@@ -155,33 +161,32 @@ function getSdkHttpParameters(
         contentTypes: [],
         defaultContentType: "application/json", // actual content type info is added later
         isApiVersionParam: false,
-        apiVersions: getAvailableApiVersions(context, tspBody.type),
+        apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: false,
-        nullable: isNullable(tspBody.type),
         correspondingMethodParams,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
       };
     }
-    addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
-    retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
-      getCorrespondingMethodParams(
-        context,
-        httpOperation.operation.name,
-        methodParameters,
-        retval.bodyParam
-      )
-    );
+    if (retval.bodyParam) {
+      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
+      retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
+        getCorrespondingMethodParams(
+          context,
+          httpOperation.operation,
+          methodParameters,
+          retval.bodyParam
+        )
+      );
+    }
   }
-  if (
-    retval.bodyParam &&
-    !headerParams.some((h) => h.__raw && isContentTypeHeader(context.program, h.__raw))
-  ) {
+  if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(retval.bodyParam),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
-    if (!methodParameters.some((m) => m.__raw && isContentTypeHeader(context.program, m.__raw))) {
+    if (!methodParameters.some((m) => m.name === "contentType")) {
       methodParameters.push({
         ...contentTypeBase,
         kind: "method",
@@ -197,7 +202,7 @@ function getSdkHttpParameters(
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
     // If our operation returns a body, we add an accept header if none exist
     const acceptBase = {
-      ...createContentTypeOrAcceptHeader(responseBody),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, responseBody),
     };
     if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
@@ -214,20 +219,21 @@ function getSdkHttpParameters(
   }
   for (const param of retval.parameters) {
     param.correspondingMethodParams = diagnostics.pipe(
-      getCorrespondingMethodParams(context, httpOperation.operation.name, methodParameters, param)
+      getCorrespondingMethodParams(context, httpOperation.operation, methodParameters, param)
     );
   }
   return diagnostics.wrap(retval);
 }
 
 function createContentTypeOrAcceptHeader(
+  context: TCGCContext,
+  httpOperation: HttpOperation,
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = {
     kind: "string",
     encode: "string",
-    nullable: false,
   };
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
@@ -243,10 +249,11 @@ function createContentTypeOrAcceptHeader(
   ) {
     // in this case, we just want a content type of application/json
     type = {
-      nullable: false,
       kind: "constant",
       value: bodyObject.contentTypes[0],
       valueType: type,
+      name: `${httpOperation.operation.name}ContentType`,
+      isGeneratedName: true,
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -259,7 +266,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: false,
-    nullable: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
   };
 }
 
@@ -287,10 +294,11 @@ function addContentTypeInfoToBodyParam(
 export function getSdkHttpParameter(
   context: TCGCContext,
   type: ModelProperty,
+  operation?: Operation,
   location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, type) || location === "path") {
@@ -374,6 +382,7 @@ function getSdkHttpResponseAndExceptions(
 
     for (const innerResponse of response.responses) {
       for (const header of Object.values(innerResponse.headers || [])) {
+        if (isNeverOrVoidType(header.type)) continue;
         const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
         const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
           ? "application/json"
@@ -386,10 +395,9 @@ function getSdkHttpResponseAndExceptions(
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
-          nullable: isNullable(header.type),
         });
       }
-      if (innerResponse.body) {
+      if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
         if (body && body !== innerResponse.body.type) {
           diagnostics.add(
             createDiagnostic({
@@ -406,10 +414,12 @@ function getSdkHttpResponseAndExceptions(
           );
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body = innerResponse.body.type;
+        body =
+          innerResponse.body.type.kind === "Model"
+            ? getEffectivePayloadType(context, innerResponse.body.type)
+            : innerResponse.body.type;
       }
     }
-
     const sdkResponse: SdkHttpResponse = {
       __raw: response,
       kind: "http",
@@ -419,8 +429,11 @@ function getSdkHttpResponseAndExceptions(
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
-      apiVersions: getAvailableApiVersions(context, httpOperation.operation),
-      nullable: body ? isNullable(body) : true,
+      apiVersions: getAvailableApiVersions(
+        context,
+        httpOperation.operation,
+        httpOperation.operation
+      ),
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.set(response.statusCodes, sdkResponse);
@@ -433,13 +446,16 @@ function getSdkHttpResponseAndExceptions(
 
 export function getCorrespondingMethodParams(
   context: TCGCContext,
-  methodName: string,
+  operation: Operation,
   methodParameters: SdkParameter[],
   serviceParam: SdkHttpParameter
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  const operationLocation = getLocationOfOperation(operation);
   if (serviceParam.isApiVersionParam) {
-    if (!context.__api_version_parameter) {
+    const existingApiVersion = context.__namespaceToApiVersionParameter.get(operationLocation);
+    if (!existingApiVersion) {
       const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
       if (!apiVersionParam) {
         diagnostics.add(
@@ -448,22 +464,24 @@ export function getCorrespondingMethodParams(
             target: serviceParam.__raw!,
             format: {
               paramName: "apiVersion",
-              methodName: methodName,
+              methodName: operation.name,
             },
           })
         );
         return diagnostics.wrap([]);
       }
-      context.__api_version_parameter = {
+      const apiVersionParamUpdated: SdkParameter = {
         ...apiVersionParam,
         name: "apiVersion",
         nameInClient: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
-        clientDefaultValue: context.__api_version_client_default_value,
+        clientDefaultValue:
+          context.__namespaceToApiVersionClientDefaultValue.get(operationLocation),
       };
+      context.__namespaceToApiVersionParameter.set(operationLocation, apiVersionParamUpdated);
     }
-    return diagnostics.wrap([context.__api_version_parameter]);
+    return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(operationLocation)!]);
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {
@@ -475,7 +493,7 @@ export function getCorrespondingMethodParams(
             target: serviceParam.__raw!,
             format: {
               paramName: "subscriptionId",
-              methodName: methodName,
+              methodName: operation.name,
             },
           })
         );
@@ -526,7 +544,7 @@ export function getCorrespondingMethodParams(
         target: serviceParam.__raw!,
         format: {
           paramName: serviceParam.name,
-          methodName: methodName,
+          methodName: operation.name,
         },
       })
     );
@@ -547,7 +565,7 @@ export function getCorrespondingMethodParams(
       target: serviceParam.__raw!,
       format: {
         paramName: serviceParam.name,
-        methodName: methodName,
+        methodName: operation.name,
       },
     })
   );

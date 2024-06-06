@@ -64,6 +64,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
     version: resolvedOptions["version"],
     newLine: resolvedOptions["new-line"],
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
+    versionEnumStrategy: resolvedOptions["version-enum-strategy"],
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
@@ -71,7 +72,9 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const tracer = getTracer(context.program);
   tracer.trace("options", JSON.stringify(options, null, 2));
 
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest");
+  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest", {
+    versionStrategy: "ignore",
+  });
 
   await emitAllServiceAtAllVersions(context.program, tcgcSdkContext, options);
 }

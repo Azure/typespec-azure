@@ -20,6 +20,7 @@ namespace Microsoft.InterfacesTest;
  * A Test Tracked Resource
  */
 model TestTrackedResource is TrackedResource<TestTrackedProperties> {
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
   @doc("The name of the Tracked resource.")
   @key("trackedResourceName")
   @segment("trackedResources")
@@ -48,6 +49,7 @@ model TestTrackedProperties {
 
 @parentResource(TestTrackedResource)
 model TestTrackedChild is ProxyResource<TrackedChildProperties> {
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
   @doc("The name of the Tracked child.")
   @key("childName")
   @segment("children")
@@ -71,6 +73,7 @@ interface TrackedChildOperations extends ProxyResourceOperations<TestTrackedChil
 
 @tenantResource
 model TestTenantResource is ProxyResource<TestTenantProperties> {
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
   @doc("The name of the tenant resource.")
   @key("tenantResourceName")
   @segment("tenantResources")
@@ -86,7 +89,8 @@ interface TenantOperations
 @doc("rp-specific properties for the resource")
 model TestTenantProperties {
   @doc("The status of the last operation performed on this resource.")
-  provisioningState: ResourceProvisioningState;
+  @visibility("read")
+  provisioningState?: ResourceProvisioningState;
 
   @doc("Name of the resource")
   displayName?: string = "default";
@@ -95,6 +99,7 @@ model TestTenantProperties {
 // Extension resources
 
 model TestExtensionResource is ExtensionResource<TestExtensionProperties> {
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
   @doc("The name of the extension resource.")
   @key("extensionResourceName")
   @segment("extensionResources")
@@ -110,7 +115,8 @@ interface ExtensionOperations
 @doc("rp-specific properties for the resource")
 model TestExtensionProperties {
   @doc("The status of the last operation performed on this resource.")
-  provisioningState: ResourceProvisioningState;
+  @visibility("read")
+  provisioningState?: ResourceProvisioningState;
 
   @doc("Name of the resource")
   displayName?: string = "default";

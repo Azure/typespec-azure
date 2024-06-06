@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.41.1",
+  "version": "0.42.1",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -55,6 +55,7 @@
   ],
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
@@ -64,6 +65,7 @@
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@types/node": "~18.11.19",
     "@typespec/compiler": "workspace:~",
@@ -74,12 +76,12 @@
     "@typespec/rest": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@typespec/versioning": "workspace:~",
-    "@vitest/coverage-v8": "^1.5.0",
-    "@vitest/ui": "^1.5.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/ui": "^1.6.0",
     "c8": "^9.1.0",
     "change-case": "~5.4.4",
-    "rimraf": "~5.0.5",
+    "rimraf": "~5.0.7",
     "typescript": "~5.4.5",
-    "vitest": "^1.5.0"
+    "vitest": "^1.6.0"
   }
 }

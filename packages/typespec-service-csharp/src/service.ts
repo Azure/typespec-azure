@@ -18,6 +18,7 @@ import {
   getNamespaceFullName,
   getService,
   isErrorModel,
+  isType,
 } from "@typespec/compiler";
 import {
   CodeTypeEmitter,
@@ -465,6 +466,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       let pushed = 0;
       for (const arg of model.templateMapper!.args) {
         if (
+          isType(arg) &&
           arg.kind !== "Intrinsic" &&
           (arg.kind !== "Model" ||
             (arg.name !== "" && arg.name !== "Error" && arg.name !== "AcceptedResponse"))
@@ -730,7 +732,8 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       let i = 0;
       const params = new StringBuilder();
       const args = model.templateMapper.args.filter(
-        (parameter) =>
+        (parameter): parameter is Type =>
+          isType(parameter) &&
           parameter.kind !== "Boolean" &&
           parameter.kind !== "Intrinsic" &&
           parameter.kind !== "Number" &&

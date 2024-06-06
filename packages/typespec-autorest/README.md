@@ -105,6 +105,12 @@ Set the newline character for emitting files.
 
 Omit unreachable types. By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.
 
+#### `version-enum-strategy`
+
+**Type:** `string`
+
+Decide how to deal with the Version enum when when `omit-unreachable-types` is not set. Default to 'omit'
+
 #### `include-x-typespec-name`
 
 **Type:** `"inline-only" | "never"`

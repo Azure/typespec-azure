@@ -6,6 +6,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  Scalar,
   Type,
   Union,
   createDiagnosticCollector,
@@ -24,6 +25,7 @@ import {
   getHttpOperation,
   getPathParamName,
   getQueryParamName,
+  isMetadata,
   isStatusCode,
 } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
@@ -35,7 +37,12 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { TCGCContext, getClientNamespaceStringHelper, parseEmitterName } from "./internal-utils.js";
+import {
+  TCGCContext,
+  TspLiteralType,
+  getClientNamespaceStringHelper,
+  parseEmitterName,
+} from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
 /**
@@ -49,7 +56,18 @@ export function getDefaultApiVersion(
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
-    const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    let versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    // filter with specific api version
+    if (
+      context.apiVersion !== undefined &&
+      context.apiVersion !== "latest" &&
+      context.apiVersion !== "all"
+    ) {
+      const index = versions.findIndex((version) => version.value === context.apiVersion);
+      if (index >= 0) {
+        versions = versions.slice(0, index + 1);
+      }
+    }
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {
@@ -179,7 +197,10 @@ export function getLibraryName(
       type.templateMapper.args
         .filter(
           (arg): arg is Model | Enum =>
-            (arg.kind === "Model" || arg.kind === "Enum") && arg.name.length > 0
+            "kind" in arg &&
+            (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
+            arg.name !== undefined &&
+            arg.name.length > 0
         )
         .map((arg) => pascalCase(arg.name))
         .join("")
@@ -209,20 +230,45 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @returns
  */
 export function getCrossLanguageDefinitionId(
-  type: {
-    name?: string;
-    kind: string;
-    interface?: Interface;
-    namespace?: Namespace;
-  },
-  name?: string
+  context: TCGCContext,
+  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  appendNamespace: boolean = true
 ): string {
-  let retval = type.name ? type.name : name ?? "";
-  if (type.kind === "Operation" && type.interface) {
-    retval = `${type.interface.name}.${retval}`;
+  let retval = type.name || "anonymous";
+  const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  switch (type.kind) {
+    case "Union":
+    case "Model":
+      // Enum and Scalar will always have a name
+      if (type.name) {
+        break;
+      }
+      const contextPath = findContextPath(context, type);
+      retval =
+        contextPath
+          .slice(findLastNonAnonymousModelNode(contextPath))
+          .map((x) =>
+            x.type?.kind === "Model" || x.type?.kind === "Union"
+              ? x.type.name || x.name
+              : x.name || "anonymous"
+          )
+          .join(".") +
+        "." +
+        retval;
+      break;
+    case "ModelProperty":
+      if (type.model) {
+        retval = `${getCrossLanguageDefinitionId(context, type.model, false)}.${retval}`;
+      }
+      break;
+    case "Operation":
+      if (type.interface) {
+        retval = `${getCrossLanguageDefinitionId(context, type.interface, false)}.${retval}`;
+      }
+      break;
   }
-  if (type.namespace) {
-    retval = `${getNamespaceFullName(type.namespace!)}.${retval}`;
+  if (appendNamespace && namespace && getNamespaceFullName(namespace)) {
+    retval = `${getNamespaceFullName(namespace)}.${retval}`;
   }
   return retval;
 }
@@ -256,11 +302,11 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
  */
 export function getGeneratedName(
   context: TCGCContext,
-  type: Model | Union,
+  type: Model | Union | TspLiteralType,
   operation?: Operation
 ): string {
   if (!context.generatedNames) {
-    context.generatedNames = new Map<Union | Model, string>();
+    context.generatedNames = new Map<Union | Model | TspLiteralType, string>();
   }
   const generatedName = context.generatedNames.get(type);
   if (generatedName) return generatedName;
@@ -278,8 +324,24 @@ export function getGeneratedName(
  * @param type
  * @returns
  */
-function findContextPath(context: TCGCContext, type: Model | Union): ContextNode[] {
+function findContextPath(
+  context: TCGCContext,
+  type: Model | Union | TspLiteralType
+): ContextNode[] {
   for (const client of listClients(context)) {
+    // orphan models
+    if (client.service) {
+      for (const model of client.service.models.values()) {
+        if (
+          [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+        )
+          continue;
+        const result = getContextPath(context, model, type);
+        if (result.length > 0) {
+          return result;
+        }
+      }
+    }
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
@@ -294,22 +356,13 @@ function findContextPath(context: TCGCContext, type: Model | Union): ContextNode
         }
       }
     }
-    // orphan models
-    if (client.service) {
-      for (const model of client.service.models.values()) {
-        const result = getContextPath(context, model, type);
-        if (result.length > 0) {
-          return result;
-        }
-      }
-    }
   }
   return [];
 }
 
 interface ContextNode {
-  displayName: string;
-  type?: Model | Union;
+  name: string;
+  type?: Model | Union | TspLiteralType;
 }
 
 /**
@@ -322,7 +375,7 @@ interface ContextNode {
 function getContextPath(
   context: TCGCContext,
   root: Operation | Model,
-  typeToFind: Model | Union
+  typeToFind: Model | Union | TspLiteralType
 ): ContextNode[] {
   // use visited set to avoid cycle model reference
   const visited: Set<Type> = new Set<Type>();
@@ -333,7 +386,7 @@ function getContextPath(
 
     if (httpOperation.parameters.body) {
       visited.clear();
-      result = [{ displayName: pascalCase(root.name) }];
+      result = [{ name: root.name }];
       if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type, "Request")) {
         return result;
       }
@@ -341,8 +394,10 @@ function getContextPath(
 
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
       visited.clear();
-      result = [{ displayName: pascalCase(root.name) }];
-      if (dfsModelProperties(typeToFind, parameter.param.type, "Request")) {
+      result = [{ name: root.name }];
+      if (
+        dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)
+      ) {
         return result;
       }
     }
@@ -351,7 +406,7 @@ function getContextPath(
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
           visited.clear();
-          result = [{ displayName: pascalCase(root.name) }];
+          result = [{ name: root.name }];
           if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response")) {
             return result;
           }
@@ -360,8 +415,8 @@ function getContextPath(
         if (innerResponse.headers) {
           for (const header of Object.values(innerResponse.headers)) {
             visited.clear();
-            result = [{ displayName: pascalCase(root.name) }];
-            if (dfsModelProperties(typeToFind, header.type, "Response")) {
+            result = [{ name: root.name }];
+            if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {
               return result;
             }
           }
@@ -392,7 +447,7 @@ function getContextPath(
    * @returns
    */
   function dfsModelProperties(
-    expectedType: Model | Union,
+    expectedType: Model | Union | TspLiteralType,
     currentType: Type,
     displayName: string
   ): boolean {
@@ -401,14 +456,14 @@ function getContextPath(
       return false;
     }
 
-    if (!(currentType.kind === "Model" || currentType.kind === "Union")) {
+    if (!["Model", "Union", "String", "Number", "Boolean"].includes(currentType.kind)) {
       return false;
     }
 
     visited.add(currentType);
 
     if (currentType === expectedType) {
-      result.push({ displayName: pascalCase(displayName), type: currentType });
+      result.push({ name: displayName, type: currentType });
       return true;
     } else if (
       currentType.kind === "Model" &&
@@ -423,7 +478,7 @@ function getContextPath(
     } else if (currentType.kind === "Model") {
       currentType = getEffectivePayloadType(context, currentType);
       // handle model
-      result.push({ displayName: pascalCase(displayName), type: currentType });
+      result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
         // traverse model property
         // use property.name as displayName
@@ -473,7 +528,7 @@ function getContextPath(
         if (result) return true;
       }
       return false;
-    } else {
+    } else if (currentType.kind === "Union") {
       // handle union
       for (const unionType of currentType.variants.values()) {
         // traverse union type
@@ -482,8 +537,27 @@ function getContextPath(
         if (result) return true;
       }
       return false;
+    } else {
+      return false;
     }
   }
+}
+
+function findLastNonAnonymousModelNode(contextPath: ContextNode[]): number {
+  let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
+  while (lastNonAnonymousModelNodeIndex >= 0) {
+    const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
+    if (
+      !contextPath[lastNonAnonymousModelNodeIndex].type ||
+      (currType?.kind === "Model" && currType.name)
+    ) {
+      // it's nonanonymous model node (if no type defined, it's the operation node)
+      break;
+    } else {
+      --lastNonAnonymousModelNodeIndex;
+    }
+  }
+  return lastNonAnonymousModelNodeIndex;
 }
 
 /**
@@ -496,7 +570,7 @@ function getContextPath(
  */
 function buildNameFromContextPaths(
   context: TCGCContext,
-  type: Union | Model,
+  type: Union | Model | TspLiteralType,
   contextPath: ContextNode[]
 ): string {
   // fallback to empty name for corner case
@@ -505,27 +579,24 @@ function buildNameFromContextPaths(
   }
 
   // 1. find the last nonanonymous model node
-  let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
-  while (lastNonAnonymousModelNodeIndex >= 0) {
-    if (
-      !contextPath[lastNonAnonymousModelNodeIndex].type ||
-      contextPath[lastNonAnonymousModelNodeIndex].type?.name
-    ) {
-      // it's nonanonymous model node (if no type defined, it's the operation node)
-      break;
-    } else {
-      --lastNonAnonymousModelNodeIndex;
-    }
-  }
+  const lastNonAnonymousModelNodeIndex = findLastNonAnonymousModelNode(contextPath);
   // 2. build name
   let createName: string = "";
   for (let j = lastNonAnonymousModelNodeIndex; j < contextPath.length; j++) {
-    if (!contextPath[j]?.type?.name) {
+    const currContextPathType = contextPath[j]?.type;
+    if (
+      currContextPathType?.kind === "String" ||
+      currContextPathType?.kind === "Number" ||
+      currContextPathType?.kind === "Boolean"
+    ) {
+      // constant type
+      createName = `${createName}${pascalCase(contextPath[j].name)}`;
+    } else if (!currContextPathType?.name) {
       // is anonymous model node
-      createName = `${createName}${contextPath[j].displayName}`;
+      createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else {
       // is non-anonymous model, use type name
-      createName = `${createName}${contextPath[j]!.type!.name!}`;
+      createName = `${createName}${currContextPathType!.name!}`;
     }
   }
   // 3. simplely handle duplication
@@ -538,7 +609,7 @@ function buildNameFromContextPaths(
   if (context.generatedNames) {
     context.generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Map<Union | Model, string>([[type, createName]]);
+    context.generatedNames = new Map<Union | Model | TspLiteralType, string>([[type, createName]]);
   }
   return createName;
 }

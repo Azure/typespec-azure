@@ -14,6 +14,7 @@ title: "[I] SdkInitializationType"
 | `__raw?` | `Type` | - | [`SdkModelType`](SdkModelType.md).`__raw` | [`SdkModelType`](SdkModelType.md).`__raw` |
 | `access?` | [`AccessFlags`](../type-aliases/AccessFlags.md) | - | [`SdkModelType`](SdkModelType.md).`access` | [`SdkModelType`](SdkModelType.md).`access` |
 | `additionalProperties?` | [`SdkType`](../type-aliases/SdkType.md) | - | [`SdkModelType`](SdkModelType.md).`additionalProperties` | [`SdkModelType`](SdkModelType.md).`additionalProperties` |
+| `additionalPropertiesNullable?` | `boolean` | - | [`SdkModelType`](SdkModelType.md).`additionalPropertiesNullable` | [`SdkModelType`](SdkModelType.md).`additionalPropertiesNullable` |
 | `apiVersions` | `string`[] | - | [`SdkModelType`](SdkModelType.md).`apiVersions` | [`SdkModelType`](SdkModelType.md).`apiVersions` |
 | `baseModel?` | [`SdkModelType`](SdkModelType.md) | - | [`SdkModelType`](SdkModelType.md).`baseModel` | [`SdkModelType`](SdkModelType.md).`baseModel` |
 | `crossLanguageDefinitionId` | `string` | - | [`SdkModelType`](SdkModelType.md).`crossLanguageDefinitionId` | [`SdkModelType`](SdkModelType.md).`crossLanguageDefinitionId` |

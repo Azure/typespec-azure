@@ -7,9 +7,11 @@ import {
   Program,
   Union,
   UnionVariant,
+  compilerAssert,
   createDiagnosticCollector,
   getEffectiveModelType,
   isErrorType,
+  isType,
 } from "@typespec/compiler";
 import {
   HttpOperationResponse,
@@ -135,8 +137,8 @@ export function getLroOperationInfo(
   }
   if (targetParameters.body) {
     const body = targetParameters.body;
-    if (body.parameter) {
-      targetProperties.set(body.parameter.name, body.parameter);
+    if (body.bodyKind === "single" && body.property) {
+      targetProperties.set(body.property.name, body.property);
     } else if (body.type.kind === "Model") {
       for (const [name, param] of getAllProperties(body.type)) {
         targetProperties.set(name, param);
@@ -355,7 +357,12 @@ export function getLroOperationInfo(
       );
       return;
     }
-    const sourceProperty = propMap.templateMapper!.args[0];
+    let sourceProperty = propMap.templateMapper!.args[0];
+    if (sourceProperty.entityKind === "Indeterminate") {
+      sourceProperty = sourceProperty.type;
+    } else if (!isType(sourceProperty)) {
+      compilerAssert(false, "Lro Template Arg should be a Type", propMap);
+    }
     switch (sourceProperty.kind) {
       case "String":
         const sourcePropertyName = sourceProperty.value;

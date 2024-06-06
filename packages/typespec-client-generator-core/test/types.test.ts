@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Enum, Model, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
@@ -245,7 +246,6 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `
       );
-      // eslint-disable-next-line deprecation/deprecation
       expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, []);
       expectDiagnostics(runner.context.diagnostics, []);
       const m = runner.context.experimental_sdkPackage.models.find((x) => x.name === "TestModel");
@@ -363,16 +363,13 @@ describe("typespec-client-generator-core: types", () => {
         }
       `
       );
-      const sdkType = getSdkTypeHelper(runner);
+      const nullableType = getSdkTypeHelper(runner);
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
       strictEqual(sdkType.kind, "duration");
       strictEqual(sdkType.wireType.kind, "float");
       strictEqual(sdkType.encode, "seconds");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.wireType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("float seconds decorated scalar", async function () {
@@ -477,16 +474,13 @@ describe("typespec-client-generator-core: types", () => {
         }
       `
       );
-      const sdkType = getSdkTypeHelper(runner);
+      const nullableType = getSdkTypeHelper(runner);
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
       strictEqual(sdkType.kind, "utcDateTime");
       strictEqual(sdkType.wireType.kind, "int64");
       strictEqual(sdkType.encode, "unixTimestamp");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.wireType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("unixTimestamp array", async function () {
@@ -542,12 +536,11 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      const sdkType = getSdkTypeHelper(runner);
+      const nullableType = getSdkTypeHelper(runner);
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
       strictEqual(sdkType.kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("nullable with more types", async function () {
@@ -559,15 +552,14 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      const sdkType = getSdkTypeHelper(runner);
+      const nullableType = getSdkTypeHelper(runner);
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
       strictEqual(sdkType.kind, "union");
       strictEqual(sdkType.values.length, 2);
       strictEqual(sdkType.values[0].kind, "string");
       strictEqual(sdkType.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, true);
     });
 
     it("record with nullable", async function () {
@@ -582,12 +574,8 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
-      strictEqual(elementType.kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(elementType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
+      strictEqual(elementType.kind, "nullable");
+      strictEqual(elementType.type.kind, "float32");
     });
 
     it("record with nullable with more types", async function () {
@@ -602,15 +590,13 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "dict");
       const elementType = sdkType.valueType;
-      strictEqual(elementType.kind, "union");
-      strictEqual(elementType.values.length, 2);
-      strictEqual(elementType.values[0].kind, "string");
-      strictEqual(elementType.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(elementType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
+      strictEqual(elementType.kind, "nullable");
+
+      const elementTypeValueType = elementType.type;
+      strictEqual(elementTypeValueType.kind, "union");
+      strictEqual(elementTypeValueType.values.length, 2);
+      strictEqual(elementTypeValueType.values[0].kind, "string");
+      strictEqual(elementTypeValueType.values[1].kind, "float32");
     });
 
     it("array with nullable", async function () {
@@ -625,12 +611,8 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
       const elementType = sdkType.valueType;
-      strictEqual(elementType.kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(elementType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
+      strictEqual(elementType.kind, "nullable");
+      strictEqual(elementType.type.kind, "float32");
     });
 
     it("array with nullable with more types", async function () {
@@ -645,15 +627,12 @@ describe("typespec-client-generator-core: types", () => {
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
       const elementType = sdkType.valueType;
-      strictEqual(elementType.kind, "union");
-      strictEqual(elementType.values.length, 2);
-      strictEqual(elementType.values[0].kind, "string");
-      strictEqual(elementType.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(elementType.nullable, true);
-      const nameProp = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(nameProp.nullable, false);
-      strictEqual(sdkType.nullableValues, true);
+      strictEqual(elementType.kind, "nullable");
+      const elementTypeValueType = elementType.type;
+      strictEqual(elementTypeValueType.kind, "union");
+      strictEqual(elementTypeValueType.values.length, 2);
+      strictEqual(elementTypeValueType.values[0].kind, "string");
+      strictEqual(elementTypeValueType.values[1].kind, "float32");
     });
 
     it("additional property is nullable", async function () {
@@ -684,26 +663,26 @@ describe("typespec-client-generator-core: types", () => {
       const extendsType = models.find((x) => x.name === "TestExtends");
       ok(extendsType);
       strictEqual(extendsType.kind, "model");
-      strictEqual(extendsType.additionalProperties?.kind, "string");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(extendsType.additionalProperties?.nullable, true);
-      strictEqual(extendsType.additionalPropertiesNullable, true);
+      const additionalProperties = extendsType.additionalProperties;
+      ok(additionalProperties);
+      strictEqual(additionalProperties.kind, "nullable");
+      strictEqual(additionalProperties.type.kind, "string");
 
       const isType = models.find((x) => x.name === "TestIs");
       ok(isType);
       strictEqual(isType.kind, "model");
-      strictEqual(isType.additionalProperties?.kind, "string");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(isType.additionalProperties?.nullable, true);
-      strictEqual(isType.additionalPropertiesNullable, true);
+      const isTypeAdditionalProperties = isType.additionalProperties;
+      ok(isTypeAdditionalProperties);
+      strictEqual(isTypeAdditionalProperties.kind, "nullable");
+      strictEqual(isTypeAdditionalProperties.type.kind, "string");
 
       const spreadType = models.find((x) => x.name === "TestSpread");
       ok(spreadType);
       strictEqual(spreadType.kind, "model");
-      strictEqual(spreadType.additionalProperties?.kind, "string");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(spreadType.additionalProperties?.nullable, true);
-      strictEqual(spreadType.additionalPropertiesNullable, true);
+      const spreadTypeAdditionalProperties = spreadType.additionalProperties;
+      ok(spreadTypeAdditionalProperties);
+      strictEqual(spreadTypeAdditionalProperties.kind, "nullable");
+      strictEqual(spreadTypeAdditionalProperties.type.kind, "string");
     });
 
     it("additional property nullable with more types", async function () {
@@ -734,41 +713,51 @@ describe("typespec-client-generator-core: types", () => {
       const extendsType = models.find((x) => x.name === "TestExtends");
       ok(extendsType);
       strictEqual(extendsType.kind, "model");
-      strictEqual(extendsType.additionalProperties?.kind, "union");
-      strictEqual(extendsType.additionalProperties?.name, "TestExtendsAdditionalProperty");
-      strictEqual(extendsType.additionalProperties?.isGeneratedName, true);
-      strictEqual(extendsType.additionalProperties?.values.length, 2);
-      strictEqual(extendsType.additionalProperties?.values[0].kind, "string");
-      strictEqual(extendsType.additionalProperties?.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(extendsType.additionalProperties?.nullable, true);
-      strictEqual(extendsType.additionalPropertiesNullable, true);
+
+      const extendsTypeAdditionalProperties = extendsType.additionalProperties;
+      ok(extendsTypeAdditionalProperties);
+      strictEqual(extendsTypeAdditionalProperties.kind, "nullable");
+      const extendsAdPropUnderlyingType = extendsTypeAdditionalProperties.type;
+      strictEqual(extendsAdPropUnderlyingType.kind, "union");
+      strictEqual(extendsAdPropUnderlyingType.name, "TestExtendsAdditionalProperty");
+      strictEqual(extendsAdPropUnderlyingType.isGeneratedName, true);
+      strictEqual(extendsAdPropUnderlyingType.values.length, 2);
+      strictEqual(extendsAdPropUnderlyingType.values[0].kind, "string");
+      strictEqual(extendsAdPropUnderlyingType.values[1].kind, "float32");
 
       const isType = models.find((x) => x.name === "TestIs");
       ok(isType);
       strictEqual(isType.kind, "model");
-      strictEqual(isType.additionalProperties?.kind, "union");
-      strictEqual(isType.additionalProperties?.name, "TestIsAdditionalProperty");
-      strictEqual(isType.additionalProperties?.isGeneratedName, true);
-      strictEqual(isType.additionalProperties?.values.length, 2);
-      strictEqual(isType.additionalProperties?.values[0].kind, "string");
-      strictEqual(isType.additionalProperties?.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(isType.additionalProperties?.nullable, true);
-      strictEqual(isType.additionalPropertiesNullable, true);
+      const isTypeAdditionalProperties = isType.additionalProperties;
+      ok(isTypeAdditionalProperties);
+      strictEqual(isTypeAdditionalProperties.kind, "nullable");
+
+      const isTypeAdditionalPropertiesUnderlyingType = isTypeAdditionalProperties.type;
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.kind, "union");
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.name, "TestIsAdditionalProperty");
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.isGeneratedName, true);
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.values.length, 2);
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
+      strictEqual(isTypeAdditionalPropertiesUnderlyingType.values[1].kind, "float32");
 
       const spreadType = models.find((x) => x.name === "TestSpread");
       ok(spreadType);
       strictEqual(spreadType.kind, "model");
-      strictEqual(spreadType.additionalProperties?.kind, "union");
-      strictEqual(spreadType.additionalProperties?.name, "TestSpreadAdditionalProperty");
-      strictEqual(spreadType.additionalProperties?.isGeneratedName, true);
-      strictEqual(spreadType.additionalProperties?.values.length, 2);
-      strictEqual(spreadType.additionalProperties?.values[0].kind, "string");
-      strictEqual(spreadType.additionalProperties?.values[1].kind, "float32");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(spreadType.additionalProperties?.nullable, true);
-      strictEqual(spreadType.additionalPropertiesNullable, true);
+
+      const spreadTypeAdditionalProperties = spreadType.additionalProperties;
+      ok(spreadTypeAdditionalProperties);
+      strictEqual(spreadTypeAdditionalProperties.kind, "nullable");
+
+      const spreadTypeAdditionalPropertiesUnderlyingType = spreadTypeAdditionalProperties.type;
+      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.kind, "union");
+      strictEqual(
+        spreadTypeAdditionalPropertiesUnderlyingType.name,
+        "TestSpreadAdditionalProperty"
+      );
+      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.isGeneratedName, true);
+      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values.length, 2);
+      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[0].kind, "string");
+      strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.values[1].kind, "float32");
     });
 
     it("model with simple union property", async function () {
@@ -861,14 +850,35 @@ describe("typespec-client-generator-core: types", () => {
       }
       `);
 
-      const sdkType = getSdkTypeHelper(runner);
+      const nullableType = getSdkTypeHelper(runner);
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
       strictEqual(sdkType.kind, "enum");
       strictEqual(sdkType.isUnionAsEnum, false);
       strictEqual(sdkType.name, "PetKind");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
-      const pet = runner.context.experimental_sdkPackage.models[0].properties[0];
-      strictEqual(pet.nullable, true);
+
+      const values = sdkType.values;
+      strictEqual(values.length, 3);
+    });
+
+    it("model with nullable union as enum", async function () {
+      await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Home {
+        pet: "dog" | "cat" | "bird" | string | null;
+      }
+      `);
+
+      const nullableType = getSdkTypeHelper(runner);
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
+      strictEqual(sdkType.kind, "enum");
+      strictEqual(sdkType.isUnionAsEnum, true);
+      strictEqual(sdkType.name, "HomePet");
+
       const values = sdkType.values;
       strictEqual(values.length, 3);
     });
@@ -892,12 +902,12 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 2);
       const model = models.find((x) => x.kind === "model" && x.name === "Test");
       ok(model);
-      const sdkType = model.properties[0].type;
+      const nullableType = model.properties[0].type;
+      strictEqual(nullableType.kind, "nullable");
+
+      const sdkType = nullableType.type;
       strictEqual(sdkType.kind, "model");
       strictEqual(sdkType.name, "PropertyModel");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(sdkType.nullable, true);
-      strictEqual(model.properties[0].nullable, true);
     });
 
     it("mix types", async function () {
@@ -928,9 +938,6 @@ describe("typespec-client-generator-core: types", () => {
       const nullableModel = models.find((x) => x.kind === "model" && x.name === "TestNullable");
       ok(nullableModel);
       strictEqual(model.properties[0].type.kind, "union");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(model.properties[0].type.nullable, false);
-      strictEqual(model.properties[0].nullable, false);
       const unionType = model.properties[0].type;
       strictEqual(unionType.kind, "union");
       for (const v of unionType.values) {
@@ -940,11 +947,16 @@ describe("typespec-client-generator-core: types", () => {
           strictEqual(v.kind, "constant");
         }
       }
-      strictEqual(nullableModel.properties[0].type.kind, "union");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(nullableModel.properties[0].type.nullable, true);
-      strictEqual(nullableModel.properties[0].nullable, true);
-      for (const v of nullableModel.properties[0].type.values) {
+      const nullableProp = nullableModel.properties[0];
+      strictEqual(nullableProp.type.kind, "nullable");
+      strictEqual(nullableProp.type.type.kind, "union");
+      strictEqual(nullableProp.type.type.values.length, 3);
+
+      // now check without null with help of helper function
+      strictEqual(nullableModel.properties[0].type.kind, "nullable");
+      const sdkType = nullableProp.type.type;
+      strictEqual(sdkType.kind, "union");
+      for (const v of sdkType.values) {
         if (v.kind === "model") {
           strictEqual(v.name, "ModelType");
         } else {
@@ -1005,12 +1017,12 @@ describe("typespec-client-generator-core: types", () => {
         string,
       }
 
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
       model Foo {
         prop: string;
       }
 
-      @usage(Usage.input | Usage.output)
-      @access(Access.public)
       union NullableUnion {
         Foo,
         null
@@ -1521,11 +1533,12 @@ describe("typespec-client-generator-core: types", () => {
       `
       )) as { Test: Union };
 
-      const enumType = getClientType(runner.context, Test);
+      const nullableType = getClientType(runner.context, Test);
+      strictEqual(nullableType.kind, "nullable");
+
+      const enumType = nullableType.type;
       strictEqual(enumType.kind, "enum");
       strictEqual(enumType.name, "Test");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(enumType.nullable, true);
       strictEqual(enumType.isUnionAsEnum, true);
       const values = enumType.values;
       strictEqual(values.length, 4);
@@ -1572,11 +1585,13 @@ describe("typespec-client-generator-core: types", () => {
       `
       )) as { Test: Union };
 
-      const unionType = getClientType(runner.context, Test);
+      const nullableType = getClientType(runner.context, Test);
+      strictEqual(nullableType.kind, "nullable");
+      const unionType = nullableType.type;
+
       strictEqual(unionType.kind, "union");
       strictEqual(unionType.name, "Test");
-      // eslint-disable-next-line deprecation/deprecation
-      strictEqual(unionType.nullable, true);
+
       const values = unionType.values;
       strictEqual(values.length, 3);
       const a = values[0] as SdkEnumType;
@@ -1631,7 +1646,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enumType.name, "TestColor");
       strictEqual(enumType.isGeneratedName, true);
       strictEqual(enumType.isUnionAsEnum, true);
-      strictEqual(enumType.crossLanguageDefinitionId, "TestColor");
+      // no cross language def id bc it's not a defined object in tsp
+      strictEqual(enumType.crossLanguageDefinitionId, "Test.color.anonymous");
       const values = enumType.values;
       strictEqual(values[0].name, "left");
       strictEqual(values[0].value, "left");
@@ -1710,6 +1726,94 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(enums.length, 1);
       strictEqual(enums[0].name, "Versions");
       strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
+    });
+
+    it("versioned enums with all", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "all",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
+    });
+
+    it("versioned enums with latest", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "latest",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1", "v2"]
+      );
+    });
+
+    it("versioned enums with specific version", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "v1",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          v2,
+        }
+      `
+      );
+      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+      strictEqual(enums.length, 1);
+      strictEqual(enums[0].name, "Versions");
+      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+      deepStrictEqual(
+        enums[0].values.map((x) => x.value),
+        ["v1"]
+      );
     });
 
     it("usage propagation for enum value", async () => {
@@ -1839,7 +1943,6 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "encodedWireName"
       );
       ok(jsonEncodedProp);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
       strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
@@ -1848,7 +1951,6 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "realWireName"
       );
       ok(jsonProjectedProp);
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(jsonProjectedProp.nameInClient, "jsonProjectedName");
       strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
@@ -1857,7 +1959,6 @@ describe("typespec-client-generator-core: types", () => {
         (x) => x.kind === "property" && x.serializedName === "regular"
       );
       ok(regularProp);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(regularProp.nameInClient, "regular");
       strictEqual(regularProp.name, "regular");
     });
@@ -1941,6 +2042,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "string");
       strictEqual(sdkType.value, "json");
+      strictEqual(sdkType.name, "TestProp");
+      strictEqual(sdkType.isGeneratedName, true);
     });
     it("boolean", async function () {
       await runner.compileWithBuiltInService(`
@@ -1955,6 +2058,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "boolean");
       strictEqual(sdkType.value, true);
+      strictEqual(sdkType.name, "TestProp");
+      strictEqual(sdkType.isGeneratedName, true);
     });
     it("number", async function () {
       await runner.compileWithBuiltInService(`
@@ -1969,6 +2074,8 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(sdkType.kind, "constant");
       strictEqual(sdkType.valueType.kind, "int32");
       strictEqual(sdkType.value, 4);
+      strictEqual(sdkType.name, "TestProp");
+      strictEqual(sdkType.isGeneratedName, true);
     });
   });
   describe("SdkModelType", () => {
@@ -2103,7 +2210,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(recursiveModel.properties.length, 1);
       const prop = recursiveModel.properties[0];
       strictEqual(prop.kind, "property");
-      //eslint-disable-next-line deprecation/deprecation
       strictEqual(prop.nameInClient, "prop");
       strictEqual(prop.name, "prop");
       strictEqual(prop.type.kind, "model");
@@ -2147,6 +2253,7 @@ describe("typespec-client-generator-core: types", () => {
       const kindProperty = fish.properties[0];
       ok(kindProperty);
       strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.description, "Discriminator property for Fish.");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -2158,6 +2265,7 @@ describe("typespec-client-generator-core: types", () => {
       const sharktypeProperty = shark.properties[0];
       ok(sharktypeProperty);
       strictEqual(sharktypeProperty.name, "sharktype");
+      strictEqual(sharktypeProperty.description, "Discriminator property for Shark.");
       strictEqual(sharktypeProperty.kind, "property");
       strictEqual(sharktypeProperty.discriminator, true);
       strictEqual(sharktypeProperty.type.kind, "string");
@@ -2188,6 +2296,7 @@ describe("typespec-client-generator-core: types", () => {
       const kindProperty = fish.properties[0];
       ok(kindProperty);
       strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.description, "Discriminator property for Fish.");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -2219,6 +2328,7 @@ describe("typespec-client-generator-core: types", () => {
       const kindProperty = fish.properties[0];
       ok(kindProperty);
       strictEqual(kindProperty.name, "kind");
+      strictEqual(kindProperty.description, "Discriminator property for Fish.");
       strictEqual(kindProperty.kind, "property");
       strictEqual(kindProperty.discriminator, true);
       strictEqual(kindProperty.type.kind, "string");
@@ -2364,6 +2474,30 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(kindProperty.type, kind);
     });
 
+    it("request/response header with enum value", async () => {
+      await runner.compileWithBuiltInService(`
+      model RepeatableResponse {
+        @visibility("read")
+        @header("Repeatability-Result")
+        repeatabilityResult?: "accepted" | "rejected";
+      }
+      op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
+      `);
+      const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 0);
+      strictEqual(sdkPackage.enums.length, 2);
+      strictEqual(sdkPackage.enums[0].name, "FooRequestRepeatabilityResult");
+      strictEqual(sdkPackage.enums[1].name, "FooResponseRepeatabilityResult");
+      deepStrictEqual(
+        sdkPackage.enums[0].values.map((x) => x.name),
+        ["accepted", "rejected"]
+      );
+      deepStrictEqual(
+        sdkPackage.enums[1].values.map((x) => x.name),
+        ["accepted", "rejected"]
+      );
+    });
+
     it("enum discriminator model without base discriminator property", async () => {
       await runner.compileWithBuiltInService(`
       enum DogKind {
@@ -2404,6 +2538,7 @@ describe("typespec-client-generator-core: types", () => {
       const dogKindProperty = dog.properties[0];
       ok(dogKindProperty);
       strictEqual(dogKindProperty.type, dogKind);
+      strictEqual(dogKindProperty.description, "Discriminator property for Dog.");
     });
 
     it("discriminator", async () => {
@@ -2469,6 +2604,63 @@ describe("typespec-client-generator-core: types", () => {
 
       model Salmon extends Fish {
         kind: KindType.salmon;
+        norweigan: boolean;
+      }
+
+      @get
+      op getModel(): Fish;
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 3);
+      const fish = models.find((x) => x.name === "Fish");
+      ok(fish);
+      let kindTypeProperty = fish.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enum");
+      strictEqual(kindTypeProperty.type.isUnionAsEnum, true);
+      strictEqual(fish.discriminatorProperty, kindTypeProperty);
+      const shark = models.find((x) => x.name === "Shark");
+      ok(shark);
+      strictEqual(shark.discriminatorValue, "shark");
+      kindTypeProperty = shark.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      const salmon = models.find((x) => x.name === "Salmon");
+      ok(salmon);
+      kindTypeProperty = salmon.properties.find((x) => x.name === "kind");
+      ok(kindTypeProperty);
+      strictEqual(kindTypeProperty.type.kind, "enumvalue");
+      strictEqual(salmon.discriminatorValue, "salmon");
+
+      strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
+      const kindType = runner.context.experimental_sdkPackage.enums.find(
+        (x) => x.name === "KindType"
+      );
+      ok(kindType);
+      strictEqual(kindType.isFixed, false);
+    });
+
+    it("string discriminator map to enum value", async () => {
+      await runner.compileWithBuiltInService(`
+      union KindType {
+        string,
+        shark: "shark",
+        salmon: "salmon"
+      };
+
+      @discriminator("kind")
+      model Fish {
+        kind: KindType;
+        age: int32;
+      }
+
+      model Shark extends Fish {
+        kind: "shark";
+        hasFin: boolean;
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
         norweigan: boolean;
       }
 
@@ -2723,6 +2915,32 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.filter((x) => x.usage === UsageFlags.None).length, 0);
     });
 
+    it("readonly usage", async () => {
+      await runner.compileWithBuiltInService(`
+        model ResultModel {
+          name: string;
+        }
+      
+        model RoundTripModel {
+          @visibility("read")
+          result: ResultModel;
+        }
+      
+        @route("/modelInReadOnlyProperty")
+        @put
+        op modelInReadOnlyProperty(@body body: RoundTripModel): {
+          @body body: RoundTripModel;
+        };
+      `);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 2);
+      strictEqual(
+        models.find((x) => x.name === "RoundTripModel")?.usage,
+        UsageFlags.Input | UsageFlags.Output
+      );
+      strictEqual(models.find((x) => x.name === "ResultModel")?.usage, UsageFlags.Output);
+    });
+
     it("usage propagation", async () => {
       await runner.compileWithBuiltInService(`
         @discriminator("kind")
@@ -2928,7 +3146,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const Test3 = models.find((x) => x.name === "Test3");
       ok(Test3);
-      strictEqual(Test3.access, undefined);
+      strictEqual(Test3.access, "public");
 
       const Test4 = models.find((x) => x.name === "Test4");
       ok(Test4);
@@ -2940,7 +3158,7 @@ describe("typespec-client-generator-core: types", () => {
 
       const Test6 = models.find((x) => x.name === "Test6");
       ok(Test6);
-      strictEqual(Test6.access, undefined);
+      strictEqual(Test6.access, "public");
     });
     it("additionalProperties of same type", async () => {
       await runner.compileWithBuiltInService(`
@@ -3226,12 +3444,10 @@ describe("typespec-client-generator-core: types", () => {
       const models = getAllModels(runner.context);
       strictEqual(models.length, 1);
       strictEqual(models[0].kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(models[0].isError, true);
       const rawModel = models[0].__raw;
       ok(rawModel);
       strictEqual(rawModel.kind, "Model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(isErrorOrChildOfError(runner.context, rawModel), true);
     });
 
@@ -3267,7 +3483,6 @@ describe("typespec-client-generator-core: types", () => {
       `);
       const models = getAllModels(runner.context);
       strictEqual(models.length, 5);
-      // eslint-disable-next-line deprecation/deprecation
       const errorModels = models.filter((x) => x.kind === "model" && x.isError);
       deepStrictEqual(errorModels.map((x) => x.name).sort(), [
         "ApiError",
@@ -3275,12 +3490,31 @@ describe("typespec-client-generator-core: types", () => {
         "FourHundredError",
         "FourZeroFourError",
       ]);
-      // eslint-disable-next-line deprecation/deprecation
       const validModel = models.filter((x) => x.kind === "model" && !x.isError);
       deepStrictEqual(
         validModel.map((x) => x.name),
         ["ValidResponse"]
       );
+    });
+
+    it("never or void property", async () => {
+      await runner.compileAndDiagnose(`
+        @service({})
+        @test namespace MyService {
+          @test
+          @usage(Usage.input | Usage.output)
+          @access(Access.public)
+          model Test{
+            prop1: never;
+            prop2: void;
+          }
+        }
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      strictEqual(models[0].name, "Test");
+      strictEqual(models[0].properties.length, 0);
     });
   });
 
@@ -3328,7 +3562,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(models.length, 1);
       const model = models[0];
       strictEqual(model.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(model.isFormDataType, true);
       ok((model.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(model.name, "MultiPartRequest");
@@ -3380,7 +3613,6 @@ describe("typespec-client-generator-core: types", () => {
       const modelA = models.find((x) => x.name === "A");
       ok(modelA);
       strictEqual(modelA.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelA.isFormDataType, true);
       ok((modelA.usage & UsageFlags.MultipartFormData) > 0);
       strictEqual(modelA.properties.length, 1);
@@ -3391,7 +3623,6 @@ describe("typespec-client-generator-core: types", () => {
       const modelB = models.find((x) => x.name === "B");
       ok(modelB);
       strictEqual(modelB.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(modelB.isFormDataType, false);
       ok((modelB.usage & UsageFlags.MultipartFormData) === 0);
       strictEqual(modelB.properties.length, 1);
@@ -3479,14 +3710,12 @@ describe("typespec-client-generator-core: types", () => {
 
       const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
       ok(pictureWrapper);
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(pictureWrapper.isFormDataType, true);
       ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
       const errorResponse = models.find((x) => x.name === "ErrorResponse");
       ok(errorResponse);
       strictEqual(errorResponse.kind, "model");
-      // eslint-disable-next-line deprecation/deprecation
       strictEqual(errorResponse.isFormDataType, false);
       ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
     });

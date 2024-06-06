@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-client-generator-core",
-  "version": "0.41.8",
+  "version": "0.42.3",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Data Plane Generation library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -43,6 +43,7 @@
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/libraries/typespec-client-generator-core/reference"
@@ -74,11 +75,11 @@
     "@typespec/rest": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@typespec/versioning": "workspace:~",
-    "@vitest/coverage-v8": "^1.5.0",
-    "@vitest/ui": "^1.5.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/ui": "^1.6.0",
     "c8": "^9.1.0",
-    "rimraf": "~5.0.5",
+    "rimraf": "~5.0.7",
     "typescript": "~5.4.5",
-    "vitest": "^1.5.0"
+    "vitest": "^1.6.0"
   }
 }

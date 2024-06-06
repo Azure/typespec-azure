@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest-canonical",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting canonical swagger",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -53,10 +53,10 @@
     "!dist/test/**"
   ],
   "peerDependencies": {
+    "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@typespec/versioning": "workspace:~",
-    "@azure-tools/typespec-autorest": "workspace:~"
+    "@typespec/versioning": "workspace:~"
   },
   "devDependencies": {
     "@azure-tools/typespec-autorest": "workspace:~",
@@ -70,12 +70,12 @@
     "@typespec/rest": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@typespec/versioning": "workspace:~",
-    "@vitest/coverage-v8": "^1.5.0",
-    "@vitest/ui": "^1.5.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/ui": "^1.6.0",
     "c8": "^9.1.0",
     "change-case": "~5.4.4",
-    "rimraf": "~5.0.5",
+    "rimraf": "~5.0.7",
     "typescript": "~5.4.5",
-    "vitest": "^1.5.0"
+    "vitest": "^1.6.0"
   }
 }

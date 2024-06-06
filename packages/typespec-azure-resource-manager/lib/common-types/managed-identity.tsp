@@ -2,15 +2,14 @@ using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
 
+#deprecated "Please change ManagedIdentityProperties to ManagedServiceIdentity."
+alias ManagedIdentityProperties = ManagedServiceIdentity;
 /**
  * The properties of the managed service identities assigned to this resource.
  */
 @armCommonDefinition(
   "ManagedServiceIdentity",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "managedidentity.json"
 )
 @armCommonDefinition(
@@ -18,8 +17,7 @@ namespace Azure.ResourceManager.Foundations;
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "managedidentity.json"
 )
-@doc("The properties of the managed service identities assigned to this resource.")
-model ManagedIdentityProperties {
+model ManagedServiceIdentity {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
@@ -35,15 +33,28 @@ model ManagedIdentityProperties {
   userAssignedIdentities?: Record<UserAssignedIdentity>;
 }
 
+/** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.", */
+#deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
+@armCommonDefinition(
+  "UserAssignedIdentities",
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  "managedidentity.json"
+)
+@armCommonDefinition(
+  "UserAssignedIdentities",
+  Azure.ResourceManager.CommonTypes.Versions.v5,
+  "managedidentity.json"
+)
+model UserAssignedIdentities is Record<UserAssignedIdentity>;
+
+#deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
+alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 /**
  * The properties of the service-assigned identity associated with this resource.
  */
 @armCommonDefinition(
   "SystemAssignedServiceIdentity",
-  {
-    version: Azure.ResourceManager.CommonTypes.Versions.v4,
-    isDefault: true,
-  },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "managedidentity.json"
 )
 @armCommonDefinition(
@@ -51,8 +62,7 @@ model ManagedIdentityProperties {
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "managedidentity.json"
 )
-@doc("The properties of the service-assigned identity associated with this resource.")
-model ManagedSystemIdentityProperties {
+model SystemAssignedServiceIdentity {
   @doc("The Active Directory tenant id of the principal.")
   @visibility("read")
   tenantId?: string;
@@ -71,6 +81,16 @@ alias ManagedIdentityType = ManagedServiceIdentityType;
 /**
  * A managed identity assigned by the user.
  */
+@armCommonDefinition(
+  "UserAssignedIdentity",
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  "managedidentity.json"
+)
+@armCommonDefinition(
+  "UserAssignedIdentity",
+  Azure.ResourceManager.CommonTypes.Versions.v5,
+  "managedidentity.json"
+)
 @doc("A managed identity assigned by the user.")
 model UserAssignedIdentity {
   @doc("The active directory client identifier for this principal.")

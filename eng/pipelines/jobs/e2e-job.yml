@@ -24,4 +24,4 @@ jobs:
         displayName: Cadl Ranch e2e tests
 
       - script: pnpm test:e2e
-        displayName: UI Tests
+        displayName: E2E Tests
