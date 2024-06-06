@@ -4,6 +4,7 @@ import {
   Interface,
   Model,
   Namespace,
+  Numeric,
   NumericLiteral,
   Operation,
   Program,
@@ -11,6 +12,7 @@ import {
   StringLiteral,
   Type,
   Union,
+  Value,
   createDiagnosticCollector,
   getDeprecationDetails,
   getDoc,
@@ -242,6 +244,7 @@ interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
   deprecation?: string;
   kind: TKind;
+  decorators: Record<string, Array<any>>;
 }
 
 /**
@@ -257,7 +260,67 @@ export function getSdkTypeBaseHelper<TKind>(
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
+    decorators: getTypeDecorators(context, type),
   };
+}
+
+export function getTypeDecorators(context: TCGCContext, type: Type): Record<string, Array<any>> {
+  const retval: Record<string, Array<any>> = {};
+  if ("decorators" in type) {
+    for (const decorator of type.decorators) {
+      // only process explicitly defined decorators
+      if (decorator.definition) {
+        const decoratorName = `${decorator.definition?.namespace ? getNamespaceFullName(decorator.definition.namespace) + "." : ""}${decorator.definition?.name}`;
+        // white list filtering
+        if (!context.decoratorsWhiteList) {
+          continue;
+        }
+        let found = false;
+        for (const item of context.decoratorsWhiteList) {
+          if (decoratorName === item) {
+            found = true;
+            break;
+          }
+          const regex = new RegExp(item);
+          if (regex.test(decoratorName)) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          continue;
+        }
+        retval[decoratorName] = [];
+        for (const arg of decorator.args) {
+          retval[decoratorName].push(getDecoratorArgValue(arg.jsValue));
+        }
+      }
+    }
+  }
+  return retval;
+}
+
+function getDecoratorArgValue(
+  arg:
+    | Type
+    | Record<string, unknown>
+    | Value
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | Numeric
+    | null
+): any {
+  if (typeof arg === "object" && arg !== null && "kind" in arg) {
+    if (arg.kind === "EnumMember") {
+      return arg.value ?? arg.name;
+    }
+    if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
+      return arg.value;
+    }
+  }
+  return arg;
 }
 
 export function intOrFloat(value: number): "int32" | "float32" {
@@ -325,6 +388,7 @@ export interface TCGCContext {
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   originalProgram: Program;
+  decoratorsWhiteList?: string[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -426,9 +490,10 @@ export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
 }
 
-export function getAnyType(): SdkBuiltInType {
+export function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
   return {
     kind: "any",
     encode: "string",
+    decorators: getTypeDecorators(context, type),
   };
 }

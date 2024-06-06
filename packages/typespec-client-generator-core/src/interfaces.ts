@@ -36,6 +36,7 @@ export interface SdkEmitterOptions {
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
+  "decorators-white-list"?: string[];
 }
 
 export interface SdkClient {
@@ -54,7 +55,8 @@ export interface SdkInitializationType extends SdkModelType {
   properties: SdkParameter[];
 }
 
-export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   kind: "client";
   name: string;
   description?: string;
@@ -77,7 +79,11 @@ export interface SdkOperationGroup {
   service: Namespace;
 }
 
-interface SdkTypeBase {
+interface DecoratedType {
+  decorators: Record<string, Array<any>>;
+}
+
+interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
@@ -318,7 +324,7 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase {
+export interface SdkModelPropertyTypeBase extends DecoratedType {
   __raw?: ModelProperty;
   type: SdkType;
   /**
@@ -461,7 +467,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase {
+interface SdkMethodBase extends DecoratedType {
   __raw?: Operation;
   name: string;
   access: AccessFlags;

@@ -83,6 +83,7 @@ import {
   getNonNullOptions,
   getNullOption,
   getSdkTypeBaseHelper,
+  getTypeDecorators,
   intOrFloat,
   isAzureCoreModel,
   isMultipartFormData,
@@ -231,7 +232,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   diagnostics.add(
     createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
   );
-  return diagnostics.wrap(getAnyType());
+  return diagnostics.wrap(getAnyType(context, type));
 }
 
 export function getSdkBuiltInType(
@@ -336,7 +337,7 @@ export function getSdkUnionWithDiagnostics(
 
   if (nonNullOptions.length === 0) {
     diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
-    return diagnostics.wrap(getAnyType());
+    return diagnostics.wrap(getAnyType(context, type));
   }
 
   if (nonNullOptions.length === 1) {
@@ -488,6 +489,7 @@ function addDiscriminatorToModelType(
       discriminatorType = {
         kind: "string",
         encode: "string",
+        decorators: {},
       };
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
@@ -511,6 +513,7 @@ function addDiscriminatorToModelType(
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
+      decorators: {},
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -694,7 +697,7 @@ function getSdkUnionEnumValues(
     const docWrapper = getDocHelper(context, member.type);
     const name = getLibraryName(context, member.type);
     values.push({
-      kind: "enumvalue",
+      ...getSdkTypeBaseHelper(context, member.type, "enumvalue"),
       name: name ? name : `${member.value}`,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -867,7 +870,7 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkEnumValue(context, enumType, type);
       break;
     default:
-      retval = getAnyType();
+      retval = getAnyType(context, type);
       diagnostics.add(
         createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
       );
@@ -926,6 +929,7 @@ function getSdkCredentialType(
         __raw: client.service,
         kind: "credential",
         scheme: scheme,
+        decorators: {},
       });
     }
   }
@@ -936,6 +940,7 @@ function getSdkCredentialType(
       values: credentialTypes,
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
+      decorators: {},
     };
   }
   return credentialTypes[0];
@@ -960,6 +965,7 @@ export function getSdkCredentialParameter(
     optional: false,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
+    decorators: {},
   };
 }
 
@@ -996,6 +1002,7 @@ export function getSdkModelPropertyTypeBase(
       operation ? getLocationOfOperation(operation) : undefined
     ),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+    decorators: getTypeDecorators(context, type),
   });
 }
 

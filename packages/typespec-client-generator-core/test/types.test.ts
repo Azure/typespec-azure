@@ -3824,6 +3824,69 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(test.type.values[1].kind, "string");
     });
   });
+  describe("general decorators list", () => {
+    it("no arg", async function () {
+      runner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+        "decorators-white-list": ["TypeSpec.@key"],
+      });
+
+      await runner.compileWithBuiltInService(`
+        model Blob {
+          @key id: string;
+        }
+
+        op test(): Blob;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      strictEqual(models[0].properties[0].decorators["TypeSpec.@key"].length, 0);
+    });
+
+    it("basic arg type", async function () {
+      runner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+        "decorators-white-list": ["Azure.ClientGenerator.Core.@clientName"],
+      });
+
+      await runner.compileWithBuiltInService(`
+        model Blob {
+          @clientName("ID")
+          id: string;
+        }
+
+        op test(): Blob;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(
+        models[0].properties[0].decorators["Azure.ClientGenerator.Core.@clientName"],
+        ["ID"]
+      );
+    });
+
+    it("enum member arg type", async function () {
+      runner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+        "decorators-white-list": ["TypeSpec.@encode"],
+      });
+
+      await runner.compileWithBuiltInService(`
+        model Blob {
+          @encode(BytesKnownEncoding.base64url)
+          value: bytes;
+        }
+
+        op test(): Blob;
+      `);
+
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].properties[0].decorators["TypeSpec.@encode"], ["base64url"]);
+    });
+  });
 });
 
 function getSdkBodyModelPropertyTypeHelper(runner: SdkTestRunner): SdkBodyModelPropertyType {
