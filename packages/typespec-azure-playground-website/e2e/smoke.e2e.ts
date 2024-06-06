@@ -9,7 +9,7 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     await page.goto(host);
     const samplesDropDown = page.locator("_react=SamplesDropdown").locator("select");
     await samplesDropDown.selectOption({ label: "Azure Resource Manager framework" });
-    const outputContainer = page.locator("_react=OutputContent");
+    const outputContainer = page.locator("_react=FileOutput");
     await expect(outputContainer).toContainText(`"title": "ContosoProviderHubClient"`);
   });
 });
