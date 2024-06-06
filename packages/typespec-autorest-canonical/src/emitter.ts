@@ -84,7 +84,7 @@ async function emitAllServices(
     validateUnsupportedVersioning(program, service.type);
     const context: AutorestEmitterContext = {
       program,
-      outputFile: resolveOutputFile(service, services.length > 1, options),
+      outputFile: resolveOutputFile(service, services.length > 1, options, canonicalVersion),
       service,
       version: canonicalVersion,
       tcgcSdkContext,
@@ -144,11 +144,6 @@ function resolveOutputFile(
       multipleServices || azureResourceProviderFolder
         ? getNamespaceFullName(service.type)
         : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
     version,
   });
 
