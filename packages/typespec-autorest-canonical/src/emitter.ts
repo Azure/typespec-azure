@@ -84,7 +84,7 @@ async function emitAllServices(
     validateUnsupportedVersioning(program, service.type);
     const context: AutorestEmitterContext = {
       program,
-      outputFile: resolveOutputFile(service, services.length > 1, options, canonicalVersion),
+      outputFile: resolveOutputFile(service, services.length > 1, options),
       service,
       version: canonicalVersion,
       tcgcSdkContext,
@@ -134,8 +134,7 @@ async function emitAllServices(
 function resolveOutputFile(
   service: Service,
   multipleServices: boolean,
-  options: ResolvedAutorestCanonicalEmitterOptions,
-  version?: string
+  options: ResolvedAutorestCanonicalEmitterOptions
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   const interpolated = interpolatePath(options.outputFile, {
@@ -144,7 +143,7 @@ function resolveOutputFile(
       multipleServices || azureResourceProviderFolder
         ? getNamespaceFullName(service.type)
         : undefined,
-    version,
+    version: canonicalVersion,
   });
 
   return resolvePath(options.outputDir, interpolated);
