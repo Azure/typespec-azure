@@ -116,8 +116,10 @@ describe("typespec-autorest: Long-running Operations", () => {
         get is ArmResourceRead<Widget>;
         @Azure.Core.useFinalStateVia("azure-async-operation")
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
-        update is ArmResourcePatchSync<Widget, WidgetProperties>;
-        delete is ArmResourceDeleteSync<Widget>;
+        update is ArmResourcePatchAsync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+        restart is ArmResourceActionAsync<Widget, void, never>;
+        munge is ArmResourceActionAsync<Widget, void, Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
