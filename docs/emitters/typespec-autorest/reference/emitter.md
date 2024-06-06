@@ -119,3 +119,9 @@ This extension is meant for debugging and should not be depended on.
 **Type:** `boolean`
 
 Create read-only property schema for lro status
+
+### `suppress-lro-options`
+
+**Type:** `boolean`
+
+Disable emitting x-ms-long-running-operation-options for lro resolution
