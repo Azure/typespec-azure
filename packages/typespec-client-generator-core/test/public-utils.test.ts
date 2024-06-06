@@ -1734,8 +1734,8 @@ describe("typespec-client-generator-core: public-utils", () => {
         });
         await runnerWithCore.compile(lroCode);
         const models = runnerWithCore.context.experimental_sdkPackage.models;
-        strictEqual(models.length, 2);
-        deepStrictEqual(models.map((x) => x.name).sort(), ["ExportedUser", "User"].sort());
+        strictEqual(models.length, 1);
+        deepStrictEqual(models[0].name, "ExportedUser");
       });
       it("filter-out-core-models false", async () => {
         const runnerWithCore = await createSdkTestRunner({
@@ -1746,7 +1746,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runnerWithCore.compile(lroCode);
         runnerWithCore.context.filterOutCoreModels = false;
         const models = getAllModels(runnerWithCore.context);
-        strictEqual(models.length, 9);
+        strictEqual(models.length, 8);
         // there should only be one non-core model
         deepStrictEqual(
           models.map((x) => x.name).sort(),
@@ -1758,7 +1758,6 @@ describe("typespec-client-generator-core: public-utils", () => {
             "ExportedUser",
             "ErrorResponse",
             "OperationStatusExportedUserError",
-            "User",
             "Versions",
           ].sort()
         );
