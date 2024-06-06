@@ -205,3 +205,6 @@ docs/**/js-api/
 
 # vitest temporary files
 **/vitest.config.ts.timestamp*
+
+# Playwright temp file
+.last_run.json
