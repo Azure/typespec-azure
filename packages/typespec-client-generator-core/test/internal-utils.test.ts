@@ -51,4 +51,17 @@ describe("typespec-client-generator-core: internal-utils", () => {
       strictEqual(docHelper.details, "This is a description");
     });
   });
+  describe("parseEmitterName", () => {
+    it("@azure-tools/typespec-{language}", async () => {
+      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+      await runner.compile("");
+      strictEqual(runner.context.emitterName, "csharp");
+    });
+
+    it("@typespec/{protocol}-{client|server}-{language}-generator", async () => {
+      const runner = await createSdkTestRunner({ emitterName: "@typespec/http-client-csharp" });
+      await runner.compile("");
+      strictEqual(runner.context.emitterName, "csharp");
+    });
+  });
 });

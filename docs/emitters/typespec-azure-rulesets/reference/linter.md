@@ -13,13 +13,14 @@ Add the following in `tspconfig.yaml`:
 ```yaml
 linter:
   extends:
-    - "@azure-tools/typespec-azure-rulesets/data-plane"
+    - "@azure-tools/typespec-azure-rulesets/all"
 ```
 
 ## RuleSets
 
 Available ruleSets:
 
+- `@azure-tools/typespec-azure-rulesets/all`
 - `@azure-tools/typespec-azure-rulesets/data-plane`
 - `@azure-tools/typespec-azure-rulesets/resource-manager`
 
