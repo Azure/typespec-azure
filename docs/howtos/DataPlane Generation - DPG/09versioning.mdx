@@ -14,8 +14,10 @@ If there is just one api version in the spec, we will generate the api surface a
 
 ```typespec
 import "@typespec/versioning";
+import "@typespec/http";
 
 using TypeSpec.Versioning;
+using TypeSpec.Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -29,7 +31,7 @@ model StableModel {
   stableFeature: string;
 }
 
-op stableFunctionality(...StableModel): void;
+op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </TabItem>
@@ -138,8 +140,10 @@ For the below example, all languages will generate the api surface of default ve
 
 ```typespec
 import "@typespec/versioning";
+import "@typespec/http";
 
 using TypeSpec.Versioning;
+using TypeSpec.Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -160,9 +164,9 @@ model StableModel {
 
 @added(Versions.v2023_11_01_preview)
 @removed(Versions.v2023_11_01)
-op previewFunctionality(...PreviewModel): void;
+op previewFunctionality(@body previewModel: PreviewModel): void;
 
-op stableFunctionality(...StableModel): void;
+op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </TabItem>
@@ -263,8 +267,10 @@ In this example, we are going to override to return the preview api surface area
 
 ```typespec
 import "@typespec/versioning";
+import "@typespec/http";
 
 using TypeSpec.Versioning;
+using TypeSpec.Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -285,9 +291,9 @@ model StableModel {
 
 @added(Versions.v2023_11_01_preview)
 @removed(Versions.v2023_11_01)
-op previewFunctionality(...PreviewModel): void;
+op previewFunctionality(@body previewModel: PreviewModel): void;
 
-op stableFunctionality(...StableModel): void;
+op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </TabItem>
@@ -407,8 +413,10 @@ You can also override the signature to return the combined api surface area of a
 
 ```typespec
 import "@typespec/versioning";
+import "@typespec/http";
 
 using TypeSpec.Versioning;
+using TypeSpec.Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -429,9 +437,9 @@ model StableModel {
 
 @added(Versions.v2023_11_01_preview)
 @removed(Versions.v2023_11_01)
-op previewFunctionality(...PreviewModel): void;
+op previewFunctionality(@body previewModel: PreviewModel): void;
 
-op stableFunctionality(...StableModel): void;
+op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </TabItem>
