@@ -63,6 +63,7 @@ words:
   - oncophenotype
   - PAYG
   - prismjs
+  - pytest
   - psscriptanalyzer
   - qnas
   - regionality
@@ -73,3 +74,5 @@ words:
   - tcgc
   - userrp
   - WINDOWSVMIMAGE
+  - contosowidgetmanager
+  - locationyaml

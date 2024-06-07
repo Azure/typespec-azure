@@ -1735,7 +1735,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runnerWithCore.compile(lroCode);
         // TODO: need to wait core template update
         // const models = runnerWithCore.context.experimental_sdkPackage.models;
-        // strictEqual(models.length, 2);
+        // strictEqual(models.length, 1);
         // deepStrictEqual(models.map((x) => x.name).sort(), ["ExportedUser", "User"].sort());
       });
       it("filter-out-core-models false", async () => {
@@ -1748,18 +1748,18 @@ describe("typespec-client-generator-core: public-utils", () => {
         runnerWithCore.context.filterOutCoreModels = false;
         const models = getAllModels(runnerWithCore.context);
         strictEqual(models.length, 8);
-        // there should only be one non-core model
         // TODO: need to wait core template fix
+        // there should only be one non-core model
         // deepStrictEqual(
         //   models.map((x) => x.name).sort(),
         //   [
+        //     "ResourceOperationStatusUserExportedUserError",
         //     "OperationState",
         //     "Error",
         //     "InnerError",
         //     "ExportedUser",
         //     "ErrorResponse",
         //     "OperationStatusExportedUserError",
-        //     "User",
         //     "Versions",
         //   ].sort()
         // );

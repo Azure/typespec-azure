@@ -265,13 +265,13 @@ export function intOrFloat(value: number): "int32" | "float32" {
 }
 
 /**
- * Whether a model is an Azure.Core model or not
+ * Whether a model or enum or union as enum is in Azure.Core[.Foundations] namespace
  * @param t
  * @returns
  */
 export function isAzureCoreModel(t: Type): boolean {
   return (
-    t.kind === "Model" &&
+    (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&
     ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
   );
