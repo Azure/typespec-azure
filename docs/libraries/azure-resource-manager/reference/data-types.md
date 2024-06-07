@@ -512,20 +512,6 @@ model Azure.ResourceManager.LocationParameter
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
 
-### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
-
-The default location parameter type.
-
-```typespec
-model Azure.ResourceManager.LocationResourceParameter
-```
-
-#### Properties
-
-| Name     | Type     | Description        |
-| -------- | -------- | ------------------ |
-| location | `string` | The location name. |
-
 ### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
 Model representing the standard `managedBy` envelope property for a resource.
@@ -673,20 +659,6 @@ model Azure.ResourceManager.ResourceGroupLocationResource
 | Name     | Type     | Description        |
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
-
-### `ResourceGroupParameter` {#Azure.ResourceManager.ResourceGroupParameter}
-
-The default resource group parameter type.
-
-```typespec
-model Azure.ResourceManager.ResourceGroupParameter
-```
-
-#### Properties
-
-| Name              | Type     | Description                                                   |
-| ----------------- | -------- | ------------------------------------------------------------- |
-| resourceGroupName | `string` | The name of the resource group. The name is case insensitive. |
 
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
@@ -1036,12 +1008,12 @@ model Azure.ResourceManager.CommonTypes.Encryption
 | infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption)         | Values are enabled and disabled.                                 |
 | customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
 
-### `encryptionProperties` {#Azure.ResourceManager.CommonTypes.encryptionProperties}
+### `EncryptionProperties` {#Azure.ResourceManager.CommonTypes.EncryptionProperties}
 
 Configuration of key for data encryption
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.encryptionProperties
+model Azure.ResourceManager.CommonTypes.EncryptionProperties
 ```
 
 #### Properties
@@ -1112,18 +1084,6 @@ model Azure.ResourceManager.CommonTypes.ExtendedLocation
 | ---- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
 | name | `string`                                                                                         | The name of the extended location. |
 | type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocationType) | The type of the extended location. |
-
-### `ExtensionResource` {#Azure.ResourceManager.CommonTypes.ExtensionResource}
-
-The base extension resource.
-
-```typespec
-model Azure.ResourceManager.CommonTypes.ExtensionResource
-```
-
-#### Properties
-
-None
 
 ### `Identity` {#Azure.ResourceManager.CommonTypes.Identity}
 
@@ -1199,12 +1159,12 @@ model Azure.ResourceManager.CommonTypes.KeyVaultProperties
 | keyIdentifier? | `string` | Key vault uri to access the encryption key.                           |
 | identity?      | `string` | The client ID of the identity which will be used to access key vault. |
 
-### `locationData` {#Azure.ResourceManager.CommonTypes.locationData}
+### `LocationData` {#Azure.ResourceManager.CommonTypes.LocationData}
 
 Metadata pertaining to the geographic location of the resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.locationData
+model Azure.ResourceManager.CommonTypes.LocationData
 ```
 
 #### Properties
@@ -1229,6 +1189,20 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 | Name     | Type     | Description               |
 | -------- | -------- | ------------------------- |
 | location | `string` | The name of Azure region. |
+
+### `LocationResourceParameter` {#Azure.ResourceManager.CommonTypes.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.LocationResourceParameter
+```
+
+#### Properties
+
+| Name     | Type     | Description        |
+| -------- | -------- | ------------------ |
+| location | `string` | The location name. |
 
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity}
 

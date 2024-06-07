@@ -59,22 +59,6 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /**
- * The base extension resource.
- */
-@@armCommonDefinition(ExtensionResource,
-  "ProxyResource",
-  Azure.ResourceManager.CommonTypes.Versions.v3
-);
-@@armCommonDefinition(ExtensionResource,
-  "ProxyResource",
-  Azure.ResourceManager.CommonTypes.Versions.v4
-);
-@@armCommonDefinition(ExtensionResource,
-  "ProxyResource",
-  Azure.ResourceManager.CommonTypes.Versions.v5
-);
-
-/**
  * The SKU (Stock Keeping Unit) assigned to this resource.
  */
 @@armCommonDefinition(Sku, "Sku", Azure.ResourceManager.CommonTypes.Versions.v3);
@@ -137,20 +121,11 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /**
- * The default operationId parameter type.
+ * locationData
  */
-@@armCommonDefinition(OperationIdParameter,
-  "OperationIdParameter",
-  Azure.ResourceManager.CommonTypes.Versions.v3
-);
-@@armCommonDefinition(OperationIdParameter,
-  "OperationIdParameter",
-  Azure.ResourceManager.CommonTypes.Versions.v4
-);
-@@armCommonDefinition(OperationIdParameter,
-  "OperationIdParameter",
-  Azure.ResourceManager.CommonTypes.Versions.v5
-);
+@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v3);
+@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v4);
+@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v5);
 
 /**
  * The error detail.
@@ -176,6 +151,13 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /**
+ * Identity
+ */
+@@armCommonDefinition(Identity, "Identity", Azure.ResourceManager.CommonTypes.Versions.v3);
+@@armCommonDefinition(Identity, "Identity", Azure.ResourceManager.CommonTypes.Versions.v4);
+@@armCommonDefinition(Identity, "Identity", Azure.ResourceManager.CommonTypes.Versions.v5);
+
+/**
  * Metadata pertaining to creation and last modification of the resource.
  */
 @@armCommonDefinition(SystemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v3);
@@ -188,6 +170,38 @@ namespace Azure.ResourceManager.CommonTypes;
 @@armCommonDefinition(Plan, "Plan", Azure.ResourceManager.CommonTypes.Versions.v3);
 @@armCommonDefinition(Plan, "Plan", Azure.ResourceManager.CommonTypes.Versions.v4);
 @@armCommonDefinition(Plan, "Plan", Azure.ResourceManager.CommonTypes.Versions.v5);
+
+/**
+ * encryptionProperties
+ */
+@@armCommonDefinition(EncryptionProperties,
+  "encryptionProperties",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonDefinition(EncryptionProperties,
+  "encryptionProperties",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonDefinition(EncryptionProperties,
+  "encryptionProperties",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/**
+ * KeyVaultProperties
+ */
+@@armCommonDefinition(KeyVaultProperties,
+  "KeyVaultProperties",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonDefinition(KeyVaultProperties,
+  "KeyVaultProperties",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonDefinition(KeyVaultProperties,
+  "KeyVaultProperties",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
 
 /**
  * ResourceModelWithAllowedPropertySet
@@ -237,6 +251,21 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
 
+@@armCommonDefinition(ErrorResponse,
+  "ErrorResponse",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonDefinition(ErrorResponse,
+  "ErrorResponse",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonDefinition(ErrorResponse,
+  "ErrorResponse",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+// -- Parameters
+/** ApiVersionParameter */
 @@armCommonParameter(ApiVersionParameter.apiVersion,
   "ApiVersionParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
@@ -260,6 +289,7 @@ namespace Azure.ResourceManager.CommonTypes;
   ]
 );
 
+/** SubscriptionIdParameter */
 @@armCommonParameter(SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
@@ -276,15 +306,93 @@ namespace Azure.ResourceManager.CommonTypes;
   [ResourceHome.ResourceGroup, ResourceHome.Subscription, ResourceHome.Location]
 );
 
-@@armCommonDefinition(ErrorResponse,
-  "ErrorResponse",
+/** ResourceGroupNameParameter */
+@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+  "ResourceGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(ErrorResponse,
-  "ErrorResponse",
+@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+  "ResourceGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(ErrorResponse,
-  "ErrorResponse",
+@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+  "ResourceGroupNameParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+@@resourceParameterBaseFor(ResourceGroupNameParameter.resourceGroupName,
+  [ResourceHome.ResourceGroup]
+);
+
+/** ManagementGroupNameParameter */
+@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+  "ManagementGroupNameParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+  "ManagementGroupNameParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+  "ManagementGroupNameParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/** ScopeParameter */
+@@armCommonParameter(ScopeParameter.scope,
+  "ScopeParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonParameter(ScopeParameter.scope,
+  "ScopeParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonParameter(ScopeParameter.scope,
+  "ScopeParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/** LocationResourceParameter */
+@@armCommonParameter(LocationResourceParameter.location,
+  "LocationParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonParameter(LocationResourceParameter.location,
+  "LocationParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonParameter(LocationResourceParameter.location,
+  "LocationParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/**
+ * The default operationId parameter type.
+ */
+@@armCommonParameter(OperationIdParameter.operationId,
+  "OperationIdParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonParameter(OperationIdParameter.operationId,
+  "OperationIdParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonParameter(OperationIdParameter.operationId,
+  "OperationIdParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/**
+ * TenantIdParameter
+ */
+@@armCommonParameter(TenantIdParameter.tenantId,
+  "TenantIdParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonParameter(TenantIdParameter.tenantId,
+  "TenantIdParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonParameter(TenantIdParameter.tenantId,
+  "TenantIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );

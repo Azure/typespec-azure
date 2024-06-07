@@ -103,9 +103,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 ##### Parameters
 
-| Name    | Type                           | Description                                                                          |
-| ------- | ------------------------------ | ------------------------------------------------------------------------------------ |
-| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version. |
+| Name    | Type                           | Description                                                                                                                  |
+| ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value like "v5". |
 
 #### `@armLibraryNamespace`
 

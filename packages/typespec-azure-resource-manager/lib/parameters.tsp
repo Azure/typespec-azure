@@ -19,6 +19,16 @@ alias ApiVersionParameter = CommonTypes.ApiVersionParameter;
 alias SubscriptionIdParameter = CommonTypes.SubscriptionIdParameter;
 
 /**
+ * The default ResourceGroup parameter type.
+ */
+alias ResourceGroupParameter = CommonTypes.ResourceGroupNameParameter;
+
+/**
+ * The default LocationResource parameter type.
+ */
+alias LocationResourceParameter = CommonTypes.LocationResourceParameter;
+
+/**
  * DEPRECATED - DO NOT USE
  * The default location parameter type.
  */
@@ -32,22 +42,6 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor([ResourceHome.Location])
-  location: string;
-}
-
-/**
- * The default location parameter type.
- */
-@doc("The default location parameter type.")
-model LocationResourceParameter {
-  @path
-  @minLength(1)
-  @segment("locations")
-  @doc("The location name.")
-  @key
-  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   location: string;
 }
 
@@ -82,24 +76,6 @@ model ArmLocationResource<BaseType extends
   | "Location"
   | "Extension" = never> {
   ...LocationResourceParameter;
-}
-
-/**
- * The default resource group parameter type.
- */
-@doc("The default resource group parameter type.")
-model ResourceGroupParameter {
-  @path
-  @minLength(1)
-  @maxLength(90)
-  @segment("resourceGroups")
-  @pattern("^[-\\w\\._\\(\\)]+$")
-  @doc("The name of the resource group. The name is case insensitive.")
-  @armCommonParameter("ResourceGroupNameParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("ResourceGroupNameParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("ResourceGroupNameParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
-  @resourceParameterBaseFor([ResourceHome.ResourceGroup])
-  resourceGroupName: string;
 }
 
 /**

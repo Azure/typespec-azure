@@ -55,12 +55,6 @@ model TrackedResource extends Resource {
 model ProxyResource extends Resource {}
 
 /**
- * The base extension resource.
- */
-// Note that ProxyResource is the base definition for both kinds of resources
-model ExtensionResource extends Resource {}
-
-/**
  * The resource model definition containing the full set of allowed properties for a resource. Except properties bag, there cannot be a top level property outside of this set.
  */
 @extension("x-ms-azure-resource", true)
@@ -430,7 +424,7 @@ union EncryptionStatus {
 /**
  * Configuration of key for data encryption
  */
-model encryptionProperties {
+model EncryptionProperties {
   /** Indicates whether or not the encryption is enabled for container registry. */
   status?: EncryptionStatus;
 
@@ -441,7 +435,7 @@ model encryptionProperties {
 /**
  * Metadata pertaining to the geographic location of the resource.
  */
-model locationData {
+model LocationData {
   /** A canonical name for the geographic or physical location. */
   @maxLength(256)
   name: string;
@@ -511,6 +505,16 @@ model SubscriptionIdParameter {
   @segment("subscriptions")
   @doc("The ID of the target subscription.  The value must be an UUID.")
   subscriptionId: uuid;
+}
+
+@doc("The default location parameter type.")
+model LocationResourceParameter {
+  @path
+  @minLength(1)
+  @segment("locations")
+  @doc("The location name.")
+  @key
+  location: string;
 }
 
 /**
