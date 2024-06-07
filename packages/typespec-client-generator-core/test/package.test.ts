@@ -3410,7 +3410,7 @@ describe("typespec-client-generator-core: package", () => {
           h: string;
           prop: string;
         }
-        op foo(@bodyRoot body: {@query q: string, outer: string, inner: Inner}): void;
+        op foo(): {@bodyRoot body: {@header oh: string, outer: string, inner: Inner}};
         `);
       const sdkPackage = runner.context.experimental_sdkPackage;
     });
