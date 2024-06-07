@@ -118,10 +118,21 @@ export async function getAllServicesAtAllVersions(
     );
 
     if (versions.length === 1 && versions[0].version === undefined) {
+      let projectedProgram;
+      if (versions[0].projections.length > 0) {
+        projectedProgram = program = projectProgram(originalProgram, versions[0].projections);
+      }
+      const projectedServiceNs: Namespace = projectedProgram
+        ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
+        : service.type;
+      const projectedService =
+        projectedServiceNs === program.getGlobalNamespaceType()
+          ? { type: program.getGlobalNamespaceType() }
+          : getService(program, projectedServiceNs)!;
       const context: AutorestEmitterContext = {
         program,
         outputFile: resolveOutputFile(program, service, services.length > 1, options),
-        service: service,
+        service: projectedService,
         tcgcSdkContext,
       };
 
