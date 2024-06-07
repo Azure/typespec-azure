@@ -272,24 +272,15 @@ export function getTypeDecorators(context: TCGCContext, type: Type): Record<stri
       if (decorator.definition) {
         const decoratorName = `${decorator.definition?.namespace ? getNamespaceFullName(decorator.definition.namespace) + "." : ""}${decorator.definition?.name}`;
         // white list filtering
-        if (!context.decoratorsWhiteList) {
+        if (
+          !context.decoratorsWhiteList ||
+          !context.decoratorsWhiteList.some(
+            (x) => x === decoratorName || new RegExp(x).test(decoratorName)
+          )
+        ) {
           continue;
         }
-        let found = false;
-        for (const item of context.decoratorsWhiteList) {
-          if (decoratorName === item) {
-            found = true;
-            break;
-          }
-          const regex = new RegExp(item);
-          if (regex.test(decoratorName)) {
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          continue;
-        }
+
         retval[decoratorName] = [];
         for (const arg of decorator.args) {
           retval[decoratorName].push(getDecoratorArgValue(arg.jsValue));
