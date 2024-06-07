@@ -1136,34 +1136,6 @@ function updateModelsMap(
   }
 }
 
-function checkAndGetClientType(
-  context: TCGCContext,
-  type: Type,
-  operation?: Operation
-): [SdkType[], readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const retval: SdkType[] = [];
-  if (type.kind === "Model") {
-    if (isExclude(context, type)) return diagnostics.wrap([]); // eslint-disable-line deprecation/deprecation
-    const effectivePayloadType = getEffectivePayloadType(context, type);
-    if (context.filterOutCoreModels && isAzureCoreModel(effectivePayloadType)) {
-      if (effectivePayloadType.templateMapper && effectivePayloadType.name) {
-        effectivePayloadType.templateMapper.args
-          .filter((arg): arg is Type => "kind" in arg)
-          .filter((arg) => arg.kind === "Model" && arg.name)
-          .forEach((arg) => {
-            retval.push(...diagnostics.pipe(checkAndGetClientType(context, arg, operation)));
-          });
-        return diagnostics.wrap(retval);
-      } else {
-        return diagnostics.wrap([]);
-      }
-    }
-  }
-  const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type, operation));
-  return diagnostics.wrap([clientType]);
-}
-
 interface ModelUsageOptions {
   seenModelNames?: Set<SdkType>;
   propagation?: boolean;
@@ -1256,69 +1228,58 @@ function updateTypesFromOperation(
   const generateConvenient = shouldGenerateConvenient(context, operation);
   for (const param of operation.parameters.properties.values()) {
     if (isNeverOrVoidType(param.type)) continue;
-    const paramTypes = diagnostics.pipe(checkAndGetClientType(context, param.type, operation));
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {
-      paramTypes.forEach((paramType) => {
-        updateUsageOfModel(context, UsageFlags.Input, paramType);
-      });
+      updateUsageOfModel(context, UsageFlags.Input, sdkType);
     }
   }
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
-    const paramTypes = diagnostics.pipe(
-      checkAndGetClientType(context, param.param.type, operation)
+    const sdkType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, param.param.type, operation)
     );
     if (generateConvenient) {
-      paramTypes.forEach((paramType) => {
-        updateUsageOfModel(context, UsageFlags.Input, paramType);
-      });
+      updateUsageOfModel(context, UsageFlags.Input, sdkType);
     }
   }
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
-    const bodies = diagnostics.pipe(checkAndGetClientType(context, httpBody.type, operation));
+    const sdkType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, httpBody.type, operation)
+    );
     if (generateConvenient) {
-      bodies.forEach((body) => {
-        // spread body model should be none usage
-        if (body.kind === "model" && body.isGeneratedName) return;
-        updateUsageOfModel(context, UsageFlags.Input, body);
-      });
+      // spread body model should be none usage
+      if (sdkType.kind !== "model" || !sdkType.isGeneratedName) {
+        updateUsageOfModel(context, UsageFlags.Input, sdkType);
+      }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
-        bodies.forEach((body) => {
-          updateUsageOfModel(context, UsageFlags.JsonMergePatch, body);
-        });
+        updateUsageOfModel(context, UsageFlags.JsonMergePatch, sdkType);
       }
     }
     if (isMultipartFormData(context, httpBody.type, operation)) {
-      bodies.forEach((body) => {
-        updateUsageOfModel(context, UsageFlags.MultipartFormData, body, {
-          propagation: false,
-        });
+      updateUsageOfModel(context, UsageFlags.MultipartFormData, sdkType, {
+        propagation: false,
       });
     }
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
-        const responseBodies = diagnostics.pipe(
-          checkAndGetClientType(context, innerResponse.body.type, operation)
+        const sdkType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, innerResponse.body.type, operation)
         );
         if (generateConvenient) {
-          responseBodies.forEach((responseBody) => {
-            updateUsageOfModel(context, UsageFlags.Output, responseBody);
-          });
+          updateUsageOfModel(context, UsageFlags.Output, sdkType);
         }
       }
       if (innerResponse.headers) {
         for (const header of Object.values(innerResponse.headers)) {
           if (isNeverOrVoidType(header.type)) continue;
-          const headerTypes = diagnostics.pipe(
-            checkAndGetClientType(context, header.type, operation)
+          const sdkType = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, header.type, operation)
           );
           if (generateConvenient) {
-            headerTypes.forEach((headerType) => {
-              updateUsageOfModel(context, UsageFlags.Output, headerType);
-            });
+            updateUsageOfModel(context, UsageFlags.Output, sdkType);
           }
         }
       }
@@ -1327,22 +1288,18 @@ function updateTypesFromOperation(
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData && generateConvenient) {
     if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
-      const finalResults = diagnostics.pipe(
-        checkAndGetClientType(context, lroMetaData.finalResult, operation)
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, lroMetaData.finalResult, operation)
       );
-      finalResults.forEach((finalResult) => {
-        updateUsageOfModel(context, UsageFlags.Output, finalResult);
-      });
+      updateUsageOfModel(context, UsageFlags.Output, sdkType);
 
       if (!context.arm) {
         // TODO: currently skipping adding of envelopeResult due to arm error
         // https://github.com/Azure/typespec-azure/issues/311
-        const envelopeResults = diagnostics.pipe(
-          checkAndGetClientType(context, lroMetaData.envelopeResult, operation)
+        const sdkType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, lroMetaData.envelopeResult, operation)
         );
-        envelopeResults.forEach((envelopeResult) => {
-          updateUsageOfModel(context, UsageFlags.Output, envelopeResult);
-        });
+        updateUsageOfModel(context, UsageFlags.Output, sdkType);
       }
     }
   }
@@ -1394,18 +1351,12 @@ function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Unio
   const diagnostics = createDiagnosticCollector();
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
-    const sdkModels = diagnostics.pipe(checkAndGetClientType(context, type));
-    sdkModels.forEach((sdkModel) => {
-      updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkModel);
-    });
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
+    updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType);
   }
   if (getAccessOverride(context, type) !== undefined) {
-    const sdkModels = diagnostics.pipe(checkAndGetClientType(context, type));
-    sdkModels
-      .filter((sdkModel) => ["model", "enum", "array", "dict", "union"].includes(sdkModel.kind))
-      .forEach((sdkModel) => {
-        updateUsageOfModel(context, UsageFlags.None, sdkModel);
-      });
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
+    updateUsageOfModel(context, UsageFlags.None, sdkType);
   }
 }
 
@@ -1438,6 +1389,19 @@ function verifyNoConflictingMultipartModelUsage(
 
 function modelChecks(context: TCGCContext): [void, readonly Diagnostic[]] {
   return verifyNoConflictingMultipartModelUsage(context);
+}
+
+function filterOutModels(context: TCGCContext) {
+  for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
+    if (type.kind === "Model") {
+      if (isExclude(context, type)) sdkType.usage = UsageFlags.None; // eslint-disable-line deprecation/deprecation
+    }
+    if (type.kind === "Enum" || type.kind === "Model" || type.kind === "Union") {
+      if (context.filterOutCoreModels && isAzureCoreModel(type)) {
+        sdkType.usage = UsageFlags.None;
+      }
+    }
+  }
 }
 
 export function getAllModelsWithDiagnostics(
@@ -1491,10 +1455,8 @@ export function getAllModelsWithDiagnostics(
     const servers = getServers(context.program, client.service);
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
-        const sdkModels = diagnostics.pipe(checkAndGetClientType(context, param));
-        sdkModels.forEach((sdkModel) => {
-          updateUsageOfModel(context, UsageFlags.Input, sdkModel);
-        });
+        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
+        updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }
     }
     // versioned enums
@@ -1517,6 +1479,8 @@ export function getAllModelsWithDiagnostics(
   }
   // update access
   updateAccessOfModel(context);
+  // filter out models
+  filterOutModels(context);
   let filter = 0;
   if (options.input && options.output) {
     filter = Number.MAX_SAFE_INTEGER;
