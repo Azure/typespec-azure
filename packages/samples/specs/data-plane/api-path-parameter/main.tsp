@@ -101,7 +101,6 @@ interface Widgets {
 
 interface Manufacturers {
   @doc("Gets status of a Manufacturer operation.")
-  @sharedRoute
   getManufacturerDeleteOperationStatus is Operations.GetResourceOperationStatus<
     Manufacturer,
     never
