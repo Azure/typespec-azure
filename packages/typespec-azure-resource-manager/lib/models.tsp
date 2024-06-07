@@ -80,40 +80,6 @@ model ExtensionResource<Properties extends {}> extends Foundations.ExtensionReso
 }
 //#region
 
-//#region Private Link models
-model PrivateLinkResource extends Foundations.ProxyResource {
-  /** Properties of the private link resource. */
-  properties?: PrivateLinkResourceProperties;
-}
-
-/** Properties of a private link resource. */
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "Matches current common code"
-model PrivateLinkResourceProperties {
-  /** The private link resource group id. */
-  @visibility("read")
-  groupId?: string;
-
-  /** The private link resource required member names. */
-  @visibility("read")
-  requiredMembers?: string[];
-
-  /** The private link resource private link DNS zone name. */
-  requiredZoneNames?: string[];
-}
-
-/** List of private endpoint connections associated with the specified resource. */
-model PrivateEndpointConnectionResourceListResult {
-  /** Array of private endpoint connections */
-  value?: PrivateEndpointConnection[];
-}
-
-/** A list of private link resources. */
-model PrivateLinkResourceListResult {
-  /** Array of private link resources */
-  value?: PrivateLinkResource[];
-}
-//#region
-
 //#region Standard extraction models
 
 /**

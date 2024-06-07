@@ -19,3 +19,6 @@ enum ResourceHome {
   @doc("The resource is bound to an extension")
   Extension,
 }
+
+/** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
+alias KeyEncryptionIdentity = KeyEncryptionKeyIdentity;

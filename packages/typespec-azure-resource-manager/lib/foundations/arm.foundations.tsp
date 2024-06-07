@@ -45,6 +45,17 @@ model DefaultBaseParameters<Resource extends {}> {
 }
 
 /**
+ * Standard type definition for Azure Resource Manager Tags property.
+ *
+ * It is included in the TrackedResource template definition.
+ */
+/** The Azure Resource Manager Resource tags. */
+model ArmTagsProperty {
+  /** Resource tags. */
+  tags?: Record<string>;
+}
+
+/**
  * The static parameters for a tenant-based resource
  */
 model TenantBaseParameters {

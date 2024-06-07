@@ -16,7 +16,6 @@ namespace Azure.ResourceManager.Foundations {
   // types
   alias Resource = CommonTypes.Resource;
   alias AzureEntityResource = CommonTypes.AzureEntityResource;
-  alias ArmTagsProperty = CommonTypes.ArmTagsProperty;
   alias TrackedResource = CommonTypes.TrackedResource;
   alias ProxyResource = CommonTypes.ProxyResource;
   alias ExtensionResource = CommonTypes.ExtensionResource;

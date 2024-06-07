@@ -52,3 +52,14 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
+
+@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+  "PrivateEndpointConnectionName",
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  "privatelinks.json"
+);
+@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+  "PrivateEndpointConnectionName",
+  Azure.ResourceManager.CommonTypes.Versions.v5,
+  "privatelinks.json"
+);

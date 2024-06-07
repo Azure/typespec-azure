@@ -1,12 +1,13 @@
 using TypeSpec.Http;
 using TypeSpec.Versioning;
+using OpenAPI;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-/** The private endpoint resource */
-@added(CommonTypes.Versions.v4)
+/** The Private Endpoint resource. */
 model PrivateEndpoint {
   /** The resource identifier for private endpoint */
+  @visibility("read")
   id?: Azure.Core.armResourceIdentifier<[
     {
       type: "Microsoft.Network/privateEndpoints";
@@ -14,32 +15,65 @@ model PrivateEndpoint {
   ]>;
 }
 
+/** A private link resource. */
+model PrivateLinkResource extends Resource {
+  /** Resource properties. */
+  @extension("x-ms-client-flatten", true)
+  properties?: PrivateLinkResourceProperties;
+}
+
+/** Properties of a private link resource. */
+model PrivateLinkResourceProperties {
+  /** The private link resource group id. */
+  @visibility("read")
+  groupId?: string;
+
+  /** The private link resource required member names. */
+  @visibility("read")
+  requiredMembers?: string[];
+
+  /** The private link resource private link DNS zone name. */
+  requiredZoneNames?: string[];
+}
+
+/** A list of private link resources. */
+model PrivateLinkResourceListResult {
+  /** Array of private link resources */
+  value?: PrivateLinkResource[];
+}
+//#region
 /** The private endpoint connection resource */
-@added(CommonTypes.Versions.v4)
-model PrivateEndpointConnection extends Azure.ResourceManager.Foundations.ProxyResource {
+model PrivateEndpointConnection extends Resource {
   /** The private endpoint connection properties */
+  @extension("x-ms-client-flatten", true)
   properties?: PrivateEndpointConnectionProperties;
 }
 
-/** Properties of he private endpoint connection resource */
-@added(CommonTypes.Versions.v4)
+/** List of private endpoint connections associated with the specified resource. */
+model PrivateEndpointConnectionListResult {
+  /** Array of private endpoint connections. */
+  value?: PrivateEndpointConnection[];
+}
+
+/** Properties of the private endpoint connection. */
 model PrivateEndpointConnectionProperties {
-  /** The group identifiers for the private endpoint resource */
+  /** The group ids for the private endpoint resource. */
   @visibility("read")
+  @added(Versions.v4)
   groupIds?: string[];
 
-  /** The private endpoint resource */
+  /** The private endpoint resource. */
   privateEndpoint?: PrivateEndpoint;
 
   /** A collection of information about the state of the connection between service consumer and provider. */
   privateLinkServiceConnectionState: PrivateLinkServiceConnectionState;
 
   /** The provisioning state of the private endpoint connection resource. */
+  @visibility("read")
   provisioningState?: PrivateEndpointConnectionProvisioningState;
 }
 
 /** A collection of information about the state of the connection between service consumer and provider. */
-@added(CommonTypes.Versions.v4)
 model PrivateLinkServiceConnectionState {
   /** Indicates whether the connection has been Approved/Rejected/Removed by the owner of the service. */
   status?: PrivateEndpointServiceConnectionStatus;
@@ -51,20 +85,24 @@ model PrivateLinkServiceConnectionState {
   actionsRequired?: string;
 }
 
-/** The provisioning state of the connection */
-@added(CommonTypes.Versions.v4)
+/** The current provisioning state. */
 union PrivateEndpointConnectionProvisioningState {
-  ResourceProvisioningState,
+  string,
+
+  /** Connection has been provisioned */
+  Succeeded: "Succeeded",
 
   /** Connection is being created */
   Creating: "Creating",
 
   /** Connection is being deleted */
   Deleting: "Deleting",
+
+  /** Connection provisioning has failed */
+  Failed: "Failed",
 }
 
-/** The private endpoint connection status */
-@added(CommonTypes.Versions.v4)
+/** The private endpoint connection status. */
 union PrivateEndpointServiceConnectionStatus {
   /** Connectionaiting for approval or rejection */
   Pending: "Pending",
@@ -82,20 +120,9 @@ union PrivateEndpointServiceConnectionStatus {
  * The name of the private endpoint connection associated with the Azure resource.
  * @template Segment The resource type name for private endpoint connections (default is privateEndpointConnections)
  */
-@added(CommonTypes.Versions.v4)
 model PrivateEndpointConnectionParameter<Segment extends valueof string = "privateEndpointConnections"> {
   /** The name of the private endpoint connection associated with the Azure resource. */
   @path
-  @CommonTypes.Private.armCommonParameter(
-    "PrivateEndpointConnectionName",
-    #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
-    "privatelinks.json"
-  )
-  @CommonTypes.Private.armCommonParameter(
-    "PrivateEndpointConnectionName",
-    Azure.ResourceManager.CommonTypes.Versions.v5,
-    "privatelinks.json"
-  )
   @TypeSpec.Rest.segment(Segment)
   @key("privateEndpointConnectionName")
   name: string;
@@ -105,7 +132,6 @@ model PrivateEndpointConnectionParameter<Segment extends valueof string = "priva
  * The name of the private link associated with the Azure resource.
  * @template Segment The resource type name for private links (default is privateLinkResources)
  */
-@added(CommonTypes.Versions.v4)
 model PrivateLinkResourceParameter<Segment extends valueof string = "privateLinkResources"> {
   /** The name of the private link associated with the Azure resource. */
   @path

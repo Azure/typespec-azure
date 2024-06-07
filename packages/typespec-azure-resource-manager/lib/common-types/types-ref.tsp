@@ -2,6 +2,7 @@ import "../private.decorators.tsp";
 import "./common-types.tsp";
 import "./types.tsp";
 
+using Azure.ResourceManager.Private;
 using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
@@ -233,6 +234,16 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
 
+@@resourceParameterBaseFor(ApiVersionParameter.apiVersion,
+  [
+    ResourceHome.ResourceGroup,
+    ResourceHome.Subscription,
+    ResourceHome.Location,
+    ResourceHome.Tenant,
+    ResourceHome.Extension
+  ]
+);
+
 @@armCommonParameter(SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
@@ -243,5 +254,21 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 @@armCommonParameter(SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+@@resourceParameterBaseFor(SubscriptionIdParameter.subscriptionId,
+  [ResourceHome.ResourceGroup, ResourceHome.Subscription, ResourceHome.Location]
+);
+
+@@armCommonDefinition(ErrorResponse,
+  "ErrorResponse",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonDefinition(ErrorResponse,
+  "ErrorResponse",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonDefinition(ErrorResponse,
+  "ErrorResponse",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );

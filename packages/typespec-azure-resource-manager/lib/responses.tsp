@@ -241,19 +241,6 @@ model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foun
 }
 
 /**
- * The standard Azure Resource Manager error response
- */
-@error
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v3)
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v4)
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v5)
-@doc("Common error response for all Azure Resource Manager APIs to return error details for failed operations.")
-model ErrorResponse {
-  @doc("The error object.")
-  error?: ErrorDetail;
-}
-
-/**
  * @dev Resource exists response
  */
 @doc("The Azure resource exists")

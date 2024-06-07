@@ -7,7 +7,7 @@ alias InfrastructureEncryption = CommonTypes.InfrastructureEncryption;
 alias KeyEncryptionIdentity = CommonTypes.KeyEncryptionKeyIdentity;
 alias KeyEncryptionKeyIdentity = CommonTypes.KeyEncryptionKeyIdentity;
 alias CustomerManagedKeyEncryption = CommonTypes.CustomerManagedKeyEncryption;
-alias EncryptionConfiguration = CommonTypes.EncryptionConfiguration;
+alias EncryptionConfiguration = CommonTypes.Encryption;
 
 // private-links
 alias PrivateEndpoint = CommonTypes.PrivateEndpoint;
@@ -17,4 +17,9 @@ alias PrivateLinkServiceConnectionState = CommonTypes.PrivateLinkServiceConnecti
 alias PrivateEndpointConnectionProvisioningState = CommonTypes.PrivateEndpointConnectionProvisioningState;
 alias PrivateEndpointServiceConnectionStatus = CommonTypes.PrivateEndpointServiceConnectionStatus;
 alias PrivateEndpointConnectionParameter = CommonTypes.PrivateEndpointConnectionParameter;
+alias PrivateLinkResource = CommonTypes.PrivateLinkResource;
+alias PrivateLinkResourceProperties = CommonTypes.PrivateLinkResourceProperties;
 alias PrivateLinkResourceParameter = CommonTypes.PrivateLinkResourceParameter;
+
+// types
+alias ErrorResponse = CommonTypes.ErrorResponse;

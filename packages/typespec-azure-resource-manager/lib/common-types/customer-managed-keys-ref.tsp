@@ -1,13 +1,15 @@
 import "./customer-managed-keys.tsp";
 
-namespace Azure.ResourceManager.CommonTypes.Private;
+using Azure.ResourceManager.CommonTypes.Private;
 
-@@armCommonDefinition(EncryptionConfiguration,
+namespace Azure.ResourceManager.CommonTypes;
+
+@@armCommonDefinition(Encryption,
   "encryption",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "customermanagedkeys.json"
 );
-@@armCommonDefinition(EncryptionConfiguration,
+@@armCommonDefinition(Encryption,
   "encryption",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "customermanagedkeys.json"
