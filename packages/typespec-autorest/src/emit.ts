@@ -191,6 +191,9 @@ async function emitAllServiceAtAllVersions(
   options: ResolvedAutorestEmitterOptions
 ) {
   const services = await getAllServicesAtAllVersions(program, options);
+  if (program.compilerOptions.noEmit || program.hasError()) {
+    return;
+  }
   for (const serviceRecord of services) {
     if (serviceRecord.versioned) {
       for (const documentRecord of serviceRecord.versions) {
