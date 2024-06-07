@@ -10,14 +10,14 @@ using TypeSpec.Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
-@armProviderNamespace("Contoso.CustomerManagedKeyExample")
+@armProviderNamespace("Contoso.CommonEnvelopePropertiesExample")
 @service({
-  title: "Contoso.CustomerManagedKeyExample",
+  title: "Contoso.CommonEnvelopePropertiesExample",
 })
 @OpenAPI.info({
   version: "2023-03-01-preview",
 })
-@doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
+@doc("An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.UpdateTests;
@@ -32,6 +32,9 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @segment("widgets")
   @path
   name: string;
+
+  ...ExtendedLocationProperty;
+  ...ManagedByProperty;
 }
 
 @doc("Widget Resource Properties.")
@@ -44,7 +47,10 @@ model WidgetResourceProperties {
   @visibility("read")
   provisioningState?: ResourceProvisioningState;
 
-  ...EncryptionProperty;
+  ...EntityTagProperty;
+  ...ResourceKindProperty;
+  ...ResourcePlanProperty;
+  ...ResourceSkuProperty;
 }
 
 @armResourceOperations

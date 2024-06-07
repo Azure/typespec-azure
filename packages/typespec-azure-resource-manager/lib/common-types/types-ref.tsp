@@ -190,6 +190,22 @@ namespace Azure.ResourceManager.CommonTypes;
 @@armCommonDefinition(Plan, "Plan", Azure.ResourceManager.CommonTypes.Versions.v5);
 
 /**
+ * ResourceModelWithAllowedPropertySet
+ */
+@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+  "ResourceModelWithAllowedPropertySet",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+  "ResourceModelWithAllowedPropertySet",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+  "ResourceModelWithAllowedPropertySet",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/**
  * The check availability request body.
  */
 @@armCommonDefinition(CheckNameAvailabilityRequest,

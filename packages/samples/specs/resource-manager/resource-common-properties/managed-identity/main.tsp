@@ -10,14 +10,14 @@ using TypeSpec.Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
-@armProviderNamespace("Contoso.CustomerManagedKeyExample")
+@armProviderNamespace("Contoso.ManagedIdentityExample")
 @service({
-  title: "Contoso.CustomerManagedKeyExample",
+  title: "Contoso.ManagedIdentityExample",
 })
 @OpenAPI.info({
   version: "2023-03-01-preview",
 })
-@doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
+@doc("An example of using the ManagedIdentity properties in a resource type.")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.UpdateTests;
@@ -32,6 +32,8 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @segment("widgets")
   @path
   name: string;
+
+  ...ManagedServiceIdentityProperty; // Or ...ManagedSystemAssignedIdentityProperty;
 }
 
 @doc("Widget Resource Properties.")
@@ -43,8 +45,6 @@ model WidgetResourceProperties {
   /** Provisioning state */
   @visibility("read")
   provisioningState?: ResourceProvisioningState;
-
-  ...EncryptionProperty;
 }
 
 @armResourceOperations
