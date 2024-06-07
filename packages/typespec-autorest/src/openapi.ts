@@ -31,7 +31,6 @@ import {
   Operation,
   Program,
   Scalar,
-  SourceFile,
   StringLiteral,
   StringTemplate,
   SyntaxKind,
@@ -146,6 +145,7 @@ import {
   PrimitiveItems,
   Refable,
 } from "./openapi2-document.js";
+import type { AutorestEmitterResult, LoadedExample } from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 
 interface SchemaContext {
@@ -227,16 +227,6 @@ interface PendingSchema {
  */
 interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
-}
-
-export interface OperationExamples {
-  readonly operationId: string;
-  readonly examples: LoadedExample[];
-}
-
-export interface AutorestEmitterResult {
-  readonly document: OpenAPI2Document;
-  readonly operationExamples: OperationExamples[];
 }
 
 export async function getOpenAPIForService(
@@ -360,6 +350,7 @@ export async function getOpenAPIForService(
         }
       })
       .filter((x) => x) as any,
+    outputFile: context.outputFile,
   };
 
   function resolveHost(
@@ -2302,11 +2293,6 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
-interface LoadedExample {
-  readonly relativePath: string;
-  readonly file: SourceFile;
-  readonly data: any;
-}
 async function loadExamples(
   host: CompilerHost,
   options: AutorestDocumentEmitterOptions,
