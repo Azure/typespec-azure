@@ -86,11 +86,10 @@ export interface AutorestEmitterOptions {
   "use-read-only-status-schema"?: boolean;
 
   /**
-   * Determines whether to suppress the emission of x-ms-long-running-operation-options to
-   * document lro resolution
-   * @default false
+   * Determines whether and how to emit the x-ms-long-running-operation-options
+   * @default "final-state-only"
    */
-  "suppress-lro-options"?: boolean;
+  "emit-lro-options"?: "none" | "final-state-only" | "all";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -186,11 +185,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: false,
       description: "Create read-only property schema for lro status",
     },
-    "suppress-lro-options": {
-      type: "boolean",
+    "emit-lro-options": {
+      type: "string",
+      enum: ["none", "final-state-only", "all"],
       nullable: true,
-      default: false,
-      description: "Disable emitting x-ms-long-running-operation-options for lro resolution",
+      default: "final-state-only",
+      description:
+        "Determine whether and hot to emit x-ms-long-running-operation-options for lro resolution",
     },
   },
   required: [],

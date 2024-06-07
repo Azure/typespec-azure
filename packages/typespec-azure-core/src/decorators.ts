@@ -904,6 +904,8 @@ function validateFinalState(
 
     return;
   }
+
+  if (httpOp.verb === "put") return;
   for (const response of httpOp.responses) {
     for (const content of response.responses) {
       let compare: string;

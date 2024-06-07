@@ -149,8 +149,7 @@ op ArmResourceCheckExistence<
 op ArmResourceCreateOrUpdateAsync<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader &
-    Azure.ResourceManager.ArmAsyncOperationHeader<FinalResult = Resource>,
+  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,

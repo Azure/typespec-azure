@@ -757,7 +757,7 @@ describe("typespec-azure-core: decorators", () => {
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
       @pollingOperation(bar)
       @useFinalStateVia("location")
-      @put op foo(): {};
+      @post op foo(): {};
 
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
       @route("/polling")

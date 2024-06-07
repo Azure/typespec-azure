@@ -338,8 +338,8 @@ op test(): void;
       }
       `;
 
-    it("emit x-ms-long-running-operation-options by default", async () => {
-      const output = await openapiWithOptions(lroCode, {});
+    it("emits all x-ms-long-running-operation-options", async () => {
+      const output = await openapiWithOptions(lroCode, { "emit-lro-options": "all" });
       const itemPath =
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
       ok(output.paths[itemPath]);
@@ -351,8 +351,32 @@ op test(): void;
       });
     });
 
+    it("emits final-state-via by default", async () => {
+      const output = await openapiWithOptions(lroCode, {});
+      const itemPath =
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+      ok(output.paths[itemPath]);
+      ok(output.paths[itemPath].put);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation"], true);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation-options"], {
+        "final-state-via": "azure-async-operation",
+      });
+    });
+
+    it("emits final-state-via when configured", async () => {
+      const output = await openapiWithOptions(lroCode, { "emit-lro-options": "final-state-only" });
+      const itemPath =
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+      ok(output.paths[itemPath]);
+      ok(output.paths[itemPath].put);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation"], true);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation-options"], {
+        "final-state-via": "azure-async-operation",
+      });
+    });
+
     it("suppress x-ms-long-running operation options when configured", async () => {
-      const output = await openapiWithOptions(lroCode, { "suppress-lro-options": true });
+      const output = await openapiWithOptions(lroCode, { "emit-lro-options": "none" });
       const itemPath =
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
       ok(output.paths[itemPath]);

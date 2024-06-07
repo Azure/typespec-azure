@@ -55,7 +55,9 @@ describe("typespec-autorest: Long-running Operations", () => {
     
       @pollingOperation(getWidgetOperationStatus)
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
-      `
+      `,
+      undefined,
+      { "emit-lro-options": "all" }
     );
 
     deepStrictEqual(
@@ -115,7 +117,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         @Azure.Core.useFinalStateVia("azure-async-operation")
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<Widget>;
         restart is ArmResourceActionAsync<Widget, void, never>;
@@ -123,7 +125,9 @@ describe("typespec-autorest: Long-running Operations", () => {
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
-      `
+      `,
+      undefined,
+      { "emit-lro-options": "all" }
     );
 
     const itemPath =

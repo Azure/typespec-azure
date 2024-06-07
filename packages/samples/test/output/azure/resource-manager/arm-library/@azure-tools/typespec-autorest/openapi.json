@@ -177,10 +177,6 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
             },
             "headers": {
-              "Azure-AsyncOperation": {
-                "type": "string",
-                "description": "A link to the status monitor"
-              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -196,8 +192,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "azure-async-operation",
-          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
+          "final-state-via": "azure-async-operation"
         },
         "x-ms-long-running-operation": true
       },
@@ -441,10 +436,6 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
             },
             "headers": {
-              "Azure-AsyncOperation": {
-                "type": "string",
-                "description": "A link to the status monitor"
-              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -460,8 +451,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "azure-async-operation",
-          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
+          "final-state-via": "azure-async-operation"
         },
         "x-ms-long-running-operation": true
       },
@@ -788,10 +778,6 @@
               "$ref": "#/definitions/AllPropertiesResource"
             },
             "headers": {
-              "Azure-AsyncOperation": {
-                "type": "string",
-                "description": "A link to the status monitor"
-              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -807,8 +793,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "azure-async-operation",
-          "final-state-schema": "#/definitions/AllPropertiesResource"
+          "final-state-via": "azure-async-operation"
         },
         "x-ms-long-running-operation": true
       },
@@ -1268,10 +1253,6 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
             },
             "headers": {
-              "Azure-AsyncOperation": {
-                "type": "string",
-                "description": "A link to the status monitor"
-              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -1287,8 +1268,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "azure-async-operation",
-          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
+          "final-state-via": "azure-async-operation"
         },
         "x-ms-long-running-operation": true
       },
@@ -1549,10 +1529,6 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
             },
             "headers": {
-              "Azure-AsyncOperation": {
-                "type": "string",
-                "description": "A link to the status monitor"
-              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -1568,8 +1544,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "azure-async-operation",
-          "final-state-schema": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
+          "final-state-via": "azure-async-operation"
         },
         "x-ms-long-running-operation": true
       },

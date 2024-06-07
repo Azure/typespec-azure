@@ -190,11 +190,11 @@ export interface AutorestDocumentEmitterOptions {
   readonly versionEnumStrategy?: "omit" | "include";
 
   /**
-   * Determines whether to suppress emission of x-ms-long-running-operation-options
+   * Determines whether and how to emit x-ms-long-running-operation-options
    * to describe resolution of asynchronous operations
-   * @default false
+   * @default "final-state-only"
    */
-  readonly suppressLroOptions?: boolean;
+  readonly emitLroOptions?: "none" | "final-state-only" | "all";
 }
 
 /**
@@ -597,22 +597,22 @@ export async function getOpenAPIForService(
     // which does have LRO metadata.
     if (lroMetadata !== undefined && operation.verb !== "get") {
       currentEndpoint["x-ms-long-running-operation"] = true;
-      if (!options.suppressLroOptions) {
+      if (options.emitLroOptions !== "none") {
         const finalState = getFinalStateVia(lroMetadata);
         if (finalState !== undefined) {
           const finalSchema = getFinalStateSchema(lroMetadata);
-          let options = {
+          let lroOptions = {
             "final-state-via": finalState,
           };
 
-          if (finalSchema !== undefined) {
-            options = {
+          if (finalSchema !== undefined && options.emitLroOptions === "all") {
+            lroOptions = {
               "final-state-via": finalState,
               ...finalSchema,
             };
           }
 
-          currentEndpoint["x-ms-long-running-operation-options"] = options;
+          currentEndpoint["x-ms-long-running-operation-options"] = lroOptions;
         }
       }
     }
