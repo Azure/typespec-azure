@@ -296,7 +296,7 @@ model SystemData {
 
   /** The timestamp of resource creation (UTC). */
   @visibility("read")
-  createdAt?: plainDate;
+  createdAt?: utcDateTime;
 
   /** The identity that last modified the resource. */
   @visibility("read")
@@ -308,7 +308,7 @@ model SystemData {
 
   /** The timestamp of resource last modification (UTC) */
   @visibility("read")
-  lastModifiedAt?: plainDate;
+  lastModifiedAt?: utcDateTime;
 }
 
 /**

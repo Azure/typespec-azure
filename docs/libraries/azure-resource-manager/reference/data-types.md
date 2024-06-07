@@ -1635,10 +1635,10 @@ model Azure.ResourceManager.CommonTypes.SystemData
 | ------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | createdBy?          | `string`                                                                           | The identity that created the resource.               |
 | createdByType?      | [`createdByType`](./data-types.md#Azure.ResourceManager.CommonTypes.createdByType) | The type of identity that created the resource.       |
-| createdAt?          | `plainDate`                                                                        | The timestamp of resource creation (UTC).             |
+| createdAt?          | `utcDateTime`                                                                      | The timestamp of resource creation (UTC).             |
 | lastModifiedBy?     | `string`                                                                           | The identity that last modified the resource.         |
 | lastModifiedByType? | [`createdByType`](./data-types.md#Azure.ResourceManager.CommonTypes.createdByType) | The type of identity that last modified the resource. |
-| lastModifiedAt?     | `plainDate`                                                                        | The timestamp of resource last modification (UTC)     |
+| lastModifiedAt?     | `utcDateTime`                                                                      | The timestamp of resource last modification (UTC)     |
 
 ### `TenantIdParameter` {#Azure.ResourceManager.CommonTypes.TenantIdParameter}
 
