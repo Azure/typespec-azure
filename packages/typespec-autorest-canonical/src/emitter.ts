@@ -143,7 +143,6 @@ function resolveOutputFile(
       multipleServices || azureResourceProviderFolder
         ? getNamespaceFullName(service.type)
         : undefined,
-    version: canonicalVersion,
   });
 
   return resolvePath(options.outputDir, interpolated);
