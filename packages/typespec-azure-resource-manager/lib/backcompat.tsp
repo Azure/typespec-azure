@@ -20,6 +20,8 @@ alias PrivateEndpointConnectionParameter = CommonTypes.PrivateEndpointConnection
 alias PrivateLinkResource = CommonTypes.PrivateLinkResource;
 alias PrivateLinkResourceProperties = CommonTypes.PrivateLinkResourceProperties;
 alias PrivateLinkResourceParameter = CommonTypes.PrivateLinkResourceParameter;
+alias PrivateEndpointConnectionResourceListResult = CommonTypes.PrivateEndpointConnectionListResult;
+alias PrivateLinkResourceListResult = CommonTypes.PrivateLinkResourceListResult;
 
 // types
 alias ErrorResponse = CommonTypes.ErrorResponse;

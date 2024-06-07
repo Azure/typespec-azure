@@ -1135,13 +1135,11 @@ model Azure.ResourceManager.CommonTypes.Identity
 
 #### Properties
 
-| Name           | Type                                                                                             | Description                                                       |
-| -------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| principalIdV3? | `string`                                                                                         | The principal ID of resource identity.                            |
-| principalId?   | `Core.uuid`                                                                                      | The principal ID of resource identity. The value must be an UUID. |
-| tenantIdV3?    | `string`                                                                                         | The tenant ID of resource.                                        |
-| tenantId?      | `Core.uuid`                                                                                      | The tenant ID of resource. The value must be an UUID.             |
-| type?          | [`ResourceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceIdentityType) | The identity type.                                                |
+| Name         | Type                                                                                             | Description                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| principalId? | `Core.uuid`                                                                                      | The principal ID of resource identity. The value must be an UUID. |
+| tenantId?    | `Core.uuid`                                                                                      | The tenant ID of resource. The value must be an UUID.             |
+| type?        | [`ResourceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceIdentityType) | The identity type.                                                |
 
 ### `IfMatchHeader` {#Azure.ResourceManager.CommonTypes.IfMatchHeader}
 
@@ -1547,13 +1545,12 @@ model Azure.ResourceManager.CommonTypes.Resource
 
 #### Properties
 
-| Name        | Type                                                                         | Description                                                                                                                                                                                 |
-| ----------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| idV3?       | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}   |
-| id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}" |
-| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                    |
-| type?       | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                   |
-| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                            |
+| Name        | Type                                                                         | Description                                                                                                                                                                               |
+| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
+| type?       | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
+| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
 ### `ResourceGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ResourceGroupNameParameter}
 
@@ -1630,10 +1627,9 @@ model Azure.ResourceManager.CommonTypes.SubscriptionIdParameter
 
 #### Properties
 
-| Name             | Type        | Description                                                   |
-| ---------------- | ----------- | ------------------------------------------------------------- |
-| subscriptionIdV3 | `string`    | The ID of the target subscription.                            |
-| subscriptionId   | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
+| Name           | Type        | Description                                                   |
+| -------------- | ----------- | ------------------------------------------------------------- |
+| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
 
 ### `SystemAssignedServiceIdentity` {#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity}
 
@@ -1890,7 +1886,6 @@ model Azure.ResourceManager.Foundations.DefaultBaseParameters<Resource>
 | Name              | Type        | Description                                                            |
 | ----------------- | ----------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`    | The API version to use for this operation.                             |
-| subscriptionIdV3  | `string`    | The ID of the target subscription.                                     |
 | subscriptionId    | `Core.uuid` | The ID of the target subscription. The value must be an UUID.          |
 | location          | `string`    | The location name.                                                     |
 | resourceGroupName | `string`    | The name of the resource group. The name is case insensitive.          |
@@ -1943,12 +1938,11 @@ model Azure.ResourceManager.Foundations.LocationBaseParameters
 
 #### Properties
 
-| Name             | Type        | Description                                                   |
-| ---------------- | ----------- | ------------------------------------------------------------- |
-| apiVersion       | `string`    | The API version to use for this operation.                    |
-| subscriptionIdV3 | `string`    | The ID of the target subscription.                            |
-| subscriptionId   | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
-| location         | `string`    | The location name.                                            |
+| Name           | Type        | Description                                                   |
+| -------------- | ----------- | ------------------------------------------------------------- |
+| apiVersion     | `string`    | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
+| location       | `string`    | The location name.                                            |
 
 ### `LocationScope` {#Azure.ResourceManager.Foundations.LocationScope}
 
@@ -1966,13 +1960,12 @@ model Azure.ResourceManager.Foundations.LocationScope<Resource>
 
 #### Properties
 
-| Name             | Type                             | Description                                                   |
-| ---------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion       | `string`                         | The API version to use for this operation.                    |
-| subscriptionIdV3 | `string`                         | The ID of the target subscription.                            |
-| subscriptionId   | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| location         | `string`                         | The location name.                                            |
-| provider         | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
+| Name           | Type                             | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion     | `string`                         | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| location       | `string`                         | The location name.                                            |
+| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
 
 ### `ProxyResourceUpdateModel` {#Azure.ResourceManager.Foundations.ProxyResourceUpdateModel}
 
@@ -2008,7 +2001,6 @@ model Azure.ResourceManager.Foundations.ResourceGroupBaseParameters
 | Name              | Type        | Description                                                   |
 | ----------------- | ----------- | ------------------------------------------------------------- |
 | apiVersion        | `string`    | The API version to use for this operation.                    |
-| subscriptionIdV3  | `string`    | The ID of the target subscription.                            |
 | subscriptionId    | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
 | resourceGroupName | `string`    | The name of the resource group. The name is case insensitive. |
 
@@ -2031,7 +2023,6 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | Name              | Type                             | Description                                                            |
 | ----------------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`                         | The API version to use for this operation.                             |
-| subscriptionIdV3  | `string`                         | The ID of the target subscription.                                     |
 | subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID.          |
 | location          | `string`                         | The location name.                                                     |
 | resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
@@ -2090,11 +2081,10 @@ model Azure.ResourceManager.Foundations.SubscriptionBaseParameters
 
 #### Properties
 
-| Name             | Type        | Description                                                   |
-| ---------------- | ----------- | ------------------------------------------------------------- |
-| apiVersion       | `string`    | The API version to use for this operation.                    |
-| subscriptionIdV3 | `string`    | The ID of the target subscription.                            |
-| subscriptionId   | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
+| Name           | Type        | Description                                                   |
+| -------------- | ----------- | ------------------------------------------------------------- |
+| apiVersion     | `string`    | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
 
 ### `SubscriptionScope` {#Azure.ResourceManager.Foundations.SubscriptionScope}
 
@@ -2112,12 +2102,11 @@ model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 
 #### Properties
 
-| Name             | Type                             | Description                                                   |
-| ---------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion       | `string`                         | The API version to use for this operation.                    |
-| subscriptionIdV3 | `string`                         | The ID of the target subscription.                            |
-| subscriptionId   | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| provider         | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
+| Name           | Type                             | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion     | `string`                         | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
 
 ### `TagsUpdateModel` {#Azure.ResourceManager.Foundations.TagsUpdateModel}
 

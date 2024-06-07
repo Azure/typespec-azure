@@ -200,7 +200,7 @@ op Azure.ResourceManager.ResourceCollectionOperations.listByParent(provider: "Mi
 #### `ResourceCollectionOperations.listBySubscription` {#Azure.ResourceManager.ResourceCollectionOperations.listBySubscription}
 
 ```typespec
-op Azure.ResourceManager.ResourceCollectionOperations.listBySubscription(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ResourceCollectionOperations.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ResourceCreateAsync` {#Azure.ResourceManager.ResourceCreateAsync}
@@ -385,7 +385,7 @@ interface Azure.ResourceManager.ResourceListBySubscription<Resource>
 #### `ResourceListBySubscription.listBySubscription` {#Azure.ResourceManager.ResourceListBySubscription.listBySubscription}
 
 ```typespec
-op Azure.ResourceManager.ResourceListBySubscription.listBySubscription(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ResourceListBySubscription.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ResourceOperations` {#Azure.ResourceManager.ResourceOperations}
@@ -435,7 +435,7 @@ op Azure.ResourceManager.ResourceOperations.listByParent(provider: "Microsoft.Th
 #### `ResourceOperations.listBySubscription` {#Azure.ResourceManager.ResourceOperations.listBySubscription}
 
 ```typespec
-op Azure.ResourceManager.ResourceOperations.listBySubscription(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ResourceOperations.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ResourceRead` {#Azure.ResourceManager.ResourceRead}
@@ -604,7 +604,7 @@ op Azure.ResourceManager.TrackedResourceOperations.listByParent(provider: "Micro
 #### `TrackedResourceOperations.listBySubscription` {#Azure.ResourceManager.TrackedResourceOperations.listBySubscription}
 
 ```typespec
-op Azure.ResourceManager.TrackedResourceOperations.listBySubscription(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.TrackedResourceOperations.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ArmCustomPatchAsync` {#Azure.ResourceManager.ArmCustomPatchAsync}
@@ -651,7 +651,7 @@ op Azure.ResourceManager.ArmCustomPatchSync(provider: "Microsoft.ThisWillBeRepla
 A resource list operation, at the subscription scope
 
 ```typespec
-op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -1049,7 +1049,7 @@ op Azure.ResourceManager.ArmTagsPatchSync(provider: "Microsoft.ThisWillBeReplace
 ### `checkGlobalNameAvailability` {#Azure.ResourceManager.checkGlobalNameAvailability}
 
 ```typespec
-op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -1063,7 +1063,7 @@ op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscri
 ### `checkLocalNameAvailability` {#Azure.ResourceManager.checkLocalNameAvailability}
 
 ```typespec
-op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionIdV3: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: string, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: string, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters

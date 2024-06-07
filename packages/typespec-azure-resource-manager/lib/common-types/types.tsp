@@ -13,13 +13,7 @@ namespace Azure.ResourceManager.CommonTypes;
 @extension("x-ms-azure-resource", true)
 model Resource {
   /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
-  @renamedFrom(Versions.v4, "id")
-  @removed(Versions.v4)
-  @visibility("read")
-  idV3?: string;
-
-  /** Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}" */
-  @added(CommonTypes.Versions.v4)
+  @typeChangedFrom(Versions.v4, string)
   @visibility("read")
   id?: armResourceIdentifier;
 
@@ -348,25 +342,13 @@ union ResourceIdentityType {
 
 /** Identity for the resource. */
 model Identity {
-  /** The principal ID of resource identity. */
-  @renamedFrom(Versions.v4, "principalId")
-  @removed(Versions.v4)
-  @visibility("read")
-  principalIdV3?: string;
-
   /** The principal ID of resource identity. The value must be an UUID. */
-  @added(CommonTypes.Versions.v4)
+  @typeChangedFrom(Versions.v4, string)
   @visibility("read")
   principalId?: uuid;
 
-  /** The tenant ID of resource. */
-  @renamedFrom(Versions.v4, "tenantId")
-  @removed(Versions.v4)
-  @visibility("read")
-  tenantIdV3?: string;
-
   /** The tenant ID of resource. The value must be an UUID. */
-  @added(CommonTypes.Versions.v4)
+  @typeChangedFrom(Versions.v4, string)
   @visibility("read")
   tenantId?: uuid;
 
@@ -523,15 +505,7 @@ model ResourceGroupNameParameter {
  */
 @doc("The default subscriptionId parameter type.")
 model SubscriptionIdParameter {
-  @renamedFrom(Versions.v4, "subscriptionId")
-  @removed(Versions.v4)
-  @path
-  @minLength(1)
-  @segment("subscriptions")
-  @doc("The ID of the target subscription.")
-  subscriptionIdV3: string;
-
-  @added(Versions.v4)
+  @typeChangedFrom(Versions.v4, string)
   @path
   @segment("subscriptions")
   @doc("The ID of the target subscription.  The value must be an UUID.")

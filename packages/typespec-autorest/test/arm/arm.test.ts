@@ -121,6 +121,7 @@ it("can use private endpoints with common-types references", async () => {
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
       
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -161,6 +162,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
       
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -200,6 +202,7 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
       
       interface Operations extends Azure.ResourceManager.Operations {}
