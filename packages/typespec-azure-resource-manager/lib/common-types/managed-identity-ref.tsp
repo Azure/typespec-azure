@@ -9,7 +9,12 @@ namespace Azure.ResourceManager.CommonTypes;
  */
 @@armCommonDefinition(ManagedServiceIdentity,
   "ManagedServiceIdentity",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
+  "managedidentity.json"
+);
+@@armCommonDefinition(ManagedServiceIdentity,
+  "ManagedServiceIdentity",
+  Azure.ResourceManager.CommonTypes.Versions.v4,
   "managedidentity.json"
 );
 @@armCommonDefinition(ManagedServiceIdentity,
@@ -21,7 +26,12 @@ namespace Azure.ResourceManager.CommonTypes;
 /** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.", */
 @@armCommonDefinition(UserAssignedIdentities,
   "UserAssignedIdentities",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
+  "managedidentity.json"
+);
+@@armCommonDefinition(UserAssignedIdentities,
+  "UserAssignedIdentities",
+  Azure.ResourceManager.CommonTypes.Versions.v4,
   "managedidentity.json"
 );
 @@armCommonDefinition(UserAssignedIdentities,
@@ -35,7 +45,12 @@ namespace Azure.ResourceManager.CommonTypes;
  */
 @@armCommonDefinition(SystemAssignedServiceIdentity,
   "SystemAssignedServiceIdentity",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
+  "managedidentity.json"
+);
+@@armCommonDefinition(SystemAssignedServiceIdentity,
+  "SystemAssignedServiceIdentity",
+  Azure.ResourceManager.CommonTypes.Versions.v4,
   "managedidentity.json"
 );
 @@armCommonDefinition(SystemAssignedServiceIdentity,
@@ -49,7 +64,12 @@ namespace Azure.ResourceManager.CommonTypes;
  */
 @@armCommonDefinition(UserAssignedIdentity,
   "UserAssignedIdentity",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
+  #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
+  "managedidentity.json"
+);
+@@armCommonDefinition(UserAssignedIdentity,
+  "UserAssignedIdentity",
+  Azure.ResourceManager.CommonTypes.Versions.v4,
   "managedidentity.json"
 );
 @@armCommonDefinition(UserAssignedIdentity,
