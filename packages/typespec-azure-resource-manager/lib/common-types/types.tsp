@@ -55,6 +55,12 @@ model TrackedResource extends Resource {
 model ProxyResource extends Resource {}
 
 /**
+ * The base extension resource.
+ */
+// Note that ProxyResource is the base definition for both kinds of resources
+model ExtensionResource extends Resource {}
+
+/**
  * The resource model definition containing the full set of allowed properties for a resource. Except properties bag, there cannot be a top level property outside of this set.
  */
 @extension("x-ms-azure-resource", true)

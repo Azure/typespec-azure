@@ -59,6 +59,22 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /**
+ * The base extension resource.
+ */
+@@armCommonDefinition(ExtensionResource,
+  "ProxyResource",
+  Azure.ResourceManager.CommonTypes.Versions.v3
+);
+@@armCommonDefinition(ExtensionResource,
+  "ProxyResource",
+  Azure.ResourceManager.CommonTypes.Versions.v4
+);
+@@armCommonDefinition(ExtensionResource,
+  "ProxyResource",
+  Azure.ResourceManager.CommonTypes.Versions.v5
+);
+
+/**
  * The SKU (Stock Keeping Unit) assigned to this resource.
  */
 @@armCommonDefinition(Sku, "Sku", Azure.ResourceManager.CommonTypes.Versions.v3);

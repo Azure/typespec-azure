@@ -18,7 +18,7 @@ namespace Azure.ResourceManager.Foundations {
   alias AzureEntityResource = CommonTypes.AzureEntityResource;
   alias TrackedResource = CommonTypes.TrackedResource;
   alias ProxyResource = CommonTypes.ProxyResource;
-  alias ExtensionResource = CommonTypes.ProxyResource;
+  alias ExtensionResource = CommonTypes.ExtensionResource;
   alias Sku = CommonTypes.Sku;
   alias SkuTier = CommonTypes.SkuTier;
   alias OperationListResult = CommonTypes.OperationListResult;

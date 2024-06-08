@@ -1085,6 +1085,18 @@ model Azure.ResourceManager.CommonTypes.ExtendedLocation
 | name | `string`                                                                                         | The name of the extended location. |
 | type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocationType) | The type of the extended location. |
 
+### `ExtensionResource` {#Azure.ResourceManager.CommonTypes.ExtensionResource}
+
+The base extension resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ExtensionResource
+```
+
+#### Properties
+
+None
+
 ### `Identity` {#Azure.ResourceManager.CommonTypes.Identity}
 
 Identity for the resource.
