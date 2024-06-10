@@ -66,7 +66,6 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @armResourceOperations
 interface RoleAssignments {
   get is ArmResourceRead<RoleAssignment>;
-  @Azure.Core.useFinalStateVia("azure-async-operation")
   createOrUpdate is ArmResourceCreateOrReplaceAsync<
     RoleAssignment,
     LroHeaders = ArmAsyncOperationHeader<FinalResult = RoleAssignment> &

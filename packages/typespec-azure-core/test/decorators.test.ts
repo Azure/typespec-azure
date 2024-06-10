@@ -752,6 +752,24 @@ describe("typespec-azure-core: decorators", () => {
       const finalState = getFinalStateOverride(runner.program, op);
       assert.deepStrictEqual(finalState, FinalStateValue.operationLocation);
     });
+    it("emits diagnostic for invalid PUT override", async () => {
+      const code = `
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
+      @pollingOperation(bar)
+      @useFinalStateVia("operation-location")
+      @test @put op foo(): {loc: string};
+
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
+      @route("/polling")
+      @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
+      `;
+      const diagnostics = await runner.diagnose(code);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-core/invalid-final-state",
+        message:
+          "There was no header corresponding to the desired final-state-via value 'operation-location'.",
+      });
+    });
     it("emits error for missing header", async () => {
       const code = `
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
@@ -766,7 +784,7 @@ describe("typespec-azure-core: decorators", () => {
       const diagnostics = await runner.diagnose(code);
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-azure-core/invalid-final-state",
-        message: "There was no header corresponding to the desired final-state-via value location",
+        message: `There was no header corresponding to the desired final-state-via value 'location'.`,
       });
     });
     it("emits error for original-uri on non-PUT request", async () => {
@@ -783,7 +801,7 @@ describe("typespec-azure-core: decorators", () => {
       const diagnostics = await runner.diagnose(code);
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-azure-core/invalid-final-state",
-        message: "The final state value 'original-uri' can only be attached to http PUT operations",
+        message: "The final state value 'original-uri' can only be used in http PUT operations",
       });
     });
   });

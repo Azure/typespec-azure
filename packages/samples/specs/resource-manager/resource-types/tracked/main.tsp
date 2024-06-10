@@ -72,12 +72,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
-  @Azure.Core.useFinalStateVia("azure-async-operation")
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<
-    Employee,
-    LroHeaders = ArmAsyncOperationHeader<FinalResult = Employee> &
-      Azure.Core.Foundations.RetryAfterHeader
-  >;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
   update is ArmResourcePatchSync<Employee, EmployeeProperties>;
   delete is ArmResourceDeleteSync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;

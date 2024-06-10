@@ -50,7 +50,6 @@ model WidgetResourceProperties {
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<WidgetResource>;
-  @Azure.Core.useFinalStateVia("azure-async-operation")
   create is ArmResourceCreateOrUpdateAsync<
     WidgetResource,
     LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource> &

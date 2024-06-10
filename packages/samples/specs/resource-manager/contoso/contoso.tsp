@@ -66,6 +66,3 @@ union ProvisioningState {
   @doc("The resource create request has been accepted")
   Accepted: "Accepted",
 }
-
-// Override default LRO for PUT
-@@Azure.Core.useFinalStateVia(Employees.createOrUpdate, "azure-async-operation");

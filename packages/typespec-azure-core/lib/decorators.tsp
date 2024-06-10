@@ -124,7 +124,12 @@ namespace Azure.Core {
    */
   extern dec useFinalStateVia(
     entity: Operation,
-    finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation"
+    finalState: valueof
+      | "original-uri"
+      | "operation-location"
+      | "location"
+      | "azure-async-operation"
+      | "arm-put-default"
   );
 
   /**
@@ -205,5 +210,14 @@ namespace Azure.Core.Foundations.Private {
   extern dec armResourceIdentifierConfig(
     target: Scalar,
     options: ArmResourceIdentifierConfigOptions
+  );
+
+  /**
+   * Sets the priority order of default final-state-via options for an operation
+   * @param states: list of final-state-via options in priority order
+   */
+  extern dec defaultFinalStateVia(
+    target: TypeSpec.Reflection.Operation,
+    states: valueof ("operation-location" | "location" | "azure-async-operation")[]
   );
 }

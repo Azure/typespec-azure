@@ -31,7 +31,12 @@ import {
   UnionVariant,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { getHttpOperation, getRoutePath } from "@typespec/http";
+import {
+  getHttpOperation,
+  getRoutePath,
+  HttpOperation,
+  HttpOperationResponse,
+} from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
 import { FinalStateValue, OperationLink } from "./lro-helpers.js";
 import {
@@ -860,19 +865,19 @@ export function $useFinalStateVia(
   finalState: string
 ) {
   const { program } = context;
-  let finalStateValue: FinalStateValue;
+  let finalStateVia: FinalStateValue;
   switch (finalState?.toLowerCase()) {
     case "original-uri":
-      finalStateValue = FinalStateValue.originalUri;
+      finalStateVia = FinalStateValue.originalUri;
       break;
     case "operation-location":
-      finalStateValue = FinalStateValue.operationLocation;
+      finalStateVia = FinalStateValue.operationLocation;
       break;
     case "location":
-      finalStateValue = FinalStateValue.location;
+      finalStateVia = FinalStateValue.location;
       break;
     case "azure-async-operation":
-      finalStateValue = FinalStateValue.azureAsyncOperation;
+      finalStateVia = FinalStateValue.azureAsyncOperation;
       break;
     default:
       reportDiagnostic(program, {
@@ -883,57 +888,122 @@ export function $useFinalStateVia(
       });
       return;
   }
-  validateFinalState(program, entity, finalStateValue);
-  program.stateMap(finalStateOverrideKey).set(entity, finalStateValue);
+
+  const operation = ignoreDiagnostics(getHttpOperation(program, entity));
+  const storedValue = validateFinalState(program, operation, finalStateVia);
+  if (storedValue !== undefined || operation.verb === "put") {
+    program.stateMap(finalStateOverrideKey).set(entity, finalStateVia);
+  }
+  if (
+    storedValue === undefined &&
+    [
+      FinalStateValue.operationLocation,
+      FinalStateValue.location,
+      FinalStateValue.azureAsyncOperation,
+    ].includes(finalStateVia)
+  ) {
+    reportDiagnostic(program, {
+      code: "invalid-final-state",
+      target: entity,
+      messageId: "noHeader",
+      format: { finalStateValue: finalStateVia },
+    });
+  }
+}
+
+type LroHeader = "azure-asyncoperation" | "location" | "operation-location";
+
+function getLroHeaderName(finalState: FinalStateValue): LroHeader | undefined {
+  switch (finalState) {
+    case FinalStateValue.azureAsyncOperation:
+      return "azure-asyncoperation";
+    case FinalStateValue.location:
+      return "location";
+    case FinalStateValue.operationLocation:
+      return "operation-location";
+    default:
+      return undefined;
+  }
+}
+
+function getLroHeader(propertyName: string): LroHeader | undefined {
+  const name = propertyName.toLowerCase();
+  switch (name) {
+    case "azure-asyncoperation":
+    case "location":
+    case "operation-location":
+      return name;
+    default:
+      return undefined;
+  }
+}
+
+function getLroHeaders(response: HttpOperationResponse): Set<LroHeader> | undefined {
+  const result = new Set<LroHeader>();
+  for (const content of response.responses) {
+    if (content.headers) {
+      for (const candidate of Object.keys(content.headers)) {
+        const headerName = getLroHeader(candidate);
+        if (headerName !== undefined) {
+          result.add(headerName);
+        }
+      }
+    }
+  }
+
+  return result;
 }
 
 function validateFinalState(
   program: Program,
-  operation: Operation,
+  operation: HttpOperation,
   finalState: FinalStateValue
-): void {
-  const httpOp = ignoreDiagnostics(getHttpOperation(program, operation));
+): FinalStateValue | undefined {
   if (finalState === FinalStateValue.originalUri) {
-    if (httpOp.verb !== "put") {
+    if (operation.verb !== "put") {
       reportDiagnostic(program, {
         code: "invalid-final-state",
-        target: operation,
+        target: operation.operation,
         messageId: "notPut",
       });
+      return undefined;
     }
 
-    return;
+    return FinalStateValue.originalUri;
   }
 
-  if (httpOp.verb === "put") return;
-  for (const response of httpOp.responses) {
-    for (const content of response.responses) {
-      let compare: string;
-      switch (finalState) {
-        case FinalStateValue.azureAsyncOperation:
-          compare = "azure-asyncoperation";
-          break;
-        case FinalStateValue.location:
-          compare = "location";
-          break;
-        case FinalStateValue.operationLocation:
-          compare = "operation-location";
-          break;
-        default:
-          return;
-      }
-      if (content.headers !== undefined) {
-        const allHeaders = Object.keys(content.headers).flatMap((e) => e.toLowerCase());
-        if (allHeaders?.includes(compare)) return;
-      }
+  const header = getLroHeaderName(finalState);
+  if (header === undefined) {
+    reportDiagnostic(program, {
+      code: "invalid-final-state",
+      target: operation.operation,
+      messageId: "badValue",
+      format: { finalStateValue: finalState },
+    });
+    return undefined;
+  }
+
+  for (const response of operation.responses) {
+    const lroHeaders = getLroHeaders(response);
+    if (lroHeaders?.has(header)) {
+      return finalState;
     }
   }
-  reportDiagnostic(program, {
-    code: "invalid-final-state",
-    target: operation,
-    messageId: "noHeader",
-    format: { finalStateValue: finalState },
-  });
+
+  return undefined;
+}
+
+function validateFinalStates(
+  program: Program,
+  operation: Operation,
+  finalStates: FinalStateValue[]
+): FinalStateValue | undefined {
+  const httpOp = ignoreDiagnostics(getHttpOperation(program, operation));
+  for (const state of finalStates) {
+    if (validateFinalState(program, httpOp, state)) return state;
+  }
+
+  return undefined;
 }
 
 /**
@@ -1398,6 +1468,40 @@ export function getArmResourceIdentifierConfig(
   return program.stateMap(armResourceIdentifierConfigKey).get(entity);
 }
 
+export function $defaultFinalStateVia(
+  context: DecoratorContext,
+  target: Operation,
+  states: LroHeader[]
+) {
+  const { program } = context;
+  const finalStateValues: FinalStateValue[] = [];
+  for (const finalState of states) {
+    switch (finalState?.toLowerCase()) {
+      case "operation-location":
+        finalStateValues.push(FinalStateValue.operationLocation);
+        break;
+      case "location":
+        finalStateValues.push(FinalStateValue.location);
+        break;
+      case "azure-async-operation":
+        finalStateValues.push(FinalStateValue.azureAsyncOperation);
+        break;
+      default:
+        reportDiagnostic(program, {
+          code: "invalid-final-state",
+          target: target,
+          messageId: "badValue",
+          format: { finalStateValue: finalState },
+        });
+        return;
+    }
+  }
+  const storedValue = validateFinalStates(program, target, finalStateValues);
+  if (storedValue !== undefined) {
+    program.stateMap(finalStateOverrideKey).set(target, storedValue);
+  }
+}
+
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
   "Foundations.Private",
@@ -1407,5 +1511,6 @@ setTypeSpecNamespace(
   $needsRoute,
   $ensureVerb,
   $embeddingVector,
-  $armResourceIdentifierConfig
+  $armResourceIdentifierConfig,
+  $defaultFinalStateVia
 );

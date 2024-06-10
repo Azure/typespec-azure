@@ -79,10 +79,3 @@ interface ExtensionOperations extends Microsoft.InterfacesTest.ExtensionOperatio
 
 @armResourceOperations
 interface Tracked2Operations extends Microsoft.OperationsTest.Tracked2Operations {}
-
-// Overrides for PUT Operations
-@@Azure.Core.useFinalStateVia(ExtensionOperations.createOrUpdate, "azure-async-operation");
-@@Azure.Core.useFinalStateVia(TenantOperations.createOrUpdate, "azure-async-operation");
-@@Azure.Core.useFinalStateVia(AllProperties.createOrUpdate, "azure-async-operation");
-@@Azure.Core.useFinalStateVia(TrackedOperations.createOrUpdate, "azure-async-operation");
-@@Azure.Core.useFinalStateVia(TrackedChildOperations.createOrUpdate, "azure-async-operation");

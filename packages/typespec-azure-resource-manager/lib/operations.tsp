@@ -145,11 +145,13 @@ op ArmResourceCheckExistence<
 @doc("Create a {name}", Resource)
 @armResourceCreateOrUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
 @put
 op ArmResourceCreateOrUpdateAsync<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -229,7 +231,8 @@ op ArmResourceCreateOrReplaceSync<
 op ArmResourceCreateOrReplaceAsync<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
