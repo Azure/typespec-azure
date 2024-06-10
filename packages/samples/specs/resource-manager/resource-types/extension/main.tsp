@@ -66,11 +66,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @armResourceOperations
 interface RoleAssignments {
   get is ArmResourceRead<RoleAssignment>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<
-    RoleAssignment,
-    LroHeaders = ArmAsyncOperationHeader<FinalResult = RoleAssignment> &
-      Azure.Core.Foundations.RetryAfterHeader
-  >;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<RoleAssignment>;
   update is ArmResourcePatchSync<RoleAssignment, RoleAssignmentProperties>;
   delete is ArmResourceDeleteSync<RoleAssignment>;
   list is ArmResourceListByParent<RoleAssignment>;

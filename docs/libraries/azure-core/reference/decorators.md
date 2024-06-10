@@ -314,7 +314,7 @@ Used to define how to call custom polling operations for long-running operations
 Overrides the final state value for an operation
 
 ```typespec
-@Azure.Core.useFinalStateVia(finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation" | "arm-put-default")
+@Azure.Core.useFinalStateVia(finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation")
 ```
 
 #### Target
@@ -323,9 +323,9 @@ Overrides the final state value for an operation
 
 #### Parameters
 
-| Name       | Type                                                                                                           | Description                   |
-| ---------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| finalState | `valueof "original-uri" \| "operation-location" \| "location" \| "azure-async-operation" \| "arm-put-default"` | The desired final state value |
+| Name       | Type                                                                                      | Description                   |
+| ---------- | ----------------------------------------------------------------------------------------- | ----------------------------- |
+| finalState | `valueof "original-uri" \| "operation-location" \| "location" \| "azure-async-operation"` | The desired final state value |
 
 ## Azure.Core.Foundations
 

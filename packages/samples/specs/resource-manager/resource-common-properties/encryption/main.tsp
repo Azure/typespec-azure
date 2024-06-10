@@ -50,11 +50,7 @@ model WidgetResourceProperties {
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<WidgetResource>;
-  create is ArmResourceCreateOrUpdateAsync<
-    WidgetResource,
-    LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource> &
-      Azure.Core.Foundations.RetryAfterHeader
-  >;
+  create is ArmResourceCreateOrUpdateAsync<WidgetResource>;
   update is ArmTagsPatchSync<WidgetResource>;
   delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
   listByResourceGroup is ArmResourceListByParent<WidgetResource>;

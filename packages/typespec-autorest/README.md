@@ -128,7 +128,7 @@ Create read-only property schema for lro status
 
 **Type:** `"none" | "final-state-only" | "all"`
 
-Determine whether and hot to emit x-ms-long-running-operation-options for lro resolution
+Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
 
 ## Decorators
 

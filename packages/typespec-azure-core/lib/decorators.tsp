@@ -124,12 +124,7 @@ namespace Azure.Core {
    */
   extern dec useFinalStateVia(
     entity: Operation,
-    finalState: valueof
-      | "original-uri"
-      | "operation-location"
-      | "location"
-      | "azure-async-operation"
-      | "arm-put-default"
+    finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation"
   );
 
   /**

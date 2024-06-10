@@ -191,7 +191,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       default: "final-state-only",
       description:
-        "Determine whether and hot to emit x-ms-long-running-operation-options for lro resolution",
+        "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
     },
   },
   required: [],
