@@ -1753,6 +1753,8 @@ union Azure.ResourceManager.CommonTypes.createdByType
 
 ### `EncryptionStatus` {#Azure.ResourceManager.CommonTypes.EncryptionStatus}
 
+Indicates whether or not the encryption is enabled for container registry.
+
 ```typespec
 union Azure.ResourceManager.CommonTypes.EncryptionStatus
 ```

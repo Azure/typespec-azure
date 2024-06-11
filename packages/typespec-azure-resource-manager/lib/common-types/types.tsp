@@ -416,9 +416,14 @@ union CheckNameAvailabilityReason {
   string,
 }
 
+/** Indicates whether or not the encryption is enabled for container registry. */
 union EncryptionStatus {
+  /** Encryption is enabled. */
   enabled: "enabled",
+
+  /** Encryption is disabled. */
   disabled: "disabled",
+
   string,
 }
 /**

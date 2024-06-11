@@ -14,13 +14,17 @@ using Azure.Core;
 @service({
   title: "Contoso.CommonEnvelopePropertiesExample",
 })
-@OpenAPI.info({
-  version: "2023-03-01-preview",
-})
+@versioned(Versions)
 @doc("An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.")
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.UpdateTests;
+
+/** UpdateTests API versions */
+enum Versions {
+  /** 2023-03-01-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2023-03-01-preview`,
+}
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -56,7 +60,7 @@ model WidgetResourceProperties {
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<WidgetResource>;
-  create is ArmResourceCreateOrUpdateAsync<WidgetResource>;
+  create is ArmResourceCreateOrReplaceAsync<WidgetResource>;
   update is ArmTagsPatchSync<WidgetResource>;
   delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
   listByResourceGroup is ArmResourceListByParent<WidgetResource>;

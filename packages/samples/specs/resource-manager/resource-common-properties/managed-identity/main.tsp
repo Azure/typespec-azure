@@ -14,13 +14,17 @@ using Azure.Core;
 @service({
   title: "Contoso.ManagedIdentityExample",
 })
-@OpenAPI.info({
-  version: "2023-03-01-preview",
-})
+@versioned(Versions)
 @doc("An example of using the ManagedIdentity properties in a resource type.")
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.UpdateTests;
+
+/** UpdateTests API versions */
+enum Versions {
+  /** 2023-03-01-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2023-03-01-preview`,
+}
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
