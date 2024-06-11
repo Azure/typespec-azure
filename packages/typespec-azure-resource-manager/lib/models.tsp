@@ -11,24 +11,27 @@ namespace Azure.ResourceManager;
  * Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
  * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
  * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+ *
+ * For additional decorators such as @minLength, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
+ *
  * @template Resource The ARM resource this name parameter is applying to.
  * @template KeyName Override default key name of the resource.
  * @template SegmentName Override default segment name of the resource.
  * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
- * @template NameType The type of the name property. Default type is string. However you can pass an union with string values. For additional decorators such as @minLength, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
+ * @template Type The type of the name property. Default type is string. However you can pass an union with string values.
  */
 model ResourceNameParameter<
   Resource extends Foundations.Resource,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
-  NameType extends string = string
+  Type extends string = string
 > {
   @doc("The name of the {name}", Resource)
   @pattern(NamePattern)
   @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
   @path
-  name: NameType;
+  name: Type;
 }
 
 //#region Standard Resource Operation Interfaces

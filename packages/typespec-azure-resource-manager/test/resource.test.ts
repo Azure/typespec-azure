@@ -661,7 +661,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
-         ...ResourceNameParameter<Widget, NameType=WidgetNameType>;
+         ...ResourceNameParameter<Widget, Type=WidgetNameType>;
       }
 
       @doc("The properties of a widget")
@@ -695,7 +695,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
-         ...ResourceNameParameter<Widget, NameType=WidgetNameType>;
+         ...ResourceNameParameter<Widget, Type=WidgetNameType>;
       }
 
       @doc("The properties of a widget")
