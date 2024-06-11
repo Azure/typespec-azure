@@ -1,4 +1,6 @@
 import {
+  FinalStateValue,
+  LroMetadata,
   PagedResultMetadata,
   UnionEnum,
   extractLroStates,
@@ -144,6 +146,7 @@ import {
   OpenAPI2StatusCode,
   PrimitiveItems,
   Refable,
+  XMSLongRunningFinalState,
 } from "./openapi2-document.js";
 import type { AutorestEmitterResult, LoadedExample } from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
@@ -185,6 +188,13 @@ export interface AutorestDocumentEmitterOptions {
    * @default "omit"
    */
   readonly versionEnumStrategy?: "omit" | "include";
+
+  /**
+   * Determines whether and how to emit x-ms-long-running-operation-options
+   * to describe resolution of asynchronous operations
+   * @default "final-state-only"
+   */
+  readonly emitLroOptions?: "none" | "final-state-only" | "all";
 }
 
 /**
@@ -486,6 +496,45 @@ export async function getOpenAPIForService(
     return path.replace(/\/?\?.*/, "");
   }
 
+  function getFinalStateVia(metadata: LroMetadata): XMSLongRunningFinalState | undefined {
+    switch (metadata.finalStateVia) {
+      case FinalStateValue.azureAsyncOperation:
+        return "azure-async-operation";
+      case FinalStateValue.location:
+        return "location";
+      case FinalStateValue.operationLocation:
+        return "operation-location";
+      case FinalStateValue.originalUri:
+        return "original-uri";
+      default:
+        return undefined;
+    }
+  }
+
+  function getFinalStateSchema(metadata: LroMetadata): { "final-state-schema": Ref } | undefined {
+    if (
+      metadata.finalResult !== undefined &&
+      metadata.finalResult !== "void" &&
+      metadata.finalResult.name.length > 0
+    ) {
+      const model: Model = metadata.finalResult;
+      const schemaOrRef = resolveExternalRef(metadata.finalResult);
+
+      if (schemaOrRef !== undefined) {
+        const ref = new Ref();
+        ref.value = schemaOrRef.$ref;
+        return { "final-state-schema": ref };
+      }
+      const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
+        type: model,
+        visibility: Visibility.Read,
+        ref: refs.getOrAdd(model, Visibility.Read, () => new Ref()),
+      }));
+      return { "final-state-schema": pending.ref };
+    }
+    return undefined;
+  }
+
   function emitOperation(operation: HttpOperation) {
     let { path: fullPath, operation: op, verb, parameters } = operation;
     let pathsObject: Record<string, OpenAPI2PathItem> = root.paths;
@@ -548,6 +597,24 @@ export async function getOpenAPIForService(
     // which does have LRO metadata.
     if (lroMetadata !== undefined && operation.verb !== "get") {
       currentEndpoint["x-ms-long-running-operation"] = true;
+      if (options.emitLroOptions !== "none") {
+        const finalState = getFinalStateVia(lroMetadata);
+        if (finalState !== undefined) {
+          const finalSchema = getFinalStateSchema(lroMetadata);
+          let lroOptions = {
+            "final-state-via": finalState,
+          };
+
+          if (finalSchema !== undefined && options.emitLroOptions === "all") {
+            lroOptions = {
+              "final-state-via": finalState,
+              ...finalSchema,
+            };
+          }
+
+          currentEndpoint["x-ms-long-running-operation-options"] = lroOptions;
+        }
+      }
     }
 
     // Extract paged metadata from Azure.Core.Page

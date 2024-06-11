@@ -177,6 +177,10 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
             },
             "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -436,6 +440,10 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
             },
             "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -778,6 +786,10 @@
               "$ref": "#/definitions/AllPropertiesResource"
             },
             "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -1253,6 +1265,10 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
             },
             "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
@@ -1529,6 +1545,10 @@
               "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
             },
             "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
               "Retry-After": {
                 "type": "integer",
                 "format": "int32",
