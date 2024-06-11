@@ -157,9 +157,9 @@ model ConditionalRequestHeaders {
 }
 
 @doc("""
-Provides the 'ETag' field to enable conditional (cached) requests.  This model can be spread
-into responses and item models to convey the ETag when it cannot simply conveyed in a header.
-""")
+  Provides the 'ETag' field to enable conditional (cached) requests.  This model can be spread
+  into responses and item models to convey the ETag when it cannot simply conveyed in a header.
+  """)
 model EtagProperty {
   @visibility("read")
   @doc("The entity tag for this resource.")
