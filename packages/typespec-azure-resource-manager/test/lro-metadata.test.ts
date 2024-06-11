@@ -77,7 +77,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
     deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
     deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
   });
 
   it("Returns correct metadata for Async CreateOrUpdate with final location", async () => {
@@ -362,7 +362,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
     deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
     deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
   });
 
   it("Returns correct metadata for Async CreateOrUpdate with final location, with union type ProvisioningState", async () => {

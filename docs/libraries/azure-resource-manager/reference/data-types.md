@@ -65,7 +65,7 @@ model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 The standard header for asynchronous operation polling
 
 ```typespec
-model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
+model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue, FinalResult>
 ```
 
 #### Template Parameters
@@ -74,6 +74,7 @@ model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue>
 | ------------- | ------------------------------------------------- |
 | StatusMonitor | The status monitor type for lro polling           |
 | UrlValue      | The value type of the Azure-AsyncOperation header |
+| FinalResult   | The logical final result of the operation         |
 
 #### Properties
 

@@ -131,15 +131,18 @@ model ArmOperationStatus<
 /**
  * The standard header for asynchronous operation polling
  *  @template StatusMonitor The status monitor type for lro polling
- *  @template UrlValue The value type of the Azure-AsyncOperation  header
+ *  @template UrlValue The value type of the Azure-AsyncOperation header
+ *  @template FinalResult The logical final result of the operation
  */
 model ArmAsyncOperationHeader<
   StatusMonitor extends {} = ArmOperationStatus,
-  UrlValue extends string = string
+  UrlValue extends string = string,
+  FinalResult extends {} = never
 > {
   /** A link to the status monitor */
   @header("Azure-AsyncOperation")
-  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
+  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<PollingModel = StatusMonitor>)
+  @Azure.Core.finalLocation(FinalResult)
   azureAsyncOperation?: UrlValue;
 }
 
@@ -150,7 +153,7 @@ model ArmAsyncOperationHeader<
  * @template UrlValue The value type for the location header
  */
 model ArmLroLocationHeader<
-  LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+  LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<PollingModel = ArmOperationStatus>,
   FinalResult extends {} | void = void,
   UrlValue extends string = string
 > {
