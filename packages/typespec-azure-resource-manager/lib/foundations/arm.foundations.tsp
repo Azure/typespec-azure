@@ -115,7 +115,11 @@ model ResourceUpdateModelProperties<
 model ResourceUpdateModel<
   Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
-> is OptionalProperties<UpdateableProperties<OmitProperties<Resource, "Name" | "name">>> {
+>
+  is OptionalProperties<UpdateableProperties<OmitProperties<
+    Resource,
+    "Name" | "name" | "properties"
+  >>> {
   @extension("x-ms-client-flatten", true)
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
