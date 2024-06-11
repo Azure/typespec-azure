@@ -293,27 +293,21 @@ model ErrorAdditionalInfo {
  */
 model SystemData {
   /** The identity that created the resource. */
-  @visibility("read")
   createdBy?: string;
 
   /** The type of identity that created the resource. */
-  @visibility("read")
   createdByType?: createdByType;
 
   /** The timestamp of resource creation (UTC). */
-  @visibility("read")
   createdAt?: utcDateTime;
 
   /** The identity that last modified the resource. */
-  @visibility("read")
   lastModifiedBy?: string;
 
   /** The type of identity that last modified the resource. */
-  @visibility("read")
   lastModifiedByType?: createdByType;
 
   /** The timestamp of resource last modification (UTC) */
-  @visibility("read")
   lastModifiedAt?: utcDateTime;
 }
 
@@ -509,7 +503,7 @@ model SubscriptionIdParameter {
   @typeChangedFrom(Versions.v4, string)
   @path
   @segment("subscriptions")
-  @doc("The ID of the target subscription.  The value must be an UUID.")
+  @doc("The ID of the target subscription. The value must be an UUID.")
   subscriptionId: uuid;
 }
 
