@@ -1,4 +1,4 @@
-import { SdkContext, createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
@@ -21,6 +21,11 @@ import {
   getOpenAPIForService,
   sortOpenAPIDocument,
 } from "./openapi.js";
+import type {
+  AutorestEmitterResult,
+  AutorestServiceRecord,
+  AutorestVersionedServiceRecord,
+} from "./types.js";
 import { AutorestEmitterContext } from "./utils.js";
 
 /**
@@ -48,17 +53,34 @@ const defaultOptions = {
 } as const;
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
-  const resolvedOptions = { ...defaultOptions, ...context.options };
+  const tracer = getTracer(context.program);
+
+  const options = resolveAutorestOptions(
+    context.program,
+    context.emitterOutputDir,
+    context.options
+  );
+  tracer.trace("options", JSON.stringify(options, null, 2));
+
+  await emitAllServiceAtAllVersions(context.program, options);
+}
+
+export function resolveAutorestOptions(
+  program: Program,
+  emitterOutputDir: string,
+  options: AutorestEmitterOptions
+): ResolvedAutorestEmitterOptions {
+  const resolvedOptions = { ...defaultOptions, ...options };
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {
-      "project-root": context.program.projectRoot,
-      "emitter-output-dir": context.emitterOutputDir,
+      "project-root": program.projectRoot,
+      "emitter-output-dir": emitterOutputDir,
     }
   );
-  const options: ResolvedAutorestEmitterOptions = {
+  return {
     outputFile: resolvedOptions["output-file"],
-    outputDir: context.emitterOutputDir,
+    outputDir: emitterOutputDir,
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
     examplesDirectory: resolvedOptions["examples-directory"],
     version: resolvedOptions["version"],
@@ -69,37 +91,37 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
   };
-  const tracer = getTracer(context.program);
-  tracer.trace("options", JSON.stringify(options, null, 2));
-
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest", {
-    versionStrategy: "ignore",
-  });
-
-  await emitAllServiceAtAllVersions(context.program, tcgcSdkContext, options);
 }
 
-export async function emitAllServiceAtAllVersions(
+export async function getAllServicesAtAllVersions(
   program: Program,
-  tcgcSdkContext: SdkContext,
   options: ResolvedAutorestEmitterOptions
-) {
+): Promise<AutorestServiceRecord[]> {
+  const tcgcSdkContext = createSdkContext(
+    { program, options: {} } as any,
+    "@azure-tools/typespec-autorest",
+    {
+      versionStrategy: "ignore",
+    }
+  );
+
   const services = listServices(program);
   if (services.length === 0) {
     services.push({ type: program.getGlobalNamespaceType() });
   }
 
+  const serviceRecords: AutorestServiceRecord[] = [];
   for (const service of services) {
     const originalProgram = program;
     const versions = buildVersionProjections(program, service.type).filter(
       (v) => !options.version || options.version === v.version
     );
-    for (const record of versions) {
-      let projectedProgram;
-      if (record.projections.length > 0) {
-        projectedProgram = program = projectProgram(originalProgram, record.projections);
-      }
 
+    if (versions.length === 1 && versions[0].version === undefined) {
+      let projectedProgram;
+      if (versions[0].projections.length > 0) {
+        projectedProgram = program = projectProgram(originalProgram, versions[0].projections);
+      }
       const projectedServiceNs: Namespace = projectedProgram
         ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
         : service.type;
@@ -109,50 +131,111 @@ export async function emitAllServiceAtAllVersions(
           : getService(program, projectedServiceNs)!;
       const context: AutorestEmitterContext = {
         program,
-        outputFile: resolveOutputFile(
-          program,
-          projectedService,
-          services.length > 1,
-          options,
-          record.version
-        ),
+        outputFile: resolveOutputFile(program, service, services.length > 1, options),
         service: projectedService,
-        version: record.version,
         tcgcSdkContext,
       };
+
       const result = await getOpenAPIForService(context, options);
-      if (!program.compilerOptions.noEmit && !program.hasError()) {
-        // Sort the document
-        const sortedDocument = sortOpenAPIDocument(result.document);
+      serviceRecords.push({
+        service,
+        versioned: false,
+        ...result,
+      });
+    } else {
+      const serviceRecord: AutorestVersionedServiceRecord = {
+        service,
+        versioned: true,
+        versions: [],
+      };
+      serviceRecords.push(serviceRecord);
 
-        // Write out the OpenAPI document to the output path
-        await emitFile(program, {
-          path: context.outputFile,
-          content: prettierOutput(JSON.stringify(sortedDocument, null, 2)),
-          newLine: options.newLine,
+      for (const record of versions) {
+        const projectedProgram = (program = projectProgram(originalProgram, record.projections));
+
+        const projectedServiceNs: Namespace = projectedProgram
+          ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
+          : service.type;
+        const projectedService =
+          projectedServiceNs === program.getGlobalNamespaceType()
+            ? { type: program.getGlobalNamespaceType() }
+            : getService(program, projectedServiceNs)!;
+        const context: AutorestEmitterContext = {
+          program,
+          outputFile: resolveOutputFile(
+            program,
+            projectedService,
+            services.length > 1,
+            options,
+            record.version
+          ),
+          service: projectedService,
+          version: record.version,
+          tcgcSdkContext,
+        };
+        const result = await getOpenAPIForService(context, options);
+        serviceRecord.versions.push({
+          ...result,
+          service: projectedService,
+          version: record.version!,
         });
+      }
+    }
+  }
 
-        // Copy examples to the output directory
-        if (options.examplesDirectory && result.operationExamples.length > 0) {
-          const examplesPath = resolvePath(getDirectoryPath(context.outputFile), "examples");
-          await program.host.mkdirp(examplesPath);
-          for (const { examples } of result.operationExamples) {
-            if (examples) {
-              for (const { relativePath, file } of Object.values(examples)) {
-                await emitFile(program, {
-                  path: resolvePath(examplesPath, relativePath),
-                  content: file.text,
-                  newLine: options.newLine,
-                });
-              }
-            }
-          }
+  return serviceRecords;
+}
+
+async function emitAllServiceAtAllVersions(
+  program: Program,
+  options: ResolvedAutorestEmitterOptions
+) {
+  const services = await getAllServicesAtAllVersions(program, options);
+  if (program.compilerOptions.noEmit || program.hasError()) {
+    return;
+  }
+  for (const serviceRecord of services) {
+    if (serviceRecord.versioned) {
+      for (const documentRecord of serviceRecord.versions) {
+        await emitOutput(program, documentRecord, options);
+      }
+    } else {
+      await emitOutput(program, serviceRecord, options);
+    }
+  }
+}
+
+async function emitOutput(
+  program: Program,
+  result: AutorestEmitterResult,
+  options: ResolvedAutorestEmitterOptions
+) {
+  const sortedDocument = sortOpenAPIDocument(result.document);
+
+  // Write out the OpenAPI document to the output path
+  await emitFile(program, {
+    path: result.outputFile,
+    content: prettierOutput(JSON.stringify(sortedDocument, null, 2)),
+    newLine: options.newLine,
+  });
+
+  // Copy examples to the output directory
+  if (options.examplesDirectory && result.operationExamples.length > 0) {
+    const examplesPath = resolvePath(getDirectoryPath(result.outputFile), "examples");
+    await program.host.mkdirp(examplesPath);
+    for (const { examples } of result.operationExamples) {
+      if (examples) {
+        for (const { relativePath, file } of Object.values(examples)) {
+          await emitFile(program, {
+            path: resolvePath(examplesPath, relativePath),
+            content: file.text,
+            newLine: options.newLine,
+          });
         }
       }
     }
   }
 }
-
 function prettierOutput(output: string) {
   return output + "\n";
 }

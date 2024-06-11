@@ -31,7 +31,6 @@ import {
   Operation,
   Program,
   Scalar,
-  SourceFile,
   StringLiteral,
   StringTemplate,
   SyntaxKind,
@@ -90,9 +89,10 @@ import {
   Authentication,
   HttpAuth,
   HttpOperation,
+  HttpOperationBody,
+  HttpOperationMultipartBody,
   HttpOperationParameters,
   HttpOperationResponse,
-  HttpOperationResponseBody,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
@@ -128,6 +128,7 @@ import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2Document,
+  OpenAPI2FileSchema,
   OpenAPI2FormDataParameter,
   OpenAPI2HeaderDefinition,
   OpenAPI2OAuth2FlowType,
@@ -144,6 +145,7 @@ import {
   PrimitiveItems,
   Refable,
 } from "./openapi2-document.js";
+import type { AutorestEmitterResult, LoadedExample } from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 
 interface SchemaContext {
@@ -225,16 +227,6 @@ interface PendingSchema {
  */
 interface ProcessedSchema extends PendingSchema {
   schema: OpenAPI2Schema | undefined;
-}
-
-export interface OperationExamples {
-  readonly operationId: string;
-  readonly examples: LoadedExample[];
-}
-
-export interface AutorestEmitterResult {
-  readonly document: OpenAPI2Document;
-  readonly operationExamples: OperationExamples[];
 }
 
 export async function getOpenAPIForService(
@@ -358,6 +350,7 @@ export async function getOpenAPIForService(
         }
       })
       .filter((x) => x) as any,
+    outputFile: context.outputFile,
   };
 
   function resolveHost(
@@ -717,7 +710,7 @@ export async function getOpenAPIForService(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: HttpOperationResponseBody | undefined;
+    let body: HttpOperationBody | HttpOperationMultipartBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -739,13 +732,7 @@ export async function getOpenAPIForService(
     }
 
     if (body) {
-      const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
-      openapiResponse.schema = isBinary
-        ? { type: "file" }
-        : getSchemaOrRef(body.type, {
-            visibility: Visibility.Read,
-            ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
-          });
+      openapiResponse.schema = getSchemaForResponseBody(body, contentTypes);
     }
 
     for (const contentType of contentTypes) {
@@ -753,6 +740,24 @@ export async function getOpenAPIForService(
     }
 
     currentEndpoint.responses![statusCode] = openapiResponse;
+  }
+
+  function getSchemaForResponseBody(
+    body: HttpOperationBody | HttpOperationMultipartBody,
+    contentTypes: string[]
+  ): OpenAPI2Schema | OpenAPI2FileSchema {
+    const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
+    if (isBinary) {
+      return { type: "file" };
+    }
+    if (body.bodyKind === "multipart") {
+      // OpenAPI2 doesn't support multipart responses, so we just return a string schema
+      return { type: "string" };
+    }
+    return getSchemaOrRef(body.type, {
+      visibility: Visibility.Read,
+      ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
+    });
   }
 
   function getResponseHeader(prop: ModelProperty): OpenAPI2HeaderDefinition {
@@ -954,39 +959,81 @@ export async function getOpenAPIForService(
     }
 
     if (methodParams.body && !isVoidType(methodParams.body.type)) {
-      const isBinary = isBinaryPayload(methodParams.body.type, consumes);
-      const schemaContext = {
-        visibility,
-        ignoreMetadataAnnotations:
-          methodParams.body.isExplicit && methodParams.body.containsMetadataAnnotations,
-      };
-      const schema = isBinary
-        ? { type: "string", format: "binary" }
-        : getSchemaOrRef(methodParams.body.type, schemaContext);
+      emitBodyParameters(methodParams.body, visibility);
+    }
+  }
 
-      if (currentConsumes.has("multipart/form-data")) {
-        const bodyModelType = methodParams.body.type;
-        // Assert, this should never happen. Rest library guard against that.
-        compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
-        if (bodyModelType) {
-          for (const param of bodyModelType.properties.values()) {
-            emitParameter(param, "formData", schemaContext, getJsonName(param));
-          }
+  function emitBodyParameters(
+    body: HttpOperationBody | HttpOperationMultipartBody,
+    visibility: Visibility
+  ) {
+    switch (body.bodyKind) {
+      case "single":
+        emitSingleBodyParameters(body, visibility);
+        break;
+      case "multipart":
+        emitMultipartBodyParameters(body, visibility);
+        break;
+    }
+  }
+
+  function emitSingleBodyParameters(body: HttpOperationBody, visibility: Visibility) {
+    const isBinary = isBinaryPayload(body.type, body.contentTypes);
+    const schemaContext = {
+      visibility,
+      ignoreMetadataAnnotations: body.isExplicit && body.containsMetadataAnnotations,
+    };
+    const schema = isBinary
+      ? { type: "string", format: "binary" }
+      : getSchemaOrRef(body.type, schemaContext);
+
+    if (currentConsumes.has("multipart/form-data")) {
+      const bodyModelType = body.type;
+      // Assert, this should never happen. Rest library guard against that.
+      compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
+      if (bodyModelType) {
+        for (const param of bodyModelType.properties.values()) {
+          emitParameter(param, "formData", schemaContext, getJsonName(param));
         }
-      } else if (methodParams.body.parameter) {
-        emitParameter(
-          methodParams.body.parameter,
-          "body",
-          { visibility, ignoreMetadataAnnotations: false },
-          getJsonName(methodParams.body.parameter),
-          schema
-        );
-      } else {
+      }
+    } else if (body.property) {
+      emitParameter(
+        body.property,
+        "body",
+        { visibility, ignoreMetadataAnnotations: false },
+        getJsonName(body.property),
+        schema
+      );
+    } else {
+      currentEndpoint.parameters.push({
+        name: "body",
+        in: "body",
+        schema,
+        required: true,
+      });
+    }
+  }
+
+  function emitMultipartBodyParameters(body: HttpOperationMultipartBody, visibility: Visibility) {
+    for (const [index, part] of body.parts.entries()) {
+      const partName = part.name ?? `part${index}`;
+      let schema = getFormDataSchema(
+        part.body.type,
+        { visibility, ignoreMetadataAnnotations: false },
+        partName
+      );
+      if (schema) {
+        if (part.multi) {
+          schema = {
+            type: "array",
+            items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
+          };
+        }
         currentEndpoint.parameters.push({
-          name: "body",
-          in: "body",
-          schema,
-          required: true,
+          name: partName,
+          in: "formData",
+          required: !part.optional,
+          ...schema,
         });
       }
     }
@@ -2246,11 +2293,6 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
-interface LoadedExample {
-  readonly relativePath: string;
-  readonly file: SourceFile;
-  readonly data: any;
-}
 async function loadExamples(
   host: CompilerHost,
   options: AutorestDocumentEmitterOptions,

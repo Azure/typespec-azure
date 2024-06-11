@@ -134,8 +134,7 @@ async function emitAllServices(
 function resolveOutputFile(
   service: Service,
   multipleServices: boolean,
-  options: ResolvedAutorestCanonicalEmitterOptions,
-  version?: string
+  options: ResolvedAutorestCanonicalEmitterOptions
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   const interpolated = interpolatePath(options.outputFile, {
@@ -144,12 +143,6 @@ function resolveOutputFile(
       multipleServices || azureResourceProviderFolder
         ? getNamespaceFullName(service.type)
         : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
-    version,
   });
 
   return resolvePath(options.outputDir, interpolated);

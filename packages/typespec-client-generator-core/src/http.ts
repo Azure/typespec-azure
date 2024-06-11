@@ -48,7 +48,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getEffectivePayloadType } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -124,7 +124,7 @@ function getSdkHttpParameters(
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
-  if (tspBody) {
+  if (tspBody && tspBody?.bodyKind !== "multipart") {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter && !isNeverOrVoidType(tspBody.parameter.type)) {
       const getParamResponse = diagnostics.pipe(
@@ -165,6 +165,7 @@ function getSdkHttpParameters(
         type,
         optional: false,
         correspondingMethodParams,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
       };
     }
     if (retval.bodyParam) {
@@ -182,7 +183,7 @@ function getSdkHttpParameters(
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(httpOperation, retval.bodyParam),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -201,7 +202,7 @@ function getSdkHttpParameters(
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
     // If our operation returns a body, we add an accept header if none exist
     const acceptBase = {
-      ...createContentTypeOrAcceptHeader(httpOperation, responseBody),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, responseBody),
     };
     if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
@@ -225,6 +226,7 @@ function getSdkHttpParameters(
 }
 
 function createContentTypeOrAcceptHeader(
+  context: TCGCContext,
   httpOperation: HttpOperation,
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
@@ -264,6 +266,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
   };
 }
 

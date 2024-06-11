@@ -62,7 +62,7 @@ export function parseEmitterName(
     );
     return diagnostics.wrap("none");
   }
-  const regex = /(?:cadl|typespec)-([^\\/]*)/;
+  const regex = /(?:cadl|typespec|client|server)-([^\\/-]*)/;
   const match = emitterName.match(regex);
   if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
@@ -265,13 +265,13 @@ export function intOrFloat(value: number): "int32" | "float32" {
 }
 
 /**
- * Whether a model is an Azure.Core model or not
+ * Whether a model or enum or union as enum is in Azure.Core[.Foundations] namespace
  * @param t
  * @returns
  */
 export function isAzureCoreModel(t: Type): boolean {
   return (
-    t.kind === "Model" &&
+    (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&
     ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
   );
@@ -380,8 +380,12 @@ export function getAllResponseBodies(
  * Otherwise, you should use the `getGeneratedName` function.
  * @param context
  */
-export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
-  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
+export function createGeneratedName(
+  context: TCGCContext,
+  type: Namespace | Operation,
+  suffix: string
+): string {
+  return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
 function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
