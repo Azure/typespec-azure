@@ -131,8 +131,8 @@ enum SkuTier {
 @armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v4)
 @armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v5)
 @doc("""
-A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
-""")
+  A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
+  """)
 model OperationListResult is Azure.Core.Page<Operation>;
 
 /**
@@ -144,14 +144,14 @@ model OperationListResult is Azure.Core.Page<Operation>;
 @doc("Details of a REST API operation, returned from the Resource Provider Operations API")
 model Operation {
   @doc("""
-  The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
-  """)
+    The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
+    """)
   @visibility("read")
   name?: string;
 
   @doc("""
-  Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
-  """)
+    Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
+    """)
   @visibility("read")
   isDataAction?: boolean;
 
@@ -159,14 +159,14 @@ model Operation {
   display?: OperationDisplay;
 
   @doc("""
-  The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-  """)
+    The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+    """)
   @visibility("read")
   origin?: Origin;
 
   @doc("""
-  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-  """)
+    Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+    """)
   actionType?: ActionType;
 }
 
@@ -179,18 +179,18 @@ model Operation {
 @doc("Localized display information for and operation.")
 model OperationDisplay {
   @doc("""
-  The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".
-  """)
+    The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".
+    """)
   provider?: string;
 
   @doc("""
-  The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
-  """)
+    The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
+    """)
   resource?: string;
 
   @doc("""
-  The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
-  """)
+    The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
+    """)
   operation?: string;
 
   @doc("The short, localized friendly description of the operation; suitable for tool tips and detailed views.")
@@ -250,8 +250,8 @@ model OperationIdParameter {
  * Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
  */
 @doc("""
-Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-""")
+  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+  """)
 union ActionType {
   @doc("Actions are for internal-only APIs.")
   Internal: "Internal",
@@ -263,8 +263,8 @@ union ActionType {
  * The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
  */
 @doc("""
-The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-""")
+  The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+  """)
 union Origin {
   @doc("Indicates the operation is initiated by a user.")
   user: "user",

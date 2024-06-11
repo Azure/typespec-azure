@@ -352,10 +352,10 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description                                         |
-| ---------- | ---------- | --------------------------------------------------- |
-| statusCode | `200`      | The status code.                                    |
-| body       | `Resource` | The body type of the operation request or response. |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `200`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResponse` {#Azure.ResourceManager.ArmResponse}
 
@@ -968,10 +968,10 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 
 #### Properties
 
-| Name      | Type                             | Description                        |
-| --------- | -------------------------------- | ---------------------------------- |
-| value     | `Array<Element>`                 | The {name} items on this page      |
-| nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
+| Name      | Type                             | Description |
+| --------- | -------------------------------- | ----------- |
+| value     | `Array<Element>`                 |             |
+| nextLink? | `TypeSpec.Rest.ResourceLocation` |             |
 
 ### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
 
@@ -1404,7 +1404,7 @@ model Azure.ResourceManager.Foundations.ExtensionScope<Resource>
 | ----------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion  | `string`                         | The API version to use for this operation.                             |
 | resourceUri | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
-| provider    | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
+| provider    | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
 
 ### `LocationBaseParameters` {#Azure.ResourceManager.Foundations.LocationBaseParameters}
 
@@ -1443,7 +1443,7 @@ model Azure.ResourceManager.Foundations.LocationScope<Resource>
 | apiVersion     | `string`                         | The API version to use for this operation. |
 | subscriptionId | `string`                         | The ID of the target subscription.         |
 | location       | `string`                         | The location name.                         |
-| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| provider       | `"Microsoft.ThisWillBeReplaced"` |                                            |
 
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.Foundations.ManagedServiceIdentity}
 
@@ -1654,7 +1654,7 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | location          | `string`                         | The location name.                                                     |
 | resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
+| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
 
 ### `ResourceUpdateModel` {#Azure.ResourceManager.Foundations.ResourceUpdateModel}
 
@@ -1751,7 +1751,7 @@ model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 | -------------- | -------------------------------- | ------------------------------------------ |
 | apiVersion     | `string`                         | The API version to use for this operation. |
 | subscriptionId | `string`                         | The ID of the target subscription.         |
-| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| provider       | `"Microsoft.ThisWillBeReplaced"` |                                            |
 
 ### `SystemAssignedServiceIdentity` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity}
 
@@ -1841,7 +1841,7 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 | Name       | Type                             | Description                                |
 | ---------- | -------------------------------- | ------------------------------------------ |
 | apiVersion | `string`                         | The API version to use for this operation. |
-| provider   | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| provider   | `"Microsoft.ThisWillBeReplaced"` |                                            |
 
 ### `TrackedResource` {#Azure.ResourceManager.Foundations.TrackedResource}
 
