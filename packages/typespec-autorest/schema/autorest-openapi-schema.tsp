@@ -156,6 +156,8 @@ How to determine the final state of the operation. Possible Values:
     | "original-uri"
     | "operation-location"
     | "final-state-schema";
+
+  `final-state-schema`?: string;
 }
 
 /** Describes the 'x-ms-examples' extension. */

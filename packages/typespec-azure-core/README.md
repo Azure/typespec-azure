@@ -87,6 +87,7 @@ Available ruleSets:
 - [`@pollingLocation`](#@pollinglocation)
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
+- [`@useFinalStateVia`](#@usefinalstatevia)
 
 #### `@finalLocation`
 
@@ -388,6 +389,24 @@ Used to define how to call custom polling operations for long-running operations
 | Name            | Type                      | Description                                                                                                                                                                                        |
 | --------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | targetParameter | `ModelProperty \| string` | A reference to the polling operation parameter this parameter<br />provides a value for, or the name of that parameter. The default value is the name of<br />the decorated parameter or property. |
+
+#### `@useFinalStateVia`
+
+Overrides the final state value for an operation
+
+```typespec
+@Azure.Core.useFinalStateVia(finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation")
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+| Name       | Type                                                                                      | Description                   |
+| ---------- | ----------------------------------------------------------------------------------------- | ----------------------------- |
+| finalState | `valueof "original-uri" \| "operation-location" \| "location" \| "azure-async-operation"` | The desired final state value |
 
 ### Azure.Core.Foundations
 

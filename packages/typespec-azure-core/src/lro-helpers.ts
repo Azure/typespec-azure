@@ -37,6 +37,7 @@ import {
   extractLroStates,
   FinalOperationKey,
   getFinalLocationValue,
+  getFinalStateOverride,
   getLroResult,
   getOperationLink,
   getOperationLinks,
@@ -572,7 +573,9 @@ function getFinalStateVia(
   let model: Model | IntrinsicType | undefined =
     context.originalModel?.name !== undefined ? context.originalModel : undefined;
   let finalState: FinalStateValue = FinalStateValue.originalUri;
+  const finalStateOverride = getFinalStateOverride(program, operation);
   const resOp = getLogicalResourceOperation(program, operation, model);
+
   if (operationAction !== undefined || resOp?.operation === "delete") {
     finalState = FinalStateValue.operationLocation;
     model = context.pollingStep?.responseModel ?? context.originalModel;
@@ -603,7 +606,7 @@ function getFinalStateVia(
     } else {
       finalState = getStatusFromLinkOrReference(program, operation, context.finalStep.target);
     }
-    return [finalState, model];
+    return [finalStateOverride || finalState, model];
   }
 
   if (
@@ -613,7 +616,7 @@ function getFinalStateVia(
     resOp.resourceType !== undefined
   ) {
     model = resOp.resourceType;
-    return [FinalStateValue.originalUri, model];
+    return [finalStateOverride || FinalStateValue.originalUri, model];
   }
 
   // handle actions and delete operations
@@ -643,7 +646,7 @@ function getFinalStateVia(
     }
   }
 
-  return [finalState, model];
+  return [finalStateOverride || finalState, model];
 }
 
 function getLroStatusFromHeaderProperty(
