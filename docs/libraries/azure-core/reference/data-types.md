@@ -348,12 +348,12 @@ model Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError>
 
 #### Properties
 
-| Name    | Type                                                                      | Description                                                    |
-| ------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| id      | `string`                                                                  | The unique ID of the operation.                                |
-| status  | [`OperationState`](./data-types.md#Azure.Core.Foundations.OperationState) | The status of the operation                                    |
-| error?  | `StatusError`                                                             | Error object that describes the error when status is "Failed". |
-| result? | `StatusResult`                                                            | The result of the operation.                                   |
+| Name    | Type                                                                      | Description |
+| ------- | ------------------------------------------------------------------------- | ----------- |
+| id      | `string`                                                                  |             |
+| status  | [`OperationState`](./data-types.md#Azure.Core.Foundations.OperationState) |             |
+| error?  | `StatusError`                                                             |             |
+| result? | `StatusResult`                                                            |             |
 
 ### `ResponseProperty` {#Azure.Core.ResponseProperty}
 

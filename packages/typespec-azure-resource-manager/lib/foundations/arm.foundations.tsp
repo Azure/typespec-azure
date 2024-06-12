@@ -1,29 +1,20 @@
+import "@typespec/openapi";
+import "@typespec/http";
+import "@typespec/rest";
+
+import "./backcompat.tsp";
+import "./deprecation.tsp";
+import "../common-types/common-types.tsp";
+import "../decorators.tsp";
+import "../responses.tsp";
+import "../private.decorators.tsp";
+import "../parameters.tsp";
+
 using TypeSpec.Http;
 using TypeSpec.OpenAPI;
-using TypeSpec.Versioning;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
-
-/**
- * An internal enum to indicate the resource support for various path types
- */
-enum ResourceHome {
-  @doc("The resource is bound to a tenant")
-  Tenant,
-
-  @doc("The resource is bound to a subscription")
-  Subscription,
-
-  @doc("The resource is bound to a location")
-  Location,
-
-  @doc("The resource is bound to a resource group")
-  ResourceGroup,
-
-  @doc("The resource is bound to an extension")
-  Extension,
-}
 
 /**
  * Base parameters for a resource.
@@ -51,6 +42,17 @@ model DefaultBaseParameters<Resource extends {}> {
 
   // unless tenant, subscription, location, or resourceGroup
   ...ResourceUriParameter;
+}
+
+/**
+ * Standard type definition for Azure Resource Manager Tags property.
+ *
+ * It is included in the TrackedResource template definition.
+ */
+/** The Azure Resource Manager Resource tags. */
+model ArmTagsProperty {
+  /** Resource tags. */
+  tags?: Record<string>;
 }
 
 /**

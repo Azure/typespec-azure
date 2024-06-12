@@ -59,7 +59,11 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits, WidgetServiceErr
 interface Widgets {
   // Operation Status
   @doc("Gets status of a Widget operation.")
+  @sharedRoute
   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+  /** Gets the status of a Widget delete operation */
+  @sharedRoute
+  getWidgetDeleteOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   // Widget Operations
   @doc("Creates or updates a Widget asynchronously")
@@ -70,7 +74,7 @@ interface Widgets {
   getWidget is Operations.ResourceRead<Widget>;
 
   @doc("Delete a Widget asynchronously.")
-  @pollingOperation(Widgets.getWidgetOperationStatus)
+  @pollingOperation(Widgets.getWidgetDeleteOperationStatus)
   deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
   @doc("List Widget resources")

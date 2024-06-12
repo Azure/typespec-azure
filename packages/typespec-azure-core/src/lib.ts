@@ -27,6 +27,14 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "invalid-final-state": {
+      severity: "warning",
+      messages: {
+        badValue: paramMessage`Specified final state value '${"finalStateValue"}' is not valid. It must be one of ("operation-location", "original-uri", "location", "azure-async-operation")`,
+        notPut: "The final state value 'original-uri' can only be used in http PUT operations",
+        noHeader: paramMessage`There was no header corresponding to the desired final-state-via value '${"finalStateValue"}'.`,
+      },
+    },
     "bad-record-type": {
       severity: "warning",
       messages: {

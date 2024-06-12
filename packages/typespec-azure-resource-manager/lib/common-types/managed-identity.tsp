@@ -1,137 +1,100 @@
-using Azure.ResourceManager.Private;
+using Azure.Core;
+using TypeSpec.Versioning;
 
-namespace Azure.ResourceManager.Foundations;
+namespace Azure.ResourceManager.CommonTypes;
 
-#deprecated "Please change ManagedIdentityProperties to ManagedServiceIdentity."
-alias ManagedIdentityProperties = ManagedServiceIdentity;
-/**
- * The properties of the managed service identities assigned to this resource.
- */
-@armCommonDefinition(
-  "ManagedServiceIdentity",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
-  "managedidentity.json"
-)
-@armCommonDefinition(
-  "ManagedServiceIdentity",
-  Azure.ResourceManager.CommonTypes.Versions.v5,
-  "managedidentity.json"
-)
-model ManagedServiceIdentity {
-  @doc("The Active Directory tenant id of the principal.")
-  @visibility("read")
-  tenantId?: string;
-
-  @doc("The active directory identifier of this principal.")
-  @visibility("read")
-  principalId?: string;
-
-  @doc("The type of managed identity assigned to this resource.")
-  type: ManagedServiceIdentityType;
-
-  @doc("The identities assigned to this resource by the user.")
-  userAssignedIdentities?: Record<UserAssignedIdentity>;
-}
-
-/** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.", */
+/** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests. */
 #deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
-@armCommonDefinition(
-  "UserAssignedIdentities",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
-  "managedidentity.json"
-)
-@armCommonDefinition(
-  "UserAssignedIdentities",
-  Azure.ResourceManager.CommonTypes.Versions.v5,
-  "managedidentity.json"
-)
 model UserAssignedIdentities is Record<UserAssignedIdentity>;
 
-#deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
-alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 /**
- * The properties of the service-assigned identity associated with this resource.
+ * Managed service identity (system assigned and/or user assigned identities)
  */
-@armCommonDefinition(
-  "SystemAssignedServiceIdentity",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
-  "managedidentity.json"
-)
-@armCommonDefinition(
-  "SystemAssignedServiceIdentity",
-  Azure.ResourceManager.CommonTypes.Versions.v5,
-  "managedidentity.json"
-)
+model ManagedServiceIdentity {
+  /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
+  @visibility("read")
+  principalId?: uuid;
+
+  /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
+  @visibility("read")
+  tenantId?: uuid;
+
+  /** The type of managed identity assigned to this resource. */
+  type: ManagedServiceIdentityType;
+
+  /** The identities assigned to this resource by the user. */
+  @typeChangedFrom(Versions.v5, Record<UserAssignedIdentity>)
+  userAssignedIdentities?: Record<UserAssignedIdentity> | null;
+}
+
+/**
+ * Managed service identity (either system assigned, or none)
+ */
 model SystemAssignedServiceIdentity {
-  @doc("The Active Directory tenant id of the principal.")
+  /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
   @visibility("read")
-  tenantId?: string;
+  principalId?: uuid;
 
-  @doc("The active directory identifier of this principal.")
+  /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
   @visibility("read")
-  principalId?: string;
+  tenantId?: uuid;
 
-  @doc("The type of managed identity assigned to this resource.")
+  /** The type of managed identity assigned to this resource. */
   type: SystemAssignedServiceIdentityType;
 }
 
-/** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
-#deprecated "Please change to ManagedServiceIdentityType."
-alias ManagedIdentityType = ManagedServiceIdentityType;
 /**
- * A managed identity assigned by the user.
+ * User assigned identity properties
  */
-@armCommonDefinition(
-  "UserAssignedIdentity",
-  #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
-  "managedidentity.json"
-)
-@armCommonDefinition(
-  "UserAssignedIdentity",
-  Azure.ResourceManager.CommonTypes.Versions.v5,
-  "managedidentity.json"
-)
-@doc("A managed identity assigned by the user.")
 model UserAssignedIdentity {
-  @doc("The active directory client identifier for this principal.")
-  clientId?: string;
+  /** The principal ID of the assigned identity. */
+  @visibility("read")
+  principalId?: uuid;
 
-  @doc("The active directory identifier for this principal.")
-  principalId?: string;
+  /** The client ID of the assigned identity. */
+  @visibility("read")
+  clientId?: uuid;
 }
 
 /**
- * The kind of managed identity assigned to this resource.
+ * Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).
  */
-@doc("The kind of managed identity assigned to this resource.")
 union ManagedServiceIdentityType {
-  @doc("No managed identity.")
+  /** No managed identity. */
   None: "None",
 
-  @doc("System assigned managed identity.")
+  /** System assigned managed identity. */
   SystemAssigned: "SystemAssigned",
 
-  @doc("User assigned managed identity.")
+  /** User assigned managed identity. */
   UserAssigned: "UserAssigned",
 
-  @doc("System and user assigned managed identity.")
-  SystemAndUserAssigned: "SystemAssigned, UserAssigned",
+  /** System and user assigned managed identity. */
+  @renamedFrom(Versions.v3, "SystemAndUserAssigned")
+  @removed(Versions.v4)
+  SystemAndUserAssignedV3: "SystemAssigned,UserAssigned",
+
+  /** System and user assigned managed identity. */
+  @added(Versions.v4)
+  @renamedFrom(Versions.v4, "SystemAndUserAssigned")
+  @removed(Versions.v5)
+  SystemAndUserAssignedV4: "SystemAssigned, UserAssigned",
+
+  /** System and user assigned managed identity. */
+  @added(Versions.v5)
+  SystemAndUserAssigned: "SystemAssigned,UserAssigned",
 
   string,
 }
 
-/** Alias of SystemAssignedServiceIdentityType for back compatability. Please change to SystemAssignedServiceIdentityType. */
-alias ManagedSystemIdentityType = SystemAssignedServiceIdentityType;
-
 /**
- * The kind of managemed identity assigned to this resource.
+ * Type of managed service identity (either system assigned, or none).
  */
-@doc("The kind of managemed identity assigned to this resource.")
 union SystemAssignedServiceIdentityType {
-  @doc("No managed system identity.")
+  /** No managed system identity. */
   None: "None",
 
-  @doc("System assigned managed system identity.")
+  /** System assigned managed system identity. */
   SystemAssigned: "SystemAssigned",
 
   string,
