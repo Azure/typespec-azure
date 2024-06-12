@@ -5,14 +5,9 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 
-import "./arm.foundations.tsp";
+import "./foundations/arm.foundations.tsp";
 import "./common-types/common-types.tsp";
-import "./common-types/backcompat.tsp";
-import "./common-types/types.tsp";
-import "./common-types/managed-identity.tsp";
-import "./common-types/private-links.tsp";
-import "./common-types/customer-managed-keys.tsp";
-import "./common-types/extended-location.tsp";
+import "./backcompat.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";

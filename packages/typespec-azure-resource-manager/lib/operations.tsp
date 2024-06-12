@@ -1,6 +1,5 @@
 using TypeSpec.Http;
 using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
 using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;
@@ -144,20 +143,15 @@ op ArmResourceCheckExistence<
  */
 @autoRoute
 @doc("Create a {name}", Resource)
-@extension("x-ms-long-running-operation", true)
-@extension(
-  "x-ms-long-running-operation-options",
-  {
-    `final-state-via`: "azure-async-operation",
-  }
-)
 @armResourceCreateOrUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
 @put
 op ArmResourceCreateOrUpdateAsync<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -237,7 +231,8 @@ op ArmResourceCreateOrReplaceSync<
 op ArmResourceCreateOrReplaceAsync<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+    Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
     Resource,
@@ -320,13 +315,6 @@ op ArmResourcePatchAsync<
  */
 @autoRoute
 @doc("Update a {name}", Resource)
-@extension("x-ms-long-running-operation", true)
-@extension(
-  "x-ms-long-running-operation-options",
-  {
-    `final-state-via`: "location",
-  }
-)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @patch
@@ -424,13 +412,6 @@ op ArmCustomPatchSync<
  */
 @autoRoute
 @doc("Delete a {name}", Resource)
-@extension("x-ms-long-running-operation", true)
-@extension(
-  "x-ms-long-running-operation-options",
-  {
-    `final-state-via`: "location",
-  }
-)
 @armResourceDelete(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @delete
@@ -514,13 +495,6 @@ op ArmResourceDeleteSync<
  * @template Error Optional. The error response, if non-standard.
  */
 @autoRoute
-@extension("x-ms-long-running-operation", true)
-@extension(
-  "x-ms-long-running-operation-options",
-  {
-    `final-state-via`: "location",
-  }
-)
 @armResourceAction(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @post

@@ -229,8 +229,8 @@ paths:
                 $ref: '#/components/schemas/WidgetServiceErrorResponse'
   /widgets/{widgetName}/operations/{operationId}:
     get:
-      operationId: Widgets_getWidgetOperationStatus
-      description: Gets status of a Widget operation.
+      operationId: Widgets_getWidgetOperationStatus_Widgets_getWidgetDeleteOperationStatus
+      description: Gets status of a Widget operation. Gets the status of a Widget delete operation
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: widgetName
@@ -251,27 +251,45 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - status
-                properties:
-                  id:
-                    type: string
-                    description: The unique ID of the operation.
-                  status:
-                    allOf:
-                      - $ref: '#/components/schemas/OperationState'
-                    description: The status of the operation
-                  error:
-                    allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
-                    description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/Widget'
-                    description: The result of the operation.
-                description: Provides status details for long running operations.
+                anyOf:
+                  - type: object
+                    required:
+                      - id
+                      - status
+                    properties:
+                      id:
+                        type: string
+                        description: The unique ID of the operation.
+                      status:
+                        allOf:
+                          - $ref: '#/components/schemas/OperationState'
+                        description: The status of the operation
+                      error:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                        description: Error object that describes the error when status is "Failed".
+                      result:
+                        allOf:
+                          - $ref: '#/components/schemas/Widget'
+                        description: The result of the operation.
+                    description: Provides status details for long running operations.
+                  - type: object
+                    required:
+                      - id
+                      - status
+                    properties:
+                      id:
+                        type: string
+                        description: The unique ID of the operation.
+                      status:
+                        allOf:
+                          - $ref: '#/components/schemas/OperationState'
+                        description: The status of the operation
+                      error:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                        description: Error object that describes the error when status is "Failed".
+                    description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
           content:

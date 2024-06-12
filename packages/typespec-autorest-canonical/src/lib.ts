@@ -8,7 +8,7 @@ export interface AutorestCanonicalEmitterOptions {
    *  - version: Version of the service if multiple
    *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/{version}/openapi.json`
+   * @default `{azure-resource-provider-folder}/{service-name}/canonical/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -68,7 +68,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
         " - service-name: Name of the service if multiple",
         " - azure-resource-provider-folder: Value of the azure-resource-provider-folder option",
         "",
-        "Default: `{azure-resource-provider-folder}/{service-name}/{version}/openapi.json`",
+        "Default: `{azure-resource-provider-folder}/{service-name}/canonical/openapi.json`",
         "",
         "",
         "Example: Single service",
