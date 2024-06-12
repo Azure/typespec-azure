@@ -125,38 +125,42 @@ union SkuTier {
 /**
  * A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
  */
-@friendlyName("OperationListResult")
+@armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v3)
+@armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v4)
+@armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v5)
+@doc("""
+  A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
+  """)
 model OperationListResult is Azure.Core.Page<Operation>;
 
 /**
  * Details of a REST API operation, returned from the Resource Provider Operations API
  */
 model Operation {
-  /** 
-  The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
-   */
+  @doc("""
+    The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
+    """)
   @visibility("read")
   name?: string;
 
-  /** 
-  Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
-   */
+  @doc("""
+    Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
+    """)
   @visibility("read")
   isDataAction?: boolean;
 
   /** Localized display information for this particular operation. */
   display?: OperationDisplay;
 
-  /** 
-  The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-   */
+  @doc("""
+    The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+    """)
   @visibility("read")
   origin?: Origin;
 
-  /** 
-  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-   */
-  @visibility("read")
+  @doc("""
+    Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+    """)
   actionType?: ActionType;
 }
 
@@ -169,14 +173,14 @@ model OperationDisplay {
    */
   provider?: string;
 
-  /** 
-  The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
-   */
+  @doc("""
+    The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
+    """)
   resource?: string;
 
-  /** 
-  The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
-   */
+  @doc("""
+    The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
+    """)
   operation?: string;
 
   /** The short, localized friendly description of the operation; suitable for tool tips and detailed views. */
@@ -217,6 +221,9 @@ model OperationStatusResult {
 /**
  * Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
  */
+@doc("""
+  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+  """)
 union ActionType {
   /** Actions are for internal-only APIs. */
   Internal: "Internal",
@@ -227,6 +234,9 @@ union ActionType {
 /**
  * The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
  */
+@doc("""
+  The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+  """)
 union Origin {
   /** Indicates the operation is initiated by a user. */
   user: "user",
