@@ -1,0 +1,57 @@
+This doc is to design TCGC API of multipart for language emitters.
+
+# multipart payload
+
+Here is classic payload of multipart:
+```
+POST /upload HTTP/1.1
+Content-Length: 428
+Content-Type: multipart/form-data; boundary=abcde12345
+--abcde12345
+Content-Disposition: form-data; name="id"
+Content-Type: text/plain
+
+123e4567-e89b-12d3-a456-426655440000
+--abcde12345
+Content-Disposition: form-data; name="profileImage"; filename="image1.png"
+Content-Type: image/png
+
+{…file content…}
+--abcde12345--
+```
+According to https://datatracker.ietf.org/doc/html/rfc7578, multipart request payload contains multi independent parts which could be divided into two kinds: one is non-file part which contains `required "name"/optional "Content-Type" / content`; the other one is file part which contains one more `optional "filename"`.
+
+# Current TCGC API for multipart
+Currently TCGC only has boolean flag [isMultipartFileInput](https://github.com/Azure/typespec-azure/blob/ab7a066d4ac0ae23a40f9ff8f4b6037559bda34c/packages/typespec-client-generator-core/src/interfaces.ts#L368) to distinguish file and non-file. After https://github.com/microsoft/typespec/issues/3046 complete, Typespec permit users to define more info explicitly(e.g. content-type) for each part so boolean flag is not enough.
+
+# proposal about new TCGC API for multipart
+
+```typescript
+exprot interface multipartOptionsType {
+  isFilePart: boolean; // whether this part is for file
+  multi: boolean; // whether this part is multi in request payload
+  headers: HeaderProperty[]; // relates to custom header
+  filename?: SdkModelPropertyTypeBase;
+  contentType?: SdkModelPropertyTypeBase;
+}
+
+export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
+  kind: "property";
+  discriminator: boolean;
+  serializedName: string;
+  isMultipartFileInput: boolean;  // deprecated
+  multipartOptions: multipartOptionsType; // new options for multipart
+  visibility?: Visibility[];
+  flatten: boolean;
+}
+```
+
+notes:
+- `isFilePart`: same with `isMultipartFileInput` before
+- `multi`: mainly for explicity of `Type[]`. In old design for `Model[]`, Typespec can't declare it clearly that SDK shall
+ (a) serialize array of model as single part or (b) serialize model as single part then send it multi times. With new design, if
+ `HttpPart<Model[]>`, multi is false and SDK shall follow (a); if `HttpPart<Model>[]`, multi is true and follow (b)
+- `headers`: equals to custom headers in swagger https://swagger.io/docs/specification/describing-request-body/multipart-requests/  
+- `filename`: Typespec permit author use `httpFile` change requiredness for optional metadata properties, including `filename`.
+If defined, users could explicitly set it as required or not.
+- `contentType`: Typespec permit author use `httpFile` change requiredness for optional metadata properties, including `content-type`.
