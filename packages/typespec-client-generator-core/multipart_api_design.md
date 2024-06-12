@@ -80,6 +80,5 @@ notes:
  (a) serialize array of model as single part or (b) serialize model as single part then send it multi times. With new design, if
  `HttpPart<Model[]>`, multi is false and SDK shall follow (a); if `HttpPart<Model>[]`, multi is true and follow (b)
 - `headers`: equals to custom headers in swagger https://swagger.io/docs/specification/describing-request-body/multipart-requests/  
-- `filename`: Typespec permit author use `httpFile` change requiredness for optional metadata properties, including `filename`.
-If defined, users could explicitly set it as required or not.
-- `contentType`: Typespec permit author use `httpFile` change requiredness for optional metadata properties, including `content-type`.
+- `filename`: When Typespec author use `httpFile` change requiredness for optional metadata properties "filename", this property has value; otherwise it is "undefined".
+- `contentType`: When Typespec author use `httpFile` change requiredness for optional metadata properties "contentType", this property has value; otherwise it is "undefined".
