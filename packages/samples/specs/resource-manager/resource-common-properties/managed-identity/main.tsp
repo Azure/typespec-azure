@@ -10,12 +10,12 @@ using TypeSpec.Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
-@armProviderNamespace("Contoso.CustomerManagedKeyExample")
+@armProviderNamespace("Contoso.ManagedIdentityExample")
 @service({
-  title: "Contoso.CustomerManagedKeyExample",
+  title: "Contoso.ManagedIdentityExample",
 })
 @versioned(Versions)
-@doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
+@doc("An example of using the ManagedIdentity properties in a resource type.")
 namespace Microsoft.UpdateTests;
 
 /** UpdateTests API versions */
@@ -36,6 +36,8 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @segment("widgets")
   @path
   name: string;
+
+  ...ManagedServiceIdentityProperty; // Or ...ManagedSystemAssignedIdentityProperty;
 }
 
 @doc("Widget Resource Properties.")
@@ -47,8 +49,6 @@ model WidgetResourceProperties {
   /** Provisioning state */
   @visibility("read")
   provisioningState?: ResourceProvisioningState;
-
-  ...EncryptionProperty;
 }
 
 @armResourceOperations
