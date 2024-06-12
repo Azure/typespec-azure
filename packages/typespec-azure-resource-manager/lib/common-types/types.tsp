@@ -6,10 +6,7 @@ using Azure.Core;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-/**
- * Base model that defines common properties for all Azure Resource Manager resources.
- */
-@doc("Common fields that are returned in the response for all Azure Resource Manager resources")
+/** Common fields that are returned in the response for all Azure Resource Manager resources */
 @extension("x-ms-azure-resource", true)
 model Resource {
   /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
@@ -132,30 +129,30 @@ model OperationListResult is Azure.Core.Page<Operation>;
  * Details of a REST API operation, returned from the Resource Provider Operations API
  */
 model Operation {
-  @doc("""
+  /** 
     The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
-    """)
+     */
   @visibility("read")
   name?: string;
 
-  @doc("""
+  /** 
     Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
-    """)
+     */
   @visibility("read")
   isDataAction?: boolean;
 
   /** Localized display information for this particular operation. */
   display?: OperationDisplay;
 
-  @doc("""
+  /** 
     The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-    """)
+     */
   @visibility("read")
   origin?: Origin;
 
-  @doc("""
+  /** 
     Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-    """)
+     */
   actionType?: ActionType;
 }
 
@@ -168,14 +165,14 @@ model OperationDisplay {
    */
   provider?: string;
 
-  @doc("""
+  /** 
     The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
-    """)
+     */
   resource?: string;
 
-  @doc("""
+  /** 
     The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
-    """)
+     */
   operation?: string;
 
   /** The short, localized friendly description of the operation; suitable for tool tips and detailed views. */
@@ -216,9 +213,6 @@ model OperationStatusResult {
 /**
  * Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
  */
-@doc("""
-  Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-  """)
 union ActionType {
   /** Actions are for internal-only APIs. */
   Internal: "Internal",
@@ -229,9 +223,6 @@ union ActionType {
 /**
  * The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
  */
-@doc("""
-  The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-  """)
 union Origin {
   /** Indicates the operation is initiated by a user. */
   user: "user",
@@ -276,7 +267,7 @@ model ErrorDetail {
  */
 @error
 model ErrorResponse {
-  @doc("The error object.")
+  /** The error object. */
   error?: ErrorDetail;
 }
 
@@ -463,11 +454,10 @@ model LocationData {
 /**
  * The default api-version parameter type.
  */
-@doc("The default api-version parameter type.")
 model ApiVersionParameter {
+  /** The API version to use for this operation. */
   @query("api-version")
   @minLength(1)
-  @doc("The API version to use for this operation.")
   apiVersion: string;
 }
 
@@ -508,21 +498,20 @@ model ResourceGroupNameParameter {
 /**
  * The default subscriptionId parameter type.
  */
-@doc("The default subscriptionId parameter type.")
 model SubscriptionIdParameter {
+  /** The ID of the target subscription. The value must be an UUID. */
   @typeChangedFrom(Versions.v4, string)
   @path
   @segment("subscriptions")
-  @doc("The ID of the target subscription. The value must be an UUID.")
   subscriptionId: uuid;
 }
 
-@doc("The default location parameter type.")
+/** The default location parameter type. */
 model LocationResourceParameter {
+  /** The name of the Azure region. */
   @path
   @minLength(1)
   @segment("locations")
-  @doc("The location name.")
   @key
   location: string;
 }
