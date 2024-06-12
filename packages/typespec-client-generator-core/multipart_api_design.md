@@ -24,7 +24,35 @@ According to https://datatracker.ietf.org/doc/html/rfc7578, multipart request pa
 # Current TCGC API for multipart
 Currently TCGC only has boolean flag [isMultipartFileInput](https://github.com/Azure/typespec-azure/blob/ab7a066d4ac0ae23a40f9ff8f4b6037559bda34c/packages/typespec-client-generator-core/src/interfaces.ts#L368) to distinguish file and non-file. After https://github.com/microsoft/typespec/issues/3046 complete, Typespec permit users to define more info explicitly(e.g. content-type) for each part so boolean flag is not enough.
 
-# proposal about new TCGC API for multipart
+# Multipart in Typespec
+Typespec support two kinds of definition for multipart:
+
+1. Model format
+
+```
+op upload(
+  @header `content-type`: "multipart/form-data",
+  @multipartBody body: {
+    fullName: HttpPart<string>,
+    headShots: HttpPart<Image>[]
+  }
+): void;
+```
+
+2. Tuple format
+
+ ```
+op upload(
+  @header `content-type`: "multipart/form-data",
+  @multipartBody body: [
+    HttpPart<string, #{ name: "fullName" }>,
+    HttpPart<File, #{ name: "file" }>
+  ]
+): void;
+```
+
+# Proposal about new TCGC API for multipart
+Since all language emitters emit multipart body as model format, TCGC will uniform the multipart body type as model, and each model property equals to property of model format or part of tuple format in Typespec.
 
 ```typescript
 exprot interface multipartOptionsType {
