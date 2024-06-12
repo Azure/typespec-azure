@@ -529,7 +529,8 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
+export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }
