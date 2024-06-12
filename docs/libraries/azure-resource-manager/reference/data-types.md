@@ -338,10 +338,10 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description      |
-| ---------- | ---------- | ---------------- |
-| statusCode | `200`      | The status code. |
-| body       | `Resource` |                  |
+| Name       | Type       | Description                                         |
+| ---------- | ---------- | --------------------------------------------------- |
+| statusCode | `200`      | The status code.                                    |
+| body       | `Resource` | The body type of the operation request or response. |
 
 ### `ArmResponse` {#Azure.ResourceManager.ArmResponse}
 
@@ -723,10 +723,10 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 
 #### Properties
 
-| Name      | Type                             | Description |
-| --------- | -------------------------------- | ----------- |
-| value     | `Array<Element>`                 |             |
-| nextLink? | `TypeSpec.Rest.ResourceLocation` |             |
+| Name      | Type                             | Description                        |
+| --------- | -------------------------------- | ---------------------------------- |
+| value     | `Array<Element>`                 | The {name} items on this page      |
+| nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
 
 ### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
 
@@ -1918,7 +1918,7 @@ model Azure.ResourceManager.Foundations.ExtensionScope<Resource>
 | ----------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion  | `string`                         | The API version to use for this operation.                             |
 | resourceUri | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
-| provider    | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
+| provider    | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
 
 ### `LocationBaseParameters` {#Azure.ResourceManager.Foundations.LocationBaseParameters}
 
@@ -1952,144 +1952,12 @@ model Azure.ResourceManager.Foundations.LocationScope<Resource>
 
 #### Properties
 
-| Name           | Type                             | Description                                |
-| -------------- | -------------------------------- | ------------------------------------------ |
-| apiVersion     | `string`                         | The API version to use for this operation. |
-| subscriptionId | `string`                         | The ID of the target subscription.         |
-| location       | `string`                         | The location name.                         |
-| provider       | `"Microsoft.ThisWillBeReplaced"` |                                            |
-
-### `ManagedServiceIdentity` {#Azure.ResourceManager.Foundations.ManagedServiceIdentity}
-
-The properties of the managed service identities assigned to this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ManagedServiceIdentity
-```
-
-#### Properties
-
-| Name                    | Type                                                                                                         | Description                                             |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
-| principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
-| type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
-
-### `Operation` {#Azure.ResourceManager.Foundations.Operation}
-
-Details of a REST API operation, returned from the Resource Provider Operations API
-
-```typespec
-model Azure.ResourceManager.Foundations.Operation
-```
-
-#### Properties
-
-| Name          | Type                                                                                     | Description                                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name?         | `string`                                                                                 | The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action" |
-| isDataAction? | `boolean`                                                                                | Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.                          |
-| display?      | [`OperationDisplay`](./data-types.md#Azure.ResourceManager.Foundations.OperationDisplay) | Localized display information for this particular operation.                                                                                                                    |
-| origin?       | [`Origin`](./data-types.md#Azure.ResourceManager.Foundations.Origin)                     | The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"                                            |
-| actionType?   | [`ActionType`](./data-types.md#Azure.ResourceManager.Foundations.ActionType)             | Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.                                                                       |
-
-### `OperationDisplay` {#Azure.ResourceManager.Foundations.OperationDisplay}
-
-Localized display information for and operation.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationDisplay
-```
-
-#### Properties
-
-| Name         | Type     | Description                                                                                                                                         |
-| ------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| provider?    | `string` | The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".                             |
-| resource?    | `string` | The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".                  |
-| operation?   | `string` | The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine". |
-| description? | `string` | The short, localized friendly description of the operation; suitable for tool tips and detailed views.                                              |
-
-### `OperationIdParameter` {#Azure.ResourceManager.Foundations.OperationIdParameter}
-
-The default operationId parameter type.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationIdParameter
-```
-
-#### Properties
-
-| Name        | Type     | Description                           |
-| ----------- | -------- | ------------------------------------- |
-| operationId | `string` | The ID of an ongoing async operation. |
-
-### `OperationListResult` {#Azure.ResourceManager.Foundations.OperationListResult}
-
-A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationListResult
-```
-
-#### Properties
-
-| Name      | Type                                      | Description                        |
-| --------- | ----------------------------------------- | ---------------------------------- |
-| value     | `ResourceManager.Foundations.Operation[]` | The Operation items on this page   |
-| nextLink? | `TypeSpec.Rest.ResourceLocation`          | The link to the next page of items |
-
-### `OperationStatusResult` {#Azure.ResourceManager.Foundations.OperationStatusResult}
-
-The current status of an async operation.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationStatusResult
-```
-
-#### Properties
-
-| Name             | Type                                                                           | Description                                 |
-| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------- |
-| id?              | `string`                                                                       | Fully qualified ID for the async operation. |
-| name?            | `string`                                                                       | Name of the async operation.                |
-| status           | `string`                                                                       | Operation status.                           |
-| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
-| startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
-| endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
-| operations       | `ResourceManager.Foundations.OperationStatusResult[]`                          | The operations list.                        |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | If present, details of the operation error. |
-
-### `Plan` {#Azure.ResourceManager.Foundations.Plan}
-
-Details of the resource plan.
-
-```typespec
-model Azure.ResourceManager.Foundations.Plan
-```
-
-#### Properties
-
-| Name           | Type     | Description                                                                                                                                                 |
-| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name           | `string` | A user defined name of the 3rd Party Artifact that is being procured.                                                                                       |
-| publisher      | `string` | The publisher of the 3rd Party Artifact that is being bought. E.g. NewRelic                                                                                 |
-| product        | `string` | The 3rd Party artifact that is being procured. E.g. NewRelic. Product maps to the OfferID specified for the artifact at the time of Data Market onboarding. |
-| promotionCode? | `string` | A publisher provided promotion code as provisioned in Data Market for the said product/artifact.                                                            |
-| version?       | `string` | The version of the desired product/artifact.                                                                                                                |
-
-### `ProxyResource` {#Azure.ResourceManager.Foundations.ProxyResource}
-
-The base proxy resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ProxyResource
-```
-
-#### Properties
-
-None
+| Name           | Type                             | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion     | `string`                         | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| location       | `string`                         | The location name.                                            |
+| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
 
 ### `ProxyResourceUpdateModel` {#Azure.ResourceManager.Foundations.ProxyResourceUpdateModel}
 
@@ -2151,7 +2019,7 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | location          | `string`                         | The location name.                                                     |
 | resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
+| provider          | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
 
 ### `ResourceUpdateModel` {#Azure.ResourceManager.Foundations.ResourceUpdateModel}
 
@@ -2226,46 +2094,11 @@ model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 
 #### Properties
 
-| Name           | Type                             | Description                                |
-| -------------- | -------------------------------- | ------------------------------------------ |
-| apiVersion     | `string`                         | The API version to use for this operation. |
-| subscriptionId | `string`                         | The ID of the target subscription.         |
-| provider       | `"Microsoft.ThisWillBeReplaced"` |                                            |
-
-### `SystemAssignedServiceIdentity` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity}
-
-The properties of the service-assigned identity associated with this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity
-```
-
-#### Properties
-
-| Name         | Type                                                                                                                       | Description                                             |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| tenantId?    | `string`                                                                                                                   | The Active Directory tenant id of the principal.        |
-| principalId? | `string`                                                                                                                   | The active directory identifier of this principal.      |
-| type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource. |
-
-### `SystemData` {#Azure.ResourceManager.Foundations.SystemData}
-
-Metadata pertaining to creation and last modification of the resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.SystemData
-```
-
-#### Properties
-
-| Name                | Type                                                                               | Description                                           |
-| ------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| createdBy?          | `string`                                                                           | The identity that created the resource.               |
-| createdByType?      | [`createdByType`](./data-types.md#Azure.ResourceManager.Foundations.createdByType) | The type of identity that created the resource.       |
-| createdAt?          | `plainDate`                                                                        | The type of identity that created the resource.       |
-| lastModifiedBy?     | `string`                                                                           | The identity that last modified the resource.         |
-| lastModifiedByType? | [`createdByType`](./data-types.md#Azure.ResourceManager.Foundations.createdByType) | The type of identity that last modified the resource. |
-| lastModifiedAt?     | `plainDate`                                                                        | The timestamp of resource last modification (UTC)     |
+| Name           | Type                             | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion     | `string`                         | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
 
 ### `TagsUpdateModel` {#Azure.ResourceManager.Foundations.TagsUpdateModel}
 
@@ -2320,170 +2153,4 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 | Name       | Type                             | Description                                |
 | ---------- | -------------------------------- | ------------------------------------------ |
 | apiVersion | `string`                         | The API version to use for this operation. |
-| provider   | `"Microsoft.ThisWillBeReplaced"` |                                            |
-
-### `TrackedResource` {#Azure.ResourceManager.Foundations.TrackedResource}
-
-The base tracked resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.TrackedResource
-```
-
-#### Properties
-
-| Name     | Type             | Description                               |
-| -------- | ---------------- | ----------------------------------------- |
-| location | `string`         | The geo-location where the resource lives |
-| tags?    | `Record<string>` | Resource tags.                            |
-
-### `UserAssignedIdentities` {#Azure.ResourceManager.Foundations.UserAssignedIdentities}
-
-The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
-
-```typespec
-model Azure.ResourceManager.Foundations.UserAssignedIdentities
-```
-
-#### Properties
-
-| Name | Type                                                                                             | Description           |
-| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
-|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentity) | Additional properties |
-
-### `UserAssignedIdentity` {#Azure.ResourceManager.Foundations.UserAssignedIdentity}
-
-A managed identity assigned by the user.
-
-```typespec
-model Azure.ResourceManager.Foundations.UserAssignedIdentity
-```
-
-#### Properties
-
-| Name         | Type     | Description                                                |
-| ------------ | -------- | ---------------------------------------------------------- |
-| clientId?    | `string` | The active directory client identifier for this principal. |
-| principalId? | `string` | The active directory identifier for this principal.        |
-
-### `ResourceHome` {#Azure.ResourceManager.Foundations.ResourceHome}
-
-An internal enum to indicate the resource support for various path types
-
-```typespec
-enum Azure.ResourceManager.Foundations.ResourceHome
-```
-
-### `SkuTier` {#Azure.ResourceManager.Foundations.SkuTier}
-
-Available service tiers for the SKU.
-
-```typespec
-enum Azure.ResourceManager.Foundations.SkuTier
-```
-
-### `ActionType` {#Azure.ResourceManager.Foundations.ActionType}
-
-Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-
-```typespec
-union Azure.ResourceManager.Foundations.ActionType
-```
-
-### `CheckNameAvailabilityReason` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityReason}
-
-Possible reasons for a name not being available.
-
-```typespec
-union Azure.ResourceManager.Foundations.CheckNameAvailabilityReason
-```
-
-#### Template Parameters
-
-| Name       | Description                 |
-| ---------- | --------------------------- |
-| Resource   | The type of the resource.   |
-| Properties | The type of the properties. |
-
-#### Properties
-
-None
-
-### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
-
-The kind of entity that created the resource.
-
-```typespec
-union Azure.ResourceManager.Foundations.createdByType
-```
-
-#### Properties
-
-| Name           | Type        | Description                                                   |
-| -------------- | ----------- | ------------------------------------------------------------- |
-| apiVersion     | `string`    | The API version to use for this operation.                    |
-| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
-
-### `SubscriptionScope` {#Azure.ResourceManager.Foundations.SubscriptionScope}
-
-The supported ExtendedLocation types.
-
-```typespec
-model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
-```
-
-#### Template Parameters
-
-| Name     | Description               |
-| -------- | ------------------------- |
-| Resource | The type of the resource. |
-
-#### Properties
-
-| Name           | Type                             | Description                                                   |
-| -------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion     | `string`                         | The API version to use for this operation.                    |
-| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                      |
-
-### `TagsUpdateModel` {#Azure.ResourceManager.Foundations.TagsUpdateModel}
-
-The kind of managed identity assigned to this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>
-```
-
-#### Template Parameters
-
-| Name     | Description               |
-| -------- | ------------------------- |
-| Resource | The type of the resource. |
-
-#### Properties
-
-| Name  | Type             | Description    |
-| ----- | ---------------- | -------------- |
-| tags? | `Record<string>` | Resource tags. |
-
-### `TenantBaseParameters` {#Azure.ResourceManager.Foundations.TenantBaseParameters}
-
-The static parameters for a tenant-based resource
-
-```typespec
-union Azure.ResourceManager.Foundations.Origin
-```
-
-#### Properties
-
-| Name       | Type     | Description                                |
-| ---------- | -------- | ------------------------------------------ |
-| apiVersion | `string` | The API version to use for this operation. |
-
-### `TenantScope` {#Azure.ResourceManager.Foundations.TenantScope}
-
-The kind of managemed identity assigned to this resource.
-
-```typespec
-union Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType
-```
+| provider   | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |

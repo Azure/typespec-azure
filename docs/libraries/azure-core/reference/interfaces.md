@@ -263,7 +263,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion:
 Resource operation status operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | ErrorResponse
+op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string, operationId: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -280,7 +280,7 @@ op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string):
 Operation signature to retrieve a resource operation status.
 
 ```typespec
-op Azure.Core.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.GetResourceOperationStatus(apiVersion: string, operationId: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters

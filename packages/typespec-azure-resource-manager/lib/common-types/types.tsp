@@ -125,12 +125,7 @@ union SkuTier {
 /**
  * A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
  */
-@armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v3)
-@armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v4)
-@armCommonDefinition("OperationListResult", Azure.ResourceManager.CommonTypes.Versions.v5)
-@doc("""
-  A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
-  """)
+@friendlyName("OperationListResult")
 model OperationListResult is Azure.Core.Page<Operation>;
 
 /**
