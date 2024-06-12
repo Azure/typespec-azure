@@ -147,6 +147,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Can not find name for your emitter, please check your emitter name.`,
       },
     },
+    "unsupported-generic-decorator-arg-type": {
+      severity: "warning",
+      messages: {
+        default: `Can not parse the arg type for decorator "${"decoratorName"}".`,
+      },
+    },
   },
 });
 

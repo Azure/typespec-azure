@@ -244,7 +244,7 @@ interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
   deprecation?: string;
   kind: TKind;
-  decorators: Record<string, Array<any>>;
+  decorators: Record<string, Record<string, any>>;
 }
 
 /**
@@ -255,17 +255,22 @@ export function getSdkTypeBaseHelper<TKind>(
   context: TCGCContext,
   type: Type,
   kind: TKind
-): DefaultSdkTypeBase<TKind> {
-  return {
+): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
-    decorators: getTypeDecorators(context, type),
-  };
+    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+  });
 }
 
-export function getTypeDecorators(context: TCGCContext, type: Type): Record<string, Array<any>> {
-  const retval: Record<string, Array<any>> = {};
+export function getTypeDecorators(
+  context: TCGCContext,
+  type: Type
+): [Record<string, Record<string, any>>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const retval: Record<string, Record<string, any>> = {};
   if ("decorators" in type) {
     for (const decorator of type.decorators) {
       // only process explicitly defined decorators
@@ -281,14 +286,20 @@ export function getTypeDecorators(context: TCGCContext, type: Type): Record<stri
           continue;
         }
 
-        retval[decoratorName] = [];
-        for (const arg of decorator.args) {
-          retval[decoratorName].push(getDecoratorArgValue(arg.jsValue));
+        retval[decoratorName] = {};
+        for (let i = 0; i < decorator.definition.parameters.length; i++) {
+          if (i >= decorator.args.length) {
+            retval[decoratorName][decorator.definition.parameters[i].name] = undefined;
+          } else {
+            retval[decoratorName][decorator.definition.parameters[i].name] = diagnostics.pipe(
+              getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+            );
+          }
         }
       }
     }
   }
-  return retval;
+  return diagnostics.wrap(retval);
 }
 
 function getDecoratorArgValue(
@@ -301,17 +312,28 @@ function getDecoratorArgValue(
     | number
     | boolean
     | Numeric
-    | null
-): any {
+    | null,
+  type: Type,
+  decoratorName: string
+): [any, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
     if (arg.kind === "EnumMember") {
-      return arg.value ?? arg.name;
+      return diagnostics.wrap(arg.value ?? arg.name);
     }
     if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
-      return arg.value;
+      return diagnostics.wrap(arg.value);
     }
+    diagnostics.add(
+      createDiagnostic({
+        code: "unsupported-generic-decorator-arg-type",
+        target: type,
+        format: { decoratorName },
+      })
+    );
+    return diagnostics.wrap(undefined);
   }
-  return arg;
+  return diagnostics.wrap(arg);
 }
 
 export function intOrFloat(value: number): "int32" | "float32" {
@@ -481,10 +503,14 @@ export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
 }
 
-export function getAnyType(context: TCGCContext, type: Type): SdkBuiltInType {
-  return {
+export function getAnyType(
+  context: TCGCContext,
+  type: Type
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
     kind: "any",
     encode: "string",
-    decorators: getTypeDecorators(context, type),
-  };
+    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+  });
 }

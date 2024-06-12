@@ -310,7 +310,7 @@ function getSdkBasicServiceMethod<
       return undefined; // currently we only return a value for paging or lro
     },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
-    decorators: getTypeDecorators(context, operation),
+    decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
   });
 }
 
@@ -427,7 +427,7 @@ function getSdkMethodParameter(
       isApiVersionParam: false,
       onClient: false,
       crossLanguageDefinitionId: "anonymous",
-      decorators: getTypeDecorators(context, type),
+      decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     });
   }
   return diagnostics.wrap({
@@ -495,7 +495,7 @@ function getSdkEndpointParameter(
           serializedName: "endpoint",
           correspondingMethodParams: [],
           type: {
-            ...getSdkTypeBaseHelper(context, client.service, "string"),
+            ...diagnostics.pipe(getSdkTypeBaseHelper(context, client.service, "string")),
             encode: "string",
           },
           isApiVersionParam: false,
@@ -583,7 +583,7 @@ function createSdkClientType<
     ), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
-    decorators: getTypeDecorators(context, client.type),
+    decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
   };
   context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);

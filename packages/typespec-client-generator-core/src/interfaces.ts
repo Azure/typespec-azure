@@ -80,7 +80,7 @@ export interface SdkOperationGroup {
 }
 
 interface DecoratedType {
-  decorators: Record<string, Array<any>>;
+  decorators: Record<string, Record<string, any>>;
 }
 
 interface SdkTypeBase extends DecoratedType {

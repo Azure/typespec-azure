@@ -167,7 +167,7 @@ function getSdkHttpParameters(
         optional: false,
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
-        decorators: getTypeDecorators(context, tspBody.type),
+        decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
       };
     }
     if (retval.bodyParam) {
