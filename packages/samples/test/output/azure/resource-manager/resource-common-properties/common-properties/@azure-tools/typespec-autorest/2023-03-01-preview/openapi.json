@@ -447,11 +447,7 @@
         "properties": {
           "$ref": "#/definitions/WidgetResourceProperties",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         },
         "extendedLocation": {
           "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ExtendedLocation",
