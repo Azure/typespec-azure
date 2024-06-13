@@ -56,7 +56,7 @@ Since all language emitters emit multipart body as model format, TCGC will unifo
 
 ```typescript
 exprot interface multipartOptionsType {
-  isNameDefined? boolean; // whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts
+  isNameDefined: boolean; // whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts
   isFilePart: boolean; // whether this part is for file
   multi: boolean; // whether this part is multi in request payload
   headers: HeaderProperty[]; // relates to custom header
