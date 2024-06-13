@@ -187,11 +187,13 @@ export function findArmCommonTypeRecord(
         break;
       }
     }
-  } else {
+  }
+  if (record === undefined) {
     // If no version was found, use the default version
     record = records[defaultKey ?? ArmCommonTypesDefaultVersion];
   }
 
+  // If after resolve version AND unable to load default version, report diagnostic
   if (record === undefined) {
     return [
       undefined,

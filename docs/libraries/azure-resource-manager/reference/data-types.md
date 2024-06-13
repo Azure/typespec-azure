@@ -2154,3 +2154,58 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 | ---------- | -------------------------------- | ------------------------------------------ |
 | apiVersion | `string`                         | The API version to use for this operation. |
 | provider   | `"Microsoft.ThisWillBeReplaced"` |                                            |
+
+## Azure.ResourceManager.Legacy
+
+### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
+
+Managed service identity (system assigned and/or user assigned identities)
+
+```typespec
+model Azure.ResourceManager.Legacy.ManagedServiceIdentityV4
+```
+
+#### Properties
+
+| Name                    | Type                                                                                                    | Description                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| principalId?            | `Core.uuid`                                                                                             | The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. |
+| tenantId?               | `Core.uuid`                                                                                             | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
+| type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
+| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity>`                                              | The identities assigned to this resource by the user.                                                                         |
+
+### `ManagedServiceIdentityV4Property` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property}
+
+Model representing the standard `ManagedServiceIdentity` envelope property from V4 of common type.
+
+Please note that this is only included for legacy specs with mixed v3 and v4 types, which would cause
+breaking changes due to the ManagedServiceIdentityType.SystemAndUserAssigned value changes.
+
+Do not use this if you are already on CommonTypes.Version.v4 or beyond.
+
+```typespec
+model Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property
+```
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  ...ResourceNameParameter<Foo>;
+  ...Legacy.ManagedServiceIdentityV4Property;
+}
+```
+
+#### Properties
+
+| Name      | Type                                                                                                | Description                                               |
+| --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
+
+### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
+
+Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).
+
+```typespec
+union Azure.ResourceManager.Legacy.ManagedServiceIdentityType
+```
