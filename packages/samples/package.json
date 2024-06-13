@@ -30,6 +30,7 @@
     "test:watch": "vitest -w",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "test:regen": "cross-env RECORD=true vitest run",
+    "regen-common-types": "tsx ./common-types/gen.ts",
     "regen-samples": "cross-env RECORD=true vitest run"
   },
   "files": [
