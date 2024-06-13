@@ -1020,6 +1020,7 @@ export async function getOpenAPIForService(
         currentEndpoint.parameters.push(shared);
         continue;
       }
+
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
