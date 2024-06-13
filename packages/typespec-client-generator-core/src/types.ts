@@ -369,6 +369,7 @@ export function getSdkUnionWithDiagnostics(
     retval = {
       ...getSdkTypeBaseHelper(context, type, "union"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
+      namespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
@@ -727,6 +728,7 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name,
+      namespace: getNamespaceHelper(type.union.namespace),
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,

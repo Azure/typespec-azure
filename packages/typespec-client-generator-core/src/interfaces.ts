@@ -278,6 +278,7 @@ export interface SdkConstantType extends SdkTypeBase {
 
 export interface SdkUnionType extends SdkTypeBase {
   name: string;
+  namespace?: string;
   isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
