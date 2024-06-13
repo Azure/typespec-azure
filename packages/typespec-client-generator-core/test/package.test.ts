@@ -3323,6 +3323,29 @@ describe("typespec-client-generator-core: package", () => {
         op foo(@query q: string, @header h: string, @body body: Foo): void;
         `);
       const sdkPackage = runner.context.experimental_sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.models[0].name, "Foo");
+      const fooMethod = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      ok(fooMethod);
+      strictEqual(fooMethod.parameters.length, 4);
+      strictEqual(fooMethod.parameters[0].name, "q");
+      strictEqual(fooMethod.parameters[1].name, "h");
+      strictEqual(fooMethod.parameters[2].name, "body");
+      strictEqual(fooMethod.parameters[3].name, "contentType");
+      const fooOperation = fooMethod.operation;
+      strictEqual(fooOperation.parameters.length, 3);
+      strictEqual(fooOperation.parameters[0].name, "q");
+      deepStrictEqual(fooOperation.parameters[0].correspondingMethodParams, [fooMethod.parameters[0]]);
+      strictEqual(fooOperation.parameters[1].name, "h");
+      deepStrictEqual(fooOperation.parameters[1].correspondingMethodParams, [fooMethod.parameters[1]]);
+      const bodyParam = fooOperation.bodyParam;
+      ok(bodyParam);
+      strictEqual(bodyParam.kind, "body");
+      strictEqual(bodyParam.name, "body");
+      strictEqual(bodyParam.type, sdkPackage.models[0]);
+      deepStrictEqual(bodyParam.correspondingMethodParams, [fooMethod.parameters[2]]);
+      strictEqual(fooOperation.parameters[2].name, "contentType");
+      deepStrictEqual(fooOperation.parameters[2].correspondingMethodParams, [fooMethod.parameters[3]]);
     });
 
     it("with auto body resolution", async () => {
@@ -3337,7 +3360,7 @@ describe("typespec-client-generator-core: package", () => {
         }
         op foo(@query q: string, outer: string, inner: Inner): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      // const sdkPackage = runner.context.experimental_sdkPackage;
     });
 
     it("with body resolution from specific property", async () => {
@@ -3352,7 +3375,7 @@ describe("typespec-client-generator-core: package", () => {
         }
         op foo(@bodyRoot body: {@query q: string, outer: string, inner: Inner}): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      // const sdkPackage = runner.context.experimental_sdkPackage;
     });
 
     it("with spread and auto body resolution", async () => {
@@ -3373,7 +3396,7 @@ describe("typespec-client-generator-core: package", () => {
         }
         op foo(...Wrapper): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      // const sdkPackage = runner.context.experimental_sdkPackage;
     });
   });
 
@@ -3386,7 +3409,7 @@ describe("typespec-client-generator-core: package", () => {
         model Foo {}
         op foo(): {@header h: string, @body body: Foo};
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      // const sdkPackage = runner.context.experimental_sdkPackage;
     });
 
     it("with auto body resolution", async () => {
@@ -3401,7 +3424,7 @@ describe("typespec-client-generator-core: package", () => {
         }
         op foo(): {@header oh: string, outer: string, inner: Inner};
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      // const sdkPackage = runner.context.experimental_sdkPackage;
     });
 
     it("with body resolution from specific property", async () => {
@@ -3416,7 +3439,7 @@ describe("typespec-client-generator-core: package", () => {
         }
         op foo(): {@bodyRoot body: {@header oh: string, outer: string, inner: Inner}};
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      // const sdkPackage = runner.context.experimental_sdkPackage;
     });
   });
 });
