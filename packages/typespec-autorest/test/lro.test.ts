@@ -111,6 +111,8 @@ describe("typespec-autorest: Long-running Operations", () => {
         @segment("widgets")
         @path
         name: string;
+
+        ...ManagedServiceIdentityProperty;
       }
       @armResourceOperations(Widget)
       interface Widgets {

@@ -871,9 +871,9 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext, isDerived?: boolean): any {
     const ref = resolveExternalRef(type);
-    if (ref) {
+    if (ref && (isDerived || !metadataInfo.isTransformed(type, schemaContext.visibility))) {
       return ref;
     }
 
@@ -1694,7 +1694,7 @@ export async function getOpenAPIForService(
 
     // getSchemaOrRef on all children to push them into components.schemas
     for (const child of derivedModels) {
-      getSchemaOrRef(child, schemaContext);
+      getSchemaOrRef(child, schemaContext, true);
     }
 
     const discriminator = getDiscriminator(program, model);
