@@ -56,6 +56,7 @@ Since all language emitters emit multipart body as model format, TCGC will unifo
 
 ```typescript
 exprot interface multipartOptionsType {
+  isNameDefined? boolean; // whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts
   isFilePart: boolean; // whether this part is for file
   multi: boolean; // whether this part is multi in request payload
   headers: HeaderProperty[]; // relates to custom header
@@ -75,10 +76,11 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
 ```
 
 notes:
-- `isFilePart`: same with `isMultipartFileInput` before
-- `multi`: mainly for explicity of `Type[]`. In old design for `Model[]`, Typespec can't declare it clearly that SDK shall
+- `isNameDefined`: Whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts.
+- `isFilePart`: Same with `isMultipartFileInput` before
+- `multi`: Mainly for explicity of `Type[]`. In old design for `Model[]`, Typespec can't declare it clearly that SDK shall
  (a) serialize array of model as single part or (b) serialize model as single part then send it multi times. With new design, if
  `HttpPart<Model[]>`, multi is false and SDK shall follow (a); if `HttpPart<Model>[]`, multi is true and follow (b)
-- `headers`: equals to custom headers in swagger https://swagger.io/docs/specification/describing-request-body/multipart-requests/  
+- `headers`: Equals to custom headers in swagger https://swagger.io/docs/specification/describing-request-body/multipart-requests/  
 - `filename`: When Typespec author use `httpFile` change requiredness for optional metadata properties "filename", this property has value; otherwise it is "undefined".
 - `contentType`: When Typespec author use `httpFile` change requiredness for optional metadata properties "contentType", this property has value; otherwise it is "undefined".
