@@ -11,7 +11,7 @@ title: "[I] SdkPagingServiceMethod"
 
 | Type parameter |
 | :------ |
-| `TServiceOperation` extends [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) |
+| `TServiceOperation` *extends* [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) |
 
 ## Properties
 
@@ -19,7 +19,7 @@ title: "[I] SdkPagingServiceMethod"
 | :------ | :------ | :------ |
 | `__raw?` | `Operation` | `SdkServiceMethodBase.__raw` |
 | `__raw_paged_metadata` | `PagedResultMetadata` | `SdkPagingServiceMethodOptions.__raw_paged_metadata` |
-| `access` | `undefined` \| [`AccessFlags`](../type-aliases/AccessFlags.md) | `SdkServiceMethodBase.access` |
+| `access` | [`AccessFlags`](../type-aliases/AccessFlags.md) | `SdkServiceMethodBase.access` |
 | `apiVersions` | `string`[] | `SdkServiceMethodBase.apiVersions` |
 | `crossLanguageDefintionId` | `string` | `SdkServiceMethodBase.crossLanguageDefintionId` |
 | `description?` | `string` | `SdkServiceMethodBase.description` |
@@ -57,7 +57,7 @@ getParameterMapping(serviceParam): SdkModelPropertyType[]
 
 #### Deprecated
 
-This property is deprecated. Access .correspondingMethodParams on the service parameters instead
+This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
 
 ***
 
@@ -77,4 +77,4 @@ getResponseMapping(): undefined | string
 
 #### Deprecated
 
-This property is deprecated. Access .resultPath on the method response instead
+This property is deprecated. Access .resultPath on the method response instead.

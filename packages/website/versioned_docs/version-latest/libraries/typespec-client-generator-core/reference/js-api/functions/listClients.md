@@ -4,7 +4,7 @@ title: "[F] listClients"
 
 ---
 ```ts
-listClients(context): SdkClient[]
+function listClients(context): SdkClient[]
 ```
 
 List all the clients.

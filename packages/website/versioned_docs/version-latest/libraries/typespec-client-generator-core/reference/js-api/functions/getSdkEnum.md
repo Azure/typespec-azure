@@ -4,7 +4,7 @@ title: "[F] getSdkEnum"
 
 ---
 ```ts
-getSdkEnum(
+function getSdkEnum(
    context, 
    type, 
    operation?): SdkEnumType

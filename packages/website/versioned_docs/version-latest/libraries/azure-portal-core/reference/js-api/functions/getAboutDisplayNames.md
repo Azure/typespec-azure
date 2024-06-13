@@ -4,7 +4,7 @@ title: "[F] getAboutDisplayNames"
 
 ---
 ```ts
-getAboutDisplayNames(program, target): any
+function getAboutDisplayNames(program, target): any
 ```
 
 ## Parameters

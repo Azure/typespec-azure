@@ -4,7 +4,7 @@ title: "[F] getLibraryName"
 
 ---
 ```ts
-getLibraryName(context, type): string
+function getLibraryName(context, type): string
 ```
 
 Get the library name of a property / parameter / operation / model / enum. Takes projections into account
@@ -21,7 +21,7 @@ Returns name in the following order of priority
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | `TCGCContext` |  |
-| `type` | `Type` & `Object` |  |
+| `type` | `Type` & `object` |  |
 
 ## Returns
 

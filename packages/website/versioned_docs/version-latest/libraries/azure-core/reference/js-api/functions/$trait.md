@@ -4,7 +4,7 @@ title: "[F] $trait"
 
 ---
 ```ts
-$trait(
+function $trait(
    context, 
    target, 
    traitName?): void

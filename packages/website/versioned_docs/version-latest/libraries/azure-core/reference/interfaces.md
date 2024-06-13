@@ -28,7 +28,7 @@ interface Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>
 Create or replace operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateOrReplace(apiVersion: string, resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceCreateOrReplace(apiVersion: string, resource: Resource): { statusCode: 201 } | { statusCode: 200 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -43,7 +43,7 @@ op Azure.Core.ResourceOperations.ResourceCreateOrReplace(apiVersion: string, res
 Long-running resource create or replace operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: string, resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: string, resource: Resource): { statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | { statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -58,7 +58,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: 
 Create or update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 201 } | { statusCode: 200 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -73,7 +73,7 @@ op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, cont
 Long-running resource create or update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | { statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -88,7 +88,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: s
 Resource update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 200 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -103,7 +103,7 @@ op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType:
 Resource create with service-provided name operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.(anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 201, location: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -118,7 +118,7 @@ op Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName(apiVersio
 Long-running resource create with service-provided name operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.(anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 202, location: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -148,7 +148,7 @@ op Azure.Core.ResourceOperations.ResourceRead(apiVersion: string): {} | ErrorRes
 Resource delete operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceDelete(apiVersion: string): Azure.Core.(anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.ResourceDelete(apiVersion: string): Azure.Core.{ statusCode: 204 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -163,7 +163,7 @@ op Azure.Core.ResourceOperations.ResourceDelete(apiVersion: string): Azure.Core.
 Long-running resource delete operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceDelete(apiVersion: string): (anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceDelete(apiVersion: string): { statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: Azure.Core.Foundations.Error, result: never, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -227,7 +227,7 @@ op Azure.Core.ResourceOperations.ResourceCollectionAction(apiVersion: string): {
 Long-running resource action operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceAction(apiVersion: string): Azure.Core.(anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -245,7 +245,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceAction(apiVersion: string): 
 Long-running resource collection action operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.(anonymous model) | ErrorResponse
+op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -263,7 +263,7 @@ op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion:
 Resource operation status operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string, operationId: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | ErrorResponse
+op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -280,7 +280,7 @@ op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string, 
 Operation signature to retrieve a resource operation status.
 
 ```typespec
-op Azure.Core.GetResourceOperationStatus(apiVersion: string, operationId: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -301,7 +301,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature for a resource action.
 
 ```typespec
-op Azure.Core.LongRunningResourceAction(apiVersion: string): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -323,7 +323,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature for an action that applies to a collection of resources.
 
 ```typespec
-op Azure.Core.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -345,7 +345,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature to create or replace a resource.
 
 ```typespec
-op Azure.Core.LongRunningResourceCreateOrReplace(apiVersion: string, resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceCreateOrReplace(apiVersion: string, resource: Resource): { statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | { statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -364,7 +364,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature to create or update a resource.
 
 ```typespec
-op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | { statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -383,7 +383,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature to create a resource with a service-provided name.
 
 ```typespec
-op Azure.Core.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 202, location: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -402,7 +402,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Long-running operation signature to delete a resource.
 
 ```typespec
-op Azure.Core.LongRunningResourceDelete(apiVersion: string): (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.LongRunningResourceDelete(apiVersion: string): { statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: Azure.Core.Foundations.Error, result: never, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -417,7 +417,7 @@ op Azure.Core.LongRunningResourceDelete(apiVersion: string): (anonymous model) |
 A long-running remote procedure call (RPC) operation.
 
 ```typespec
-op Azure.Core.LongRunningRpcOperation(apiVersion: string): Azure.Core.(anonymous model) | ErrorResponse
+op Azure.Core.LongRunningRpcOperation(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -483,7 +483,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to create or replace a resource.
 
 ```typespec
-op Azure.Core.ResourceCreateOrReplace(apiVersion: string, resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceCreateOrReplace(apiVersion: string, resource: Resource): { statusCode: 201 } | { statusCode: 200 } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -502,7 +502,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to create or update a resource.
 
 ```typespec
-op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 201 } | { statusCode: 200 } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -521,7 +521,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to synchronously create a resource with a service-provided name.
 
 ```typespec
-op Azure.Core.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 201, location: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -540,7 +540,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to delete a resource.
 
 ```typespec
-op Azure.Core.ResourceDelete(apiVersion: string): Azure.Core.(anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceDelete(apiVersion: string): Azure.Core.{ statusCode: 204 } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -596,7 +596,7 @@ See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#def
 Operation signature to update a resource.
 
 ```typespec
-op Azure.Core.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 200 } | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -649,7 +649,7 @@ op Azure.Core.Foundations.GetOperationStatus(apiVersion: string, operationId: st
 Long-running operation.
 
 ```typespec
-op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.Foundations.(anonymous model) | ErrorResponse
+op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.Foundations.{ operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -666,7 +666,7 @@ op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.F
 Long-running operation that updates a resource.
 
 ```typespec
-op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): (anonymous model) | ErrorResponse
+op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -682,7 +682,7 @@ op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentT
 Operation that lists resources in a non-paginated way.
 
 ```typespec
-op Azure.Core.Foundations.NonPagedResourceList(apiVersion: string): Azure.Core.Foundations.(anonymous model) | ErrorResponse
+op Azure.Core.Foundations.NonPagedResourceList(apiVersion: string): Azure.Core.Foundations.{ body: Array<Element> } | ErrorResponse
 ```
 
 #### Template Parameters

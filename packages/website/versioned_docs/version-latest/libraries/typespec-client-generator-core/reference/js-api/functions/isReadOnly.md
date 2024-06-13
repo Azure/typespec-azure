@@ -4,7 +4,7 @@ title: "[F] isReadOnly"
 
 ---
 ```ts
-isReadOnly(property): boolean
+function isReadOnly(property): boolean
 ```
 
 ## Parameters

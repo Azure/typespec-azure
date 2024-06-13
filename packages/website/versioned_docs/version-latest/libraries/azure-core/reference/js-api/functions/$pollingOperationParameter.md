@@ -4,7 +4,7 @@ title: "[F] $pollingOperationParameter"
 
 ---
 ```ts
-$pollingOperationParameter(
+function $pollingOperationParameter(
    context, 
    entity, 
    target?): void

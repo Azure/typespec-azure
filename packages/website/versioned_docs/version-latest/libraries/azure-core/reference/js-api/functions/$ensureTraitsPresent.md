@@ -4,7 +4,7 @@ title: "[F] $ensureTraitsPresent"
 
 ---
 ```ts
-$ensureTraitsPresent(
+function $ensureTraitsPresent(
    context, 
    target, 
    traitModel, 
