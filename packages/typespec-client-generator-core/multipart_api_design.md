@@ -46,7 +46,7 @@ op upload(
   @header `content-type`: "multipart/form-data",
   @multipartBody body: [
     HttpPart<string, #{ name: "fullName" }>,
-    HttpPart<File, #{ name: "file" }>
+    HttpPart<Image, #{ name: "headShots" }>[]
   ]
 ): void;
 ```
