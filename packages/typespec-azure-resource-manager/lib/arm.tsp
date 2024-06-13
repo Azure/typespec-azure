@@ -6,7 +6,7 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 
 import "./foundations/arm.foundations.tsp";
-import "./legacy/arm.legacy.tsp";
+import "./Legacy/arm.legacy.tsp";
 import "./common-types/common-types.tsp";
 import "./backcompat.tsp";
 import "./private.decorators.tsp";
