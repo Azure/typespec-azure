@@ -247,6 +247,7 @@ export interface SdkNullableType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
+  namespace?: string;
   isGeneratedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
@@ -262,6 +263,7 @@ export interface SdkEnumType extends SdkTypeBase {
 export interface SdkEnumValueType extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
+  namespace?: string;
   value: string | number;
   enumType: SdkEnumType;
   valueType: SdkBuiltInType;
@@ -287,6 +289,7 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
+  namespace?: string;
   /**
    * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */

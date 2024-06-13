@@ -10,6 +10,7 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
+  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -110,6 +111,13 @@ function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string
     return getEncode(context.program, type)?.encoding || kind;
   }
   return kind;
+}
+
+function getNamespaceHelper(ns: Namespace | undefined): string | undefined {
+  if (ns) {
+    return getNamespaceFullName(ns);
+  }
+  return undefined;
 }
 
 /**
@@ -543,6 +551,7 @@ export function getSdkModelWithDiagnostics(
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: name,
+      namespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -663,6 +672,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
+      namespace: getNamespaceHelper(type.namespace),
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -696,6 +706,7 @@ function getSdkUnionEnumValues(
     values.push({
       kind: "enumvalue",
       name: name ? name : `${member.value}`,
+      namespace: enumType.namespace,
       description: docWrapper.description,
       details: docWrapper.details,
       value: member.value,
