@@ -2756,8 +2756,7 @@ describe("typespec-client-generator-core: types", () => {
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.experimental_sdkPackage.models;
-      // TODO: deal with response anonymous model
-      // strictEqual(models.length, 1);
+      strictEqual(models.length, 4);
       strictEqual(models[0].name, "User");
     });
 
@@ -2784,11 +2783,20 @@ describe("typespec-client-generator-core: types", () => {
         @doc("Creates or updates a User")
         op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-      // TODO: need to deal with response anonymous model
-      // const models = runnerWithCore.context.experimental_sdkPackage.models;
-      // strictEqual(models.length, 4);
-      // const modelNames = models.map((model) => model.name).sort();
-      // deepStrictEqual(modelNames, ["Error", "ErrorResponse", "InnerError", "User"].sort());
+      const models = runnerWithCore.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 6);
+      const modelNames = models.map((model) => model.name).sort();
+      deepStrictEqual(
+        modelNames,
+        [
+          "CreateOrUpdateResponse",
+          "CreateOrUpdateResponse1",
+          "CreateOrUpdateResponse2",
+          "Error",
+          "InnerError",
+          "User",
+        ].sort()
+      );
     });
 
     it("lro core filterOutCoreModels true", async () => {
@@ -2815,8 +2823,7 @@ describe("typespec-client-generator-core: types", () => {
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
       const models = runnerWithCore.context.experimental_sdkPackage.models;
-      // TODO: need to deal with response anonymous model
-      // strictEqual(models.length, 1);
+      strictEqual(models.length, 5);
       strictEqual(models[0].name, "User");
     });
 
@@ -2844,20 +2851,22 @@ describe("typespec-client-generator-core: types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-      // TODO: need to deal with the response anonymous model
-      // const models = runnerWithCore.context.experimental_sdkPackage.models;
-      // strictEqual(models.length, 5);
-      // const modelNames = models.map((model) => model.name).sort();
-      // deepStrictEqual(
-      //   modelNames,
-      //   [
-      //     "Error",
-      //     "ErrorResponse",
-      //     "InnerError",
-      //     "User",
-      //     "ResourceOperationStatusUserUserError",
-      //   ].sort()
-      // );
+      const models = runnerWithCore.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 8);
+      const modelNames = models.map((model) => model.name).sort();
+      deepStrictEqual(
+        modelNames,
+        [
+          "CreateOrUpdateUserResponse",
+          "CreateOrUpdateUserResponse1",
+          "CreateOrUpdateUserResponse2",
+          "Error",
+          "GetStatusResponse",
+          "InnerError",
+          "ResourceOperationStatusUserUserError",
+          "User",
+        ].sort()
+      );
       strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
       strictEqual(runnerWithCore.context.experimental_sdkPackage.enums[0].name, "OperationState");
     });
@@ -3621,7 +3630,7 @@ describe("typespec-client-generator-core: types", () => {
       ok(modelA);
       strictEqual(modelA.kind, "model");
       strictEqual(modelA.isFormDataType, true);
-      strictEqual(modelA.usage,  UsageFlags.MultipartFormData | UsageFlags.Spread);
+      strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Spread);
       strictEqual(modelA.properties.length, 1);
       const modelAProp = modelA.properties[0];
       strictEqual(modelAProp.kind, "property");
@@ -3631,7 +3640,7 @@ describe("typespec-client-generator-core: types", () => {
       ok(modelB);
       strictEqual(modelB.kind, "model");
       strictEqual(modelB.isFormDataType, false);
-      strictEqual(modelB.usage,  UsageFlags.Spread);
+      strictEqual(modelB.usage, UsageFlags.Spread);
       strictEqual(modelB.properties.length, 1);
       strictEqual(modelB.properties[0].type.kind, "bytes");
     });
@@ -3770,7 +3779,6 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(formDataMethod.parameters[4].name, "contentType");
       strictEqual(formDataMethod.parameters[4].type.kind, "constant");
       strictEqual(formDataMethod.parameters[4].type.value, "multipart/form-data");
-
 
       strictEqual(formDataMethod.parameters[5].name, "accept");
       strictEqual(formDataMethod.parameters[5].type.kind, "constant");

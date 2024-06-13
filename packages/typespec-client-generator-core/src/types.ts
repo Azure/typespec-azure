@@ -1242,7 +1242,11 @@ function updateTypesFromOperation(
     );
     if (generateConvenient) {
       // special logic for spread body model
-      if (httpBody.type.kind === "Model" && httpBody.type.name === "" && !context.spreadModels?.has(httpBody.type)) {
+      if (
+        httpBody.type.kind === "Model" &&
+        httpBody.type.name === "" &&
+        !context.spreadModels?.has(httpBody.type)
+      ) {
         context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
       } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);

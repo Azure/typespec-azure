@@ -1733,10 +1733,12 @@ describe("typespec-client-generator-core: public-utils", () => {
           emitterName: "@azure-tools/typespec-java",
         });
         await runnerWithCore.compile(lroCode);
-        // TODO: need to wait core template update
-        // const models = runnerWithCore.context.experimental_sdkPackage.models;
-        // strictEqual(models.length, 1);
-        // deepStrictEqual(models.map((x) => x.name).sort(), ["ExportedUser", "User"].sort());
+        const models = runnerWithCore.context.experimental_sdkPackage.models;
+        strictEqual(models.length, 3);
+        deepStrictEqual(
+          models.map((x) => x.name).sort(),
+          ["ExportResponse", "ExportResponse1", "ExportedUser"].sort()
+        );
       });
       it("filter-out-core-models false", async () => {
         const runnerWithCore = await createSdkTestRunner({
@@ -1748,21 +1750,19 @@ describe("typespec-client-generator-core: public-utils", () => {
         runnerWithCore.context.filterOutCoreModels = false;
         const models = getAllModels(runnerWithCore.context);
         strictEqual(models.length, 8);
-        // TODO: need to wait core template fix
-        // there should only be one non-core model
-        // deepStrictEqual(
-        //   models.map((x) => x.name).sort(),
-        //   [
-        //     "ResourceOperationStatusUserExportedUserError",
-        //     "OperationState",
-        //     "Error",
-        //     "InnerError",
-        //     "ExportedUser",
-        //     "ErrorResponse",
-        //     "OperationStatusExportedUserError",
-        //     "Versions",
-        //   ].sort()
-        // );
+        deepStrictEqual(
+          models.map((x) => x.name).sort(),
+          [
+            "Error",
+            "ExportResponse",
+            "ExportResponse1",
+            "ExportedUser",
+            "InnerError",
+            "OperationState",
+            "OperationStatusExportedUserError",
+            "Versions",
+          ].sort()
+        );
       });
     });
   });

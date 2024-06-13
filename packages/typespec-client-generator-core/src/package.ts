@@ -214,7 +214,7 @@ function getSdkMethodResponse<
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
     };
-  } else if (responseTypes) {
+  } else if (responseTypes.size === 1) {
     type = allResponseBodies[0];
   }
   if (nonBodyExists && type) {
