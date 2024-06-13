@@ -4,7 +4,7 @@ title: "[F] $armResourceCreateOrUpdate"
 
 ---
 ```ts
-$armResourceCreateOrUpdate(
+function $armResourceCreateOrUpdate(
    context, 
    target, 
    resourceType): void

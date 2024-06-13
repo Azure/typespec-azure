@@ -4,7 +4,7 @@ title: "[F] $responseProperty"
 
 ---
 ```ts
-$responseProperty(
+function $responseProperty(
    context, 
    entity, 
    name): void

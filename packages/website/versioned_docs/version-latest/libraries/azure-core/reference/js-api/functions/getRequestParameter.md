@@ -4,7 +4,7 @@ title: "[F] getRequestParameter"
 
 ---
 ```ts
-getRequestParameter(program, entity): string | undefined
+function getRequestParameter(program, entity): string | undefined
 ```
 
 ## Parameters

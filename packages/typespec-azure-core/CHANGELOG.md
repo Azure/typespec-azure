@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.43.0
+
+### Bug Fixes
+
+- [#693](https://github.com/Azure/typespec-azure/pull/693) Add new `no-string-discriminator` linter rule suggesting using an explicit extensible union as the discriminator kind.
+- [#851](https://github.com/Azure/typespec-azure/pull/851) Convert `OperationState` enum  to an open union
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+### Features
+
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Add override decorator @useFinalStateVia for lro resolution when multiple resolution pathways exist
+- [#707](https://github.com/Azure/typespec-azure/pull/707) Remove linter rules that are not relevant anymore: `use-extensible-enum` and `no-fixed-enum-discriminator`
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
+
+
 ## 0.42.0
 
 ### Bug Fixes

@@ -4,7 +4,7 @@ title: "[F] isArmCommonType"
 
 ---
 ```ts
-isArmCommonType(entity): boolean
+function isArmCommonType(entity): boolean
 ```
 
 Check if a given model or model property is an ARM common type.

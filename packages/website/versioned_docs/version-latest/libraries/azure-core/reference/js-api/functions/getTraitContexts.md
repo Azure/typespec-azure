@@ -4,7 +4,7 @@ title: "[F] getTraitContexts"
 
 ---
 ```ts
-getTraitContexts(program, property): EnumMember[]
+function getTraitContexts(program, property): EnumMember[]
 ```
 
 ## Parameters

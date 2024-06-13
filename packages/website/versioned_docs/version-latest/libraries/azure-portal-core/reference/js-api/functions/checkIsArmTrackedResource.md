@@ -4,7 +4,7 @@ title: "[F] checkIsArmTrackedResource"
 
 ---
 ```ts
-checkIsArmTrackedResource(
+function checkIsArmTrackedResource(
    program, 
    target, 
    decoratorName): boolean

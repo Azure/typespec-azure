@@ -4,7 +4,7 @@ title: "[F] $addTraitProperties"
 
 ---
 ```ts
-$addTraitProperties(
+function $addTraitProperties(
    context, 
    target, 
    traitModel, 

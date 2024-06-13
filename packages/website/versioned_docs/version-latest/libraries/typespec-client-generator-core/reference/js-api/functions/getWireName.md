@@ -4,7 +4,7 @@ title: "[F] getWireName"
 
 ---
 ```ts
-getWireName(context, type): string
+function getWireName(context, type): string
 ```
 
 Get the serialized name of a type.
@@ -14,7 +14,7 @@ Get the serialized name of a type.
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | `TCGCContext` |  |
-| `type` | `Type` & `Object` |  |
+| `type` | `Type` & `object` |  |
 
 ## Returns
 

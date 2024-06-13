@@ -4,49 +4,49 @@ title: "[V] $lib"
 
 ---
 ```ts
-const $lib: TypeSpecLibrary<Object, AutorestEmitterOptions, never>;
+const $lib: TypeSpecLibrary<object, AutorestEmitterOptions, never>;
 ```
 
 ## Type declaration
 
 | Member | Type | Value |
 | :------ | :------ | :------ |
-| `duplicate-body-types` | `Object` | - |
+| `duplicate-body-types` | `object` | ... |
 | `duplicate-body-types.default` | `"Request has multiple body types"` | "Request has multiple body types" |
-| `duplicate-example` | `Object` | - |
+| `duplicate-example` | `object` | ... |
 | `duplicate-example.default` | `"Duplicate @example declarations on operation"` | "Duplicate @example declarations on operation" |
-| `duplicate-example-file` | `Object` | - |
-| `duplicate-example-file.default` | `CallableMessage`<[`"filename"`, `"title"`, `"operationId"`]\> | - |
-| `duplicate-header` | `Object` | - |
-| `duplicate-header.default` | `CallableMessage`<[`"header"`]\> | - |
-| `example-loading` | `Object` | - |
-| `example-loading.default` | `CallableMessage`<[`"filename"`, `"error"`]\> | - |
-| `example-loading.noDirectory` | `CallableMessage`<[`"directory"`]\> | - |
-| `example-loading.noOperationId` | `CallableMessage`<[`"filename"`]\> | - |
-| `inline-cycle` | `Object` | - |
-| `inline-cycle.default` | `CallableMessage`<[`"type"`]\> | - |
-| `invalid-default` | `Object` | - |
-| `invalid-default.default` | `CallableMessage`<[`"type"`]\> | - |
-| `invalid-format` | `Object` | - |
-| `invalid-format.default` | `CallableMessage`<[`"schema"`, `"format"`]\> | - |
-| `invalid-multi-collection-format` | `Object` | - |
+| `duplicate-example-file` | `object` | ... |
+| `duplicate-example-file.default` | `CallableMessage`<[`"filename"`, `"title"`, `"operationId"`]\> | ... |
+| `duplicate-header` | `object` | ... |
+| `duplicate-header.default` | `CallableMessage`<[`"header"`]\> | ... |
+| `example-loading` | `object` | ... |
+| `example-loading.default` | `CallableMessage`<[`"filename"`, `"error"`]\> | ... |
+| `example-loading.noDirectory` | `CallableMessage`<[`"directory"`]\> | ... |
+| `example-loading.noOperationId` | `CallableMessage`<[`"filename"`]\> | ... |
+| `inline-cycle` | `object` | ... |
+| `inline-cycle.default` | `CallableMessage`<[`"type"`]\> | ... |
+| `invalid-default` | `object` | ... |
+| `invalid-default.default` | `CallableMessage`<[`"type"`]\> | ... |
+| `invalid-format` | `object` | ... |
+| `invalid-format.default` | `CallableMessage`<[`"schema"`, `"format"`]\> | ... |
+| `invalid-multi-collection-format` | `object` | ... |
 | `invalid-multi-collection-format.default` | `"The 'multi' should be applied to parameter in 'query', 'header' or 'formData'."` | "The 'multi' should be applied to parameter in 'query', 'header' or 'formData'." |
-| `invalid-schema` | `Object` | - |
-| `invalid-schema.default` | `CallableMessage`<[`"type"`]\> | - |
-| `nonspecific-scalar` | `Object` | - |
-| `nonspecific-scalar.default` | `CallableMessage`<[`"type"`, `"chosenType"`]\> | - |
-| `union-null` | `Object` | - |
+| `invalid-schema` | `object` | ... |
+| `invalid-schema.default` | `CallableMessage`<[`"type"`]\> | ... |
+| `nonspecific-scalar` | `object` | ... |
+| `nonspecific-scalar.default` | `CallableMessage`<[`"type"`, `"chosenType"`]\> | ... |
+| `union-null` | `object` | ... |
 | `union-null.default` | `"Cannot have a union containing only null types."` | "Cannot have a union containing only null types." |
-| `union-unsupported` | `Object` | - |
+| `union-unsupported` | `object` | ... |
 | `union-unsupported.default` | `"Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type."` | "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type." |
 | `union-unsupported.empty` | `"Empty unions are not supported for OpenAPI v2 - enums must have at least one value."` | "Empty unions are not supported for OpenAPI v2 - enums must have at least one value." |
-| `unsupported-auth` | `Object` | - |
-| `unsupported-auth.default` | `CallableMessage`<[`"authType"`]\> | - |
-| `unsupported-http-auth-scheme` | `Object` | - |
-| `unsupported-http-auth-scheme.default` | `CallableMessage`<[`"scheme"`]\> | - |
-| `unsupported-multipart-type` | `Object` | - |
-| `unsupported-multipart-type.default` | `CallableMessage`<[`"part"`]\> | - |
-| `unsupported-param-type` | `Object` | - |
-| `unsupported-param-type.default` | `CallableMessage`<[`"part"`]\> | - |
-| `unsupported-status-code-range` | `Object` | - |
-| `unsupported-status-code-range.default` | `CallableMessage`<[`"start"`, `"end"`]\> | - |
+| `unsupported-auth` | `object` | ... |
+| `unsupported-auth.default` | `CallableMessage`<[`"authType"`]\> | ... |
+| `unsupported-http-auth-scheme` | `object` | ... |
+| `unsupported-http-auth-scheme.default` | `CallableMessage`<[`"scheme"`]\> | ... |
+| `unsupported-multipart-type` | `object` | ... |
+| `unsupported-multipart-type.default` | `CallableMessage`<[`"part"`]\> | ... |
+| `unsupported-param-type` | `object` | ... |
+| `unsupported-param-type.default` | `CallableMessage`<[`"part"`]\> | ... |
+| `unsupported-status-code-range` | `object` | ... |
+| `unsupported-status-code-range.default` | `CallableMessage`<[`"start"`, `"end"`]\> | ... |

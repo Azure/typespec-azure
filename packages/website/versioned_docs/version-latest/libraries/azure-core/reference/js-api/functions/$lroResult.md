@@ -4,7 +4,7 @@ title: "[F] $lroResult"
 
 ---
 ```ts
-$lroResult(context, entity): void
+function $lroResult(context, entity): void
 ```
 
 Marks the property in a StatusMonitor that contains the logical result

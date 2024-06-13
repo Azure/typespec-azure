@@ -4,7 +4,7 @@ title: "[F] getTraitName"
 
 ---
 ```ts
-getTraitName(program, model): string | undefined
+function getTraitName(program, model): string | undefined
 ```
 
 ## Parameters

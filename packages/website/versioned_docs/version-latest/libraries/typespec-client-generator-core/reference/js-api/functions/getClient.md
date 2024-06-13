@@ -4,7 +4,7 @@ title: "[F] getClient"
 
 ---
 ```ts
-getClient(context, type): SdkClient | undefined
+function getClient(context, type): SdkClient | undefined
 ```
 
 Return the client object for the given namespace or interface, or undefined if the given namespace or interface is not a client.
@@ -14,7 +14,7 @@ Return the client object for the given namespace or interface, or undefined if t
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | `TCGCContext` | TCGCContext |
-| `type` | `Interface` \| `Namespace` | Type to check |
+| `type` | `Namespace` \| `Interface` | Type to check |
 
 ## Returns
 

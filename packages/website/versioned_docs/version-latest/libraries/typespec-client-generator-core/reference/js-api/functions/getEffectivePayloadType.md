@@ -4,7 +4,7 @@ title: "[F] getEffectivePayloadType"
 
 ---
 ```ts
-getEffectivePayloadType(context, type): Model
+function getEffectivePayloadType(context, type): Model
 ```
 
 If the given type is an anonymous model and all of its properties excluding

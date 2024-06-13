@@ -4,7 +4,7 @@ title: "[F] $internal"
 
 ---
 ```ts
-$internal(
+function $internal(
    context, 
    target, 
    scope?): void

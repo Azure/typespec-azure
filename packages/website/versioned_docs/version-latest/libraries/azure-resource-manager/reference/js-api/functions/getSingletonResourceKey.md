@@ -4,7 +4,7 @@ title: "[F] getSingletonResourceKey"
 
 ---
 ```ts
-getSingletonResourceKey(program, resourceType): string | undefined
+function getSingletonResourceKey(program, resourceType): string | undefined
 ```
 
 ## Parameters
