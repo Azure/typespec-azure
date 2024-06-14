@@ -5,7 +5,7 @@ import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getSdkTypeHelper } from "./utils.test.js";
+import { getSdkTypeHelper } from "./utils.js";
 
 describe("typespec-client-generator-core: types", () => {
   let runner: SdkTestRunner;
