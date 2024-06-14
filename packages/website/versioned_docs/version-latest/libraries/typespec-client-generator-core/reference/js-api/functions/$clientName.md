@@ -4,7 +4,7 @@ title: "[F] $clientName"
 
 ---
 ```ts
-$clientName(
+function $clientName(
    context, 
    entity, 
    value, 

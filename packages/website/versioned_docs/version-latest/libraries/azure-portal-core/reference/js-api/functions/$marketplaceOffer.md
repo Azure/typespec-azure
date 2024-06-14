@@ -4,7 +4,7 @@ title: "[F] $marketplaceOffer"
 
 ---
 ```ts
-$marketplaceOffer(
+function $marketplaceOffer(
    context, 
    target, 
    options): void

@@ -4,7 +4,7 @@ title: "[F] getAsEmbeddingVector"
 
 ---
 ```ts
-getAsEmbeddingVector(program, model): EmbeddingVectorMetadata | undefined
+function getAsEmbeddingVector(program, model): EmbeddingVectorMetadata | undefined
 ```
 
 If the provided model is an embedding vector, returns the appropriate metadata; otherwise,

@@ -4,7 +4,7 @@ title: "[F] isInOperationGroup"
 
 ---
 ```ts
-isInOperationGroup(context, type): boolean
+function isInOperationGroup(context, type): boolean
 ```
 
 Check an operation is in an operation group.
@@ -14,7 +14,7 @@ Check an operation is in an operation group.
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | `TCGCContext` | TCGCContext |
-| `type` | `Interface` \| `Namespace` \| `Operation` | Type to check |
+| `type` | `Namespace` \| `Interface` \| `Operation` | Type to check |
 
 ## Returns
 

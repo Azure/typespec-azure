@@ -4,7 +4,7 @@ title: "[F] $convenientAPI"
 
 ---
 ```ts
-$convenientAPI(
+function $convenientAPI(
    context, 
    entity, 
    value, 

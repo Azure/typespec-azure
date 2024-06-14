@@ -4,7 +4,7 @@ title: "[F] $singleton"
 
 ---
 ```ts
-$singleton(
+function $singleton(
    context, 
    resourceType, 
    keyValue): void

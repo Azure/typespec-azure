@@ -58,6 +58,7 @@ title: "[P] JS API"
 
 - [$addTraitProperties](functions/$addTraitProperties.md)
 - [$applyTraitOverride](functions/$applyTraitOverride.md)
+- [$defaultFinalStateVia](functions/$defaultFinalStateVia.md)
 - [$ensureAllHeaderParams](functions/$ensureAllHeaderParams.md)
 - [$ensureAllQueryParams](functions/$ensureAllQueryParams.md)
 - [$ensureResourceType](functions/$ensureResourceType.md)
@@ -92,6 +93,7 @@ title: "[P] JS API"
 - [$traitContext](functions/$traitContext.md)
 - [$traitLocation](functions/$traitLocation.md)
 - [$traitSource](functions/$traitSource.md)
+- [$useFinalStateVia](functions/$useFinalStateVia.md)
 - [\_\_unsupported\_enable\_checkStandardOperations](functions/unsupported_enable_checkStandardOperations.md)
 - [checkEnsureVerb](functions/checkEnsureVerb.md)
 - [checkRpcRoutes](functions/checkRpcRoutes.md)
@@ -102,6 +104,7 @@ title: "[P] JS API"
 - [getArmResourceIdentifierConfig](functions/getArmResourceIdentifierConfig.md)
 - [getAsEmbeddingVector](functions/getAsEmbeddingVector.md)
 - [getFinalLocationValue](functions/getFinalLocationValue.md)
+- [getFinalStateOverride](functions/getFinalStateOverride.md)
 - [getHttpMetadata](functions/getHttpMetadata.md)
 - [getItems](functions/getItems.md)
 - [getLongRunningStates](functions/getLongRunningStates.md)

@@ -348,12 +348,12 @@ model Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError>
 
 #### Properties
 
-| Name    | Type                                                                      | Description                                                    |
-| ------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| id      | `string`                                                                  | The unique ID of the operation.                                |
-| status  | [`OperationState`](./data-types.md#Azure.Core.Foundations.OperationState) | The status of the operation                                    |
-| error?  | `StatusError`                                                             | Error object that describes the error when status is "Failed". |
-| result? | `StatusResult`                                                            | The result of the operation.                                   |
+| Name    | Type                                                                      | Description |
+| ------- | ------------------------------------------------------------------------- | ----------- |
+| id      | `string`                                                                  |             |
+| status  | [`OperationState`](./data-types.md#Azure.Core.Foundations.OperationState) |             |
+| error?  | `StatusError`                                                             |             |
+| result? | `StatusResult`                                                            |             |
 
 ### `ResponseProperty` {#Azure.Core.ResponseProperty}
 
@@ -427,10 +427,10 @@ model Azure.Core.StatusMonitorOptions
 
 #### Properties
 
-| Name           | Type                         | Description                                                                             |
-| -------------- | ---------------------------- | --------------------------------------------------------------------------------------- |
-| kind           | `"statusMonitor"`            | The kind of polling options                                                             |
-| finalProperty? | `ModelProperty \| ErrorType` | A reference to or name of the property of the status monitor that contains the response |
+| Name           | Type                      | Description                                                                             |
+| -------------- | ------------------------- | --------------------------------------------------------------------------------------- |
+| kind           | `"statusMonitor"`         | The kind of polling options                                                             |
+| finalProperty? | `ModelProperty \| string` | A reference to or name of the property of the status monitor that contains the response |
 
 ### `StatusMonitorPollingOptions` {#Azure.Core.StatusMonitorPollingOptions}
 
@@ -984,7 +984,7 @@ model Azure.Core.Foundations.RetryAfterHeader
 Enum describing allowed operation states.
 
 ```typespec
-enum Azure.Core.Foundations.OperationState
+union Azure.Core.Foundations.OperationState
 ```
 
 ## Azure.Core.Traits

@@ -4,7 +4,7 @@ title: "[F] $lroCanceled"
 
 ---
 ```ts
-$lroCanceled(context, entity): void
+function $lroCanceled(context, entity): void
 ```
 
 ## Parameters

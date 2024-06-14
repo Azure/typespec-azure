@@ -4,7 +4,7 @@ title: "[F] $resourceGroupResource"
 
 ---
 ```ts
-$resourceGroupResource(context, entity): void
+function $resourceGroupResource(context, entity): void
 ```
 
 ## Parameters

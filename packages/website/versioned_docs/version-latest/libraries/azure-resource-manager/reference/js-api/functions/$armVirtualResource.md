@@ -4,7 +4,7 @@ title: "[F] $armVirtualResource"
 
 ---
 ```ts
-$armVirtualResource(context, entity): void
+function $armVirtualResource(context, entity): void
 ```
 
 Marks the given resource as an external resource

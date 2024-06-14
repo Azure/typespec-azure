@@ -4,7 +4,7 @@ title: "[F] getUnionAsEnum"
 
 ---
 ```ts
-getUnionAsEnum(union): [UnionEnum | undefined, readonly Diagnostic[]]
+function getUnionAsEnum(union): [UnionEnum | undefined, readonly Diagnostic[]]
 ```
 
 Tries to convert a union into an enum.

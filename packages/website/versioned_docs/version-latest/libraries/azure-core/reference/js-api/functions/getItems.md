@@ -4,7 +4,7 @@ title: "[F] getItems"
 
 ---
 ```ts
-getItems(program, entity): boolean | undefined
+function getItems(program, entity): boolean | undefined
 ```
 
 Returns `true` if the property is marked with `@items`.

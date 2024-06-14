@@ -4,7 +4,7 @@ title: "[F] getOpenAPIForService"
 
 ---
 ```ts
-getOpenAPIForService(context, options): Promise<AutorestEmitterResult>
+function getOpenAPIForService(context, options): Promise<AutorestEmitterResult>
 ```
 
 ## Parameters

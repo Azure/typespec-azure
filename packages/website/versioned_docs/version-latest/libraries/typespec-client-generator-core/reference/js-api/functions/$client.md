@@ -4,7 +4,7 @@ title: "[F] $client"
 
 ---
 ```ts
-$client(
+function $client(
    context, 
    target, 
    options?, 
@@ -16,7 +16,7 @@ $client(
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `target` | `Interface` \| `Namespace` |
+| `target` | `Namespace` \| `Interface` |
 | `options`? | `Model` |
 | `scope`? | `string` |
 

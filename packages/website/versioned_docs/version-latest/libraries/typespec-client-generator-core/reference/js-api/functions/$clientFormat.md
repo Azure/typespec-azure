@@ -4,7 +4,7 @@ title: "[F] $clientFormat"
 
 ---
 ```ts
-$clientFormat(
+function $clientFormat(
    context, 
    target, 
    format, 

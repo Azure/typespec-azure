@@ -4,7 +4,7 @@ title: "[F] $ensureAllQueryParams"
 
 ---
 ```ts
-$ensureAllQueryParams(
+function $ensureAllQueryParams(
    context, 
    target, 
    paramModel): void

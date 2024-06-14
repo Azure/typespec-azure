@@ -4,7 +4,7 @@ title: "[F] $armProviderNameValue"
 
 ---
 ```ts
-$armProviderNameValue(context, entity): void
+function $armProviderNameValue(context, entity): void
 ```
 
 ## Parameters

@@ -4,7 +4,7 @@ title: "[F] checkEnsureVerb"
 
 ---
 ```ts
-checkEnsureVerb(program): void
+function checkEnsureVerb(program): void
 ```
 
 ## Parameters

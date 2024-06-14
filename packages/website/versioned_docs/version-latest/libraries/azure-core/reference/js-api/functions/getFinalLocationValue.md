@@ -4,7 +4,7 @@ title: "[F] getFinalLocationValue"
 
 ---
 ```ts
-getFinalLocationValue(program, entity): Model | IntrinsicType | undefined
+function getFinalLocationValue(program, entity): Model | IntrinsicType | undefined
 ```
 
 ## Parameters

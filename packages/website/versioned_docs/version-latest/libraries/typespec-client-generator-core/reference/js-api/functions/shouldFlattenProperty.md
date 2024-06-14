@@ -4,7 +4,7 @@ title: "[F] shouldFlattenProperty"
 
 ---
 ```ts
-shouldFlattenProperty(context, target): boolean
+function shouldFlattenProperty(context, target): boolean
 ```
 
 Whether a model property should be flattened or not.
