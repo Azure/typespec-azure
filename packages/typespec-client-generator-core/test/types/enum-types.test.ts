@@ -1,10 +1,14 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Union, Model } from "@typespec/compiler";
-import { strictEqual, deepEqual, deepStrictEqual, ok } from "assert";
-import { describe, beforeEach, it } from "vitest";
+import { Enum, Model, Union } from "@typespec/compiler";
+import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
-import { getSdkEnum, getClientType } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner, createTcgcTestRunnerForEmitter } from "../test-host.js";
+import { getClientType, getSdkEnum } from "../../src/types.js";
+import {
+  SdkTestRunner,
+  createSdkTestRunner,
+  createTcgcTestRunnerForEmitter,
+} from "../test-host.js";
 
 describe("typespec-client-generator-core: types", () => {
   let runner: SdkTestRunner;

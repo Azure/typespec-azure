@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { UsageFlags, isErrorModel } from "@typespec/compiler";
-import { strictEqual, deepStrictEqual, ok } from "assert";
-import { describe, beforeEach, it } from "vitest";
+import { deepStrictEqual, ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";

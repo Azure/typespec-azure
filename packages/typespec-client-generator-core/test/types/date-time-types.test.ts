@@ -1,5 +1,5 @@
 import { strictEqual } from "assert";
-import { describe, beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 

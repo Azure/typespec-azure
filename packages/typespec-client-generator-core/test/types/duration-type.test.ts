@@ -1,5 +1,5 @@
 import { strictEqual } from "assert";
-import { describe, beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
@@ -9,7 +9,7 @@ describe("typespec-client-generator-core: types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-  
+
   describe("SdkDurationType", () => {
     it("default", async function () {
       await runner.compileWithBuiltInService(
