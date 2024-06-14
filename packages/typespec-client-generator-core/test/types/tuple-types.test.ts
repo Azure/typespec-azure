@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
