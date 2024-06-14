@@ -1,31 +1,21 @@
 /* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Model, Union } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  SdkArrayType,
   SdkBodyModelPropertyType,
-  SdkEnumType,
-  SdkModelType,
-  SdkUnionType,
   UsageFlags,
 } from "../../src/interfaces.js";
 import { isErrorOrChildOfError } from "../../src/public-utils.js";
 import {
   getAllModels,
   getAllModelsWithDiagnostics,
-  getClientType,
-  getSdkEnum,
-  isReadOnly,
 } from "../../src/types.js";
 import {
   SdkTestRunner,
   createSdkTestRunner,
-  createTcgcTestRunnerForEmitter,
 } from "../test-host.js";
-import { getSdkBodyModelPropertyTypeHelper, getSdkTypeHelper } from "./utils.js";
 
 describe("typespec-client-generator-core: types", () => {
   let runner: SdkTestRunner;
@@ -34,56 +24,6 @@ describe("typespec-client-generator-core: types", () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
 
-  describe("SdkConstantType", () => {
-    it("string", async function () {
-      await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        @access(Access.public)
-        model Test {
-          prop: "json";
-        }
-      `);
-
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "constant");
-      strictEqual(sdkType.valueType.kind, "string");
-      strictEqual(sdkType.value, "json");
-      strictEqual(sdkType.name, "TestProp");
-      strictEqual(sdkType.isGeneratedName, true);
-    });
-    it("boolean", async function () {
-      await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        @access(Access.public)
-        model Test {
-          @test prop: true;
-        }
-      `);
-
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "constant");
-      strictEqual(sdkType.valueType.kind, "boolean");
-      strictEqual(sdkType.value, true);
-      strictEqual(sdkType.name, "TestProp");
-      strictEqual(sdkType.isGeneratedName, true);
-    });
-    it("number", async function () {
-      await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        @access(Access.public)
-        model Test {
-          @test prop: 4;
-        }
-      `);
-
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "constant");
-      strictEqual(sdkType.valueType.kind, "int32");
-      strictEqual(sdkType.value, 4);
-      strictEqual(sdkType.name, "TestProp");
-      strictEqual(sdkType.isGeneratedName, true);
-    });
-  });
   describe("SdkModelType", () => {
     it("basic", async () => {
       await runner.compile(`
