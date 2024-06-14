@@ -4,7 +4,7 @@ title: "[F] getEmitterTargetName"
 
 ---
 ```ts
-getEmitterTargetName(context): string
+function getEmitterTargetName(context): string
 ```
 
 ## Parameters

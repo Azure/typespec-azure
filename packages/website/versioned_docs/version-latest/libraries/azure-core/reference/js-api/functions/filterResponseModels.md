@@ -4,7 +4,7 @@ title: "[F] filterResponseModels"
 
 ---
 ```ts
-filterResponseModels(operation, predicate): Model[] | undefined
+function filterResponseModels(operation, predicate): Model[] | undefined
 ```
 
 Filter operation responses using a predicate

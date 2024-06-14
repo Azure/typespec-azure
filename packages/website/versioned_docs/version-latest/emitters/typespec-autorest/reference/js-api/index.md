@@ -32,7 +32,6 @@ title: "[P] JS API"
 - [OpenAPI2Tag](interfaces/OpenAPI2Tag.md)
 - [PrimitiveItems](interfaces/PrimitiveItems.md)
 - [Ref](interfaces/Ref.md)
-- [RefProducerParams](interfaces/RefProducerParams.md)
 - [XMSParameterizedHost](interfaces/XMSParameterizedHost.md)
 
 ## Type Aliases
@@ -40,6 +39,7 @@ title: "[P] JS API"
 - [Extensions](type-aliases/Extensions.md)
 - [HttpMethod](type-aliases/HttpMethod.md)
 - [JsonType](type-aliases/JsonType.md)
+- [OpenAPI2FileSchema](type-aliases/OpenAPI2FileSchema.md)
 - [OpenAPI2OAuth2FlowType](type-aliases/OpenAPI2OAuth2FlowType.md)
 - [OpenAPI2Operation](type-aliases/OpenAPI2Operation.md)
 - [OpenAPI2Parameter](type-aliases/OpenAPI2Parameter.md)
@@ -52,8 +52,9 @@ title: "[P] JS API"
 - [OpenAPI2SecurityRequirement](type-aliases/OpenAPI2SecurityRequirement.md)
 - [OpenAPI2SecurityScheme](type-aliases/OpenAPI2SecurityScheme.md)
 - [OpenAPI2StatusCode](type-aliases/OpenAPI2StatusCode.md)
-- [RefProducer](type-aliases/RefProducer.md)
 - [Refable](type-aliases/Refable.md)
+- [XMSLongRunningFinalState](type-aliases/XMSLongRunningFinalState.md)
+- [XMSLongRunningOperationOptions](type-aliases/XMSLongRunningOperationOptions.md)
 
 ## Variables
 
@@ -65,8 +66,9 @@ title: "[P] JS API"
 - [$example](functions/$example.md)
 - [$onEmit](functions/$onEmit.md)
 - [$useRef](functions/$useRef.md)
+- [getAllServicesAtAllVersions](functions/getAllServicesAtAllVersions.md)
 - [getExamples](functions/getExamples.md)
 - [getOpenAPIForService](functions/getOpenAPIForService.md)
 - [getRef](functions/getRef.md)
-- [setRefProducer](functions/setRefProducer.md)
+- [resolveAutorestOptions](functions/resolveAutorestOptions.md)
 - [sortOpenAPIDocument](functions/sortOpenAPIDocument.md)

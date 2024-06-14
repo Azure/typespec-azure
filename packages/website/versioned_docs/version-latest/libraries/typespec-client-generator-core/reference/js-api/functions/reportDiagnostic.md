@@ -4,14 +4,14 @@ title: "[F] reportDiagnostic"
 
 ---
 ```ts
-reportDiagnostic<C, M>(program, diag): void
+function reportDiagnostic<C, M>(program, diag): void
 ```
 
 ## Type parameters
 
 | Type parameter |
 | :------ |
-| `C` extends 
+| `C` *extends* 
   \| `"client-name"`
   \| `"client-service"`
   \| `"unknown-client-format"`
@@ -35,14 +35,14 @@ reportDiagnostic<C, M>(program, diag): void
   \| `"no-corresponding-method-param"`
   \| `"unsupported-protocol"`
   \| `"no-emitter-name"` |
-| `M` extends `string` \| `number` \| `symbol` |
+| `M` *extends* `string` \| `number` \| `symbol` |
 
 ## Parameters
 
 | Parameter | Type |
 | :------ | :------ |
 | `program` | `Program` |
-| `diag` | `DiagnosticReport`<`Object`, `C`, `M`\> |
+| `diag` | `DiagnosticReport`<`object`, `C`, `M`\> |
 
 ## Returns
 

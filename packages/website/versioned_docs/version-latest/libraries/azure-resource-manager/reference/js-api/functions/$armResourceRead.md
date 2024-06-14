@@ -4,7 +4,7 @@ title: "[F] $armResourceRead"
 
 ---
 ```ts
-$armResourceRead(
+function $armResourceRead(
    context, 
    target, 
    resourceType): void

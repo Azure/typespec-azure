@@ -4,7 +4,7 @@ title: "[F] getPagedResult"
 
 ---
 ```ts
-getPagedResult(program, entity): PagedResultMetadata | undefined
+function getPagedResult(program, entity): PagedResultMetadata | undefined
 ```
 
 Retrieves PagedResultMetadata for a model, if available. If passed an

@@ -4,7 +4,7 @@ title: "[F] getSdkArrayOrDict"
 
 ---
 ```ts
-getSdkArrayOrDict(
+function getSdkArrayOrDict(
    context, 
    type, 
    operation?): SdkDictionaryType | SdkArrayType | undefined

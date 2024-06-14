@@ -4,7 +4,7 @@ title: "[F] $lroErrorResult"
 
 ---
 ```ts
-$lroErrorResult(context, entity): void
+function $lroErrorResult(context, entity): void
 ```
 
 Marks the property in a StatusMonitor that contains the error result

@@ -4,7 +4,7 @@ title: "[F] getKnownScalars"
 
 ---
 ```ts
-getKnownScalars(): Record<string, SdkBuiltInKinds>
+function getKnownScalars(): Record<string, SdkBuiltInKinds>
 ```
 
 ## Returns

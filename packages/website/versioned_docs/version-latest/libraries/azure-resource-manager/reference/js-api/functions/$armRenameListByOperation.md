@@ -4,7 +4,7 @@ title: "[F] $armRenameListByOperation"
 
 ---
 ```ts
-$armRenameListByOperation(
+function $armRenameListByOperation(
    context, 
    entity, 
    resourceType, 

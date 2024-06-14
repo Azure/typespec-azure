@@ -4,7 +4,7 @@ title: "[F] isLroCanceledState"
 
 ---
 ```ts
-isLroCanceledState(program, entity): boolean
+function isLroCanceledState(program, entity): boolean
 ```
 
 Returns `true` if the enum member represents a "canceled" state.

@@ -4,7 +4,7 @@ title: "[F] getSdkCredentialParameter"
 
 ---
 ```ts
-getSdkCredentialParameter(context, client): SdkCredentialParameter | undefined
+function getSdkCredentialParameter(context, client): SdkCredentialParameter | undefined
 ```
 
 ## Parameters

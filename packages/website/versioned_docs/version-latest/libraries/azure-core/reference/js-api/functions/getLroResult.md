@@ -4,7 +4,7 @@ title: "[F] getLroResult"
 
 ---
 ```ts
-getLroResult(
+function getLroResult(
    program, 
    entity, 
    useDefault): [ModelProperty | undefined, readonly Diagnostic[]]
@@ -18,7 +18,7 @@ Gets the logical result property from a StatusMonitor
 | :------ | :------ | :------ | :------ |
 | `program` | `Program` | `undefined` | The program to process. |
 | `entity` | `Model` | `undefined` | The StatusMonitor model to process. |
-| `useDefault` | `boolean` | `true` | Use the default result property if no other<br />property is marked. (defaults to true) |
+| `useDefault` | `boolean` | `true` | Use the default result property if no other property is marked. (defaults to true) |
 
 ## Returns
 
