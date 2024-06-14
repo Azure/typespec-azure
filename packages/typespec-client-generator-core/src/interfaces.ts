@@ -550,7 +550,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
    */
   diagnostics: readonly Diagnostic[];
   crossLanguagePackageId: string;
-  examples: Map<SdkServiceMethod<TServiceOperation>, SdkServiceExample<TServiceOperation>[]>;
+  examples: Map<SdkServiceMethod<TServiceOperation>, SdkServiceOperationExample[]>;
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
@@ -571,15 +571,94 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
 }
 
-export type SdkServiceExample = SdkHttpExample;
+export type SdkServiceOperationExample = SdkHttpOperationExample;
 
-export type SdkServiceExampleBase<TServiceOperation extends SdkServiceOperation> = {
+export type SdkServiceOperationExampleBase<TServiceOperation extends SdkServiceOperation> = {
   operation: TServiceOperation;
   name: string;
   description: string;
+  filePath: string;
 };
 
-export interface SdkHttpExample extends SdkServiceExampleBase<SdkHttpOperation> {
+export interface SdkHttpOperationExample extends SdkServiceOperationExampleBase<SdkHttpOperation> {
   kind: "http";
+  parameters: SdkHttpParameterExample[];
+  responses: Map<number, SdkHttpResponseExample>;
+}
 
+export interface SdkHttpParameterExample {
+  parameter: SdkHttpParameter;
+  value: SdkExample;
+}
+
+export interface SdkHttpResponseExample {
+  response: SdkHttpResponse;
+  value: SdkExample;
+}
+
+export type SdkExample = SdkStringExample | SdkNumberExample | SdkBooleanExample | SdkNullExample | SdkAnyExample | SdkArrayExample | SdkDictionaryExample | SdkUnionExample | SdkModelExample;
+
+export interface SdkExampleBase {
+  kind: string;
+  schema: SdkType | SdkModelPropertyType;
+  value: unknown;
+}
+
+export interface SdkStringExample extends SdkExampleBase {
+  kind: "string",
+  schema: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  value: string;
+}
+
+export interface SdkNumberExample extends SdkExampleBase {
+  kind: "number",
+  schema: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  value: number;
+}
+
+export interface SdkBooleanExample extends SdkExampleBase {
+  kind: "boolean",
+  schema: SdkBuiltInType | SdkConstantType;
+  value: boolean;
+}
+
+export interface SdkNullExample extends SdkExampleBase {
+  kind: "null",
+  schema: SdkNullableType;
+  value: null;
+}
+
+export interface SdkAnyExample extends SdkExampleBase {
+  kind: "any",
+  schema: SdkBuiltInType;
+  value: unknown;
+}
+
+export interface SdkArrayExample extends SdkExampleBase {
+  kind: "array",
+  schema: SdkArrayType;
+  items: SdkExample[];
+  value: unknown[];
+}
+
+export interface SdkDictionaryExample extends SdkExampleBase {
+  kind: "dict",
+  schema: SdkDictionaryType;
+  properties: Record<string, SdkExample>;
+  value: Record<string, unknown>;
+}
+
+export interface SdkUnionExample extends SdkExampleBase {
+  kind: "union",
+  schema: SdkUnionType;
+  value: unknown;
+}
+
+export interface SdkModelExample extends SdkExampleBase {
+  kind: "model";
+  schema: SdkModelType;
+  properties: Record<string, SdkExample>;
+  baseModel?: SdkModelExample;
+  additionalProperties?: Record<string, SdkExample>;
+  value: Record<string, unknown>;
 }
