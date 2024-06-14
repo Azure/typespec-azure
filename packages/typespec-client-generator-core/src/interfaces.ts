@@ -138,15 +138,6 @@ enum SdkFloatKindsEnum {
   decimal128 = "decimal128",
 }
 
-// enum SdkAzureBuiltInStringKindsEnum {
-//   uuid = "uuid",
-//   ipV4Address = "ipV4Address",
-//   ipV6Address = "ipV6Address",
-//   eTag = "eTag",
-//   armId = "armId",
-//   azureLocation = "azureLocation",
-// }
-
 enum SdkGenericBuiltInStringKindsEnum {
   string = "string",
   url = "url",
@@ -163,10 +154,6 @@ enum SdkBuiltInKindsMiscellaneousEnum {
 export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
 
 export type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
-  // | keyof typeof SdkBuiltInKindsMiscellaneousEnum
-  // | keyof typeof SdkIntKindsEnum
-  // | keyof typeof SdkFloatKindsEnum
-  // | keyof typeof SdkGenericBuiltInStringKindsEnum;
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
