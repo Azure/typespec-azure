@@ -124,19 +124,23 @@ describe("typespec-client-generator-core: types", () => {
       await runner.compileWithBuiltInService(
         `
         @encode(BytesKnownEncoding.base64url)
-        scalar Base64rulBytes extends bytes;
+        scalar Base64UrlBytes extends bytes;
 
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
-          value: Base64rulBytes[];
+          value: Base64UrlBytes[];
         }
       `
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "bytes");
+      strictEqual(sdkType.valueType.kind, "scalar");
+      strictEqual(sdkType.valueType.name, "Base64UrlBytes");
+      strictEqual(sdkType.valueType.namespace, "TestService");
       strictEqual(sdkType.valueType.encode, "base64url");
+      strictEqual(sdkType.valueType.baseType?.kind, "bytes");
+      strictEqual(sdkType.valueType.baseType.encode, "base64url");
     });
 
     it("format", async function () {

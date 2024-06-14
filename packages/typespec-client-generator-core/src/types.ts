@@ -273,22 +273,24 @@ function getSdkScalarTypeWithDiagnostics(
   };
   const encodeData = getEncode(context.program, type);
   addEncodeInfo(scalarType, encodeData);
-  // addFormatInfo(context, type, scalarType);
   return diagnostics.wrap(scalarType);
 
   function addEncodeInfo(
-    sdkType: SdkDatetimeType | SdkDurationType | SdkScalarType,
+    sdkType: SdkDatetimeType | SdkDurationType | SdkScalarType | SdkBuiltInType,
     encodeData: EncodeData | undefined
   ): [void, readonly Diagnostic[]] {
     const diagnostics = createDiagnosticCollector();
     if (encodeData === undefined) return diagnostics.wrap(undefined);
 
     sdkType.encode = encodeData.encoding;
-    sdkType.wireType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, encodeData.type)
-    ) as SdkBuiltInType;
+    if (!isSdkbuiltInType(sdkType)) {
+      // only built-in types does not have wireType
+      sdkType.wireType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, encodeData.type)
+      ) as SdkBuiltInType;
+    }
     // this encode info should propagate to the base type and all the base type if any
-    if (sdkType.kind === "scalar" && sdkType.baseType && !isSdkbuiltInType(sdkType.baseType)) {
+    if (sdkType.kind === "scalar" && sdkType.baseType) {
       addEncodeInfo(sdkType.baseType, encodeData);
     }
 
@@ -912,8 +914,7 @@ export function getClientTypeWithDiagnostics(
       break;
     case "Scalar":
       retval = getKnownValuesEnum(context, type, operation);
-      if (retval)
-      {
+      if (retval) {
         break;
       }
       retval = diagnostics.pipe(
