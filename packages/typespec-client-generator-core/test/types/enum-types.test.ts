@@ -10,16 +10,15 @@ import {
   createTcgcTestRunnerForEmitter,
 } from "../test-host.js";
 
-describe("typespec-client-generator-core: types", () => {
+describe("typespec-client-generator-core: enum types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
 
-  describe("SdkEnumType", () => {
-    it("string extensible", async function () {
-      await runner.compileWithBuiltInService(`
+  it("string extensible", async function () {
+    await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
       @access(Access.public)
       enum DaysOfWeekExtensibleEnum {
@@ -39,41 +38,33 @@ describe("typespec-client-generator-core: types", () => {
       }
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
-      strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-      const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      strictEqual(sdkType.isFixed, true);
-      strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
-      strictEqual(sdkType.valueType.kind, "string");
-      strictEqual(sdkType.usage & UsageFlags.ApiVersionEnum, 0); // not a versioning enum
-      strictEqual(sdkType.isUnionAsEnum, false);
-      const values = sdkType.values;
-      strictEqual(values.length, 7);
-      const nameList = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ];
-      deepEqual(
-        values.map((x) => x.name),
-        nameList
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        nameList
-      );
-      for (const value of sdkType.values) {
-        deepStrictEqual(value.enumType, sdkType);
-        deepStrictEqual(value.valueType, sdkType.valueType);
-      }
-    });
+    strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
+    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
+    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(sdkType.isFixed, true);
+    strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
+    strictEqual(sdkType.valueType.kind, "string");
+    strictEqual(sdkType.usage & UsageFlags.ApiVersionEnum, 0); // not a versioning enum
+    strictEqual(sdkType.isUnionAsEnum, false);
+    const values = sdkType.values;
+    strictEqual(values.length, 7);
+    const nameList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    deepEqual(
+      values.map((x) => x.name),
+      nameList
+    );
+    deepEqual(
+      values.map((x) => x.value),
+      nameList
+    );
+    for (const value of sdkType.values) {
+      deepStrictEqual(value.enumType, sdkType);
+      deepStrictEqual(value.valueType, sdkType.valueType);
+    }
+  });
 
-    it("int extensible", async function () {
-      await runner.compileWithBuiltInService(`
+  it("int extensible", async function () {
+    await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
       @access(Access.public)
       enum Integers {
@@ -91,26 +82,26 @@ describe("typespec-client-generator-core: types", () => {
       }
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
-      strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-      const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      strictEqual(sdkType.isFixed, true);
-      strictEqual(sdkType.name, "Integers");
-      strictEqual(sdkType.valueType.kind, "int32");
-      const values = sdkType.values;
-      strictEqual(values.length, 5);
-      deepEqual(
-        values.map((x) => x.name),
-        ["one", "two", "three", "four", "five"]
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        [1, 2, 3, 4, 5]
-      );
-    });
+    strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
+    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
+    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(sdkType.isFixed, true);
+    strictEqual(sdkType.name, "Integers");
+    strictEqual(sdkType.valueType.kind, "int32");
+    const values = sdkType.values;
+    strictEqual(values.length, 5);
+    deepEqual(
+      values.map((x) => x.name),
+      ["one", "two", "three", "four", "five"]
+    );
+    deepEqual(
+      values.map((x) => x.value),
+      [1, 2, 3, 4, 5]
+    );
+  });
 
-    it("float extensible", async function () {
-      await runner.compileWithBuiltInService(`
+  it("float extensible", async function () {
+    await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
       @access(Access.public)
       enum Floats {
@@ -126,25 +117,25 @@ describe("typespec-client-generator-core: types", () => {
       }
       `);
 
-      const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      ok(sdkType);
-      strictEqual(sdkType.isFixed, true);
-      strictEqual(sdkType.name, "Floats");
-      strictEqual(sdkType.valueType.kind, "float32");
-      const values = sdkType.values;
-      strictEqual(values.length, 3);
-      deepEqual(
-        values.map((x) => x.name),
-        ["a", "b", "c"]
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        [1, 2.1, 3]
-      );
-    });
+    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    ok(sdkType);
+    strictEqual(sdkType.isFixed, true);
+    strictEqual(sdkType.name, "Floats");
+    strictEqual(sdkType.valueType.kind, "float32");
+    const values = sdkType.values;
+    strictEqual(values.length, 3);
+    deepEqual(
+      values.map((x) => x.name),
+      ["a", "b", "c"]
+    );
+    deepEqual(
+      values.map((x) => x.value),
+      [1, 2.1, 3]
+    );
+  });
 
-    it("union as enum float type", async function () {
-      await runner.compileWithBuiltInService(`
+  it("union as enum float type", async function () {
+    await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
       @access(Access.public)
       union Floats {
@@ -161,24 +152,24 @@ describe("typespec-client-generator-core: types", () => {
       }
       `);
 
-      const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      strictEqual(sdkType.isFixed, false);
-      strictEqual(sdkType.name, "Floats");
-      strictEqual(sdkType.valueType.kind, "float");
-      const values = sdkType.values;
-      strictEqual(values.length, 3);
-      deepEqual(
-        values.map((x) => x.name),
-        ["a", "b", "c"]
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        [1, 2, 3]
-      );
-    });
+    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(sdkType.isFixed, false);
+    strictEqual(sdkType.name, "Floats");
+    strictEqual(sdkType.valueType.kind, "float");
+    const values = sdkType.values;
+    strictEqual(values.length, 3);
+    deepEqual(
+      values.map((x) => x.name),
+      ["a", "b", "c"]
+    );
+    deepEqual(
+      values.map((x) => x.value),
+      [1, 2, 3]
+    );
+  });
 
-    it("union of union as enum float type", async function () {
-      await runner.compileWithBuiltInService(`
+  it("union of union as enum float type", async function () {
+    await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
       @access(Access.public)
       union BaseEnum {
@@ -200,26 +191,26 @@ describe("typespec-client-generator-core: types", () => {
         prop: ExtendedEnum
       }
       `);
-      const sdkType = runner.context.experimental_sdkPackage.enums[0];
-      ok(sdkType);
-      strictEqual(sdkType.isFixed, false);
-      strictEqual(sdkType.valueType.kind, "int32");
-      const values = sdkType.values;
-      strictEqual(values.length, 3);
+    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    ok(sdkType);
+    strictEqual(sdkType.isFixed, false);
+    strictEqual(sdkType.valueType.kind, "int32");
+    const values = sdkType.values;
+    strictEqual(values.length, 3);
 
-      // since these union is named, it gets flattened into one
-      ok(values.find((x) => x.name === "a" && x.value === 1));
-      ok(values.find((x) => x.name === "b" && x.value === 2));
-      ok(values.find((x) => x.name === "c" && x.value === 3));
+    // since these union is named, it gets flattened into one
+    ok(values.find((x) => x.name === "a" && x.value === 1));
+    ok(values.find((x) => x.name === "b" && x.value === 2));
+    ok(values.find((x) => x.name === "c" && x.value === 3));
+  });
+
+  it("string fixed", async function () {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
     });
-
-    it("string fixed", async function () {
-      const runnerWithCore = await createSdkTestRunner({
-        librariesToAdd: [AzureCoreTestLibrary],
-        autoUsings: ["Azure.Core"],
-        emitterName: "@azure-tools/typespec-java",
-      });
-      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runnerWithCore.compileWithBuiltInAzureCoreService(`
       #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
       @doc(".")
       @fixed
@@ -243,38 +234,30 @@ describe("typespec-client-generator-core: types", () => {
         prop: DaysOfWeekFixedEnum
       }
       `);
-      strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 1);
-      strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
-      const sdkType = runnerWithCore.context.experimental_sdkPackage.enums[0];
-      strictEqual(sdkType.isFixed, true);
-      strictEqual(sdkType.name, "DaysOfWeekFixedEnum");
-      strictEqual(sdkType.valueType.kind, "string");
-      const values = sdkType.values;
-      strictEqual(values.length, 7);
-      const nameList = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ];
-      deepEqual(
-        values.map((x) => x.name),
-        nameList
-      );
-      deepEqual(
-        values.map((x) => x.value),
-        nameList
-      );
-      for (const value of sdkType.values) {
-        deepStrictEqual(value.enumType, sdkType);
-        deepStrictEqual(value.valueType, sdkType.valueType);
-      }
-    });
-    it("enum access transitive closure", async () => {
-      await runner.compileWithBuiltInService(`
+    strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 1);
+    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
+    const sdkType = runnerWithCore.context.experimental_sdkPackage.enums[0];
+    strictEqual(sdkType.isFixed, true);
+    strictEqual(sdkType.name, "DaysOfWeekFixedEnum");
+    strictEqual(sdkType.valueType.kind, "string");
+    const values = sdkType.values;
+    strictEqual(values.length, 7);
+    const nameList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    deepEqual(
+      values.map((x) => x.name),
+      nameList
+    );
+    deepEqual(
+      values.map((x) => x.value),
+      nameList
+    );
+    for (const value of sdkType.values) {
+      deepStrictEqual(value.enumType, sdkType);
+      deepStrictEqual(value.valueType, sdkType.valueType);
+    }
+  });
+  it("enum access transitive closure", async () => {
+    await runner.compileWithBuiltInService(`
         enum Integers {
           one: 1,
           two: 2,
@@ -288,10 +271,10 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.enums[0].access, "internal");
-    });
-    it("crossLanguageDefinitionId", async () => {
-      await runner.compile(`
+    strictEqual(runner.context.experimental_sdkPackage.enums[0].access, "internal");
+  });
+  it("crossLanguageDefinitionId", async () => {
+    await runner.compile(`
         @service({})
         namespace MyService {
           @usage(Usage.input | Usage.output)
@@ -311,13 +294,13 @@ describe("typespec-client-generator-core: types", () => {
           }
         }
       `);
-      strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-      const integersEnum = runner.context.experimental_sdkPackage.enums[0];
-      strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
-    });
+    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
+    const integersEnum = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
+  });
 
-    it("enum with deprecated annotation", async () => {
-      await runner.compileAndDiagnose(`
+  it("enum with deprecated annotation", async () => {
+    await runner.compileAndDiagnose(`
         @service({})
         namespace MyService;
         #deprecated "no longer support"
@@ -329,11 +312,11 @@ describe("typespec-client-generator-core: types", () => {
         ): void;
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.enums[0].deprecation, "no longer support");
-    });
+    strictEqual(runner.context.experimental_sdkPackage.enums[0].deprecation, "no longer support");
+  });
 
-    it("orphan enum", async () => {
-      await runner.compileAndDiagnose(`
+  it("orphan enum", async () => {
+    await runner.compileAndDiagnose(`
         @service({})
         @test namespace MyService {
           @test
@@ -353,15 +336,15 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.enums[0].name, "Enum1");
-      strictEqual(
-        runner.context.experimental_sdkPackage.enums[0].usage,
-        UsageFlags.Input | UsageFlags.Output
-      );
-    });
+    strictEqual(runner.context.experimental_sdkPackage.enums[0].name, "Enum1");
+    strictEqual(
+      runner.context.experimental_sdkPackage.enums[0].usage,
+      UsageFlags.Input | UsageFlags.Output
+    );
+  });
 
-    it("projected name", async () => {
-      await runner.compileAndDiagnose(`
+  it("projected name", async () => {
+    await runner.compileAndDiagnose(`
         @service({})
         @test namespace MyService {
           @test
@@ -377,9 +360,9 @@ describe("typespec-client-generator-core: types", () => {
         }
       `);
 
-      async function helper(emitterName: string, enumName: string, enumValueName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
-        const { Enum1 } = (await runner.compile(`
+    async function helper(emitterName: string, enumName: string, enumValueName: string) {
+      const runner = await createTcgcTestRunnerForEmitter(emitterName);
+      const { Enum1 } = (await runner.compile(`
         @service({})
         namespace MyService {
           #suppress "deprecated" "for testing"
@@ -396,17 +379,17 @@ describe("typespec-client-generator-core: types", () => {
           }
         }
       `)) as { Enum1: Enum };
-        const enum1 = getSdkEnum(runner.context, Enum1);
-        strictEqual(enum1.name, enumName);
-        strictEqual(enum1.values[0].name, enumValueName);
-      }
-      await helper("@azure-tools/typespec-csharp", "Enum1", "One");
-      await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
-    });
+      const enum1 = getSdkEnum(runner.context, Enum1);
+      strictEqual(enum1.name, enumName);
+      strictEqual(enum1.values[0].name, enumValueName);
+    }
+    await helper("@azure-tools/typespec-csharp", "Enum1", "One");
+    await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
+  });
 
-    it("union as enum rename", async () => {
-      const { TestUnion } = (await runner.compileWithCustomization(
-        `
+  it("union as enum rename", async () => {
+    const { TestUnion } = (await runner.compileWithCustomization(
+      `
         @service({})
         namespace N {
           @test
@@ -419,25 +402,25 @@ describe("typespec-client-generator-core: types", () => {
           op x(body: TestUnion): void;
         }
       `,
-        `
+      `
         namespace Customizations;
 
         @@clientName(N.TestUnion, "TestUnionRename");
         @@clientName(N.TestUnion.B, "BRename");
       `
-      )) as { TestUnion: Union };
+    )) as { TestUnion: Union };
 
-      const enumType = getClientType(runner.context, TestUnion);
-      strictEqual(enumType.kind, "enum");
-      strictEqual(enumType.name, "TestUnionRename");
-      strictEqual(enumType.isUnionAsEnum, true);
-      strictEqual(enumType.values[0].name, "ARename");
-      strictEqual(enumType.values[1].name, "BRename");
-    });
+    const enumType = getClientType(runner.context, TestUnion);
+    strictEqual(enumType.kind, "enum");
+    strictEqual(enumType.name, "TestUnionRename");
+    strictEqual(enumType.isUnionAsEnum, true);
+    strictEqual(enumType.values[0].name, "ARename");
+    strictEqual(enumType.values[1].name, "BRename");
+  });
 
-    it("union as enum with hierarchy", async () => {
-      const { Test } = (await runner.compile(
-        `
+  it("union as enum with hierarchy", async () => {
+    const { Test } = (await runner.compile(
+      `
         @service({})
         namespace N {
           @test
@@ -464,32 +447,32 @@ describe("typespec-client-generator-core: types", () => {
           op x(body: Test): void;
         }
       `
-      )) as { Test: Union };
+    )) as { Test: Union };
 
-      const nullableType = getClientType(runner.context, Test);
-      strictEqual(nullableType.kind, "nullable");
+    const nullableType = getClientType(runner.context, Test);
+    strictEqual(nullableType.kind, "nullable");
 
-      const enumType = nullableType.type;
-      strictEqual(enumType.kind, "enum");
-      strictEqual(enumType.name, "Test");
-      strictEqual(enumType.isUnionAsEnum, true);
-      const values = enumType.values;
-      strictEqual(values.length, 4);
-      strictEqual(enumType.isFixed, false);
+    const enumType = nullableType.type;
+    strictEqual(enumType.kind, "enum");
+    strictEqual(enumType.name, "Test");
+    strictEqual(enumType.isUnionAsEnum, true);
+    const values = enumType.values;
+    strictEqual(values.length, 4);
+    strictEqual(enumType.isFixed, false);
 
-      ok(values.find((x) => x.kind === "enumvalue" && x.name === "A1" && x.value === "A1"));
-      ok(values.find((x) => x.kind === "enumvalue" && x.name === "A2" && x.value === "A2"));
-      ok(values.find((x) => x.kind === "enumvalue" && x.name === "B" && x.value === "B"));
-      ok(values.find((x) => x.kind === "enumvalue" && x.name === "C" && x.value === "C"));
+    ok(values.find((x) => x.kind === "enumvalue" && x.name === "A1" && x.value === "A1"));
+    ok(values.find((x) => x.kind === "enumvalue" && x.name === "A2" && x.value === "A2"));
+    ok(values.find((x) => x.kind === "enumvalue" && x.name === "B" && x.value === "B"));
+    ok(values.find((x) => x.kind === "enumvalue" && x.name === "C" && x.value === "C"));
+  });
+
+  it("union as enum with hierarchy without flatten", async () => {
+    runner = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+      "flatten-union-as-enum": false,
     });
-
-    it("union as enum with hierarchy without flatten", async () => {
-      runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "flatten-union-as-enum": false,
-      });
-      const { Test } = (await runner.compile(
-        `
+    const { Test } = (await runner.compile(
+      `
         @service({})
         namespace N {
           @test
@@ -516,44 +499,44 @@ describe("typespec-client-generator-core: types", () => {
           op x(body: Test): void;
         }
       `
-      )) as { Test: Union };
+    )) as { Test: Union };
 
-      const nullableType = getClientType(runner.context, Test);
-      strictEqual(nullableType.kind, "nullable");
-      const unionType = nullableType.type;
+    const nullableType = getClientType(runner.context, Test);
+    strictEqual(nullableType.kind, "nullable");
+    const unionType = nullableType.type;
 
-      strictEqual(unionType.kind, "union");
-      strictEqual(unionType.name, "Test");
+    strictEqual(unionType.kind, "union");
+    strictEqual(unionType.name, "Test");
 
-      const values = unionType.values;
-      strictEqual(values.length, 3);
-      const a = values[0] as SdkEnumType;
-      strictEqual(a.name, "A");
-      strictEqual(a.kind, "enum");
-      strictEqual(a.isUnionAsEnum, true);
-      strictEqual(a.values[0].name, "A1");
-      strictEqual(a.values[0].value, "A1");
-      strictEqual(a.values[1].name, "A2");
-      strictEqual(a.values[1].value, "A2");
+    const values = unionType.values;
+    strictEqual(values.length, 3);
+    const a = values[0] as SdkEnumType;
+    strictEqual(a.name, "A");
+    strictEqual(a.kind, "enum");
+    strictEqual(a.isUnionAsEnum, true);
+    strictEqual(a.values[0].name, "A1");
+    strictEqual(a.values[0].value, "A1");
+    strictEqual(a.values[1].name, "A2");
+    strictEqual(a.values[1].value, "A2");
 
-      const b = values[1] as SdkEnumType;
-      strictEqual(b.name, "B");
-      strictEqual(b.kind, "enum");
-      strictEqual(b.isUnionAsEnum, true);
-      strictEqual(b.values[0].name, "B");
-      strictEqual(b.values[0].value, "B");
+    const b = values[1] as SdkEnumType;
+    strictEqual(b.name, "B");
+    strictEqual(b.kind, "enum");
+    strictEqual(b.isUnionAsEnum, true);
+    strictEqual(b.values[0].name, "B");
+    strictEqual(b.values[0].value, "B");
 
-      const c = values[2] as SdkEnumType;
-      strictEqual(c.name, "C");
-      strictEqual(c.kind, "enum");
-      strictEqual(c.isUnionAsEnum, false);
-      strictEqual(c.values[0].name, "C");
-      strictEqual(c.values[0].value, "C");
-    });
+    const c = values[2] as SdkEnumType;
+    strictEqual(c.name, "C");
+    strictEqual(c.kind, "enum");
+    strictEqual(c.isUnionAsEnum, false);
+    strictEqual(c.values[0].name, "C");
+    strictEqual(c.values[0].value, "C");
+  });
 
-    it("anonymous union as enum with hierarchy", async () => {
-      const { Test } = (await runner.compile(
-        `
+  it("anonymous union as enum with hierarchy", async () => {
+    const { Test } = (await runner.compile(
+      `
         @service({})
         namespace N {
           enum LR {
@@ -572,37 +555,37 @@ describe("typespec-client-generator-core: types", () => {
           op read(@body body: Test): void;
         }
       `
-      )) as { Test: Model };
+    )) as { Test: Model };
 
-      const modelType = getClientType(runner.context, Test) as SdkModelType;
-      const enumType = modelType.properties[0].type as SdkEnumType;
-      strictEqual(enumType.name, "TestColor");
-      strictEqual(enumType.isGeneratedName, true);
-      strictEqual(enumType.isUnionAsEnum, true);
-      // no cross language def id bc it's not a defined object in tsp
-      strictEqual(enumType.crossLanguageDefinitionId, "Test.color.anonymous");
-      const values = enumType.values;
-      strictEqual(values[0].name, "left");
-      strictEqual(values[0].value, "left");
-      strictEqual(values[0].valueType.kind, "string");
-      strictEqual(values[1].name, "right");
-      strictEqual(values[1].value, "right");
-      strictEqual(values[1].valueType.kind, "string");
-      strictEqual(values[2].name, "up");
-      strictEqual(values[2].value, "up");
-      strictEqual(values[2].valueType.kind, "string");
-      strictEqual(values[3].name, "down");
-      strictEqual(values[3].value, "down");
-      strictEqual(values[3].valueType.kind, "string");
+    const modelType = getClientType(runner.context, Test) as SdkModelType;
+    const enumType = modelType.properties[0].type as SdkEnumType;
+    strictEqual(enumType.name, "TestColor");
+    strictEqual(enumType.isGeneratedName, true);
+    strictEqual(enumType.isUnionAsEnum, true);
+    // no cross language def id bc it's not a defined object in tsp
+    strictEqual(enumType.crossLanguageDefinitionId, "Test.color.anonymous");
+    const values = enumType.values;
+    strictEqual(values[0].name, "left");
+    strictEqual(values[0].value, "left");
+    strictEqual(values[0].valueType.kind, "string");
+    strictEqual(values[1].name, "right");
+    strictEqual(values[1].value, "right");
+    strictEqual(values[1].valueType.kind, "string");
+    strictEqual(values[2].name, "up");
+    strictEqual(values[2].value, "up");
+    strictEqual(values[2].valueType.kind, "string");
+    strictEqual(values[3].name, "down");
+    strictEqual(values[3].value, "down");
+    strictEqual(values[3].valueType.kind, "string");
+  });
+
+  it("anonymous union as enum with hierarchy without flatten", async () => {
+    runner = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+      "flatten-union-as-enum": false,
     });
-
-    it("anonymous union as enum with hierarchy without flatten", async () => {
-      runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "flatten-union-as-enum": false,
-      });
-      const { Test } = (await runner.compile(
-        `
+    const { Test } = (await runner.compile(
+      `
         @service({})
         namespace N {
           enum LR {
@@ -621,30 +604,30 @@ describe("typespec-client-generator-core: types", () => {
           op read(@body body: Test): void;
         }
       `
-      )) as { Test: Model };
+    )) as { Test: Model };
 
-      const modelType = getClientType(runner.context, Test) as SdkModelType;
-      const unionType = modelType.properties[0].type as SdkUnionType;
-      strictEqual(unionType.name, "TestColor");
-      strictEqual(unionType.isGeneratedName, true);
-      const values = unionType.values;
-      const lr = values[0] as SdkEnumType;
-      strictEqual(lr.name, "LR");
-      strictEqual(lr.isUnionAsEnum, false);
-      strictEqual(lr.values[0].name, "left");
-      strictEqual(lr.values[1].name, "right");
-      strictEqual(lr.isFixed, true);
-      const ud = values[1] as SdkEnumType;
-      strictEqual(ud.name, "UD");
-      strictEqual(ud.isUnionAsEnum, false);
-      strictEqual(ud.values[0].name, "up");
-      strictEqual(ud.values[1].name, "down");
-      strictEqual(ud.isFixed, true);
-    });
+    const modelType = getClientType(runner.context, Test) as SdkModelType;
+    const unionType = modelType.properties[0].type as SdkUnionType;
+    strictEqual(unionType.name, "TestColor");
+    strictEqual(unionType.isGeneratedName, true);
+    const values = unionType.values;
+    const lr = values[0] as SdkEnumType;
+    strictEqual(lr.name, "LR");
+    strictEqual(lr.isUnionAsEnum, false);
+    strictEqual(lr.values[0].name, "left");
+    strictEqual(lr.values[1].name, "right");
+    strictEqual(lr.isFixed, true);
+    const ud = values[1] as SdkEnumType;
+    strictEqual(ud.name, "UD");
+    strictEqual(ud.isUnionAsEnum, false);
+    strictEqual(ud.values[0].name, "up");
+    strictEqual(ud.values[1].name, "down");
+    strictEqual(ud.isFixed, true);
+  });
 
-    it("versioned enums", async () => {
-      await runner.compile(
-        `
+  it("versioned enums", async () => {
+    await runner.compile(
+      `
         @versioned(Versions)
         @service()
         namespace DemoService;
@@ -654,25 +637,25 @@ describe("typespec-client-generator-core: types", () => {
           v2,
         }
       `
-      );
-      const enums = runner.context.experimental_sdkPackage.enums;
-      strictEqual(enums.length, 1);
-      strictEqual(enums[0].name, "Versions");
-      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(
-        enums[0].values.map((x) => x.value),
-        ["v1", "v2"]
-      );
+    );
+    const enums = runner.context.experimental_sdkPackage.enums;
+    strictEqual(enums.length, 1);
+    strictEqual(enums[0].name, "Versions");
+    strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+    deepStrictEqual(
+      enums[0].values.map((x) => x.value),
+      ["v1", "v2"]
+    );
+  });
+
+  it("versioned enums with all", async () => {
+    const runnerWithVersion = await createSdkTestRunner({
+      "api-version": "all",
+      emitterName: "@azure-tools/typespec-python",
     });
 
-    it("versioned enums with all", async () => {
-      const runnerWithVersion = await createSdkTestRunner({
-        "api-version": "all",
-        emitterName: "@azure-tools/typespec-python",
-      });
-
-      await runnerWithVersion.compile(
-        `
+    await runnerWithVersion.compile(
+      `
         @versioned(Versions)
         @service()
         namespace DemoService;
@@ -682,25 +665,25 @@ describe("typespec-client-generator-core: types", () => {
           v2,
         }
       `
-      );
-      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
-      strictEqual(enums.length, 1);
-      strictEqual(enums[0].name, "Versions");
-      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(
-        enums[0].values.map((x) => x.value),
-        ["v1", "v2"]
-      );
+    );
+    const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+    strictEqual(enums.length, 1);
+    strictEqual(enums[0].name, "Versions");
+    strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+    deepStrictEqual(
+      enums[0].values.map((x) => x.value),
+      ["v1", "v2"]
+    );
+  });
+
+  it("versioned enums with latest", async () => {
+    const runnerWithVersion = await createSdkTestRunner({
+      "api-version": "latest",
+      emitterName: "@azure-tools/typespec-python",
     });
 
-    it("versioned enums with latest", async () => {
-      const runnerWithVersion = await createSdkTestRunner({
-        "api-version": "latest",
-        emitterName: "@azure-tools/typespec-python",
-      });
-
-      await runnerWithVersion.compile(
-        `
+    await runnerWithVersion.compile(
+      `
         @versioned(Versions)
         @service()
         namespace DemoService;
@@ -710,25 +693,25 @@ describe("typespec-client-generator-core: types", () => {
           v2,
         }
       `
-      );
-      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
-      strictEqual(enums.length, 1);
-      strictEqual(enums[0].name, "Versions");
-      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(
-        enums[0].values.map((x) => x.value),
-        ["v1", "v2"]
-      );
+    );
+    const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+    strictEqual(enums.length, 1);
+    strictEqual(enums[0].name, "Versions");
+    strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+    deepStrictEqual(
+      enums[0].values.map((x) => x.value),
+      ["v1", "v2"]
+    );
+  });
+
+  it("versioned enums with specific version", async () => {
+    const runnerWithVersion = await createSdkTestRunner({
+      "api-version": "v1",
+      emitterName: "@azure-tools/typespec-python",
     });
 
-    it("versioned enums with specific version", async () => {
-      const runnerWithVersion = await createSdkTestRunner({
-        "api-version": "v1",
-        emitterName: "@azure-tools/typespec-python",
-      });
-
-      await runnerWithVersion.compile(
-        `
+    await runnerWithVersion.compile(
+      `
         @versioned(Versions)
         @service()
         namespace DemoService;
@@ -738,20 +721,20 @@ describe("typespec-client-generator-core: types", () => {
           v2,
         }
       `
-      );
-      const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
-      strictEqual(enums.length, 1);
-      strictEqual(enums[0].name, "Versions");
-      strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
-      deepStrictEqual(
-        enums[0].values.map((x) => x.value),
-        ["v1"]
-      );
-    });
+    );
+    const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+    strictEqual(enums.length, 1);
+    strictEqual(enums[0].name, "Versions");
+    strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+    deepStrictEqual(
+      enums[0].values.map((x) => x.value),
+      ["v1"]
+    );
+  });
 
-    it("usage propagation for enum value", async () => {
-      await runner.compile(
-        `
+  it("usage propagation for enum value", async () => {
+    await runner.compile(
+      `
         @service({})
         namespace N {
           enum LR {
@@ -771,13 +754,12 @@ describe("typespec-client-generator-core: types", () => {
           op read(@body body: Test): void;
         }
       `
-      );
-      const enums = runner.context.experimental_sdkPackage.enums;
-      strictEqual(enums.length, 2);
-      strictEqual(enums[0].name, "LR");
-      strictEqual(enums[0].usage, UsageFlags.Input);
-      strictEqual(enums[1].name, "UD");
-      strictEqual(enums[1].usage, UsageFlags.Input);
-    });
+    );
+    const enums = runner.context.experimental_sdkPackage.enums;
+    strictEqual(enums.length, 2);
+    strictEqual(enums[0].name, "LR");
+    strictEqual(enums[0].usage, UsageFlags.Input);
+    strictEqual(enums[1].name, "UD");
+    strictEqual(enums[1].usage, UsageFlags.Input);
   });
 });

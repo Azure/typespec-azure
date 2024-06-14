@@ -3,32 +3,31 @@ import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-describe("typespec-client-generator-core: types", () => {
+describe("typespec-client-generator-core: date-time types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
 
-  describe("SdkDatetimeType", () => {
-    it("default", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("default", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
           prop: utcDateTime;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "utcDateTime");
-      strictEqual(sdkType.wireType.kind, "string");
-      strictEqual(sdkType.encode, "rfc3339");
-    });
-    it("rfc3339", async function () {
-      await runner.compileWithBuiltInService(
-        `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "utcDateTime");
+    strictEqual(sdkType.wireType.kind, "string");
+    strictEqual(sdkType.encode, "rfc3339");
+  });
+  it("rfc3339", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -36,15 +35,15 @@ describe("typespec-client-generator-core: types", () => {
           prop: utcDateTime;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "utcDateTime");
-      strictEqual(sdkType.wireType.kind, "string");
-      strictEqual(sdkType.encode, "rfc3339");
-    });
-    it("rfc7231", async function () {
-      await runner.compileWithBuiltInService(
-        `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "utcDateTime");
+    strictEqual(sdkType.wireType.kind, "string");
+    strictEqual(sdkType.encode, "rfc3339");
+  });
+  it("rfc7231", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -52,16 +51,16 @@ describe("typespec-client-generator-core: types", () => {
           prop: utcDateTime;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "utcDateTime");
-      strictEqual(sdkType.wireType.kind, "string");
-      strictEqual(sdkType.encode, "rfc7231");
-    });
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "utcDateTime");
+    strictEqual(sdkType.wireType.kind, "string");
+    strictEqual(sdkType.encode, "rfc7231");
+  });
 
-    it("unixTimestamp", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("unixTimestamp", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -69,16 +68,16 @@ describe("typespec-client-generator-core: types", () => {
           value: utcDateTime;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "utcDateTime");
-      strictEqual(sdkType.wireType.kind, "int64");
-      strictEqual(sdkType.encode, "unixTimestamp");
-    });
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "utcDateTime");
+    strictEqual(sdkType.wireType.kind, "int64");
+    strictEqual(sdkType.encode, "unixTimestamp");
+  });
 
-    it("nullable unixTimestamp", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("nullable unixTimestamp", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -86,19 +85,19 @@ describe("typespec-client-generator-core: types", () => {
           value: utcDateTime | null;
         }
       `
-      );
-      const nullableType = getSdkTypeHelper(runner);
-      strictEqual(nullableType.kind, "nullable");
+    );
+    const nullableType = getSdkTypeHelper(runner);
+    strictEqual(nullableType.kind, "nullable");
 
-      const sdkType = nullableType.type;
-      strictEqual(sdkType.kind, "utcDateTime");
-      strictEqual(sdkType.wireType.kind, "int64");
-      strictEqual(sdkType.encode, "unixTimestamp");
-    });
+    const sdkType = nullableType.type;
+    strictEqual(sdkType.kind, "utcDateTime");
+    strictEqual(sdkType.wireType.kind, "int64");
+    strictEqual(sdkType.encode, "unixTimestamp");
+  });
 
-    it("unixTimestamp array", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("unixTimestamp array", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @doc("doc")
         @summary("title")
         @encode(DateTimeKnownEncoding.unixTimestamp, int64)
@@ -110,14 +109,13 @@ describe("typespec-client-generator-core: types", () => {
           value: unixTimestampDatetime[];
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "utcDateTime");
-      strictEqual(sdkType.valueType.wireType.kind, "int64");
-      strictEqual(sdkType.valueType.encode, "unixTimestamp");
-      strictEqual(sdkType.valueType.description, "title");
-      strictEqual(sdkType.valueType.details, "doc");
-    });
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "array");
+    strictEqual(sdkType.valueType.kind, "utcDateTime");
+    strictEqual(sdkType.valueType.wireType.kind, "int64");
+    strictEqual(sdkType.valueType.encode, "unixTimestamp");
+    strictEqual(sdkType.valueType.description, "title");
+    strictEqual(sdkType.valueType.details, "doc");
   });
 });

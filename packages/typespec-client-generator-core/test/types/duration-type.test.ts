@@ -3,32 +3,31 @@ import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-describe("typespec-client-generator-core: types", () => {
+describe("typespec-client-generator-core: duration types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
 
-  describe("SdkDurationType", () => {
-    it("default", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("default", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
           prop: duration;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "duration");
-      strictEqual(sdkType.wireType.kind, "string");
-      strictEqual(sdkType.encode, "ISO8601");
-    });
-    it("iso8601", async function () {
-      await runner.compileWithBuiltInService(
-        `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "duration");
+    strictEqual(sdkType.wireType.kind, "string");
+    strictEqual(sdkType.encode, "ISO8601");
+  });
+  it("iso8601", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -36,15 +35,15 @@ describe("typespec-client-generator-core: types", () => {
           prop: duration;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "duration");
-      strictEqual(sdkType.wireType.kind, "string");
-      strictEqual(sdkType.encode, "ISO8601");
-    });
-    it("int32 seconds", async function () {
-      await runner.compileWithBuiltInService(
-        `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "duration");
+    strictEqual(sdkType.wireType.kind, "string");
+    strictEqual(sdkType.encode, "ISO8601");
+  });
+  it("int32 seconds", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -52,16 +51,16 @@ describe("typespec-client-generator-core: types", () => {
           prop: duration;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "duration");
-      strictEqual(sdkType.wireType.kind, "int32");
-      strictEqual(sdkType.encode, "seconds");
-    });
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "duration");
+    strictEqual(sdkType.wireType.kind, "int32");
+    strictEqual(sdkType.encode, "seconds");
+  });
 
-    it("float seconds", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("float seconds", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -69,16 +68,16 @@ describe("typespec-client-generator-core: types", () => {
           prop: duration;
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "duration");
-      strictEqual(sdkType.wireType.kind, "float");
-      strictEqual(sdkType.encode, "seconds");
-    });
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "duration");
+    strictEqual(sdkType.wireType.kind, "float");
+    strictEqual(sdkType.encode, "seconds");
+  });
 
-    it("nullable float seconds", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("nullable float seconds", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @usage(Usage.input | Usage.output)
         @access(Access.public)
         model Test {
@@ -86,19 +85,19 @@ describe("typespec-client-generator-core: types", () => {
           prop: duration | null;
         }
       `
-      );
-      const nullableType = getSdkTypeHelper(runner);
-      strictEqual(nullableType.kind, "nullable");
+    );
+    const nullableType = getSdkTypeHelper(runner);
+    strictEqual(nullableType.kind, "nullable");
 
-      const sdkType = nullableType.type;
-      strictEqual(sdkType.kind, "duration");
-      strictEqual(sdkType.wireType.kind, "float");
-      strictEqual(sdkType.encode, "seconds");
-    });
+    const sdkType = nullableType.type;
+    strictEqual(sdkType.kind, "duration");
+    strictEqual(sdkType.wireType.kind, "float");
+    strictEqual(sdkType.encode, "seconds");
+  });
 
-    it("float seconds decorated scalar", async function () {
-      await runner.compileWithBuiltInService(
-        `
+  it("float seconds decorated scalar", async function () {
+    await runner.compileWithBuiltInService(
+      `
         @doc("doc")
         @summary("title")
         @encode(DurationKnownEncoding.seconds, float32)
@@ -110,14 +109,13 @@ describe("typespec-client-generator-core: types", () => {
           value: Float32Duration[];
         }
       `
-      );
-      const sdkType = getSdkTypeHelper(runner);
-      strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "duration");
-      strictEqual(sdkType.valueType.wireType.kind, "float32");
-      strictEqual(sdkType.valueType.encode, "seconds");
-      strictEqual(sdkType.valueType.description, "title");
-      strictEqual(sdkType.valueType.details, "doc");
-    });
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "array");
+    strictEqual(sdkType.valueType.kind, "duration");
+    strictEqual(sdkType.valueType.wireType.kind, "float32");
+    strictEqual(sdkType.valueType.encode, "seconds");
+    strictEqual(sdkType.valueType.description, "title");
+    strictEqual(sdkType.valueType.details, "doc");
   });
 });
