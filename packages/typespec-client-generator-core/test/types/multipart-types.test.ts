@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
