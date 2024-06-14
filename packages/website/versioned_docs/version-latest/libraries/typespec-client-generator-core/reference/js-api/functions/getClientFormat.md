@@ -4,7 +4,7 @@ title: "[F] getClientFormat"
 
 ---
 ```ts
-getClientFormat(context, entity): ClientFormat | undefined
+function getClientFormat(context, entity): ClientFormat | undefined
 ```
 
 Gets additional information on how to serialize / deserialize TYPESPEC standard types depending

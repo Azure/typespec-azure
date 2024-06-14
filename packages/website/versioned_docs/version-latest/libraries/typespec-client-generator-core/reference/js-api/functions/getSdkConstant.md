@@ -4,7 +4,10 @@ title: "[F] getSdkConstant"
 
 ---
 ```ts
-getSdkConstant(context, type): SdkConstantType
+function getSdkConstant(
+   context, 
+   type, 
+   operation?): SdkConstantType
 ```
 
 ## Parameters
@@ -12,7 +15,8 @@ getSdkConstant(context, type): SdkConstantType
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `TCGCContext` |
-| `type` | `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` |
+| `type` | `BooleanLiteral` \| `NumericLiteral` \| `StringLiteral` |
+| `operation`? | `Operation` |
 
 ## Returns
 

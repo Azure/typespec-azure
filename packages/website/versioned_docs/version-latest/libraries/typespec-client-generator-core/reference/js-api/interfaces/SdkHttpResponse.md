@@ -17,5 +17,4 @@ title: "[I] SdkHttpResponse"
 | `defaultContentType?` | `string` | - |
 | `headers` | [`SdkServiceResponseHeader`](SdkServiceResponseHeader.md)[] | [`SdkServiceResponse`](SdkServiceResponse.md).`headers` |
 | `kind` | `"http"` | - |
-| `nullable` | `boolean` | [`SdkServiceResponse`](SdkServiceResponse.md).`nullable` |
 | `type?` | [`SdkType`](../type-aliases/SdkType.md) | [`SdkServiceResponse`](SdkServiceResponse.md).`type` |

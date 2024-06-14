@@ -4,7 +4,7 @@ title: "[F] getAccessOverride"
 
 ---
 ```ts
-getAccessOverride(context, entity): AccessFlags | undefined
+function getAccessOverride(context, entity): AccessFlags | undefined
 ```
 
 ## Parameters
@@ -12,7 +12,7 @@ getAccessOverride(context, entity): AccessFlags | undefined
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `TCGCContext` |
-| `entity` | `Model` \| `Enum` \| `Operation` \| `Union` |
+| `entity` | `Enum` \| `Model` \| `Operation` \| `Union` |
 
 ## Returns
 

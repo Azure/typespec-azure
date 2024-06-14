@@ -4,7 +4,7 @@ title: "[F] getTracer"
 
 ---
 ```ts
-getTracer(program): Tracer
+function getTracer(program): Tracer
 ```
 
 Returns a tracer scopped to the current library.

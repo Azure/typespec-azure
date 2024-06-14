@@ -4,7 +4,7 @@ title: "[F] isInternal"
 
 ---
 ```ts
-isInternal(context, entity): boolean
+function isInternal(context, entity): boolean
 ```
 
 Whether a model / operation is internal or not. If it's internal, emitters
@@ -15,7 +15,7 @@ should not expose them to users
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | `TCGCContext` | TCGCContext |
-| `entity` | `Model` \| `Enum` \| `Operation` \| `Union` | model / operation that we want to check is internal or not |
+| `entity` | `Enum` \| `Model` \| `Operation` \| `Union` | model / operation that we want to check is internal or not |
 
 ## Returns
 

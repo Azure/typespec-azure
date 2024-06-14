@@ -4,7 +4,7 @@ title: "[F] $items"
 
 ---
 ```ts
-$items(context, entity): void
+function $items(context, entity): void
 ```
 
 ## Parameters

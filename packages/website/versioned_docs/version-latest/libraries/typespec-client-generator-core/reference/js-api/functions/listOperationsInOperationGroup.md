@@ -4,7 +4,7 @@ title: "[F] listOperationsInOperationGroup"
 
 ---
 ```ts
-listOperationsInOperationGroup(
+function listOperationsInOperationGroup(
    context, 
    group, 
    ignoreHierarchy): Operation[]

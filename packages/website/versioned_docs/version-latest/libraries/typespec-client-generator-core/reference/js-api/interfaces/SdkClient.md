@@ -7,9 +7,9 @@ title: "[I] SdkClient"
 
 | Property | Type | Description |
 | :------ | :------ | :------ |
-| ~~`arm`~~ | `boolean` | **Deprecated**<br />This property is deprecated. Look at `.arm` on `SdkContext` instead. |
+| ~~`arm`~~ | `boolean` | <p>**Deprecated**</p><p>This property is deprecated. Look at `.arm` on `SdkContext` instead.</p> |
 | `crossLanguageDefinitionId` | `string` | - |
 | `kind` | `"SdkClient"` | - |
 | `name` | `string` | - |
 | `service` | `Namespace` | - |
-| `type` | `Interface` \| `Namespace` | - |
+| `type` | `Namespace` \| `Interface` | - |

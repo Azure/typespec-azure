@@ -21,13 +21,13 @@ title: "[I] SdkModelPropertyTypeBase"
 | `__raw?` | `ModelProperty` | - |
 | `apiVersions` | `string`[] | - |
 | `clientDefaultValue?` | `any` | - |
+| `crossLanguageDefinitionId` | `string` | - |
 | `description?` | `string` | - |
 | `details?` | `string` | - |
 | `isApiVersionParam` | `boolean` | - |
 | `isGeneratedName` | `boolean` | - |
 | `name` | `string` | - |
-| ~~`nameInClient`~~ | `string` | **Deprecated**<br />This property is deprecated. Use `.name` instead.<br />https://github.com/Azure/typespec-azure/issues/446 |
-| `nullable` | `boolean` | - |
+| ~~`nameInClient`~~ | `string` | <p>**Deprecated**</p><p>This property is deprecated. Use `.name` instead.</p> |
 | `onClient` | `boolean` | - |
 | `optional` | `boolean` | - |
 | `type` | [`SdkType`](../type-aliases/SdkType.md) | - |

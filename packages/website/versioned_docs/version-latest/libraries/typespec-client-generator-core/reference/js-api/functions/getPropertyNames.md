@@ -4,7 +4,7 @@ title: "[F] getPropertyNames"
 
 ---
 ```ts
-getPropertyNames(context, property): [string, string]
+function getPropertyNames(context, property): [string, string]
 ```
 
 Get the library and wire name of a model property. Takes

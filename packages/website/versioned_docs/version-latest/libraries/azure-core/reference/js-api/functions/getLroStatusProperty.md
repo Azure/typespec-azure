@@ -4,7 +4,7 @@ title: "[F] getLroStatusProperty"
 
 ---
 ```ts
-getLroStatusProperty(program, target): ModelProperty | undefined
+function getLroStatusProperty(program, target): ModelProperty | undefined
 ```
 
 Return the property that contains the lro status

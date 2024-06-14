@@ -4,7 +4,7 @@ title: "[F] getUsedLibraryNamespaces"
 
 ---
 ```ts
-getUsedLibraryNamespaces(program, namespace): Namespace[] | undefined
+function getUsedLibraryNamespaces(program, namespace): Namespace[] | undefined
 ```
 
 Determine which library namespaces are used in this provider

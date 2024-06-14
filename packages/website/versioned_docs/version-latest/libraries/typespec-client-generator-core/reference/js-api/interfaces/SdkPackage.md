@@ -7,7 +7,7 @@ title: "[I] SdkPackage"
 
 | Type parameter |
 | :------ |
-| `TServiceOperation` extends [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) |
+| `TServiceOperation` *extends* [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) |
 
 ## Properties
 
@@ -15,7 +15,7 @@ title: "[I] SdkPackage"
 | :------ | :------ | :------ |
 | `clients` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\>[] | - |
 | `crossLanguagePackageId` | `string` | - |
-| ~~`diagnostics`~~ | readonly `Diagnostic`[] | **Deprecated**<br />This property is deprecated. Look at `.diagnostics` on SdkContext instead |
+| ~~`diagnostics`~~ | readonly `Diagnostic`[] | <p>**Deprecated**</p><p>This property is deprecated. Look at `.diagnostics` on SdkContext instead.</p> |
 | `enums` | [`SdkEnumType`](SdkEnumType.md)[] | - |
 | `models` | [`SdkModelType`](SdkModelType.md)[] | - |
 | `name` | `string` | - |

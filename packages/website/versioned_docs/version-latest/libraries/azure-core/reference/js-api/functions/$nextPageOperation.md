@@ -4,7 +4,7 @@ title: "[F] $nextPageOperation"
 
 ---
 ```ts
-$nextPageOperation(
+function $nextPageOperation(
    context, 
    entity, 
    linkedOperation, 

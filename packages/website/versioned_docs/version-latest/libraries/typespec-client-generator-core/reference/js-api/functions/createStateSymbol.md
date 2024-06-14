@@ -4,7 +4,7 @@ title: "[F] createStateSymbol"
 
 ---
 ```ts
-createStateSymbol(name): symbol
+function createStateSymbol(name): symbol
 ```
 
 Get or create a symbol with the given name unique for that library.

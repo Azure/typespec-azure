@@ -4,7 +4,7 @@ title: "[F] $spreadCustomParameters"
 
 ---
 ```ts
-$spreadCustomParameters(
+function $spreadCustomParameters(
    context, 
    entity, 
    customizations): void
