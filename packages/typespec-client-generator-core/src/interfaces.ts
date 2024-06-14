@@ -5,6 +5,7 @@ import {
   DurationKnownEncoding,
   EmitContext,
   Interface,
+  IntrinsicScalarName,
   ModelProperty,
   Namespace,
   Operation,
@@ -87,6 +88,7 @@ interface SdkTypeBase {
 
 export type SdkType =
   | SdkBuiltInType
+  | SdkScalarType
   | SdkDatetimeType
   | SdkDurationType
   | SdkArrayType
@@ -100,6 +102,14 @@ export type SdkType =
   | SdkModelType
   | SdkCredentialType
   | SdkEndpointType;
+
+export interface SdkScalarType extends SdkTypeBase {
+  kind: "scalar";
+  name: string;
+  namespace?: string;
+  encode?: string;
+  baseType?: SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType;
+}
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
@@ -128,22 +138,18 @@ enum SdkFloatKindsEnum {
   decimal128 = "decimal128",
 }
 
-enum SdkAzureBuiltInStringKindsEnum {
-  uuid = "uuid",
-  ipV4Address = "ipV4Address",
-  ipV6Address = "ipV6Address",
-  eTag = "eTag",
-  armId = "armId",
-  azureLocation = "azureLocation",
-}
+// enum SdkAzureBuiltInStringKindsEnum {
+//   uuid = "uuid",
+//   ipV4Address = "ipV4Address",
+//   ipV6Address = "ipV6Address",
+//   eTag = "eTag",
+//   armId = "armId",
+//   azureLocation = "azureLocation",
+// }
 
 enum SdkGenericBuiltInStringKindsEnum {
   string = "string",
-  password = "password",
-  guid = "guid",
   url = "url",
-  uri = "uri",
-  ipAddress = "ipAddress",
 }
 
 enum SdkBuiltInKindsMiscellaneousEnum {
@@ -154,12 +160,13 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   any = "any",
 }
 
-export type SdkBuiltInKinds =
-  | keyof typeof SdkBuiltInKindsMiscellaneousEnum
-  | keyof typeof SdkIntKindsEnum
-  | keyof typeof SdkFloatKindsEnum
-  | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkAzureBuiltInStringKindsEnum;
+export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
+
+export type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
+  // | keyof typeof SdkBuiltInKindsMiscellaneousEnum
+  // | keyof typeof SdkIntKindsEnum
+  // | keyof typeof SdkFloatKindsEnum
+  // | keyof typeof SdkGenericBuiltInStringKindsEnum;
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
@@ -171,10 +178,6 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
     retval[`TypeSpec.${kind}`] = kind;
   }
-  for (const kind in SdkAzureBuiltInStringKindsEnum) {
-    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
-    retval[`Azure.Core.${kind}`] = kind;
-  }
   return retval;
 }
 
@@ -183,8 +186,7 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
     kind in SdkBuiltInKindsMiscellaneousEnum ||
     isSdkIntKind(kind) ||
     isSdkFloatKind(kind) ||
-    kind in SdkGenericBuiltInStringKindsEnum ||
-    kind in SdkAzureBuiltInStringKindsEnum
+    kind in SdkGenericBuiltInStringKindsEnum
   );
 }
 
