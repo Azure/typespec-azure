@@ -239,12 +239,15 @@ function getStdTypeWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   const kind: SdkBuiltInKinds = type.name;
   const docWrapper = getDocHelper(context, type);
-  return diagnostics.wrap({
+  const stdType = {
     ...getSdkTypeBaseHelper(context, type, kind),
     encode: getEncodeHelper(context, type, kind),
     description: docWrapper.description,
     details: docWrapper.details,
-  });
+  };
+  addEncodeInfo(context, type, stdType);
+  addFormatInfo(context, type, stdType);
+  return diagnostics.wrap(stdType);
 }
 
 function getSdkScalarTypeWithDiagnostics(
@@ -908,6 +911,11 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
+      retval = getKnownValuesEnum(context, type, operation);
+      if (retval)
+      {
+        break;
+      }
       retval = diagnostics.pipe(
         getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(context, type)
       );

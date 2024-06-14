@@ -151,15 +151,9 @@ describe("typespec-client-generator-core: types", () => {
         @access(Access.public)
         model Test {
           urlScalar: url;
-          uuidScalar: uuid;
-          eTagScalar: eTag;
 
           @format("url")
           urlProperty: string;
-          @format("uuid")
-          uuidProperty: string;
-          @format("eTag")
-          eTagProperty: string;
         }
       `
       );
@@ -202,7 +196,11 @@ describe("typespec-client-generator-core: types", () => {
       strictEqual(userModel.properties.length, 2);
       const etagProperty = userModel.properties.find((x) => x.name === "etag");
       ok(etagProperty);
-      strictEqual(etagProperty.type.kind, "eTag");
+      strictEqual(etagProperty.type.kind, "scalar");
+      strictEqual(etagProperty.type.name, "eTag");
+      strictEqual(etagProperty.type.namespace, "Azure.Core");
+      strictEqual(etagProperty.type.encode, undefined);
+      strictEqual(etagProperty.type.wireType, undefined);
     });
 
     it("unknown format", async function () {
@@ -389,11 +387,16 @@ describe("typespec-client-generator-core: types", () => {
       );
       const sdkType = getSdkTypeHelper(runner);
       strictEqual(sdkType.kind, "array");
-      strictEqual(sdkType.valueType.kind, "duration");
-      strictEqual(sdkType.valueType.wireType.kind, "float32");
-      strictEqual(sdkType.valueType.encode, "seconds");
+      strictEqual(sdkType.valueType.kind, "scalar");
+      strictEqual(sdkType.valueType.name, "Float32Duration");
+      strictEqual(sdkType.valueType.namespace, "TestService");
       strictEqual(sdkType.valueType.description, "title");
       strictEqual(sdkType.valueType.details, "doc");
+      strictEqual(sdkType.valueType.encode, "seconds");
+      strictEqual(sdkType.valueType.wireType?.kind, "float32");
+      strictEqual(sdkType.valueType.baseType?.kind, "duration");
+      strictEqual(sdkType.valueType.baseType.wireType.kind, "float32");
+      strictEqual(sdkType.valueType.baseType.encode, "seconds");
     });
   });
 
