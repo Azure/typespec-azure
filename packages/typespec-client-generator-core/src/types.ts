@@ -186,18 +186,6 @@ export function addEncodeInfo(
   return diagnostics.wrap(undefined);
 }
 
-/**
- * Mapping of typespec scalar kinds to the built in kinds exposed in the SDK
- * @param scalar the original typespec scalar
- * @returns the corresponding sdk built in kind
- */
-function getScalarKind(scalar: Scalar): SdkBuiltInKinds {
-  if (isSdkBuiltInKind(scalar.name)) {
-    return scalar.name;
-  }
-  throw Error(`Unknown scalar kind ${scalar.name}`);
-}
-
 function isTCGCStdType(context: TCGCContext, type: Scalar): type is Scalar & { name: Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> } {
   return context.program.checker.isStdType(type) && type.name !== "utcDateTime" && type.name !== "offsetDateTime" && type.name !== "duration";
 }
@@ -254,57 +242,44 @@ function getSdkScalarTypeWithDiagnostics(
   });
 }
 
-/**
- * Get the sdk built in type for a given typespec type
- * @param context the sdk context
- * @param type the typespec type
- * @returns the corresponding sdk type
- */
-function getSdkBuiltInTypeWithDiagnostics(
-  context: TCGCContext,
-  type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
-): [SdkBuiltInType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  if (context.program.checker.isStdType(type) || type.kind === "Intrinsic") {
-    let kind: SdkBuiltInKinds = "any";
-    if (type.kind === "Scalar") {
-      if (isSdkBuiltInKind(type.name)) {
-        kind = getScalarKind(type);
-      }
-    }
-    const docWrapper = getDocHelper(context, type);
-    return diagnostics.wrap({
-      ...getSdkTypeBaseHelper(context, type, kind),
-      encode: getEncodeHelper(context, type, kind),
-      description: docWrapper.description,
-      details: docWrapper.details,
-    });
-  } else if (type.kind === "String" || type.kind === "Boolean" || type.kind === "Number") {
-    let kind: SdkBuiltInKinds;
+function getSdkTypeForLiteral(context: TCGCContext, type: NumericLiteral | StringLiteral | BooleanLiteral): SdkBuiltInType {
+  let kind: SdkBuiltInKinds;
 
-    if (type.kind === "String") {
-      kind = "string";
-    } else if (type.kind === "Boolean") {
-      kind = "boolean";
-    } else {
-      kind = intOrFloat(type.value);
-    }
-    return diagnostics.wrap({
-      ...getSdkTypeBaseHelper(context, type, kind),
-      encode: getEncodeHelper(context, type, kind),
-    });
+  if (type.kind === "String") {
+    kind = "string";
+  } else if (type.kind === "Boolean") {
+    kind = "boolean";
+  } else {
+    kind = intOrFloat(type.value);
   }
-  diagnostics.add(
-    createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } })
-  );
-  return diagnostics.wrap(getAnyType());
+  return {
+    ...getSdkTypeBaseHelper(context, type, kind),
+    encode: getEncodeHelper(context, type, kind),
+  };
+}
+
+function getSdkTypeForIntrinsic(context: TCGCContext, type: IntrinsicType): SdkBuiltInType {
+  const kind: SdkBuiltInKinds = "any";
+  return {
+    ...getSdkTypeBaseHelper(context, type, kind),
+    encode: getEncodeHelper(context, type, kind),
+  }
 }
 
 export function getSdkBuiltInType(
   context: TCGCContext,
   type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
-): SdkBuiltInType {
-  return ignoreDiagnostics(getSdkBuiltInTypeWithDiagnostics(context, type));
+): SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType {
+  switch (type.kind) {
+    case "Scalar":
+      return ignoreDiagnostics(getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(context, type));
+    case "Intrinsic":
+      return getSdkTypeForIntrinsic(context, type);
+    case "String":
+    case "Number":
+    case "Boolean":
+      return getSdkTypeForLiteral(context, type);
+  }
 }
 
 export function getSdkDurationType(context: TCGCContext, type: Scalar): SdkDurationType {
@@ -454,7 +429,7 @@ function getSdkConstantWithDiagnostics(
     case "Number":
     case "String":
     case "Boolean":
-      const valueType = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
+      const valueType = getSdkTypeForLiteral(context, type);
       return diagnostics.wrap({
         ...getSdkTypeBaseHelper(context, type, "constant"),
         value: type.value,
@@ -870,7 +845,7 @@ export function getClientTypeWithDiagnostics(
       }
       break;
     case "Intrinsic":
-      retval = diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type));
+      retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
       retval = diagnostics.pipe(getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(context, type));
