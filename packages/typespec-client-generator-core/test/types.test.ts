@@ -3828,7 +3828,7 @@ describe("typespec-client-generator-core: types", () => {
     it("no arg", async function () {
       runner = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec.@error"],
+        "decorators-white-list": ["TypeSpec\\.@error"],
       });
 
       await runner.compileWithBuiltInService(`
@@ -3848,7 +3848,7 @@ describe("typespec-client-generator-core: types", () => {
     it("basic arg type", async function () {
       runner = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["Azure.ClientGenerator.Core.@clientName"],
+        "decorators-white-list": ["Azure\\.ClientGenerator\\.Core\\.@clientName"],
       });
 
       await runner.compileWithBuiltInService(`
@@ -3871,7 +3871,7 @@ describe("typespec-client-generator-core: types", () => {
     it("enum member arg type", async function () {
       runner = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec.@encode"],
+        "decorators-white-list": ["TypeSpec\\.@encode"],
       });
 
       await runner.compileWithBuiltInService(`

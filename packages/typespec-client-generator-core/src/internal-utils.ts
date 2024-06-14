@@ -265,6 +265,10 @@ export function getSdkTypeBaseHelper<TKind>(
   });
 }
 
+export function getNamespacePrefix(namespace: Namespace): string {
+  return namespace ? getNamespaceFullName(namespace) + "." : "";
+}
+
 export function getTypeDecorators(
   context: TCGCContext,
   type: Type
@@ -275,13 +279,11 @@ export function getTypeDecorators(
     for (const decorator of type.decorators) {
       // only process explicitly defined decorators
       if (decorator.definition) {
-        const decoratorName = `${decorator.definition?.namespace ? getNamespaceFullName(decorator.definition.namespace) + "." : ""}${decorator.definition?.name}`;
+        const decoratorName = `${getNamespacePrefix(decorator.definition?.namespace)}${decorator.definition?.name}`;
         // white list filtering
         if (
           !context.decoratorsWhiteList ||
-          !context.decoratorsWhiteList.some(
-            (x) => x === decoratorName || new RegExp(x).test(decoratorName)
-          )
+          !context.decoratorsWhiteList.some((x) => new RegExp(x).test(decoratorName))
         ) {
           continue;
         }
