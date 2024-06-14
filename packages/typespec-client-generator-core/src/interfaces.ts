@@ -109,6 +109,7 @@ export interface SdkScalarType extends SdkTypeBase {
   namespace?: string;
   encode?: string;
   baseType?: SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType;
+  wireType?: SdkBuiltInType;
 }
 
 export interface SdkBuiltInType extends SdkTypeBase {
