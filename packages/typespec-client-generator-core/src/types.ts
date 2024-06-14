@@ -283,7 +283,7 @@ function getSdkScalarTypeWithDiagnostics(
     if (encodeData === undefined) return diagnostics.wrap(undefined);
 
     sdkType.encode = encodeData.encoding;
-    if (!isSdkbuiltInType(sdkType)) {
+    if (!isSdkBuiltInType(sdkType)) {
       // only built-in types does not have wireType
       sdkType.wireType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, encodeData.type)
@@ -297,7 +297,7 @@ function getSdkScalarTypeWithDiagnostics(
     return diagnostics.wrap(undefined);
   }
 
-  function isSdkbuiltInType(type: SdkType): type is SdkBuiltInType {
+  function isSdkBuiltInType(type: SdkType): type is SdkBuiltInType {
     return isSdkBuiltInKind(type.kind);
   }
 }
