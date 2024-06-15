@@ -225,6 +225,8 @@ export interface SdkDurationType extends SdkTypeBase {
 
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
+  name: string;
+  namespace?: string;
   valueType: SdkType;
 }
 

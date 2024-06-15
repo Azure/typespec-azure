@@ -284,13 +284,16 @@ export function getSdkArrayOrDictWithDiagnostics(
           keyType: diagnostics.pipe(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
-          valueType,
+          valueType: valueType,
         });
       } else if (name === "integer") {
         // only array's index key name is integer
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
-          valueType,
+          name: getLibraryName(context, type),
+          namespace:
+            type.namespace !== undefined ? getNamespaceFullName(type.namespace) : undefined,
+          valueType: valueType,
         });
       }
     }
