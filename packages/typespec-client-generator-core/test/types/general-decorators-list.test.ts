@@ -46,10 +46,10 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(
-      models[0].properties[0].decorators["Azure.ClientGenerator.Core.@clientName"],
-      { rename: "ID", scope: undefined }
-    );
+    deepStrictEqual(models[0].properties[0].decorators["Azure.ClientGenerator.Core.@clientName"], {
+      rename: "ID",
+      scope: undefined,
+    });
   });
 
   it("enum member arg type", async function () {
@@ -74,7 +74,6 @@ describe("typespec-client-generator-core: general decorators list", () => {
       encodedAs: undefined,
     });
   });
-
 
   describe("xml scenario", () => {
     it("@attribute", async function () {
@@ -214,4 +213,3 @@ describe("typespec-client-generator-core: general decorators list", () => {
     });
   });
 });
-
