@@ -593,6 +593,12 @@ export interface SdkHttpParameterExample {
 
 export interface SdkHttpResponseExample {
   response: SdkHttpResponse;
+  headers: SdkHttpResponseHeaderExample[];
+  value: SdkExample;
+}
+
+export interface SdkHttpResponseHeaderExample {
+  header: SdkServiceResponseHeader;
   value: SdkExample;
 }
 
