@@ -69,7 +69,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   discriminator: boolean;
   serializedName: string;
   isMultipartFileInput: boolean;  // deprecated
-  multipartOptions: multipartOptionsType; // new options for multipart
+  multipartOptions?: multipartOptionsType; // new options for multipart
   visibility?: Visibility[];
   flatten: boolean;
 }
