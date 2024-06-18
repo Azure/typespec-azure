@@ -259,6 +259,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   enumType: SdkEnumType;
   valueType: SdkBuiltInType;
 }
+
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
   value: string | number | boolean | null;
