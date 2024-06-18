@@ -399,3 +399,7 @@ model ArmResourceIdentifierAllowedResource {
    */
   scopes?: ArmResourceDeploymentScope[];
 }
+
+model BodyRoot<TResponse> {
+  @bodyRoot response: TResponse;
+}

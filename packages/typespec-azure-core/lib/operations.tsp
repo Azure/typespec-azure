@@ -31,7 +31,7 @@ op RpcOperation<
   TraitContexts extends TraitContext = TraitContext.Undefined
 > is Foundations.Operation<
   Parameters & TraitProperties<Traits, TraitLocation.Parameters>,
-  Response & TraitProperties<Traits, TraitLocation.Response, TraitContexts>,
+  BodyRoot<Response> & TraitProperties<Traits, TraitLocation.Response, TraitContexts>,
   Traits,
   ErrorResponse
 >;
@@ -59,7 +59,7 @@ op LongRunningRpcOperation<
 > is Foundations.Operation<
   Parameters & TraitProperties<Traits, TraitLocation.Parameters>,
   AcceptedResponse &
-    ResourceOperationStatus<Response, StatusResult, StatusError> &
+    ResourceOperationStatus<BodyRoot<Response>, StatusResult, StatusError> &
     Foundations.LongRunningStatusLocation<StatusResult> &
     TraitProperties<Traits, TraitLocation.Response, TraitContexts>,
   Traits,
@@ -111,7 +111,7 @@ interface ResourceOperations<
         TraitLocation.Parameters,
         TraitContext.Create | TraitContext.Update
       >,
-    Foundations.ResourceCreatedOrOkResponse<Resource &
+    Foundations.ResourceCreatedOrOkResponse<BodyRoot<Resource> &
       TraitProperties<
         Traits & InterfaceTraits,
         TraitLocation.Response,
@@ -139,7 +139,7 @@ interface ResourceOperations<
         TraitLocation.Parameters,
         TraitContext.Create | TraitContext.Update
       >,
-    Foundations.ResourceCreatedOrOkResponse<Resource &
+    Foundations.ResourceCreatedOrOkResponse<BodyRoot<Resource> &
       TraitProperties<
         Traits & InterfaceTraits,
         TraitLocation.Response,
@@ -175,7 +175,7 @@ interface ResourceOperations<
         TraitContext.Create | TraitContext.Update
       >;
     },
-    Foundations.ResourceCreatedOrOkResponse<Resource &
+    Foundations.ResourceCreatedOrOkResponse<BodyRoot<Resource> &
       TraitProperties<
         Traits & InterfaceTraits,
         TraitLocation.Response,
@@ -210,7 +210,7 @@ interface ResourceOperations<
         TraitContext.Create | TraitContext.Update
       >;
     },
-    Foundations.ResourceCreatedOrOkResponse<Resource &
+    Foundations.ResourceCreatedOrOkResponse<BodyRoot<Resource> &
       TraitProperties<
         Traits & InterfaceTraits,
         TraitLocation.Response,
@@ -241,7 +241,7 @@ interface ResourceOperations<
       ...Foundations.ResourceBody<Resource>;
       ...TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Update>;
     },
-    Foundations.ResourceOkResponse<Resource &
+    Foundations.ResourceOkResponse<BodyRoot<Resource> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Update>>,
     Traits & InterfaceTraits,
     ErrorResponse
@@ -262,7 +262,7 @@ interface ResourceOperations<
     Resource,
     Foundations.ResourceBody<Resource> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Create>,
-    Foundations.LocationOfCreatedResourceResponse<Resource> &
+    Foundations.LocationOfCreatedResourceResponse<BodyRoot<Resource>> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Create>,
     Traits & InterfaceTraits,
     ErrorResponse
@@ -281,7 +281,7 @@ interface ResourceOperations<
     Traits extends TypeSpec.Reflection.Model = {}
   > is Foundations.ResourceCollectionOperation<
     Resource,
-    Foundations.ResourceBody<Resource> &
+    Foundations.ResourceBody<BodyRoot<Resource>> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Create>,
     Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Create>,
@@ -302,7 +302,7 @@ interface ResourceOperations<
   > is Foundations.ResourceOperation<
     Resource,
     TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Read>,
-    Resource &
+    BodyRoot<Resource> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Read>,
     Traits & InterfaceTraits,
     ErrorResponse
@@ -361,7 +361,7 @@ interface ResourceOperations<
   > is Foundations.ResourceList<
     Resource,
     TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.List>,
-    Foundations.CustomPage<Resource, Traits & InterfaceTraits>,
+    Foundations.CustomPage<BodyRoot<Resource>, Traits & InterfaceTraits>,
     Traits & InterfaceTraits,
     ErrorResponse
   >;
@@ -385,7 +385,7 @@ interface ResourceOperations<
     Resource,
     Parameters &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Action>,
-    Response &
+    BodyRoot<Response> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
     Traits & InterfaceTraits,
     ErrorResponse
@@ -410,7 +410,7 @@ interface ResourceOperations<
     Resource,
     Parameters &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Action>,
-    Response &
+    BodyRoot<Response> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
     Traits & InterfaceTraits,
     ErrorResponse
@@ -440,7 +440,7 @@ interface ResourceOperations<
     Parameters &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Action>,
     AcceptedResponse &
-      ResourceOperationStatus<Resource, StatusResult, StatusError> &
+      ResourceOperationStatus<BodyRoot<Resource>, StatusResult, StatusError> &
       Foundations.LongRunningStatusLocation<StatusResult> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
     Traits & InterfaceTraits,
@@ -472,7 +472,7 @@ interface ResourceOperations<
     Parameters &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Parameters, TraitContext.Action>,
     AcceptedResponse &
-      ResourceOperationStatus<Resource, StatusResult, StatusError> &
+      ResourceOperationStatus<BodyRoot<Resource>, StatusResult, StatusError> &
       Foundations.LongRunningStatusLocation<StatusResult> &
       TraitProperties<Traits & InterfaceTraits, TraitLocation.Response, TraitContext.Action>,
     Traits & InterfaceTraits,
@@ -497,7 +497,7 @@ interface ResourceOperations<
   > is Foundations.ResourceOperation<
     ResourceOperationStatus<Resource, StatusResult, StatusError>,
     {},
-    ResourceOperationStatusResponse<Resource, StatusResult, StatusError>,
+    ResourceOperationStatusResponse<BodyRoot<Resource>, StatusResult, StatusError>,
     Traits & InterfaceTraits,
     ErrorResponse
   >;
@@ -522,6 +522,6 @@ op GetResourceOperationStatus<
 > is Foundations.ResourceOperation<
   ResourceOperationStatus<Resource, StatusResult, StatusError>,
   {},
-  ResourceOperationStatusResponse<Resource, StatusResult, StatusError>,
+  ResourceOperationStatusResponse<BodyRoot<Resource>, StatusResult, StatusError>,
   Traits
 >;

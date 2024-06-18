@@ -305,7 +305,12 @@ op LongRunningOperation<
   Response = AcceptedResponse,
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
-> is Operation<Parameters, Response & Foundations.LongRunningStatusLocation, Traits, ErrorResponse>;
+> is Operation<
+  Parameters,
+  BodyRoot<Response> & Foundations.LongRunningStatusLocation,
+  Traits,
+  ErrorResponse
+>;
 
 /**
  * Operation that returns the status of another operation.
@@ -436,7 +441,7 @@ op LongRunningResourceUpdate<
     ...Foundations.ResourceBody<Resource>;
     ...TraitProperties<Traits, TraitLocation.Parameters, TraitContext.Update>;
   },
-  Foundations.ResourceOkResponse<Resource &
+  Foundations.ResourceOkResponse<BodyRoot<Resource> &
     TraitProperties<Traits, TraitLocation.Response, TraitContext.Update> &
     Foundations.LongRunningStatusLocation<Resource>>,
   Traits,
