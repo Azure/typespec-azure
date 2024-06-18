@@ -299,8 +299,7 @@ export function getSdkArrayOrDictWithDiagnostics(
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           name: getLibraryName(context, type),
-          tspNamespace:
-            type.namespace !== undefined ? getNamespaceFullName(type.namespace) : undefined,
+          tspNamespace: getNamespaceHelper(type.namespace),
           valueType: valueType,
         });
       }
