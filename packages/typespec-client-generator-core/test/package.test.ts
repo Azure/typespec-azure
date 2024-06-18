@@ -4,6 +4,7 @@ import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
+  SdkClientType,
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
@@ -577,10 +578,10 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      strictEqual(sdkPackage.clients.length, 1);
 
       const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-      const operationGroup = sdkPackage.clients.find((c) => c.name === "MyOperationGroup");
+      const operationGroup = mainClient?.methods.find((c) => c.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
       ok(mainClient && operationGroup);
 
       strictEqual(mainClient.methods.length, 1);
@@ -620,12 +621,12 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 4);
+      strictEqual(sdkPackage.clients.length, 1);
 
-      const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-      const fooClient = sdkPackage.clients.find((c) => c.name === "Foo");
-      const fooBarClient = sdkPackage.clients.filter((c) => c.name === "Bar")![0];
-      const barClient = sdkPackage.clients.filter((c) => c.name === "Bar")![1];
+      const mainClient = sdkPackage.clients[0];
+      const fooClient = mainClient.methods.find(m => m.kind === "clientaccessor" && m.name === "getFoo")?.response as SdkClientType<SdkHttpOperation>;
+      const fooBarClient = fooClient.methods.find(m => m.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const barClient = mainClient.methods.find(m => m.kind === "clientaccessor" && m.name === "getBar")?.response as SdkClientType<SdkHttpOperation>;
       ok(mainClient && fooClient && fooBarClient && barClient);
 
       strictEqual(mainClient.methods.length, 2);
@@ -2449,12 +2450,10 @@ describe("typespec-client-generator-core: package", () => {
       `
       );
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
-      const client = sdkPackage.clients.find((c) => c.initialization.access === "internal");
+      strictEqual(sdkPackage.clients.length, 1);
+      const parentClient = sdkPackage.clients[0];
+      const client = parentClient.methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
       ok(client);
-      const parentClient = sdkPackage.clients.filter(
-        (c) => c.initialization.access === "public"
-      )[0];
       strictEqual(client.methods.length, 2);
 
       // TEST GET STATUS
@@ -2671,10 +2670,10 @@ describe("typespec-client-generator-core: package", () => {
       `
       );
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      strictEqual(sdkPackage.clients.length, 1);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.models[0].name, "Manufacturer");
-      const widgetClient = sdkPackage.clients.find((c) => c.name === "Widgets");
+      const widgetClient = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
       strictEqual(widgetClient.initialization.properties.length, 3);
       strictEqual(widgetClient.initialization.access, "internal");
@@ -2953,7 +2952,8 @@ describe("typespec-client-generator-core: package", () => {
         sdkPackage.models.map((x) => x.name).sort(),
         ["CheckupCollectionWithNextLink", "Checkup", "PetStoreError", "CheckupUpdate"].sort()
       );
-      const createOrUpdate = sdkPackage.clients[0].methods[0];
+      const client = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const createOrUpdate = client.methods[0];
       strictEqual(createOrUpdate.kind, "basic");
       strictEqual(createOrUpdate.name, "createOrUpdate");
       strictEqual(createOrUpdate.parameters.length, 5);
@@ -3048,7 +3048,9 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
       strictEqual(sdkPackage.models.length, 2);
 
-      const createOrReplace = sdkPackage.clients[0].methods[1];
+      const client = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+
+      const createOrReplace = client.methods[1];
       strictEqual(createOrReplace.kind, "basic");
       strictEqual(createOrReplace.name, "createOrReplaceDataConnection");
       strictEqual(createOrReplace.parameters.length, 5);
@@ -3215,7 +3217,8 @@ describe("typespec-client-generator-core: package", () => {
       `);
 
       const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+      const client = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      strictEqual(client.methods[0].parameters[0].clientDefaultValue, "v2");
     });
 
     it("default api version for operation is", async () => {
@@ -3350,9 +3353,9 @@ function getServiceMethodOfClient(
   numMethods: number = 1,
   methodIndex: number = 0
 ): SdkServiceMethod<SdkHttpOperation> {
-  let client = sdkPackage.clients.filter((c) => c.initialization.access === "internal")[0];
-  if (!client) {
-    client = sdkPackage.clients.filter((c) => c.initialization.access === "public")[0];
+  let client = sdkPackage.clients[0];
+  if (client.methods.some(x=>x.kind === "clientaccessor")) {
+    client = client.methods.find(x=>x.kind ==="clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
   }
   strictEqual(client.methods.length, numMethods);
   const method = client.methods[methodIndex];
