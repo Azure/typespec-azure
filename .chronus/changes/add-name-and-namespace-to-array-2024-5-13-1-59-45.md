@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add `name` and `namespace` to `SdkArrayType`
+Add `name` and `tspNamespace` to `SdkArrayType`
