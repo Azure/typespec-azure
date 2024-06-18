@@ -4,7 +4,7 @@ title: "[F] getClientTypeWithDiagnostics"
 
 ---
 ```ts
-getClientTypeWithDiagnostics(
+function getClientTypeWithDiagnostics(
    context, 
    type, 
    operation?): [SdkType, readonly Diagnostic[]]

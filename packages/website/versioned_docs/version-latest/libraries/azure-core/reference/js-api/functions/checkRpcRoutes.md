@@ -4,7 +4,7 @@ title: "[F] checkRpcRoutes"
 
 ---
 ```ts
-checkRpcRoutes(program): void
+function checkRpcRoutes(program): void
 ```
 
 ## Parameters

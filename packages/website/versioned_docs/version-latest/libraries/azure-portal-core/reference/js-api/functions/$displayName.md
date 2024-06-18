@@ -4,7 +4,7 @@ title: "[F] $displayName"
 
 ---
 ```ts
-$displayName(
+function $displayName(
    context, 
    target, 
    name): void

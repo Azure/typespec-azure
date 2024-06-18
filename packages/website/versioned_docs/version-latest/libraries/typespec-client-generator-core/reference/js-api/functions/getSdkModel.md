@@ -4,7 +4,7 @@ title: "[F] getSdkModel"
 
 ---
 ```ts
-getSdkModel(
+function getSdkModel(
    context, 
    type, 
    operation?): SdkModelType

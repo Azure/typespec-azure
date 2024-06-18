@@ -4,7 +4,7 @@ title: "[F] $protocolAPI"
 
 ---
 ```ts
-$protocolAPI(
+function $protocolAPI(
    context, 
    entity, 
    value, 

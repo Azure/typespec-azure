@@ -7,6 +7,6 @@ title: "[I] ArmResourceOperations"
 
 | Property | Type |
 | :------ | :------ |
-| `actions` | `Object` |
+| `actions` | `object` |
 | `lifecycle` | [`ArmLifecycleOperations`](ArmLifecycleOperations.md) |
-| `lists` | `Object` |
+| `lists` | `object` |

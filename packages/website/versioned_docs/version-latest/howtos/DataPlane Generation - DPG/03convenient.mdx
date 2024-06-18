@@ -189,7 +189,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@access(PetStoreNamespace.GetModel, Access.internal);
+@@access(PetStoreNamespace.GetModel, "internal");
 ```
 
 The two possible value for the `Access` enum are `internal` and `public`.

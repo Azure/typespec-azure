@@ -4,7 +4,7 @@ title: "[F] $browse"
 
 ---
 ```ts
-$browse(
+function $browse(
    context, 
    target, 
    options): void

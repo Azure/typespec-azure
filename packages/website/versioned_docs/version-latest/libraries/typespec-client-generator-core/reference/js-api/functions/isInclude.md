@@ -4,7 +4,7 @@ title: "[F] isInclude"
 
 ---
 ```ts
-isInclude(context, entity): boolean
+function isInclude(context, entity): boolean
 ```
 
 ## Parameters

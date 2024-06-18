@@ -4,7 +4,7 @@ title: "[F] $omitKeyProperties"
 
 ---
 ```ts
-$omitKeyProperties(context, entity): void
+function $omitKeyProperties(context, entity): void
 ```
 
 ## Parameters

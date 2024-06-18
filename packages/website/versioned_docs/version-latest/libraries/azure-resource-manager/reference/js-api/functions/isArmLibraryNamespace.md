@@ -4,7 +4,7 @@ title: "[F] isArmLibraryNamespace"
 
 ---
 ```ts
-isArmLibraryNamespace(program, namespace): boolean
+function isArmLibraryNamespace(program, namespace): boolean
 ```
 
 Check if the given namespace contains ARM library types

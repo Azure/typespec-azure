@@ -4,7 +4,7 @@ title: "[F] isSdkFloatKind"
 
 ---
 ```ts
-isSdkFloatKind(kind): kind is "float" | "decimal" | "float32" | "float64" | "decimal128"
+function isSdkFloatKind(kind): kind is "float" | "decimal" | "float32" | "float64" | "decimal128"
 ```
 
 ## Parameters
@@ -15,4 +15,4 @@ isSdkFloatKind(kind): kind is "float" | "decimal" | "float32" | "float64" | "dec
 
 ## Returns
 
-`kind is "float" | "decimal" | "float32" | "float64" | "decimal128"`
+kind is "float" \| "decimal" \| "float32" \| "float64" \| "decimal128"

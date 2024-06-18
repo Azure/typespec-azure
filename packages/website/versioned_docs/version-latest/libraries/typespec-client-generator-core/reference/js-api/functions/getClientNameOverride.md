@@ -4,7 +4,7 @@ title: "[F] getClientNameOverride"
 
 ---
 ```ts
-getClientNameOverride(context, entity): string | undefined
+function getClientNameOverride(context, entity): string | undefined
 ```
 
 ## Parameters

@@ -4,7 +4,7 @@ title: "[F] getBrowseArgQuery"
 
 ---
 ```ts
-getBrowseArgQuery(program, target): any
+function getBrowseArgQuery(program, target): any
 ```
 
 ## Parameters

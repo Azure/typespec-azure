@@ -4,7 +4,7 @@ title: "[F] getPollingLocationInfo"
 
 ---
 ```ts
-getPollingLocationInfo(program, target): PollingLocationInfo | undefined
+function getPollingLocationInfo(program, target): PollingLocationInfo | undefined
 ```
 
 Gets polling information stored with a field that contains a link to an Lro polling endpoint

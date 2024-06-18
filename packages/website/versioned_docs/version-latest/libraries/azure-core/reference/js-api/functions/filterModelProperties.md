@@ -4,7 +4,7 @@ title: "[F] filterModelProperties"
 
 ---
 ```ts
-filterModelProperties(model, predicate): ModelProperty[]
+function filterModelProperties(model, predicate): ModelProperty[]
 ```
 
 Filter the model properties of a model, using the given predicate

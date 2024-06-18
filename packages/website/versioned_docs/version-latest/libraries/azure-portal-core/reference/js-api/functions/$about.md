@@ -4,7 +4,7 @@ title: "[F] $about"
 
 ---
 ```ts
-$about(
+function $about(
    context, 
    target, 
    options): void
