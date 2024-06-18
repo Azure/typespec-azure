@@ -16,4 +16,5 @@ packages:
    - `guid` (removed)
    - `uri` (removed)
    - `ipAddress` (removed)
-2. introduce `SdkScalarType`. Now types defined by keyword `scalar` will be parsed as a `SdkScalarType` with specific name and namespace.
+2. add `name`, `tspNamespace` and `baseType` to `SdkBuiltInType`, `SdkDatetimeType` and `SdkDurationType`.
+3. now scalars defined using `scalar` keyword will be parsed into either `SdkBuiltInType`, `SdkDatetimeType` or `SdkDurationType` depending on the base type, with its name and tsp namespace. `@encode` will be added to the scalar type, and will not propagate to its base type.
