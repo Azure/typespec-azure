@@ -173,7 +173,8 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   }
   for (const kind in SdkAzureBuiltInStringKindsMapping) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
-    const kindMappedName = SdkAzureBuiltInStringKindsMapping[kind as keyof typeof SdkAzureBuiltInStringKindsMapping];
+    const kindMappedName =
+      SdkAzureBuiltInStringKindsMapping[kind as keyof typeof SdkAzureBuiltInStringKindsMapping];
     retval[`Azure.Core.${kindMappedName}`] = kind;
   }
   return retval;
