@@ -36,7 +36,6 @@ export interface SdkEmitterOptions {
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
-  "decorators-white-list"?: string[];
 }
 
 export interface SdkClient {

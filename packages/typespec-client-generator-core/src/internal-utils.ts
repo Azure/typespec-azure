@@ -289,14 +289,10 @@ export function getTypeDecorators(
         }
 
         retval[decoratorName] = {};
-        for (let i = 0; i < decorator.definition.parameters.length; i++) {
-          if (i >= decorator.args.length) {
-            retval[decoratorName][decorator.definition.parameters[i].name] = undefined;
-          } else {
-            retval[decoratorName][decorator.definition.parameters[i].name] = diagnostics.pipe(
-              getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
-            );
-          }
+        for (let i = 0; i < decorator.args.length; i++) {
+          retval[decoratorName][decorator.definition.parameters[i].name] = diagnostics.pipe(
+            getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+          );
         }
       }
     }
@@ -475,8 +471,8 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
     : undefined;
   return Boolean(
     httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+    httpBody.type.kind === "Model" &&
+    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 

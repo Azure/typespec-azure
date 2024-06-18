@@ -1,3 +1,4 @@
+import { XmlTestLibrary } from "@typespec/xml/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -10,10 +11,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   });
 
   it("no arg", async function () {
-    runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      "decorators-white-list": ["TypeSpec\\.@error"],
-    });
+    runner = await createSdkTestRunner({}, { decoratorsWhiteList: ["TypeSpec\\.@error"] });
 
     await runner.compileWithBuiltInService(`
       @error
@@ -30,10 +28,10 @@ describe("typespec-client-generator-core: general decorators list", () => {
   });
 
   it("basic arg type", async function () {
-    runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      "decorators-white-list": ["Azure\\.ClientGenerator\\.Core\\.@clientName"],
-    });
+    runner = await createSdkTestRunner(
+      {},
+      { decoratorsWhiteList: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+    );
 
     await runner.compileWithBuiltInService(`
       model Blob {
@@ -48,15 +46,11 @@ describe("typespec-client-generator-core: general decorators list", () => {
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators["Azure.ClientGenerator.Core.@clientName"], {
       rename: "ID",
-      scope: undefined,
     });
   });
 
   it("enum member arg type", async function () {
-    runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      "decorators-white-list": ["TypeSpec\\.@encode"],
-    });
+    runner = await createSdkTestRunner({}, { decoratorsWhiteList: ["TypeSpec\\.@encode"] });
 
     await runner.compileWithBuiltInService(`
       model Blob {
@@ -71,15 +65,14 @@ describe("typespec-client-generator-core: general decorators list", () => {
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators["TypeSpec.@encode"], {
       encoding: "base64url",
-      encodedAs: undefined,
     });
   });
 
   describe("xml scenario", () => {
     it("@attribute", async function () {
       runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec\\.Xml\\..*"],
+        librariesToAdd: [XmlTestLibrary],
+        autoUsings: ["TypeSpec.Xml"],
       });
 
       await runner.compileWithBuiltInService(`
@@ -97,8 +90,8 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     it("@name", async function () {
       runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec\\.Xml\\..*"],
+        librariesToAdd: [XmlTestLibrary],
+        autoUsings: ["TypeSpec.Xml"],
       });
 
       await runner.compileWithBuiltInService(`
@@ -119,8 +112,8 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     it("@ns", async function () {
       runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec\\.Xml\\..*"],
+        librariesToAdd: [XmlTestLibrary],
+        autoUsings: ["TypeSpec.Xml"],
       });
 
       await runner.compileWithBuiltInService(`
@@ -154,8 +147,8 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     it("@nsDeclarations", async function () {
       runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec\\.Xml\\..*"],
+        librariesToAdd: [XmlTestLibrary],
+        autoUsings: ["TypeSpec.Xml"],
       });
 
       await runner.compileWithBuiltInService(`
@@ -181,22 +174,19 @@ describe("typespec-client-generator-core: general decorators list", () => {
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators["TypeSpec.Xml.@ns"], {
         ns: "https://example.com/ns1",
-        prefix: undefined,
       });
       deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@ns"], {
         ns: "https://example.com/ns1",
-        prefix: undefined,
       });
       deepStrictEqual(models[0].properties[1].decorators["TypeSpec.Xml.@ns"], {
         ns: "https://example.com/ns2",
-        prefix: undefined,
       });
     });
 
     it("@unwrapped", async function () {
       runner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-        "decorators-white-list": ["TypeSpec\\.Xml\\..*"],
+        librariesToAdd: [XmlTestLibrary],
+        autoUsings: ["TypeSpec.Xml"],
       });
 
       await runner.compileWithBuiltInService(`

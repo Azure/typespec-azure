@@ -571,8 +571,11 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
-interface CreateSdkContextOptions {
+const defaultDecoratorsWhiteList = ["TypeSpec\\.Xml\\..*"];
+
+export interface CreateSdkContextOptions {
   readonly versionStrategy?: "ignore";
+  decoratorsWhiteList?: string[];
 }
 
 export function createSdkContext<
@@ -607,7 +610,7 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
-    decoratorsWhiteList: context.options["decorators-white-list"] ?? [],
+    decoratorsWhiteList: options?.decoratorsWhiteList ?? defaultDecoratorsWhiteList,
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
