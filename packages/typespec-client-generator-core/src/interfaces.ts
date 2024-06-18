@@ -230,6 +230,8 @@ export interface SdkDurationType extends SdkTypeBase {
 
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
+  name: string;
+  tspNamespace?: string;
   valueType: SdkType;
 }
 
@@ -252,6 +254,7 @@ export interface SdkNullableType extends SdkTypeBase {
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
+  tspNamespace?: string;
   isGeneratedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
@@ -267,6 +270,7 @@ export interface SdkEnumType extends SdkTypeBase {
 export interface SdkEnumValueType extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
+  tspNamespace?: string;
   value: string | number;
   enumType: SdkEnumType;
   valueType: SdkBuiltInType;
@@ -281,6 +285,7 @@ export interface SdkConstantType extends SdkTypeBase {
 
 export interface SdkUnionType extends SdkTypeBase {
   name: string;
+  tspNamespace?: string;
   isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
@@ -292,6 +297,7 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
+  tspNamespace?: string;
   /**
    * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */
