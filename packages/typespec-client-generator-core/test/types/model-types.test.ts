@@ -737,11 +737,11 @@ describe("typespec-client-generator-core: model types", () => {
       ].sort()
     );
     strictEqual(models[0].name, "CreateOrUpdateResponse");
-    strictEqual(models[0].tspNamespace, "My.Service");
+    strictEqual(models[0].tspNamespace, undefined); // model created by http operation
     strictEqual(models[1].name, "CreateOrUpdateResponse1");
-    strictEqual(models[1].tspNamespace, "My.Service");
+    strictEqual(models[1].tspNamespace, undefined); // model created by http operation
     strictEqual(models[2].name, "CreateOrUpdateResponse2");
-    strictEqual(models[2].tspNamespace, "My.Service");
+    strictEqual(models[2].tspNamespace, undefined); // model created by http operation
     strictEqual(models[3].name, "Error");
     strictEqual(models[3].tspNamespace, "Azure.Core.Foundations");
     strictEqual(models[4].name, "InnerError");
@@ -809,15 +809,15 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 8);
 
     strictEqual(models[0].name, "CreateOrUpdateUserResponse");
-    strictEqual(models[0].tspNamespace, "My.Service");
+    strictEqual(models[0].tspNamespace, undefined); // model created by http operation
     strictEqual(models[1].name, "CreateOrUpdateUserResponse1");
-    strictEqual(models[1].tspNamespace, "My.Service");
+    strictEqual(models[1].tspNamespace, undefined); // model created by http operation
     strictEqual(models[2].name, "CreateOrUpdateUserResponse2");
-    strictEqual(models[2].tspNamespace, "My.Service");
+    strictEqual(models[2].tspNamespace, undefined); // model created by http operation
     strictEqual(models[3].name, "Error");
     strictEqual(models[3].tspNamespace, "Azure.Core.Foundations");
     strictEqual(models[4].name, "GetStatusResponse");
-    strictEqual(models[4].tspNamespace, "My.Service");
+    strictEqual(models[4].tspNamespace, undefined); // model created by http operation
     strictEqual(models[5].name, "InnerError");
     strictEqual(models[5].tspNamespace, "Azure.Core.Foundations");
     strictEqual(models[6].name, "ResourceOperationStatusUserUserError");
