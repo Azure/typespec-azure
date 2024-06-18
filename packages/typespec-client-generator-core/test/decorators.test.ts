@@ -21,7 +21,13 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkClientType, SdkHttpOperation, SdkMethodResponse, SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperation,
+  SdkMethodResponse,
+  SdkOperationGroup,
+  UsageFlags,
+} from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -3306,7 +3312,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clientAccessor.name, "getInterfaceV2");
       deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
 
-      const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(interfaceV2);
       strictEqual(interfaceV2.methods.length, 1);
 

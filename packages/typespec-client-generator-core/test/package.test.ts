@@ -581,7 +581,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-      const operationGroup = mainClient?.methods.find((c) => c.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const operationGroup = mainClient?.methods.find((c) => c.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(mainClient && operationGroup);
 
       strictEqual(mainClient.methods.length, 1);
@@ -624,9 +625,14 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const mainClient = sdkPackage.clients[0];
-      const fooClient = mainClient.methods.find(m => m.kind === "clientaccessor" && m.name === "getFoo")?.response as SdkClientType<SdkHttpOperation>;
-      const fooBarClient = fooClient.methods.find(m => m.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
-      const barClient = mainClient.methods.find(m => m.kind === "clientaccessor" && m.name === "getBar")?.response as SdkClientType<SdkHttpOperation>;
+      const fooClient = mainClient.methods.find(
+        (m) => m.kind === "clientaccessor" && m.name === "getFoo"
+      )?.response as SdkClientType<SdkHttpOperation>;
+      const fooBarClient = fooClient.methods.find((m) => m.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
+      const barClient = mainClient.methods.find(
+        (m) => m.kind === "clientaccessor" && m.name === "getBar"
+      )?.response as SdkClientType<SdkHttpOperation>;
       ok(mainClient && fooClient && fooBarClient && barClient);
 
       strictEqual(mainClient.methods.length, 2);
@@ -2452,7 +2458,8 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const parentClient = sdkPackage.clients[0];
-      const client = parentClient.methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const client = parentClient.methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(client);
       strictEqual(client.methods.length, 2);
 
@@ -2673,7 +2680,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.models[0].name, "Manufacturer");
-      const widgetClient = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const widgetClient = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
       strictEqual(widgetClient.initialization.properties.length, 3);
       strictEqual(widgetClient.initialization.access, "internal");
@@ -2952,7 +2960,8 @@ describe("typespec-client-generator-core: package", () => {
         sdkPackage.models.map((x) => x.name).sort(),
         ["CheckupCollectionWithNextLink", "Checkup", "PetStoreError", "CheckupUpdate"].sort()
       );
-      const client = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       const createOrUpdate = client.methods[0];
       strictEqual(createOrUpdate.kind, "basic");
       strictEqual(createOrUpdate.name, "createOrUpdate");
@@ -3048,7 +3057,8 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
       strictEqual(sdkPackage.models.length, 2);
 
-      const client = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
 
       const createOrReplace = client.methods[1];
       strictEqual(createOrReplace.kind, "basic");
@@ -3217,7 +3227,8 @@ describe("typespec-client-generator-core: package", () => {
       `);
 
       const sdkPackage = runner.context.experimental_sdkPackage;
-      const client = sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+      const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       strictEqual(client.methods[0].parameters[0].clientDefaultValue, "v2");
     });
 
@@ -3354,8 +3365,9 @@ function getServiceMethodOfClient(
   methodIndex: number = 0
 ): SdkServiceMethod<SdkHttpOperation> {
   let client = sdkPackage.clients[0];
-  if (client.methods.some(x=>x.kind === "clientaccessor")) {
-    client = client.methods.find(x=>x.kind ==="clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+  if (client.methods.some((x) => x.kind === "clientaccessor")) {
+    client = client.methods.find((x) => x.kind === "clientaccessor")
+      ?.response as SdkClientType<SdkHttpOperation>;
   }
   strictEqual(client.methods.length, numMethods);
   const method = client.methods[methodIndex];

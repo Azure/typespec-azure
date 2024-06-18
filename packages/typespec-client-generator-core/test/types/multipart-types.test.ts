@@ -208,7 +208,9 @@ describe("typespec-client-generator-core: multipart types", () => {
           upload(...WidgetForm): Widget;
         }
         `);
-    const client = runner.context.experimental_sdkPackage.clients[0].methods.find(x => x.kind === "clientaccessor")?.response as SdkClientType<SdkHttpOperation>;
+    const client = runner.context.experimental_sdkPackage.clients[0].methods.find(
+      (x) => x.kind === "clientaccessor"
+    )?.response as SdkClientType<SdkHttpOperation>;
     const formDataMethod = client.methods[0];
     strictEqual(formDataMethod.kind, "basic");
     strictEqual(formDataMethod.name, "upload");

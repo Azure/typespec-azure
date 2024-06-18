@@ -620,7 +620,7 @@ export function getSdkPackage<
   return {
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
-    clients: listClients(context).map(c => diagnostics.pipe(createSdkClientType(context, c))),
+    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
     enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
     diagnostics: diagnostics.diagnostics,
