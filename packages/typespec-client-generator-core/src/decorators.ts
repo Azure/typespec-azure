@@ -52,7 +52,8 @@ const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-sco
 function getScopedDecoratorData(context: TCGCContext, key: symbol, target: Type): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
-  if (Object.keys(retval).includes(context.emitterName)) return retval[context.emitterName];
+  const scopes = Object.keys(retval);
+  if (scopes.includes(context.emitterName)) return retval[context.emitterName];
   return retval[AllScopes]; // in this case it applies to all languages
 }
 
@@ -77,8 +78,9 @@ function setScopedDecoratorData(
   const targetEntry = context.program.stateMap(key).get(target);
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
-    // value is going to be a list of tuples, each tuple is a value and a list of scopes
-    context.program.stateMap(key).set(target, { [scope ?? AllScopes]: value });
+    const splitScopes = scope?.split(",") || [AllScopes];
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, newObject);
     return true;
   }
 
@@ -93,7 +95,7 @@ function setScopedDecoratorData(
     return false;
   }
   if (!Reflect.ownKeys(targetEntry).includes(AllScopes) && !scope) {
-    context.program.stateMap(key).set(target, { AllScopes: value });
+    context.program.stateMap(key).set(target, { [AllScopes]: value });
   }
   return false;
 }

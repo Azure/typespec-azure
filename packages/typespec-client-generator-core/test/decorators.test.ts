@@ -2086,6 +2086,34 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(models[0].access, "public");
       strictEqual(models[1].access, "public");
     });
+    it("override generic access with language specific access", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          @access(Access.internal, "${language}")
+          model Test {
+            prop: string;
+          }
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
   });
 
   describe("@usage", () => {
