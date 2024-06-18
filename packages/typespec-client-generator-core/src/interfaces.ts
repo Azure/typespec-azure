@@ -173,6 +173,12 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   }
   for (const kind in SdkAzureBuiltInStringKindsEnum) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
+    // for armId, the defined scalar name is different from kind 
+    if (kind === SdkAzureBuiltInStringKindsEnum.armId) {
+      retval["Azure.Core.armResourceIdentifier"] = kind;
+      continue;
+    }
+    // This only works when defined scalar name is same as kind 
     retval[`Azure.Core.${kind}`] = kind;
   }
   return retval;

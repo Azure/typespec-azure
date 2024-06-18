@@ -122,6 +122,29 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(sdkType.valueType.encode, "base64url");
   });
 
+  it("armId from Core", async function () {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithCore.compileWithBuiltInAzureCoreService(
+      `
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        id: Azure.Core.armResourceIdentifier<[
+          {
+            type: "Microsoft.Test/test";
+          }
+        ]>;
+      }
+    `
+    );
+    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    strictEqual(models[0].properties[0].type.kind, "armId");
+  });
+
   it("format", async function () {
     const runnerWithCore = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
