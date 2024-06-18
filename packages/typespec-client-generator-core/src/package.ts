@@ -573,7 +573,6 @@ function createSdkClientType<
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
   };
-  context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -613,7 +612,6 @@ export function getSdkPackage<
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
-  context.__clients = new Array<SdkClientType<TServiceOperation>>();
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
