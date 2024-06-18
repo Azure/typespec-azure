@@ -550,7 +550,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
    */
   diagnostics: readonly Diagnostic[];
   crossLanguagePackageId: string;
-  examples: Map<SdkServiceMethod<TServiceOperation>, SdkServiceOperationExample[]>;
+  examples: Map<SdkServiceOperation, SdkServiceOperationExample[]>;
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
@@ -606,65 +606,61 @@ export type SdkExample = SdkStringExample | SdkNumberExample | SdkBooleanExample
 
 export interface SdkExampleBase {
   kind: string;
-  schema: SdkType | SdkModelPropertyType;
+  type: SdkType | SdkModelPropertyType;
   value: unknown;
 }
 
 export interface SdkStringExample extends SdkExampleBase {
   kind: "string",
-  schema: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  type: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
   value: string;
 }
 
 export interface SdkNumberExample extends SdkExampleBase {
   kind: "number",
-  schema: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  type: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
   value: number;
 }
 
 export interface SdkBooleanExample extends SdkExampleBase {
   kind: "boolean",
-  schema: SdkBuiltInType | SdkConstantType;
+  type: SdkBuiltInType | SdkConstantType;
   value: boolean;
 }
 
 export interface SdkNullExample extends SdkExampleBase {
   kind: "null",
-  schema: SdkNullableType;
+  type: SdkNullableType;
   value: null;
 }
 
 export interface SdkAnyExample extends SdkExampleBase {
   kind: "any",
-  schema: SdkBuiltInType;
+  type: SdkBuiltInType;
   value: unknown;
 }
 
 export interface SdkArrayExample extends SdkExampleBase {
   kind: "array",
-  schema: SdkArrayType;
-  items: SdkExample[];
-  value: unknown[];
+  type: SdkArrayType;
+  value: SdkExample[];
 }
 
 export interface SdkDictionaryExample extends SdkExampleBase {
   kind: "dict",
-  schema: SdkDictionaryType;
-  properties: Record<string, SdkExample>;
-  value: Record<string, unknown>;
+  type: SdkDictionaryType;
+  value: Record<string, SdkExample>;
 }
 
 export interface SdkUnionExample extends SdkExampleBase {
   kind: "union",
-  schema: SdkUnionType;
+  type: SdkUnionType;
   value: unknown;
 }
 
 export interface SdkModelExample extends SdkExampleBase {
   kind: "model";
-  schema: SdkModelType;
-  properties: Record<string, SdkExample>;
-  baseModel?: SdkModelExample;
+  type: SdkModelType;
+  value: Record<string, SdkExample>;
   additionalProperties?: Record<string, SdkExample>;
-  value: Record<string, unknown>;
 }
