@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add namespace to `SdkModelType`, `SdkEnumType`, `SdkEnumValueType` and `SdkUnionType`
+add `tspNamespace` to `SdkModelType`, `SdkEnumType`, `SdkEnumValueType` and `SdkUnionType`

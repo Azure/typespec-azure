@@ -369,7 +369,7 @@ export function getSdkUnionWithDiagnostics(
     retval = {
       ...getSdkTypeBaseHelper(context, type, "union"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
-      namespace: getNamespaceHelper(type.namespace),
+      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
@@ -552,7 +552,7 @@ export function getSdkModelWithDiagnostics(
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: name,
-      namespace: getNamespaceHelper(type.namespace),
+      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -673,7 +673,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
-      namespace: getNamespaceHelper(type.namespace),
+      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -707,7 +707,7 @@ function getSdkUnionEnumValues(
     values.push({
       kind: "enumvalue",
       name: name ? name : `${member.value}`,
-      namespace: enumType.namespace,
+      tspNamespace: enumType.tspNamespace,
       description: docWrapper.description,
       details: docWrapper.details,
       value: member.value,
@@ -728,7 +728,7 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name,
-      namespace: getNamespaceHelper(type.union.namespace),
+      tspNamespace: getNamespaceHelper(type.union.namespace),
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
