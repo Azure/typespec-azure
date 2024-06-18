@@ -191,6 +191,8 @@ function getBuiltInTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalar
     return type.name;
   }
 
+  // for those scalar defined as `scalar newThing;`,
+  // the best we could do here is return as a `any` type with a name and namespace and let the generator figure what this is
   if (type.baseScalar === undefined) {
     return "any";
   }
@@ -270,10 +272,10 @@ function getSdkDateTimeOrDurationOrBuiltInType(
     return getSdkDurationTypeWithDiagnostics(context, type, kind);
   }
   // handle the std types of typespec
-  return getBuiltInType(context, type, kind);
+  return getSdkBuiltInTypeWithDiagnostics(context, type, kind);
 }
 
-function getBuiltInType(
+function getSdkBuiltInTypeWithDiagnostics(
   context: TCGCContext,
   type: Scalar,
   kind: SdkBuiltInKinds
@@ -288,7 +290,7 @@ function getBuiltInType(
     description: docWrapper.description,
     details: docWrapper.details,
     baseType: type.baseScalar
-      ? diagnostics.pipe(getBuiltInType(context, type.baseScalar, kind))
+      ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
       : undefined,
   };
   addEncodeInfo(context, type, stdType);
@@ -708,11 +710,7 @@ function getSdkEnumValueType(
     }
   }
 
-  return {
-    ...getSdkTypeBaseHelper(context, type!, kind!),
-    name: kind!,
-    encode: kind!,
-  };
+  return getTypeSpecBuiltInType(kind!, kind!, type!);
 }
 
 function getUnionAsEnumValueType(context: TCGCContext, union: Union): SdkBuiltInType | undefined {
