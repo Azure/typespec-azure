@@ -84,3 +84,252 @@ notes:
 - `headers`: Equals to custom headers in swagger https://swagger.io/docs/specification/describing-request-body/multipart-requests/  
 - `filename`: When Typespec author use `httpFile` change requiredness for optional metadata properties "filename", this property has value; otherwise it is "undefined".
 - `contentType`: When Typespec author use `httpFile` change requiredness for optional metadata properties "contentType", this property has value; otherwise it is "undefined".
+
+# Examples
+
+## Define "multipart/form-data" with "@body" (compatible for old scenario)
+Typespec example:
+
+```
+model JSON {
+  name: string;
+}
+
+op upload(
+  @header `content-type`: "multipart/form-data",
+  @body body: {
+    basic: string,
+    singleJson: JSON,
+    singleBytes: bytes,
+    multiJsonOnePart: JSON[],
+    multiBytes: bytes[]
+  }
+): void;
+```
+
+
+TCGC API example:
+
+```json
+
+{
+  "properties": [
+    {
+      "name": "basic",
+      "type": { "kind": "string" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": false,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "singleJson",
+      "type": { "kind": "model" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": false,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "singleBytes",
+      "type": { "kind": "bytes" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "multiJsonOnePart",
+      "type": { "kind": "array" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "multiBytes",
+      "type": { "kind": "bytes" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": true,
+        "headers": []
+      }
+    }
+  ]
+}
+
+```
+
+## Define "multipart/form-data" with "@multipartBody"
+Typespec example:
+
+```
+// "File" is predefined model for user to declare requiredness of metadata properties in part of multipart payload: https://github.com/microsoft/typespec/blob/602fe73692dddf7897363b2ac5d98f5871954612/packages/http/lib/http.tsp#L109-L114
+
+model RequiredFileMetadata is File {
+  contentType: string;
+  filename: string;
+}
+
+op upload(
+  @header `content-type`: "multipart/form-data",
+  @multipartBody body: [
+    // single
+    HttpPart<string, #{ name: "basic" }>,
+    HttpPart<JSON, #{ name: "singleJson" }>,
+    HttpPart<bytes, #{ name: "singleBytes" }>,
+    HttpPart<File, #{ name: "singleFileWithOptionalMetadata" }>,
+    HttpPart<RequiredFileMetadata, #{ name: "singleFileWithRequiredMetadata" }>,
+
+    // multi
+    HttpPart<JSON[], #{ name: "multiJsonOnePart" }>,
+    HttpPart<bytes, #{ name: "multiBytes" }>[],
+    HttpPart<JSON, #{ name: "multiJsonMultiParts" }>[],
+
+    // custom header
+    HttpPart<{ @header `x-ms-header`: "x-custom", @body image: File }>
+  ]
+): void;
+```
+
+TCGC API example:
+
+```json
+
+{
+  "properties": [
+    {
+      "name": "basic",
+      "type": { "kind": "string" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": false,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "singleJson",
+      "type": { "kind": "model" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": false,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "singleBytes",
+      "type": { "kind": "bytes" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "singleFileWithOptionalMetadata",
+      "type": { "kind": "bytes" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": [],
+        "fileName": { "optional": true },
+        "contentType": { "optional": true }
+      }
+    },
+    {
+      "name": "singleFileWithRequiredMetadata",
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": [],
+        "fileName": { "optional": false },
+        "contentType": { "optional": false }
+      }
+    },
+    {
+      "name": "multiJsonOnePart",
+      "type": { "kind": "array" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": []
+      }
+    },
+    {
+      "name": "multiBytes",
+      "type": { "kind": "bytes" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": true,
+        "headers": []
+      }
+    },
+    {
+      "name": "multiJsonMultiParts",
+      "type": { "kind": "model" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": true,
+        "headers": []
+      }
+    },
+    {
+      "name": "image",
+      "type": { "kind": "bytes" },
+      "multipartOptions": {
+        "isNameDefined": true,
+        "isFilePart": true,
+        "multi": false,
+        "headers": [{"kind": "header", "name": "x-ms-header"}]
+      }
+    }
+  ]
+}
+
+```
+
+## Define "multipart/mixed" with "@multipartBody"
+Typespec example:
+
+```
+op upload(
+  @header `content-type`: "multipart/mixed",
+  @multipartBody body: [HttpPart<string>]): void;
+```
+
+TCGC API example:
+
+```json
+{
+  "properties": [
+    {
+      "name": "",
+      "type": { "kind": "string" },
+      "multipartOptions": {
+        "isNameDefined": false,
+        "isFilePart": false,
+        "multi": false,
+        "headers": []
+      }
+    }
+  ]
+}
+```
+
