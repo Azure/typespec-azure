@@ -5,7 +5,6 @@ import {
   DateTimeKnownEncoding,
   Diagnostic,
   DurationKnownEncoding,
-  EncodeData,
   Enum,
   EnumMember,
   IntrinsicScalarName,
@@ -70,7 +69,6 @@ import {
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkOperationGroup,
-  SdkScalarType,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -116,12 +114,12 @@ function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string
   return kind;
 }
 
-function getEncodeHelperWithUndefined(context: TCGCContext, type: Type): string | undefined {
-  if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding;
-  }
-  return undefined;
-}
+const typeSpecStringType: SdkBuiltInType = {
+  kind: "string",
+  name: "string",
+  tspNamespace: "TypeSpec",
+  encode: "string",
+};
 
 /**
  * Add format info onto an sdk type. Since the format decorator
@@ -199,107 +197,112 @@ function isTCGCStdType(
   );
 }
 
-function getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(
-  context: TCGCContext,
-  type: Scalar
-): [SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType, readonly Diagnostic[]] {
-  if (type.name === "utcDateTime" || type.name === "offsetDateTime") {
-    const diagnostics = createDiagnosticCollector();
-    return diagnostics.wrap({
-      ...getSdkTypeBaseHelper(context, type, type.name),
-      encode: "rfc3339",
-      wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
-    });
+function getBuiltInTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalarName | "any" {
+  if (context.program.checker.isStdType(type)) {
+    return type.name;
   }
-  if (type.name === "duration") {
-    const diagnostics = createDiagnosticCollector();
-    return diagnostics.wrap(getSdkDurationType(context, type));
+
+  if (type.baseScalar === undefined) {
+    return "any";
   }
-  if (isTCGCStdType(context, type)) {
-    // handle the std types of typespec
-    return getStdTypeWithDiagnostics(context, type);
-  }
-  // all know types have been handled, therefore here we should have a custom scalar
-  return getSdkScalarTypeWithDiagnostics(context, type);
+
+  return getBuiltInTypeKind(context, type.baseScalar);
 }
 
-function getSdkDateTimeOrDurationOrBuiltInOrScalarType(
+function getSdkDateTimeType(
   context: TCGCContext,
-  type: Scalar
-): SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType {
-  return ignoreDiagnostics(
-    getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(context, type)
-  );
+  type: Scalar,
+  kind: "utcDateTime" | "offsetDateTime"
+): SdkDatetimeType {
+  const docWrapper = getDocHelper(context, type);
+  const tspNamespace: string | undefined = type.namespace
+    ? getNamespaceFullName(type.namespace)
+    : undefined;
+  const encodeData = getEncode(context.program, type);
+  const wireType: SdkBuiltInType = encodeData?.type
+    ? (getClientType(context, encodeData.type) as SdkBuiltInType)
+    : typeSpecStringType; // wire type is string by default
+  return {
+    ...getSdkTypeBaseHelper(context, type, kind),
+    name: getLibraryName(context, type),
+    tspNamespace: tspNamespace, // TODO -- use the helper
+    encode: (encodeData?.encoding ?? "rfc3339") as DateTimeKnownEncoding,
+    wireType: wireType,
+    baseType: type.baseScalar ? getSdkDateTimeType(context, type.baseScalar, kind) : undefined,
+    description: docWrapper.description,
+    details: docWrapper.details,
+  };
 }
 
-function getStdTypeWithDiagnostics(
+function getSdkDurationTypeWithDiagnostics(
   context: TCGCContext,
-  type: Scalar & { name: Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> }
+  type: Scalar,
+  kind: "duration"
+): [SdkDurationType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const docWrapper = getDocHelper(context, type);
+  const tspNamespace: string | undefined = type.namespace
+    ? getNamespaceFullName(type.namespace)
+    : undefined;
+  const encodeData = getEncode(context.program, type);
+  const wireType: SdkBuiltInType = encodeData?.type
+    ? (getClientType(context, encodeData.type) as SdkBuiltInType)
+    : {
+        ...getSdkTypeBaseHelper(context, type, "string"),
+        encode: "string",
+        name: "string",
+        tspNamespace: "TypeSpec",
+      }; // wire type is string by default
+  return diagnostics.wrap({
+    ...getSdkTypeBaseHelper(context, type, kind),
+    name: getLibraryName(context, type),
+    tspNamespace: tspNamespace, // TODO -- use the helper
+    encode: (encodeData?.encoding ?? "ISO8601") as DurationKnownEncoding,
+    wireType: wireType,
+    description: docWrapper.description,
+    details: docWrapper.details,
+  });
+}
+
+function getSdkDateTimeOrDurationOrBuiltInType(
+  context: TCGCContext,
+  type: Scalar
+): [SdkDatetimeType | SdkDurationType | SdkBuiltInType, readonly Diagnostic[]] {
+  // follow the extends hierarchy to determine the final kind of this type
+  const kind = getBuiltInTypeKind(context, type);
+
+  if (kind === "utcDateTime" || kind === "offsetDateTime") {
+    const diagnostics = createDiagnosticCollector();
+    return diagnostics.wrap(getSdkDateTimeType(context, type, kind));
+  }
+  if (kind === "duration") {
+    return getSdkDurationTypeWithDiagnostics(context, type, kind);
+  }
+  // handle the std types of typespec
+  return getBuiltInType(context, type, kind);
+}
+
+function getBuiltInType(
+  context: TCGCContext,
+  type: Scalar,
+  kind: SdkBuiltInKinds
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const kind: SdkBuiltInKinds = type.name;
   const docWrapper = getDocHelper(context, type);
   const stdType = {
     ...getSdkTypeBaseHelper(context, type, kind),
+    name: getLibraryName(context, type),
+    tspNamespace: type.namespace ? getNamespaceFullName(type.namespace) : undefined, // TODO -- use the helper
     encode: getEncodeHelper(context, type, kind),
     description: docWrapper.description,
     details: docWrapper.details,
+    baseType: type.baseScalar
+      ? diagnostics.pipe(getBuiltInType(context, type.baseScalar, kind))
+      : undefined,
   };
   addEncodeInfo(context, type, stdType);
   addFormatInfo(context, type, stdType);
   return diagnostics.wrap(stdType);
-}
-
-function getSdkScalarTypeWithDiagnostics(
-  context: TCGCContext,
-  type: Scalar
-): [SdkScalarType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const name: string = getLibraryName(context, type);
-  const namespace: string | undefined = type.namespace
-    ? getNamespaceFullName(type.namespace)
-    : undefined;
-  const docWrapper = getDocHelper(context, type);
-  const scalarType: SdkScalarType = {
-    ...getSdkTypeBaseHelper(context, type, "scalar"),
-    name: name,
-    namespace: namespace,
-    encode: getEncodeHelperWithUndefined(context, type),
-    baseType: type.baseScalar
-      ? getSdkDateTimeOrDurationOrBuiltInOrScalarType(context, type.baseScalar)
-      : undefined,
-    description: docWrapper.description,
-    details: docWrapper.details,
-  };
-  const encodeData = getEncode(context.program, type);
-  addEncodeInfo(scalarType, encodeData);
-  return diagnostics.wrap(scalarType);
-
-  function addEncodeInfo(
-    sdkType: SdkDatetimeType | SdkDurationType | SdkScalarType | SdkBuiltInType,
-    encodeData: EncodeData | undefined
-  ): [void, readonly Diagnostic[]] {
-    const diagnostics = createDiagnosticCollector();
-    if (encodeData === undefined) return diagnostics.wrap(undefined);
-
-    sdkType.encode = encodeData.encoding;
-    if (!isSdkBuiltInType(sdkType)) {
-      // only built-in types does not have wireType
-      sdkType.wireType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, encodeData.type)
-      ) as SdkBuiltInType;
-    }
-    // this encode info should propagate to the base type and all the base type if any
-    if (sdkType.kind === "scalar" && sdkType.baseType) {
-      addEncodeInfo(sdkType.baseType, encodeData);
-    }
-
-    return diagnostics.wrap(undefined);
-  }
-
-  function isSdkBuiltInType(type: SdkType): type is SdkBuiltInType {
-    return isSdkBuiltInKind(type.kind);
-  }
 }
 
 function getSdkTypeForLiteral(
@@ -317,6 +320,8 @@ function getSdkTypeForLiteral(
   }
   return {
     ...getSdkTypeBaseHelper(context, type, kind),
+    name: kind,
+    tspNamespace: "TypeSpec",
     encode: getEncodeHelper(context, type, kind),
   };
 }
@@ -325,6 +330,8 @@ function getSdkTypeForIntrinsic(context: TCGCContext, type: IntrinsicType): SdkB
   const kind: SdkBuiltInKinds = "any";
   return {
     ...getSdkTypeBaseHelper(context, type, kind),
+    name: "unknown",
+    tspNamespace: "TypeSpec",
     encode: getEncodeHelper(context, type, kind),
   };
 }
@@ -332,12 +339,10 @@ function getSdkTypeForIntrinsic(context: TCGCContext, type: IntrinsicType): SdkB
 export function getSdkBuiltInType(
   context: TCGCContext,
   type: Scalar | IntrinsicType | NumericLiteral | StringLiteral | BooleanLiteral
-): SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType {
+): SdkDatetimeType | SdkDurationType | SdkBuiltInType {
   switch (type.kind) {
     case "Scalar":
-      return ignoreDiagnostics(
-        getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(context, type)
-      );
+      return ignoreDiagnostics(getSdkDateTimeOrDurationOrBuiltInType(context, type));
     case "Intrinsic":
       return getSdkTypeForIntrinsic(context, type);
     case "String":
@@ -351,11 +356,7 @@ export function getSdkDurationType(context: TCGCContext, type: Scalar): SdkDurat
   // we don't get encode info until we get to the property / parameter level
   // so we insert the default. Later in properties, we will check
   // for encoding info and override accordingly
-  return {
-    ...getSdkTypeBaseHelper(context, type, "duration"),
-    encode: "ISO8601",
-    wireType: { ...getSdkTypeBaseHelper(context, type, "string"), encode: "string" },
-  };
+  return ignoreDiagnostics(getSdkDurationTypeWithDiagnostics(context, type, "duration"));
 }
 
 export function getSdkArrayOrDict(
@@ -591,10 +592,7 @@ function addDiscriminatorToModelType(
         discriminatorType = discriminatorProperty.type.enumType;
       }
     } else {
-      discriminatorType = {
-        kind: "string",
-        encode: "string",
-      };
+      discriminatorType = typeSpecStringType; // TODO
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
@@ -727,6 +725,7 @@ function getSdkEnumValueType(
 
   return {
     ...getSdkTypeBaseHelper(context, type!, kind!),
+    name: kind!,
     encode: kind!,
   };
 }
@@ -917,9 +916,7 @@ export function getClientTypeWithDiagnostics(
       if (retval) {
         break;
       }
-      retval = diagnostics.pipe(
-        getSdkDateTimeOrDurationOrBuiltInOrScalarTypeWithDiagnostics(context, type)
-      );
+      retval = diagnostics.pipe(getSdkDateTimeOrDurationOrBuiltInType(context, type));
       break;
     case "Enum":
       retval = getSdkEnum(context, type, operation);

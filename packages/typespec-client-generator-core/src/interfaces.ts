@@ -88,7 +88,6 @@ interface SdkTypeBase {
 
 export type SdkType =
   | SdkBuiltInType
-  | SdkScalarType
   | SdkDatetimeType
   | SdkDurationType
   | SdkArrayType
@@ -103,18 +102,21 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-export interface SdkScalarType extends SdkTypeBase {
-  kind: "scalar";
-  name: string;
-  namespace?: string;
-  encode?: string;
-  baseType?: SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType;
-  wireType?: SdkBuiltInType;
-}
+// export interface SdkScalarType extends SdkTypeBase {
+//   kind: "scalar";
+//   name: string;
+//   namespace?: string;
+//   encode?: string;
+//   baseType?: SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType;
+//   wireType?: SdkBuiltInType;
+// }
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
+  name: string;
+  tspNamespace?: string;
+  baseType?: SdkBuiltInType;
 }
 
 enum SdkIntKindsEnum {
@@ -193,6 +195,9 @@ export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKn
 }
 
 interface SdkDatetimeTypeBase extends SdkTypeBase {
+  name: string;
+  tspNamespace?: string;
+  baseType?: SdkDatetimeType;
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
