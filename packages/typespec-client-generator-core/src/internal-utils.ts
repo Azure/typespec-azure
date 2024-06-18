@@ -42,8 +42,13 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 
-export function getTypeSpecBuiltInType(kind: SdkBuiltInKinds, encode?: string): SdkBuiltInType {
+export function getTypeSpecBuiltInType(
+  kind: SdkBuiltInKinds,
+  encode?: string,
+  raw?: Type
+): SdkBuiltInType {
   return {
+    __raw: raw,
     kind: kind,
     name: kind,
     tspNamespace: "TypeSpec",

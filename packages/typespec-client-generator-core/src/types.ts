@@ -309,22 +309,12 @@ function getSdkTypeForLiteral(
   } else {
     kind = intOrFloat(type.value);
   }
-  return {
-    ...getSdkTypeBaseHelper(context, type, kind),
-    name: kind,
-    tspNamespace: "TypeSpec",
-    encode: getEncodeHelper(context, type, kind),
-  };
+  return getTypeSpecBuiltInType(kind, getEncodeHelper(context, type, kind), type);
 }
 
 function getSdkTypeForIntrinsic(context: TCGCContext, type: IntrinsicType): SdkBuiltInType {
-  const kind: SdkBuiltInKinds = "any";
-  return {
-    ...getSdkTypeBaseHelper(context, type, kind),
-    name: "unknown",
-    tspNamespace: "TypeSpec",
-    encode: getEncodeHelper(context, type, kind),
-  };
+  const kind = "any";
+  return getTypeSpecBuiltInType(kind, getEncodeHelper(context, type, kind), type);
 }
 
 export function getSdkBuiltInType(
