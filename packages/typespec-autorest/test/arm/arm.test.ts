@@ -310,25 +310,25 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
   ok(system);
   deepStrictEqual(
     all["properties"]["plan"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.Plan"
+    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate"
   );
   deepStrictEqual(
     all["properties"]["sku"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.Sku"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate"
   );
   deepStrictEqual(
     all["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentity"
+    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"
   );
   deepStrictEqual(
     system["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"
   );
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.Plan"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.Sku"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentity"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.TrackedResource"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"]);
   deepStrictEqual(
     openapi.definitions["Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet"],
     undefined
@@ -407,22 +407,22 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
   ok(system);
   deepStrictEqual(
     all["properties"]["plan"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.Plan"
+    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate"
   );
   deepStrictEqual(
     all["properties"]["sku"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.Sku"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate"
   );
   deepStrictEqual(
     all["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentity"
+    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"
   );
   deepStrictEqual(
     system["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"
   );
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.Plan"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.Sku"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentity"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"]);
 });
