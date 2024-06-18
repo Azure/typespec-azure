@@ -54,7 +54,7 @@ import {
   getDocHelper,
   getHashForType,
   getLocationOfOperation,
-  getSdkTypeBaseHelper,
+  getTypeSpecBuiltInType,
   isNeverOrVoidType,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -487,10 +487,7 @@ function getSdkEndpointParameter(
           optional: false,
           serializedName: "endpoint",
           correspondingMethodParams: [],
-          type: {
-            ...getSdkTypeBaseHelper(context, client.service, "string"),
-            encode: "string",
-          },
+          type: getTypeSpecBuiltInType("string"),
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,

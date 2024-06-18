@@ -118,12 +118,12 @@ describe("typespec-client-generator-core: built-in types", () => {
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
-    strictEqual(sdkType.valueType.kind, "scalar");
+    strictEqual(sdkType.valueType.kind, "bytes");
     strictEqual(sdkType.valueType.name, "Base64UrlBytes");
-    strictEqual(sdkType.valueType.namespace, "TestService");
+    strictEqual(sdkType.valueType.tspNamespace, "TestService");
     strictEqual(sdkType.valueType.encode, "base64url");
     strictEqual(sdkType.valueType.baseType?.kind, "bytes");
-    strictEqual(sdkType.valueType.baseType.encode, "base64url");
+    strictEqual(sdkType.valueType.baseType.encode, "base64");
   });
 
   it("format", async function () {
@@ -183,11 +183,10 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(userModel.properties.length, 2);
     const etagProperty = userModel.properties.find((x) => x.name === "etag");
     ok(etagProperty);
-    strictEqual(etagProperty.type.kind, "scalar");
+    strictEqual(etagProperty.type.kind, "string");
     strictEqual(etagProperty.type.name, "eTag");
-    strictEqual(etagProperty.type.namespace, "Azure.Core");
-    strictEqual(etagProperty.type.encode, undefined);
-    strictEqual(etagProperty.type.wireType, undefined);
+    strictEqual(etagProperty.type.tspNamespace, "Azure.Core");
+    strictEqual(etagProperty.type.encode, "string");
   });
 
   it("unknown format", async function () {

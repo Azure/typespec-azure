@@ -112,14 +112,14 @@ describe("typespec-client-generator-core: date-time types", () => {
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
-    strictEqual(sdkType.valueType.kind, "scalar");
+    strictEqual(sdkType.valueType.kind, "utcDateTime");
     strictEqual(sdkType.valueType.name, "unixTimestampDatetime");
-    strictEqual(sdkType.valueType.namespace, "TestService");
+    strictEqual(sdkType.valueType.tspNamespace, "TestService");
     strictEqual(sdkType.valueType.encode, "unixTimestamp");
     strictEqual(sdkType.valueType.wireType?.kind, "int64");
     strictEqual(sdkType.valueType.description, "title");
     strictEqual(sdkType.valueType.details, "doc");
     strictEqual(sdkType.valueType.baseType?.kind, "utcDateTime");
-    strictEqual(sdkType.valueType.baseType.wireType.kind, "int64");
+    strictEqual(sdkType.valueType.baseType.wireType.kind, "string");
   });
 });

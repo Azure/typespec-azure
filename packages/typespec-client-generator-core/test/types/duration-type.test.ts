@@ -112,15 +112,17 @@ describe("typespec-client-generator-core: duration types", () => {
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
-    strictEqual(sdkType.valueType.kind, "scalar");
+    strictEqual(sdkType.valueType.kind, "duration");
     strictEqual(sdkType.valueType.name, "Float32Duration");
-    strictEqual(sdkType.valueType.namespace, "TestService");
+    strictEqual(sdkType.valueType.tspNamespace, "TestService");
     strictEqual(sdkType.valueType.description, "title");
     strictEqual(sdkType.valueType.details, "doc");
+    // the encode and wireType will only be added to the outer type
     strictEqual(sdkType.valueType.encode, "seconds");
     strictEqual(sdkType.valueType.wireType?.kind, "float32");
     strictEqual(sdkType.valueType.baseType?.kind, "duration");
-    strictEqual(sdkType.valueType.baseType.wireType.kind, "float32");
-    strictEqual(sdkType.valueType.baseType.encode, "seconds");
+    // the encode and wireType on the baseType will have its default value
+    strictEqual(sdkType.valueType.baseType.wireType.kind, "string");
+    strictEqual(sdkType.valueType.baseType.encode, "ISO8601");
   });
 });

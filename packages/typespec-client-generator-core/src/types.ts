@@ -55,7 +55,6 @@ import {
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
-  SdkBuiltInKindsExcludes,
   SdkBuiltInType,
   SdkClient,
   SdkConstantType,
@@ -86,6 +85,7 @@ import {
   getNonNullOptions,
   getNullOption,
   getSdkTypeBaseHelper,
+  getTypeSpecBuiltInType,
   intOrFloat,
   isAzureCoreModel,
   isMultipartFormData,
@@ -114,13 +114,6 @@ function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string
   }
   return kind;
 }
-
-const typeSpecStringType: SdkBuiltInType = {
-  kind: "string",
-  name: "string",
-  tspNamespace: "TypeSpec",
-  encode: "string",
-};
 
 function getNamespaceHelper(ns: Namespace | undefined): string | undefined {
   if (ns) {
@@ -193,18 +186,6 @@ export function addEncodeInfo(
   return diagnostics.wrap(undefined);
 }
 
-function isTCGCStdType(
-  context: TCGCContext,
-  type: Scalar
-): type is Scalar & { name: Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> } {
-  return (
-    context.program.checker.isStdType(type) &&
-    type.name !== "utcDateTime" &&
-    type.name !== "offsetDateTime" &&
-    type.name !== "duration"
-  );
-}
-
 function getBuiltInTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalarName | "any" {
   if (context.program.checker.isStdType(type)) {
     return type.name;
@@ -221,7 +202,8 @@ function getSdkDateTimeType(
   context: TCGCContext,
   type: Scalar,
   kind: "utcDateTime" | "offsetDateTime"
-): SdkDatetimeType {
+): [SdkDatetimeType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const docWrapper = getDocHelper(context, type);
   const tspNamespace: string | undefined = type.namespace
     ? getNamespaceFullName(type.namespace)
@@ -229,17 +211,19 @@ function getSdkDateTimeType(
   const encodeData = getEncode(context.program, type);
   const wireType: SdkBuiltInType = encodeData?.type
     ? (getClientType(context, encodeData.type) as SdkBuiltInType)
-    : typeSpecStringType; // wire type is string by default
-  return {
+    : getTypeSpecBuiltInType("string"); // wire type is string by default
+  return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
     tspNamespace: tspNamespace, // TODO -- use the helper
     encode: (encodeData?.encoding ?? "rfc3339") as DateTimeKnownEncoding,
     wireType: wireType,
-    baseType: type.baseScalar ? getSdkDateTimeType(context, type.baseScalar, kind) : undefined,
+    baseType: type.baseScalar
+      ? diagnostics.pipe(getSdkDateTimeType(context, type.baseScalar, kind))
+      : undefined,
     description: docWrapper.description,
     details: docWrapper.details,
-  };
+  });
 }
 
 function getSdkDurationTypeWithDiagnostics(
@@ -249,9 +233,6 @@ function getSdkDurationTypeWithDiagnostics(
 ): [SdkDurationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const docWrapper = getDocHelper(context, type);
-  const tspNamespace: string | undefined = type.namespace
-    ? getNamespaceFullName(type.namespace)
-    : undefined;
   const encodeData = getEncode(context.program, type);
   const wireType: SdkBuiltInType = encodeData?.type
     ? (getClientType(context, encodeData.type) as SdkBuiltInType)
@@ -264,9 +245,12 @@ function getSdkDurationTypeWithDiagnostics(
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
-    tspNamespace: tspNamespace, // TODO -- use the helper
+    tspNamespace: getNamespaceHelper(type.namespace),
     encode: (encodeData?.encoding ?? "ISO8601") as DurationKnownEncoding,
     wireType: wireType,
+    baseType: type.baseScalar
+      ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
+      : undefined,
     description: docWrapper.description,
     details: docWrapper.details,
   });
@@ -280,8 +264,7 @@ function getSdkDateTimeOrDurationOrBuiltInType(
   const kind = getBuiltInTypeKind(context, type);
 
   if (kind === "utcDateTime" || kind === "offsetDateTime") {
-    const diagnostics = createDiagnosticCollector();
-    return diagnostics.wrap(getSdkDateTimeType(context, type, kind));
+    return getSdkDateTimeType(context, type, kind);
   }
   if (kind === "duration") {
     return getSdkDurationTypeWithDiagnostics(context, type, kind);
@@ -603,7 +586,7 @@ function addDiscriminatorToModelType(
         discriminatorType = discriminatorProperty.type.enumType;
       }
     } else {
-      discriminatorType = typeSpecStringType; // TODO
+      discriminatorType = getTypeSpecBuiltInType("string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {

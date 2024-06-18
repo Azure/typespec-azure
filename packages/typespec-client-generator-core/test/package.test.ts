@@ -2742,9 +2742,9 @@ describe("typespec-client-generator-core: package", () => {
       const nextLinkProperty = pagingModel.properties.find((x) => x.name === "nextLink");
       ok(nextLinkProperty);
       strictEqual(nextLinkProperty.kind, "property");
-      strictEqual(nextLinkProperty.type.kind, "scalar");
+      strictEqual(nextLinkProperty.type.kind, "url");
       strictEqual(nextLinkProperty.type.name, "ResourceLocation");
-      strictEqual(nextLinkProperty.type.namespace, "TypeSpec.Rest");
+      strictEqual(nextLinkProperty.type.tspNamespace, "TypeSpec.Rest");
       strictEqual(nextLinkProperty.type.baseType?.kind, "url");
       strictEqual(nextLinkProperty.serializedName, "nextLink");
       strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);

@@ -42,6 +42,15 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 
+export function getTypeSpecBuiltInType(kind: SdkBuiltInKinds, encode?: string): SdkBuiltInType {
+  return {
+    kind: kind,
+    name: kind,
+    tspNamespace: "TypeSpec",
+    encode: encode ?? kind,
+  };
+}
+
 /**
  *
  * @param emitterName Full emitter name
@@ -427,8 +436,5 @@ export function isNeverOrVoidType(type: Type): boolean {
 }
 
 export function getAnyType(): SdkBuiltInType {
-  return {
-    kind: "any",
-    encode: "string",
-  };
+  return getTypeSpecBuiltInType("any");
 }

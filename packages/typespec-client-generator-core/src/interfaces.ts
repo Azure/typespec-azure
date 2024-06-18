@@ -102,15 +102,6 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-// export interface SdkScalarType extends SdkTypeBase {
-//   kind: "scalar";
-//   name: string;
-//   namespace?: string;
-//   encode?: string;
-//   baseType?: SdkDatetimeType | SdkDurationType | SdkBuiltInType | SdkScalarType;
-//   wireType?: SdkBuiltInType;
-// }
-
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
@@ -214,6 +205,9 @@ export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
+  name: string;
+  tspNamespace?: string;
+  baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
 }
