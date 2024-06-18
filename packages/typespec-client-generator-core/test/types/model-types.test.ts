@@ -1,9 +1,9 @@
 /* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { UsageFlags, isErrorModel } from "@typespec/compiler";
+import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkBodyModelPropertyType } from "../../src/interfaces.js";
+import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -375,7 +375,7 @@ describe("typespec-client-generator-core: model types", () => {
       interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
       `);
     const sdkPackage = runner.context.experimental_sdkPackage;
-    strictEqual(sdkPackage.models.length, 1);
+    strictEqual(sdkPackage.models.length, 2);
     strictEqual(sdkPackage.enums.length, 1);
     const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.isGeneratedName);
     ok(prop);
@@ -384,6 +384,9 @@ describe("typespec-client-generator-core: model types", () => {
     const resp = sdkPackage.models.find((x) => x.name === "GetResponse" && x.isGeneratedName);
     ok(resp);
     strictEqual(resp.properties[0].type, prop);
+    const req = sdkPackage.models.find((x) => x.name === "SendRequest" && x.isGeneratedName);
+    ok(req);
+    strictEqual(req.usage, UsageFlags.Spread);
   });
 
   it("property of anonymous union as enum", async () => {
@@ -688,7 +691,7 @@ describe("typespec-client-generator-core: model types", () => {
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.experimental_sdkPackage.models;
-    strictEqual(models.length, 1);
+    strictEqual(models.length, 4);
     strictEqual(models[0].name, "User");
   });
 
@@ -716,9 +719,19 @@ describe("typespec-client-generator-core: model types", () => {
         op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.experimental_sdkPackage.models;
-    strictEqual(models.length, 4);
+    strictEqual(models.length, 6);
     const modelNames = models.map((model) => model.name).sort();
-    deepStrictEqual(modelNames, ["Error", "ErrorResponse", "InnerError", "User"].sort());
+    deepStrictEqual(
+      modelNames,
+      [
+        "CreateOrUpdateResponse",
+        "CreateOrUpdateResponse1",
+        "CreateOrUpdateResponse2",
+        "Error",
+        "InnerError",
+        "User",
+      ].sort()
+    );
   });
 
   it("lro core filterOutCoreModels true", async () => {
@@ -745,7 +758,7 @@ describe("typespec-client-generator-core: model types", () => {
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.experimental_sdkPackage.models;
-    strictEqual(models.length, 1);
+    strictEqual(models.length, 5);
     strictEqual(models[0].name, "User");
   });
 
@@ -774,16 +787,19 @@ describe("typespec-client-generator-core: model types", () => {
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.experimental_sdkPackage.models;
-    strictEqual(models.length, 5);
+    strictEqual(models.length, 8);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(
       modelNames,
       [
+        "CreateOrUpdateUserResponse",
+        "CreateOrUpdateUserResponse1",
+        "CreateOrUpdateUserResponse2",
         "Error",
-        "ErrorResponse",
+        "GetStatusResponse",
         "InnerError",
-        "User",
         "ResourceOperationStatusUserUserError",
+        "User",
       ].sort()
     );
     strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
@@ -1129,9 +1145,9 @@ describe("typespec-client-generator-core: model types", () => {
     );
     ok(
       AdditionalPropertiesModel &&
-        AdditionalPropertiesModel2 &&
-        AdditionalPropertiesModel3 &&
-        NonAdditionalPropertiesModel
+      AdditionalPropertiesModel2 &&
+      AdditionalPropertiesModel3 &&
+      NonAdditionalPropertiesModel
     );
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -1177,10 +1193,10 @@ describe("typespec-client-generator-core: model types", () => {
     const Test2 = models.find((x) => x.name === "Test2");
     ok(
       AdditionalPropertiesModel &&
-        AdditionalPropertiesModel2 &&
-        AdditionalPropertiesModel3 &&
-        Test &&
-        Test2
+      AdditionalPropertiesModel2 &&
+      AdditionalPropertiesModel3 &&
+      Test &&
+      Test2
     );
 
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
