@@ -11,6 +11,7 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
+  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -120,6 +121,13 @@ const typeSpecStringType: SdkBuiltInType = {
   tspNamespace: "TypeSpec",
   encode: "string",
 };
+
+function getNamespaceHelper(ns: Namespace | undefined): string | undefined {
+  if (ns) {
+    return getNamespaceFullName(ns);
+  }
+  return undefined;
+}
 
 /**
  * Add format info onto an sdk type. Since the format decorator
@@ -391,13 +399,15 @@ export function getSdkArrayOrDictWithDiagnostics(
           keyType: diagnostics.pipe(
             getClientTypeWithDiagnostics(context, type.indexer.key, operation)
           ),
-          valueType,
+          valueType: valueType,
         });
       } else if (name === "integer") {
         // only array's index key name is integer
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
-          valueType,
+          name: getLibraryName(context, type),
+          tspNamespace: getNamespaceHelper(type.namespace),
+          valueType: valueType,
         });
       }
     }
@@ -468,6 +478,7 @@ export function getSdkUnionWithDiagnostics(
     retval = {
       ...getSdkTypeBaseHelper(context, type, "union"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
+      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
@@ -647,6 +658,7 @@ export function getSdkModelWithDiagnostics(
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: name,
+      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -768,6 +780,7 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
+      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -801,6 +814,7 @@ function getSdkUnionEnumValues(
     values.push({
       kind: "enumvalue",
       name: name ? name : `${member.value}`,
+      tspNamespace: enumType.tspNamespace,
       description: docWrapper.description,
       details: docWrapper.details,
       value: member.value,
@@ -821,6 +835,7 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name,
+      tspNamespace: getNamespaceHelper(type.union.namespace),
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
