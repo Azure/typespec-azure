@@ -236,6 +236,14 @@ interface PendingSchema {
    * must be emitted for the type for different visibilities.
    */
   ref: Ref;
+
+  /**
+   * Determines the schema name if an override has been set
+   * @param name The default name of the schema
+   * @param visibility The visibility in which the schema is used
+   * @returns The name of the given schema in the given visibility context
+   */
+  getSchemaNameOverride?: (name: string, visibility: Visibility) => string;
 }
 
 /**
@@ -885,9 +893,17 @@ export async function getOpenAPIForService(
     return undefined;
   }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext, isDerived?: boolean): any {
+    let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
+      undefined;
     const ref = resolveExternalRef(type);
-    if (ref && (isDerived || !metadataInfo.isTransformed(type, schemaContext.visibility))) {
-      return ref;
+    if (ref) {
+      if (isDerived || !metadataInfo.isTransformed(type, schemaContext.visibility)) {
+        return ref;
+      }
+
+      // Reference schemas will only be generated when they differ from READ
+      schemaNameOverride = (n: string, v: Visibility) =>
+        `${n}${getVisibilitySuffix(v, Visibility.Read)}`;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -945,6 +961,7 @@ export async function getOpenAPIForService(
         type,
         visibility: schemaContext.visibility,
         ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
+        getSchemaNameOverride: schemaNameOverride,
       }));
       return { $ref: pending.ref };
     }
@@ -1319,7 +1336,9 @@ export async function getOpenAPIForService(
     for (const group of processedSchemas.values()) {
       for (const [visibility, processed] of group) {
         let name = getOpenAPITypeName(program, processed.type, typeNameOptions);
-        if (group.size > 1) {
+        if (processed.getSchemaNameOverride !== undefined) {
+          name = processed.getSchemaNameOverride(name, visibility);
+        } else if (group.size > 1) {
           name += getVisibilitySuffix(visibility, Visibility.Read);
         }
 
