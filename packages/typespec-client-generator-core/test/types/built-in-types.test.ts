@@ -3,15 +3,27 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { leftOver } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
+
+type TypeEquality<T, U> = keyof T extends keyof U
+  ? keyof U extends keyof T
+    ? true
+    : false
+  : false;
 
 describe("typespec-client-generator-core: built-in types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  });
+
+  it("validate the BuiltInKinds are exhaustive", async function () {
+    const identity: TypeEquality<leftOver, never> = true;
+    strictEqual(identity, true);
   });
 
   it("decimal", async function () {

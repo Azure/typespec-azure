@@ -110,6 +110,14 @@ export interface SdkBuiltInType extends SdkTypeBase {
   baseType?: SdkBuiltInType;
 }
 
+export type leftOver = Exclude<
+  | keyof typeof SdkIntKindsEnum
+  | keyof typeof SdkFloatKindsEnum
+  | keyof typeof SdkGenericBuiltInStringKindsEnum
+  | keyof typeof SdkBuiltInKindsMiscellaneousEnum,
+  Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any"
+>;
+
 enum SdkIntKindsEnum {
   numeric = "numeric",
   integer = "integer",
