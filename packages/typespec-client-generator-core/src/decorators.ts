@@ -29,6 +29,7 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
+import { defaultDecoratorsWhiteList } from "./configs.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -46,7 +47,6 @@ import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
-export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 function getScopedDecoratorData(context: TCGCContext, key: symbol, target: Type): any {
@@ -313,6 +313,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");
+
 export function $operationGroup(
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -412,6 +413,7 @@ function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interfa
   }
   return path.reverse().join(".");
 }
+
 /**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
  * @param context TCGCContext
@@ -570,12 +572,9 @@ export function listOperationsInOperationGroup(
   addOperations(group.type);
   return operations;
 }
-
-const defaultDecoratorsWhiteList = ["TypeSpec\\.Xml\\..*"];
-
 export interface CreateSdkContextOptions {
   readonly versionStrategy?: "ignore";
-  decoratorsWhiteList?: string[];
+  additionalDecorators?: string[];
 }
 
 export function createSdkContext<
@@ -610,7 +609,7 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
-    decoratorsWhiteList: options?.decoratorsWhiteList ?? defaultDecoratorsWhiteList,
+    decoratorsWhiteList: [...defaultDecoratorsWhiteList, ...(options?.additionalDecorators ?? [])],
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
@@ -710,6 +709,7 @@ function modelTransitiveSet(
 }
 
 const clientFormatKey = createStateSymbol("clientFormat");
+
 const allowedClientFormatToTargetTypeMap: Record<ClientFormat, string[]> = {
   unixtime: ["int32", "int64"],
   iso8601: ["utcDateTime", "offsetDateTime", "duration"],

@@ -11,7 +11,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   });
 
   it("no arg", async function () {
-    runner = await createSdkTestRunner({}, { decoratorsWhiteList: ["TypeSpec\\.@error"] });
+    runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@error"] });
 
     await runner.compileWithBuiltInService(`
       @error
@@ -30,7 +30,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("basic arg type", async function () {
     runner = await createSdkTestRunner(
       {},
-      { decoratorsWhiteList: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
     );
 
     await runner.compileWithBuiltInService(`
@@ -50,7 +50,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   });
 
   it("enum member arg type", async function () {
-    runner = await createSdkTestRunner({}, { decoratorsWhiteList: ["TypeSpec\\.@encode"] });
+    runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@encode"] });
 
     await runner.compileWithBuiltInService(`
       model Blob {
