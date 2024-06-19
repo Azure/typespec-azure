@@ -2,6 +2,7 @@ import { XmlTestLibrary } from "@typespec/xml/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 
 describe("typespec-client-generator-core: general decorators list", () => {
   let runner: SdkTestRunner;
@@ -25,6 +26,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].decorators["TypeSpec.@error"], {});
+    expectDiagnostics(runner.context.diagnostics, []);
   });
 
   it("basic arg type", async function () {
@@ -47,6 +49,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
     deepStrictEqual(models[0].properties[0].decorators["Azure.ClientGenerator.Core.@clientName"], {
       rename: "ID",
     });
+    expectDiagnostics(runner.context.diagnostics, []);
   });
 
   it("enum member arg type", async function () {
@@ -65,6 +68,20 @@ describe("typespec-client-generator-core: general decorators list", () => {
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators["TypeSpec.@encode"], {
       encoding: "base64url",
+    });
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
+
+  it("decorator arg type not supported", async function () {
+    runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@service"] });
+
+    await runner.compileWithBuiltInService(`
+      op test(): void;
+    `);
+
+    deepStrictEqual(runner.context.experimental_sdkPackage.clients[0].decorators["TypeSpec.@service"], { options: undefined });
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/unsupported-generic-decorator-arg-type",
     });
   });
 

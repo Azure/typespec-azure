@@ -141,12 +141,12 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TOptions, TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters
-          )
+        getSdkServiceOperation<TOptions, TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters
         )
+      )
       : undefined,
     getResponseMapping(): string | undefined {
       return basic.response.resultPath;
@@ -495,8 +495,9 @@ function getSdkEndpointParameter(
           serializedName: "endpoint",
           correspondingMethodParams: [],
           type: {
-            ...diagnostics.pipe(getSdkTypeBaseHelper(context, client.service, "string")),
+            kind: "string",
             encode: "string",
+            decorators: {},
           },
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
@@ -629,7 +630,7 @@ export function getSdkPackage<
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
   for (const client of listClients(context)) {
-    createSdkClientType(context, client);
+    diagnostics.pipe(createSdkClientType(context, client));
   }
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   return {
