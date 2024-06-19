@@ -497,7 +497,7 @@ interface ResourceOperations<
   > is Foundations.ResourceOperation<
     ResourceOperationStatus<Resource, StatusResult, StatusError>,
     {},
-    BodyRoot<ResourceOperationStatusResponse<Resource, StatusResult, StatusError>,
+    BodyRoot<ResourceOperationStatusResponse<Resource, StatusResult, StatusError>>,
     Traits & InterfaceTraits,
     ErrorResponse
   >;

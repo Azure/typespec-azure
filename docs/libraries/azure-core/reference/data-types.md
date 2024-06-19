@@ -86,6 +86,24 @@ model Azure.Core.AzureApiKeyAuthentication
 | in   | `TypeSpec.Http.ApiKeyLocation.header` | location of the API key |
 | name | `"Ocp-Apim-Subscription-Key"`         | name of the API key     |
 
+### `BodyRoot` {#Azure.Core.BodyRoot}
+
+```typespec
+model Azure.Core.BodyRoot<TResponse>
+```
+
+#### Template Parameters
+
+| Name      | Description |
+| --------- | ----------- |
+| TResponse |             |
+
+#### Properties
+
+| Name     | Type        | Description |
+| -------- | ----------- | ----------- |
+| response | `TResponse` |             |
+
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
 Provides the 'x-ms-client-request-id' header to enable request correlation in requests and responses.
