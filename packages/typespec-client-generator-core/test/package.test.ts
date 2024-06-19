@@ -3334,9 +3334,13 @@ describe("typespec-client-generator-core: package", () => {
       const fooOperation = fooMethod.operation;
       strictEqual(fooOperation.parameters.length, 3);
       strictEqual(fooOperation.parameters[0].name, "q");
-      deepStrictEqual(fooOperation.parameters[0].correspondingMethodParams, [fooMethod.parameters[0]]);
+      deepStrictEqual(fooOperation.parameters[0].correspondingMethodParams, [
+        fooMethod.parameters[0],
+      ]);
       strictEqual(fooOperation.parameters[1].name, "h");
-      deepStrictEqual(fooOperation.parameters[1].correspondingMethodParams, [fooMethod.parameters[1]]);
+      deepStrictEqual(fooOperation.parameters[1].correspondingMethodParams, [
+        fooMethod.parameters[1],
+      ]);
       const bodyParam = fooOperation.bodyParam;
       ok(bodyParam);
       strictEqual(bodyParam.kind, "body");
@@ -3344,7 +3348,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParam.type, sdkPackage.models[0]);
       deepStrictEqual(bodyParam.correspondingMethodParams, [fooMethod.parameters[2]]);
       strictEqual(fooOperation.parameters[2].name, "contentType");
-      deepStrictEqual(fooOperation.parameters[2].correspondingMethodParams, [fooMethod.parameters[3]]);
+      deepStrictEqual(fooOperation.parameters[2].correspondingMethodParams, [
+        fooMethod.parameters[3],
+      ]);
     });
 
     it("with auto body resolution", async () => {

@@ -1285,12 +1285,11 @@ function updateTypesFromOperation(
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
-        const body = innerResponse.body.type.kind === "Model"
-          ? getEffectivePayloadType(context, innerResponse.body.type)
-          : innerResponse.body.type;
-        const sdkType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, body, operation)
-        );
+        const body =
+          innerResponse.body.type.kind === "Model"
+            ? getEffectivePayloadType(context, innerResponse.body.type)
+            : innerResponse.body.type;
+        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
         }
