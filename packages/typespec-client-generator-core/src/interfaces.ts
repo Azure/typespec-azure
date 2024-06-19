@@ -110,13 +110,21 @@ export interface SdkBuiltInType extends SdkTypeBase {
   baseType?: SdkBuiltInType;
 }
 
-export type leftOver = Exclude<
+type TypeEquality<T, U> = keyof T extends keyof U
+  ? keyof U extends keyof T
+    ? true
+    : false
+  : false;
+
+// this const is used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
+// if it is not, a typescript compilation error will be thrown here.
+const _: TypeEquality<Exclude<SupportedBuiltInKinds, SdkBuiltInKinds>, never> = true;
+
+type SupportedBuiltInKinds =
   | keyof typeof SdkIntKindsEnum
   | keyof typeof SdkFloatKindsEnum
   | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkBuiltInKindsMiscellaneousEnum,
-  Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any"
->;
+  | keyof typeof SdkBuiltInKindsMiscellaneousEnum;
 
 enum SdkIntKindsEnum {
   numeric = "numeric",
