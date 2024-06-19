@@ -801,6 +801,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[3].tspNamespace, "Azure.Core");
     strictEqual(models[4].name, "User");
     strictEqual(models[4].tspNamespace, "My.Service");
+    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
+    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums[0].name, "OperationState");
   });
   it("no models filter core", async () => {
     await runner.compile(`
