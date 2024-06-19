@@ -116,9 +116,10 @@ type TypeEquality<T, U> = keyof T extends keyof U
     : false
   : false;
 
-// this const is used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
+// these two vars are used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
 // if it is not, a typescript compilation error will be thrown here.
 const _: TypeEquality<Exclude<SupportedBuiltInKinds, SdkBuiltInKinds>, never> = true;
+const __: TypeEquality<Exclude<SdkBuiltInKinds, SupportedBuiltInKinds>, never> = true;
 
 type SupportedBuiltInKinds =
   | keyof typeof SdkIntKindsEnum
