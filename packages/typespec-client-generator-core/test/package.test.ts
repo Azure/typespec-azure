@@ -1800,9 +1800,9 @@ describe("typespec-client-generator-core: package", () => {
       const createResponse = serviceResponses.get(200);
       ok(createResponse);
       strictEqual(createResponse.kind, "http");
-      deepStrictEqual(
+      strictEqual(
         createResponse.type,
-        sdkPackage.models.find((x) => x.name === "OperationResponse")
+        sdkPackage.models.find((x) => x.name === "Widget")
       );
       strictEqual(createResponse.headers.length, 1);
       strictEqual(createResponse.headers[0].serializedName, "id");
@@ -1811,12 +1811,12 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.response.resultPath, undefined);
       const methodResponseType = method.response.type;
       ok(methodResponseType);
-      deepStrictEqual(
+      strictEqual(
         methodResponseType,
-        sdkPackage.models.find((x) => x.name === "OperationResponse")
+        sdkPackage.models.find((x) => x.name === "Widget")
       );
-      strictEqual(methodResponseType.properties.length, 1);
-      strictEqual(methodResponseType.properties.filter((x) => x.name === "weight").length, 1);
+      strictEqual(methodResponseType.properties.length, 2);
+      strictEqual(methodResponseType.properties.filter((x) => x.kind === "header").length, 1);
     });
 
     it("Headers and body with null", async () => {
@@ -2629,10 +2629,7 @@ describe("typespec-client-generator-core: package", () => {
         response200.headers.map((x) => x.serializedName),
         responseHeaders
       );
-      strictEqual(
-        response200.type,
-        sdkPackage.models.find((x) => x.name === "CreateOrUpdateWidgetResponse1")
-      );
+      strictEqual(response200.type, widgetModel);
 
       const response201 = serviceOperation.responses.get(201);
       ok(response201);
@@ -2640,19 +2637,20 @@ describe("typespec-client-generator-core: package", () => {
         response201.headers.map((x) => x.serializedName),
         responseHeaders
       );
-      strictEqual(
-        response201.type,
-        sdkPackage.models.find((x) => x.name === "CreateOrUpdateWidgetResponse")
-      );
+      strictEqual(response201.type, widgetModel);
 
       const exception = serviceOperation.exceptions.get("*");
       ok(exception);
       strictEqual(exception.kind, "http");
       ok(exception.type);
       strictEqual(exception.type.kind, "model");
+      strictEqual(exception.type.crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
+      // we shouldn't generate this model
       strictEqual(
-        exception.type.crossLanguageDefinitionId,
-        "createOrUpdateWidget.Response.anonymous"
+        sdkPackage.models.find(
+          (x) => x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse"
+        ),
+        undefined
       );
 
       const methodResponse = createOrUpdate.response;
@@ -2676,7 +2674,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
-      strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 1);
+      strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 0);
       strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
     });
     it("paging", async () => {
@@ -2694,9 +2692,8 @@ describe("typespec-client-generator-core: package", () => {
       );
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
-      // Manufacturer, ListManufacturersResponse, ListManufacturersResponse1
-      strictEqual(sdkPackage.models.length, 3);
-      strictEqual(sdkPackage.models[1].name, "Manufacturer");
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.models[0].name, "Manufacturer");
 
       const widgetClient = sdkPackage.clients.find((c) => c.name === "Widgets");
       ok(widgetClient);
@@ -2719,7 +2716,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodResponse = listManufacturers.response.type;
       ok(methodResponse);
       strictEqual(methodResponse.kind, "array");
-      deepStrictEqual(methodResponse.valueType, sdkPackage.models[1]);
+      deepStrictEqual(methodResponse.valueType, sdkPackage.models[0]);
 
       const operation = listManufacturers.operation;
       strictEqual(operation.kind, "http");
@@ -2754,14 +2751,14 @@ describe("typespec-client-generator-core: package", () => {
       const pagingModel = response200.type;
       ok(pagingModel);
       strictEqual(pagingModel.kind, "model");
-      strictEqual(pagingModel.name, "ListManufacturersResponse");
-      strictEqual(pagingModel.properties.length, 2);
+      strictEqual(pagingModel.name, "PagedManufacturer");
+      strictEqual(pagingModel.properties.length, 3);
 
       const valueProperty = pagingModel.properties.find((x) => x.name === "value");
       ok(valueProperty);
       strictEqual(valueProperty.kind, "property");
       strictEqual(valueProperty.type.kind, "array");
-      strictEqual(valueProperty.type.valueType, sdkPackage.models[1]);
+      strictEqual(valueProperty.type.valueType, sdkPackage.models[0]);
 
       const nextLinkProperty = pagingModel.properties.find((x) => x.name === "nextLink");
       ok(nextLinkProperty);
@@ -2770,9 +2767,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(nextLinkProperty.serializedName, "nextLink");
       strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
-      const clientRequestIdHeader = response200.headers[0];
-      ok(clientRequestIdHeader);
-      strictEqual(clientRequestIdHeader.serializedName, "x-ms-client-request-id");
+      const clientRequestIdProperty = pagingModel.properties.find(
+        (x) => x.name === "clientRequestId"
+      );
+      ok(clientRequestIdProperty);
+      strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
   describe("spread", () => {
@@ -3012,7 +3011,7 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.models.length, 5);
+      strictEqual(sdkPackage.models.length, 2);
 
       const createOrReplace = sdkPackage.clients[0].methods[1];
       strictEqual(createOrReplace.kind, "basic");

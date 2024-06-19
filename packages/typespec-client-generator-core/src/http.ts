@@ -47,7 +47,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getCrossLanguageDefinitionId } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -413,7 +413,10 @@ function getSdkHttpResponseAndExceptions(
           );
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body = innerResponse.body.type;
+        body =
+          innerResponse.body.type.kind === "Model"
+            ? getEffectivePayloadType(context, innerResponse.body.type)
+            : innerResponse.body.type;
       }
     }
     const sdkResponse: SdkHttpResponse = {
@@ -431,25 +434,13 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation
       ),
     };
-    if (response.statusCodes === "*" || (body && judgeException(context, body))) {
+    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.set(response.statusCodes, sdkResponse);
     } else {
       responses.set(response.statusCodes, sdkResponse);
     }
   }
   return diagnostics.wrap({ responses, exceptions });
-}
-
-function judgeException(context: TCGCContext, body: Type): boolean {
-  if (isErrorModel(context.program, body)) return true;
-  // if spread by http, we need to judge the source model
-  if (body.kind === "Model" && body.name === "") {
-    const spreads = body.sourceModels.filter((t) => t.usage === "spread");
-    if (spreads.length === 1) {
-      return isErrorModel(context.program, spreads[0].model);
-    }
-  }
-  return false;
 }
 
 export function getCorrespondingMethodParams(

@@ -692,7 +692,7 @@ describe("typespec-client-generator-core: model types", () => {
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.experimental_sdkPackage.models;
-    strictEqual(models.length, 4);
+    strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].tspNamespace, "My.Service");
   });
@@ -723,31 +723,15 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runnerWithCore.context.experimental_sdkPackage.models.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-    strictEqual(models.length, 6);
-    const modelNames = models.map((model) => model.name).sort();
-    deepStrictEqual(
-      modelNames,
-      [
-        "CreateOrUpdateResponse",
-        "CreateOrUpdateResponse1",
-        "CreateOrUpdateResponse2",
-        "Error",
-        "InnerError",
-        "User",
-      ].sort()
-    );
-    strictEqual(models[0].name, "CreateOrUpdateResponse");
-    strictEqual(models[0].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[1].name, "CreateOrUpdateResponse1");
-    strictEqual(models[1].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[2].name, "CreateOrUpdateResponse2");
-    strictEqual(models[2].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[3].name, "Error");
-    strictEqual(models[3].tspNamespace, "Azure.Core.Foundations");
-    strictEqual(models[4].name, "InnerError");
-    strictEqual(models[4].tspNamespace, "Azure.Core.Foundations");
-    strictEqual(models[5].name, "User");
-    strictEqual(models[5].tspNamespace, "My.Service");
+    strictEqual(models.length, 4);
+    strictEqual(models[0].name, "Error");
+    strictEqual(models[0].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[1].name, "ErrorResponse");
+    strictEqual(models[1].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[2].name, "InnerError");
+    strictEqual(models[2].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[3].name, "User");
+    strictEqual(models[3].tspNamespace, "My.Service");
   });
 
   it("lro core filterOutCoreModels true", async () => {
@@ -774,7 +758,7 @@ describe("typespec-client-generator-core: model types", () => {
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.experimental_sdkPackage.models;
-    strictEqual(models.length, 5);
+    strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].tspNamespace, "My.Service");
   });
@@ -806,26 +790,17 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runnerWithCore.context.experimental_sdkPackage.models.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-    strictEqual(models.length, 8);
-
-    strictEqual(models[0].name, "CreateOrUpdateUserResponse");
-    strictEqual(models[0].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[1].name, "CreateOrUpdateUserResponse1");
-    strictEqual(models[1].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[2].name, "CreateOrUpdateUserResponse2");
-    strictEqual(models[2].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[3].name, "Error");
-    strictEqual(models[3].tspNamespace, "Azure.Core.Foundations");
-    strictEqual(models[4].name, "GetStatusResponse");
-    strictEqual(models[4].tspNamespace, undefined); // model created by http operation
-    strictEqual(models[5].name, "InnerError");
-    strictEqual(models[5].tspNamespace, "Azure.Core.Foundations");
-    strictEqual(models[6].name, "ResourceOperationStatusUserUserError");
-    strictEqual(models[6].tspNamespace, "Azure.Core");
-    strictEqual(models[7].name, "User");
-    strictEqual(models[7].tspNamespace, "My.Service");
-    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
-    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums[0].name, "OperationState");
+    strictEqual(models.length, 5);
+    strictEqual(models[0].name, "Error");
+    strictEqual(models[0].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[1].name, "ErrorResponse");
+    strictEqual(models[1].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[2].name, "InnerError");
+    strictEqual(models[2].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[3].name, "ResourceOperationStatusUserUserError");
+    strictEqual(models[3].tspNamespace, "Azure.Core");
+    strictEqual(models[4].name, "User");
+    strictEqual(models[4].tspNamespace, "My.Service");
   });
   it("no models filter core", async () => {
     await runner.compile(`

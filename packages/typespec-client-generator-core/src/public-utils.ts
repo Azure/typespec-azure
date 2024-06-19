@@ -112,7 +112,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  const effective = getEffectiveModelType(program, type, (t) => isMetadata(context.program, t));
+  const effective = getEffectiveModelType(program, type, (t) => !isMetadata(context.program, t));
   if (effective.name) {
     return effective;
   }
@@ -388,9 +388,13 @@ function getContextPath(
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
+          const body =
+            innerResponse.body.type.kind === "Model"
+              ? getEffectivePayloadType(context, innerResponse.body.type)
+              : innerResponse.body.type;
           visited.clear();
           result = [{ name: root.name }];
-          if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response")) {
+          if (dfsModelProperties(typeToFind, body, "Response")) {
             return result;
           }
         }

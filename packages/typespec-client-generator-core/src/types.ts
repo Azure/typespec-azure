@@ -36,6 +36,7 @@ import {
   getAuthentication,
   getServers,
   isHeader,
+  isStatusCode,
 } from "@typespec/http";
 import {
   getAccessOverride,
@@ -93,6 +94,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
+  getEffectivePayloadType,
   getGeneratedName,
   getHttpOperationWithCache,
   getLibraryName,
@@ -1060,7 +1062,11 @@ function addPropertiesToModelType(
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const property of type.properties.values()) {
-    if (isNeverOrVoidType(property.type) || sdkType.kind !== "model") {
+    if (
+      isStatusCode(context.program, property) ||
+      isNeverOrVoidType(property.type) ||
+      sdkType.kind !== "model"
+    ) {
       continue;
     }
     const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
@@ -1279,8 +1285,11 @@ function updateTypesFromOperation(
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
+        const body = innerResponse.body.type.kind === "Model"
+          ? getEffectivePayloadType(context, innerResponse.body.type)
+          : innerResponse.body.type;
         const sdkType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, innerResponse.body.type, operation)
+          getClientTypeWithDiagnostics(context, body, operation)
         );
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
