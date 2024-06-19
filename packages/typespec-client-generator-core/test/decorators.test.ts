@@ -2086,7 +2086,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(models[0].access, "public");
       strictEqual(models[1].access, "public");
     });
-    it("override generic access with language specific access", async () => {
+    it("csv list", async () => {
       function getCodeTemplate(language: string) {
         return `
           @test
@@ -2094,6 +2094,37 @@ describe("typespec-client-generator-core: decorators", () => {
           model Test {
             prop: string;
           }
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("csv list augment", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          model Test {
+            prop: string;
+          }
+
+          @@access(Test, Access.public, "java");
+          @@access(Test, Access.internal, "${language}");
           `;
       }
       const pythonRunner = await createSdkTestRunner({

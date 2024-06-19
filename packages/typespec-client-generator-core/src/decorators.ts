@@ -76,9 +76,9 @@ function setScopedDecoratorData(
   transitivity: boolean = false
 ): boolean {
   const targetEntry = context.program.stateMap(key).get(target);
+  const splitScopes = scope?.split(",") || [AllScopes];
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
-    const splitScopes = scope?.split(",") || [AllScopes];
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, newObject);
     return true;
@@ -87,7 +87,8 @@ function setScopedDecoratorData(
   // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
   const scopes = Reflect.ownKeys(targetEntry);
   if (!scopes.includes(AllScopes) && scope && !scopes.includes(scope)) {
-    targetEntry[scope] = value;
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
     return true;
   }
   if (!transitivity) {
