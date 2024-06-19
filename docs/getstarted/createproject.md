@@ -22,6 +22,7 @@ When initializing a new project, you'll encounter four templates:
 | **(rest-api-spec repo) Azure Resource Manager Service Project** | Similar to the above, but tailored for Azure Resource Manager services within the `azure-rest-api-specs` repository.                                                                 |
 | **(standalone) Azure Data Plane Service Project**               | This template is configured for local use or in a personal repo, allowing for API development without the specific directory structure of the `azure-rest-api-specs` repo.           |
 | **(standalone) Azure Resource Manager Service Project**         | Similar to the above but designed for Azure Resource Manager services, configured for local use or in a personal repo.                                                               |
+| **(standalone) Azure Resource Manager Service Project with only Operations Resource Type**         | Similar to the above but designed to only have the operations resource type.                                                              |
 
 ### Target Users
 

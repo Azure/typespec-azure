@@ -240,5 +240,50 @@
         "initialValue": "Microsoft.Contoso"
       }
     }
+  },
+  "azure-arm-operations": {
+    "title": "(rest-api-spec repo) Azure Resource Manager Service Project with only Operations Resource Type",
+    "description": "Create a project with operations resource type in rest-api-spec repo, representing an Azure service ARM API",
+    "compilerVersion": "0.45.2",
+    "libraries": [],
+    "skipCompilerPackage": true,
+    "config": {
+      "emit": ["@azure-tools/typespec-autorest"]
+    },
+    "files": [
+      {
+        "path": "package.json",
+        "destination": "package.json",
+        "skipGeneration": true
+      },
+      {
+        "path": "./arm-operations/main.tsp",
+        "destination": "main.tsp"
+      },
+      {
+        "path": "./arm-operations/operation.tsp",
+        "destination": "operation.tsp"
+      },
+      {
+        "path": "./arm-operations/tspconfig.yaml",
+        "destination": "tspconfig.yaml"
+      },
+      {
+        "path": "./arm-operations/examples/2021-10-01-preview/Operations_List.json",
+        "destination": "examples/2021-10-01-preview/Operations_List.json"
+      }
+    ],
+    "inputs": {
+      "ServiceNamespace": {
+        "description": "Please provide ARM Resource Provider Name in Pascal case:",
+        "type": "text",
+        "initialValue": "Microsoft.Contoso"
+      },
+      "APIVersion": {
+        "description": "Please provide API version:",
+        "type": "text",
+        "initialValue": "2024-04-01-preview"
+      }
+    }
   }
 }

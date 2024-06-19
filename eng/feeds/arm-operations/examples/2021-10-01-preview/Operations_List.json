@@ -1,0 +1,28 @@
+{
+  "title": "Operations_List",
+  "operationId": "Operations_List",
+  "parameters": {
+    "api-version": "{{parameters.APIVersion}}"
+  },
+  "responses": {
+    "200": {
+      "body": {
+        "value": [
+          {
+            "name": "{{parameters.ServiceNamespace}}",
+            "isDataAction": true,
+            "display": {
+              "provider": "{{parameters.ServiceNamespace}}",
+              "resource": "Sample",
+              "operation": "Sample Operation",
+              "description": "Sample operation description"
+            },
+            "origin": "user",
+            "actionType": "Internal"
+          }
+        ],
+        "nextLink": "https://sample.com/nextLink"
+      }
+    }
+  }
+}
