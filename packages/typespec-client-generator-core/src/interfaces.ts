@@ -128,14 +128,14 @@ enum SdkFloatKindsEnum {
   decimal128 = "decimal128",
 }
 
-enum SdkAzureBuiltInStringKindsEnum {
-  uuid = "uuid",
-  ipV4Address = "ipV4Address",
-  ipV6Address = "ipV6Address",
-  eTag = "eTag",
-  armId = "armId",
-  azureLocation = "azureLocation",
-}
+const SdkAzureBuiltInStringKindsMapping = {
+  uuid: "uuid",
+  ipV4Address: "ipV4Address",
+  ipV6Address: "ipV6Address",
+  eTag: "eTag",
+  armId: "armResourceIdentifier",
+  azureLocation: "azureLocation",
+};
 
 enum SdkGenericBuiltInStringKindsEnum {
   string = "string",
@@ -159,7 +159,7 @@ export type SdkBuiltInKinds =
   | keyof typeof SdkIntKindsEnum
   | keyof typeof SdkFloatKindsEnum
   | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkAzureBuiltInStringKindsEnum;
+  | keyof typeof SdkAzureBuiltInStringKindsMapping;
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
@@ -171,9 +171,11 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
     retval[`TypeSpec.${kind}`] = kind;
   }
-  for (const kind in SdkAzureBuiltInStringKindsEnum) {
+  for (const kind in SdkAzureBuiltInStringKindsMapping) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
-    retval[`Azure.Core.${kind}`] = kind;
+    const kindMappedName =
+      SdkAzureBuiltInStringKindsMapping[kind as keyof typeof SdkAzureBuiltInStringKindsMapping];
+    retval[`Azure.Core.${kindMappedName}`] = kind;
   }
   return retval;
 }
@@ -184,7 +186,7 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
     isSdkIntKind(kind) ||
     isSdkFloatKind(kind) ||
     kind in SdkGenericBuiltInStringKindsEnum ||
-    kind in SdkAzureBuiltInStringKindsEnum
+    kind in SdkAzureBuiltInStringKindsMapping
   );
 }
 
