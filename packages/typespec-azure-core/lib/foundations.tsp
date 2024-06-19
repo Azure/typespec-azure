@@ -441,7 +441,7 @@ op LongRunningResourceUpdate<
     ...Foundations.ResourceBody<Resource>;
     ...TraitProperties<Traits, TraitLocation.Parameters, TraitContext.Update>;
   },
-  Foundations.ResourceOkResponse<BodyRoot<Resource> &
+  Foundations.ResourceOkResponse<Resource &
     TraitProperties<Traits, TraitLocation.Response, TraitContext.Update> &
     Foundations.LongRunningStatusLocation<Resource>>,
   Traits,
