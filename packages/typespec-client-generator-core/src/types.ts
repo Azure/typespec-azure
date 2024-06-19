@@ -77,6 +77,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
+  filterApiVersionsInEnum,
   getAnyType,
   getAvailableApiVersions,
   getDocHelper,
@@ -1479,16 +1480,7 @@ export function getAllModelsWithDiagnostics(
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
       const sdkVersionsEnum = getSdkEnum(context, versionMap.getVersions()[0].enumMember.enum);
-      if (
-        context.apiVersion !== undefined &&
-        context.apiVersion !== "latest" &&
-        context.apiVersion !== "all"
-      ) {
-        const index = sdkVersionsEnum.values.findIndex((v) => v.value === context.apiVersion);
-        if (index >= 0) {
-          sdkVersionsEnum.values = sdkVersionsEnum.values.slice(0, index + 1);
-        }
-      }
+      filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }

@@ -21,11 +21,12 @@ import {
   isVoidType,
 } from "@typespec/compiler";
 import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { Version, getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
+  SdkContext,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -37,6 +38,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
+  getDefaultApiVersion,
   getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
@@ -431,4 +433,24 @@ export function getAnyType(): SdkBuiltInType {
     kind: "any",
     encode: "string",
   };
+}
+
+export function filterApiVersionsInEnum(
+  context: TCGCContext, client: SdkClient, sdkVersionsEnum: SdkEnumType
+): void {
+  // if they explicitly set an api version, remove previous versions
+  if (
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    const index = sdkVersionsEnum.values.findIndex((v) => v.value === context.apiVersion);
+    if (index >= 0) {
+      sdkVersionsEnum.values = sdkVersionsEnum.values.slice(0, index + 1);
+    }
+  }
+  const defaultApiVersion = getDefaultApiVersion(context, client.service);
+  if (!defaultApiVersion?.value.endsWith("-preview")) {
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => typeof v.value === "string" && !v.value.endsWith("-preview"));
+  }
 }

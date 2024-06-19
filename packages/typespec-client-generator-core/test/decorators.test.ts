@@ -3323,6 +3323,40 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(test2Method.name, "test2");
       deepStrictEqual(test2Method.apiVersions, ["v2"]);
     });
+    it("default latest version with preview", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2022_10_01_preview: "2022-10-01-preview",
+          v2024_10_01: "2024-10-01",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.experimental_sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 1);
+      strictEqual(sdkVersionsEnum.values[0].value, "v2024_10_01");
+    });
+
   });
 
   describe("versioning impact for apis", () => {
