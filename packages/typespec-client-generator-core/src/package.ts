@@ -487,7 +487,7 @@ function getSdkEndpointParameter(
           optional: false,
           serializedName: "endpoint",
           correspondingMethodParams: [],
-          type: getTypeSpecBuiltInType("string"),
+          type: getTypeSpecBuiltInType("string", undefined, client.service),
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
