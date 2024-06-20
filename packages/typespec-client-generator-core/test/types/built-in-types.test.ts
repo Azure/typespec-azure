@@ -292,7 +292,11 @@ describe("typespec-client-generator-core: built-in types", () => {
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
-    strictEqual(models[0].properties[0].type.description, "title");
-    strictEqual(models[0].properties[0].type.details, "doc");
+    const type = models[0].properties[0].type;
+    strictEqual(type.kind, "string");
+    strictEqual(type.name, "TestScalar");
+    strictEqual(type.tspNamespace, "TestService");
+    strictEqual(type.description, "title");
+    strictEqual(type.details, "doc");
   });
 });

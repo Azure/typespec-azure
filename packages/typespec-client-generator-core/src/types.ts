@@ -186,7 +186,7 @@ export function addEncodeInfo(
   return diagnostics.wrap(undefined);
 }
 
-function getBuiltInTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalarName | "any" {
+function getScalarTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalarName | "any" {
   if (context.program.checker.isStdType(type)) {
     return type.name;
   }
@@ -197,7 +197,7 @@ function getBuiltInTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalar
     return "any";
   }
 
-  return getBuiltInTypeKind(context, type.baseScalar);
+  return getScalarTypeKind(context, type.baseScalar);
 }
 
 function getSdkDateTimeType(
@@ -207,22 +207,24 @@ function getSdkDateTimeType(
 ): [SdkDatetimeType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const docWrapper = getDocHelper(context, type);
-  const tspNamespace: string | undefined = type.namespace
-    ? getNamespaceFullName(type.namespace)
-    : undefined;
   const encodeData = getEncode(context.program, type);
-  const wireType: SdkBuiltInType = encodeData?.type
-    ? (getClientType(context, encodeData.type) as SdkBuiltInType)
-    : getTypeSpecBuiltInType("string"); // wire type is string by default
+  const baseType = type.baseScalar
+    ? diagnostics.pipe(getSdkDateTimeType(context, type.baseScalar, kind))
+    : undefined;
+  // first we try if this type has an encode on the encode decorator, if not, we get the encode from base type, if still not, we fallback to the default value of datetime rfc3339
+  const encode = encodeData?.encoding ?? baseType?.encode ?? "rfc3339";
+  // first we try if this type has a wire type on the encode decorator, if not, we get the wireType from base type, if still not, we fallback to default wire type string
+  const wireType =
+    (encodeData?.type
+      ? (getClientType(context, encodeData.type) as SdkBuiltInType)
+      : baseType?.wireType) ?? getTypeSpecBuiltInType("string");
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
-    tspNamespace: tspNamespace, // TODO -- use the helper
-    encode: (encodeData?.encoding ?? "rfc3339") as DateTimeKnownEncoding,
+    tspNamespace: getNamespaceHelper(type.namespace),
+    encode: encode as DateTimeKnownEncoding,
     wireType: wireType,
-    baseType: type.baseScalar
-      ? diagnostics.pipe(getSdkDateTimeType(context, type.baseScalar, kind))
-      : undefined,
+    baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
   });
@@ -236,23 +238,23 @@ function getSdkDurationTypeWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   const docWrapper = getDocHelper(context, type);
   const encodeData = getEncode(context.program, type);
-  const wireType: SdkBuiltInType = encodeData?.type
-    ? (getClientType(context, encodeData.type) as SdkBuiltInType)
-    : {
-        ...getSdkTypeBaseHelper(context, type, "string"),
-        encode: "string",
-        name: "string",
-        tspNamespace: "TypeSpec",
-      }; // wire type is string by default
+  const baseType = type.baseScalar
+    ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
+    : undefined;
+  // first we try if this type has an encode on the encode decorator, if not, we get the encode from base type, if still not, we fallback to the default value of duration ISO8601
+  const encode = encodeData?.encoding ?? baseType?.encode ?? "ISO8601";
+  // first we try if this type has a wire type on the encode decorator, if not, we get the wireType from base type, if still not, we fallback to default wire type string
+  const wireType =
+    (encodeData?.type
+      ? (getClientType(context, encodeData.type) as SdkBuiltInType)
+      : baseType?.wireType) ?? getTypeSpecBuiltInType("string");
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
     tspNamespace: getNamespaceHelper(type.namespace),
-    encode: (encodeData?.encoding ?? "ISO8601") as DurationKnownEncoding,
+    encode: encode as DurationKnownEncoding,
     wireType: wireType,
-    baseType: type.baseScalar
-      ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
-      : undefined,
+    baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
   });
@@ -263,7 +265,7 @@ function getSdkDateTimeOrDurationOrBuiltInType(
   type: Scalar
 ): [SdkDatetimeType | SdkDurationType | SdkBuiltInType, readonly Diagnostic[]] {
   // follow the extends hierarchy to determine the final kind of this type
-  const kind = getBuiltInTypeKind(context, type);
+  const kind = getScalarTypeKind(context, type);
 
   if (kind === "utcDateTime" || kind === "offsetDateTime") {
     return getSdkDateTimeType(context, type, kind);
