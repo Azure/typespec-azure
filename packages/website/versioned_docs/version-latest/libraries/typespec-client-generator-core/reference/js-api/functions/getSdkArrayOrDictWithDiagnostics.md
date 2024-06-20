@@ -4,7 +4,7 @@ title: "[F] getSdkArrayOrDictWithDiagnostics"
 
 ---
 ```ts
-getSdkArrayOrDictWithDiagnostics(
+function getSdkArrayOrDictWithDiagnostics(
    context, 
    type, 
    operation?): [SdkDictionaryType | SdkArrayType | undefined, readonly Diagnostic[]]

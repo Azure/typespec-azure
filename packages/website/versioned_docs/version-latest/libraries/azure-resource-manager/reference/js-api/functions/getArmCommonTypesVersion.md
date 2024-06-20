@@ -4,7 +4,7 @@ title: "[F] getArmCommonTypesVersion"
 
 ---
 ```ts
-getArmCommonTypesVersion(program, entity): string | undefined
+function getArmCommonTypesVersion(program, entity): string | undefined
 ```
 
 Returns the ARM common-types version used by the service.
@@ -14,7 +14,7 @@ Returns the ARM common-types version used by the service.
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `program` | `Program` | - |
-| `entity` | `EnumMember` \| `Namespace` | Target of the decorator. Must be `Namespace` or `EnumMember` type |
+| `entity` | `Namespace` \| `EnumMember` | Target of the decorator. Must be `Namespace` or `EnumMember` type |
 
 ## Returns
 

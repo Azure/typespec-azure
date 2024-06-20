@@ -4,7 +4,7 @@ title: "[F] $lroFailed"
 
 ---
 ```ts
-$lroFailed(context, entity): void
+function $lroFailed(context, entity): void
 ```
 
 ## Parameters

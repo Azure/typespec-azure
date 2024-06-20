@@ -4,7 +4,7 @@ title: "[F] getHttpOperationWithCache"
 
 ---
 ```ts
-getHttpOperationWithCache(context, operation): HttpOperation
+function getHttpOperationWithCache(context, operation): HttpOperation
 ```
 
 ## Parameters

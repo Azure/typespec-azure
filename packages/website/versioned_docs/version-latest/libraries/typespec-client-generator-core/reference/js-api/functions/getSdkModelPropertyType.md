@@ -4,7 +4,7 @@ title: "[F] getSdkModelPropertyType"
 
 ---
 ```ts
-getSdkModelPropertyType(
+function getSdkModelPropertyType(
    context, 
    type, 
    operation?): [SdkModelPropertyType, readonly Diagnostic[]]

@@ -4,7 +4,7 @@ title: "[F] isFixed"
 
 ---
 ```ts
-isFixed(program, target): boolean
+function isFixed(program, target): boolean
 ```
 
 ## Parameters

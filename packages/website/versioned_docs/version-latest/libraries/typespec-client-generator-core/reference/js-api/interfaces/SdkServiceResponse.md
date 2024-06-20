@@ -13,5 +13,4 @@ title: "[I] SdkServiceResponse"
 | :------ | :------ |
 | `apiVersions` | `string`[] |
 | `headers` | [`SdkServiceResponseHeader`](SdkServiceResponseHeader.md)[] |
-| `nullable` | `boolean` |
 | `type?` | [`SdkType`](../type-aliases/SdkType.md) |

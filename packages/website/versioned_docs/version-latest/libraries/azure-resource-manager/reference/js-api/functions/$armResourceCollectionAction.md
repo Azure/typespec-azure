@@ -4,7 +4,7 @@ title: "[F] $armResourceCollectionAction"
 
 ---
 ```ts
-$armResourceCollectionAction(context, target): void
+function $armResourceCollectionAction(context, target): void
 ```
 
 ## Parameters

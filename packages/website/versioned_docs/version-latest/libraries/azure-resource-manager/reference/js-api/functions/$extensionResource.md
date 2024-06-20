@@ -4,7 +4,7 @@ title: "[F] $extensionResource"
 
 ---
 ```ts
-$extensionResource(context, entity): void
+function $extensionResource(context, entity): void
 ```
 
 ## Parameters

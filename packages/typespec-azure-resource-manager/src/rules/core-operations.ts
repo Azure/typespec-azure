@@ -90,7 +90,7 @@ function isApiParameter(program: Program, property: ModelProperty): boolean {
   if (sourceModel === undefined) return false;
   return (
     sourceModel.name === "ApiVersionParameter" &&
-    getNamespaceName(program, sourceModel) === "Azure.ResourceManager"
+    getNamespaceName(program, sourceModel) === "Azure.ResourceManager.CommonTypes"
   );
 }
 

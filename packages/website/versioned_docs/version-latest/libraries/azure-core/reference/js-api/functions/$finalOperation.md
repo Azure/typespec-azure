@@ -4,7 +4,7 @@ title: "[F] $finalOperation"
 
 ---
 ```ts
-$finalOperation(
+function $finalOperation(
    context, 
    entity, 
    linkedOperation, 

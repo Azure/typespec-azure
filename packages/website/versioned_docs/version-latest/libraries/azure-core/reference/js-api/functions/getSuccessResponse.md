@@ -4,7 +4,7 @@ title: "[F] getSuccessResponse"
 
 ---
 ```ts
-getSuccessResponse(program, operation): Model | undefined
+function getSuccessResponse(program, operation): Model | undefined
 ```
 
 Get the first success response of an operation

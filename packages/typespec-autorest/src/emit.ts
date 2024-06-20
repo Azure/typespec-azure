@@ -90,6 +90,7 @@ export function resolveAutorestOptions(
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
+    emitLroOptions: resolvedOptions["emit-lro-options"],
   };
 }
 

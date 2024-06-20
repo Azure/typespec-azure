@@ -4,7 +4,7 @@ title: "[F] isSdkDatetimeEncodings"
 
 ---
 ```ts
-isSdkDatetimeEncodings(encoding): encoding is DateTimeKnownEncoding
+function isSdkDatetimeEncodings(encoding): encoding is DateTimeKnownEncoding
 ```
 
 ## Parameters

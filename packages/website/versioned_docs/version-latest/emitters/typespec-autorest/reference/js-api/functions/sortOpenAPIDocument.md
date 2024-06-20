@@ -4,7 +4,7 @@ title: "[F] sortOpenAPIDocument"
 
 ---
 ```ts
-sortOpenAPIDocument(doc): OpenAPI2Document
+function sortOpenAPIDocument(doc): OpenAPI2Document
 ```
 
 ## Parameters

@@ -4,7 +4,7 @@ title: "[F] $usage"
 
 ---
 ```ts
-$usage(
+function $usage(
    context, 
    entity, 
    value, 
@@ -16,7 +16,7 @@ $usage(
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` \| `Enum` \| `Union` |
+| `entity` | `Enum` \| `Model` \| `Union` |
 | `value` | `EnumMember` \| `Union` |
 | `scope`? | `string` |
 

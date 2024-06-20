@@ -4,7 +4,7 @@ title: "[F] getResponseProperty"
 
 ---
 ```ts
-getResponseProperty(program, entity): string | undefined
+function getResponseProperty(program, entity): string | undefined
 ```
 
 ## Parameters

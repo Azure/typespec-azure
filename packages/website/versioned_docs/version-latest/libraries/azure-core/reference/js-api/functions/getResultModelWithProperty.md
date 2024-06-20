@@ -4,7 +4,7 @@ title: "[F] getResultModelWithProperty"
 
 ---
 ```ts
-getResultModelWithProperty(
+function getResultModelWithProperty(
    program, 
    operation, 
    predicate): [Model, ModelProperty] | undefined

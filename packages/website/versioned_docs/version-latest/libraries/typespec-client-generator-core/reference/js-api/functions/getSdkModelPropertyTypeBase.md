@@ -4,7 +4,7 @@ title: "[F] getSdkModelPropertyTypeBase"
 
 ---
 ```ts
-getSdkModelPropertyTypeBase(
+function getSdkModelPropertyTypeBase(
    context, 
    type, 
    operation?): [SdkModelPropertyTypeBase, readonly Diagnostic[]]

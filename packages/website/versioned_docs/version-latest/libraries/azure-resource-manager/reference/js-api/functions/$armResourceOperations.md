@@ -4,7 +4,7 @@ title: "[F] $armResourceOperations"
 
 ---
 ```ts
-$armResourceOperations(context, interfaceType): void
+function $armResourceOperations(context, interfaceType): void
 ```
 
 This decorator is used to identify interfaces containing resource operations.

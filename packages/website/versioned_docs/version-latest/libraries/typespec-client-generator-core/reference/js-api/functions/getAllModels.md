@@ -4,7 +4,7 @@ title: "[F] getAllModels"
 
 ---
 ```ts
-getAllModels(context, options): (SdkModelType | SdkEnumType)[]
+function getAllModels(context, options): (SdkModelType | SdkEnumType)[]
 ```
 
 ## Parameters

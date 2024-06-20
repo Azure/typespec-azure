@@ -4,7 +4,7 @@ title: "[F] resolveResourceOperations"
 
 ---
 ```ts
-resolveResourceOperations(program, resourceType): ArmResourceOperations
+function resolveResourceOperations(program, resourceType): ArmResourceOperations
 ```
 
 ## Parameters
