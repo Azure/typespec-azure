@@ -25,7 +25,7 @@ describe("typespec-client-generator-core: date-time types", () => {
     strictEqual(sdkType.wireType.kind, "string");
     strictEqual(sdkType.encode, "rfc3339");
   });
-  
+
   it("rfc3339", async function () {
     await runner.compileWithBuiltInService(
       `
