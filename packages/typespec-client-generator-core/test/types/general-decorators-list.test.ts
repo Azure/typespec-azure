@@ -1,8 +1,9 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { XmlTestLibrary } from "@typespec/xml/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { expectDiagnostics } from "@typespec/compiler/testing";
 
 describe("typespec-client-generator-core: general decorators list", () => {
   let runner: SdkTestRunner;
@@ -79,7 +80,10 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): void;
     `);
 
-    deepStrictEqual(runner.context.experimental_sdkPackage.clients[0].decorators["TypeSpec.@service"], { options: undefined });
+    deepStrictEqual(
+      runner.context.experimental_sdkPackage.clients[0].decorators["TypeSpec.@service"],
+      { options: undefined }
+    );
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/unsupported-generic-decorator-arg-type",
     });
@@ -217,6 +221,27 @@ describe("typespec-client-generator-core: general decorators list", () => {
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@unwrapped"], {});
+    });
+  });
+
+  describe("azure scenario", () => {
+    it("@useFinalStateVia", async function () {
+      runner = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+      });
+
+      await runner.compileWithBuiltInService(`
+      @useFinalStateVia("original-uri")
+      @put
+      op test(): void;
+    `);
+
+      const methods = runner.context.experimental_sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 1);
+      deepStrictEqual(methods[0].decorators["Azure.Core.@useFinalStateVia"], {
+        finalState: "original-uri",
+      });
     });
   });
 });

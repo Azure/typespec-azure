@@ -1,1 +1,4 @@
-export const defaultDecoratorsWhiteList = ["TypeSpec\\.Xml\\..*"];
+export const defaultDecoratorsWhiteList = [
+  "TypeSpec\\.Xml\\..*",
+  "Azure\\.Core\\.@useFinalStateVia",
+];
