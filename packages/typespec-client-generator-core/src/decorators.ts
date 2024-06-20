@@ -52,8 +52,7 @@ const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-sco
 function getScopedDecoratorData(context: TCGCContext, key: symbol, target: Type): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
-  const scopes = Object.keys(retval);
-  if (scopes.includes(context.emitterName)) return retval[context.emitterName];
+  if (Object.keys(retval).includes(context.emitterName)) return retval[context.emitterName];
   return retval[AllScopes]; // in this case it applies to all languages
 }
 
@@ -76,7 +75,8 @@ function setScopedDecoratorData(
   transitivity: boolean = false
 ): boolean {
   const targetEntry = context.program.stateMap(key).get(target);
-  const splitScopes = scope?.split(",") || [AllScopes];
+  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
@@ -86,17 +86,20 @@ function setScopedDecoratorData(
 
   // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
   const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !scopes.includes(scope)) {
+  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
     return true;
   }
+  // we only want to allow multiple decorators if they each specify a different scope
   if (!transitivity) {
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
-  if (!Reflect.ownKeys(targetEntry).includes(AllScopes) && !scope) {
-    context.program.stateMap(key).set(target, { [AllScopes]: value });
+  // for transitivity situation, we could allow scope extension
+  if (!scopes.includes(AllScopes) && !scope) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
   }
   return false;
 }

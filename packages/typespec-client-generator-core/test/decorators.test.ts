@@ -1537,10 +1537,87 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "duplicate-decorator",
       });
     });
+
     it("duplicate-decorator diagnostic for multiple same scope", async () => {
       const diagnostics = await runner.diagnose(`
       @test
       @access(Access.internal, "csharp")
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "duplicate-decorator",
+      });
+    });
+
+    it("csv scope list", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          @access(Access.internal, "${language}")
+          model Test {
+            prop: string;
+          }
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("csv scope list augment", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          model Test {
+            prop: string;
+          }
+
+          @@access(Test, Access.public, "java, ts");
+          @@access(Test, Access.internal, "${language}");
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("duplicate-decorator diagnostic for csv scope list", async () => {
+      const diagnostics = await runner.diagnose(`
+      @test
+      @access(Access.internal, "csharp,ts")
       @access(Access.internal, "csharp")
       op func(
         @query("createdAt")
@@ -2085,65 +2162,6 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(models.length, 2);
       strictEqual(models[0].access, "public");
       strictEqual(models[1].access, "public");
-    });
-    it("csv list", async () => {
-      function getCodeTemplate(language: string) {
-        return `
-          @test
-          @access(Access.internal, "${language}")
-          model Test {
-            prop: string;
-          }
-          `;
-      }
-      const pythonRunner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-      });
-      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      const csharpRunner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-csharp",
-      });
-
-      const testCode = getCodeTemplate("python,csharp");
-      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
-      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
-
-      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
-      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
-
-      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
-      strictEqual(getAccess(javaRunner.context, TestJava), "public");
-    });
-
-    it("csv list augment", async () => {
-      function getCodeTemplate(language: string) {
-        return `
-          @test
-          model Test {
-            prop: string;
-          }
-
-          @@access(Test, Access.public, "java");
-          @@access(Test, Access.internal, "${language}");
-          `;
-      }
-      const pythonRunner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-      });
-      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      const csharpRunner = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-csharp",
-      });
-
-      const testCode = getCodeTemplate("python,csharp");
-      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
-      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
-
-      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
-      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
-
-      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
-      strictEqual(getAccess(javaRunner.context, TestJava), "public");
     });
   });
 
