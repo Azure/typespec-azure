@@ -164,7 +164,7 @@ enum SdkBuiltInKindsMiscellaneousEnum {
 
 export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
 
-export type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
+type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
