@@ -45,6 +45,7 @@ import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
+import { handleClientExamples } from "./example.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
@@ -575,14 +576,14 @@ interface CreateSdkContextOptions {
   readonly versionStrategy?: "ignore";
 }
 
-export function createSdkContext<
+export async function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: EmitContext<TOptions>,
   emitterName?: string,
   options?: CreateSdkContextOptions
-): SdkContext<TOptions, TServiceOperation> {
+): Promise<SdkContext<TOptions, TServiceOperation>> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
@@ -607,8 +608,14 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
+    examplesDirectory: context.options["examples-directory"] ?? "{project-root}/examples",
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  for (const client of sdkContext.experimental_sdkPackage.clients) {
+    if (client.initialization.access === "internal") continue;
+    await handleClientExamples(sdkContext, client);
+  }
+
   if (sdkContext.diagnostics) {
     sdkContext.diagnostics = sdkContext.diagnostics.concat(
       sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation

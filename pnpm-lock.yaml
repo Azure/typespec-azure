@@ -2027,6 +2027,9 @@ importers:
       '@typespec/library-linter':
         specifier: workspace:~
         version: link:../../core/packages/library-linter
+      '@typespec/openapi':
+        specifier: workspace:~
+        version: link:../../core/packages/openapi
       '@typespec/prettier-plugin-typespec':
         specifier: workspace:~
         version: link:../../core/packages/prettier-plugin-typespec
