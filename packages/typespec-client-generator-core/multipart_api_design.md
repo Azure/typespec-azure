@@ -55,7 +55,7 @@ op upload(
 Since all language emitters emit multipart body as model format, TCGC will uniform the multipart body type as model, and each model property equals to property of model format or part of tuple format in Typespec.
 
 ```typescript
-exprot interface multipartOptionsType {
+export interface multipartOptionsType {
   isNameDefined: boolean; // whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts
   isFilePart: boolean; // whether this part is for file
   multi: boolean; // whether this part is multi in request payload
