@@ -31,11 +31,18 @@ if (type.kind === "azureLocation")
   // do something for azure-location
 }
 ```
-should be changed to
+should be changed to the following if the emitter is doing something special for azure-location:
 ```typescript
 if (type.kind === "string" && type.name === "azureLocation" && type.tspNamespace === "Azure.Core")
 {
   // do something for azure-location
+}
+```
+or just change it to this:
+```typescript
+if (type.kind === "string")
+{
+  // treat azure-location as a string
 }
 ```
 
