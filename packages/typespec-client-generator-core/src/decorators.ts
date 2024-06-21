@@ -288,7 +288,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     context.__rawClients = getClientsWithVersioning(context, explicitClients);
-    if (context.__rawClients.some(client => isArm(client.service))) {
+    if (context.__rawClients.some((client) => isArm(client.service))) {
       context.arm = true;
     }
     return context.__rawClients;
