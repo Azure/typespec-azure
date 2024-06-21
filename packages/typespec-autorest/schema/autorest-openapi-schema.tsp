@@ -145,17 +145,19 @@ model XmsPageable {
 @doc("Indicates whether the operation is long running (asynchronous). `true` value indicates that it is a long running operation.")
 model XmsLongRunningOperationOptions {
   @doc("""
-How to determine the final state of the operation. Possible Values:
-- `azure-async-operation` - poll until terminal state, the final response will be available at the uri pointed to by the header `Azure-AsyncOperation`
-- `location`  - poll until terminal state, the final response will be available at the uri pointed to by the header `Location`
-- `operation-location` - poll until terminal state, the final response will be available at the uri pointed to by the header `Operation-Location`
-""")
+    How to determine the final state of the operation. Possible Values:
+    - `azure-async-operation` - poll until terminal state, the final response will be available at the uri pointed to by the header `Azure-AsyncOperation`
+    - `location`  - poll until terminal state, the final response will be available at the uri pointed to by the header `Location`
+    - `operation-location` - poll until terminal state, the final response will be available at the uri pointed to by the header `Operation-Location`
+    """)
   `final-state-via`:
     | "azure-async-operation"
     | "location"
     | "original-uri"
     | "operation-location"
     | "final-state-schema";
+
+  `final-state-schema`?: string;
 }
 
 /** Describes the 'x-ms-examples' extension. */

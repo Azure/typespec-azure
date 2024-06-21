@@ -4,7 +4,7 @@ title: "[F] $ensureResourceType"
 
 ---
 ```ts
-$ensureResourceType(
+function $ensureResourceType(
    context, 
    entity, 
    resourceType): void

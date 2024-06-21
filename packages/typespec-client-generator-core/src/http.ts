@@ -45,11 +45,10 @@ import {
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
-  isNullable,
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getEffectivePayloadType } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -125,7 +124,7 @@ function getSdkHttpParameters(
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
-  if (tspBody) {
+  if (tspBody && tspBody?.bodyKind !== "multipart") {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.parameter && !isNeverOrVoidType(tspBody.parameter.type)) {
       const getParamResponse = diagnostics.pipe(
@@ -165,8 +164,8 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: false,
-        nullable: isNullable(tspBody.type),
         correspondingMethodParams,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
       };
     }
     if (retval.bodyParam) {
@@ -184,7 +183,7 @@ function getSdkHttpParameters(
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
-      ...createContentTypeOrAcceptHeader(httpOperation, retval.bodyParam),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -203,7 +202,7 @@ function getSdkHttpParameters(
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
     // If our operation returns a body, we add an accept header if none exist
     const acceptBase = {
-      ...createContentTypeOrAcceptHeader(httpOperation, responseBody),
+      ...createContentTypeOrAcceptHeader(context, httpOperation, responseBody),
     };
     if (!methodParameters.some((m) => m.name === "accept")) {
       methodParameters.push({
@@ -227,6 +226,7 @@ function getSdkHttpParameters(
 }
 
 function createContentTypeOrAcceptHeader(
+  context: TCGCContext,
   httpOperation: HttpOperation,
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
@@ -234,7 +234,6 @@ function createContentTypeOrAcceptHeader(
   let type: SdkType = {
     kind: "string",
     encode: "string",
-    nullable: false,
   };
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
@@ -250,7 +249,6 @@ function createContentTypeOrAcceptHeader(
   ) {
     // in this case, we just want a content type of application/json
     type = {
-      nullable: false,
       kind: "constant",
       value: bodyObject.contentTypes[0],
       valueType: type,
@@ -268,7 +266,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: false,
-    nullable: false,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
   };
 }
 
@@ -397,7 +395,6 @@ function getSdkHttpResponseAndExceptions(
           details: getDocHelper(context, header).details,
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
-          nullable: isNullable(header.type),
         });
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -437,7 +434,6 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
         httpOperation.operation
       ),
-      nullable: body ? isNullable(body) : true,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.set(response.statusCodes, sdkResponse);

@@ -13,6 +13,13 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securit
 
 - [`OpenAPI2SecuritySchemeBase`](OpenAPI2SecuritySchemeBase.md)
 
+## Extended by
+
+- [`OpenAPI2OAuth2ImplicitSecurityScheme`](OpenAPI2OAuth2ImplicitSecurityScheme.md)
+- [`OpenAPI2OAuth2PasswordSecurityScheme`](OpenAPI2OAuth2PasswordSecurityScheme.md)
+- [`OpenAPI2OAuth2ApplicationSecurityScheme`](OpenAPI2OAuth2ApplicationSecurityScheme.md)
+- [`OpenAPI2OAuth2AccessCodeSecurityScheme`](OpenAPI2OAuth2AccessCodeSecurityScheme.md)
+
 ## Properties
 
 | Property | Type | Description | Overrides | Inherited from |

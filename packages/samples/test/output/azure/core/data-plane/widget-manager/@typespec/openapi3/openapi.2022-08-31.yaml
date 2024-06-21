@@ -216,7 +216,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -237,8 +237,8 @@ paths:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
   /manufacturers/{manufacturerId}/operations/{operationId}:
     get:
-      operationId: Manufacturers_getManufacturerOperationStatus
-      description: Gets status of a Manufacturer operation.
+      operationId: Manufacturers_getManufacturerDeleteOperationStatus
+      description: Gets status of a Manufacturer delete operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: manufacturerId
@@ -269,16 +269,12 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
                       - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
                     description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/Manufacturer'
-                    description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
@@ -394,7 +390,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -609,7 +605,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -759,8 +755,8 @@ paths:
               $ref: '#/components/schemas/WidgetAnalyticsCreateOrUpdate'
   /widgets/{widgetName}/operations/{operationId}:
     get:
-      operationId: Widgets_getWidgetOperationStatus
-      description: Gets status of a Widget operation.
+      operationId: Widgets_getWidgetOperationStatus_Widgets_getWidgetDeleteOperationStatus
+      description: Gets status of a Widget operation. Gets status of a Widget delete operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: widgetName
@@ -781,27 +777,45 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - status
-                properties:
-                  id:
-                    type: string
-                    description: The unique ID of the operation.
-                  status:
-                    allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
-                    description: The status of the operation
-                  error:
-                    allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
-                    description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/Widget'
-                    description: The result of the operation.
-                description: Provides status details for long running operations.
+                anyOf:
+                  - type: object
+                    required:
+                      - id
+                      - status
+                    properties:
+                      id:
+                        type: string
+                        description: The unique ID of the operation.
+                      status:
+                        allOf:
+                          - $ref: '#/components/schemas/OperationState'
+                        description: The status of the operation
+                      error:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                        description: Error object that describes the error when status is "Failed".
+                      result:
+                        allOf:
+                          - $ref: '#/components/schemas/Widget'
+                        description: The result of the operation.
+                    description: Provides status details for long running operations.
+                  - type: object
+                    required:
+                      - id
+                      - status
+                    properties:
+                      id:
+                        type: string
+                        description: The unique ID of the operation.
+                      status:
+                        allOf:
+                          - $ref: '#/components/schemas/OperationState'
+                        description: The status of the operation
+                      error:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                        description: Error object that describes the error when status is "Failed".
+                    description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
           headers:
@@ -1018,7 +1032,7 @@ paths:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
   /widgets/{widgetName}/parts/{widgetPartName}/operations/{operationId}:
     get:
-      operationId: WidgetParts_getWidgetPartOperationStatus
+      operationId: WidgetParts_getWidgetPartReorderOperationStatus
       description: Gets status of a WidgetPart operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
@@ -1056,16 +1070,12 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
                       - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
                     description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/WidgetPart'
-                    description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
@@ -1127,7 +1137,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1205,7 +1215,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                      - $ref: '#/components/schemas/OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1412,15 +1422,6 @@ components:
             - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
           description: Inner error.
       description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
-    Azure.Core.Foundations.OperationState:
-      type: string
-      enum:
-        - NotStarted
-        - Running
-        - Succeeded
-        - Failed
-        - Canceled
-      description: Enum describing allowed operation states.
     Azure.Core.eTag:
       type: string
       format: eTag
@@ -1457,6 +1458,17 @@ components:
           description: The entity tag for this resource.
           readOnly: true
       description: A manufacturer of widgets.
+    OperationState:
+      anyOf:
+        - type: string
+          enum:
+            - NotStarted
+            - Running
+            - Succeeded
+            - Failed
+            - Canceled
+        - type: string
+      description: Enum describing allowed operation states.
     PagedManufacturer:
       type: object
       required:

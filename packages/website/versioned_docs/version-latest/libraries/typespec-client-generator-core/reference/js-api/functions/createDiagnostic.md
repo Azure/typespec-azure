@@ -4,14 +4,14 @@ title: "[F] createDiagnostic"
 
 ---
 ```ts
-createDiagnostic<C, M>(diag): Diagnostic
+function createDiagnostic<C, M>(diag): Diagnostic
 ```
 
 ## Type parameters
 
 | Type parameter |
 | :------ |
-| `C` extends 
+| `C` *extends* 
   \| `"client-name"`
   \| `"client-service"`
   \| `"unknown-client-format"`
@@ -35,13 +35,13 @@ createDiagnostic<C, M>(diag): Diagnostic
   \| `"no-corresponding-method-param"`
   \| `"unsupported-protocol"`
   \| `"no-emitter-name"` |
-| `M` extends `string` \| `number` \| `symbol` |
+| `M` *extends* `string` \| `number` \| `symbol` |
 
 ## Parameters
 
 | Parameter | Type |
 | :------ | :------ |
-| `diag` | `DiagnosticReport`<`Object`, `C`, `M`\> |
+| `diag` | `DiagnosticReport`<`object`, `C`, `M`\> |
 
 ## Returns
 

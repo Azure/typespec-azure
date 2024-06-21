@@ -4,7 +4,7 @@ title: "[F] $applyTraitOverride"
 
 ---
 ```ts
-$applyTraitOverride(
+function $applyTraitOverride(
    context, 
    target, 
    traitModel): void

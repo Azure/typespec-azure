@@ -4,7 +4,7 @@ title: "[F] getSourceTraitName"
 
 ---
 ```ts
-getSourceTraitName(program, property): string | undefined
+function getSourceTraitName(program, property): string | undefined
 ```
 
 Retrieves the `traitName` stored for the given `property`, if any.

@@ -73,20 +73,18 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   `);
     expectDiagnostics(diagnostics, [
       {
-        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message: `The template parameter "Widget" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
+        code: "invalid-argument",
+        message: `Argument of type 'Microsoft.Contoso.Widget' is not assignable to parameter of type 'Azure.ResourceManager.CommonTypes.Resource'`,
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message: `The template parameter "Widget" for "create" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
+        message:
+          'The template parameter "CustomResource" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message: `The template parameter "CustomResource" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message: `The template parameter "CustomResource" for "delete" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.`,
+        message:
+          'The template parameter "CustomResource" for "delete" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
       },
     ]);
   });

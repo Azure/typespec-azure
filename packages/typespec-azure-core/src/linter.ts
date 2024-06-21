@@ -4,7 +4,6 @@ import { authRequiredRule } from "./rules/auth-required.js";
 import { byosRule } from "./rules/byos.js";
 import { casingRule } from "./rules/casing.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
-import { extensibleEnumRule } from "./rules/extensible-enums.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
@@ -12,13 +11,13 @@ import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
-import { noFixedEnumDiscriminatorRule } from "./rules/no-fixed-enum-discriminator.js";
 import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
+import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatUse } from "./rules/prevent-format.js";
@@ -43,14 +42,12 @@ const rules = [
   byosRule,
   casingRule,
   compositionOverInheritanceRule,
-  extensibleEnumRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
   noClosedLiteralUnionRule,
   noEnumRule,
   noErrorStatusCodesRule,
   noExplicitRoutesResourceOps,
-  noFixedEnumDiscriminatorRule,
   nonBreakingVersioningRule,
   noGenericNumericRule,
   noNullableRule,
@@ -72,6 +69,7 @@ const rules = [
   spreadDiscriminatedModelRule,
   useStandardNames,
   useStandardOperations,
+  noStringDiscriminatorRule,
 ];
 
 export const $linter = defineLinter({
@@ -88,11 +86,9 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/${compositionOverInheritanceRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${spreadDiscriminatedModelRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${preferCsvCollectionFormatRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${extensibleEnumRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${knownEncodingRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${useStandardOperations.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noErrorStatusCodesRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noFixedEnumDiscriminatorRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noNullableRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noOffsetDateTimeRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noRpcPathParamsRule.name}`]: true,
@@ -114,6 +110,7 @@ export const $linter = defineLinter({
         [`@azure-tools/typespec-azure-core/${friendlyNameRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: true,
         [`@azure-tools/typespec-azure-core/${noClosedLiteralUnionRule.name}`]: true,
+        [`@azure-tools/typespec-azure-core/${noStringDiscriminatorRule.name}`]: true,
       },
       extends: ["@typespec/http/all"],
     },

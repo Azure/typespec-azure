@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.43.0
+
+### Bug Fixes
+
+- [#904](https://github.com/Azure/typespec-azure/pull/904) don't add constant value to generated name
+- [#873](https://github.com/Azure/typespec-azure/pull/873) add description for created discriminator property
+- [#947](https://github.com/Azure/typespec-azure/pull/947) support new typespec emitter naming rule
+- [#930](https://github.com/Azure/typespec-azure/pull/930) expose enums on response headers
+- [#962](https://github.com/Azure/typespec-azure/pull/962) refine logic of core model filtering
+- [#950](https://github.com/Azure/typespec-azure/pull/950) remove duplicated types in TCGC
+- [#936](https://github.com/Azure/typespec-azure/pull/936) enhance cross language definition id logic
+- [#935](https://github.com/Azure/typespec-azure/pull/935) add read only logic to usage propagation
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+### Breaking Changes
+
+- [#925](https://github.com/Azure/typespec-azure/pull/925) change default of `.access` on a model or enum to `"public"` instead of `undefined`
+- [#870](https://github.com/Azure/typespec-azure/pull/870) return nullable types as a new type called `SdkNullableType`
+
+
+## 0.42.3
+
+### Bug Fixes
+
+- [#834](https://github.com/Azure/typespec-azure/pull/834) map discriminator string value type to enum value type
+- [#826](https://github.com/Azure/typespec-azure/pull/826) change from using logical result to final result
+- [#826](https://github.com/Azure/typespec-azure/pull/826) add union support for templated model naming
+
+
 ## 0.42.2
 
 ### Bug Fixes

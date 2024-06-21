@@ -1,0 +1,544 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Versioning
+
+This doc details what emitters will generate for versioned specs
+
+## Single api Version
+
+If there is just one api version in the spec, we will generate the api surface area for that one version.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01")
+# python allows you to override the api version, even if only one version is defined in the spec
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 1,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api_version will be "2023-11-01"
+
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01);
+ServiceClient client = new ServiceClient(endpoint, options);
+//You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01"
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// there's no apiVersion defined in the all the operations, TypeScript emitter will ignore it.
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2023_11_01
+}
+
+// Client API
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+    // override the api version, even if only one version is defined in the spec
+    .serviceVersion(ServiceServiceVersion.V2023_11_01)
+    // other configurations
+    .buildClient();
+// client's api-version will be 2023-11-01
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+## Multiple api versions
+
+The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate.
+
+We will get the versioning information from the `Versions` enum that you pass to the `@versioned` decorator from the `@typespec/versioning` library.
+
+> NOTE: The ordering of the values in the `Versions` enum is very important. We use this information to determine the order of versions. Our default value will be the **last entry** in the `Versions` list
+
+### Default
+
+By default our emitters will only generate the surface used by the latest api version if there are multiple defined. This includes generating only the models used in the surface area of the latest api version.
+
+Documentation and enums showing the available api versions will still include all of the known api versions, meaning there will be documentation for both the preview and stable releases.
+
+For the below example, all languages will generate the api surface of default version `v2023_11_01`. There will be no generation of the operation `previewFunctionality`, and we will also not generate the `PreviewModel` because it's only used in `previewFunctionality`, and therefore is not used in the api surface of `v2023_11_01`.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+op previewFunctionality(@body previewModel: PreviewModel): void;
+
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+with pytest.expect(ImportError):
+  preview_model = models.PreviewModel(preview_functionality="not present")
+
+with pytest.expect(AttributeError):
+  client.preview_functionality({"previewFunctionality": "not present"})
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1,
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 2,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api-version will be "2023-11-01"
+
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+//neither PreviewModel nor PreviewFunctionality will be generated
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2023_11_01
+}
+
+// Client API
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+    // other configurations
+    .buildClient();
+// client's api-version will be 2023-11-01
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+
+// neither PreviewModel nor previewFunctionality will be generated
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+### Override to a specific version
+
+You can override the signature to return the api surface area for a specific api version.
+
+In this example, we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+op previewFunctionality(@body previewModel: PreviewModel): void;
+
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
+
+```yaml
+---
+options:
+  "@azure-tools/typespec-python":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-csharp":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-ts":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-java":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-go":
+    api-version: "2023-11-01-preview"
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+preview_client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01-preview"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+preview_client.stable_functionality(stable_model) # call goes through
+
+preview_model = models.PreviewModel(preview_functionality="present")
+# the model is generated as part of the api surface
+
+preview_client.preview_functionality(preview_model) # call goes through
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+// ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+// client's api-version will be "2023-11-01-preview"
+
+//call PreviewFunctionality
+PreviewModel previewModel = new PreviewModel("<betaFeature>");
+Response response = client.PreviewFunctionality(previewModel);
+
+//call StableFunctionality
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01_PREVIEW("2023-11-01-preview");
+
+    public static ServiceServiceVersion getLatest() {} // V2023_11_01_PREVIEW
+}
+
+// Client API
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+    // other configurations
+    .buildClient();
+// client's api-version will be 2023-11-01-preview
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+
+PreviewModel previewModel = new PreviewModel("present");
+// call goes through
+serviceClientClient.previewFunctionality(previewModel);
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+### Override to return all
+
+You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+op previewFunctionality(@body previewModel: PreviewModel): void;
+
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+</TabItem>
+
+<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
+
+```yaml
+---
+options:
+  "@azure-tools/typespec-python":
+    api-version: "all"
+  "@azure-tools/typespec-csharp":
+    api-version: "all"
+  "@azure-tools/typespec-ts":
+    api-version: "all"
+  "@azure-tools/typespec-java":
+    api-version: "all"
+  "@azure-tools/typespec-go":
+    api-version: "all"
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+preview_model = models.PreviewModel(preview_functionality="present")
+# the model is generated as part of the api surface
+
+with pytest.expect(ValueError) as ex:
+  client.preview_functionality(preview_model)
+assert "preview_functionality is not available in api version 2023-11-01" in str(ex)
+
+preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01-preview")
+
+preview_client.preview_functionality(preview_model) # call goes through
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1,
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 2,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api_version will be "2023-11-01"
+
+//call PreviewFunctionality
+PreviewModel previewModel = new PreviewModel("<betaFeature>");
+Response response = client.PreviewFunctionality(previewModel);
+
+//call StableFunctionality
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01_Preview);
+ServiceClient client = new ServiceClient(endpoint, options);
+//You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01-preview"
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>

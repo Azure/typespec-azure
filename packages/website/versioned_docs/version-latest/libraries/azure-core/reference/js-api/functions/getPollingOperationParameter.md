@@ -4,7 +4,7 @@ title: "[F] getPollingOperationParameter"
 
 ---
 ```ts
-getPollingOperationParameter(program, entity): string | ModelProperty | undefined
+function getPollingOperationParameter(program, entity): string | ModelProperty | undefined
 ```
 
 ## Parameters

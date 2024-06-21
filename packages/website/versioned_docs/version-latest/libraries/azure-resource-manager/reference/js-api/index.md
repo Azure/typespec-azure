@@ -10,6 +10,7 @@ title: "[P] JS API"
 ## Interfaces
 
 - [ArmCommonTypeVersions](interfaces/ArmCommonTypeVersions.md)
+- [ArmCommonTypesResolutionOptions](interfaces/ArmCommonTypesResolutionOptions.md)
 - [ArmLifecycleOperations](interfaces/ArmLifecycleOperations.md)
 - [ArmResourceDetails](interfaces/ArmResourceDetails.md)
 - [ArmResourceDetailsBase](interfaces/ArmResourceDetailsBase.md)
@@ -24,6 +25,7 @@ title: "[P] JS API"
 
 ## Variables
 
+- [$flags](variables/$flags.md)
 - [$lib](variables/$lib.md)
 - [$linter](variables/$linter.md)
 - [namespace](variables/namespace.md)
@@ -52,6 +54,7 @@ title: "[P] JS API"
 - [$subscriptionResource](functions/$subscriptionResource.md)
 - [$tenantResource](functions/$tenantResource.md)
 - [$useLibraryNamespace](functions/$useLibraryNamespace.md)
+- [getArmCommonTypeOpenAPIRef](functions/getArmCommonTypeOpenAPIRef.md)
 - [getArmCommonTypesVersion](functions/getArmCommonTypesVersion.md)
 - [getArmCommonTypesVersions](functions/getArmCommonTypesVersions.md)
 - [getArmProviderNamespace](functions/getArmProviderNamespace.md)

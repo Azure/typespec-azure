@@ -1,6 +1,9 @@
 import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
+  Enum,
+  EnumMember,
+  EnumValue,
   Model,
   ModelProperty,
   Namespace,
@@ -12,9 +15,34 @@ import {
 import * as http from "@typespec/http";
 import { getAuthentication, setAuthentication, setRouteOptionsForNamespace } from "@typespec/http";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
+import { $armCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
+
+function getArmCommonTypesVersion(
+  context: DecoratorContext,
+  entity: Namespace | EnumMember
+): EnumValue | undefined {
+  return entity.decorators.find((x) => x.definition?.name === "@armCommonTypesVersion")?.args[0]
+    .jsValue as EnumValue | undefined;
+}
+
+function setArmCommonTypesVersionIfDoesnotExist(
+  context: DecoratorContext,
+  entity: Namespace | EnumMember,
+  commonTypeVersion: string
+) {
+  // Determine whether to set a default ARM CommonTypes.Version
+  const armCommonTypesVersion = entity.decorators.find(
+    (x) => x.definition?.name === "@armCommonTypesVersion"
+  );
+  // if no existing @armCommonTypesVersion decorator, add default.
+  // This will NOT cause error if overrode on version enum.
+  if (!armCommonTypesVersion) {
+    context.call($armCommonTypesVersion, entity, commonTypeVersion);
+  }
+}
 
 /**
  * Mark the target namespace as containign only ARM library types.  This is used to create libraries to share among RPs
@@ -29,6 +57,8 @@ export function $armLibraryNamespace(context: DecoratorContext, entity: Namespac
   __unsupported_enable_checkStandardOperations(false);
 
   program.stateMap(ArmStateKeys.armLibraryNamespaces).set(entity, true);
+
+  setArmCommonTypesVersionIfDoesnotExist(context, entity, "v3");
 }
 
 /**
@@ -125,6 +155,27 @@ export function $armProviderNamespace(
         "https://management.azure.com",
         "Azure Resource Manager url."
       );
+    }
+  }
+
+  const armCommonTypesVersion = getArmCommonTypesVersion(context, entity);
+
+  // If it is versioned namespace, we will check each Version enum member. If no
+  // @armCommonTypeVersion decorator, add the one
+  const versioned = entity.decorators.find((x) => x.definition?.name === "@versioned");
+  if (versioned) {
+    const versionEnum = versioned.args[0].value as Enum;
+    versionEnum.members.forEach((v) => {
+      if (!getArmCommonTypesVersion(context, v)) {
+        context.call($armCommonTypesVersion, v, armCommonTypesVersion ?? "v3");
+      }
+    });
+  } else {
+    // if it is unversioned namespace, set @armCommonTypesVersion and
+    // no existing @armCommonTypesVersion decorator, add default.
+    // This will NOT cause error if overrode on version enum.
+    if (!armCommonTypesVersion) {
+      context.call($armCommonTypesVersion, entity, "v3");
     }
   }
 

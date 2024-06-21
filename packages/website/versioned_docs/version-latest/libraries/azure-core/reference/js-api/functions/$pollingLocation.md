@@ -4,7 +4,7 @@ title: "[F] $pollingLocation"
 
 ---
 ```ts
-$pollingLocation(
+function $pollingLocation(
    context, 
    entity, 
    options?): void

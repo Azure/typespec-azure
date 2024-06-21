@@ -4,7 +4,7 @@ title: "[F] $armLibraryNamespace"
 
 ---
 ```ts
-$armLibraryNamespace(context, entity): void
+function $armLibraryNamespace(context, entity): void
 ```
 
 Mark the target namespace as containign only ARM library types.  This is used to create libraries to share among RPs

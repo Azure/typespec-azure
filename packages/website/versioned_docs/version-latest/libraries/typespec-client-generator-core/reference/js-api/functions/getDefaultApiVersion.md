@@ -4,7 +4,7 @@ title: "[F] getDefaultApiVersion"
 
 ---
 ```ts
-getDefaultApiVersion(context, serviceNamespace): Version | undefined
+function getDefaultApiVersion(context, serviceNamespace): Version | undefined
 ```
 
 Return the default api version for a versioned service. Will return undefined if one does not exist

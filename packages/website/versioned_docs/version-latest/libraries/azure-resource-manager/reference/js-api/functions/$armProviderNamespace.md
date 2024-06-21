@@ -4,7 +4,7 @@ title: "[F] $armProviderNamespace"
 
 ---
 ```ts
-$armProviderNamespace(
+function $armProviderNamespace(
    context, 
    entity, 
    armProviderNamespace?): void

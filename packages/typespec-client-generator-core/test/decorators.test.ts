@@ -21,7 +21,13 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkMethodResponse, SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperation,
+  SdkMethodResponse,
+  SdkOperationGroup,
+  UsageFlags,
+} from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -279,7 +285,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @test op one(): void;
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.one");
     });
 
     it("crossLanguageDefinitionId with interface", async () => {
@@ -293,7 +299,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.Widgets.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
     });
 
     it("crossLanguageDefinitionId with subnamespace", async () => {
@@ -307,7 +313,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.Widgets.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
     });
 
     it("crossLanguageDefinitionId with subnamespace and interface", async () => {
@@ -323,7 +329,10 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+      strictEqual(
+        getCrossLanguageDefinitionId(runner.context, one),
+        "MyClient.SubNamespace.Widgets.one"
+      );
     });
 
     it("crossLanguagePackageId", async () => {
@@ -1433,17 +1442,22 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("emitter different scope from decorator", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @access(Access.internal, "csharp")
-        op func(
-          @query("createdAt")
-          createdAt: utcDateTime;
-        ): void;
-      `)) as { func: Operation };
+      const code = `
+      @test
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+    `;
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "public");
 
-      const actual = getAccess(runner.context, func);
-      strictEqual(actual, undefined);
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
     });
 
     it("emitter first in decorator scope list", async () => {
@@ -1479,18 +1493,23 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("emitter excluded from decorator scope list", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @access(Access.internal, "java")
-        @access(Access.internal, "csharp")
-        op func(
-          @query("createdAt")
-          createdAt: utcDateTime;
-        ): void;
-      `)) as { func: Operation };
+      const code = `
+      @test
+      @access(Access.internal, "java")
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+    `;
+      const { func } = (await runner.compile(code)) as { func: Operation };
 
-      const actual = getAccess(runner.context, func);
-      strictEqual(actual, undefined);
+      strictEqual(getAccess(runner.context, func), "public");
+      const runnerWithJava = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const { func: funcJava } = (await runnerWithJava.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithJava.context, funcJava), "internal");
     });
 
     it("duplicate-decorator diagnostic for first non-scoped decorator then scoped decorator", async () => {
@@ -1524,10 +1543,87 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "duplicate-decorator",
       });
     });
+
     it("duplicate-decorator diagnostic for multiple same scope", async () => {
       const diagnostics = await runner.diagnose(`
       @test
       @access(Access.internal, "csharp")
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "duplicate-decorator",
+      });
+    });
+
+    it("csv scope list", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          @access(Access.internal, "${language}")
+          model Test {
+            prop: string;
+          }
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("csv scope list augment", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          model Test {
+            prop: string;
+          }
+
+          @@access(Test, Access.public, "java, ts");
+          @@access(Test, Access.internal, "${language}");
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("duplicate-decorator diagnostic for csv scope list", async () => {
+      const diagnostics = await runner.diagnose(`
+      @test
+      @access(Access.internal, "csharp,ts")
       @access(Access.internal, "csharp")
       op func(
         @query("createdAt")
@@ -1563,10 +1659,8 @@ describe("typespec-client-generator-core: decorators", () => {
         op test(): void;
       `)) as { test: Operation; Test: Model };
 
-      let actual = getAccess(runner.context, test);
-      strictEqual(actual, undefined);
-      actual = getAccess(runner.context, Test);
-      strictEqual(actual, undefined);
+      strictEqual(getAccess(runner.context, test), "public");
+      strictEqual(getAccess(runner.context, Test), "public");
     });
 
     it("model access calculated by operation", async () => {
@@ -1630,10 +1724,8 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `)) as { Test: Model; func: Operation };
 
-      let actual = getAccess(runner.context, Test);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, func);
-      strictEqual(actual, undefined);
+      strictEqual(getAccess(runner.context, Test), "internal");
+      strictEqual(getAccess(runner.context, func), "public");
     });
 
     it("access propagation", async () => {
@@ -1762,29 +1854,18 @@ describe("typespec-client-generator-core: decorators", () => {
           func5: Operation;
         };
 
-      const func1Actual = getAccess(runner.context, func1);
-      strictEqual(func1Actual, "internal");
-      const func2Actual = getAccess(runner.context, func2);
-      strictEqual(func2Actual, "internal");
-      const func3Actual = getAccess(runner.context, func3);
-      strictEqual(func3Actual, undefined);
-      const func4Actual = getAccess(runner.context, func4);
-      strictEqual(func4Actual, "internal");
-      const func5Actual = getAccess(runner.context, func5);
-      strictEqual(func5Actual, undefined);
+      strictEqual(getAccess(runner.context, func1), "internal");
+      strictEqual(getAccess(runner.context, func2), "internal");
+      strictEqual(getAccess(runner.context, func3), "public");
+      strictEqual(getAccess(runner.context, func4), "internal");
+      strictEqual(getAccess(runner.context, func5), "public");
 
-      const test1Actual = getAccess(runner.context, Test1);
-      strictEqual(test1Actual, "internal");
-      const test2Actual = getAccess(runner.context, Test2);
-      strictEqual(test2Actual, "internal");
-      const test3Actual = getAccess(runner.context, Test3);
-      strictEqual(test3Actual, undefined);
-      const test4Actual = getAccess(runner.context, Test4);
-      strictEqual(test4Actual, "internal");
-      const test5Actual = getAccess(runner.context, Test5);
-      strictEqual(test5Actual, "internal");
-      const test6Actual = getAccess(runner.context, Test6);
-      strictEqual(test6Actual, undefined);
+      strictEqual(getAccess(runner.context, Test1), "internal");
+      strictEqual(getAccess(runner.context, Test2), "internal");
+      strictEqual(getAccess(runner.context, Test3), "public");
+      strictEqual(getAccess(runner.context, Test4), "internal");
+      strictEqual(getAccess(runner.context, Test5), "internal");
+      strictEqual(getAccess(runner.context, Test6), "public");
     });
 
     it("access propagation for properties, base models and sub models", async () => {
@@ -1915,21 +1996,21 @@ describe("typespec-client-generator-core: decorators", () => {
       };
 
       strictEqual(getAccess(runner.context, func1), "internal");
-      strictEqual(getAccess(runner.context, func2), undefined);
+      strictEqual(getAccess(runner.context, func2), "public");
       strictEqual(getAccess(runner.context, func3), "internal");
-      strictEqual(getAccess(runner.context, func4), undefined);
+      strictEqual(getAccess(runner.context, func4), "public");
 
-      strictEqual(getAccess(runner.context, Fish), undefined);
-      strictEqual(getAccess(runner.context, Salmon), undefined);
-      strictEqual(getAccess(runner.context, Origin), undefined);
-      strictEqual(getAccess(runner.context, BaseModel), undefined);
-      strictEqual(getAccess(runner.context, ModelA), undefined);
-      strictEqual(getAccess(runner.context, ModelB), undefined);
-      strictEqual(getAccess(runner.context, ModelC), undefined);
-      strictEqual(getAccess(runner.context, ModelD), undefined);
-      strictEqual(getAccess(runner.context, ModelE), undefined);
-      strictEqual(getAccess(runner.context, ModelF), undefined);
-      strictEqual(getAccess(runner.context, EnumA), undefined);
+      strictEqual(getAccess(runner.context, Fish), "public");
+      strictEqual(getAccess(runner.context, Salmon), "public");
+      strictEqual(getAccess(runner.context, Origin), "public");
+      strictEqual(getAccess(runner.context, BaseModel), "public");
+      strictEqual(getAccess(runner.context, ModelA), "public");
+      strictEqual(getAccess(runner.context, ModelB), "public");
+      strictEqual(getAccess(runner.context, ModelC), "public");
+      strictEqual(getAccess(runner.context, ModelD), "public");
+      strictEqual(getAccess(runner.context, ModelE), "public");
+      strictEqual(getAccess(runner.context, ModelF), "public");
+      strictEqual(getAccess(runner.context, EnumA), "public");
 
       strictEqual(runner.context.operationModelsMap?.get(func1)?.size, 3);
       strictEqual(runner.context.operationModelsMap?.get(func2)?.size, 3);
@@ -2037,33 +2118,20 @@ describe("typespec-client-generator-core: decorators", () => {
         func8: Operation;
       };
 
-      const func1Actual = getAccess(runner.context, func1);
-      strictEqual(func1Actual, "internal");
-      const func2Actual = getAccess(runner.context, func2);
-      strictEqual(func2Actual, undefined);
-      const func3Actual = getAccess(runner.context, func3);
-      strictEqual(func3Actual, "public");
-      const func4Actual = getAccess(runner.context, func4);
-      strictEqual(func4Actual, "internal");
-      const func5Actual = getAccess(runner.context, func5);
-      strictEqual(func5Actual, undefined);
-      const func6Actual = getAccess(runner.context, func6);
-      strictEqual(func6Actual, "internal");
-      const func7Actual = getAccess(runner.context, func7);
-      strictEqual(func7Actual, undefined);
-      const func8Actual = getAccess(runner.context, func8);
-      strictEqual(func8Actual, "public");
+      strictEqual(getAccess(runner.context, func1), "internal");
+      strictEqual(getAccess(runner.context, func2), "public");
+      strictEqual(getAccess(runner.context, func3), "public");
+      strictEqual(getAccess(runner.context, func4), "internal");
+      strictEqual(getAccess(runner.context, func5), "public");
+      strictEqual(getAccess(runner.context, func6), "internal");
+      strictEqual(getAccess(runner.context, func7), "public");
+      strictEqual(getAccess(runner.context, func8), "public");
 
-      const test1Actual = getAccess(runner.context, Test1);
-      strictEqual(test1Actual, "internal");
-      const test2Actual = getAccess(runner.context, Test2);
-      strictEqual(test2Actual, undefined);
-      const test3Actual = getAccess(runner.context, Test3);
-      strictEqual(test3Actual, "public");
-      const test4Actual = getAccess(runner.context, Test4);
-      strictEqual(test4Actual, undefined);
-      const test5Actual = getAccess(runner.context, Test5);
-      strictEqual(test5Actual, "public");
+      strictEqual(getAccess(runner.context, Test1), "internal");
+      strictEqual(getAccess(runner.context, Test2), "public");
+      strictEqual(getAccess(runner.context, Test3), "public");
+      strictEqual(getAccess(runner.context, Test4), "public");
+      strictEqual(getAccess(runner.context, Test5), "public");
     });
 
     it("access propagation with nullable", async () => {
@@ -2098,8 +2166,8 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 2);
-      strictEqual(models[0].access, undefined);
-      strictEqual(models[1].access, undefined);
+      strictEqual(models[0].access, "public");
+      strictEqual(models[1].access, "public");
     });
   });
 
@@ -3299,7 +3367,7 @@ describe("typespec-client-generator-core: decorators", () => {
         `
       );
       const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      strictEqual(sdkPackage.clients.length, 1);
       const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
       ok(versioningClient);
       strictEqual(versioningClient.methods.length, 2);
@@ -3321,7 +3389,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clientAccessor.name, "getInterfaceV2");
       deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
 
-      const interfaceV2 = sdkPackage.clients.find((x) => x.name === "InterfaceV2");
+      const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(interfaceV2);
       strictEqual(interfaceV2.methods.length, 1);
 

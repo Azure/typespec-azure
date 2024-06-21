@@ -4,7 +4,7 @@ title: "[F] getSdkUnionWithDiagnostics"
 
 ---
 ```ts
-getSdkUnionWithDiagnostics(
+function getSdkUnionWithDiagnostics(
    context, 
    type, 
    operation?): [SdkType, readonly Diagnostic[]]

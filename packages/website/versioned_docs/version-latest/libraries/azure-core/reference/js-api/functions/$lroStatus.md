@@ -4,7 +4,7 @@ title: "[F] $lroStatus"
 
 ---
 ```ts
-$lroStatus(context, entity): void
+function $lroStatus(context, entity): void
 ```
 
 ## Parameters
@@ -12,7 +12,7 @@ $lroStatus(context, entity): void
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `DecoratorContext` |
-| `entity` | `ModelProperty` \| `Enum` \| `Union` |
+| `entity` | `Enum` \| `ModelProperty` \| `Union` |
 
 ## Returns
 

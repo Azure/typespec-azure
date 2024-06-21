@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   Diagnostic,
@@ -17,7 +16,6 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
-  ignoreDiagnostics,
   isNeverType,
   isNullType,
   isVoidType,
@@ -26,13 +24,13 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
+  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
   SdkParameter,
-  SdkServiceOperation,
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
@@ -64,7 +62,7 @@ export function parseEmitterName(
     );
     return diagnostics.wrap("none");
   }
-  const regex = /(?:cadl|typespec)-([^\\/]*)/;
+  const regex = /(?:cadl|typespec|client|server)-([^\\/-]*)/;
   const match = emitterName.match(regex);
   if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
@@ -242,13 +240,12 @@ export function getHashForType(type: SdkType): string {
 
 interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
-  nullable: boolean;
   deprecation?: string;
   kind: TKind;
 }
 
 /**
- * Helper function to return default values for nullable, encode etc
+ * Helper function to return default values for encode etc
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
@@ -258,7 +255,6 @@ export function getSdkTypeBaseHelper<TKind>(
 ): DefaultSdkTypeBase<TKind> {
   return {
     __raw: type,
-    nullable: false,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
   };
@@ -269,13 +265,13 @@ export function intOrFloat(value: number): "int32" | "float32" {
 }
 
 /**
- * Whether a model is an Azure.Core model or not
+ * Whether a model or enum or union as enum is in Azure.Core[.Foundations] namespace
  * @param t
  * @returns
  */
 export function isAzureCoreModel(t: Type): boolean {
   return (
-    t.kind === "Model" &&
+    (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&
     ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
   );
@@ -347,7 +343,11 @@ export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(
+export function getNullOption(type: Union): Type | undefined {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
+}
+
+export function getAllResponseBodiesAndNonBodyExists(
   responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
 ): {
   allResponseBodies: SdkType[];
@@ -357,7 +357,7 @@ function getAllResponseBodiesAndNonBodyExists(
   let nonBodyExists = false;
   for (const response of responses.values()) {
     if (response.type) {
-      if (response.nullable) {
+      if (response.type.kind === "nullable") {
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);
@@ -375,28 +375,17 @@ export function getAllResponseBodies(
 }
 
 /**
- * Determines if a type is nullable.
- * @param type
- * @returns
- */
-export function isNullable(type: Type | SdkServiceOperation): boolean {
-  if (type.kind === "Union") {
-    if (getNonNullOptions(type).length < type.variants.size) return true;
-    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
-  }
-  if (type.kind === "http") {
-    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
-  }
-  return false;
-}
-/**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
  * Otherwise, you should use the `getGeneratedName` function.
  * @param context
  */
-export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
-  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
+export function createGeneratedName(
+  context: TCGCContext,
+  type: Namespace | Operation,
+  suffix: string
+): string {
+  return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
 function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
@@ -435,4 +424,11 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
 
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
+}
+
+export function getAnyType(): SdkBuiltInType {
+  return {
+    kind: "any",
+    encode: "string",
+  };
 }

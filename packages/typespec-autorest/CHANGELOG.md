@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.43.0
+
+### Bug Fixes
+
+- [#923](https://github.com/Azure/typespec-azure/pull/923) When emitting version enum only include current version and mark with `modelAsString: true`
+- [#902](https://github.com/Azure/typespec-azure/pull/902) Add support for new multipart constructs in http library
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for tuple literals as default values
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+### Features
+
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Use emit-lro--options emitter option to control emission of x-ms-long-running-operation-options
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Add support for displaying lro options in typespec-autorest based on lro metadata
+- [#972](https://github.com/Azure/typespec-azure/pull/972) Add API to programmatically get all the OpenAPI2 documents for all services at all versions in a spec
+- [#811](https://github.com/Azure/typespec-azure/pull/811) Add dependency on typespec-azure-resource-manager to resolve the spec repo common types paths
+- [#813](https://github.com/Azure/typespec-azure/pull/813) `@summary` sets the title of definitions
+
+### Breaking Changes
+
+- [#473](https://github.com/Azure/typespec-azure/pull/473) Enums are not extensible by default anymore. Update to an extensible union `union Foo {a: "a", b: "b", string}`
+
+
+## 0.42.1
+
+### Bug Fixes
+
+- [#839](https://github.com/Azure/typespec-azure/pull/839) Do not omit unreferenced non version enum when `omit-unreachable-types` is not set to true
+
+
 ## 0.42.0
 
 ### Bug Fixes

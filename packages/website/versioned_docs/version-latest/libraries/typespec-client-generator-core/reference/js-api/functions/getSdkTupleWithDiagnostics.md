@@ -4,7 +4,7 @@ title: "[F] getSdkTupleWithDiagnostics"
 
 ---
 ```ts
-getSdkTupleWithDiagnostics(
+function getSdkTupleWithDiagnostics(
    context, 
    type, 
    operation?): [SdkTupleType, readonly Diagnostic[]]

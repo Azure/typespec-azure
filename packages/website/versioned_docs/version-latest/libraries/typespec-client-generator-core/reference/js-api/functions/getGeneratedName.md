@@ -4,7 +4,7 @@ title: "[F] getGeneratedName"
 
 ---
 ```ts
-getGeneratedName(
+function getGeneratedName(
    context, 
    type, 
    operation?): string
@@ -17,7 +17,7 @@ Create a name for anonymous model
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
 | `context` | `TCGCContext` |  |
-| `type` | `Model` \| `Union` |  |
+| `type` | `Model` \| `Union` \| `TspLiteralType` |  |
 | `operation`? | `Operation` | - |
 
 ## Returns

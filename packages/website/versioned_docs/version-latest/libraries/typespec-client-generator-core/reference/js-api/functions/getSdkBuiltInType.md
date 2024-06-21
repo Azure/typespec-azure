@@ -4,7 +4,7 @@ title: "[F] getSdkBuiltInType"
 
 ---
 ```ts
-getSdkBuiltInType(context, type): SdkBuiltInType
+function getSdkBuiltInType(context, type): SdkBuiltInType
 ```
 
 ## Parameters
@@ -12,7 +12,7 @@ getSdkBuiltInType(context, type): SdkBuiltInType
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `TCGCContext` |
-| `type` |  \| `Scalar` \| `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` \| `IntrinsicType` |
+| `type` |  \| `BooleanLiteral` \| `IntrinsicType` \| `NumericLiteral` \| `Scalar` \| `StringLiteral` |
 
 ## Returns
 

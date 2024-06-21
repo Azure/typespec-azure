@@ -4,7 +4,7 @@ title: "[F] getBrowse"
 
 ---
 ```ts
-getBrowse(program, target): any
+function getBrowse(program, target): any
 ```
 
 ## Parameters

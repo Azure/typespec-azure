@@ -4,7 +4,7 @@ title: "[F] getAllModelsWithDiagnostics"
 
 ---
 ```ts
-getAllModelsWithDiagnostics(context, options): [(SdkModelType | SdkEnumType)[], readonly Diagnostic[]]
+function getAllModelsWithDiagnostics(context, options): [(SdkModelType | SdkEnumType)[], readonly Diagnostic[]]
 ```
 
 ## Parameters

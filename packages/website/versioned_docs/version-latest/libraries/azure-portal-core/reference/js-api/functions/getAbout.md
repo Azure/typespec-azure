@@ -4,7 +4,7 @@ title: "[F] getAbout"
 
 ---
 ```ts
-getAbout(program, target): any
+function getAbout(program, target): any
 ```
 
 ## Parameters

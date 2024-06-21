@@ -1,5 +1,32 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.43.0
+
+### Bug Fixes
+
+- [#998](https://github.com/Azure/typespec-azure/pull/998) Adding legacy v4 ManagedServiceIdentity model to avoid breaking changes in specs with mixed v3 and v4 common type reference
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Remove OpenAPI dependencies from ARM LRO templates and test LRO overrides
+- [#929](https://github.com/Azure/typespec-azure/pull/929) Adding an overload parameter to ResourceNameParameter that allows `name` type to be set to string union type.
+- [#860](https://github.com/Azure/typespec-azure/pull/860) Fix `percentComplete` property on `OperationStatus` should be a float not an int
+- [#979](https://github.com/Azure/typespec-azure/pull/979) Make Resource Properties Bag Updatable
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+### Features
+
+- [#811](https://github.com/Azure/typespec-azure/pull/811) Remove dependency on `typespec-autorest` emitter
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
+
+
+## 0.42.1
+
+### Bug Fixes
+
+- [#868](https://github.com/Azure/typespec-azure/pull/868) Changing back `ManagedServiceIdentity.userAssignedIdentities` back to `Record<UserAssignedIdentity`. Adding ARM common-type references for on all Managed Identity models.
+
+
 ## 0.42.0
 
 ### Bug Fixes

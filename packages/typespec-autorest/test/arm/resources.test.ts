@@ -205,3 +205,105 @@ it("emits correct paths for ArmResourceHead operation", async () => {
     },
   });
 });
+
+it("emits correct fixed union name parameter for resource", async () => {
+  const openApi = await openApiFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is ProxyResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget, Type=WidgetNameType>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+       size: int32;
+    }
+
+    /** different type of widget used on resource path */
+    union WidgetNameType {
+      string,
+      /** small widget */
+      Small: "Small",
+      /** large widget */        
+      Large: "Large"
+    }
+
+    interface Widgets extends Operations {
+      get is ArmResourceRead<Widget>;
+    }
+`);
+  const getOperation =
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
+    ].get;
+  ok(getOperation);
+  deepEqual(getOperation.parameters[3], {
+    description: "The name of the Widget",
+    enum: ["Small", "Large"],
+    "x-ms-enum": {
+      modelAsString: true,
+      name: "WidgetNameType",
+      values: [
+        {
+          name: "Small",
+          value: "Small",
+          description: "small widget",
+        },
+        {
+          name: "Large",
+          value: "Large",
+          description: "large widget",
+        },
+      ],
+    },
+    in: "path",
+    name: "widgetName",
+    required: true,
+    type: "string",
+  });
+});
+
+it("emits a scalar string with decorator parameter for resource", async () => {
+  const openApi = await openApiFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is ProxyResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget, Type=WidgetNameType>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+       size: int32;
+    }
+
+    @minLength(1)
+    @maxLength(10)
+    @pattern("xxxxxx")
+    scalar WidgetNameType extends string;
+
+    interface Widgets extends Operations {
+      get is ArmResourceRead<Widget>;
+    }
+`);
+  const getOperation =
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
+    ].get;
+  ok(getOperation);
+  deepEqual(getOperation.parameters[3], {
+    description: "The name of the Widget",
+    in: "path",
+    maxLength: 10,
+    minLength: 1,
+    name: "widgetName",
+    pattern: "^[a-zA-Z0-9-]{3,24}$",
+    required: true,
+    type: "string",
+  });
+});

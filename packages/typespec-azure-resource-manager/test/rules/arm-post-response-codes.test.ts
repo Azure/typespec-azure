@@ -53,6 +53,41 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     });
 });
 
+it("Emits a warning for a synchronous post operation that does not contain the appropriate response codes and use multipart/mixed", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+      
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+      
+      @armResourceOperations
+      interface Employees {
+        @post
+        @armResourceAction(Employee)
+        hire(...ApiVersionParameter): {
+          @statusCode _: 203;
+          @header contentType: "multipart/mixed";
+          @multipartBody result: [HttpPart<string>]
+        } | ErrorResponse;
+      }
+      `
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+      message:
+        "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
+    });
+});
+
 it("Does not emit a warning for a synchronous post operation that contains the 200 and default response codes", async () => {
   await tester
     .expect(

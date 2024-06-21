@@ -11,6 +11,7 @@ type SdkType:
   | SdkArrayType
   | SdkTupleType
   | SdkDictionaryType
+  | SdkNullableType
   | SdkEnumType
   | SdkEnumValueType
   | SdkConstantType

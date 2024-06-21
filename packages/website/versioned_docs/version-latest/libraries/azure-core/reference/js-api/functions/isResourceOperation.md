@@ -4,7 +4,7 @@ title: "[F] isResourceOperation"
 
 ---
 ```ts
-isResourceOperation(program, operation): boolean
+function isResourceOperation(program, operation): boolean
 ```
 
 ## Parameters
