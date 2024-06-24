@@ -150,7 +150,7 @@ export const $lib = createTypeSpecLibrary({
     "empty-client-name": {
       severity: "warning",
       messages: {
-        default: `You cannot pass an empty value to the @clientName decorator`,
+        default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
   },
