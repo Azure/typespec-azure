@@ -423,7 +423,7 @@ function getSdkHttpResponseAndExceptions(
       kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
-      contentTypes,
+      contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
