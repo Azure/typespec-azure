@@ -86,7 +86,7 @@ interface SdkTypeBase {
 
 export type SdkType =
   | SdkBuiltInType
-  | SdkDatetimeType
+  | SdkDateTimeType
   | SdkDurationType
   | SdkArrayType
   | SdkTupleType
@@ -197,26 +197,26 @@ export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKinds
   return kind in SdkFloatKindsEnum;
 }
 
-const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
+const SdkDateTimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
-export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
-  return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
+export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
+  return SdkDateTimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-interface SdkDatetimeTypeBase extends SdkTypeBase {
+interface SdkDateTimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
 
-interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+interface SdkUtcDateTimeType extends SdkDateTimeTypeBase {
   kind: "utcDateTime";
 }
 
-interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
   kind: "offsetDateTime";
 }
 
-export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
+export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
