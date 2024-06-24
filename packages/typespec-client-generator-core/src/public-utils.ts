@@ -614,21 +614,6 @@ function buildNameFromContextPaths(
   return createName;
 }
 
-/**
- *
- * @deprecated This function is deprecated. You should use isErrorModel from the standard TypeSpec library
- */
-export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
-  const errorDecorator = isErrorModel(context.program, model);
-  if (errorDecorator) return true;
-  let baseModel = model.baseModel;
-  while (baseModel) {
-    if (isErrorModel(context.program, baseModel)) return true;
-    baseModel = baseModel.baseModel;
-  }
-  return false;
-}
-
 export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation
