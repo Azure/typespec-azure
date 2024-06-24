@@ -1285,6 +1285,9 @@ function updateTypesFromOperation(
         );
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
+          if (sdkType.kind === "model" && isErrorModel(context.program, innerResponse.body.type)) {
+            updateUsageOfModel(context, UsageFlags.Error, sdkType);
+          }
         }
       }
       if (innerResponse.headers) {

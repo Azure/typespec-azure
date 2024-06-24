@@ -1,9 +1,9 @@
 /* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { UsageFlags, isErrorModel } from "@typespec/compiler";
+import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkBodyModelPropertyType } from "../../src/interfaces.js";
+import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -919,6 +919,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 4);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    ok(!(models[0].usage & UsageFlags.Error));
   });
 
   it("usage propagation from subtype", async () => {
@@ -1383,10 +1384,14 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 1);
     strictEqual(models[0].kind, "model");
     strictEqual(models[0].isError, true);
-    const rawModel = models[0].__raw;
+
+    const model = models[0];
+    const rawModel = model.__raw;
     ok(rawModel);
     strictEqual(rawModel.kind, "Model");
     strictEqual(isErrorModel(runner.context.program, rawModel), true);
+    ok(model.usage & UsageFlags.Output);
+    ok(model.usage & UsageFlags.Error);
   });
 
   it("error model inheritance", async () => {
