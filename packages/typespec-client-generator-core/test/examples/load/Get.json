@@ -1,6 +1,6 @@
 {
-  "operationId": "Get",
-  "title": "No version test",
+  "operationId": "get",
+  "title": "get",
   "parameters": {},
   "responses": {
     "200": {

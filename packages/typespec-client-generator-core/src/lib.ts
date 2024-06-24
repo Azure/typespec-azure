@@ -164,7 +164,7 @@ export const $lib = createTypeSpecLibrary({
     "example-value-no-mapping": {
       severity: "warning",
       messages: {
-        default: paramMessage`Could not map example file ${"relativePath"} value to definition type:\n${"value"}`,
+        default: paramMessage`Value in example file '${"relativePath"}' does not follow its definition:\n${"value"}`,
       },
     },
   },

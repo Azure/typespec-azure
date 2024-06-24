@@ -583,6 +583,7 @@ export type SdkExampleBase = {
   name: string;
   description: string;
   filePath: string;
+  rawExample: any;
 };
 
 export interface SdkHttpOperationExample extends SdkExampleBase {
