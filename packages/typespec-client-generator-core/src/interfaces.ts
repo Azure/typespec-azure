@@ -79,6 +79,11 @@ export interface SdkOperationGroup {
 }
 
 interface DecoratedType {
+  // Client types sourced from TypeSpec decorated types will have this generic decoratores dict.
+  // The key is the fully qulified name of the decorator. For example, `TypeSpec.@encode`, `TypeSpec.Xml.@attribute`.
+  // The value is a dict of the decorator's arguments' value (key is argument's name).
+  // Only decorators in allowed list will be included in this dict.
+  // Language's emitter could set `additionalDecorators` in the option when `createSdkContext` to extend the allowed list.
   decorators: Record<string, Record<string, any>>;
 }
 

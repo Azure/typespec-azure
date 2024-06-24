@@ -29,7 +29,7 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
-import { defaultDecoratorsWhiteList } from "./configs.js";
+import { defaultDecoratorsWhiteList as defaultDecoratorsAllowList } from "./configs.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -610,7 +610,7 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
-    decoratorsWhiteList: [...defaultDecoratorsWhiteList, ...(options?.additionalDecorators ?? [])],
+    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {

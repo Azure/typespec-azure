@@ -282,8 +282,8 @@ export function getTypeDecorators(
         const decoratorName = `${getNamespacePrefix(decorator.definition?.namespace)}${decorator.definition?.name}`;
         // white list filtering
         if (
-          !context.decoratorsWhiteList ||
-          !context.decoratorsWhiteList.some((x) => new RegExp(x).test(decoratorName))
+          !context.decoratorsAllowList ||
+          !context.decoratorsAllowList.some((x) => new RegExp(x).test(decoratorName))
         ) {
           continue;
         }
@@ -399,7 +399,7 @@ export interface TCGCContext {
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   originalProgram: Program;
-  decoratorsWhiteList?: string[];
+  decoratorsAllowList?: string[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -471,8 +471,8 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
     : undefined;
   return Boolean(
     httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+    httpBody.type.kind === "Model" &&
+    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 
