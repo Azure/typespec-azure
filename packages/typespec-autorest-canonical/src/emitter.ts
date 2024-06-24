@@ -66,7 +66,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
-    useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
+    useReadOnlyStatusSchema: true,
   };
 
   await emitAllServices(context.program, tcgcSdkContext, options);

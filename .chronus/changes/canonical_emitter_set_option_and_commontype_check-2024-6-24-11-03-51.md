@@ -5,5 +5,5 @@ packages:
   - "@azure-tools/typespec-autorest-canonical"
 ---
 
-add option "use-read-only-status-schema" to fix ProvisioningStateMustBeReadOnly bug; 
+set option "use-read-only-status-schema" to true to fix ProvisioningStateMustBeReadOnly bug; 
 add isArmCommonType check to avoid decorator validation in canonical emitter

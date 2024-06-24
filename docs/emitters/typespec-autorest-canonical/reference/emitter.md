@@ -72,9 +72,3 @@ Omit unreachable types. By default all types declared under the service namespac
 
 If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
 This extension is meant for debugging and should not be depended on.
-
-### `use-read-only-status-schema`
-
-**Type:** `boolean`
-
-Create read-only property schema for lro status
