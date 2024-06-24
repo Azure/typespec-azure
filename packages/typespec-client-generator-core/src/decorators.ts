@@ -977,7 +977,13 @@ export function $clientName(
       }
     }
   }
-
+  if (value.trim() === "") {
+    reportDiagnostic(context.program, {
+      code: "empty-client-name",
+      format: {},
+      target: entity,
+    });
+  }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 
