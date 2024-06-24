@@ -15,7 +15,6 @@ import {
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
-  isErrorModel,
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
