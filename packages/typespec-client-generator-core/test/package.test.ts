@@ -1829,6 +1829,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
       strictEqual(voidResponse.headers.length, 0);
+      strictEqual(voidResponse.contentTypes, undefined);
 
       strictEqual(method.response.type, undefined);
       strictEqual(method.response.resultPath, undefined);
