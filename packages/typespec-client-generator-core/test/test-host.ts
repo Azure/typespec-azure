@@ -2,6 +2,7 @@ import { Diagnostic, EmitContext, Program, Type } from "@typespec/compiler";
 import {
   BasicTestRunner,
   StandardTestLibrary,
+  TestHost,
   TypeSpecTestLibrary,
   createTestHost,
   createTestWrapper,
@@ -29,6 +30,7 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
 }
 
 export interface SdkTestRunner extends BasicTestRunner {
+  host: TestHost;
   context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
@@ -40,21 +42,21 @@ export interface SdkTestRunner extends BasicTestRunner {
   ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
 }
 
-export function createSdkContextTestHelper<
+export async function createSdkContextTestHelper<
   TOptions extends object = CreateSdkTestRunnerOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   program: Program,
   options: TOptions,
   emitterName?: string
-): SdkContext<TOptions, TServiceOperation> {
+): Promise<SdkContext<TOptions, TServiceOperation>> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
     emitterOutputDir: "dummy",
     options: options,
     getAssetEmitter: null as any,
   };
-  return createSdkContext(emitContext, emitterName ?? "@azure-tools/typespec-csharp");
+  return await createSdkContext(emitContext, emitterName ?? "@azure-tools/typespec-csharp");
 }
 
 export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
@@ -81,11 +83,13 @@ export async function createSdkTestRunner(
     autoUsings: autoUsings,
   }) as SdkTestRunner;
 
+  sdkTestRunner.host = host;
+
   // compile
   const baseCompile = sdkTestRunner.compile;
   sdkTestRunner.compile = async function compile(code, compileOptions?) {
     const result = await baseCompile(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName
@@ -97,7 +101,7 @@ export async function createSdkTestRunner(
   const baseDiagnose = sdkTestRunner.diagnose;
   sdkTestRunner.diagnose = async function diagnose(code, compileOptions?) {
     const result = await baseDiagnose(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName
@@ -109,7 +113,7 @@ export async function createSdkTestRunner(
   const baseCompileAndDiagnose = sdkTestRunner.compileAndDiagnose;
   sdkTestRunner.compileAndDiagnose = async function compileAndDiagnose(code, compileOptions?) {
     const result = await baseCompileAndDiagnose(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName
@@ -126,7 +130,7 @@ export async function createSdkTestRunner(
         noEmit: true,
       }
     );
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName
@@ -148,7 +152,7 @@ export async function createSdkTestRunner(
           noEmit: true,
         }
       );
-      sdkTestRunner.context = createSdkContextTestHelper(
+      sdkTestRunner.context = await createSdkContextTestHelper(
         sdkTestRunner.program,
         options,
         options.emitterName
@@ -178,7 +182,7 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compile("./client.tsp");
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName
@@ -211,7 +215,7 @@ export async function createSdkTestRunner(
         noEmit: true,
       }
     );
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName
@@ -224,7 +228,7 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compileAndDiagnose("./client.tsp");
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       options.emitterName

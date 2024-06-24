@@ -19,7 +19,6 @@ import {
   Visibility,
 } from "@typespec/http";
 import { TCGCContext } from "./internal-utils.js";
-import { T } from "vitest/dist/reporters-yx5ZTtEV.js";
 
 export interface SdkContext<
   TOptions extends object = Record<string, any>,
@@ -448,7 +447,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   defaultContentType?: string;
 }
 
-interface SdkServiceOperationBase { }
+interface SdkServiceOperationBase {}
 
 export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
@@ -512,7 +511,7 @@ interface SdkPagingServiceMethodOptions {
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-  SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
@@ -522,14 +521,14 @@ interface SdkLroServiceMethodOptions {
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-  SdkLroServiceMethodOptions {
+    SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-  SdkLroServiceMethodOptions,
-  SdkPagingServiceMethodOptions {
+    SdkLroServiceMethodOptions,
+    SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
@@ -608,7 +607,16 @@ export interface SdkHttpResponseHeaderExample {
   value: SdkTypeExample;
 }
 
-export type SdkTypeExample = SdkStringExample | SdkNumberExample | SdkBooleanExample | SdkNullExample | SdkAnyExample | SdkArrayExample | SdkDictionaryExample | SdkUnionExample | SdkModelExample;
+export type SdkTypeExample =
+  | SdkStringExample
+  | SdkNumberExample
+  | SdkBooleanExample
+  | SdkNullExample
+  | SdkAnyExample
+  | SdkArrayExample
+  | SdkDictionaryExample
+  | SdkUnionExample
+  | SdkModelExample;
 
 export interface SdkExampleTypeBase {
   kind: string;
@@ -617,49 +625,49 @@ export interface SdkExampleTypeBase {
 }
 
 export interface SdkStringExample extends SdkExampleTypeBase {
-  kind: "string",
+  kind: "string";
   type: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
   value: string;
 }
 
 export interface SdkNumberExample extends SdkExampleTypeBase {
-  kind: "number",
+  kind: "number";
   type: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
   value: number;
 }
 
 export interface SdkBooleanExample extends SdkExampleTypeBase {
-  kind: "boolean",
+  kind: "boolean";
   type: SdkBuiltInType | SdkConstantType;
   value: boolean;
 }
 
 export interface SdkNullExample extends SdkExampleTypeBase {
-  kind: "null",
+  kind: "null";
   type: SdkNullableType;
   value: null;
 }
 
 export interface SdkAnyExample extends SdkExampleTypeBase {
-  kind: "any",
+  kind: "any";
   type: SdkBuiltInType;
   value: unknown;
 }
 
 export interface SdkArrayExample extends SdkExampleTypeBase {
-  kind: "array",
+  kind: "array";
   type: SdkArrayType;
   value: SdkTypeExample[];
 }
 
 export interface SdkDictionaryExample extends SdkExampleTypeBase {
-  kind: "dict",
+  kind: "dict";
   type: SdkDictionaryType;
   value: Record<string, SdkTypeExample>;
 }
 
 export interface SdkUnionExample extends SdkExampleTypeBase {
-  kind: "union",
+  kind: "union";
   type: SdkUnionType;
   value: unknown;
 }

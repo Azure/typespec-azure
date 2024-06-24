@@ -1,0 +1,11 @@
+{
+  "operationId": "Get",
+  "title": "No version test",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "description": "ARM operation completed successfully.",
+      "body": "test"
+    }
+  }
+}

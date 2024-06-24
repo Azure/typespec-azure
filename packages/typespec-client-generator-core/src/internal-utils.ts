@@ -23,7 +23,9 @@ import {
   isVoidType,
 } from "@typespec/compiler";
 import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
+import { getOperationId } from "@typespec/openapi";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { pascalCase } from "change-case";
 import {
   SdkBuiltInKinds,
   SdkBuiltInType,
@@ -44,8 +46,6 @@ import {
   getLibraryName,
   isApiVersion,
 } from "./public-utils.js";
-import { pascalCase } from "change-case";
-import { getOperationId } from "@typespec/openapi";
 
 /**
  *
@@ -402,8 +402,8 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
     : undefined;
   return Boolean(
     httpBody &&
-    httpBody.type.kind === "Model" &&
-    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+      httpBody.type.kind === "Model" &&
+      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 

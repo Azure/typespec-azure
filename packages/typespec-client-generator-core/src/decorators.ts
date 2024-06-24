@@ -29,6 +29,7 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
+import { handleClientExamples } from "./example.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -45,7 +46,6 @@ import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
-import { handleClientExamples } from "./example.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
@@ -614,12 +614,11 @@ export async function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
-    examplesDirectory: context.options["examples-directory"] ?? "{project-root}/examples",
+    examplesDirectory: context.options["examples-directory"],
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   for (const client of sdkContext.experimental_sdkPackage.clients) {
-    if (client.initialization.access === "internal") continue;
-    await handleClientExamples(sdkContext, client);
+    diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
 
   if (sdkContext.diagnostics) {
