@@ -4,6 +4,7 @@ import {
   getOpenAPIForService,
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
+import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
 import { SdkContext, createSdkContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
@@ -65,6 +66,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
+    useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
   };
 
   await emitAllServices(context.program, tcgcSdkContext, options);
@@ -162,6 +164,10 @@ function validateUnsupportedVersioning(program: Program, namespace: Namespace) {
         }
       },
       modelProperty: (prop) => {
+        if (isArmCommonType(prop) || (prop.model && isArmCommonType(prop.model))) {
+          return;
+        }
+
         if (getRenamedFrom(program, prop)) {
           reportDisallowedDecorator("renamedFrom", prop);
         }

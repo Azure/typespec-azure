@@ -53,6 +53,12 @@ export interface AutorestCanonicalEmitterOptions {
    * @default "${project-root}/../../common-types/resource-management"
    */
   "arm-types-dir"?: string;
+
+  /**
+   * Determines whether to transmit the 'readOnly' property to lro status schemas.
+   * @default false
+   */
+  "use-read-only-status-schema"?: boolean;
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
@@ -106,6 +112,12 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
       default: "never",
       description:
         "If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.\nThis extension is meant for debugging and should not be depended on.",
+    },
+    "use-read-only-status-schema": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description: "Create read-only property schema for lro status",
     },
   },
   required: [],
