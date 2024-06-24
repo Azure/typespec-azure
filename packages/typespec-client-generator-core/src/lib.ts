@@ -147,6 +147,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Can not find name for your emitter, please check your emitter name.`,
       },
     },
+    "empty-client-name": {
+      severity: "warning",
+      messages: {
+        default: `You cannot pass an empty value to the @clientName decorator`,
+      },
+    },
   },
 });
 
