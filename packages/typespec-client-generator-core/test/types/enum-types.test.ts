@@ -43,7 +43,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const sdkType = runner.context.experimental_sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
-    strictEqual(sdkType.tspNamespace, "TestService");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TestService.DaysOfWeekExtensibleEnum");
     strictEqual(sdkType.valueType.kind, "string");
     strictEqual(sdkType.usage & UsageFlags.ApiVersionEnum, 0); // not a versioning enum
     strictEqual(sdkType.isUnionAsEnum, false);
@@ -88,7 +88,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const sdkType = runner.context.experimental_sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "Integers");
-    strictEqual(sdkType.tspNamespace, "TestService");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Integers");
     strictEqual(sdkType.valueType.kind, "int32");
     const values = sdkType.values;
     strictEqual(values.length, 5);
@@ -123,7 +123,7 @@ describe("typespec-client-generator-core: enum types", () => {
     ok(sdkType);
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "Floats");
-    strictEqual(sdkType.tspNamespace, "TestService");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Floats");
     strictEqual(sdkType.valueType.kind, "float32");
     const values = sdkType.values;
     strictEqual(values.length, 3);
@@ -158,7 +158,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const sdkType = runner.context.experimental_sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, false);
     strictEqual(sdkType.name, "Floats");
-    strictEqual(sdkType.tspNamespace, "TestService");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Floats");
     strictEqual(sdkType.valueType.kind, "float");
     const values = sdkType.values;
     strictEqual(values.length, 3);
@@ -199,7 +199,7 @@ describe("typespec-client-generator-core: enum types", () => {
     ok(sdkType);
     strictEqual(sdkType.isFixed, false);
     strictEqual(sdkType.name, "ExtendedEnum");
-    strictEqual(sdkType.tspNamespace, "TestService");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TestService.ExtendedEnum");
     strictEqual(sdkType.valueType.kind, "int32");
     const values = sdkType.values;
     strictEqual(values.length, 3);
@@ -245,7 +245,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const sdkType = runnerWithCore.context.experimental_sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "DaysOfWeekFixedEnum");
-    strictEqual(sdkType.tspNamespace, "My.Service");
+    strictEqual(sdkType.crossLanguageDefinitionId, "My.Service.DaysOfWeekFixedEnum");
     strictEqual(sdkType.valueType.kind, "string");
     const values = sdkType.values;
     strictEqual(values.length, 7);
@@ -422,7 +422,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const enumType = getClientType(runner.context, TestUnion);
     strictEqual(enumType.kind, "enum");
     strictEqual(enumType.name, "TestUnionRename");
-    strictEqual(enumType.tspNamespace, "N");
+    strictEqual(enumType.crossLanguageDefinitionId, "N.TestUnion");
     strictEqual(enumType.isUnionAsEnum, true);
     strictEqual(enumType.values[0].name, "ARename");
     strictEqual(enumType.values[1].name, "BRename");
@@ -465,7 +465,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const enumType = nullableType.type;
     strictEqual(enumType.kind, "enum");
     strictEqual(enumType.name, "Test");
-    strictEqual(enumType.tspNamespace, "N");
+    strictEqual(enumType.crossLanguageDefinitionId, "N.Test");
     strictEqual(enumType.isUnionAsEnum, true);
     const values = enumType.values;
     strictEqual(values.length, 4);
@@ -518,14 +518,14 @@ describe("typespec-client-generator-core: enum types", () => {
 
     strictEqual(unionType.kind, "union");
     strictEqual(unionType.name, "Test");
-    strictEqual(unionType.tspNamespace, "N");
+    strictEqual(unionType.crossLanguageDefinitionId, "N.Test");
 
     const values = unionType.values;
     strictEqual(values.length, 3);
     const a = values[0] as SdkEnumType;
     strictEqual(a.kind, "enum");
     strictEqual(a.name, "A");
-    strictEqual(a.tspNamespace, "N");
+    strictEqual(a.crossLanguageDefinitionId, "N.A");
     strictEqual(a.isUnionAsEnum, true);
     strictEqual(a.values[0].name, "A1");
     strictEqual(a.values[0].value, "A1");
@@ -535,7 +535,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const b = values[1] as SdkEnumType;
     strictEqual(b.kind, "enum");
     strictEqual(b.name, "B");
-    strictEqual(b.tspNamespace, "N");
+    strictEqual(b.crossLanguageDefinitionId, "N.B");
     strictEqual(b.isUnionAsEnum, true);
     strictEqual(b.values[0].name, "B");
     strictEqual(b.values[0].value, "B");
@@ -543,7 +543,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const c = values[2] as SdkEnumType;
     strictEqual(c.kind, "enum");
     strictEqual(c.name, "C");
-    strictEqual(c.tspNamespace, "N");
+    strictEqual(c.crossLanguageDefinitionId, "N.C");
     strictEqual(c.isUnionAsEnum, false);
     strictEqual(c.values[0].name, "C");
     strictEqual(c.values[0].value, "C");
@@ -575,7 +575,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const modelType = getClientType(runner.context, Test) as SdkModelType;
     const enumType = modelType.properties[0].type as SdkEnumType;
     strictEqual(enumType.name, "TestColor");
-    strictEqual(enumType.tspNamespace, undefined); // implicitly defined union does not have a namespace
+    strictEqual(enumType.crossLanguageDefinitionId, "Test.color.anonymous");
     strictEqual(enumType.isGeneratedName, true);
     strictEqual(enumType.isUnionAsEnum, true);
     // no cross language def id bc it's not a defined object in tsp
@@ -625,19 +625,19 @@ describe("typespec-client-generator-core: enum types", () => {
     const modelType = getClientType(runner.context, Test) as SdkModelType;
     const unionType = modelType.properties[0].type as SdkUnionType;
     strictEqual(unionType.name, "TestColor");
-    strictEqual(unionType.tspNamespace, undefined); // implicitly defined union does not have a namespace
+    strictEqual(unionType.crossLanguageDefinitionId, "Test.color.anonymous");
     strictEqual(unionType.isGeneratedName, true);
     const values = unionType.values;
     const lr = values[0] as SdkEnumType;
     strictEqual(lr.name, "LR");
-    strictEqual(lr.tspNamespace, "N");
+    strictEqual(lr.crossLanguageDefinitionId, "N.LR");
     strictEqual(lr.isUnionAsEnum, false);
     strictEqual(lr.values[0].name, "left");
     strictEqual(lr.values[1].name, "right");
     strictEqual(lr.isFixed, true);
     const ud = values[1] as SdkEnumType;
     strictEqual(ud.name, "UD");
-    strictEqual(ud.tspNamespace, "N");
+    strictEqual(ud.crossLanguageDefinitionId, "N.UD");
     strictEqual(ud.isUnionAsEnum, false);
     strictEqual(ud.values[0].name, "up");
     strictEqual(ud.values[1].name, "down");
@@ -660,7 +660,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const enums = runner.context.experimental_sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
-    strictEqual(enums[0].tspNamespace, "DemoService");
+    strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
@@ -689,7 +689,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
-    strictEqual(enums[0].tspNamespace, "DemoService");
+    strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
@@ -718,7 +718,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
-    strictEqual(enums[0].tspNamespace, "DemoService");
+    strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
@@ -747,7 +747,7 @@ describe("typespec-client-generator-core: enum types", () => {
     const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
-    strictEqual(enums[0].tspNamespace, "DemoService");
+    strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
@@ -781,10 +781,10 @@ describe("typespec-client-generator-core: enum types", () => {
     const enums = runner.context.experimental_sdkPackage.enums;
     strictEqual(enums.length, 2);
     strictEqual(enums[0].name, "LR");
-    strictEqual(enums[0].tspNamespace, "N");
+    strictEqual(enums[0].crossLanguageDefinitionId, "N.LR");
     strictEqual(enums[0].usage, UsageFlags.Input);
     strictEqual(enums[1].name, "UD");
-    strictEqual(enums[1].tspNamespace, "N");
+    strictEqual(enums[1].crossLanguageDefinitionId, "N.UD");
     strictEqual(enums[1].usage, UsageFlags.Input);
   });
 });

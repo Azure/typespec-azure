@@ -299,8 +299,8 @@ export function getSdkArrayOrDictWithDiagnostics(
         return diagnostics.wrap({
           ...getSdkTypeBaseHelper(context, type, "array"),
           name: getLibraryName(context, type),
-          tspNamespace: getNamespaceHelper(type.namespace),
           valueType: valueType,
+          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
         });
       }
     }
@@ -371,11 +371,11 @@ export function getSdkUnionWithDiagnostics(
     retval = {
       ...getSdkTypeBaseHelper(context, type, "union"),
       name: getLibraryName(context, type) || getGeneratedName(context, type),
-      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
       ),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
     };
   }
 
@@ -553,7 +553,6 @@ export function getSdkModelWithDiagnostics(
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "model"),
       name: name,
-      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -674,7 +673,6 @@ export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operati
     sdkType = {
       ...getSdkTypeBaseHelper(context, type, "enum"),
       name: getLibraryName(context, type),
-      tspNamespace: getNamespaceHelper(type.namespace),
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -708,7 +706,6 @@ function getSdkUnionEnumValues(
     values.push({
       kind: "enumvalue",
       name: name ? name : `${member.value}`,
-      tspNamespace: enumType.tspNamespace,
       description: docWrapper.description,
       details: docWrapper.details,
       value: member.value,
@@ -729,7 +726,6 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
     sdkType = {
       ...getSdkTypeBaseHelper(context, type.union, "enum"),
       name,
-      tspNamespace: getNamespaceHelper(type.union.namespace),
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
@@ -950,6 +946,7 @@ function getSdkCredentialType(
       values: credentialTypes,
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
     };
   }
   return credentialTypes[0];
