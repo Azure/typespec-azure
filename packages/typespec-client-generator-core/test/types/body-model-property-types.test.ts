@@ -172,9 +172,7 @@ describe("typespec-client-generator-core: body model property types", () => {
           removedProp: string;
         }
       `);
-    const sdkModel = runnerWithVersion.context.sdkPackage.models.find(
-      (x) => x.kind === "model"
-    );
+    const sdkModel = runnerWithVersion.context.sdkPackage.models.find((x) => x.kind === "model");
     ok(sdkModel);
     strictEqual(sdkModel.kind, "model");
 

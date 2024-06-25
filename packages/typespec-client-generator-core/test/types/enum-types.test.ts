@@ -346,10 +346,7 @@ describe("typespec-client-generator-core: enum types", () => {
       `);
 
     strictEqual(runner.context.sdkPackage.enums[0].name, "Enum1");
-    strictEqual(
-      runner.context.sdkPackage.enums[0].usage,
-      UsageFlags.Input | UsageFlags.Output
-    );
+    strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
 
   it("projected name", async () => {

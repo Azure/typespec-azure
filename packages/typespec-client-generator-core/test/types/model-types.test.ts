@@ -568,9 +568,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(salmon.discriminatorValue, "salmon");
 
     strictEqual(runner.context.sdkPackage.enums.length, 1);
-    const kindType = runner.context.sdkPackage.enums.find(
-      (x) => x.name === "KindType"
-    );
+    const kindType = runner.context.sdkPackage.enums.find((x) => x.name === "KindType");
     ok(kindType);
     strictEqual(kindType.isFixed, false);
   });
@@ -625,9 +623,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(salmon.discriminatorValue, "salmon");
 
     strictEqual(runner.context.sdkPackage.enums.length, 1);
-    const kindType = runner.context.sdkPackage.enums.find(
-      (x) => x.name === "KindType"
-    );
+    const kindType = runner.context.sdkPackage.enums.find((x) => x.name === "KindType");
     ok(kindType);
     strictEqual(kindType.isFixed, false);
   });

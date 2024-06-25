@@ -2679,10 +2679,7 @@ describe("typespec-client-generator-core: decorators", () => {
         
       `);
 
-      strictEqual(
-        runner.context.sdkPackage.clients[0].methods[0].parameters[0].name,
-        "body"
-      );
+      strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
     });
     it("empty client name", async () => {
       const diagnostics = await runner.diagnose(`
