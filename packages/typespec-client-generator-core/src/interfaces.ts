@@ -218,6 +218,21 @@ interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
 
 export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
 
+/**
+ * @deprecated: Use SdkDateTimeType instead.
+ */
+export type SdkDatetimeType = SdkDateTimeType;
+
+/**
+ * @deprecated: Use SdkUtcDateTimeType instead.
+ */
+export type SdkUtcDatetimeType = SdkUtcDateTimeType;
+
+/**
+ * @deprecated Use SdkOffsetDateTimeType instead.
+ */
+export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
+
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   encode: DurationKnownEncoding;
