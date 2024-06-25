@@ -2684,6 +2684,22 @@ describe("typespec-client-generator-core: decorators", () => {
         "body"
       );
     });
+    it("empty client name", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        namespace MyService;
+        
+        @clientName(" ")
+        model Test {
+          id: string;
+          prop: string;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/empty-client-name",
+      });
+    });
   });
 
   describe("versioning projection", () => {

@@ -146,7 +146,6 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(recursiveModel.properties.length, 1);
     const prop = recursiveModel.properties[0];
     strictEqual(prop.kind, "property");
-    strictEqual(prop.nameInClient, "prop");
     strictEqual(prop.name, "prop");
     strictEqual(prop.type.kind, "model");
     strictEqual(prop.type.name, "RecursiveModel");
