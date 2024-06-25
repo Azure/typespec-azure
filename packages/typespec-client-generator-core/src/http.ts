@@ -542,6 +542,7 @@ function findMapping(
   const visited: Set<SdkModelType> = new Set();
   while (queue.length > 0) {
     const methodParam = queue.shift()!;
+    // http operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
