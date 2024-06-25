@@ -384,7 +384,6 @@ function getSdkMethodParameter(
       details: getDocHelper(context, type).details,
       apiVersions,
       type: propertyType,
-      nameInClient: name,
       name,
       isGeneratedName: Boolean(libraryName),
       optional: false,
@@ -449,7 +448,6 @@ function getSdkEndpointParameter(
       templateArguments: [
         {
           name,
-          nameInClient: name,
           isGeneratedName: true,
           description: "Service host",
           kind: "path",
@@ -504,7 +502,6 @@ function getSdkEndpointParameter(
   return diagnostics.wrap({
     kind: "endpoint",
     type,
-    nameInClient: "endpoint",
     name: "endpoint",
     isGeneratedName: true,
     description: "Service host",
@@ -544,7 +541,6 @@ function createSdkClientType<
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
   };
-  context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -584,17 +580,13 @@ export function getSdkPackage<
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
-  context.__clients = new Array<SdkClientType<TServiceOperation>>();
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
-  for (const client of listClients(context)) {
-    createSdkClientType(context, client);
-  }
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   return {
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
-    clients: Array.from(context.__clients.values()),
+    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
     enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
     diagnostics: diagnostics.diagnostics,

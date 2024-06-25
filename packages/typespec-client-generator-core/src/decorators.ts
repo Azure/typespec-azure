@@ -75,25 +75,31 @@ function setScopedDecoratorData(
   transitivity: boolean = false
 ): boolean {
   const targetEntry = context.program.stateMap(key).get(target);
+  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
-    // value is going to be a list of tuples, each tuple is a value and a list of scopes
-    context.program.stateMap(key).set(target, { [scope ?? AllScopes]: value });
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, newObject);
     return true;
   }
 
   // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
   const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !scopes.includes(scope)) {
-    targetEntry[scope] = value;
+  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
     return true;
   }
+  // we only want to allow multiple decorators if they each specify a different scope
   if (!transitivity) {
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
-  if (!Reflect.ownKeys(targetEntry).includes(AllScopes) && !scope) {
-    context.program.stateMap(key).set(target, { AllScopes: value });
+  // for transitivity situation, we could allow scope extension
+  if (!scopes.includes(AllScopes) && !scope) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
   }
   return false;
 }
@@ -282,6 +288,9 @@ export function listClients(context: TCGCContext): SdkClient[] {
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     context.__rawClients = getClientsWithVersioning(context, explicitClients);
+    if (context.__rawClients.some((client) => isArm(client.service))) {
+      context.arm = true;
+    }
     return context.__rawClients;
   }
 
@@ -968,7 +977,13 @@ export function $clientName(
       }
     }
   }
-
+  if (value.trim() === "") {
+    reportDiagnostic(context.program, {
+      code: "empty-client-name",
+      format: {},
+      target: entity,
+    });
+  }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 

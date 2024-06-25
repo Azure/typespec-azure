@@ -2,7 +2,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { UsageFlags } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
 import { getAllModelsWithDiagnostics } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -208,7 +208,10 @@ describe("typespec-client-generator-core: multipart types", () => {
           upload(...WidgetForm): Widget;
         }
         `);
-    const formDataMethod = runner.context.experimental_sdkPackage.clients[0].methods[0];
+    const client = runner.context.experimental_sdkPackage.clients[0].methods.find(
+      (x) => x.kind === "clientaccessor"
+    )?.response as SdkClientType<SdkHttpOperation>;
+    const formDataMethod = client.methods[0];
     strictEqual(formDataMethod.kind, "basic");
     strictEqual(formDataMethod.name, "upload");
     strictEqual(formDataMethod.parameters.length, 6);

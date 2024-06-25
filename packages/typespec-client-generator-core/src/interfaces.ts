@@ -26,7 +26,6 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  __clients?: SdkClientType<TServiceOperation>[];
 }
 
 export interface SdkEmitterOptions {
@@ -329,10 +328,6 @@ export interface SdkEndpointType extends SdkTypeBase {
 export interface SdkModelPropertyTypeBase {
   __raw?: ModelProperty;
   type: SdkType;
-  /**
-   * @deprecated This property is deprecated. Use `.name` instead.
-   */
-  nameInClient: string;
   name: string;
   isGeneratedName: boolean;
   description?: string;
@@ -537,7 +532,8 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
+export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }
