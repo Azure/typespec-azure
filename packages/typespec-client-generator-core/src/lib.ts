@@ -153,6 +153,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Can not parse the arg type for decorator "${"decoratorName"}".`,
       },
     },
+    "empty-client-name": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientName decorator`,
+      },
+    },
   },
 });
 

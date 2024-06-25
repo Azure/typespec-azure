@@ -154,7 +154,6 @@ function getSdkHttpParameters(
       retval.bodyParam = {
         kind: "body",
         name,
-        nameInClient: name,
         isGeneratedName: true,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
@@ -263,7 +262,6 @@ function createContentTypeOrAcceptHeader(
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
-    nameInClient: name,
     name,
     isGeneratedName: true,
     apiVersions: bodyObject.apiVersions,
@@ -430,7 +428,7 @@ function getSdkHttpResponseAndExceptions(
       kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
-      contentTypes,
+      contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
@@ -478,7 +476,6 @@ export function getCorrespondingMethodParams(
       const apiVersionParamUpdated: SdkParameter = {
         ...apiVersionParam,
         name: "apiVersion",
-        nameInClient: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
         clientDefaultValue:
