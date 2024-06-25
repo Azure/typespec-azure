@@ -1263,6 +1263,8 @@ function updateTypesFromOperation(
       if (
         httpBody.type.kind === "Model" &&
         httpBody.type.name === "" &&
+        (httpBody.type.sourceModels.some((x) => x.usage === "spread") ||
+          httpBody.type === operation.parameters) &&
         !context.spreadModels?.has(httpBody.type)
       ) {
         context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);

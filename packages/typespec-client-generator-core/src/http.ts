@@ -30,6 +30,7 @@ import {
   SdkHttpResponse,
   SdkMethodParameter,
   SdkModelPropertyType,
+  SdkModelType,
   SdkParameter,
   SdkPathParameter,
   SdkQueryParameter,
@@ -501,70 +502,18 @@ export function getCorrespondingMethodParams(
   }
 
   // to see if the service parameter is a method parameter or a property of a method parameter
-  const queue: SdkModelPropertyType[] = [...methodParameters];
-  while (queue.length > 0) {
-    const methodParam = queue.shift()!;
-    if (methodParam.__raw && serviceParam.__raw && methodParam.__raw === serviceParam.__raw) {
-      return diagnostics.wrap([methodParam]);
-    }
-    if (
-      serviceParam.kind === "header" &&
-      serviceParam.serializedName === "Content-Type" &&
-      methodParam.name === "contentType"
-    ) {
-      return diagnostics.wrap([methodParam]);
-    }
-    if (
-      serviceParam.kind === "header" &&
-      serviceParam.serializedName === "Accept" &&
-      methodParam.name === "accept"
-    ) {
-      return diagnostics.wrap([methodParam]);
-    }
-    if (methodParam.type.kind === "model") {
-      for (const prop of methodParam.type.properties) {
-        queue.push(prop);
-      }
-    }
+  const directMapping = findMapping(methodParameters, serviceParam);
+  if (directMapping) {
+    return diagnostics.wrap([directMapping]);
   }
 
   // to see if all the property of service parameter could be mapped to a method parameter or a property of a method parameter
   if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
     const retVal = [];
     for (const serviceParamProp of serviceParam.type.properties) {
-      const queue: SdkModelPropertyType[] = [...methodParameters];
-      while (queue.length > 0) {
-        const methodParam = queue.shift()!;
-        if (
-          methodParam.__raw &&
-          serviceParamProp.__raw &&
-          (methodParam.__raw === serviceParamProp.__raw ||
-            methodParam.__raw === serviceParamProp.__raw.sourceProperty)
-        ) {
-          retVal.push(methodParam);
-          break;
-        }
-        if (
-          serviceParamProp.kind === "header" &&
-          serviceParamProp.serializedName === "Content-Type" &&
-          methodParam.name === "contentType"
-        ) {
-          retVal.push(methodParam);
-          break;
-        }
-        if (
-          serviceParamProp.kind === "header" &&
-          serviceParamProp.serializedName === "Accept" &&
-          methodParam.name === "accept"
-        ) {
-          retVal.push(methodParam);
-          break;
-        }
-        if (methodParam.type.kind === "model") {
-          for (const prop of methodParam.type.properties) {
-            queue.push(prop);
-          }
-        }
+      const propertyMapping = findMapping(methodParameters, serviceParamProp);
+      if (propertyMapping) {
+        retVal.push(propertyMapping);
       }
     }
     if (retVal.length === serviceParam.type.properties.length) {
@@ -583,6 +532,50 @@ export function getCorrespondingMethodParams(
     })
   );
   return diagnostics.wrap([]);
+}
+
+function findMapping(
+  methodParameters: SdkModelPropertyType[],
+  serviceParam: SdkHttpParameter | SdkModelPropertyType
+): SdkModelPropertyType | undefined {
+  const queue: SdkModelPropertyType[] = [...methodParameters];
+  const visited: Set<SdkModelType> = new Set();
+  while (queue.length > 0) {
+    const methodParam = queue.shift()!;
+    if (
+      methodParam.__raw &&
+      serviceParam.__raw &&
+      (methodParam.__raw === serviceParam.__raw ||
+        methodParam.__raw === serviceParam.__raw.sourceProperty)
+    ) {
+      return methodParam;
+    }
+    if (
+      serviceParam.kind === "header" &&
+      serviceParam.serializedName === "Content-Type" &&
+      methodParam.name === "contentType"
+    ) {
+      return methodParam;
+    }
+    if (
+      serviceParam.kind === "header" &&
+      serviceParam.serializedName === "Accept" &&
+      methodParam.name === "accept"
+    ) {
+      return methodParam;
+    }
+    if (methodParam.type.kind === "model" && !visited.has(methodParam.type)) {
+      visited.add(methodParam.type);
+      let current: SdkModelType | undefined = methodParam.type;
+      while (current) {
+        for (const prop of methodParam.type.properties) {
+          queue.push(prop);
+        }
+        current = current.baseModel;
+      }
+    }
+  }
+  return undefined;
 }
 
 function getCollectionFormat(

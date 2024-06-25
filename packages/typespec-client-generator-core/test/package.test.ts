@@ -3064,6 +3064,48 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(op.bodyParam.name, "testRequest");
       deepStrictEqual(op.bodyParam.correspondingMethodParams, [documentMethodParam]);
     });
+
+    it("anonymous model with @body should not be spread", async () => {
+      await runner.compileWithBuiltInService(`
+        op test(@body body: {prop: string}): void;
+        `);
+      const method = getServiceMethodOfClient(runner.context.experimental_sdkPackage);
+      const models = runner.context.experimental_sdkPackage.models;
+      strictEqual(models.length, 1);
+      const model = models.find((x) => x.name === "TestRequest");
+      ok(model);
+      strictEqual(model.usage, UsageFlags.Input);
+
+      strictEqual(method.parameters.length, 2);
+      const param = method.parameters[0];
+      strictEqual(param.kind, "method");
+      strictEqual(param.name, "body");
+      strictEqual(param.optional, false);
+      strictEqual(param.isGeneratedName, false);
+      deepStrictEqual(param.type, model);
+      const contentTypeMethoParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethoParam);
+
+      const op = method.operation;
+      strictEqual(op.parameters.length, 1);
+      ok(
+        op.parameters.find(
+          (x) =>
+            x.kind === "header" &&
+            x.serializedName === "Content-Type" &&
+            x.correspondingMethodParams[0] === contentTypeMethoParam
+        )
+      );
+
+      const bodyParam = op.bodyParam;
+      ok(bodyParam);
+      strictEqual(bodyParam.kind, "body");
+      strictEqual(bodyParam.name, "body");
+      strictEqual(bodyParam.optional, false);
+      strictEqual(bodyParam.isGeneratedName, false);
+      deepStrictEqual(bodyParam.type, model);
+      deepStrictEqual(bodyParam.correspondingMethodParams[0].type, model);
+    });
   });
   describe("versioning", () => {
     it("define own api version param", async () => {
