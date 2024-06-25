@@ -120,8 +120,8 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(sdkType.kind, "array");
     strictEqual(sdkType.valueType.kind, "bytes");
     strictEqual(sdkType.valueType.name, "Base64UrlBytes");
-    strictEqual(sdkType.valueType.tspNamespace, "TestService");
     strictEqual(sdkType.valueType.encode, "base64url");
+    strictEqual(sdkType.valueType.crossLanguageDefinitionId, "TestService.Base64UrlBytes");
     strictEqual(sdkType.valueType.baseType?.kind, "bytes");
     strictEqual(sdkType.valueType.baseType.encode, "base64");
   });
@@ -149,7 +149,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "armResourceIdentifier");
-    strictEqual(type.tspNamespace, "Azure.Core");
+    strictEqual(type.crossLanguageDefinitionId, "Azure.Core.armResourceIdentifier");
   });
 
   it("format", async function () {
@@ -211,8 +211,8 @@ describe("typespec-client-generator-core: built-in types", () => {
     ok(etagProperty);
     strictEqual(etagProperty.type.kind, "string");
     strictEqual(etagProperty.type.name, "eTag");
-    strictEqual(etagProperty.type.tspNamespace, "Azure.Core");
     strictEqual(etagProperty.type.encode, "string");
+    strictEqual(etagProperty.type.crossLanguageDefinitionId, "Azure.Core.eTag");
   });
 
   it("unknown format", async function () {
@@ -295,8 +295,8 @@ describe("typespec-client-generator-core: built-in types", () => {
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "TestScalar");
-    strictEqual(type.tspNamespace, "TestService");
     strictEqual(type.description, "title");
     strictEqual(type.details, "doc");
+    strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
   });
 });

@@ -254,12 +254,12 @@ function getSdkDateTimeType(
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
-    tspNamespace: getNamespaceHelper(type.namespace),
     encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType("string"),
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
 
@@ -288,12 +288,12 @@ function getSdkDurationTypeWithDiagnostics(
   return diagnostics.wrap({
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
-    tspNamespace: getNamespaceHelper(type.namespace),
     encode: (encode ?? "ISO8601") as DurationKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType("string"),
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
 
@@ -314,13 +314,13 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...getSdkTypeBaseHelper(context, type, kind),
     name: getLibraryName(context, type),
-    tspNamespace: type.namespace ? getNamespaceFullName(type.namespace) : undefined, // TODO -- use the helper
     encode: getEncodeHelper(context, type, kind),
     description: docWrapper.description,
     details: docWrapper.details,
     baseType: type.baseScalar
       ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
       : undefined,
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   };
   addEncodeInfo(context, type, stdType);
   addFormatInfo(context, type, stdType);

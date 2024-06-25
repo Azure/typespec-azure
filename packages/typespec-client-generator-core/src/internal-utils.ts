@@ -51,8 +51,8 @@ export function getTypeSpecBuiltInType(
     __raw: raw,
     kind: kind,
     name: kind,
-    tspNamespace: "TypeSpec",
     encode: encode ?? kind,
+    crossLanguageDefinitionId: `TypeSpec.${kind}`,
   };
 }
 

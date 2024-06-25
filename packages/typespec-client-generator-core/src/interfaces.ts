@@ -105,8 +105,8 @@ export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
   name: string;
-  tspNamespace?: string;
   baseType?: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 type TypeEquality<T, U> = keyof T extends keyof U
@@ -203,10 +203,10 @@ export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKn
 
 interface SdkDatetimeTypeBase extends SdkTypeBase {
   name: string;
-  tspNamespace?: string;
   baseType?: SdkDatetimeType;
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
@@ -222,10 +222,10 @@ export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
-  tspNamespace?: string;
   baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkArrayType extends SdkTypeBase {
