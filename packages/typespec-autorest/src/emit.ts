@@ -98,7 +98,7 @@ export async function getAllServicesAtAllVersions(
   program: Program,
   options: ResolvedAutorestEmitterOptions
 ): Promise<AutorestServiceRecord[]> {
-  const tcgcSdkContext = createSdkContext(
+  const tcgcSdkContext = await createSdkContext(
     { program, options: {} } as any,
     "@azure-tools/typespec-autorest",
     {
