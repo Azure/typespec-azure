@@ -31,6 +31,7 @@ import {
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
+  SdkHttpOperationExample,
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
@@ -329,6 +330,7 @@ export interface TCGCContext {
   __rawClients?: SdkClient[];
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
   examplesDirectory?: string;
 }

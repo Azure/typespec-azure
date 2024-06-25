@@ -150,7 +150,7 @@ export async function handleClientExamples(
     } else {
       const operationId = resolveOperationId(context.program, method.__raw!).toLowerCase();
       if (examples.has(operationId)) {
-        diagnostics.pipe(handleMethodExamples(method, examples.get(operationId)!));
+        diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
       }
     }
   }
@@ -158,6 +158,7 @@ export async function handleClientExamples(
 }
 
 function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   method: SdkServiceMethod<TServiceOperation>,
   examples: Record<string, LoadedExample>
 ): [void, readonly Diagnostic[]] {
@@ -165,6 +166,12 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
 
   if (method.operation.kind === "http") {
     diagnostics.pipe(handleHttpOperationExamples(method.operation, examples));
+    if (method.operation.examples) {
+      if (!context.__httpOperationExamples) {
+        context.__httpOperationExamples = new Map();
+      }
+      context.__httpOperationExamples!.set(method.operation.__raw, method.operation.examples);
+    }
   }
 
   return diagnostics.wrap(undefined);
