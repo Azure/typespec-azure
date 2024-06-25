@@ -29,7 +29,7 @@ describe("typespec-client-generator-core: model types", () => {
           op test(@body input: InputModel): OutputModel;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "OutputModel"].sort());
@@ -46,7 +46,7 @@ describe("typespec-client-generator-core: model types", () => {
           op test(@body input: Record<InnerModel>): void;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InnerModel"].sort());
@@ -63,7 +63,7 @@ describe("typespec-client-generator-core: model types", () => {
           op test(@body input: InnerModel[]): void;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InnerModel"].sort());
@@ -84,7 +84,7 @@ describe("typespec-client-generator-core: model types", () => {
           op test(@body input: InputModel): void;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "InnerModel"].sort());
@@ -105,7 +105,7 @@ describe("typespec-client-generator-core: model types", () => {
           op test(@body input: InputModel): void;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "BaseModel"].sort());
@@ -123,7 +123,7 @@ describe("typespec-client-generator-core: model types", () => {
 
       op test(@body input: DerivedModel): void;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "DerivedModel"].sort());
@@ -137,7 +137,7 @@ describe("typespec-client-generator-core: model types", () => {
         prop: RecursiveModel
       }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const recursiveModel = models[0];
     strictEqual(recursiveModel.name, "RecursiveModel");
@@ -181,7 +181,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getModel(): Fish;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 5);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
@@ -224,7 +224,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getSalmon(): Salmon;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
@@ -256,7 +256,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getModel(): Fish;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
@@ -292,7 +292,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getExtensibleModel(): Dog;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
 
     const golden = models.find((x) => x.name === "Golden");
@@ -307,8 +307,8 @@ describe("typespec-client-generator-core: model types", () => {
 
     const dog = models.find((x) => x.name === "Dog");
     ok(dog);
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const dogKind = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const dogKind = runner.context.sdkPackage.enums[0];
 
     const dogKindProperty = dog.properties.find(
       (x) => x.kind === "property" && x.serializedName === "kind"
@@ -333,8 +333,8 @@ describe("typespec-client-generator-core: model types", () => {
       @put
       op putPet(@body petKind: PetKind): void;
       `);
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const petKind = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const petKind = runner.context.sdkPackage.enums[0];
     strictEqual(petKind.name, "PetKind");
     strictEqual(petKind.isFixed, false);
     strictEqual(petKind.valueType.kind, "string");
@@ -374,7 +374,7 @@ describe("typespec-client-generator-core: model types", () => {
       @route("/string-extensible")
       interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
       `);
-    const sdkPackage = runner.context.experimental_sdkPackage;
+    const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.models.length, 1);
     strictEqual(sdkPackage.enums.length, 1);
     const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.isGeneratedName);
@@ -396,11 +396,11 @@ describe("typespec-client-generator-core: model types", () => {
       @put
       op putPet(@body pet: Pet): void;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const pet = models.find((x) => x.name === "Pet");
 
-    const enums = runner.context.experimental_sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     const kind = enums.find((x) => x.name === "PetKind");
     ok(pet && kind);
     ok(kind.isGeneratedName);
@@ -418,7 +418,7 @@ describe("typespec-client-generator-core: model types", () => {
       }
       op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
       `);
-    const sdkPackage = runner.context.experimental_sdkPackage;
+    const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(sdkPackage.enums.length, 2);
     strictEqual(sdkPackage.enums[0].name, "FooRequestRepeatabilityResult");
@@ -452,7 +452,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getExtensibleModel(): Dog;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
 
     const golden = models.find((x) => x.name === "Golden");
@@ -467,8 +467,8 @@ describe("typespec-client-generator-core: model types", () => {
 
     const dog = models.find((x) => x.name === "Dog");
     ok(dog);
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const dogKind = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const dogKind = runner.context.sdkPackage.enums[0];
 
     const dogKindProperty = dog.properties[0];
     ok(dogKindProperty);
@@ -507,7 +507,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getModel(): Fish;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 5);
     const shark = models.find((x) => x.name === "Shark");
     ok(shark);
@@ -545,7 +545,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getModel(): Fish;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
@@ -567,8 +567,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(kindTypeProperty.type.kind, "enumvalue");
     strictEqual(salmon.discriminatorValue, "salmon");
 
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const kindType = runner.context.experimental_sdkPackage.enums.find(
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const kindType = runner.context.sdkPackage.enums.find(
       (x) => x.name === "KindType"
     );
     ok(kindType);
@@ -602,7 +602,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getModel(): Fish;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
@@ -624,8 +624,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(kindTypeProperty.type.kind, "enumvalue");
     strictEqual(salmon.discriminatorValue, "salmon");
 
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const kindType = runner.context.experimental_sdkPackage.enums.find(
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const kindType = runner.context.sdkPackage.enums.find(
       (x) => x.name === "KindType"
     );
     ok(kindType);
@@ -652,7 +652,7 @@ describe("typespec-client-generator-core: model types", () => {
       @get
       op getModel(): Fish;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
@@ -687,7 +687,7 @@ describe("typespec-client-generator-core: model types", () => {
       @doc("Creates or updates a User")
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].tspNamespace, "My.Service");
@@ -716,7 +716,7 @@ describe("typespec-client-generator-core: model types", () => {
         @doc("Creates or updates a User")
         op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.experimental_sdkPackage.models.sort((a, b) =>
+    const models = runnerWithCore.context.sdkPackage.models.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
     strictEqual(models.length, 4);
@@ -753,7 +753,7 @@ describe("typespec-client-generator-core: model types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].tspNamespace, "My.Service");
@@ -783,7 +783,7 @@ describe("typespec-client-generator-core: model types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.experimental_sdkPackage.models.sort((a, b) =>
+    const models = runnerWithCore.context.sdkPackage.models.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
     strictEqual(models.length, 5);
@@ -797,15 +797,15 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[3].tspNamespace, "Azure.Core");
     strictEqual(models[4].name, "User");
     strictEqual(models[4].tspNamespace, "My.Service");
-    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
-    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums[0].name, "OperationState");
+    strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
+    strictEqual(runnerWithCore.context.sdkPackage.enums[0].name, "OperationState");
   });
   it("no models filter core", async () => {
     await runner.compile(`
         @service({})
         @test namespace MyService { }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 0);
   });
   it("no models don't filter core", async () => {
@@ -813,7 +813,7 @@ describe("typespec-client-generator-core: model types", () => {
         @service({})
         @test namespace MyService { }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 0);
   });
   it("input usage", async () => {
@@ -823,7 +823,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
         op operation(@body input: InputModel): void;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].usage, UsageFlags.Input);
     strictEqual(models.filter((x) => x.usage === UsageFlags.Input).length, 1);
@@ -837,7 +837,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
         op operation(): OutputModel;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].usage, UsageFlags.Output);
 
@@ -852,7 +852,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
         op operation(@body input: RoundtripModel): RoundtripModel;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
 
@@ -878,7 +878,7 @@ describe("typespec-client-generator-core: model types", () => {
           @body body: RoundTripModel;
         };
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     strictEqual(
       models.find((x) => x.name === "RoundTripModel")?.usage,
@@ -915,7 +915,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
         op operation(@body input: Shark): Shark;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
@@ -948,7 +948,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
         op operation(@body input: Salmon): Salmon;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
@@ -985,7 +985,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
         op operation(@body input: Salmon): Salmon;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 5);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
@@ -1000,7 +1000,7 @@ describe("typespec-client-generator-core: model types", () => {
           @body body: Test
         ): void;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const propreties: string[] = [];
     models.forEach((model) => {
@@ -1022,7 +1022,7 @@ describe("typespec-client-generator-core: model types", () => {
         ): void;
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].access, "internal");
   });
@@ -1079,7 +1079,7 @@ describe("typespec-client-generator-core: model types", () => {
           @body body: Test6
         ): void;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 6);
 
     const Test1 = models.find((x) => x.name === "Test1");
@@ -1130,7 +1130,7 @@ describe("typespec-client-generator-core: model types", () => {
           prop: string;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
     const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
     const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
@@ -1179,7 +1179,7 @@ describe("typespec-client-generator-core: model types", () => {
           op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 5);
     const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
     const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
@@ -1223,7 +1223,7 @@ describe("typespec-client-generator-core: model types", () => {
           ...Record<boolean | float32>;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
     const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
@@ -1249,7 +1249,7 @@ describe("typespec-client-generator-core: model types", () => {
           model OutputModel {}
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const inputModel = models.find((x) => x.name === "InputModel");
     ok(inputModel);
@@ -1295,7 +1295,7 @@ describe("typespec-client-generator-core: model types", () => {
           deploymentDateUtc?: utcDateTime;
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
     const catalog = models.find((x) => x.name === "Catalog");
     const deployment = models.find((x) => x.name === "Deployment");
@@ -1315,7 +1315,7 @@ describe("typespec-client-generator-core: model types", () => {
         ): void;
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].deprecation, "no longer support");
   });
@@ -1333,7 +1333,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "Model1");
     strictEqual(models[0].tspNamespace, "MyService");
@@ -1366,7 +1366,7 @@ describe("typespec-client-generator-core: model types", () => {
           }
         }
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
   });
   it("error model", async () => {
@@ -1448,7 +1448,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "Test");
     strictEqual(models[0].properties.length, 0);

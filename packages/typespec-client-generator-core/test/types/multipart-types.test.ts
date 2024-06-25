@@ -23,7 +23,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     strictEqual(model.kind, "model");
@@ -73,7 +73,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post op normalOperation(...B): void;
         `
     );
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const modelA = models.find((x) => x.name === "A");
     ok(modelA);
@@ -114,7 +114,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
         `
     );
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
   });
 
@@ -128,7 +128,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
         `
     );
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     strictEqual(model.properties.length, 1);
@@ -170,7 +170,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post op normalOp(): void | ErrorResponse;
         `
     );
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
 
     const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
@@ -208,7 +208,7 @@ describe("typespec-client-generator-core: multipart types", () => {
           upload(...WidgetForm): Widget;
         }
         `);
-    const client = runner.context.experimental_sdkPackage.clients[0].methods.find(
+    const client = runner.context.sdkPackage.clients[0].methods.find(
       (x) => x.kind === "clientaccessor"
     )?.response as SdkClientType<SdkHttpOperation>;
     const formDataMethod = client.methods[0];
@@ -253,7 +253,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(multiPartRequest);
