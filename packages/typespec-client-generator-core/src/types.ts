@@ -10,7 +10,6 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
-  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -111,13 +110,6 @@ function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string
     return getEncode(context.program, type)?.encoding || kind;
   }
   return kind;
-}
-
-function getNamespaceHelper(ns: Namespace | undefined): string | undefined {
-  if (ns) {
-    return getNamespaceFullName(ns);
-  }
-  return undefined;
 }
 
 /**
