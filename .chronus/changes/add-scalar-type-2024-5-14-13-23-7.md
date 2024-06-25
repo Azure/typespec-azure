@@ -19,7 +19,7 @@ packages:
    - `uri` (removed)
    - `ipAddress` (removed)
 2. `@format` can no longer change a string type to above azure types (`uuid`, `eTag`, etc).
-3. add `name`, `tspNamespace` and `baseType` to `SdkBuiltInType`, `SdkDatetimeType` and `SdkDurationType`.
+3. add `name`, `crossLanguageDefinitionId` and `baseType` to `SdkBuiltInType`, `SdkDatetimeType` and `SdkDurationType`.
 4. now scalars defined using `scalar` keyword will be parsed into either `SdkBuiltInType`, `SdkDatetimeType` or `SdkDurationType` depending on the base type, with its name and tsp namespace. `@encode` will be added to the scalar type, and will not propagate to its base type.
 
 ## Migration guides for emitters
@@ -33,7 +33,7 @@ if (type.kind === "azureLocation")
 ```
 should be changed to the following if the emitter is doing something special for azure-location:
 ```typescript
-if (type.kind === "string" && type.name === "azureLocation" && type.tspNamespace === "Azure.Core")
+if (type.kind === "string" && type.crossLanguageDefinitionId === "Azure.Core.azureLocation")
 {
   // do something for azure-location
 }
