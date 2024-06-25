@@ -85,7 +85,7 @@ describe("typespec-client-generator-core: body model property types", () => {
         }
       `);
 
-    const sdkModel = runner.context.experimental_sdkPackage.models[0];
+    const sdkModel = runner.context.sdkPackage.models[0];
     strictEqual(sdkModel.name, "JavaTest");
 
     // Java projected name test
@@ -172,9 +172,7 @@ describe("typespec-client-generator-core: body model property types", () => {
           removedProp: string;
         }
       `);
-    const sdkModel = runnerWithVersion.context.experimental_sdkPackage.models.find(
-      (x) => x.kind === "model"
-    );
+    const sdkModel = runnerWithVersion.context.sdkPackage.models.find((x) => x.kind === "model");
     ok(sdkModel);
     strictEqual(sdkModel.kind, "model");
 

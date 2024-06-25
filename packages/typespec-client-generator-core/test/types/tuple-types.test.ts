@@ -21,7 +21,7 @@ describe("typespec-client-generator-core: tuple types", () => {
         }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const scopes = models[0].properties.find((x) => x.name === "scopes");
     ok(scopes);

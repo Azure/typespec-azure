@@ -25,7 +25,7 @@ export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  experimental_sdkPackage: SdkPackage<TServiceOperation>;
+  sdkPackage: SdkPackage<TServiceOperation>;
 }
 
 export interface SdkEmitterOptions {

@@ -141,7 +141,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       }
     `
     );
-    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models[0].properties[0].type.kind, "armId");
   });
 
@@ -169,7 +169,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       }
     `
     );
-    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    const models = runnerWithCore.context.sdkPackage.models;
     for (const property of models[0].properties) {
       strictEqual(property.kind, "property");
       strictEqual(
@@ -201,7 +201,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     @doc("Gets status.")
     op getStatus is GetResourceOperationStatus<User>;
     `);
-    const userModel = runnerWithCore.context.experimental_sdkPackage.models.find(
+    const userModel = runnerWithCore.context.sdkPackage.models.find(
       (x) => x.kind === "model" && x.name === "User"
     );
     ok(userModel);
@@ -252,11 +252,11 @@ describe("typespec-client-generator-core: built-in types", () => {
       ): void;
     `
     );
-    expectDiagnostics(runner.context.experimental_sdkPackage.diagnostics, []);
+    expectDiagnostics(runner.context.sdkPackage.diagnostics, []);
     expectDiagnostics(runner.context.diagnostics, []);
-    const m = runner.context.experimental_sdkPackage.models.find((x) => x.name === "TestModel");
-    const e1 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "TestEnum");
-    const e2 = runner.context.experimental_sdkPackage.enums.find((x) => x.name === "testScalar");
+    const m = runner.context.sdkPackage.models.find((x) => x.name === "TestModel");
+    const e1 = runner.context.sdkPackage.enums.find((x) => x.name === "TestEnum");
+    const e2 = runner.context.sdkPackage.enums.find((x) => x.name === "testScalar");
     ok(m && e1 && e2);
     strictEqual(e1.kind, "enum");
     strictEqual(e1.isUnionAsEnum, false);
