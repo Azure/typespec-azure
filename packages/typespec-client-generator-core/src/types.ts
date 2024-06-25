@@ -1259,12 +1259,22 @@ function updateTypesFromOperation(
       getClientTypeWithDiagnostics(context, httpBody.type, operation)
     );
     if (generateConvenient) {
-      // special logic for spread body model
+      // Special logic for spread body model:
+      // If body is from spread, then it should be an anonymous model.
+      // Also all model properties should be
+      // either equal to one of operation parameters (for case spread from model without property with metadata decorator)
+      // or its source property equal to one of operation parameters (for case spread from model with property with metadata decorator)
       if (
         httpBody.type.kind === "Model" &&
         httpBody.type.name === "" &&
-        (httpBody.type.sourceModels.some((x) => x.usage === "spread") ||
-          httpBody.type === operation.parameters) &&
+        [...httpBody.type.properties.keys()].every(
+          (k) =>
+            operation.parameters.properties.has(k) &&
+            (operation.parameters.properties.get(k) ===
+              (httpBody.type as Model).properties.get(k) ||
+              operation.parameters.properties.get(k) ===
+                (httpBody.type as Model).properties.get(k)?.sourceProperty)
+        ) &&
         !context.spreadModels?.has(httpBody.type)
       ) {
         context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);

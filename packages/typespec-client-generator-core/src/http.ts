@@ -551,6 +551,7 @@ function findMapping(
     ) {
       return methodParam;
     }
+    // this following two hard code mapping is for the case that TCGC help to add content type and accept header is not exist
     if (
       serviceParam.kind === "header" &&
       serviceParam.serializedName === "Content-Type" &&
