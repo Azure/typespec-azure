@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-export decorators in white list to all sdk types
+export decorators in allow list to all sdk types

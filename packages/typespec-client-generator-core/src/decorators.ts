@@ -29,7 +29,7 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
-import { defaultDecoratorsWhiteList as defaultDecoratorsAllowList } from "./configs.js";
+import { defaultDecoratorsAllowList } from "./configs.js";
 import {
   AccessFlags,
   LanguageScopes,
