@@ -413,7 +413,6 @@ function getSdkMethodParameter(
       details: getDocHelper(context, type).details,
       apiVersions,
       type: propertyType,
-      nameInClient: name,
       name,
       isGeneratedName: Boolean(libraryName),
       optional: false,
@@ -478,7 +477,6 @@ function getSdkEndpointParameter(
       templateArguments: [
         {
           name,
-          nameInClient: name,
           isGeneratedName: true,
           description: "Service host",
           kind: "path",
@@ -533,7 +531,6 @@ function getSdkEndpointParameter(
   return diagnostics.wrap({
     kind: "endpoint",
     type,
-    nameInClient: "endpoint",
     name: "endpoint",
     isGeneratedName: true,
     description: "Service host",

@@ -106,7 +106,6 @@ describe("typespec-client-generator-core: body model property types", () => {
       (x) => x.kind === "property" && x.serializedName === "encodedWireName"
     );
     ok(jsonEncodedProp);
-    strictEqual(jsonEncodedProp.nameInClient, "jsonEncodedAndProjectedName");
     strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
     // wire name test with deprecated projected
@@ -114,7 +113,6 @@ describe("typespec-client-generator-core: body model property types", () => {
       (x) => x.kind === "property" && x.serializedName === "realWireName"
     );
     ok(jsonProjectedProp);
-    strictEqual(jsonProjectedProp.nameInClient, "jsonProjectedName");
     strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
     // regular
@@ -122,7 +120,6 @@ describe("typespec-client-generator-core: body model property types", () => {
       (x) => x.kind === "property" && x.serializedName === "regular"
     );
     ok(regularProp);
-    strictEqual(regularProp.nameInClient, "regular");
     strictEqual(regularProp.name, "regular");
   });
   it("union type", async function () {

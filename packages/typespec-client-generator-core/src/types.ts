@@ -511,7 +511,6 @@ function addDiscriminatorToModelType(
         ? discriminatorProperty.serializedName
         : discriminator.propertyName,
       type: discriminatorType!,
-      nameInClient: name,
       name,
       isGeneratedName: false,
       onClient: false,
@@ -966,7 +965,6 @@ export function getSdkCredentialParameter(
   return {
     type: getSdkCredentialType(context, client, auth),
     kind: "credential",
-    nameInClient: name,
     name,
     isGeneratedName: true,
     description: "Credential used to authenticate requests to the service.",
@@ -1001,7 +999,6 @@ export function getSdkModelPropertyTypeBase(
     details: docWrapper.details,
     apiVersions,
     type: propertyType,
-    nameInClient: name,
     name,
     isGeneratedName: false,
     optional: type.optional,
