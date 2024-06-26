@@ -503,7 +503,7 @@ function addDiscriminatorToModelType(
       discriminatorType = {
         kind: "string",
         encode: "string",
-        decorators: {},
+        decorators: [],
       };
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
@@ -526,7 +526,7 @@ function addDiscriminatorToModelType(
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
-      decorators: {},
+      decorators: [],
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -984,7 +984,7 @@ function getSdkCredentialType(
         __raw: client.service,
         kind: "credential",
         scheme: scheme,
-        decorators: {},
+        decorators: [],
       });
     }
   }
@@ -996,7 +996,7 @@ function getSdkCredentialType(
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
-      decorators: {},
+      decorators: [],
     };
   }
   return credentialTypes[0];
@@ -1020,7 +1020,7 @@ export function getSdkCredentialParameter(
     optional: false,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
-    decorators: {},
+    decorators: [],
   };
 }
 
