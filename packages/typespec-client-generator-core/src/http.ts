@@ -166,6 +166,7 @@ function getSdkHttpParameters(
         optional: false,
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
+        decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
       };
     }
     if (retval.bodyParam) {
@@ -251,6 +252,7 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
+      decorators: {},
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -263,6 +265,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+    decorators: {},
   };
 }
 

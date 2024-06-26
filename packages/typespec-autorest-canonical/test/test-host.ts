@@ -1,5 +1,6 @@
 import { OpenAPI2Document } from "@azure-tools/typespec-autorest";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { SdkTestLibrary as TcgcTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
 import { Diagnostic } from "@typespec/compiler";
 import {
@@ -26,6 +27,7 @@ export async function createAutorestCanonicalTestHost() {
       AutorestCanonicalTestLibrary,
       VersioningTestLibrary,
       AzureCoreTestLibrary,
+      AzureResourceManagerTestLibrary,
       TcgcTestLibrary,
     ],
   });
