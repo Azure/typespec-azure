@@ -260,4 +260,36 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(address);
     strictEqual(address.usage & UsageFlags.MultipartFormData, 0);
   });
+
+  it("alias", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+          address: Address;
+        }
+
+        model Address {
+          city: string;
+        }
+
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: {
+          basic: HttpPart<string>
+        }): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 2);
+  });
+
+  it("array http part", async function () {
+    await runner.compileWithBuiltInService(`
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: [
+          HttpPart<string, #{ name: "fullName" }>
+        ] ): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 2);
+  });
 });

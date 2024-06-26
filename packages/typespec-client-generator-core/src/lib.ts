@@ -99,6 +99,13 @@ export const $lib = createTypeSpecLibrary({
           "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",
       },
     },
+    "encoding-multipart-httppart": {
+      severity: "error",
+      messages: {
+        default:
+          "Can not get original Type wrapped in HttpPart",
+      },
+    },
     "unsupported-kind": {
       severity: "warning",
       messages: {

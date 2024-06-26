@@ -7,6 +7,7 @@ import {
   Namespace,
   Operation,
   Scalar,
+  Tuple,
   Type,
   Union,
   createDiagnosticCollector,
@@ -231,16 +232,22 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  */
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
-  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface | Tuple,
   appendNamespace: boolean = true
 ): string {
-  let retval = type.name || "anonymous";
-  const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  let retval = (type.kind === "Tuple" ? "" : type.name) || "anonymous";
+  const namespace =
+    type.kind === "ModelProperty"
+      ? type.model?.namespace
+      : type.kind === "Tuple"
+        ? undefined
+        : type.namespace;
   switch (type.kind) {
     case "Union":
     case "Model":
+    case "Tuple":
       // Enum and Scalar will always have a name
-      if (type.name) {
+      if (type.kind !== "Tuple" && type.name) {
         break;
       }
       const contextPath = findContextPath(context, type);
@@ -296,17 +303,17 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
 }
 
 /**
- * Create a name for anonymous model
+ * Create a name for anonymous model or tuple
  * @param context
  * @param type
  */
 export function getGeneratedName(
   context: TCGCContext,
-  type: Model | Union | TspLiteralType,
+  type: Model | Union | TspLiteralType | Tuple,
   operation?: Operation
 ): string {
   if (!context.generatedNames) {
-    context.generatedNames = new Map<Union | Model | TspLiteralType, string>();
+    context.generatedNames = new Map<Union | Model | TspLiteralType | Tuple, string>();
   }
   const generatedName = context.generatedNames.get(type);
   if (generatedName) return generatedName;
@@ -326,7 +333,7 @@ export function getGeneratedName(
  */
 function findContextPath(
   context: TCGCContext,
-  type: Model | Union | TspLiteralType
+  type: Model | Union | TspLiteralType | Tuple
 ): ContextNode[] {
   for (const client of listClients(context)) {
     // orphan models
@@ -362,7 +369,7 @@ function findContextPath(
 
 interface ContextNode {
   name: string;
-  type?: Model | Union | TspLiteralType;
+  type?: Model | Union | TspLiteralType | Tuple;
 }
 
 /**
@@ -375,7 +382,7 @@ interface ContextNode {
 function getContextPath(
   context: TCGCContext,
   root: Operation | Model,
-  typeToFind: Model | Union | TspLiteralType
+  typeToFind: Model | Union | TspLiteralType | Tuple
 ): ContextNode[] {
   // use visited set to avoid cycle model reference
   const visited: Set<Type> = new Set<Type>();
@@ -447,7 +454,7 @@ function getContextPath(
    * @returns
    */
   function dfsModelProperties(
-    expectedType: Model | Union | TspLiteralType,
+    expectedType: Model | Union | TspLiteralType | Tuple,
     currentType: Type,
     displayName: string
   ): boolean {
@@ -570,7 +577,7 @@ function findLastNonAnonymousModelNode(contextPath: ContextNode[]): number {
  */
 function buildNameFromContextPaths(
   context: TCGCContext,
-  type: Union | Model | TspLiteralType,
+  type: Union | Model | TspLiteralType | Tuple,
   contextPath: ContextNode[]
 ): string {
   // fallback to empty name for corner case
@@ -587,7 +594,8 @@ function buildNameFromContextPaths(
     if (
       currContextPathType?.kind === "String" ||
       currContextPathType?.kind === "Number" ||
-      currContextPathType?.kind === "Boolean"
+      currContextPathType?.kind === "Boolean" ||
+      currContextPathType?.kind === "Tuple"
     ) {
       // constant type
       createName = `${createName}${pascalCase(contextPath[j].name)}`;
@@ -609,7 +617,9 @@ function buildNameFromContextPaths(
   if (context.generatedNames) {
     context.generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Map<Union | Model | TspLiteralType, string>([[type, createName]]);
+    context.generatedNames = new Map<Union | Model | TspLiteralType | Tuple, string>([
+      [type, createName],
+    ]);
   }
   return createName;
 }

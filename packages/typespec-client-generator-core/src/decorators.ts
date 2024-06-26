@@ -27,7 +27,7 @@ import {
   projectProgram,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
-import { isHeader } from "@typespec/http";
+import { getHttpPart, isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessFlags,
@@ -860,7 +860,7 @@ export function getUsageOverride(
 
 export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
   return entity.kind === "Model"
-    ? getSdkModel(context, entity).usage
+    ? (getHttpPart(context.program, entity) === undefined ? getSdkModel(context, entity).usage : UsageFlags.None)
     : getSdkEnum(context, entity).usage;
 }
 
@@ -900,7 +900,7 @@ export function getAccess(
 
   switch (entity.kind) {
     case "Model":
-      return getSdkModel(context, entity).access;
+      return getHttpPart(context.program, entity) === undefined ? getSdkModel(context, entity).access : "internal";
     case "Enum":
       return getSdkEnum(context, entity).access;
     case "Union":

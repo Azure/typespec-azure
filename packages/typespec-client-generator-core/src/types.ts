@@ -32,8 +32,10 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationPart,
   Visibility,
   getAuthentication,
+  getHttpPart,
   getServers,
   isHeader,
   isStatusCode,
@@ -51,6 +53,7 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
+  MultipartOptionsType,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
@@ -536,6 +539,95 @@ export function getSdkModel(
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
 }
 
+export function getSdkModelPropertyTypeFromTuple(
+  context: TCGCContext,
+  type: Type,
+  operation?: Operation,
+  httpOperationPart?: HttpOperationPart
+): [SdkModelPropertyType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const httpPart = getHttpPart(context.program, type);
+  if (httpPart === undefined) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "encoding-multipart-httppart",
+        target: type,
+      })
+    );
+  }
+  const docWrapper = getDocHelper(context, type);
+  const apiVersions = getAvailableApiVersions(context, type, operation || type);
+  const propertyType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, httpPart!.type, operation)
+  );
+  const name = httpPart!.options.name === undefined ? "" : httpPart!.options.name;
+  const base: SdkBodyModelPropertyType = {
+    description: docWrapper.description,
+    details: docWrapper.details,
+    apiVersions,
+    name,
+    nameInClient: name,
+    type: propertyType,
+    isGeneratedName: httpPart!.options.name === undefined,
+    optional: false, // TODO
+    onClient: false,
+    isApiVersionParam: false,
+    crossLanguageDefinitionId: type.kind === "Model" ? getCrossLanguageDefinitionId(context,  type) : "",
+    kind: "property",
+    discriminator: false,
+    serializedName: name,
+    isMultipartFileInput: false,
+    flatten: false,
+  };
+  diagnostics.pipe(addMultiPartInfo(context, type, base, operation, httpOperationPart));
+  return diagnostics.wrap(base);
+}
+
+export function getPropertiesFromTuple(
+  context: TCGCContext,
+  type: Tuple,
+  operation?: Operation
+): [SdkModelPropertyType[], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const result: SdkModelPropertyType[] = [];
+  const httpOpParts = getHttpOperationParts(context, operation);
+  for (const [index, value] of type.values.entries()) {
+    const httpOpPart = httpOpParts.length > index ? httpOpParts[index] : undefined;
+    result.push(
+      diagnostics.pipe(getSdkModelPropertyTypeFromTuple(context, value, operation, httpOpPart))
+    );
+  }
+  return diagnostics.wrap(result);
+}
+
+export function getSdkModelFromTupleWithDiagnostics(
+  context: TCGCContext,
+  type: Tuple,
+  operation?: Operation
+): [SdkModelType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
+  if (sdkType === undefined) {
+    const docWrapper = getDocHelper(context, type);
+    sdkType = {
+      kind: "model",
+      name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+      isGeneratedName: true,
+      description: docWrapper.description,
+      details: docWrapper.details,
+      properties: diagnostics.pipe(getPropertiesFromTuple(context, type, operation)),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+      apiVersions: getAvailableApiVersions(context, type, operation || type),
+      isFormDataType: true,
+      isError: false,
+      access: "public",
+      usage: UsageFlags.MultipartFormData,
+    };
+  }
+  updateModelsMap(context, type, sdkType as SdkModelType, operation);
+  return diagnostics.wrap(sdkType);
+}
+
 export function getSdkModelWithDiagnostics(
   context: TCGCContext,
   type: Model,
@@ -598,7 +690,6 @@ export function getSdkModelWithDiagnostics(
       }
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
-
     updateModelsMap(context, type, sdkType, operation);
   }
   return diagnostics.wrap(sdkType);
@@ -810,12 +901,23 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkConstantWithDiagnostics(context, type));
       break;
     case "Tuple":
-      retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
+      if (operation && getHttpOperationWithCache(context, operation).parameters.body?.bodyKind === "multipart") {
+        retval = diagnostics.pipe(getSdkModelFromTupleWithDiagnostics(context, type, operation));
+      } else {
+        retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
+      }
       break;
     case "Model":
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        const httpPart = getHttpPart(context.program, type);
+        if (httpPart === undefined) {
+          retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        } else {
+          retval = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, httpPart.type, operation)
+          );
+        }
       }
       break;
     case "Intrinsic":
@@ -1014,28 +1116,34 @@ export function getSdkModelPropertyTypeBase(
   });
 }
 
-export function getSdkModelPropertyType(
+function addMultiPartInfo(
   context: TCGCContext,
-  type: ModelProperty,
-  operation?: Operation
-): [SdkModelPropertyType, readonly Diagnostic[]] {
+  type: Type,
+  base: SdkBodyModelPropertyType,
+  operation?: Operation,
+  httpOperationPart?: HttpOperationPart
+): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
-
-  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
   // I'm a body model property
   let operationIsMultipart = false;
   if (operation) {
     const httpOperation = getHttpOperationWithCache(context, operation);
     operationIsMultipart = Boolean(
-      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+      (httpOperation &&
+        httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")) ||
+        httpOperationPart
     );
   }
   // Currently we only recognize bytes and list of bytes as potential file inputs
   const isBytesInput =
     base.type.kind === "bytes" ||
     (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
+  if (
+    isBytesInput &&
+    operationIsMultipart &&
+    type.kind === "ModelProperty" &&
+    getEncode(context.program, type)
+  ) {
     diagnostics.add(
       createDiagnostic({
         code: "encoding-multipart-bytes",
@@ -1043,16 +1151,49 @@ export function getSdkModelPropertyType(
       })
     );
   }
-  return diagnostics.wrap({
+  const multiPartOption: MultipartOptionsType = {
+    isNameDefined: httpOperationPart ? httpOperationPart.name !== undefined : true,
+    isFilePart: isBytesInput && operationIsMultipart,
+    multi: httpOperationPart ? httpOperationPart.multi : false,
+    headers: [], // TODO
+  };
+  base.isMultipartFileInput = multiPartOption.isFilePart;
+  base.multipartOptions = operationIsMultipart ? multiPartOption : undefined;
+  return diagnostics.wrap(undefined);
+}
+
+export function getSdkModelPropertyType(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation?: Operation,
+  httpOperationPart?: HttpOperationPart
+): [SdkModelPropertyType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
+  const result: SdkBodyModelPropertyType = {
     ...base,
     kind: "property",
     optional: type.optional,
     visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
-    isMultipartFileInput: isBytesInput && operationIsMultipart,
+    isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
-  });
+  };
+  diagnostics.pipe(addMultiPartInfo(context, type, result, operation, httpOperationPart));
+  return diagnostics.wrap(result);
+}
+
+function getHttpOperationParts(context: TCGCContext, operation?: Operation): HttpOperationPart[] {
+  if (operation) {
+    const body = getHttpOperationWithCache(context, operation).parameters.body;
+    if (body?.bodyKind === "multipart") {
+      return body.parts;
+    }
+  }
+  return [];
 }
 
 function addPropertiesToModelType(
@@ -1062,7 +1203,8 @@ function addPropertiesToModelType(
   operation?: Operation
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  for (const property of type.properties.values()) {
+  const httpOpParts = getHttpOperationParts(context, operation);
+  for (const [index, property] of Array.from(type.properties.values()).entries()) {
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
@@ -1070,7 +1212,10 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+    const httpOpPart = httpOpParts.length > index ? httpOpParts[index] : undefined;
+    const clientProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, property, operation, httpOpPart)
+    );
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {

@@ -9,6 +9,7 @@ import {
   Program,
   ProjectedProgram,
   StringLiteral,
+  Tuple,
   Type,
   Union,
   createDiagnosticCollector,
@@ -289,8 +290,12 @@ export function isMultipartOperation(context: TCGCContext, operation?: Operation
   if (!operation) return false;
   const httpOperation = getHttpOperationWithCache(context, operation);
   const httpBody = httpOperation.parameters.body;
-  if (httpBody && httpBody.type.kind === "Model") {
-    return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
+  if (httpBody) {
+    if (httpBody.bodyKind === "multipart") {
+      return true;
+    } else if (httpBody.type.kind === "Model") {
+      return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
+    }
   }
   return false;
 }
@@ -312,7 +317,7 @@ export interface TCGCContext {
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  generatedNames?: Map<Union | Model | TspLiteralType | Tuple, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
@@ -389,15 +394,17 @@ export function createGeneratedName(
 }
 
 function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
-  if (type.kind !== "Model") return false;
   if (!isHttpOperation(context, operation)) return false;
   const httpBody = operation
     ? getHttpOperationWithCache(context, operation).parameters.body
     : undefined;
   return Boolean(
     httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+      (httpBody.bodyKind === "multipart" ||
+        (type.kind === "Model" &&
+          httpBody.type.kind === "Model" &&
+          getEffectivePayloadType(context, httpBody.type) ===
+            getEffectivePayloadType(context, type)))
   );
 }
 
