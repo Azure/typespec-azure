@@ -26,7 +26,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].decorators["TypeSpec.@error"], {});
+    deepStrictEqual(models[0].decorators, [{ name: "TypeSpec.@error", arguments: {} }]);
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
@@ -47,9 +47,14 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].properties[0].decorators["Azure.ClientGenerator.Core.@clientName"], {
-      rename: "ID",
-    });
+    deepStrictEqual(models[0].properties[0].decorators, [
+      {
+        name: "Azure.ClientGenerator.Core.@clientName",
+        arguments: {
+          rename: "ID",
+        },
+      },
+    ]);
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
@@ -67,9 +72,14 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].properties[0].decorators["TypeSpec.@encode"], {
-      encoding: "base64url",
-    });
+    deepStrictEqual(models[0].properties[0].decorators, [
+      {
+        name: "TypeSpec.@encode",
+        arguments: {
+          encoding: "base64url",
+        },
+      },
+    ]);
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
@@ -80,13 +90,46 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): void;
     `);
 
-    deepStrictEqual(
-      runner.context.experimental_sdkPackage.clients[0].decorators["TypeSpec.@service"],
-      { options: undefined }
-    );
+    deepStrictEqual(runner.context.experimental_sdkPackage.clients[0].decorators, [
+      {
+        name: "TypeSpec.@service",
+        arguments: { options: undefined },
+      },
+    ]);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/unsupported-generic-decorator-arg-type",
     });
+  });
+
+  it("multiple same decorators", async function () {
+    runner = await createSdkTestRunner(
+      {},
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+    );
+
+    await runner.compileWithBuiltInService(`
+      @clientName("testForPython", "python")
+      @clientName("testForJava", "java")
+      op test(): void;
+    `);
+
+    deepStrictEqual(runner.context.experimental_sdkPackage.clients[0].methods[0].decorators, [
+      {
+        name: "Azure.ClientGenerator.Core.@clientName",
+        arguments: {
+          rename: "testForJava",
+          scope: "java",
+        },
+      },
+      {
+        name: "Azure.ClientGenerator.Core.@clientName",
+        arguments: {
+          rename: "testForPython",
+          scope: "python",
+        },
+      },
+    ]);
+    expectDiagnostics(runner.context.diagnostics, []);
   });
 
   describe("xml scenario", () => {
@@ -106,7 +149,12 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@attribute"], {});
+      deepStrictEqual(models[0].properties[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@attribute",
+          arguments: {},
+        },
+      ]);
     });
 
     it("@name", async function () {
@@ -127,8 +175,18 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].decorators["TypeSpec.Xml.@name"], { name: "XmlBook" });
-      deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@name"], { name: "XmlId" });
+      deepStrictEqual(models[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@name",
+          arguments: { name: "XmlBook" },
+        },
+      ]);
+      deepStrictEqual(models[0].properties[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@name",
+          arguments: { name: "XmlId" },
+        },
+      ]);
     });
 
     it("@ns", async function () {
@@ -152,18 +210,33 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].decorators["TypeSpec.Xml.@ns"], {
-        ns: "https://example.com/ns1",
-        prefix: "ns1",
-      });
-      deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@ns"], {
-        ns: "https://example.com/ns1",
-        prefix: "ns1",
-      });
-      deepStrictEqual(models[0].properties[1].decorators["TypeSpec.Xml.@ns"], {
-        ns: "https://example.com/ns2",
-        prefix: "ns2",
-      });
+      deepStrictEqual(models[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@ns",
+          arguments: {
+            ns: "https://example.com/ns1",
+            prefix: "ns1",
+          },
+        },
+      ]);
+      deepStrictEqual(models[0].properties[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@ns",
+          arguments: {
+            ns: "https://example.com/ns1",
+            prefix: "ns1",
+          },
+        },
+      ]);
+      deepStrictEqual(models[0].properties[1].decorators, [
+        {
+          name: "TypeSpec.Xml.@ns",
+          arguments: {
+            ns: "https://example.com/ns2",
+            prefix: "ns2",
+          },
+        },
+      ]);
     });
 
     it("@nsDeclarations", async function () {
@@ -193,15 +266,30 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].decorators["TypeSpec.Xml.@ns"], {
-        ns: "https://example.com/ns1",
-      });
-      deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@ns"], {
-        ns: "https://example.com/ns1",
-      });
-      deepStrictEqual(models[0].properties[1].decorators["TypeSpec.Xml.@ns"], {
-        ns: "https://example.com/ns2",
-      });
+      deepStrictEqual(models[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@ns",
+          arguments: {
+            ns: "https://example.com/ns1",
+          },
+        },
+      ]);
+      deepStrictEqual(models[0].properties[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@ns",
+          arguments: {
+            ns: "https://example.com/ns1",
+          },
+        },
+      ]);
+      deepStrictEqual(models[0].properties[1].decorators, [
+        {
+          name: "TypeSpec.Xml.@ns",
+          arguments: {
+            ns: "https://example.com/ns2",
+          },
+        },
+      ]);
     });
 
     it("@unwrapped", async function () {
@@ -220,7 +308,12 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.experimental_sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].properties[0].decorators["TypeSpec.Xml.@unwrapped"], {});
+      deepStrictEqual(models[0].properties[0].decorators, [
+        {
+          name: "TypeSpec.Xml.@unwrapped",
+          arguments: {},
+        },
+      ]);
     });
   });
 
@@ -239,9 +332,14 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const methods = runner.context.experimental_sdkPackage.clients[0].methods;
       strictEqual(methods.length, 1);
-      deepStrictEqual(methods[0].decorators["Azure.Core.@useFinalStateVia"], {
-        finalState: "original-uri",
-      });
+      deepStrictEqual(methods[0].decorators, [
+        {
+          name: "Azure.Core.@useFinalStateVia",
+          arguments: {
+            finalState: "original-uri",
+          },
+        },
+      ]);
     });
   });
 });

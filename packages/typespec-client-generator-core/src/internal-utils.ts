@@ -29,6 +29,7 @@ import { getOperationId } from "@typespec/openapi";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import {
+  DecoratorInfo,
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
@@ -250,7 +251,7 @@ interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
   deprecation?: string;
   kind: TKind;
-  decorators: Record<string, Record<string, any>>;
+  decorators: DecoratorInfo[];
 }
 
 /**
@@ -278,9 +279,9 @@ export function getNamespacePrefix(namespace: Namespace): string {
 export function getTypeDecorators(
   context: TCGCContext,
   type: Type
-): [Record<string, Record<string, any>>, readonly Diagnostic[]] {
+): [DecoratorInfo[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const retval: Record<string, Record<string, any>> = {};
+  const retval: DecoratorInfo[] = [];
   if ("decorators" in type) {
     for (const decorator of type.decorators) {
       // only process explicitly defined decorators
@@ -294,12 +295,16 @@ export function getTypeDecorators(
           continue;
         }
 
-        retval[decoratorName] = {};
+        const decoratorInfo: DecoratorInfo = {
+          name: decoratorName,
+          arguments: {},
+        };
         for (let i = 0; i < decorator.args.length; i++) {
-          retval[decoratorName][decorator.definition.parameters[i].name] = diagnostics.pipe(
+          decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
             getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
           );
         }
+        retval.push(decoratorInfo);
       }
     }
   }

@@ -235,7 +235,7 @@ function createContentTypeOrAcceptHeader(
   let type: SdkType = {
     kind: "string",
     encode: "string",
-    decorators: {},
+    decorators: [],
   };
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
@@ -256,7 +256,7 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
-      decorators: {},
+      decorators: [],
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -269,7 +269,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-    decorators: {},
+    decorators: [],
   };
 }
 
