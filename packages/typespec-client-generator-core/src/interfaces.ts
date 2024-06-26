@@ -53,7 +53,8 @@ export interface SdkInitializationType extends SdkModelType {
   properties: SdkParameter[];
 }
 
-export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   kind: "client";
   name: string;
   description?: string;
@@ -76,7 +77,16 @@ export interface SdkOperationGroup {
   service: Namespace;
 }
 
-interface SdkTypeBase {
+interface DecoratedType {
+  // Client types sourced from TypeSpec decorated types will have this generic decoratores dict.
+  // The key is the fully qualified name of the decorator. For example, `TypeSpec.@encode`, `TypeSpec.Xml.@attribute`.
+  // The value is a dict of the decorator's arguments' value (key is argument's name).
+  // Only decorators in allowed list will be included in this dict.
+  // Language's emitter could set `additionalDecorators` in the option when `createSdkContext` to extend the allowed list.
+  decorators: Record<string, Record<string, any>>;
+}
+
+interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
@@ -86,7 +96,7 @@ interface SdkTypeBase {
 
 export type SdkType =
   | SdkBuiltInType
-  | SdkDatetimeType
+  | SdkDateTimeType
   | SdkDurationType
   | SdkArrayType
   | SdkTupleType
@@ -197,26 +207,41 @@ export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKinds
   return kind in SdkFloatKindsEnum;
 }
 
-const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
+const SdkDateTimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
-export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
-  return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
+export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
+  return SdkDateTimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-interface SdkDatetimeTypeBase extends SdkTypeBase {
+interface SdkDateTimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
 
-interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+interface SdkUtcDateTimeType extends SdkDateTimeTypeBase {
   kind: "utcDateTime";
 }
 
-interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
   kind: "offsetDateTime";
 }
 
-export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
+export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
+
+/**
+ * @deprecated: Use SdkDateTimeType instead.
+ */
+export type SdkDatetimeType = SdkDateTimeType;
+
+/**
+ * @deprecated: Use SdkUtcDateTimeType instead.
+ */
+export type SdkUtcDatetimeType = SdkUtcDateTimeType;
+
+/**
+ * @deprecated Use SdkOffsetDateTimeType instead.
+ */
+export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
@@ -325,7 +350,7 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase {
+export interface SdkModelPropertyTypeBase extends DecoratedType {
   __raw?: ModelProperty;
   type: SdkType;
   name: string;
@@ -464,7 +489,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase {
+interface SdkMethodBase extends DecoratedType {
   __raw?: Operation;
   name: string;
   access: AccessFlags;
