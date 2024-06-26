@@ -42,6 +42,7 @@ import {
   getAvailableApiVersions,
   getDocHelper,
   getLocationOfOperation,
+  getTypeDecorators,
   getTypeSpecBuiltInType,
   isAcceptHeader,
   isContentTypeHeader,

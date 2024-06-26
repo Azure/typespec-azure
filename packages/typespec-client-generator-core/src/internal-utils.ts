@@ -47,7 +47,8 @@ import {
 export function getTypeSpecBuiltInType(
   kind: SdkBuiltInKinds,
   encode?: string,
-  raw?: Type
+  raw?: Type,
+  decorators?: Record<string, Record<string, any>>
 ): SdkBuiltInType {
   return {
     __raw: raw,
@@ -55,7 +56,7 @@ export function getTypeSpecBuiltInType(
     name: kind,
     encode: encode ?? kind,
     crossLanguageDefinitionId: `TypeSpec.${kind}`,
-    decorators: {}
+    decorators: {},
   };
 }
 
@@ -275,7 +276,7 @@ export function getSdkTypeBaseHelper<TKind>(
   return diagnostics.wrap({
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
-    kind,
+    kind: kind,
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
 }
@@ -521,6 +522,11 @@ export function getAnyType(
   type: Type
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const anyType = getTypeSpecBuiltInType("any", diagnostics.pipe(getTypeDecorators(context, type));
+  const anyType = getTypeSpecBuiltInType(
+    "any",
+    undefined,
+    type,
+    diagnostics.pipe(getTypeDecorators(context, type))
+  );
   return diagnostics.wrap(anyType);
 }
