@@ -43,7 +43,6 @@ import {
   getDocHelper,
   getLocationOfOperation,
   getTypeDecorators,
-  getTypeSpecBuiltInType,
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
@@ -56,6 +55,7 @@ import {
   addFormatInfo,
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
+  getTypeSpecBuiltInType,
 } from "./types.js";
 
 export function getSdkHttpOperation(
@@ -233,7 +233,7 @@ function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
-  let type: SdkType = getTypeSpecBuiltInType("string");
+  let type: SdkType = getTypeSpecBuiltInType(context, "string");
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
   // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.

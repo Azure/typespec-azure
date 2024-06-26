@@ -79,7 +79,6 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
-  getAnyType,
   getAvailableApiVersions,
   getDocHelper,
   getLocationOfOperation,
@@ -87,7 +86,6 @@ import {
   getNullOption,
   getSdkTypeBaseHelper,
   getTypeDecorators,
-  getTypeSpecBuiltInType,
   intOrFloat,
   isAzureCoreModel,
   isMultipartFormData,
@@ -109,6 +107,28 @@ import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { TCGCContext } from "./internal-utils.js";
+
+export function getTypeSpecBuiltInType(
+  context: TCGCContext,
+  kind: IntrinsicScalarName
+): SdkBuiltInType {
+  const global = context.program.getGlobalNamespaceType();
+  const typeSpecNamespace = global.namespaces!.get("TypeSpec");
+  const sdkType = typeSpecNamespace!.scalars.get(kind)!;
+
+  return getClientType(context, sdkType) as SdkBuiltInType;
+}
+
+function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const anyType: SdkBuiltInType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "any")),
+    name: getLibraryName(context, type),
+    encode: getEncodeHelper(context, type, "any"),
+    crossLanguageDefinitionId: "",
+  };
+  return diagnostics.wrap(anyType);
+}
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
@@ -256,7 +276,7 @@ function getSdkDateTimeType(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
     encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
-    wireType: wireType ?? getTypeSpecBuiltInType("string"),
+    wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
@@ -290,7 +310,7 @@ function getSdkDurationTypeWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
     encode: (encode ?? "ISO8601") as DurationKnownEncoding,
-    wireType: wireType ?? getTypeSpecBuiltInType("string"),
+    wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
@@ -358,12 +378,18 @@ function getSdkTypeForLiteral(
   } else {
     kind = intOrFloat(type.value);
   }
-  return getTypeSpecBuiltInType(kind, getEncodeHelper(context, type, kind), type);
+  return getTypeSpecBuiltInType(context, kind);
 }
 
 function getSdkTypeForIntrinsic(context: TCGCContext, type: IntrinsicType): SdkBuiltInType {
   const kind = "any";
-  return getTypeSpecBuiltInType(kind, getEncodeHelper(context, type, kind), type);
+  const diagnostics = createDiagnosticCollector();
+  return {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
+    name: getLibraryName(context, type),
+    crossLanguageDefinitionId: "",
+    encode: kind,
+  };
 }
 
 export function getSdkBuiltInType(
@@ -622,7 +648,7 @@ function addDiscriminatorToModelType(
         discriminatorType = discriminatorProperty.type.enumType;
       }
     } else {
-      discriminatorType = getTypeSpecBuiltInType("string");
+      discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
@@ -755,7 +781,7 @@ function getSdkEnumValueType(
     }
   }
 
-  return diagnostics.wrap(getTypeSpecBuiltInType(kind!, kind!, type!));
+  return diagnostics.wrap(getTypeSpecBuiltInType(context, kind!));
 }
 
 function getUnionAsEnumValueType(

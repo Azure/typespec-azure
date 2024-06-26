@@ -26,7 +26,6 @@ import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   SdkBuiltInKinds,
-  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
@@ -43,22 +42,6 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-
-export function getTypeSpecBuiltInType(
-  kind: SdkBuiltInKinds,
-  encode?: string,
-  raw?: Type,
-  decorators?: Record<string, Record<string, any>>
-): SdkBuiltInType {
-  return {
-    __raw: raw,
-    kind: kind,
-    name: kind,
-    encode: encode ?? kind,
-    crossLanguageDefinitionId: `TypeSpec.${kind}`,
-    decorators: {},
-  };
-}
 
 /**
  *
@@ -515,18 +498,4 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
 
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
-}
-
-export function getAnyType(
-  context: TCGCContext,
-  type: Type
-): [SdkBuiltInType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const anyType = getTypeSpecBuiltInType(
-    "any",
-    undefined,
-    type,
-    diagnostics.pipe(getTypeDecorators(context, type))
-  );
-  return diagnostics.wrap(anyType);
 }

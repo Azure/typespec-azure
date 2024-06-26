@@ -55,7 +55,6 @@ import {
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
-  getTypeSpecBuiltInType,
   isNeverOrVoidType,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -74,6 +73,7 @@ import {
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
+  getTypeSpecBuiltInType,
 } from "./types.js";
 
 function getSdkServiceOperation<
@@ -492,7 +492,7 @@ function getSdkEndpointParameter(
           optional: false,
           serializedName: "endpoint",
           correspondingMethodParams: [],
-          type: getTypeSpecBuiltInType("string", undefined, client.service),
+          type: getTypeSpecBuiltInType(context, "string"),
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
