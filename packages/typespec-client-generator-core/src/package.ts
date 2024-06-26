@@ -54,7 +54,7 @@ import {
   getDocHelper,
   getHashForType,
   getLocationOfOperation,
-  getSdkTypeBaseHelper,
+  getTypeDecorators,
   isNeverOrVoidType,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -213,6 +213,8 @@ function getSdkMethodResponse<
       values: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
+      decorators: {},
     };
   } else if (responseTypes.size === 1) {
     type = allResponseBodies[0];
@@ -221,6 +223,7 @@ function getSdkMethodResponse<
     type = {
       kind: "nullable",
       type: type,
+      decorators: {},
     };
   }
   return {
@@ -278,6 +281,7 @@ function getSdkBasicServiceMethod<
       return undefined; // currently we only return a value for paging or lro
     },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
+    decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
   });
 }
 
@@ -363,6 +367,7 @@ function getSdkInitializationType<
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
     isError: false,
+    decorators: {},
   });
 }
 
@@ -392,6 +397,7 @@ function getSdkMethodParameter(
       isApiVersionParam: false,
       onClient: false,
       crossLanguageDefinitionId: "anonymous",
+      decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     });
   }
   return diagnostics.wrap({
@@ -425,6 +431,7 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
       crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
+      decorators: {},
     });
   }
   return diagnostics.wrap(retval);
@@ -457,14 +464,17 @@ function getSdkEndpointParameter(
           serializedName: "endpoint",
           correspondingMethodParams: [],
           type: {
-            ...getSdkTypeBaseHelper(context, client.service, "string"),
+            kind: "string",
             encode: "string",
+            decorators: {},
           },
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+          decorators: {},
         },
       ],
+      decorators: {},
     };
   } else {
     // this means we have one server
@@ -473,6 +483,7 @@ function getSdkEndpointParameter(
       kind: "endpoint",
       serverUrl: servers[0].url,
       templateArguments,
+      decorators: {},
     };
     for (const param of servers[0].parameters.values()) {
       const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
@@ -511,6 +522,7 @@ function getSdkEndpointParameter(
     optional,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+    decorators: {},
   });
 }
 
@@ -540,6 +552,7 @@ function createSdkClientType<
     ), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
+    decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
   };
   return diagnostics.wrap(sdkClientType);
 }

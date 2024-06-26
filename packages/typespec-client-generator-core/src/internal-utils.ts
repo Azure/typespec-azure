@@ -4,6 +4,7 @@ import {
   Interface,
   Model,
   Namespace,
+  Numeric,
   NumericLiteral,
   Operation,
   Program,
@@ -11,6 +12,7 @@ import {
   StringLiteral,
   Type,
   Union,
+  Value,
   createDiagnosticCollector,
   getDeprecationDetails,
   getDoc,
@@ -242,6 +244,7 @@ interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
   deprecation?: string;
   kind: TKind;
+  decorators: Record<string, Record<string, any>>;
 }
 
 /**
@@ -252,12 +255,83 @@ export function getSdkTypeBaseHelper<TKind>(
   context: TCGCContext,
   type: Type,
   kind: TKind
-): DefaultSdkTypeBase<TKind> {
-  return {
+): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
-  };
+    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+  });
+}
+
+export function getNamespacePrefix(namespace: Namespace): string {
+  return namespace ? getNamespaceFullName(namespace) + "." : "";
+}
+
+export function getTypeDecorators(
+  context: TCGCContext,
+  type: Type
+): [Record<string, Record<string, any>>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const retval: Record<string, Record<string, any>> = {};
+  if ("decorators" in type) {
+    for (const decorator of type.decorators) {
+      // only process explicitly defined decorators
+      if (decorator.definition) {
+        const decoratorName = `${getNamespacePrefix(decorator.definition?.namespace)}${decorator.definition?.name}`;
+        // white list filtering
+        if (
+          !context.decoratorsAllowList ||
+          !context.decoratorsAllowList.some((x) => new RegExp(x).test(decoratorName))
+        ) {
+          continue;
+        }
+
+        retval[decoratorName] = {};
+        for (let i = 0; i < decorator.args.length; i++) {
+          retval[decoratorName][decorator.definition.parameters[i].name] = diagnostics.pipe(
+            getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+          );
+        }
+      }
+    }
+  }
+  return diagnostics.wrap(retval);
+}
+
+function getDecoratorArgValue(
+  arg:
+    | Type
+    | Record<string, unknown>
+    | Value
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | Numeric
+    | null,
+  type: Type,
+  decoratorName: string
+): [any, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (typeof arg === "object" && arg !== null && "kind" in arg) {
+    if (arg.kind === "EnumMember") {
+      return diagnostics.wrap(arg.value ?? arg.name);
+    }
+    if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
+      return diagnostics.wrap(arg.value);
+    }
+    diagnostics.add(
+      createDiagnostic({
+        code: "unsupported-generic-decorator-arg-type",
+        target: type,
+        format: { decoratorName },
+      })
+    );
+    return diagnostics.wrap(undefined);
+  }
+  return diagnostics.wrap(arg);
 }
 
 export function intOrFloat(value: number): "int32" | "float32" {
@@ -326,6 +400,7 @@ export interface TCGCContext {
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   originalProgram: Program;
+  decoratorsAllowList?: string[];
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -427,9 +502,14 @@ export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
 }
 
-export function getAnyType(): SdkBuiltInType {
-  return {
+export function getAnyType(
+  context: TCGCContext,
+  type: Type
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
     kind: "any",
     encode: "string",
-  };
+    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+  });
 }

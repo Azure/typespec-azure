@@ -142,7 +142,7 @@ describe("typespec-client-generator-core: model types", () => {
     const recursiveModel = models[0];
     strictEqual(recursiveModel.name, "RecursiveModel");
     strictEqual(recursiveModel.kind, "model");
-    strictEqual(recursiveModel.tspNamespace, "TestService");
+    strictEqual(recursiveModel.crossLanguageDefinitionId, "TestService.RecursiveModel");
     strictEqual(recursiveModel.properties.length, 1);
     const prop = recursiveModel.properties[0];
     strictEqual(prop.kind, "property");
@@ -693,7 +693,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runnerWithCore.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
-    strictEqual(models[0].tspNamespace, "My.Service");
+    strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("filterOutCoreModels false", async () => {
@@ -724,13 +724,13 @@ describe("typespec-client-generator-core: model types", () => {
     );
     strictEqual(models.length, 4);
     strictEqual(models[0].name, "Error");
-    strictEqual(models[0].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
     strictEqual(models[1].name, "ErrorResponse");
-    strictEqual(models[1].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[1].crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
     strictEqual(models[2].name, "InnerError");
-    strictEqual(models[2].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[2].crossLanguageDefinitionId, "Azure.Core.Foundations.InnerError");
     strictEqual(models[3].name, "User");
-    strictEqual(models[3].tspNamespace, "My.Service");
+    strictEqual(models[3].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("lro core filterOutCoreModels true", async () => {
@@ -759,7 +759,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runnerWithCore.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
-    strictEqual(models[0].tspNamespace, "My.Service");
+    strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("lro core filterOutCoreModels false", async () => {
@@ -791,15 +791,15 @@ describe("typespec-client-generator-core: model types", () => {
     );
     strictEqual(models.length, 5);
     strictEqual(models[0].name, "Error");
-    strictEqual(models[0].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
     strictEqual(models[1].name, "ErrorResponse");
-    strictEqual(models[1].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[1].crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
     strictEqual(models[2].name, "InnerError");
-    strictEqual(models[2].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[2].crossLanguageDefinitionId, "Azure.Core.Foundations.InnerError");
     strictEqual(models[3].name, "ResourceOperationStatusUserUserError");
-    strictEqual(models[3].tspNamespace, "Azure.Core");
+    strictEqual(models[3].crossLanguageDefinitionId, "Azure.Core.ResourceOperationStatus");
     strictEqual(models[4].name, "User");
-    strictEqual(models[4].tspNamespace, "My.Service");
+    strictEqual(models[4].crossLanguageDefinitionId, "My.Service.User");
     strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
     strictEqual(runnerWithCore.context.experimental_sdkPackage.enums[0].name, "OperationState");
   });
@@ -1339,7 +1339,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.experimental_sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "Model1");
-    strictEqual(models[0].tspNamespace, "MyService");
+    strictEqual(models[0].crossLanguageDefinitionId, "MyService.Model1");
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
 
