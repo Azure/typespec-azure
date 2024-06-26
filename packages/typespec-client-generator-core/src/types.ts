@@ -208,18 +208,54 @@ export function addEncodeInfo(
   return diagnostics.wrap(undefined);
 }
 
-function getScalarTypeKind(context: TCGCContext, type: Scalar): IntrinsicScalarName | "any" {
-  if (context.program.checker.isStdType(type)) {
-    return type.name;
+/**
+ * Mapping of typespec scalar kinds to the built in kinds exposed in the SDK
+ * @param context the TCGC context
+ * @param scalar the original typespec scalar
+ * @returns the corresponding sdk built in kind
+ */
+function getScalarKind(context: TCGCContext, scalar: Scalar): IntrinsicScalarName | "any" {
+  if (context.program.checker.isStdType(scalar)) {
+    return scalar.name;
   }
 
   // for those scalar defined as `scalar newThing;`,
   // the best we could do here is return as a `any` type with a name and namespace and let the generator figure what this is
-  if (type.baseScalar === undefined) {
+  if (scalar.baseScalar === undefined) {
     return "any";
   }
 
-  return getScalarTypeKind(context, type.baseScalar);
+  return getScalarKind(context, scalar.baseScalar);
+}
+
+/**
+ * This function converts a Scalar into SdkBuiltInType.
+ * @param context
+ * @param type
+ * @param kind
+ * @returns
+ */
+function getSdkBuiltInTypeWithDiagnostics(
+  context: TCGCContext,
+  type: Scalar,
+  kind: SdkBuiltInKinds
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const docWrapper = getDocHelper(context, type);
+  const stdType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
+    name: getLibraryName(context, type),
+    encode: getEncodeHelper(context, type, kind),
+    description: docWrapper.description,
+    details: docWrapper.details,
+    baseType: type.baseScalar
+      ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
+      : undefined,
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+  };
+  addEncodeInfo(context, type, stdType);
+  addFormatInfo(context, type, stdType);
+  return diagnostics.wrap(stdType);
 }
 
 /**
@@ -284,76 +320,12 @@ function getSdkDateTimeType(
   });
 }
 
-/**
- * This function converts a Scalar into SdkDurationType.
- * @param context
- * @param type
- * @param kind
- * @returns
- */
-function getSdkDurationTypeWithDiagnostics(
-  context: TCGCContext,
-  type: Scalar,
-  kind: "duration"
-): [SdkDurationType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const docWrapper = getDocHelper(context, type);
-  const baseType = type.baseScalar
-    ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
-    : undefined;
-  const [encode, wireType] = getEncodeInfoForDateTimeOrDuration(
-    context,
-    getEncode(context.program, type),
-    baseType
-  );
-  return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
-    name: getLibraryName(context, type),
-    encode: (encode ?? "ISO8601") as DurationKnownEncoding,
-    wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
-    baseType: baseType,
-    description: docWrapper.description,
-    details: docWrapper.details,
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
-  });
-}
-
-/**
- * This function converts a Scalar into SdkBuiltInType.
- * @param context
- * @param type
- * @param kind
- * @returns
- */
-function getSdkBuiltInTypeWithDiagnostics(
-  context: TCGCContext,
-  type: Scalar,
-  kind: SdkBuiltInKinds
-): [SdkBuiltInType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const docWrapper = getDocHelper(context, type);
-  const stdType = {
-    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
-    name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type, kind),
-    description: docWrapper.description,
-    details: docWrapper.details,
-    baseType: type.baseScalar
-      ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
-      : undefined,
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
-  };
-  addEncodeInfo(context, type, stdType);
-  addFormatInfo(context, type, stdType);
-  return diagnostics.wrap(stdType);
-}
-
 function getSdkDateTimeOrDurationOrBuiltInType(
   context: TCGCContext,
   type: Scalar
 ): [SdkDateTimeType | SdkDurationType | SdkBuiltInType, readonly Diagnostic[]] {
   // follow the extends hierarchy to determine the final kind of this type
-  const kind = getScalarTypeKind(context, type);
+  const kind = getScalarKind(context, type);
 
   if (kind === "utcDateTime" || kind === "offsetDateTime") {
     return getSdkDateTimeType(context, type, kind);
@@ -410,6 +382,40 @@ export function getSdkBuiltInType(
 
 export function getSdkDurationType(context: TCGCContext, type: Scalar): SdkDurationType {
   return ignoreDiagnostics(getSdkDurationTypeWithDiagnostics(context, type, "duration"));
+}
+
+/**
+ * This function converts a Scalar into SdkDurationType.
+ * @param context
+ * @param type
+ * @param kind
+ * @returns
+ */
+function getSdkDurationTypeWithDiagnostics(
+  context: TCGCContext,
+  type: Scalar,
+  kind: "duration"
+): [SdkDurationType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const docWrapper = getDocHelper(context, type);
+  const baseType = type.baseScalar
+    ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
+    : undefined;
+  const [encode, wireType] = getEncodeInfoForDateTimeOrDuration(
+    context,
+    getEncode(context.program, type),
+    baseType
+  );
+  return diagnostics.wrap({
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
+    name: getLibraryName(context, type),
+    encode: (encode ?? "ISO8601") as DurationKnownEncoding,
+    wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
+    baseType: baseType,
+    description: docWrapper.description,
+    details: docWrapper.details,
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+  });
 }
 
 export function getSdkArrayOrDict(
