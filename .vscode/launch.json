@@ -145,6 +145,26 @@
       }
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Compile AllProps",
+      "program": "${workspaceRoot}/core/packages/compiler/entrypoints/cli.js",
+      "args": ["compile", ".", "--emit=@azure-tools/typespec-autorest"],
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/packages/*/dist-dev/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist/**/*.js",
+        "${workspaceFolder}/core/packages/*/dist-dev/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}/packages/samples/specs/resource-manager/arm-library",
+      "presentation": {
+        "order": 2
+      }
+    },
+    {
       "name": "Regenerate .tmlanguage",
       "type": "node",
       "program": "${workspaceRoot}/core/packages/typespec-vscode/scripts/generate-tmlanguage.js",
