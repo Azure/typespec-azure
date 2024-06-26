@@ -34,7 +34,7 @@ import {
   isSdkFloatKind,
   isSdkIntKind,
 } from "./interfaces.js";
-import { TCGCContext } from "./internal-utils.js";
+import { TCGCContext, getValidApiVersion } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
 interface LoadedExample {
@@ -52,14 +52,7 @@ async function loadExamples<TServiceOperation extends SdkServiceOperation>(
     return diagnostics.wrap(new Map());
   }
 
-  const allApiVersions = client.apiVersions;
-  let apiVersion = context.apiVersion;
-  if (apiVersion === "all") {
-    return diagnostics.wrap(new Map());
-  }
-  if (apiVersion === "latest" || apiVersion === undefined || !allApiVersions.includes(apiVersion)) {
-    apiVersion = allApiVersions[allApiVersions.length - 1];
-  }
+  const apiVersion = getValidApiVersion(context, client.apiVersions);
 
   const exampleDir = apiVersion
     ? resolvePath(context.examplesDirectory, apiVersion)
@@ -349,100 +342,100 @@ function getSdkTypeExample(
 
   if (isSdkIntKind(type.kind) || isSdkFloatKind(type.kind)) {
     return getSdkBaseTypeExample("number", type as SdkType, example, relativePath);
-  } else if (type.kind === "string" || type.kind === "bytes") {
-    return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
-  } else if (type.kind === "boolean") {
-    return getSdkBaseTypeExample("boolean", type as SdkType, example, relativePath);
-  } else if (
-    type.kind === "password" ||
-    type.kind === "guid" ||
-    type.kind === "url" ||
-    type.kind === "uri" ||
-    type.kind === "ipAddress" ||
-    type.kind === "uuid" ||
-    type.kind === "ipV4Address" ||
-    type.kind === "ipV6Address" ||
-    type.kind === "eTag" ||
-    type.kind === "armId" ||
-    type.kind === "azureLocation" ||
-    type.kind === "plainDate" ||
-    type.kind === "plainTime"
-  ) {
-    return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
-  } else if (type.kind === "nullable") {
-    if (example === null) {
-      return diagnostics.wrap({
-        kind: "null",
-        type,
-        value: null,
-      } as SdkNullExample);
-    } else {
-      return getSdkTypeExample(type.type, example, relativePath);
+  } else {
+    switch (type.kind) {
+      case "string":
+      case "bytes":
+        return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
+      case "boolean":
+        return getSdkBaseTypeExample("boolean", type as SdkType, example, relativePath);
+      case "password":
+      case "guid":
+      case "url":
+      case "uri":
+      case "ipAddress":
+      case "uuid":
+      case "ipV4Address":
+      case "ipV6Address":
+      case "eTag":
+      case "armId":
+      case "azureLocation":
+      case "plainDate":
+      case "plainTime":
+        return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
+      case "nullable":
+        if (example === null) {
+          return diagnostics.wrap({
+            kind: "null",
+            type,
+            value: null,
+          } as SdkNullExample);
+        } else {
+          return getSdkTypeExample(type.type, example, relativePath);
+        }
+      case "any":
+        return diagnostics.wrap({
+          kind: "any",
+          type,
+          value: example,
+        } as SdkAnyExample);
+      case "constant":
+        if (example === type.value) {
+          return getSdkBaseTypeExample(
+            typeof type.value as "string" | "number" | "boolean",
+            type,
+            example,
+            relativePath
+          );
+        } else {
+          addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
+          return diagnostics.wrap(undefined);
+        }
+      case "enum":
+        if (type.values.some((v) => v.value === example)) {
+          return getSdkBaseTypeExample(
+            typeof example as "string" | "number",
+            type,
+            example,
+            relativePath
+          );
+        } else {
+          addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
+          return diagnostics.wrap(undefined);
+        }
+      case "enumvalue":
+        if (type.value === example) {
+          return getSdkBaseTypeExample(
+            typeof example as "string" | "number",
+            type,
+            example,
+            relativePath
+          );
+        } else {
+          addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
+          return diagnostics.wrap(undefined);
+        }
+      case "utcDateTime":
+      case "offsetDateTime":
+      case "duration":
+        const inner = diagnostics.pipe(getSdkTypeExample(type.wireType, example, relativePath));
+        if (inner) {
+          inner.type = type;
+        }
+        return diagnostics.wrap(inner);
+      case "union":
+        return diagnostics.wrap({
+          kind: "union",
+          type,
+          value: example,
+        } as SdkUnionExample);
+      case "array":
+        return getSdkArrayExample(type, example, relativePath);
+      case "dict":
+        return getSdkDictionaryExample(type, example, relativePath);
+      case "model":
+        return getSdkModelExample(type, example, relativePath);
     }
-  } else if (type.kind === "any") {
-    return diagnostics.wrap({
-      kind: "any",
-      type,
-      value: example,
-    } as SdkAnyExample);
-  } else if (type.kind === "constant") {
-    if (example === type.value) {
-      return getSdkBaseTypeExample(
-        typeof type.value as "string" | "number" | "boolean",
-        type,
-        example,
-        relativePath
-      );
-    } else {
-      addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
-      return diagnostics.wrap(undefined);
-    }
-  } else if (type.kind === "enum") {
-    if (type.values.some((v) => v.value === example)) {
-      return getSdkBaseTypeExample(
-        typeof example as "string" | "number",
-        type,
-        example,
-        relativePath
-      );
-    } else {
-      addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
-      return diagnostics.wrap(undefined);
-    }
-  } else if (type.kind === "enumvalue") {
-    if (type.value === example) {
-      return getSdkBaseTypeExample(
-        typeof example as "string" | "number",
-        type,
-        example,
-        relativePath
-      );
-    } else {
-      addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
-      return diagnostics.wrap(undefined);
-    }
-  } else if (
-    type.kind === "utcDateTime" ||
-    type.kind === "offsetDateTime" ||
-    type.kind === "duration"
-  ) {
-    const inner = diagnostics.pipe(getSdkTypeExample(type.wireType, example, relativePath));
-    if (inner) {
-      inner.type = type;
-    }
-    return diagnostics.wrap(inner);
-  } else if (type.kind === "union") {
-    return diagnostics.wrap({
-      kind: "union",
-      type,
-      value: example,
-    } as SdkUnionExample);
-  } else if (type.kind === "array") {
-    return getSdkArrayExample(type, example, relativePath);
-  } else if (type.kind === "dict") {
-    return getSdkDictionaryExample(type, example, relativePath);
-  } else if (type.kind === "model") {
-    return getSdkModelExample(type, example, relativePath);
   }
   return diagnostics.wrap(undefined);
 }

@@ -50,7 +50,10 @@ interface ResolvedAutorestCanonicalEmitterOptions extends AutorestDocumentEmitte
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = await createSdkContext(context, "@azure-tools/typespec-autorest-canonical");
+  const tcgcSdkContext = await createSdkContext(
+    context,
+    "@azure-tools/typespec-autorest-canonical"
+  );
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {

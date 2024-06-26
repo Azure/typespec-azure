@@ -561,3 +561,14 @@ export function resolveOperationId(context: TCGCContext, operation: Operation) {
 
   return pascalCaseForOperationId(`${namespace.name}_${operationName}`);
 }
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
+}
