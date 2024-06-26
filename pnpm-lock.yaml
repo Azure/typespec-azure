@@ -1661,6 +1661,9 @@ importers:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
         version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:~
+        version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~
         version: link:../typespec-client-generator-core
