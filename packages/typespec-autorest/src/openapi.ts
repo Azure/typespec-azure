@@ -879,12 +879,12 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext, isDerived?: boolean): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
       undefined;
     const ref = resolveExternalRef(type);
     if (ref) {
-      if (isDerived || !metadataInfo.isTransformed(type, schemaContext.visibility)) {
+      if (!metadataInfo.isTransformed(type, schemaContext.visibility)) {
         return ref;
       }
 
@@ -1653,6 +1653,7 @@ export async function getOpenAPIForService(
 
   function includeDerivedModel(model: Model): boolean {
     return (
+      !resolveExternalRef(model) &&
       !isTemplateDeclaration(model) &&
       (model.templateMapper?.args === undefined ||
         model.templateMapper?.args.length === 0 ||
@@ -1710,11 +1711,13 @@ export async function getOpenAPIForService(
       modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, schemaContext);
     }
 
-    const derivedModels = model.derivedModels.filter(includeDerivedModel);
+    const derivedModels = resolveExternalRef(model)
+      ? []
+      : model.derivedModels.filter(includeDerivedModel);
 
     // getSchemaOrRef on all children to push them into components.schemas
     for (const child of derivedModels) {
-      getSchemaOrRef(child, schemaContext, true);
+      getSchemaOrRef(child, schemaContext);
     }
 
     const discriminator = getDiscriminator(program, model);
