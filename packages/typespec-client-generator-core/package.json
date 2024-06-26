@@ -63,7 +63,8 @@
     "@typespec/http": "workspace:~",
     "@typespec/openapi": "workspace:~",
     "@typespec/rest": "workspace:~",
-    "@typespec/versioning": "workspace:~"
+    "@typespec/versioning": "workspace:~",
+    "@typespec/xml": "workspace:~"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
@@ -72,6 +73,7 @@
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/openapi": "workspace:~",
+    "@typespec/xml": "workspace:~",
     "@typespec/library-linter": "workspace:~",
     "@typespec/prettier-plugin-typespec": "workspace:~",
     "@typespec/rest": "workspace:~",

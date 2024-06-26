@@ -30,6 +30,7 @@ import {
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import { handleClientExamples } from "./example.js";
+import { defaultDecoratorsAllowList } from "./configs.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -323,6 +324,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");
+
 export function $operationGroup(
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -422,6 +424,7 @@ function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interfa
   }
   return path.reverse().join(".");
 }
+
 /**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
  * @param context TCGCContext
@@ -580,9 +583,9 @@ export function listOperationsInOperationGroup(
   addOperations(group.type);
   return operations;
 }
-
-interface CreateSdkContextOptions {
+export interface CreateSdkContextOptions {
   readonly versionStrategy?: "ignore";
+  additionalDecorators?: string[];
 }
 
 export async function createSdkContext<
@@ -618,6 +621,7 @@ export async function createSdkContext<
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
     examplesDirectory: context.options["examples-directory"],
+    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
   for (const client of sdkContext.experimental_sdkPackage.clients) {
@@ -721,6 +725,7 @@ function modelTransitiveSet(
 }
 
 const clientFormatKey = createStateSymbol("clientFormat");
+
 const allowedClientFormatToTargetTypeMap: Record<ClientFormat, string[]> = {
   unixtime: ["int32", "int64"],
   iso8601: ["utcDateTime", "offsetDateTime", "duration"],
