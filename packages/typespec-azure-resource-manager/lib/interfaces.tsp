@@ -120,7 +120,7 @@ interface ResourceInstanceOperations<
   Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
-  PatchModel extends {} = {}
+  PatchModel = ResourceUpdateModel<Resource, Properties>
 >
   extends ResourceRead<Resource, BaseParameters>,
     ResourceCreate<Resource, BaseParameters>,
@@ -315,8 +315,7 @@ interface ResourceUpdateAsync<
 interface ResourceUpdateSync<
   Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model,
-  BaseParameters = DefaultBaseParameters<Resource>,
-  PatchModel extends {} = {}
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
    * @dev Update a resource using the synchronous call pattern.
