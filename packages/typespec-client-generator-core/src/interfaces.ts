@@ -53,7 +53,8 @@ export interface SdkInitializationType extends SdkModelType {
   properties: SdkParameter[];
 }
 
-export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   kind: "client";
   name: string;
   description?: string;
@@ -76,7 +77,16 @@ export interface SdkOperationGroup {
   service: Namespace;
 }
 
-interface SdkTypeBase {
+interface DecoratedType {
+  // Client types sourced from TypeSpec decorated types will have this generic decoratores dict.
+  // The key is the fully qualified name of the decorator. For example, `TypeSpec.@encode`, `TypeSpec.Xml.@attribute`.
+  // The value is a dict of the decorator's arguments' value (key is argument's name).
+  // Only decorators in allowed list will be included in this dict.
+  // Language's emitter could set `additionalDecorators` in the option when `createSdkContext` to extend the allowed list.
+  decorators: Record<string, Record<string, any>>;
+}
+
+interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
@@ -337,7 +347,7 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase {
+export interface SdkModelPropertyTypeBase extends DecoratedType {
   __raw?: ModelProperty;
   type: SdkType;
   name: string;
@@ -476,7 +486,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase {
+interface SdkMethodBase extends DecoratedType {
   __raw?: Operation;
   name: string;
   access: AccessFlags;
