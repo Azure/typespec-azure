@@ -2,7 +2,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  SdkDatetimeType,
+  SdkDateTimeType,
   SdkDurationType,
   SdkHttpOperation,
   SdkNullableType,
@@ -254,7 +254,7 @@ describe("typespec-client-generator-core: example types", () => {
     strictEqual(operation.examples[0].responses.get(200)?.value?.value, "2022-08-26T18:38:00.000Z");
     strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "utcDateTime");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkDatetimeType).wireType.kind,
+      (operation.examples[0].responses.get(200)?.value?.type as SdkDateTimeType).wireType.kind,
       "string"
     );
 
@@ -365,7 +365,7 @@ describe("typespec-client-generator-core: example types", () => {
     strictEqual(operation.examples[0].responses.get(200)?.value?.value, 1686566864);
     strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "utcDateTime");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkDatetimeType).wireType.kind,
+      (operation.examples[0].responses.get(200)?.value?.type as SdkDateTimeType).wireType.kind,
       "int64"
     );
 

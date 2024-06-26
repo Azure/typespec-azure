@@ -639,13 +639,13 @@ export interface SdkExampleTypeBase {
 
 export interface SdkStringExample extends SdkExampleTypeBase {
   kind: "string";
-  type: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  type: SdkBuiltInType | SdkDateTimeType | SdkDurationType | SdkEnumType | SdkConstantType;
   value: string;
 }
 
 export interface SdkNumberExample extends SdkExampleTypeBase {
   kind: "number";
-  type: SdkBuiltInType | SdkDatetimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  type: SdkBuiltInType | SdkDateTimeType | SdkDurationType | SdkEnumType | SdkConstantType;
   value: number;
 }
 
