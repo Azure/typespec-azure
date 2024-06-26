@@ -59,7 +59,7 @@ import {
   SdkConstantType,
   SdkCredentialParameter,
   SdkCredentialType,
-  SdkDatetimeType,
+  SdkDateTimeType,
   SdkDictionaryType,
   SdkDurationType,
   SdkEnumType,
@@ -896,7 +896,7 @@ export function getClientTypeWithDiagnostics(
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "string")),
             encode: "string",
           },
-        } as SdkDatetimeType;
+        } as SdkDateTimeType;
         break;
       }
       if (type.name === "duration") {
