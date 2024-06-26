@@ -214,6 +214,7 @@ function getSdkMethodResponse<
       values: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
       decorators: [],
     };
   } else if (responseTypes) {
