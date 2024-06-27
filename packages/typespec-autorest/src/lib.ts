@@ -96,6 +96,11 @@ export interface AutorestEmitterOptions {
    * ARM resource properties.
    */
   "arm-resource-flattening"?: boolean;
+  /**
+   * Determines whether and how to emit schemas for common-types
+   * @default "for-visibility-changes"
+   */
+  "emit-common-types-schema"?: "reference-only" | "for-visibility-changes";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -205,6 +210,14 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: false,
       description:
         "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
+    },
+    "emit-common-types-schema": {
+      type: "string",
+      enum: ["reference-only", "for-visibility-changes"],
+      nullable: true,
+      default: "for-visibility-changes",
+      description:
+        "Determine whether and how to emit schemas for common-types rather than referencing them",
     },
   },
   required: [],
