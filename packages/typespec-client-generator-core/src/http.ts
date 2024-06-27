@@ -253,7 +253,7 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
-      decorators: {},
+      decorators: [],
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -266,7 +266,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-    decorators: {},
+    decorators: [],
   };
 }
 

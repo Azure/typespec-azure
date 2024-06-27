@@ -34,7 +34,7 @@ describe("typespec-client-generator-core: array types", () => {
     strictEqual(method.response.kind, "method");
     strictEqual(method.response.type?.kind, "array");
     strictEqual(method.response.type?.name, "TestArray");
-    strictEqual(method.response.type?.tspNamespace, "TestClient");
+    strictEqual(method.response.type?.crossLanguageDefinitionId, "TestClient.TestArray");
     strictEqual(method.response.type?.valueType.kind, "model");
     strictEqual(method.response.type?.valueType.name, "TestModel");
   });
@@ -62,7 +62,7 @@ describe("typespec-client-generator-core: array types", () => {
     const property = model.properties[0];
     strictEqual(property.type.kind, "array");
     strictEqual(property.type.name, "EmbeddingVector");
-    strictEqual(property.type.tspNamespace, "Azure.Core");
+    strictEqual(property.type.crossLanguageDefinitionId, "Azure.Core.EmbeddingVector");
     strictEqual(property.type.valueType.kind, "int32");
   });
 
@@ -91,7 +91,7 @@ describe("typespec-client-generator-core: array types", () => {
     const property = model.properties[0];
     strictEqual(property.type.kind, "array");
     strictEqual(property.type.name, "EmbeddingVector");
-    strictEqual(property.type.tspNamespace, "Azure.Core");
+    strictEqual(property.type.crossLanguageDefinitionId, "Azure.Core.EmbeddingVector");
     strictEqual(property.type.valueType.kind, "int32");
   });
 });
