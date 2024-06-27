@@ -195,6 +195,12 @@ export interface AutorestDocumentEmitterOptions {
    * @default "final-state-only"
    */
   readonly emitLroOptions?: "none" | "final-state-only" | "all";
+
+  /**
+   * Determines whether and how to emit schema for arm common-types
+   * @default "for-visibility-only"
+   */
+  readonly emitCommonTypesSchema?: "reference-only" | "for-visibility-changes";
 }
 
 /**
@@ -229,6 +235,14 @@ interface PendingSchema {
    * must be emitted for the type for different visibilities.
    */
   ref: Ref;
+
+  /**
+   * Determines the schema name if an override has been set
+   * @param name The default name of the schema
+   * @param visibility The visibility in which the schema is used
+   * @returns The name of the given schema in the given visibility context
+   */
+  getSchemaNameOverride?: (name: string, visibility: Visibility) => string;
 }
 
 /**
@@ -871,10 +885,21 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext, isDerived?: boolean): any {
+    let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
+      undefined;
     const ref = resolveExternalRef(type);
     if (ref) {
-      return ref;
+      if (
+        options.emitCommonTypesSchema === "reference-only" ||
+        !metadataInfo.isTransformed(type, schemaContext.visibility)
+      ) {
+        return ref;
+      }
+
+      // Reference schemas will only be generated when they differ from READ
+      schemaNameOverride = (n: string, v: Visibility) =>
+        `${n}${getVisibilitySuffix(v, Visibility.Read)}`;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -932,6 +957,7 @@ export async function getOpenAPIForService(
         type,
         visibility: schemaContext.visibility,
         ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
+        getSchemaNameOverride: schemaNameOverride,
       }));
       return { $ref: pending.ref };
     }
@@ -1306,7 +1332,9 @@ export async function getOpenAPIForService(
     for (const group of processedSchemas.values()) {
       for (const [visibility, processed] of group) {
         let name = getOpenAPITypeName(program, processed.type, typeNameOptions);
-        if (group.size > 1) {
+        if (processed.getSchemaNameOverride !== undefined) {
+          name = processed.getSchemaNameOverride(name, visibility);
+        } else if (group.size > 1) {
           name += getVisibilitySuffix(visibility, Visibility.Read);
         }
 
@@ -1633,6 +1661,7 @@ export async function getOpenAPIForService(
 
   function includeDerivedModel(model: Model): boolean {
     return (
+      !resolveExternalRef(model) &&
       !isTemplateDeclaration(model) &&
       (model.templateMapper?.args === undefined ||
         model.templateMapper?.args.length === 0 ||
@@ -1690,11 +1719,13 @@ export async function getOpenAPIForService(
       modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, schemaContext);
     }
 
-    const derivedModels = model.derivedModels.filter(includeDerivedModel);
+    const derivedModels = resolveExternalRef(model)
+      ? []
+      : model.derivedModels.filter(includeDerivedModel);
 
     // getSchemaOrRef on all children to push them into components.schemas
     for (const child of derivedModels) {
-      getSchemaOrRef(child, schemaContext);
+      getSchemaOrRef(child, schemaContext, true);
     }
 
     const discriminator = getDiscriminator(program, model);
