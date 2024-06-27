@@ -181,9 +181,9 @@ public void post(User user);
 
 Please use the _spread_ feature with caution.
 
-- The anonymous model to be spread into operation should have less than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
-- The anonymous model should be stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
-- The anonymous model should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
+- The model to be spread should have less than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
+- The model to be spread should be stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
+- The model to be spread should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
 
 ### Alias
 
@@ -275,7 +275,7 @@ public void upload(String firstName, String lastName);
 </TabItem>
 </Tabs>
 
-### Alias with HTTP Parameters
+### Alias with @header/@query/@path properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -294,8 +294,10 @@ op upload(...User): void;
 
 <TabItem value="python" label="Python">
 
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
 ```python
-def upload(id: str, first_name: str, last_name: str) -> None:
+def upload(self, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -392,7 +394,7 @@ op upload(...User): void;
 For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
-def upload(self, user: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
+def upload(self, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -468,7 +470,7 @@ public void upload(User user);
 </TabItem>
 </Tabs>
 
-### Model with `@body` Property
+### Model with `@body` property
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -493,7 +495,7 @@ op upload(...UserRequest): void;
 For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
-def upload(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
+def upload(self, body: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -570,7 +572,7 @@ public void upload(User user);
 </TabItem>
 </Tabs>
 
-### Model with Decorated Properties
+### Model with @header/@query/@path properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -594,7 +596,7 @@ For Python, we will also generate the overloads described in the Http Post secti
 
 ```python
 
-def get_blob_properties(name: str, *, test_header: string, **kwargs: Any) -> None:
+def get_blob_properties(self, name: str, *, test_header: string, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -663,7 +665,7 @@ public void getBlobProperties(String name, String testHeader);
 </TabItem>
 </Tabs>
 
-### Model with Decorated and non-Decorated Properties
+### Model mixed with normal and @header/@query/@path properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -687,7 +689,7 @@ For Python, we will also generate the overloads described in the Http Post secti
 class Schema:
   schema: bytes
 
-def register(body: [Schema, JSON, IO[bytes]], **kwargs: Any) -> None:
+def register(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -762,6 +764,174 @@ public final class Schema implements JsonSerializable<Schema> {
 
 // Client API
 public void register(Schema schema);
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+### Using Azure.Core.ResourceOperations template
+
+Resource create and update operations are not impacted by spread since they all have explicit defined body parameter.
+Only resource action operations are impacted by spread.
+
+If the action parameter is a model, then the model will be spread.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@resource("widgets")
+model Widget {
+  @key("widgetName")
+  name: string;
+}
+
+model RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+model RepairResult {
+  reason: string;
+  info: string;
+}
+
+alias Operations = Azure.Core.ResourceOperations<{}>;
+
+op scheduleRepairs is Operations.ResourceAction<Widget, RepairInfo, RepairResult>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+class RepairInfo:
+  problem: str
+  contact: str
+
+class RepairResult:
+  reason: str
+  info: str
+
+def scheduleRepairs(self, problem: str, contact: str, *, content_type: str = "application/json") -> RepairResult:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+
+```
+
+</TabItem>
+</Tabs>
+
+If you want client to keep the model, you could use a wrapper in TypeSpec to explict set the body to prevent spread.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+alias BodyParameter<
+  T,
+  TName extends valueof string = "body",
+  TDoc extends valueof string = "Body parameter."
+> = {
+  @doc(TDoc)
+  @friendlyName(TName)
+  @bodyRoot
+  body: T;
+};
+
+@resource("widgets")
+model Widget {
+  @key("widgetName")
+  name: string;
+}
+
+model RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+model RepairResult {
+  reason: string;
+  info: string;
+}
+
+alias Operations = Azure.Core.ResourceOperations<{}>;
+
+op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo>, RepairResult>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+class RepairInfo:
+  problem: str
+  contact: str
+
+class RepairResult:
+  reason: str
+  info: str
+
+def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> RepairResult:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+
 ```
 
 </TabItem>
