@@ -130,6 +130,12 @@ Create read-only property schema for lro status
 
 Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
 
+#### `emit-common-types-schema`
+
+**Type:** `"reference-only" | "for-visibility-changes"`
+
+Determine whether and how to emit schemas for common-types rather than referencing them
+
 ## Decorators
 
 ### Autorest
