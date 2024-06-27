@@ -3107,12 +3107,12 @@ describe("typespec-client-generator-core: package", () => {
       deepStrictEqual(bodyParam.correspondingMethodParams[0].type, model);
     });
 
-    it("anonymous model from spread with @body should not be spread", async () => {
+    it("anonymous model from spread with @bodyRoot should not be spread", async () => {
       await runner.compileWithBuiltInService(`
         model Test {
           prop: string;
         }
-        op test(@body body: {...Test}): void;
+        op test(@bodyRoot body: {...Test}): void;
         `);
       const method = getServiceMethodOfClient(runner.context.experimental_sdkPackage);
       const models = runner.context.experimental_sdkPackage.models;
