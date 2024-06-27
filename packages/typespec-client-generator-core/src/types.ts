@@ -19,7 +19,6 @@ import {
   Tuple,
   Type,
   Union,
-  UnionVariant,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
@@ -758,14 +757,7 @@ function getSdkEnumValueType(
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let kind: "string" | "int32" | "float32" = "string";
-  let type: EnumMember | UnionVariant;
   for (const value of values) {
-    if ((value as EnumMember).kind) {
-      type = value as EnumMember;
-    } else {
-      type = (value as UnionEnumVariant<string> | UnionEnumVariant<number>).type;
-    }
-
     if (typeof value.value === "number") {
       kind = intOrFloat(value.value);
       if (kind === "float32") {
