@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-remove unused isErrorOrChildOfError
+change generic decorator list data structure to support duplicate decorator use case

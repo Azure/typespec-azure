@@ -214,7 +214,7 @@ function getSdkMethodResponse<
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
-      decorators: {},
+      decorators: [],
     };
   } else if (responseTypes.size === 1) {
     type = allResponseBodies[0];
@@ -223,7 +223,7 @@ function getSdkMethodResponse<
     type = {
       kind: "nullable",
       type: type,
-      decorators: {},
+      decorators: [],
     };
   }
   return {
@@ -367,7 +367,7 @@ function getSdkInitializationType<
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
     isError: false,
-    decorators: {},
+    decorators: [],
   });
 }
 
@@ -431,7 +431,7 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
       crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
-      decorators: {},
+      decorators: [],
     });
   }
   return diagnostics.wrap(retval);
@@ -466,15 +466,15 @@ function getSdkEndpointParameter(
           type: {
             kind: "string",
             encode: "string",
-            decorators: {},
+            decorators: [],
           },
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
-          decorators: {},
+          decorators: [],
         },
       ],
-      decorators: {},
+      decorators: [],
     };
   } else {
     // this means we have one server
@@ -483,7 +483,7 @@ function getSdkEndpointParameter(
       kind: "endpoint",
       serverUrl: servers[0].url,
       templateArguments,
-      decorators: {},
+      decorators: [],
     };
     for (const param of servers[0].parameters.values()) {
       const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
@@ -522,7 +522,7 @@ function getSdkEndpointParameter(
     optional,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
-    decorators: {},
+    decorators: [],
   });
 }
 
