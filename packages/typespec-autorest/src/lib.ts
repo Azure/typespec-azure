@@ -90,6 +90,12 @@ export interface AutorestEmitterOptions {
    * @default "final-state-only"
    */
   "emit-lro-options"?: "none" | "final-state-only" | "all";
+
+  /**
+   * Determines whether and how to emit schemas for common-types
+   * @default "for-visibility-changes"
+   */
+  "emit-common-types-schema"?: "reference-only" | "for-visibility-changes";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -192,6 +198,14 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "final-state-only",
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
+    },
+    "emit-common-types-schema": {
+      type: "string",
+      enum: ["reference-only", "for-visibility-changes"],
+      nullable: true,
+      default: "for-visibility-changes",
+      description:
+        "Determine whether and how to emit schemas for common-types rather than referencing them",
     },
   },
   required: [],
