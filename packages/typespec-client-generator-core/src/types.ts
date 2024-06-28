@@ -1157,6 +1157,7 @@ export function getSdkModelPropertyType(
   diagnostics.pipe(updateMultiPartInfo(context, type, result, operation, httpOperationPart));
   return diagnostics.wrap(result);
 }
+
 function getHttpOperationParts(context: TCGCContext, operation?: Operation): HttpOperationPart[] {
   if (operation) {
     const body = getHttpOperationWithCache(context, operation).parameters.body;
