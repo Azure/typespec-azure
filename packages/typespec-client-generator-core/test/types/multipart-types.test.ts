@@ -1,6 +1,6 @@
 /* eslint-disable deprecation/deprecation */
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   SdkBodyModelPropertyType,
@@ -293,21 +293,12 @@ describe("typespec-client-generator-core: multipart types", () => {
     const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(multiPartRequest);
 
-    const addresses = multiPartRequest.properties.find(
-      (x) => x.name === "addresses"
-    ) as SdkBodyModelPropertyType;
-    ok(addresses);
-    ok(addresses.multipartOptions);
-    strictEqual(addresses.multipartOptions.multi, false);
-    strictEqual(addresses.type.kind, "array");
-
-    const profileImages = multiPartRequest.properties.find(
-      (x) => x.name === "profileImages"
-    ) as SdkBodyModelPropertyType;
-    ok(profileImages);
-    ok(profileImages.multipartOptions);
-    strictEqual(profileImages.multipartOptions.multi, true);
-    strictEqual(profileImages.type.kind, "bytes");
+    for (const p of multiPartRequest.properties.values()) {
+      strictEqual(p.kind, "property");
+      ok(p.multipartOptions);
+      ok(p.type.kind === "bytes" || p.type.kind === "model");
+      strictEqual(p.multipartOptions.multi, true);
+    }
   });
 
   it("basic multipart with @multipartBody for model", async function () {
@@ -332,7 +323,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(id.optional, true);
     ok(id.multipartOptions);
     strictEqual(id.multipartOptions.isFilePart, false);
-    strictEqual(id.multipartOptions.isNameDefined, true);
+    deepEqual(id.multipartOptions.defaultContentTypes, ["text/plain"]);
     const profileImage = MultiPartRequest.properties.find(
       (x) => x.name === "profileImage"
     ) as SdkBodyModelPropertyType;
@@ -341,12 +332,14 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(profileImage.multipartOptions.isFilePart, true);
     strictEqual(profileImage.multipartOptions.filename, undefined);
     strictEqual(profileImage.multipartOptions.contentType, undefined);
+    deepEqual(profileImage.multipartOptions.defaultContentTypes, ["application/octet-stream"]);
     const address = MultiPartRequest.properties.find(
       (x) => x.name === "address"
     ) as SdkBodyModelPropertyType;
     strictEqual(address.optional, false);
     ok(address.multipartOptions);
     strictEqual(address.multipartOptions.isFilePart, false);
+    deepEqual(address.multipartOptions.defaultContentTypes, ["application/json"]);
     strictEqual(address.type.kind, "model");
   });
 
@@ -372,6 +365,8 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(fileArrayOnePart.multipartOptions.multi, false);
     strictEqual(fileArrayOnePart.multipartOptions.filename, undefined);
     strictEqual(fileArrayOnePart.multipartOptions.contentType, undefined);
+    // Maybe we won't meet this case in real world, but we still need to test it.
+    deepEqual(fileArrayOnePart.multipartOptions.defaultContentTypes, ["application/json"]);
 
     const fileArrayMultiParts = MultiPartRequest.properties.find(
       (x) => x.name === "fileArrayMultiParts"
@@ -384,6 +379,31 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
     ok(fileArrayMultiParts.multipartOptions.contentType);
     strictEqual(fileArrayMultiParts.multipartOptions.contentType.optional, true);
+    // Typespec compiler will set default content type to ["*/*"] for "HttpPart<File>[]"
+    deepEqual(fileArrayMultiParts.multipartOptions.defaultContentTypes, ["*/*"]);
+  });
+
+  it("File with specific content-type", async function () {
+    await runner.compileWithBuiltInService(`
+      model RequiredMetaData extends File {
+        filename: string;
+        contentType: "image/png" | "image/jpeg";
+      }
+      model MultiPartRequest{
+          file: HttpPart<RequiredMetaData>;
+      }
+      @post
+      op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+      `);
+    const models = runner.context.experimental_sdkPackage.models;
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const fileOptionalFileName = MultiPartRequest.properties.find(
+      (x) => x.name === "file"
+    ) as SdkBodyModelPropertyType;
+    ok(fileOptionalFileName);
+    ok(fileOptionalFileName.multipartOptions);
+    deepEqual(fileOptionalFileName.multipartOptions.defaultContentTypes, ["image/png", "image/jpeg"]);
   });
 
   it("File of multipart with @multipartBody for model", async function () {
@@ -412,7 +432,6 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileOptionalFileName.multipartOptions);
     strictEqual(fileOptionalFileName.name, "fileOptionalFileName");
     strictEqual(fileOptionalFileName.multipartOptions.isFilePart, true);
-    strictEqual(fileOptionalFileName.multipartOptions.isNameDefined, true);
     ok(fileOptionalFileName.multipartOptions.filename);
     strictEqual(fileOptionalFileName.multipartOptions.filename.optional, true);
     ok(fileOptionalFileName.multipartOptions.contentType);
@@ -426,7 +445,6 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileRequiredFileName.multipartOptions);
     strictEqual(fileRequiredFileName.name, "fileRequiredFileName");
     strictEqual(fileRequiredFileName.multipartOptions.isFilePart, true);
-    strictEqual(fileRequiredFileName.multipartOptions.isNameDefined, true);
     ok(fileRequiredFileName.multipartOptions.filename);
     strictEqual(fileRequiredFileName.multipartOptions.filename.optional, false);
     ok(fileRequiredFileName.multipartOptions.contentType);

@@ -1091,10 +1091,9 @@ function updateMultiPartInfo(
   }
   // Currently we only recognize bytes and list of bytes as potential file inputs
   const httpPart = getHttpPart(context.program, type.type);
-  const isRawBytesArray = base.type.kind === "array" && base.type.valueType.kind === "bytes";
   const isBytesInput =
     base.type.kind === "bytes" ||
-    isRawBytesArray ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes") ||
     (httpPart !== undefined && isOrExtendsHttpFile(context.program, httpPart.type));
   if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
     diagnostics.add(
@@ -1105,10 +1104,8 @@ function updateMultiPartInfo(
     );
   }
   const multiPartOption: MultipartOptionsType = {
-    isNameDefined: httpOperationPart ? httpOperationPart.name !== undefined : true,
     isFilePart: isBytesInput && operationIsMultipart,
-    multi: httpOperationPart ? httpOperationPart.multi : isRawBytesArray,
-    headers: [], // TODO
+    multi: httpOperationPart ? httpOperationPart.multi : base.type.kind === "array",
     filename: httpOperationPart?.filename
       ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
       : undefined,
@@ -1117,15 +1114,14 @@ function updateMultiPartInfo(
           getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
         )
       : undefined,
+    defaultContentTypes: httpOperationPart ? httpOperationPart.body.contentTypes : [],
   };
   base.isMultipartFileInput = multiPartOption.isFilePart;
   base.multipartOptions = operationIsMultipart ? multiPartOption : undefined;
   if (operationIsMultipart && base.type.kind === "array") {
     if (httpOperationPart === undefined) {
-      // for "images: bytes[]", return type shall be "bytes" instead of "bytes[]"" and "multipartOptions.multi" shall be true
-      if (base.type.valueType.kind === "bytes") {
-        base.type = base.type.valueType;
-      }
+      // for "images: T[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
+      base.type = base.type.valueType;
     } else if (httpOperationPart.multi) {
       // for "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
       base.type = base.type.valueType;
