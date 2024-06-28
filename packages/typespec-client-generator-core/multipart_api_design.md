@@ -101,7 +101,7 @@ op upload(
     basic: string,
     singleJson: JSON,
     singleBytes: bytes,
-    multiJsonOnePart: JSON[],
+    multiJsonMultiParts: JSON[],
     multiBytes: bytes[]
   }
 ): void;
@@ -145,12 +145,12 @@ TCGC API example:
       }
     },
     {
-      "name": "multiJsonOnePart",
-      "type": { "kind": "array" },
+      "name": "multiJsonMultiParts",
+      "type": { "kind": "model" },
       "multipartOptions": {
         "isNameDefined": true,
-        "isFilePart": true,
-        "multi": false,
+        "isFilePart": false,
+        "multi": true,
         "headers": []
       }
     },
@@ -265,7 +265,7 @@ TCGC API example:
       "type": { "kind": "array" },
       "multipartOptions": {
         "isNameDefined": true,
-        "isFilePart": true,
+        "isFilePart": false,
         "multi": false,
         "headers": []
       }
