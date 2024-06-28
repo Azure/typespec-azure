@@ -2,7 +2,12 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
+import {
+  SdkBodyModelPropertyType,
+  SdkClientType,
+  SdkHttpOperation,
+  UsageFlags,
+} from "../../src/interfaces.js";
 import { getAllModelsWithDiagnostics } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -39,6 +44,8 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(profileImage);
     strictEqual(profileImage.kind, "property");
     strictEqual(profileImage.isMultipartFileInput, true);
+    ok(profileImage.multipartOptions);
+    strictEqual(profileImage.multipartOptions.isFilePart, true);
   });
   it("multipart conflicting model usage", async function () {
     await runner.compile(
@@ -84,6 +91,8 @@ describe("typespec-client-generator-core: multipart types", () => {
     const modelAProp = modelA.properties[0];
     strictEqual(modelAProp.kind, "property");
     strictEqual(modelAProp.isMultipartFileInput, true);
+    ok(modelAProp.multipartOptions);
+    strictEqual(modelAProp.multipartOptions.isFilePart, true);
 
     const modelB = models.find((x) => x.name === "B");
     ok(modelB);
@@ -135,6 +144,9 @@ describe("typespec-client-generator-core: multipart types", () => {
     const pictures = model.properties[0];
     strictEqual(pictures.kind, "property");
     strictEqual(pictures.isMultipartFileInput, true);
+    ok(pictures.multipartOptions);
+    strictEqual(pictures.multipartOptions.isFilePart, true);
+    strictEqual(pictures.multipartOptions.multi, true);
   });
 
   it("multipart with encoding bytes raises error", async function () {
@@ -262,5 +274,220 @@ describe("typespec-client-generator-core: multipart types", () => {
     const address = models.find((x) => x.name === "Address");
     ok(address);
     strictEqual(address.usage & UsageFlags.MultipartFormData, 0);
+  });
+
+  it("Json[] and bytes[] in multipart/form-data", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+          profileImages: bytes[];
+          addresses: Address[];
+        }
+        model Address {
+          city: string;
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 2);
+    const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(multiPartRequest);
+
+    const addresses = multiPartRequest.properties.find(
+      (x) => x.name === "addresses"
+    ) as SdkBodyModelPropertyType;
+    ok(addresses);
+    ok(addresses.multipartOptions);
+    strictEqual(addresses.multipartOptions.multi, false);
+    strictEqual(addresses.type.kind, "array");
+
+    const profileImages = multiPartRequest.properties.find(
+      (x) => x.name === "profileImages"
+    ) as SdkBodyModelPropertyType;
+    ok(profileImages);
+    ok(profileImages.multipartOptions);
+    strictEqual(profileImages.multipartOptions.multi, true);
+    strictEqual(profileImages.type.kind, "bytes");
+  });
+
+  it("basic multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model Address {
+          city: string;
+        }
+        model MultiPartRequest{
+          id?: HttpPart<string>;
+          profileImage: HttpPart<bytes>;
+          address: HttpPart<Address>;
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 2);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
+    const id = MultiPartRequest.properties.find((x) => x.name === "id") as SdkBodyModelPropertyType;
+    strictEqual(id.optional, true);
+    ok(id.multipartOptions);
+    strictEqual(id.multipartOptions.isFilePart, false);
+    strictEqual(id.multipartOptions.isNameDefined, true);
+    const profileImage = MultiPartRequest.properties.find(
+      (x) => x.name === "profileImage"
+    ) as SdkBodyModelPropertyType;
+    strictEqual(profileImage.optional, false);
+    ok(profileImage.multipartOptions);
+    strictEqual(profileImage.multipartOptions.isFilePart, true);
+    strictEqual(profileImage.multipartOptions.filename, undefined);
+    strictEqual(profileImage.multipartOptions.contentType, undefined);
+    const address = MultiPartRequest.properties.find(
+      (x) => x.name === "address"
+    ) as SdkBodyModelPropertyType;
+    strictEqual(address.optional, false);
+    ok(address.multipartOptions);
+    strictEqual(address.multipartOptions.isFilePart, false);
+    strictEqual(address.type.kind, "model");
+  });
+
+  it("File[] of multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest{
+            fileArrayOnePart: HttpPart<File[]>;
+            fileArrayMultiParts: HttpPart<File>[];
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 2);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const fileArrayOnePart = MultiPartRequest.properties.find(
+      (x) => x.name === "fileArrayOnePart"
+    ) as SdkBodyModelPropertyType;
+    ok(fileArrayOnePart);
+    ok(fileArrayOnePart.multipartOptions);
+    strictEqual(fileArrayOnePart.type.kind, "array");
+    strictEqual(fileArrayOnePart.multipartOptions.multi, false);
+    strictEqual(fileArrayOnePart.multipartOptions.filename, undefined);
+    strictEqual(fileArrayOnePart.multipartOptions.contentType, undefined);
+
+    const fileArrayMultiParts = MultiPartRequest.properties.find(
+      (x) => x.name === "fileArrayMultiParts"
+    ) as SdkBodyModelPropertyType;
+    ok(fileArrayMultiParts);
+    ok(fileArrayMultiParts.multipartOptions);
+    strictEqual(fileArrayMultiParts.type.kind, "model");
+    strictEqual(fileArrayMultiParts.multipartOptions.multi, true);
+    ok(fileArrayMultiParts.multipartOptions.filename);
+    strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
+    ok(fileArrayMultiParts.multipartOptions.contentType);
+    strictEqual(fileArrayMultiParts.multipartOptions.contentType.optional, true);
+  });
+
+  it("File of multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model RequiredMetaData extends File {
+          filename: string;
+          contentType: string;
+        }
+        model MultiPartRequest{
+            fileOptionalFileName: HttpPart<File>;
+            fileRequiredFileName: HttpPart<RequiredMetaData>;
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 3);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
+    const fileOptionalFileName = MultiPartRequest.properties.find(
+      (x) => x.name === "fileOptionalFileName"
+    ) as SdkBodyModelPropertyType;
+    ok(fileOptionalFileName);
+    strictEqual(fileOptionalFileName.optional, false);
+    ok(fileOptionalFileName.multipartOptions);
+    strictEqual(fileOptionalFileName.name, "fileOptionalFileName");
+    strictEqual(fileOptionalFileName.multipartOptions.isFilePart, true);
+    strictEqual(fileOptionalFileName.multipartOptions.isNameDefined, true);
+    ok(fileOptionalFileName.multipartOptions.filename);
+    strictEqual(fileOptionalFileName.multipartOptions.filename.optional, true);
+    ok(fileOptionalFileName.multipartOptions.contentType);
+    strictEqual(fileOptionalFileName.multipartOptions.contentType.optional, true);
+
+    const fileRequiredFileName = MultiPartRequest.properties.find(
+      (x) => x.name === "fileRequiredFileName"
+    ) as SdkBodyModelPropertyType;
+    ok(fileRequiredFileName);
+    strictEqual(fileRequiredFileName.optional, false);
+    ok(fileRequiredFileName.multipartOptions);
+    strictEqual(fileRequiredFileName.name, "fileRequiredFileName");
+    strictEqual(fileRequiredFileName.multipartOptions.isFilePart, true);
+    strictEqual(fileRequiredFileName.multipartOptions.isNameDefined, true);
+    ok(fileRequiredFileName.multipartOptions.filename);
+    strictEqual(fileRequiredFileName.multipartOptions.filename.optional, false);
+    ok(fileRequiredFileName.multipartOptions.contentType);
+    strictEqual(fileRequiredFileName.multipartOptions.contentType.optional, false);
+  });
+
+  it("check 'multi' of multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model Address {
+          city: string;
+        }
+        model MultiPartRequest {
+            stringsOnePart: HttpPart<string[]>;
+            stringsMultiParts: HttpPart<string>[];
+            bytesOnePart: HttpPart<bytes[]>;
+            bytesMultiParts: HttpPart<bytes>[];
+            addressesOnePart: HttpPart<Address[]>;
+            addressesMultiParts: HttpPart<Address>[];
+            filesOnePart: HttpPart<File[]>;
+            filesMultiParts: HttpPart<File>[];
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 3);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    for (const p of MultiPartRequest.properties.values()) {
+      strictEqual(p.kind, "property");
+      ok(p.multipartOptions);
+      strictEqual(p.multipartOptions.multi, p.name.toLowerCase().includes("multi"));
+    }
+  });
+
+  it("check returned sdkType of multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+            stringsOnePart: HttpPart<string[]>;
+            stringsMultiParts: HttpPart<string>[];
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 1);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const stringsOnePart = MultiPartRequest.properties.find(
+      (x) => x.name === "stringsOnePart"
+    ) as SdkBodyModelPropertyType;
+    ok(stringsOnePart);
+    strictEqual(stringsOnePart.type.kind, "array");
+    ok(stringsOnePart.multipartOptions);
+    strictEqual(stringsOnePart.multipartOptions.multi, false);
+    const stringsMultiParts = MultiPartRequest.properties.find(
+      (x) => x.name === "stringsMultiParts"
+    ) as SdkBodyModelPropertyType;
+    ok(stringsMultiParts);
+    strictEqual(stringsMultiParts.type.kind, "string");
+    ok(stringsMultiParts.multipartOptions);
+    strictEqual(stringsMultiParts.multipartOptions.multi, true);
   });
 });
