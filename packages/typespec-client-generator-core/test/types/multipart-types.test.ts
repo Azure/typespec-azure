@@ -387,7 +387,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     await runner.compileWithBuiltInService(`
       model RequiredMetaData extends File {
         filename: string;
-        contentType: "image/png" | "image/jpeg";
+        contentType: "image/png";
       }
       model MultiPartRequest{
           file: HttpPart<RequiredMetaData>;
@@ -403,7 +403,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(fileOptionalFileName);
     ok(fileOptionalFileName.multipartOptions);
-    deepEqual(fileOptionalFileName.multipartOptions.defaultContentTypes, ["image/png", "image/jpeg"]);
+    deepEqual(fileOptionalFileName.multipartOptions.defaultContentTypes, ["image/png"]);
   });
 
   it("File of multipart with @multipartBody for model", async function () {

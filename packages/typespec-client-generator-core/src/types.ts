@@ -1100,10 +1100,6 @@ function updateMultiPartInfo(
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
-    if (base.type.kind === "array" && httpOperationPart.multi) {
-      // for "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
-      base.type = base.type.valueType;
-    }
   } else if (operation) {
     // common body
     const httpOperation = getHttpOperationWithCache(context, operation);
@@ -1125,14 +1121,15 @@ function updateMultiPartInfo(
         multi: base.type.kind === "array",
         defaultContentTypes: [],
       };
-      if (base.type.kind === "array") {
-        // for "images: T[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
-        base.type = base.type.valueType;
-      }
     }
   }
-  base.isMultipartFileInput =
-    base.multipartOptions === undefined ? false : base.multipartOptions.isFilePart;
+  if (base.multipartOptions !== undefined) {
+    base.isMultipartFileInput = base.multipartOptions.isFilePart;
+  }
+  if (base.multipartOptions?.multi && base.type.kind === "array") {
+    // for "images: T[]" or "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"
+    base.type = base.type.valueType;
+  }
 
   return diagnostics.wrap(undefined);
 }
