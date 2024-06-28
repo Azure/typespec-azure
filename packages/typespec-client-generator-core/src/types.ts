@@ -53,7 +53,6 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
-  MultipartOptionsType,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
@@ -1079,54 +1078,62 @@ function updateMultiPartInfo(
   httpOperationPart?: HttpOperationPart
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // I'm a body model property
-  let operationIsMultipart = false;
-  if (operation) {
-    const httpOperation = getHttpOperationWithCache(context, operation);
-    operationIsMultipart = Boolean(
-      (httpOperation &&
-        httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")) ||
-        httpOperationPart
-    );
-  }
-  // Currently we only recognize bytes and list of bytes as potential file inputs
-  const httpPart = getHttpPart(context.program, type.type);
   const isBytesInput =
     base.type.kind === "bytes" ||
-    (base.type.kind === "array" && base.type.valueType.kind === "bytes") ||
-    (httpPart !== undefined && isOrExtendsHttpFile(context.program, httpPart.type));
-  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "encoding-multipart-bytes",
-        target: type,
-      })
-    );
-  }
-  const multiPartOption: MultipartOptionsType = {
-    isFilePart: isBytesInput && operationIsMultipart,
-    multi: httpOperationPart ? httpOperationPart.multi : base.type.kind === "array",
-    filename: httpOperationPart?.filename
-      ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
-      : undefined,
-    contentType: httpOperationPart?.body.contentTypeProperty
-      ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-        )
-      : undefined,
-    defaultContentTypes: httpOperationPart ? httpOperationPart.body.contentTypes : [],
-  };
-  base.isMultipartFileInput = multiPartOption.isFilePart;
-  base.multipartOptions = operationIsMultipart ? multiPartOption : undefined;
-  if (operationIsMultipart && base.type.kind === "array") {
-    if (httpOperationPart === undefined) {
-      // for "images: T[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
-      base.type = base.type.valueType;
-    } else if (httpOperationPart.multi) {
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+
+  if (httpOperationPart) {
+    // body decorated with @multipartBody
+    const httpPart = getHttpPart(context.program, type.type);
+    base.multipartOptions = {
+      isFilePart:
+        isBytesInput ||
+        (httpPart !== undefined && isOrExtendsHttpFile(context.program, httpPart.type)),
+      multi: httpOperationPart.multi,
+      filename: httpOperationPart.filename
+        ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
+        : undefined,
+      contentType: httpOperationPart.body.contentTypeProperty
+        ? diagnostics.pipe(
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
+        : undefined,
+      defaultContentTypes: httpOperationPart.body.contentTypes,
+    };
+    if (base.type.kind === "array" && httpOperationPart.multi) {
       // for "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
       base.type = base.type.valueType;
     }
+  } else if (operation) {
+    // common body
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    const operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+    if (operationIsMultipart) {
+      // Currently we only recognize bytes and list of bytes as potential file inputs
+      if (isBytesInput && getEncode(context.program, type)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "encoding-multipart-bytes",
+            target: type,
+          })
+        );
+      }
+      base.multipartOptions = {
+        isFilePart: isBytesInput,
+        multi: base.type.kind === "array",
+        defaultContentTypes: [],
+      };
+      if (base.type.kind === "array") {
+        // for "images: T[]", return type shall be "T" instead of "T[]"" and "multipartOptions.multi" shall be true
+        base.type = base.type.valueType;
+      }
+    }
   }
+  base.isMultipartFileInput =
+    base.multipartOptions === undefined ? false : base.multipartOptions.isFilePart;
+
   return diagnostics.wrap(undefined);
 }
 
