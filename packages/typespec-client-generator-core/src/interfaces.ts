@@ -602,13 +602,13 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
 }
 
-export type SdkExampleBase = {
+interface SdkExampleBase {
   kind: string;
   name: string;
   description: string;
   filePath: string;
   rawExample: any;
-};
+}
 
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
