@@ -1,0 +1,16 @@
+{
+  "operationId": "responses",
+  "title": "responses",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "headers": {},
+      "body": "test"
+    },
+    "201": {
+      "headers": {
+        "test": "test"
+      }
+    }
+  }
+}

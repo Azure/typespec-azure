@@ -1,0 +1,14 @@
+{
+  "operationId": "getDictionary",
+  "title": "getDictionary",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "a": "a",
+        "b": "b",
+        "c": "c"
+      }
+    }
+  }
+}

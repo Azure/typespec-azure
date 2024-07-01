@@ -1,0 +1,11 @@
+{
+  "operationId": "parameters",
+  "title": "parameters",
+  "parameters": {
+    "a": "header",
+    "b": "path",
+    "c": "query",
+    "d": "body"
+  },
+  "responses": {}
+}

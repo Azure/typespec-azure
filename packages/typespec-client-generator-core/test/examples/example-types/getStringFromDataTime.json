@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringFromDataTime",
+  "title": "getStringFromDataTime",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "2022-08-26T18:38:00.000Z"
+    }
+  }
+}

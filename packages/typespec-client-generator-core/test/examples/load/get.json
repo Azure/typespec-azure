@@ -1,0 +1,11 @@
+{
+  "operationId": "get",
+  "title": "get",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "description": "ARM operation completed successfully.",
+      "body": "test"
+    }
+  }
+}

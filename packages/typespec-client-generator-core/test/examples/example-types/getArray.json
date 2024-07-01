@@ -1,0 +1,10 @@
+{
+  "operationId": "getArray",
+  "title": "getArray",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": ["a", "b", "c"]
+    }
+  }
+}

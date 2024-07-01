@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringFromConstantDiagnostic",
+  "title": "getStringFromConstantDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": 123
+    }
+  }
+}

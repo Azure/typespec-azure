@@ -1,0 +1,12 @@
+{
+  "operationId": "getAny",
+  "title": "getAny",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "test": 123
+      }
+    }
+  }
+}

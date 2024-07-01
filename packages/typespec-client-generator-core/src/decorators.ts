@@ -30,6 +30,7 @@ import {
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import { defaultDecoratorsAllowList } from "./configs.js";
+import { handleClientExamples } from "./example.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -41,7 +42,7 @@ import {
   SdkServiceOperation,
   UsageFlags,
 } from "./interfaces.js";
-import { TCGCContext, parseEmitterName } from "./internal-utils.js";
+import { TCGCContext, getValidApiVersion, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -231,14 +232,7 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
       ?.getVersions()
       .map((x) => x.value);
     if (!allApiVersions) return;
-    let apiVersion = context.apiVersion;
-    if (
-      apiVersion === "latest" ||
-      apiVersion === undefined ||
-      !allApiVersions.includes(apiVersion)
-    ) {
-      apiVersion = allApiVersions[allApiVersions.length - 1];
-    }
+    const apiVersion = getValidApiVersion(context, allApiVersions);
     if (apiVersion === undefined) return;
     const versionProjections = buildVersionProjections(context.program, client.service).filter(
       (v) => apiVersion === v.version
@@ -587,14 +581,14 @@ export interface CreateSdkContextOptions {
   additionalDecorators?: string[];
 }
 
-export function createSdkContext<
+export async function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: EmitContext<TOptions>,
   emitterName?: string,
   options?: CreateSdkContextOptions
-): SdkContext<TOptions, TServiceOperation> {
+): Promise<SdkContext<TOptions, TServiceOperation>> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
@@ -619,9 +613,14 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
+    examplesDirectory: context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
   };
   sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  for (const client of sdkContext.experimental_sdkPackage.clients) {
+    diagnostics.pipe(await handleClientExamples(sdkContext, client));
+  }
+
   if (sdkContext.diagnostics) {
     sdkContext.diagnostics = sdkContext.diagnostics.concat(
       sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation

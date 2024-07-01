@@ -1,0 +1,10 @@
+{
+  "operationId": "getDictionaryDiagnostic",
+  "title": "getDictionaryDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}

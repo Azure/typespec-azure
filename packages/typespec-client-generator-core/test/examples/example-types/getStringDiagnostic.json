@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringDiagnostic",
+  "title": "getStringDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": 123
+    }
+  }
+}

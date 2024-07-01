@@ -1,0 +1,18 @@
+{
+  "operationId": "responsesDiagnostic",
+  "title": "responsesDiagnostic",
+  "parameters": {},
+  "responses": {
+    "203": {
+      "headers": {},
+      "body": "test"
+    },
+    "201": {
+      "headers": {
+        "a": "test"
+      },
+      "body": "test",
+      "test": 1
+    }
+  }
+}

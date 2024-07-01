@@ -18,18 +18,23 @@ import {
   getDoc,
   getNamespaceFullName,
   getSummary,
+  isGlobalNamespace,
   isNeverType,
   isNullType,
+  isService,
   isVoidType,
 } from "@typespec/compiler";
 import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
+import { getOperationId } from "@typespec/openapi";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { pascalCase } from "change-case";
 import {
   DecoratorInfo,
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
+  SdkHttpOperationExample,
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
@@ -42,6 +47,7 @@ import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
   getHttpOperationWithCache,
+  getLibraryName,
   isApiVersion,
 } from "./public-utils.js";
 
@@ -403,7 +409,9 @@ export interface TCGCContext {
   __rawClients?: SdkClient[];
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
+  examplesDirectory?: string;
   decoratorsAllowList?: string[];
 }
 
@@ -516,4 +524,56 @@ export function getAnyType(
     encode: "string",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
+}
+
+function pascalCaseForOperationId(name: string) {
+  return name
+    .split("_")
+    .map((s) => pascalCase(s))
+    .join("_");
+}
+
+/**
+ * Resolve the OpenAPI operation ID for the given operation using the following logic:
+ * - If @operationId was specified use that value
+ * - If operation is defined at the root or under the service namespace return `<operation.name>`
+ * - Otherwise(operation is under another namespace or interface) return `<namespace/interface.name>_<operation.name>`
+ *
+ * @param context TCGC context
+ * @param operation Operation
+ * @returns Operation ID in this format `<name>` or `<group>_<name>`
+ */
+export function resolveOperationId(context: TCGCContext, operation: Operation) {
+  const explicitOperationId = getOperationId(context.program, operation);
+  if (explicitOperationId) {
+    return explicitOperationId;
+  }
+
+  const operationName = getLibraryName(context, operation);
+  if (operation.interface) {
+    return pascalCaseForOperationId(
+      `${getLibraryName(context, operation.interface)}_${operationName}`
+    );
+  }
+  const namespace = operation.namespace;
+  if (
+    namespace === undefined ||
+    isGlobalNamespace(context.program, namespace) ||
+    isService(context.program, namespace)
+  ) {
+    return pascalCase(operationName);
+  }
+
+  return pascalCaseForOperationId(`${namespace.name}_${operationName}`);
+}
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
 }

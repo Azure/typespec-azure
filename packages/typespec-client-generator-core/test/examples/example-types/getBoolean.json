@@ -1,0 +1,10 @@
+{
+  "operationId": "getBoolean",
+  "title": "getBoolean",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": true
+    }
+  }
+}

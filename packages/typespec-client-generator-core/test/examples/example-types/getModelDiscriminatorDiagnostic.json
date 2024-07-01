@@ -1,0 +1,14 @@
+{
+  "operationId": "getModelDiscriminatorDiagnostic",
+  "title": "getModelDiscriminatorDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "kind": "shark",
+        "sharktype": "test",
+        "age": 2
+      }
+    }
+  }
+}

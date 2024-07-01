@@ -159,6 +159,26 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
+    "example-loading": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Skipped loading invalid example file: ${"filename"}. Error: ${"error"}`,
+        noDirectory: paramMessage`Skipping example loading from ${"directory"} because there was an error reading the directory.`,
+        noOperationId: paramMessage`Skipping example file ${"filename"} because it does not contain an operationId and/or title.`,
+      },
+    },
+    "duplicate-example-file": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
+      },
+    },
+    "example-value-no-mapping": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Value in example file '${"relativePath"}' does not follow its definition:\n${"value"}`,
+      },
+    },
   },
 });
 
