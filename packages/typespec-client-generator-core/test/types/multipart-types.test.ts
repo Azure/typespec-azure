@@ -508,4 +508,85 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(stringsMultiParts.multipartOptions);
     strictEqual(stringsMultiParts.multipartOptions.multi, true);
   });
+
+  it("check content-type in multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+            stringWithoutContentType: HttpPart<string>,
+            stringWithContentType: HttpPart<{@body body: string, @header contentType: "text/html"}>,
+            bytesWithoutContentType: HttpPart<bytes>,
+            bytesWithContentType: HttpPart<{@body body: string, @header contentType: "image/png"}>
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    strictEqual(models.length, 3);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const stringWithoutContentType = MultiPartRequest.properties.find(
+      (x) => x.name === "stringWithoutContentType"
+    ) as SdkBodyModelPropertyType;
+    ok(stringWithoutContentType);
+    strictEqual(stringWithoutContentType.type.kind, "string");
+    ok(stringWithoutContentType.multipartOptions);
+    strictEqual(stringWithoutContentType.multipartOptions.contentType, undefined);
+    deepEqual(stringWithoutContentType.multipartOptions.defaultContentTypes, ["text/plain"]);
+
+    const stringWithContentType = MultiPartRequest.properties.find(
+      (x) => x.name === "stringWithContentType"
+    ) as SdkBodyModelPropertyType;
+    ok(stringWithContentType);
+    strictEqual(stringWithContentType.type.kind, "model");
+    ok(stringWithContentType.multipartOptions);
+    ok(stringWithContentType.multipartOptions.contentType);
+    deepEqual(stringWithContentType.multipartOptions.defaultContentTypes, ["text/html"]);
+
+    const bytesWithoutContentType = MultiPartRequest.properties.find(
+      (x) => x.name === "bytesWithoutContentType"
+    ) as SdkBodyModelPropertyType;
+    ok(bytesWithoutContentType);
+    strictEqual(bytesWithoutContentType.type.kind, "bytes");
+    ok(bytesWithoutContentType.multipartOptions);
+    strictEqual(bytesWithoutContentType.multipartOptions.contentType, undefined);
+    deepEqual(bytesWithoutContentType.multipartOptions.defaultContentTypes, [
+      "application/octet-stream",
+    ]);
+
+    const bytesWithContentType = MultiPartRequest.properties.find(
+      (x) => x.name === "bytesWithContentType"
+    ) as SdkBodyModelPropertyType;
+    ok(bytesWithContentType);
+    strictEqual(bytesWithContentType.type.kind, "model");
+    ok(bytesWithContentType.multipartOptions);
+    ok(bytesWithContentType.multipartOptions.contentType);
+    deepEqual(bytesWithContentType.multipartOptions.defaultContentTypes, ["image/png"]);
+  });
+
+  it("check isFilePart in multipart with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+            bytesRaw: HttpPart<bytes>,
+            bytesArrayRaw: HttpPart<bytes>[],
+            fileRaw: HttpPart<File>,
+            fileArrayRaw: HttpPart<File>[],
+            bytesWithBody: HttpPart<{@body body: bytes}>,
+            bytesArrayWithBody: HttpPart<{@body body: bytes}>[],
+            fileWithBody: HttpPart<{@body body: File}>,
+            fileArrayWithBody: HttpPart<{@body body: File}>[],
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.experimental_sdkPackage.models;
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+
+    for (const p of MultiPartRequest.properties.values()) {
+      strictEqual(p.kind, "property");
+      ok(p.multipartOptions);
+      strictEqual(p.multipartOptions.isFilePart, true);
+      strictEqual(p.multipartOptions.multi, p.name.toLowerCase().includes("array"));
+    }
+  });
 });

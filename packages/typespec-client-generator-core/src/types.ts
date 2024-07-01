@@ -1070,6 +1070,27 @@ export function getSdkModelPropertyTypeBase(
   });
 }
 
+function isFilePart(context: TCGCContext, type: SdkType): boolean {
+  if (type.kind === "array") {
+    // HttpFile<T>[]
+    return isFilePart(context, type.valueType);
+  } else if (type.kind === "bytes") {
+    // Http<bytes>
+    return true;
+  } else if (type.kind === "model") {
+    if (type.__raw && isOrExtendsHttpFile(context.program, type.__raw)) {
+      // Http<File>
+      return true;
+    }
+    // HttpPart<{@body body: bytes}> or HttpPart<{@body body: File}>
+    const body = type.properties.find((x) => x.kind === "body");
+    if (body) {
+      return isFilePart(context, body.type);
+    }
+  }
+  return false;
+}
+
 function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
@@ -1078,17 +1099,10 @@ function updateMultiPartInfo(
   httpOperationPart?: HttpOperationPart
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const isBytesInput =
-    base.type.kind === "bytes" ||
-    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-
   if (httpOperationPart) {
     // body decorated with @multipartBody
-    const httpPart = getHttpPart(context.program, type.type);
     base.multipartOptions = {
-      isFilePart:
-        isBytesInput ||
-        (httpPart !== undefined && isOrExtendsHttpFile(context.program, httpPart.type)),
+      isFilePart: isFilePart(context, base.type),
       multi: httpOperationPart.multi,
       filename: httpOperationPart.filename
         ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
@@ -1107,6 +1121,9 @@ function updateMultiPartInfo(
       httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
     );
     if (operationIsMultipart) {
+      const isBytesInput =
+        base.type.kind === "bytes" ||
+        (base.type.kind === "array" && base.type.valueType.kind === "bytes");
       // Currently we only recognize bytes and list of bytes as potential file inputs
       if (isBytesInput && getEncode(context.program, type)) {
         diagnostics.add(
