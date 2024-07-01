@@ -239,7 +239,7 @@ TCGC API example:
     },
     {
       "name": "singleFileWithOptionalMetadata",
-      "type": { "kind": "bytes" },
+      "type": { "kind": "model" },
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
