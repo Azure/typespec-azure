@@ -4,7 +4,7 @@ title: "[F] getClientNamespaceString"
 
 ---
 ```ts
-getClientNamespaceString(context): string | undefined
+function getClientNamespaceString(context): string | undefined
 ```
 
 Get the client's namespace for generation. If package-name is passed in config, we return

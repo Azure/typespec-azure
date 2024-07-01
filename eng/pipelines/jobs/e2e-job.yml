@@ -25,3 +25,5 @@ jobs:
 
       - script: pnpm test:e2e
         displayName: E2E Tests
+        # E2E test have issue in publish branch due to version being bumped but package not published yet.
+        condition: and(succeeded(), eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), false))

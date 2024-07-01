@@ -4,7 +4,7 @@ title: "[F] $example"
 
 ---
 ```ts
-$example(
+function $example(
    context, 
    entity, 
    pathOrUri, 

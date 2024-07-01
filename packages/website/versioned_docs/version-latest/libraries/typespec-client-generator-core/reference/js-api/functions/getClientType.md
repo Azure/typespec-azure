@@ -4,7 +4,7 @@ title: "[F] getClientType"
 
 ---
 ```ts
-getClientType(
+function getClientType(
    context, 
    type, 
    operation?): SdkType

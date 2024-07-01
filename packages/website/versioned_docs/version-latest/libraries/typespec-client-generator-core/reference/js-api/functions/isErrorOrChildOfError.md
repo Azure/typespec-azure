@@ -4,7 +4,7 @@ title: "[F] isErrorOrChildOfError"
 
 ---
 ```ts
-isErrorOrChildOfError(context, model): boolean
+function isErrorOrChildOfError(context, model): boolean
 ```
 
 ## Parameters

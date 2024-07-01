@@ -4,7 +4,7 @@ title: "[F] getUsageOverride"
 
 ---
 ```ts
-getUsageOverride(context, entity): UsageFlags | undefined
+function getUsageOverride(context, entity): UsageFlags | undefined
 ```
 
 ## Parameters
@@ -12,7 +12,7 @@ getUsageOverride(context, entity): UsageFlags | undefined
 | Parameter | Type |
 | :------ | :------ |
 | `context` | `TCGCContext` |
-| `entity` | `Model` \| `Enum` \| `Union` |
+| `entity` | `Enum` \| `Model` \| `Union` |
 
 ## Returns
 

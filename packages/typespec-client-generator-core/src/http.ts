@@ -42,6 +42,7 @@ import {
   getAvailableApiVersions,
   getDocHelper,
   getLocationOfOperation,
+  getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
@@ -153,7 +154,6 @@ function getSdkHttpParameters(
       retval.bodyParam = {
         kind: "body",
         name,
-        nameInClient: name,
         isGeneratedName: true,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
@@ -166,6 +166,7 @@ function getSdkHttpParameters(
         optional: false,
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
+        decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
       };
     }
     if (retval.bodyParam) {
@@ -234,6 +235,7 @@ function createContentTypeOrAcceptHeader(
   let type: SdkType = {
     kind: "string",
     encode: "string",
+    decorators: [],
   };
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
@@ -254,12 +256,12 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
+      decorators: [],
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
-    nameInClient: name,
     name,
     isGeneratedName: true,
     apiVersions: bodyObject.apiVersions,
@@ -267,6 +269,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+    decorators: [],
   };
 }
 
@@ -425,7 +428,7 @@ function getSdkHttpResponseAndExceptions(
       kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
-      contentTypes,
+      contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
         : contentTypes[0],
@@ -473,7 +476,6 @@ export function getCorrespondingMethodParams(
       const apiVersionParamUpdated: SdkParameter = {
         ...apiVersionParam,
         name: "apiVersion",
-        nameInClient: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
         clientDefaultValue:

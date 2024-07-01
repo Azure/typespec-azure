@@ -4,7 +4,7 @@ title: "[F] getOperationLink"
 
 ---
 ```ts
-getOperationLink(
+function getOperationLink(
    program, 
    entity, 
    linkType): OperationLinkMetadata | undefined

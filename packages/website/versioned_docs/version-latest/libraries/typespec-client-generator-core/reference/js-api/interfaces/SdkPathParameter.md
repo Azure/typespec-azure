@@ -15,14 +15,14 @@ title: "[I] SdkPathParameter"
 | `apiVersions` | `string`[] | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`apiVersions` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`apiVersions` |
 | `clientDefaultValue?` | `any` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`clientDefaultValue` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`clientDefaultValue` |
 | `correspondingMethodParams` | [`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md)[] | - | - | - |
+| `crossLanguageDefinitionId` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`crossLanguageDefinitionId` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`crossLanguageDefinitionId` |
 | `description?` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`description` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`description` |
 | `details?` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`details` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`details` |
 | `isApiVersionParam` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isApiVersionParam` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isApiVersionParam` |
 | `isGeneratedName` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isGeneratedName` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isGeneratedName` |
 | `kind` | `"path"` | - | - | - |
 | `name` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`name` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`name` |
-| ~~`nameInClient`~~ | `string` | **Deprecated**<br />This property is deprecated. Use `.name` instead.<br />https://github.com/Azure/typespec-azure/issues/446 | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nameInClient` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nameInClient` |
-| `nullable` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nullable` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nullable` |
+| ~~`nameInClient`~~ | `string` | <p>**Deprecated**</p><p>This property is deprecated. Use `.name` instead.</p> | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nameInClient` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`nameInClient` |
 | `onClient` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`onClient` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`onClient` |
 | `optional` | `false` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`optional` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`optional` |
 | `serializedName` | `string` | - | - | - |

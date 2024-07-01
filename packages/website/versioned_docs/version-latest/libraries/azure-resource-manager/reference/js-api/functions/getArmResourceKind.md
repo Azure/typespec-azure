@@ -4,7 +4,7 @@ title: "[F] getArmResourceKind"
 
 ---
 ```ts
-getArmResourceKind(resourceType): ArmResourceKind | undefined
+function getArmResourceKind(resourceType): ArmResourceKind | undefined
 ```
 
 ## Parameters

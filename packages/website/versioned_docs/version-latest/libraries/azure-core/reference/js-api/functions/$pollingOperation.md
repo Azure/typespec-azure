@@ -4,7 +4,7 @@ title: "[F] $pollingOperation"
 
 ---
 ```ts
-$pollingOperation(
+function $pollingOperation(
    context, 
    target, 
    linkedOperation, 

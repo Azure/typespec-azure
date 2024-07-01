@@ -4,7 +4,7 @@ title: "[F] getArmCommonTypesVersions"
 
 ---
 ```ts
-getArmCommonTypesVersions(program): ArmCommonTypeVersions | undefined
+function getArmCommonTypesVersions(program): ArmCommonTypeVersions
 ```
 
 ## Parameters
@@ -15,4 +15,4 @@ getArmCommonTypesVersions(program): ArmCommonTypeVersions | undefined
 
 ## Returns
 
-[`ArmCommonTypeVersions`](../interfaces/ArmCommonTypeVersions.md) \| `undefined`
+[`ArmCommonTypeVersions`](../interfaces/ArmCommonTypeVersions.md)

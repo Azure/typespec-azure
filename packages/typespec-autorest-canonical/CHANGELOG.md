@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.4.0
+
+### Bug Fixes
+
+- [#968](https://github.com/Azure/typespec-azure/pull/968) update the canonical swagger file folder name
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+
 ## 0.3.0
 
 ### Bug Fixes

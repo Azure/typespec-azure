@@ -4,7 +4,7 @@ title: "[F] $ensureAllHeaderParams"
 
 ---
 ```ts
-$ensureAllHeaderParams(
+function $ensureAllHeaderParams(
    context, 
    target, 
    paramModel): void

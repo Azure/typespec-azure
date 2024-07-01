@@ -4,7 +4,7 @@ title: "[F] getAllProperties"
 
 ---
 ```ts
-getAllProperties(model, collection?): Map<string, ModelProperty>
+function getAllProperties(model, collection?): Map<string, ModelProperty>
 ```
 
 ## Parameters

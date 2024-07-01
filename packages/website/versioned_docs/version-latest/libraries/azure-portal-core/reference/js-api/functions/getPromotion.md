@@ -4,7 +4,7 @@ title: "[F] getPromotion"
 
 ---
 ```ts
-getPromotion(program, target): any
+function getPromotion(program, target): any
 ```
 
 ## Parameters

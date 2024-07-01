@@ -54,7 +54,7 @@ import {
   getDocHelper,
   getHashForType,
   getLocationOfOperation,
-  getSdkTypeBaseHelper,
+  getTypeDecorators,
   isNeverOrVoidType,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -214,6 +214,8 @@ function getSdkMethodResponse<
       values: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
+      decorators: [],
     };
   } else if (responseTypes) {
     type = allResponseBodies[0];
@@ -222,6 +224,7 @@ function getSdkMethodResponse<
     type = {
       kind: "nullable",
       type: type,
+      decorators: [],
     };
   }
   return {
@@ -307,6 +310,7 @@ function getSdkBasicServiceMethod<
       return undefined; // currently we only return a value for paging or lro
     },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
+    decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
   });
 }
 
@@ -392,6 +396,7 @@ function getSdkInitializationType<
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     isFormDataType: false,
     isError: false,
+    decorators: [],
   });
 }
 
@@ -413,7 +418,6 @@ function getSdkMethodParameter(
       details: getDocHelper(context, type).details,
       apiVersions,
       type: propertyType,
-      nameInClient: name,
       name,
       isGeneratedName: Boolean(libraryName),
       optional: false,
@@ -422,6 +426,7 @@ function getSdkMethodParameter(
       isApiVersionParam: false,
       onClient: false,
       crossLanguageDefinitionId: "anonymous",
+      decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     });
   }
   return diagnostics.wrap({
@@ -455,6 +460,7 @@ function getSdkMethods<TOptions extends object, TServiceOperation extends SdkSer
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
       crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
+      decorators: [],
     });
   }
   return diagnostics.wrap(retval);
@@ -478,7 +484,6 @@ function getSdkEndpointParameter(
       templateArguments: [
         {
           name,
-          nameInClient: name,
           isGeneratedName: true,
           description: "Service host",
           kind: "path",
@@ -488,14 +493,17 @@ function getSdkEndpointParameter(
           serializedName: "endpoint",
           correspondingMethodParams: [],
           type: {
-            ...getSdkTypeBaseHelper(context, client.service, "string"),
+            kind: "string",
             encode: "string",
+            decorators: [],
           },
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+          decorators: [],
         },
       ],
+      decorators: [],
     };
   } else {
     // this means we have one server
@@ -504,6 +512,7 @@ function getSdkEndpointParameter(
       kind: "endpoint",
       serverUrl: servers[0].url,
       templateArguments,
+      decorators: [],
     };
     for (const param of servers[0].parameters.values()) {
       const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
@@ -533,7 +542,6 @@ function getSdkEndpointParameter(
   return diagnostics.wrap({
     kind: "endpoint",
     type,
-    nameInClient: "endpoint",
     name: "endpoint",
     isGeneratedName: true,
     description: "Service host",
@@ -543,6 +551,7 @@ function getSdkEndpointParameter(
     optional,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+    decorators: [],
   });
 }
 
@@ -572,8 +581,8 @@ function createSdkClientType<
     ), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
+    decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
   };
-  context.__clients!.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -613,17 +622,13 @@ export function getSdkPackage<
   TServiceOperation extends SdkServiceOperation,
 >(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
-  context.__clients = new Array<SdkClientType<TServiceOperation>>();
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
-  for (const client of listClients(context)) {
-    createSdkClientType(context, client);
-  }
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   return {
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
-    clients: Array.from(context.__clients.values()),
+    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
     enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
     diagnostics: diagnostics.diagnostics,

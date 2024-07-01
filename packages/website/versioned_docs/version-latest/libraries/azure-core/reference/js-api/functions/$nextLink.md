@@ -4,7 +4,7 @@ title: "[F] $nextLink"
 
 ---
 ```ts
-$nextLink(context, entity): void
+function $nextLink(context, entity): void
 ```
 
 ## Parameters

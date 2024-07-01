@@ -4,7 +4,7 @@ title: "[F] $flattenProperty"
 
 ---
 ```ts
-$flattenProperty(
+function $flattenProperty(
    context, 
    target, 
    scope?): void

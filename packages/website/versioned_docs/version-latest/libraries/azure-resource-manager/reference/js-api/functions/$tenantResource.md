@@ -4,7 +4,7 @@ title: "[F] $tenantResource"
 
 ---
 ```ts
-$tenantResource(context, entity): void
+function $tenantResource(context, entity): void
 ```
 
 ## Parameters
