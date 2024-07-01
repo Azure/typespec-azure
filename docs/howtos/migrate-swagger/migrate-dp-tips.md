@@ -34,7 +34,7 @@ https://westus.api.widget.contoso.com).
 - **DO** ensure you have versioning (`@versioned`) enabled over your service definition. See: [Versioning][versioning]
 - **DO** ensure your versions enum is up to date. For an initial migration we recommend migrating your latest stable API version (and the latest preview API version the service may support after the stable API version)
 - **DO** review all enum definitions and add documentation over each value. See: [Documentation in TypeSpec][docs]
-- **DONT** suppress documentation warnings
+- **DON'T** suppress documentation warnings
 - **DO** use the [standard Typespec Azure operation templates and data-types][standard-templates] wherever possible. Standard operation templates should be used as much as possible
 - **DO** review model definitions and add the `@resource` decorator over models that represent resources in your service and the `@key` decorator for the resource identifier property on the model. Example:
 
@@ -73,18 +73,18 @@ union WidgetColor {
 }
 ```
 
-- **DONT** import or use templates from the `@azure-tools/typespec-azure-resource-manager` library in a data-plane specification
+- **DON'T** import or use templates from the `@azure-tools/typespec-azure-resource-manager` library in a data-plane specification
 - **DO** make client customizations in a `client.tsp` file
-- **DONT** import or use `@azure-tools/typespec-client-generator-core` in other files aside from client.tsp.
+- **DON'T** import or use `@azure-tools/typespec-client-generator-core` in other files aside from client.tsp.
 - **DO** run `tsp compile .` on your specification and address all warnings
 
 ## Additional considerations
 
 - **DO** ensure you pull in the latest `main` from the Azure/azure-rest-api-specs repo to stay up to date with latest dependencies
 - **DO** run `npm ci` to get a clean install of the package.json dependencies
-- **DONT** modify the package.json or package-lock.json files at the root of the azure-rest-api-specs repo
-- **DONT** add your own package.json or package-lock.json files in your project directory
-- **DONT** add multiple tspconfig.yaml files for your service specification
+- **DON'T** modify the package.json or package-lock.json files at the root of the azure-rest-api-specs repo
+- **DON'T** add your own package.json or package-lock.json files in your project directory
+- **DON'T** add multiple tspconfig.yaml files for your service specification
 - **DO** consult [ci-fix.md][ci-fix] for fixes to common CI errors reported
 
 <!-- LINKS -->
