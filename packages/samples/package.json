@@ -31,7 +31,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "test:regen": "cross-env RECORD=true vitest run",
     "regen-common-types": "tsx ./common-types/gen.ts",
-    "regen-samples": "cross-env RECORD=true vitest run"
+    "regen-samples": "pnpm regen-common-types && cross-env RECORD=true vitest run"
   },
   "files": [
     "lib/*.tsp",
