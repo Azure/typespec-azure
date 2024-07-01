@@ -127,6 +127,12 @@ export function $armCommonDefinition(
   storeCommonTypeRecord(context, entity, "definitions", definitionName, version, referenceFile);
 }
 
+/**
+ * Specify the ARM commont type version reference for a particular spec version or namespace.
+ * @param {DecoratorContext} context DecoratorContext object
+ * @param {enumType} entity Decorator target type. Must be `Model`
+ * @returns {void}
+ */
 export function $armCommonTypesVersions(context: DecoratorContext, enumType: Enum) {
   context.program.stateMap(ArmStateKeys.armCommonTypesVersions).set(enumType, {
     type: enumType,

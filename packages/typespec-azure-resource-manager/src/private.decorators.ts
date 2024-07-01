@@ -350,3 +350,18 @@ function hasProperty(program: Program, model: Model): boolean {
   if (model.baseModel) return hasProperty(program, model.baseModel);
   return false;
 }
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+export function $conditionalClientFlatten(context: DecoratorContext, entity: ModelProperty) {
+  context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
+}
+
+export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
+  const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
+  return flatten ?? false;
+}

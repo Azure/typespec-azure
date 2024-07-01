@@ -19,6 +19,8 @@ export * from "./resource.js";
 export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
+export { isConditionallyFlattened } from "./private.decorators.js";
+
 export const $flags = definePackageFlags({
   decoratorArgMarshalling: "new",
 });
