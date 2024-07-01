@@ -27,7 +27,6 @@ async function findJsonFiles(folder: string): Promise<string[]> {
 }
 
 const files = await findJsonFiles(resolve(dir, "existing"));
-console.log("Files", files);
 
 for (const file of files) {
   const content = await readFile(file);
