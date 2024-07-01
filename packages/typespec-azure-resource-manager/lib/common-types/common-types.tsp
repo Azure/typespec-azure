@@ -12,5 +12,4 @@ import "./versions.tsp";
 
 using TypeSpec.Versioning;
 
-@versioned(Versions)
 namespace Azure.ResourceManager.CommonTypes;
