@@ -3,7 +3,7 @@ using TypeSpec.Versioning;
 @versioned(Versions)
 namespace Azure.ResourceManager.CommonTypes;
 
-@CommonTypes.Private.armCommonTypesVersions
+@Azure.ResourceManager.CommonTypes.Private.armCommonTypesVersions
 @doc("The Azure Resource Manager common-types versions.")
 enum Versions {
   @doc("The Azure Resource Manager v3 common types.")
