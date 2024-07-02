@@ -8,6 +8,10 @@ resources:
       type: git
       name: internal/azure-sdk-build-tools
       ref: refs/tags/azure-sdk-build-tools_20230613.1
+    - repository: azure-rest-api-specs
+      type: github
+      name: Azure/azure-rest-api-specs
+      endpoint: azure
 
 parameters:
   - name: stages
@@ -35,6 +39,9 @@ extends:
         name: azsdk-pool-mms-win-2022-general
         image: azsdk-pool-mms-win-2022-1espt
         os: windows
+      sourceRepositoriesToScan:
+        exclude:
+          - repository: azure-rest-api-specs
       psscriptanalyzer:
         compiled: true
         break: true
