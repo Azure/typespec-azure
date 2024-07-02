@@ -14,10 +14,40 @@ stages:
         steps:
         - checkout: self
           submodules: true
-        - template: /eng/pipelines/templates/install.yml
-          parameters:
-            nodeVersion: "20.x"
-            workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+        - task: UseDotNet@2
+          inputs:
+            version: 8.0.x
+
+        - task: NodeTool@0
+          inputs:
+            versionSpec: 20.x
+          displayName: Install Node.js
+          retryCountOnTaskFailure: 3
+
+        - script: |
+            corepack enable
+            corepack prepare pnpm@latest-8 --activate
+          displayName: Install pnpm
+          workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+
+        - script: |
+            echo "Node:"
+            node -v
+            echo "Pnpm:"
+            pnpm -v
+          displayName: "Log tool versions used"
+          workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+
+        # purge before install to ensure a clean state between retries
+        - script: pnpm install
+          displayName: Install JavaScript Dependencies
+          retryCountOnTaskFailure: 3
+          workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+
+        - script: dotnet restore core/packages/typespec-vs
+          displayName: Restore .NET Dependencies
+          workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+          
         - script: pnpm run build
           displayName: Build
           workingDirectory: $(Build.SourcesDirectory)/typespec-azure
