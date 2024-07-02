@@ -10,6 +10,7 @@ import {
   Program,
   Service,
   Type,
+  Union,
   isTypeSpecValueTypeOf,
 } from "@typespec/compiler";
 import { $useDependency, getVersion } from "@typespec/versioning";
@@ -134,7 +135,7 @@ export function getArmCommonTypesVersion(
  */
 export function getArmCommonTypeOpenAPIRef(
   program: Program,
-  entity: Model | ModelProperty,
+  entity: Model | ModelProperty | Enum | Union,
   params: ArmCommonTypesResolutionOptions
 ): string | undefined {
   const [record, diagnostics] = findArmCommonTypeRecord(program, entity, params);
@@ -161,7 +162,7 @@ export interface ArmCommonTypesResolutionOptions {
 
 export function findArmCommonTypeRecord(
   program: Program,
-  entity: Model | ModelProperty,
+  entity: Model | ModelProperty | Enum | Union,
   params: ArmCommonTypesResolutionOptions
 ): [ArmCommonTypeRecord | undefined, readonly Diagnostic[]] {
   const { records, defaultKey } = getCommonTypeRecords(program, entity);

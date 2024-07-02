@@ -858,7 +858,13 @@ export async function getOpenAPIForService(
       };
     }
 
-    if (isArmCommonType(type) && (type.kind === "Model" || type.kind === "ModelProperty")) {
+    if (
+      isArmCommonType(type) &&
+      (type.kind === "Model" ||
+        type.kind === "ModelProperty" ||
+        type.kind === "Enum" ||
+        type.kind === "Union")
+    ) {
       const ref = getArmCommonTypeOpenAPIRef(program, type, {
         version: context.version,
         service: context.service,
