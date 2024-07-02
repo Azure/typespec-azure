@@ -387,7 +387,7 @@ model SdkQueryServiceParameter extends SdkModelPropertyType {
  *
  * @property serializedName: The name of the property we send over the wire to the services
  * @property urlEncode: Whether to url encode the path parameter
- * @property validation: Any validation for the path parameter. Right now only including validation on path paramters because we only know about path params needing validation.
+ * @property validation: Any validation for the path parameter. Right now only including validation on path parameters because we only know about path params needing validation.
  * @property location: Whether the parameter is a client-level or operation-level parameter
  */
 model SdkPathServiceParameter extends SdkModelPropertyType {

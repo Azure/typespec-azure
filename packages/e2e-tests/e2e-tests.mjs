@@ -53,6 +53,9 @@ function getPackagesPath() {
     "@typespec/rest": resolveLocalPackage("core/packages/rest"),
     "@typespec/versioning": resolveLocalPackage("core/packages/versioning"),
     "@azure-tools/typespec-azure-core": resolveLocalPackage("packages/typespec-azure-core"),
+    "@azure-tools/typespec-azure-resource-manager": resolveLocalPackage(
+      "packages/typespec-azure-resource-manager"
+    ),
     "@azure-tools/typespec-client-generator-core": resolveLocalPackage(
       "packages/typespec-client-generator-core"
     ),
@@ -139,6 +142,8 @@ function testCadlRanch(packages, args) {
       "@typespec/openapi3": packages["@typespec/openapi3"],
       "@typespec/versioning": packages["@typespec/versioning"],
       "@azure-tools/typespec-azure-core": packages["@azure-tools/typespec-azure-core"],
+      "@azure-tools/typespec-azure-resource-manager":
+        packages["@azure-tools/typespec-azure-resource-manager"],
       "@azure-tools/typespec-client-generator-core":
         packages["@azure-tools/typespec-client-generator-core"],
     },

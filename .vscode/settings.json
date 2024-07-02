@@ -51,7 +51,7 @@
     "pnpm-config.json": "jsonc",
     "version-policies.json": "jsonc"
   },
-  "typescript.tsdk": "./core/packages/compiler/node_modules/typescript/lib",
+  "typescript.tsdk": "node_modules/typescript/lib",
   "git.ignoreLimitWarning": true,
   "vitest.workspaceConfig": "./vitest.workspace.ts",
   "prettier.configPath": ".prettierrc.json",

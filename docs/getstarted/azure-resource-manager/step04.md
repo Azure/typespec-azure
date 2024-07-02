@@ -91,9 +91,9 @@ These templates have default values so that they are normally used without speci
 
 The above templates are specializations of the following template in the `Azure.ResourceManager.Foundations` namespace:
 
-| Template                                                                         | Description                                                      |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `checkNameAvailability<TScopeParamters, TRequest, TResponse, TAdditionalParams>` | Checks name availability based on the provided scope parameters. |
+| Template                                                                          | Description                                                      |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `checkNameAvailability<TScopeParameters, TRequest, TResponse, TAdditionalParams>` | Checks name availability based on the provided scope parameters. |
 
 For reference, the standard templates use the following `TScopeParameters`:
 
