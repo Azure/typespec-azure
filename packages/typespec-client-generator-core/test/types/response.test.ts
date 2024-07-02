@@ -26,5 +26,4 @@ describe("typespec-client-generator-core: responses", () => {
     strictEqual(responses[0].headers.length, 1);
     strictEqual(responses[0].headers[0].serializedName, "Content-Type");
   });
-
 });

@@ -41,13 +41,13 @@ import {
   TCGCContext,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
   isSubscriptionId,
-  getHttpOperationResponseHeaders,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";

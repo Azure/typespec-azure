@@ -1,8 +1,17 @@
 import {
   BooleanLiteral,
+  createDiagnosticCollector,
   Diagnostic,
+  getDeprecationDetails,
+  getDoc,
+  getNamespaceFullName,
+  getSummary,
   Interface,
+  isNeverType,
+  isNullType,
+  isVoidType,
   Model,
+  ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
@@ -13,17 +22,8 @@ import {
   Type,
   Union,
   Value,
-  createDiagnosticCollector,
-  getDeprecationDetails,
-  getDoc,
-  getNamespaceFullName,
-  getSummary,
-  isNeverType,
-  isNullType,
-  isVoidType,
-  ModelProperty,
 } from "@typespec/compiler";
-import { HttpOperation, HttpStatusCodeRange, HttpOperationResponseContent } from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
@@ -520,10 +520,12 @@ export function getAnyType(
   });
 }
 
-export function getHttpOperationResponseHeaders(response: HttpOperationResponseContent): ModelProperty[] {  
-  const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];  
-  if (response.body?.contentTypeProperty) {  
-    headers.push(response.body.contentTypeProperty);  
-  }  
-  return headers;  
-}  
+export function getHttpOperationResponseHeaders(
+  response: HttpOperationResponseContent
+): ModelProperty[] {
+  const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];
+  if (response.body?.contentTypeProperty) {
+    headers.push(response.body.contentTypeProperty);
+  }
+  return headers;
+}
