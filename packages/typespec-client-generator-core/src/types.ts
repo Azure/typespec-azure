@@ -148,7 +148,11 @@ export function addFormatInfo(
   propertyType: SdkType
 ): void {
   const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
-  const format = getFormat(context.program, type) ?? "";
+  let format = getFormat(context.program, type) ?? "";
+
+  // special case: we treat format: uri the same as format: url
+  if (format === "uri") format = "url";
+
   if (isSdkBuiltInKind(format)) innerType.kind = format;
 }
 
