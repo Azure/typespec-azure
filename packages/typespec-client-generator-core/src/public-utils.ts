@@ -32,6 +32,7 @@ import {
   TCGCContext,
   TspLiteralType,
   getClientNamespaceStringHelper,
+  getHttpOperationResponseHeaders,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -398,8 +399,9 @@ function getContextPath(
           }
         }
 
-        if (innerResponse.headers) {
-          for (const header of Object.values(innerResponse.headers)) {
+        const headers = getHttpOperationResponseHeaders(innerResponse);
+        if (headers) {
+          for (const header of Object.values(headers)) {
             visited.clear();
             result = [{ name: root.name }];
             if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {

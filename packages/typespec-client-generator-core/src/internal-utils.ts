@@ -21,8 +21,9 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
+  ModelProperty,
 } from "@typespec/compiler";
-import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
+import { HttpOperation, HttpStatusCodeRange, HttpOperationResponseContent } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
@@ -518,3 +519,11 @@ export function getAnyType(
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
 }
+
+export function getHttpOperationResponseHeaders(response: HttpOperationResponseContent): ModelProperty[] {  
+  const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];  
+  if (response.body?.contentTypeProperty) {  
+    headers.push(response.body.contentTypeProperty);  
+  }  
+  return headers;  
+}  

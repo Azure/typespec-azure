@@ -47,6 +47,7 @@ import {
   isContentTypeHeader,
   isNeverOrVoidType,
   isSubscriptionId,
+  getHttpOperationResponseHeaders,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
@@ -384,7 +385,7 @@ function getSdkHttpResponseAndExceptions(
     let contentTypes: string[] = [];
 
     for (const innerResponse of response.responses) {
-      for (const header of Object.values(innerResponse.headers || [])) {
+      for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
         const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
         const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")

@@ -79,6 +79,7 @@ import {
   getAnyType,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getNonNullOptions,
   getNullOption,
@@ -1352,8 +1353,9 @@ function updateTypesFromOperation(
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
         }
       }
-      if (innerResponse.headers) {
-        for (const header of Object.values(innerResponse.headers)) {
+      const headers = getHttpOperationResponseHeaders(innerResponse);
+      if (headers) {
+        for (const header of Object.values(headers)) {
           if (isNeverOrVoidType(header.type)) continue;
           const sdkType = diagnostics.pipe(
             getClientTypeWithDiagnostics(context, header.type, operation)
