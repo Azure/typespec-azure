@@ -18,15 +18,7 @@ import {
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  getHeaderFieldName,
-  getHttpOperation,
-  getPathParamName,
-  getQueryParamName,
-  isMetadata,
-  isStatusCode,
-} from "@typespec/http";
+import { HttpOperation, getHttpOperation, isMetadata } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -119,16 +111,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  function isSchemaProperty(property: ModelProperty) {
-    const program = context.program;
-    const headerInfo = getHeaderFieldName(program, property);
-    const queryInfo = getQueryParamName(program, property);
-    const pathInfo = getPathParamName(program, property);
-    const statusCodeinfo = isStatusCode(program, property);
-    return !(headerInfo || queryInfo || pathInfo || statusCodeinfo);
-  }
-
-  const effective = getEffectiveModelType(program, type, isSchemaProperty);
+  const effective = getEffectiveModelType(program, type, (t) => !isMetadata(context.program, t));
   if (effective.name) {
     return effective;
   }
@@ -404,9 +387,13 @@ function getContextPath(
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
+          const body =
+            innerResponse.body.type.kind === "Model"
+              ? getEffectivePayloadType(context, innerResponse.body.type)
+              : innerResponse.body.type;
           visited.clear();
           result = [{ name: root.name }];
-          if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response")) {
+          if (dfsModelProperties(typeToFind, body, "Response")) {
             return result;
           }
         }
@@ -475,7 +462,6 @@ function getContextPath(
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
     } else if (currentType.kind === "Model") {
-      currentType = getEffectivePayloadType(context, currentType);
       // handle model
       result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
