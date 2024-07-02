@@ -22,18 +22,15 @@ steps:
 
   - task: Cache@2
     inputs:
-      key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+      key: 'pnpm | "$(Agent.OS)" | ${{ parameters.workingDirectory }}/pnpm-lock.yaml'
       path: ${{ parameters.pnpmStorePath }}
     displayName: Cache pnpm store
-    workingDirectory: ${{ parameters.workingDirectory }}
   - script: |
       corepack enable
       corepack prepare pnpm@latest-8 --activate
     displayName: Install pnpm
-    workingDirectory: ${{ parameters.workingDirectory }}
   - script: pnpm config set store-dir ${{ parameters.pnpmStorePath }}
     displayName: Setup pnpm cache dir
-    workingDirectory: ${{ parameters.workingDirectory }}
 
   - script: |
       echo "Node:"
@@ -41,7 +38,6 @@ steps:
       echo "Pnpm:"
       pnpm -v
     displayName: "Log tool versions used"
-    workingDirectory: ${{ parameters.workingDirectory }}
 
   # purge before install to ensure a clean state between retries
   - script: pnpm install
