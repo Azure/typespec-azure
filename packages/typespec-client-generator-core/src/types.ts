@@ -31,10 +31,13 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationPart,
   Visibility,
   getAuthentication,
+  getHttpPart,
   getServers,
   isHeader,
+  isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
 import {
@@ -854,7 +857,14 @@ export function getClientTypeWithDiagnostics(
     case "Model":
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        const httpPart = getHttpPart(context.program, type);
+        if (httpPart === undefined) {
+          retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        } else {
+          retval = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, httpPart.type, operation)
+          );
+        }
       }
       break;
     case "Intrinsic":
@@ -1059,45 +1069,102 @@ export function getSdkModelPropertyTypeBase(
   });
 }
 
+function updateMultiPartInfo(
+  context: TCGCContext,
+  type: ModelProperty,
+  base: SdkBodyModelPropertyType,
+  operation?: Operation,
+  httpOperationPart?: HttpOperationPart
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const isBytesInput =
+    base.type.kind === "bytes" ||
+    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+
+  if (httpOperationPart) {
+    // body decorated with @multipartBody
+    const httpPart = getHttpPart(context.program, type.type);
+    base.multipartOptions = {
+      isFilePart:
+        isBytesInput ||
+        (httpPart !== undefined && isOrExtendsHttpFile(context.program, httpPart.type)),
+      multi: httpOperationPart.multi,
+      filename: httpOperationPart.filename
+        ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
+        : undefined,
+      contentType: httpOperationPart.body.contentTypeProperty
+        ? diagnostics.pipe(
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
+        : undefined,
+      defaultContentTypes: httpOperationPart.body.contentTypes,
+    };
+  } else if (operation) {
+    // common body
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    const operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+    if (operationIsMultipart) {
+      // Currently we only recognize bytes and list of bytes as potential file inputs
+      if (isBytesInput && getEncode(context.program, type)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "encoding-multipart-bytes",
+            target: type,
+          })
+        );
+      }
+      base.multipartOptions = {
+        isFilePart: isBytesInput,
+        multi: base.type.kind === "array",
+        defaultContentTypes: [],
+      };
+    }
+  }
+  if (base.multipartOptions !== undefined) {
+    base.isMultipartFileInput = base.multipartOptions.isFilePart;
+  }
+  if (base.multipartOptions?.multi && base.type.kind === "array") {
+    // for "images: T[]" or "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"
+    base.type = base.type.valueType;
+  }
+
+  return diagnostics.wrap(undefined);
+}
+
 export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
-  operation?: Operation
+  operation?: Operation,
+  httpOperationPart?: HttpOperationPart
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
-  // I'm a body model property
-  let operationIsMultipart = false;
-  if (operation) {
-    const httpOperation = getHttpOperationWithCache(context, operation);
-    operationIsMultipart = Boolean(
-      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
-    );
-  }
-  // Currently we only recognize bytes and list of bytes as potential file inputs
-  const isBytesInput =
-    base.type.kind === "bytes" ||
-    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "encoding-multipart-bytes",
-        target: type,
-      })
-    );
-  }
-  return diagnostics.wrap({
+  const result: SdkBodyModelPropertyType = {
     ...base,
     kind: "property",
     optional: type.optional,
     visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
-    isMultipartFileInput: isBytesInput && operationIsMultipart,
+    isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
-  });
+  };
+  diagnostics.pipe(updateMultiPartInfo(context, type, result, operation, httpOperationPart));
+  return diagnostics.wrap(result);
+}
+
+function getHttpOperationParts(context: TCGCContext, operation?: Operation): HttpOperationPart[] {
+  if (operation) {
+    const body = getHttpOperationWithCache(context, operation).parameters.body;
+    if (body?.bodyKind === "multipart") {
+      return body.parts;
+    }
+  }
+  return [];
 }
 
 function addPropertiesToModelType(
@@ -1107,7 +1174,8 @@ function addPropertiesToModelType(
   operation?: Operation
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  for (const property of type.properties.values()) {
+  const httpOpParts = getHttpOperationParts(context, operation);
+  for (const [index, property] of Array.from(type.properties.values()).entries()) {
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
@@ -1115,7 +1183,10 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+    const httpOpPart = httpOpParts.length > index ? httpOpParts[index] : undefined;
+    const clientProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, property, operation, httpOpPart)
+    );
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
