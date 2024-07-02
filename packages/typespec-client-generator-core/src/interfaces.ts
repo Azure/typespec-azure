@@ -137,7 +137,8 @@ const __: TypeEquality<Exclude<SdkBuiltInKinds, SupportedBuiltInKinds>, never> =
 
 type SupportedBuiltInKinds =
   | keyof typeof SdkIntKindsEnum
-  | keyof typeof SdkFloatKindsEnum
+  | keyof typeof SdkFloatingPointKindsEnum
+  | keyof typeof SdkFixedPointKindsEnum
   | keyof typeof SdkGenericBuiltInStringKindsEnum
   | keyof typeof SdkBuiltInKindsMiscellaneousEnum;
 
@@ -155,10 +156,13 @@ enum SdkIntKindsEnum {
   uint64 = "uint64",
 }
 
-enum SdkFloatKindsEnum {
+enum SdkFloatingPointKindsEnum {
   float = "float",
   float32 = "float32",
   float64 = "float64",
+}
+
+enum SdkFixedPointKindsEnum {
   decimal = "decimal",
   decimal128 = "decimal128",
 }
@@ -184,7 +188,8 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
   const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum)
     .concat(Object.keys(SdkIntKindsEnum))
-    .concat(Object.keys(SdkFloatKindsEnum))
+    .concat(Object.keys(SdkFloatingPointKindsEnum))
+    .concat(Object.keys(SdkFixedPointKindsEnum))
     .concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
   for (const kind of typespecNamespace) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
@@ -198,6 +203,7 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
     kind in SdkBuiltInKindsMiscellaneousEnum ||
     isSdkIntKind(kind) ||
     isSdkFloatKind(kind) ||
+    isSdkFixedPointKind(kind) ||
     kind in SdkGenericBuiltInStringKindsEnum
   );
 }
@@ -206,8 +212,12 @@ export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum
   return kind in SdkIntKindsEnum;
 }
 
-export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKindsEnum {
-  return kind in SdkFloatKindsEnum;
+export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatingPointKindsEnum {
+  return kind in SdkFloatingPointKindsEnum;
+}
+
+function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
+  return kind in SdkFixedPointKindsEnum;
 }
 
 const SdkDateTimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;

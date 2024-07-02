@@ -21,6 +21,7 @@ packages:
 2. `@format` can no longer change a string type to above azure types (`uuid`, `eTag`, etc).
 3. add `name`, `crossLanguageDefinitionId` and `baseType` to `SdkBuiltInType`, `SdkDatetimeType` and `SdkDurationType`.
 4. now scalars defined using `scalar` keyword will be parsed into either `SdkBuiltInType`, `SdkDatetimeType` or `SdkDurationType` depending on the base type, with its `name` and `crossLanguageDefinitionId`. `@encode` will be added to the scalar type, and will not propagate to its base type.
+5. `isSdkFloatKind` now returns `false` for `decimal` and `decimal128`.
 
 ## Migration guides for emitters
 
