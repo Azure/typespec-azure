@@ -16,7 +16,7 @@ stages:
           submodules: true
         - template: /eng/pipelines/templates/install.yml
           parameters:
-            nodeVersion: "20.x"
+            nodeVersion: "18.x"
             workingDirectory: $(Build.SourcesDirectory)/typespec-azure
         - script: pnpm run build
           displayName: Build
