@@ -1,12 +1,5 @@
 trigger: none
 
-resources:
-  repositories:
-    - repository: azure-rest-api-specs
-      type: github
-      name: Azure/azure-rest-api-specs
-      endpoint: azure
-
 extends:
   template: /eng/pipelines/templates/1es-redirect.yml
   parameters:
