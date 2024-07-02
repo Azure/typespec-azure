@@ -1219,7 +1219,9 @@ interface SdkTypeBase {
   // created by tcgc. Those won't have an original type
   __raw?: Type;
   kind: string;
-  deprecations?: string;
+  deprecation?: string;
+  description?: string;
+  details?: string;
 }
 ```
 
@@ -1236,6 +1238,9 @@ There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuil
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
+  name: string;
+  baseType?: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1243,9 +1248,12 @@ export interface SdkBuiltInType extends SdkTypeBase {
 
 ```ts
 interface SdkDatetimeTypeBase extends SdkTypeBase {
+  name: string;
+  baseType?: SdkDateTimeType;
   encode: DateTimeKnownEncoding;
   // what we send over the wire. Often it's string
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
@@ -1262,9 +1270,12 @@ interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
 ```ts
 interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
+  name: string;
+  baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
   // What we send over the wire. It's usually either a string or a float
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1273,8 +1284,9 @@ interface SdkDurationType extends SdkTypeBase {
 ```ts
 interface SdkArrayType extends SdkTypeBase {
   kind: "array";
+  name: string;
   valueType: SdkType;
-  nullableValues: boolean;
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1285,7 +1297,6 @@ interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType; // currently can only be string
   valueType: SdkType;
-  nullableValues: boolean;
 }
 ```
 
@@ -1296,17 +1307,16 @@ export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   // Determines whether the name was generated or not
-  generatedName: boolean;
+  isGeneratedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
-  description?: string;
-  details?: string;
   isFlags: boolean;
   usage: UsageFlags;
   access: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  isUnionAsEnum: boolean;
 }
 ```
 
@@ -1318,9 +1328,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkType;
-  description?: string;
-  details?: string;
+  valueType: SdkBuiltInType;
 }
 ```
 
@@ -1331,6 +1339,8 @@ export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
   value: string | number | boolean | null;
   valueType: SdkBuiltInType;
+  name: string;
+  isGeneratedName: boolean;
 }
 ```
 
@@ -1340,9 +1350,10 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType extends SdkTypeBase {
   name: string;
   // determines if the union name was generated or not
-  generatedName: boolean;
+  isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1353,13 +1364,9 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   // purposely can also be header / query params for fidelity with TypeSpec
   properties: SdkModelPropertyType[];
-  isFormDataType: boolean;
-  isError: boolean;
   // we will always have a name. generatedName determines if it's generated or not.
   name: string;
-  generatedName: string;
-  description?: string;
-  details?: string;
+  isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
