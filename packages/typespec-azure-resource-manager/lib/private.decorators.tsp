@@ -66,3 +66,11 @@ extern dec defaultResourceKeySegmentName(
  * Note, this is intended for internal use only for now.
  */
 extern dec enforceConstraint(target: Operation | Model, sourceType: Model, constraintType: Model);
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+extern dec conditionalClientFlatten(target: ModelProperty);

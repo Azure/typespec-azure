@@ -18,7 +18,7 @@ model PrivateEndpoint {
 /** A private link resource. */
 model PrivateLinkResource extends Resource {
   /** Resource properties. */
-  @extension("x-ms-client-flatten", true)
+  @Azure.ResourceManager.Private.conditionalClientFlatten
   properties?: PrivateLinkResourceProperties;
 }
 
@@ -45,7 +45,7 @@ model PrivateLinkResourceListResult {
 /** The private endpoint connection resource */
 model PrivateEndpointConnection extends Resource {
   /** The private endpoint connection properties */
-  @extension("x-ms-client-flatten", true)
+  @Azure.ResourceManager.Private.conditionalClientFlatten
   properties?: PrivateEndpointConnectionProperties;
 }
 
