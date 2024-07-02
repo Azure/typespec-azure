@@ -141,6 +141,18 @@ namespace Azure.ResourceManager.CommonTypes;
   "privatelinks.json"
 );
 
+@@armCommonDefinition(PrivateEndpointServiceConnectionStatus,
+  "PrivateEndpointServiceConnectionStatus",
+  Azure.ResourceManager.CommonTypes.Versions.v3,
+  "privatelinks.json"
+);
+
+@@armCommonDefinition(PrivateEndpointConnectionProvisioningState,
+  "PrivateEndpointConnectionProvisioningState",
+  Azure.ResourceManager.CommonTypes.Versions.v3,
+  "privatelinks.json"
+);
+
 /** PrivateEndpointConnectionParameter */
 @@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
   "PrivateEndpointConnectionName",

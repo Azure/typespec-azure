@@ -77,3 +77,14 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "managedidentity.json"
 );
+
+@@armCommonDefinition(ManagedServiceIdentityType,
+  "ManagedServiceIdentityType",
+  Azure.ResourceManager.CommonTypes.Versions.v3,
+  "managedidentity.json"
+);
+@@armCommonDefinition(SystemAssignedServiceIdentityType,
+  "SystemAssignedServiceIdentityType",
+  Azure.ResourceManager.CommonTypes.Versions.v3,
+  "managedidentity.json"
+);

@@ -280,6 +280,8 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
 
+@@armCommonDefinition(SkuTier, "SkuTier", Azure.ResourceManager.CommonTypes.Versions.v3);
+
 // -- Parameters
 /** ApiVersionParameter */
 @@armCommonParameter(ApiVersionParameter.apiVersion,
