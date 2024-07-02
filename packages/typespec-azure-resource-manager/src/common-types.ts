@@ -70,7 +70,7 @@ export function getArmCommonTypesVersionFromString(
  */
 export function isArmCommonType(entity: Type): boolean {
   const commonDecorators = ["$armCommonDefinition", "$armCommonParameter"];
-  if (isTypeSpecValueTypeOf(entity, ["Model", "ModelProperty"])) {
+  if (isTypeSpecValueTypeOf(entity, ["Model", "ModelProperty", "Enum", "Union"])) {
     return commonDecorators.some((commonDecorator) =>
       entity.decorators.some((d) => d.decorator.name === commonDecorator)
     );
