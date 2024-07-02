@@ -24,7 +24,7 @@ model ManagedServiceIdentity {
 
   /** The identities assigned to this resource by the user. */
   @typeChangedFrom(Versions.v5, Record<UserAssignedIdentity>)
-  userAssignedIdentities?: Record<UserAssignedIdentity> | null;
+  userAssignedIdentities?: Record<UserAssignedIdentity | null>;
 }
 
 /**
