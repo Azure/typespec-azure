@@ -17,7 +17,10 @@ stages:
         - template: /eng/pipelines/templates/install.yml
           parameters:
             nodeVersion: "20.x"
-        - template: /eng/pipelines/templates/build.yml
+            workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+        - script: pnpm run build
+          displayName: Build
+          workingDirectory: $(Build.SourcesDirectory)/typespec-azure
 
         - checkout: azure-rest-api-specs
           fetchDepth: 1
