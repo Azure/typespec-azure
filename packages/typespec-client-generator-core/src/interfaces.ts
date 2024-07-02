@@ -5,6 +5,7 @@ import {
   DurationKnownEncoding,
   EmitContext,
   Interface,
+  IntrinsicScalarName,
   ModelProperty,
   Namespace,
   Operation,
@@ -118,7 +119,28 @@ export type SdkType =
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
+  name: string;
+  baseType?: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
+
+type TypeEquality<T, U> = keyof T extends keyof U
+  ? keyof U extends keyof T
+    ? true
+    : false
+  : false;
+
+// these two vars are used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
+// if it is not, a typescript compilation error will be thrown here.
+const _: TypeEquality<Exclude<SupportedBuiltInKinds, SdkBuiltInKinds>, never> = true;
+const __: TypeEquality<Exclude<SdkBuiltInKinds, SupportedBuiltInKinds>, never> = true;
+
+type SupportedBuiltInKinds =
+  | keyof typeof SdkIntKindsEnum
+  | keyof typeof SdkFloatingPointKindsEnum
+  | keyof typeof SdkFixedPointKindsEnum
+  | keyof typeof SdkGenericBuiltInStringKindsEnum
+  | keyof typeof SdkBuiltInKindsMiscellaneousEnum;
 
 enum SdkIntKindsEnum {
   numeric = "numeric",
@@ -134,30 +156,20 @@ enum SdkIntKindsEnum {
   uint64 = "uint64",
 }
 
-enum SdkFloatKindsEnum {
+enum SdkFloatingPointKindsEnum {
   float = "float",
   float32 = "float32",
   float64 = "float64",
+}
+
+enum SdkFixedPointKindsEnum {
   decimal = "decimal",
   decimal128 = "decimal128",
 }
 
-const SdkAzureBuiltInStringKindsMapping = {
-  uuid: "uuid",
-  ipV4Address: "ipV4Address",
-  ipV6Address: "ipV6Address",
-  eTag: "eTag",
-  armId: "armResourceIdentifier",
-  azureLocation: "azureLocation",
-};
-
 enum SdkGenericBuiltInStringKindsEnum {
   string = "string",
-  password = "password",
-  guid = "guid",
   url = "url",
-  uri = "uri",
-  ipAddress = "ipAddress",
 }
 
 enum SdkBuiltInKindsMiscellaneousEnum {
@@ -168,28 +180,20 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   any = "any",
 }
 
-export type SdkBuiltInKinds =
-  | keyof typeof SdkBuiltInKindsMiscellaneousEnum
-  | keyof typeof SdkIntKindsEnum
-  | keyof typeof SdkFloatKindsEnum
-  | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkAzureBuiltInStringKindsMapping;
+export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
+
+type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
   const typespecNamespace = Object.keys(SdkBuiltInKindsMiscellaneousEnum)
     .concat(Object.keys(SdkIntKindsEnum))
-    .concat(Object.keys(SdkFloatKindsEnum))
+    .concat(Object.keys(SdkFloatingPointKindsEnum))
+    .concat(Object.keys(SdkFixedPointKindsEnum))
     .concat(Object.keys(SdkGenericBuiltInStringKindsEnum));
   for (const kind of typespecNamespace) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
     retval[`TypeSpec.${kind}`] = kind;
-  }
-  for (const kind in SdkAzureBuiltInStringKindsMapping) {
-    if (!isSdkBuiltInKind(kind)) continue; // it will always be true
-    const kindMappedName =
-      SdkAzureBuiltInStringKindsMapping[kind as keyof typeof SdkAzureBuiltInStringKindsMapping];
-    retval[`Azure.Core.${kindMappedName}`] = kind;
   }
   return retval;
 }
@@ -199,8 +203,8 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
     kind in SdkBuiltInKindsMiscellaneousEnum ||
     isSdkIntKind(kind) ||
     isSdkFloatKind(kind) ||
-    kind in SdkGenericBuiltInStringKindsEnum ||
-    kind in SdkAzureBuiltInStringKindsMapping
+    isSdkFixedPointKind(kind) ||
+    kind in SdkGenericBuiltInStringKindsEnum
   );
 }
 
@@ -208,8 +212,12 @@ export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum
   return kind in SdkIntKindsEnum;
 }
 
-export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKindsEnum {
-  return kind in SdkFloatKindsEnum;
+export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatingPointKindsEnum {
+  return kind in SdkFloatingPointKindsEnum;
+}
+
+function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
+  return kind in SdkFixedPointKindsEnum;
 }
 
 const SdkDateTimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
@@ -219,8 +227,11 @@ export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKn
 }
 
 interface SdkDateTimeTypeBase extends SdkTypeBase {
+  name: string;
+  baseType?: SdkDateTimeType;
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 interface SdkUtcDateTimeType extends SdkDateTimeTypeBase {
@@ -250,8 +261,11 @@ export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
+  name: string;
+  baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkArrayType extends SdkTypeBase {
@@ -299,6 +313,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   enumType: SdkEnumType;
   valueType: SdkBuiltInType;
 }
+
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
   value: string | number | boolean | null;

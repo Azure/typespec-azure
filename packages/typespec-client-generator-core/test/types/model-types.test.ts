@@ -268,7 +268,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
     strictEqual(kindProperty.__raw, undefined);
-    strictEqual(kindProperty.type.__raw, undefined);
+    strictEqual(kindProperty.type.__raw?.kind, "Scalar");
+    strictEqual(kindProperty.type.__raw?.name, "string");
     strictEqual(fish.discriminatorProperty, kindProperty);
   });
 

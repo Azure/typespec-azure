@@ -27,7 +27,6 @@ import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec
 import {
   DecoratorInfo,
   SdkBuiltInKinds,
-  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
@@ -261,7 +260,7 @@ export function getSdkTypeBaseHelper<TKind>(
   return diagnostics.wrap({
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
-    kind,
+    kind: kind,
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
 }
@@ -505,16 +504,4 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
 
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
-}
-
-export function getAnyType(
-  context: TCGCContext,
-  type: Type
-): [SdkBuiltInType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
-    kind: "any",
-    encode: "string",
-    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
-  });
 }
