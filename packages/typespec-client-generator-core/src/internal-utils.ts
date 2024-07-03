@@ -528,13 +528,6 @@ export function getAnyType(
   });
 }
 
-function pascalCaseForOperationId(name: string) {
-  return name
-    .split("_")
-    .map((s) => pascalCase(s))
-    .join("_");
-}
-
 export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
   let apiVersion = context.apiVersion;
   if (apiVersion === "all") {
