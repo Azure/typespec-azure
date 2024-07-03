@@ -2702,27 +2702,50 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("duplicate client name", async () => {
-      await runner.compileAndDiagnose(
+      const diagnostics = await runner.diagnose(
       `
-        @service({})
-        namespace MyService;
-        
-        @clientName("Test1")
-        model Test {
-          id: string;
-          prop: string;
-        }
-          
-        model Test1 {
-          id: string;
-          prop: string;
-        }
-      `
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      namespace Contoso.WidgetManager;
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      @clientName("Test")
+      model Widget {
+        @key
+        id: int32;
+      
+        description?: string;
+      }
+
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      op test(): Test | Error;
+
+      op list(@query apiVersion: string): Widget[] | Error;
+      
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+    `
       );
 
-      expectDiagnostics(runner.program.diagnostics, {
+    expectDiagnostics(diagnostics, [
+      {
         code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
-      });
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+      }
+      ]
+    );
     });
   });
 
