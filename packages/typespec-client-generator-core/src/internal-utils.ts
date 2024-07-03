@@ -535,40 +535,6 @@ function pascalCaseForOperationId(name: string) {
     .join("_");
 }
 
-/**
- * Resolve the OpenAPI operation ID for the given operation using the following logic:
- * - If @operationId was specified use that value
- * - If operation is defined at the root or under the service namespace return `<operation.name>`
- * - Otherwise(operation is under another namespace or interface) return `<namespace/interface.name>_<operation.name>`
- *
- * @param context TCGC context
- * @param operation Operation
- * @returns Operation ID in this format `<name>` or `<group>_<name>`
- */
-export function resolveOperationId(context: TCGCContext, operation: Operation) {
-  const explicitOperationId = getOperationId(context.program, operation);
-  if (explicitOperationId) {
-    return explicitOperationId;
-  }
-
-  const operationName = getLibraryName(context, operation);
-  if (operation.interface) {
-    return pascalCaseForOperationId(
-      `${getLibraryName(context, operation.interface)}_${operationName}`
-    );
-  }
-  const namespace = operation.namespace;
-  if (
-    namespace === undefined ||
-    isGlobalNamespace(context.program, namespace) ||
-    isService(context.program, namespace)
-  ) {
-    return pascalCase(operationName);
-  }
-
-  return pascalCaseForOperationId(`${namespace.name}_${operationName}`);
-}
-
 export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
   let apiVersion = context.apiVersion;
   if (apiVersion === "all") {
