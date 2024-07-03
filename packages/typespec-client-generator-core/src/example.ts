@@ -149,9 +149,15 @@ export async function handleClientExamples(
     if (method.kind === "clientaccessor") {
       methodQueue.push(...method.response.methods);
     } else {
-      const operationId = resolveOperationId(context.program, method.__raw!).toLowerCase();
-      if (examples.has(operationId)) {
-        diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
+      // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
+      let operation = method.__raw;
+      while (operation && operation.templateMapper === undefined) {
+        const operationId = resolveOperationId(context.program, operation).toLowerCase();
+        if (examples.has(operationId)) {
+          diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
+          break;
+        }
+        operation = operation.sourceOperation;
       }
     }
   }
