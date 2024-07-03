@@ -159,6 +159,12 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
+    "duplicate-model-name": {
+      severity: "error",
+      messages: {
+        default: `Duplicate model name: "${"name"}"`,
+      },
+    },
   },
 });
 

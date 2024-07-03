@@ -2700,6 +2700,30 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "@azure-tools/typespec-client-generator-core/empty-client-name",
       });
     });
+
+    it("duplicate client name", async () => {
+      await runner.compileAndDiagnose(
+      `
+        @service({})
+        namespace MyService;
+        
+        @clientName("Test1")
+        model Test {
+          id: string;
+          prop: string;
+        }
+          
+        model Test1 {
+          id: string;
+          prop: string;
+        }
+      `
+      );
+
+      expectDiagnostics(runner.program.diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+      });
+    });
   });
 
   describe("versioning projection", () => {
