@@ -59,13 +59,15 @@ stages:
         - pwsh: ./eng/scripts/TypeSpec-Generate-Swagger.ps1 -CheckAll
           displayName: 'Generate all swagger files'
           workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-        - pwsh: |
-            git restore package.json
-            git restore package-lock.json
-          displayName: Discard versions change
-          workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+        # - pwsh: |
+        #     git restore package.json
+        #     git restore package-lock.json
+        #   displayName: Discard versions change
+        #   workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
 
         # Step 3: Create PR
+        - checkout: azure-sdk-tools
+          fetchDepth: 1
         - template: /eng/common/pipelines/templates/steps/git-push-changes.yml@azure-sdk-tools
           parameters:
             BaseRepoBranch: auto-update-swagger-$(Build.BuildNumber)
