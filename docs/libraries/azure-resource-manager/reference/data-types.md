@@ -1695,9 +1695,9 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentities
 
 #### Properties
 
-| Name | Type                                                                                             | Description           |
-| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
-|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.UserAssignedIdentity) | Additional properties |
+| Name | Type                                                       | Description           |
+| ---- | ---------------------------------------------------------- | --------------------- |
+|      | `ResourceManager.CommonTypes.UserAssignedIdentity \| null` | Additional properties |
 
 ### `UserAssignedIdentity` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentity}
 
