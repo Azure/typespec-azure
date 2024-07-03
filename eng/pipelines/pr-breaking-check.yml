@@ -6,6 +6,11 @@ resources:
       type: github
       name: Azure/azure-rest-api-specs
       endpoint: azure
+    - repository: azure-sdk-tools
+      type: github
+      name: Azure/azure-sdk-tools
+      endpoint: azure
+      ref: refs/tags/azure-sdk-tools_20220404.3
 
 stages:
   - stage: Build_and_Validate
@@ -15,6 +20,7 @@ stages:
           name: azsdk-pool-mms-ubuntu-2004-general
           vmImage: ubuntu-20.04
         steps:
+        # Step 1: Build TypeSpec
         - checkout: self
           submodules: true
         - template: /eng/pipelines/templates/install.yml
@@ -25,6 +31,7 @@ stages:
           displayName: Build
           workingDirectory: $(Build.SourcesDirectory)/typespec-azure
 
+        #Step 2: Update swagger by TypeSpec in Step 1
         - checkout: azure-rest-api-specs
           fetchDepth: 1
         - pwsh: |
@@ -52,8 +59,36 @@ stages:
         - pwsh: ./eng/scripts/TypeSpec-Generate-Swagger.ps1 -CheckAll
           displayName: 'Generate all swagger files'
           workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-        - pwsh: git diff
-          displayName: 'Check for changes'
+        - pwsh: |
+            git restore package.json
+            git restore package-lock.json
+          displayName: Discard versions change
           workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-            
+
+        # Step 3: Create PR
+        - template: /eng/common/pipelines/templates/steps/git-push-changes.yml@azure-sdk-tools
+          parameters:
+            BaseRepoBranch: auto-update-swagger-$(Build.BuildNumber)
+            BaseRepoOwner: azure-sdk
+            CommitMsg: Update swagger with TypeSpec built from $(Build.BuildNumber)
+            TargetRepoOwner: Azure
+            TargetRepoName: azure-rest-api-specs
+            WorkingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+            ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts
+        - task: PowerShell@2
+            displayName: Create pull request
+            inputs:
+              pwsh: true
+              filePath: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts/Submit-PullRequest.ps1
+              arguments: >
+                -RepoOwner "Azure"
+                -RepoName "azure-rest-api-specs"
+                -BaseBranch "main"
+                -PROwner "azure-sdk"
+                -PRBranch "auto-update-swagger-$(Build.BuildNumber)"
+                -AuthToken "$(azuresdk-github-pat)"
+                -PRTitle "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
+                -PRBody "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
+                -OpenAsDraft $true
+                -PRLabels "Do Not Merge"
             
