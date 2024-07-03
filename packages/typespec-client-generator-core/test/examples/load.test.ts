@@ -67,4 +67,39 @@ describe("typespec-client-generator-core: load examples", () => {
     ok(operation);
     strictEqual(operation.examples?.length, 1);
   });
+
+  it("load example with client customization", async () => {
+    await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op get(): string;
+      }
+    `);
+
+    await runner.compileWithCustomization(`
+      @service({})
+      namespace TestClient {
+        op get(): string;
+      }
+    `,
+      `
+      @client({
+        name: "FooClient",
+        service: TestClient
+      })
+      namespace Customizations {
+        op test is TestClient.get;
+      }
+    `);
+
+    const client = runner.context.experimental_sdkPackage.clients[0];
+    strictEqual(client.name, "FooClient");
+    const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+    ok(method);
+    strictEqual(method.name, "test");
+    const operation = method.operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+  });
 });
