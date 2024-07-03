@@ -11,7 +11,9 @@ Removing $armRenameListByOperation decorator so operation id is directly derived
 
 With this change, the operation name will form the second part of the operation id, just like other ARM operation templates.
 
+```diff
 -list is ArmResourceListByParent<Employee>;
 +listByLocation is ArmResourceListByParent<Employee>;
+```
 
 You can modify the operation name to match existing spec to avoid breaking changes.
