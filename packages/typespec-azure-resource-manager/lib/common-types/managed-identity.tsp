@@ -4,8 +4,8 @@ using TypeSpec.Versioning;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests. */
-#deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
-model UserAssignedIdentities is Record<UserAssignedIdentity>;
+#deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity | null> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
+model UserAssignedIdentities is Record<UserAssignedIdentity | null>;
 
 /**
  * Managed service identity (system assigned and/or user assigned identities)
@@ -24,7 +24,7 @@ model ManagedServiceIdentity {
 
   /** The identities assigned to this resource by the user. */
   @typeChangedFrom(Versions.v5, Record<UserAssignedIdentity>)
-  userAssignedIdentities?: Record<UserAssignedIdentity> | null;
+  userAssignedIdentities?: Record<UserAssignedIdentity | null>;
 }
 
 /**
