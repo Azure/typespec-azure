@@ -75,7 +75,7 @@ stages:
             CommitMsg: Update swagger with TypeSpec built from $(Build.BuildNumber)
             TargetRepoOwner: Azure
             TargetRepoName: azure-rest-api-specs
-            WorkingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+            WorkingDirectory: $(Build.SourcesDirectory)/azure-sdk-tools
             ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts
         - task: PowerShell@2
           displayName: Create pull request
