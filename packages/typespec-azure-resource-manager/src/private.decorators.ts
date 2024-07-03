@@ -355,7 +355,7 @@ export function $azureResourceBase(context: DecoratorContext, resourceType: Mode
   context.program.stateMap(ArmStateKeys.azureResourceBase).set(resourceType, true);
 }
 
-export function isAzureResourceBase(program: Program, resourceType: Model): boolean {
-  const resourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
-  return resourceBase ?? false;
+export function isAzureResource(program: Program, resourceType: Model): boolean {
+  const isResourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
+  return isResourceBase ?? false;
 }
