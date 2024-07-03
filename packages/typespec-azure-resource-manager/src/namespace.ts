@@ -204,6 +204,7 @@ export function $armProviderNamespace(
                 id: "azure_auth",
                 description: "Azure Active Directory OAuth2 Flow.",
                 type: "oauth2",
+                model: null as any,
                 flows: [
                   {
                     type: "implicit",
