@@ -1,8 +1,19 @@
 import {
   BooleanLiteral,
+  createDiagnosticCollector,
   Diagnostic,
+  getDeprecationDetails,
+  getDoc,
+  getNamespaceFullName,
+  getSummary,
   Interface,
+  isGlobalNamespace,
+  isNeverType,
+  isNullType,
+  isService,
+  isVoidType,
   Model,
+  ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
@@ -13,18 +24,8 @@ import {
   Type,
   Union,
   Value,
-  createDiagnosticCollector,
-  getDeprecationDetails,
-  getDoc,
-  getNamespaceFullName,
-  getSummary,
-  isGlobalNamespace,
-  isNeverType,
-  isNullType,
-  isService,
-  isVoidType,
 } from "@typespec/compiler";
-import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
@@ -398,6 +399,7 @@ export interface TCGCContext {
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
   operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
@@ -576,4 +578,14 @@ export function getValidApiVersion(context: TCGCContext, versions: string[]): st
     apiVersion = versions[versions.length - 1];
   }
   return apiVersion;
+}
+
+export function getHttpOperationResponseHeaders(
+  response: HttpOperationResponseContent
+): ModelProperty[] {
+  const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];
+  if (response.body?.contentTypeProperty) {
+    headers.push(response.body.contentTypeProperty);
+  }
+  return headers;
 }

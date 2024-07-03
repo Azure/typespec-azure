@@ -600,6 +600,8 @@ export enum UsageFlags {
   JsonMergePatch = 1 << 4,
   // Input will also be set when MultipartFormData is set.
   MultipartFormData = 1 << 5,
+  // Used in spread.
+  Spread = 1 << 6,
 }
 
 interface SdkExampleBase {

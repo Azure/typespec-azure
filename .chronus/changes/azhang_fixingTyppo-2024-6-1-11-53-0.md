@@ -1,7 +1,8 @@
 ---
 changeKind: fix
 packages:
+  - "@azure-tools/typespec-azure-resource-manager"
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix armId not set for scalar type armResourceIdentifier.
+Fixing typo

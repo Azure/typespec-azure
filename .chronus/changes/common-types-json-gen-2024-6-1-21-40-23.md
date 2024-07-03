@@ -2,7 +2,7 @@
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
 changeKind: internal
 packages:
-  - "@azure-tools/typespec-client-generator-core"
+  - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-break up tests for types into multiple files
+Move version enum to its own file
