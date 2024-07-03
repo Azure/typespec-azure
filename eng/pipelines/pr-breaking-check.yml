@@ -56,7 +56,7 @@ stages:
         - script: npm install
           displayName: Install updated TypeSpec dependencies
           workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-        - pwsh: ./eng/scripts/TypeSpec-Generate-Swagger.ps1 -CheckAll
+        - pwsh: ./eng/scripts/TypeSpec-Validation.ps1 -CheckAll
           displayName: 'Generate all swagger files'
           workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
         # - pwsh: |
@@ -75,7 +75,7 @@ stages:
             CommitMsg: Update swagger with TypeSpec built from $(Build.BuildNumber)
             TargetRepoOwner: Azure
             TargetRepoName: azure-rest-api-specs
-            WorkingDirectory: $(Build.SourcesDirectory)/azure-sdk-tools
+            WorkingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
             ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts
         - task: PowerShell@2
           displayName: Create pull request
