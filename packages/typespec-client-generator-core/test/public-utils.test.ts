@@ -12,7 +12,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEmitterOptions } from "../src/interfaces.js";
+import { SdkEmitterOptions, UsageFlags } from "../src/interfaces.js";
 import {
   getClientNamespaceString,
   getCrossLanguageDefinitionId,
@@ -1577,7 +1577,9 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = runner.context.experimental_sdkPackage.models;
-        strictEqual(models.length, 0);
+        strictEqual(models.length, 1);
+        strictEqual(models[0].name, "TestRequest");
+        strictEqual(models[0].usage, UsageFlags.Spread);
       });
 
       it("anonymous model for body parameter", async () => {
@@ -1587,7 +1589,9 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = runner.context.experimental_sdkPackage.models;
-        strictEqual(models.length, 0);
+        strictEqual(models.length, 1);
+        strictEqual(models[0].name, "TestRequest");
+        strictEqual(models[0].usage, UsageFlags.Spread);
       });
 
       it("anonymous union in response header", async () => {
