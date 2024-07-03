@@ -76,19 +76,19 @@ stages:
             WorkingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
             ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts
         - task: PowerShell@2
-            displayName: Create pull request
-            inputs:
-              pwsh: true
-              filePath: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts/Submit-PullRequest.ps1
-              arguments: >
-                -RepoOwner "Azure"
-                -RepoName "azure-rest-api-specs"
-                -BaseBranch "main"
-                -PROwner "azure-sdk"
-                -PRBranch "auto-update-swagger-$(Build.BuildNumber)"
-                -AuthToken "$(azuresdk-github-pat)"
-                -PRTitle "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
-                -PRBody "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
-                -OpenAsDraft $true
-                -PRLabels "Do Not Merge"
+          displayName: Create pull request
+          inputs:
+            pwsh: true
+            filePath: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts/Submit-PullRequest.ps1
+            arguments: >
+              -RepoOwner "Azure"
+              -RepoName "azure-rest-api-specs"
+              -BaseBranch "main"
+              -PROwner "azure-sdk"
+              -PRBranch "auto-update-swagger-$(Build.BuildNumber)"
+              -AuthToken "$(azuresdk-github-pat)"
+              -PRTitle "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
+              -PRBody "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
+              -OpenAsDraft $true
+              -PRLabels "Do Not Merge"
             
