@@ -11,6 +11,9 @@ stages:
   - stage: Build_and_Validate
     jobs:
       - job: Validate_generated_swagger
+        pool:
+          name: azsdk-pool-mms-ubuntu-2004-general
+          vmImage: ubuntu-20.04
         steps:
         - checkout: self
           submodules: true
