@@ -647,7 +647,7 @@ export type SdkTypeExample =
 
 export interface SdkExampleTypeBase {
   kind: string;
-  type: SdkType | SdkModelPropertyType;
+  type: SdkType;
   value: unknown;
 }
 

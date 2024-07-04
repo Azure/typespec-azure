@@ -3673,7 +3673,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);
