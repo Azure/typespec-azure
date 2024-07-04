@@ -2811,10 +2811,10 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   
     it("duplicate model client name with csharp language scopes", async () => {
-      const runnerForPython = await createSdkTestRunner({
+      const runnerForCsharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const diagnostics = await runnerForPython.diagnose(
+      const diagnostics = await runnerForCsharp.diagnose(
       `
       @service({
         title: "Contoso Widget Manager",
