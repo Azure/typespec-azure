@@ -19,77 +19,76 @@ stages:
           name: azsdk-pool-mms-ubuntu-2004-general
           vmImage: ubuntu-20.04
         steps:
-        # Step 1: Build TypeSpec
-        - checkout: self
-          submodules: true
-        - template: /eng/pipelines/templates/install.yml
-          parameters:
-            nodeVersion: "18.x"
+          # Step 1: Build TypeSpec
+          - checkout: self
+            submodules: true
+          - template: /eng/pipelines/templates/install.yml
+            parameters:
+              nodeVersion: "18.x"
+              workingDirectory: $(Build.SourcesDirectory)/typespec-azure
+          - script: pnpm run build
+            displayName: Build
             workingDirectory: $(Build.SourcesDirectory)/typespec-azure
-        - script: pnpm run build
-          displayName: Build
-          workingDirectory: $(Build.SourcesDirectory)/typespec-azure
 
-        #Step 2: Update swagger by TypeSpec in Step 1
-        - checkout: azure-rest-api-specs
-          fetchDepth: 1
-        - pwsh: |
-            $packageJson = Get-Content -Raw "package.json" | ConvertFrom-Json -AsHashtable
+          #Step 2: Update swagger by TypeSpec in Step 1
+          - checkout: azure-rest-api-specs
+            fetchDepth: 1
+          - pwsh: |
+              $packageJson = Get-Content -Raw "package.json" | ConvertFrom-Json -AsHashtable
 
-            $packageJson.devDependencies["@azure-tools/typespec-autorest"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-autorest"
-            $packageJson.devDependencies["@azure-tools/typespec-azure-core"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-core"
-            $packageJson.devDependencies["@azure-tools/typespec-azure-portal-core"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-portal-core"
-            $packageJson.devDependencies["@azure-tools/typespec-azure-resource-manager"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-resource-manager"
-            $packageJson.devDependencies["@azure-tools/typespec-client-generator-core"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-client-generator-core"
-            $packageJson.devDependencies["@azure-tools/typespec-azure-rulesets"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-rulesets"
-            $packageJson.devDependencies["@typespec/compiler"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/compiler"
-            $packageJson.devDependencies["@typespec/http"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/http"
-            $packageJson.devDependencies["@typespec/openapi"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/openapi"
-            $packageJson.devDependencies["@typespec/openapi3"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/openapi3"
-            $packageJson.devDependencies["@typespec/rest"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/rest"
-            $packageJson.devDependencies["@typespec/versioning"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/versioning"
+              $packageJson.devDependencies["@azure-tools/typespec-autorest"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-autorest"
+              $packageJson.devDependencies["@azure-tools/typespec-azure-core"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-core"
+              $packageJson.devDependencies["@azure-tools/typespec-azure-portal-core"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-portal-core"
+              $packageJson.devDependencies["@azure-tools/typespec-azure-resource-manager"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-resource-manager"
+              $packageJson.devDependencies["@azure-tools/typespec-client-generator-core"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-client-generator-core"
+              $packageJson.devDependencies["@azure-tools/typespec-azure-rulesets"] = "file:$(Build.SourcesDirectory)/typespec-azure/packages/typespec-azure-rulesets"
+              $packageJson.devDependencies["@typespec/compiler"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/compiler"
+              $packageJson.devDependencies["@typespec/http"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/http"
+              $packageJson.devDependencies["@typespec/openapi"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/openapi"
+              $packageJson.devDependencies["@typespec/openapi3"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/openapi3"
+              $packageJson.devDependencies["@typespec/rest"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/rest"
+              $packageJson.devDependencies["@typespec/versioning"] = "file:$(Build.SourcesDirectory)/typespec-azure/core/packages/versioning"
 
-            $packageJson | ConvertTo-Json -Depth 100 | Out-File -Path "package.json" -Encoding utf8 -NoNewline -Force
-          displayName: 'Update package.json in azure-rest-api-specs'
-          workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-        - script: npm install
-          displayName: Install updated TypeSpec dependencies
-          workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-        - pwsh: ./eng/scripts/TypeSpec-Validation.ps1 -CheckAll
-          displayName: 'Generate all swagger files'
-          workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-        # - pwsh: |
-        #     git restore package.json
-        #     git restore package-lock.json
-        #   displayName: Discard versions change
-        #   workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+              $packageJson | ConvertTo-Json -Depth 100 | Out-File -Path "package.json" -Encoding utf8 -NoNewline -Force
+            displayName: "Update package.json in azure-rest-api-specs"
+            workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+          - script: npm install
+            displayName: Install updated TypeSpec dependencies
+            workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+          - pwsh: ./eng/scripts/TypeSpec-Validation.ps1 -CheckAll
+            displayName: "Generate all swagger files"
+            workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+          - pwsh: |
+              git restore package.json
+              git restore package-lock.json
+            displayName: Discard versions change
+            workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
 
-        # Step 3: Create PR
-        - checkout: azure-sdk-tools
-          fetchDepth: 1
-        - template: /eng/common/pipelines/templates/steps/git-push-changes.yml@azure-sdk-tools
-          parameters:
-            BaseRepoBranch: auto-update-swagger-$(Build.BuildNumber)
-            BaseRepoOwner: azure-sdk
-            CommitMsg: Update swagger with TypeSpec built from $(Build.BuildNumber)
-            TargetRepoOwner: Azure
-            TargetRepoName: azure-rest-api-specs
-            WorkingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-            ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts
-        - task: PowerShell@2
-          displayName: Create pull request
-          inputs:
-            pwsh: true
-            filePath: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts/Submit-PullRequest.ps1
-            arguments: >
-              -RepoOwner "Azure"
-              -RepoName "azure-rest-api-specs"
-              -BaseBranch "main"
-              -PROwner "azure-sdk"
-              -PRBranch "auto-update-swagger-$(Build.BuildNumber)"
-              -AuthToken "$(azuresdk-github-pat)"
-              -PRTitle "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
-              -PRBody "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
-              -OpenAsDraft $true
-              -PRLabels "Do Not Merge"
-            
+          # Step 3: Create PR
+          - checkout: azure-sdk-tools
+            fetchDepth: 1
+          - template: /eng/common/pipelines/templates/steps/git-push-changes.yml@azure-sdk-tools
+            parameters:
+              BaseRepoBranch: auto-update-swagger-$(Build.BuildNumber)
+              BaseRepoOwner: azure-sdk
+              CommitMsg: Update swagger with TypeSpec built from $(Build.BuildNumber)
+              TargetRepoOwner: Azure
+              TargetRepoName: azure-rest-api-specs
+              WorkingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
+              ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts
+          - task: PowerShell@2
+            displayName: Create pull request
+            inputs:
+              pwsh: true
+              filePath: $(Build.SourcesDirectory)/azure-sdk-tools/eng/common/scripts/Submit-PullRequest.ps1
+              arguments: >
+                -RepoOwner "Azure"
+                -RepoName "azure-rest-api-specs"
+                -BaseBranch "main"
+                -PROwner "azure-sdk"
+                -PRBranch "auto-update-swagger-$(Build.BuildNumber)"
+                -AuthToken "$(azuresdk-github-pat)"
+                -PRTitle "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
+                -PRBody "Swagger Regen Preview from TypeSpec built from $(Build.BuildNumber)"
+                -OpenAsDraft $true
+                -PRLabels "Do Not Merge"

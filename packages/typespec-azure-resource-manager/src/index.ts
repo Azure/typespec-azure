@@ -8,8 +8,8 @@ export {
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
   isArmCommonType,
-  type ArmCommonTypesResolutionOptions,
   type ArmCommonTypeVersions,
+  type ArmCommonTypesResolutionOptions,
 } from "./common-types.js";
 
 export * from "./namespace.js";
