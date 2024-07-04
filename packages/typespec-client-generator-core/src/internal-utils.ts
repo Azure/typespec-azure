@@ -7,10 +7,8 @@ import {
   getNamespaceFullName,
   getSummary,
   Interface,
-  isGlobalNamespace,
   isNeverType,
   isNullType,
-  isService,
   isVoidType,
   Model,
   ModelProperty,
@@ -26,9 +24,7 @@ import {
   Value,
 } from "@typespec/compiler";
 import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
-import { getOperationId } from "@typespec/openapi";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { pascalCase } from "change-case";
 import {
   DecoratorInfo,
   SdkBuiltInKinds,
@@ -48,7 +44,6 @@ import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
   getHttpOperationWithCache,
-  getLibraryName,
   isApiVersion,
 } from "./public-utils.js";
 

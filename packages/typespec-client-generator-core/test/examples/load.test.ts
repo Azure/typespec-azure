@@ -77,7 +77,8 @@ describe("typespec-client-generator-core: load examples", () => {
       }
     `);
 
-    await runner.compileWithCustomization(`
+    await runner.compileWithCustomization(
+      `
       @service({})
       namespace TestClient {
         op get(): string;
@@ -91,7 +92,8 @@ describe("typespec-client-generator-core: load examples", () => {
       namespace Customizations {
         op test is TestClient.get;
       }
-    `);
+    `
+    );
 
     const client = runner.context.experimental_sdkPackage.clients[0];
     strictEqual(client.name, "FooClient");
