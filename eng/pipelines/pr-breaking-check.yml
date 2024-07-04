@@ -10,7 +10,6 @@ resources:
       type: github
       name: Azure/azure-sdk-tools
       endpoint: azure
-      ref: refs/tags/azure-sdk-tools_20220404.3
 
 stages:
   - stage: Build_and_Validate
