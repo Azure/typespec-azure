@@ -1235,7 +1235,7 @@ model Azure.ResourceManager.CommonTypes.ManagedServiceIdentity
 | principalId?            | `Core.uuid`                                                                                                  | The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. |
 | tenantId?               | `Core.uuid`                                                                                                  | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
 | type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
-| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity> \| null`                                           | The identities assigned to this resource by the user.                                                                         |
+| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity \| null>`                                           | The identities assigned to this resource by the user.                                                                         |
 
 ### `ManagementGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter}
 
@@ -1695,9 +1695,9 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentities
 
 #### Properties
 
-| Name | Type                                                                                             | Description           |
-| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
-|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.UserAssignedIdentity) | Additional properties |
+| Name | Type                                                       | Description           |
+| ---- | ---------------------------------------------------------- | --------------------- |
+|      | `ResourceManager.CommonTypes.UserAssignedIdentity \| null` | Additional properties |
 
 ### `UserAssignedIdentity` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentity}
 

@@ -27,6 +27,7 @@ enableFiletypes:
   - typespec
 words:
   - allof
+  - mobo
   - apim
   - apos
   - armId
