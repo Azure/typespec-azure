@@ -191,22 +191,11 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface
 ): SdkClient | undefined {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    let client = getScopedDecoratorData(context, clientKey, type);
-    if (client && (client.type as Type).kind === "Intrinsic") client = undefined;
-    return client;
-  }
-
-  // if there is no explicit client or operation group,
-  // we need to find whether current namespace is an implicit client (namespace with @service decorator)
-  if (type.kind === "Namespace") {
-    for (const client of listClients(context)) {
-      if (client.type === type) {
-        return client;
-      }
+  for (const client of listClients(context)) {
+    if (client.type === type) {
+      return client;
     }
   }
-
   return undefined;
 }
 
@@ -264,9 +253,16 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
 
 function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
   if (context.apiVersion !== "all") {
-    clients.map((client) => serviceVersioningProjection(context, client));
-    // filter all the clients not existed in the current version
-    return clients.filter((client) => (client.type as Type).kind !== "Intrinsic");
+    const projectedClients = [];
+    for (const client of clients) {
+      const projectedClient = { ...client };
+      serviceVersioningProjection(context, projectedClient);
+      // filter client not existed in the current version
+      if ((projectedClient.type as Type).kind !== "Intrinsic") {
+        projectedClients.push(projectedClient);
+      }
+    }
+    return projectedClients;
   }
   return clients;
 }
