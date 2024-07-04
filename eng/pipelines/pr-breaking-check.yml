@@ -55,7 +55,7 @@ stages:
           - script: npm install
             displayName: Install updated TypeSpec dependencies
             workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
-          - pwsh: ./eng/scripts/TypeSpec-Validation.ps1 -CheckAll
+          - pwsh: ./eng/scripts/TypeSpec-Generate-Swagger.ps1 -CheckAll
             displayName: "Generate all swagger files"
             workingDirectory: $(Build.SourcesDirectory)/azure-rest-api-specs
           - pwsh: |
