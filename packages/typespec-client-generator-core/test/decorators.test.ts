@@ -2684,6 +2684,7 @@ describe("typespec-client-generator-core: decorators", () => {
         "body"
       );
     });
+
     it("empty client name", async () => {
       const diagnostics = await runner.diagnose(`
         @service({})
@@ -2701,7 +2702,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
     });
 
-    it("duplicate client name", async () => {
+    it("duplicate model client name with all language scopes", async () => {
       const diagnostics = await runner.diagnose(
       `
       @service({
@@ -2716,6 +2717,117 @@ describe("typespec-client-generator-core: decorators", () => {
       }
       
       @clientName("Test")
+      model Widget {
+        @key
+        id: int32;
+      
+        description?: string;
+      }
+
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      op test(): Test | Error;
+
+      op list(@query apiVersion: string): Widget[] | Error;
+      
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+        }
+        ]
+      );
+    });
+    
+    it("duplicate enum client name with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+      `
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      namespace Contoso.WidgetManager;
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+        
+      @clientName("EnumB")
+      enum EnumA {
+        one,
+        two,
+        three,
+      }
+
+      enum EnumB {
+        one,
+        two,
+        three,
+      }
+      
+      model Widget {
+        @key
+        id: int32;
+      
+        description?: string;
+        propertyA: EnumA;
+        propertyB: EnumB;
+      }
+
+      model Test {
+        prop1: string;
+      }
+
+      @route("/test")
+      op test(): Test | Error;
+
+      op list(@query apiVersion: string): Widget[] | Error;
+      
+      @route("/widget/{id}")
+      op get(...Resource.KeysOf<Widget>): Widget | Error;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+        }
+        ]
+      );
+    });
+  
+    it("duplicate model client name with csharp language scopes", async () => {
+      const runnerForPython = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const diagnostics = await runnerForPython.diagnose(
+      `
+      @service({
+        title: "Contoso Widget Manager",
+      })
+      namespace Contoso.WidgetManager;
+      
+      @error
+      model Error {
+        code: string;
+        message?: string;
+      }
+      
+      @clientName("Test", "csharp")
       model Widget {
         @key
         id: int32;

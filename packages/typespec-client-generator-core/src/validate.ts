@@ -1,39 +1,48 @@
-import { Program } from "@typespec/compiler";
-import { createTCGCContext } from "./internal-utils.js";
+import { Program, listServices, Model, Enum } from "@typespec/compiler";
+import { createTCGCContext, TCGCContext } from "./internal-utils.js";
 import { getAllModelsWithDiagnostics } from "./types.js";
-import { SdkModelType, SdkEnumType } from "./interfaces.js";
 import { reportDiagnostic } from "./lib.js";
+import { getClientNameOverride } from "./decorators.js";
 
 export function $onValidate(program: Program) {
   // Pass along any diagnostics that might be returned from the HTTP library
   const tcgcContext = createTCGCContext(program);
-  const [models, diagnostics] = getAllModelsWithDiagnostics(tcgcContext);
-  if (diagnostics.length > 0) {
-    program.reportDiagnostics(diagnostics);
-  }
-
-  validateModels(program, models);
+  validateModels(program, tcgcContext);
 }
 
-function validateModels(program: Program, models: (SdkModelType | SdkEnumType)[]) {
-  const modelNameMap = new Map<string, Set<SdkModelType | SdkEnumType>>();
-  for (const model of models) {
-    const existing = modelNameMap.get(model.name);
-    if (existing) {
-      existing.add(model);
-    } else {
-      modelNameMap.set(model.name, new Set([model]));
+function validateModels(program: Program, tcgcContext: TCGCContext) {
+  const services = listServices(program);
+  for (const service of services) {
+    const modelNameMap = new Map<string, Set<Model | Enum>>();
+    for(const model of service.type.models.values()){
+      const clientName = getClientNameOverride(tcgcContext, model);
+      const name = clientName ?? model.name;
+      const existing = modelNameMap.get(name);
+      if (existing) {
+        existing.add(model);
+      } else {
+        modelNameMap.set(name, new Set([model]));
+      }
     }
-  }
 
-  for (const [modelName, models] of modelNameMap) {
-    if (models.size > 1) {
-      for (const model of models) {
-        if (model.__raw !== undefined) {
+    for (const model of service.type.enums.values()) {
+      const clientName = getClientNameOverride(tcgcContext, model);
+      const name = clientName ?? model.name;
+      const existing = modelNameMap.get(name);
+      if (existing) {
+        existing.add(model);
+      } else {
+        modelNameMap.set(name, new Set([model]));
+      }
+    }
+
+    for (const [modelName, models] of modelNameMap) {
+      if (models.size > 1) {
+        for (const model of models) {
           reportDiagnostic(program, {
             code: "duplicate-model-name",
             format: { modelName },
-            target: model.__raw,
+            target: model,
           });
         }
       }
