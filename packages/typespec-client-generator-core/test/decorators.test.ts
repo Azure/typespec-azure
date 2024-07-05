@@ -10,6 +10,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
+  createSdkContext,
   getAccess,
   getClient,
   getClientNameOverride,
@@ -3642,6 +3643,40 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(aOps.length, 1);
       a = aOps.find((x) => x.name === "a");
       ok(a);
+    });
+  });
+
+  describe("createSdkContext", () => {
+    it("multiple call with versioning", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+        }
+
+        @client({name: "TestClient"})
+        @test
+        interface Test {}
+      `;
+
+      const runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+      let clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
+
+      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      clients = listClients(newSdkContext);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
     });
   });
 });

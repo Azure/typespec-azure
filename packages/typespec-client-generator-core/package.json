@@ -62,8 +62,7 @@
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/rest": "workspace:~",
-    "@typespec/versioning": "workspace:~",
-    "@typespec/xml": "workspace:~"
+    "@typespec/versioning": "workspace:~"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
