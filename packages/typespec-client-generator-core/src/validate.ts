@@ -1,10 +1,10 @@
 import { Program, listServices, Model, Enum } from "@typespec/compiler";
+import { DuplicateTracker } from "@typespec/compiler/utils";
 import { createTCGCContext, TCGCContext } from "./internal-utils.js";
-import { reportDiagnostic } from "./lib.js";
+import { reportDiagnostic,  } from "./lib.js";
 import { getClientNameOverride } from "./decorators.js";
 
 export function $onValidate(program: Program) {
-  // Pass along any diagnostics that might be returned from the HTTP library
   const tcgcContext = createTCGCContext(program);
   validateModels(program, tcgcContext);
 }
@@ -12,38 +12,20 @@ export function $onValidate(program: Program) {
 function validateModels(program: Program, tcgcContext: TCGCContext) {
   const services = listServices(program);
   for (const service of services) {
-    const modelNameMap = new Map<string, Set<Model | Enum>>();
-    for(const model of service.type.models.values()){
+    const duplicateTracker = new DuplicateTracker<string, Model | Enum>();
+    for(const model of [...service.type.models.values(), ...service.type.enums.values()]){
       const clientName = getClientNameOverride(tcgcContext, model);
       const name = clientName ?? model.name;
-      const existing = modelNameMap.get(name);
-      if (existing) {
-        existing.add(model);
-      } else {
-        modelNameMap.set(name, new Set([model]));
-      }
+      duplicateTracker.track(name, model);
     }
 
-    for (const model of service.type.enums.values()) {
-      const clientName = getClientNameOverride(tcgcContext, model);
-      const name = clientName ?? model.name;
-      const existing = modelNameMap.get(name);
-      if (existing) {
-        existing.add(model);
-      } else {
-        modelNameMap.set(name, new Set([model]));
-      }
-    }
-
-    for (const [modelName, models] of modelNameMap) {
-      if (models.size > 1) {
-        for (const model of models) {
-          reportDiagnostic(program, {
-            code: "duplicate-model-name",
-            format: { modelName },
-            target: model,
-          });
-        }
+    for (const [modelName, duplicates] of duplicateTracker.entries()) {
+      for (const model of duplicates) {
+        reportDiagnostic(program, {
+          code: "duplicate-model-name",
+          format: { modelName },
+          target: model,
+        });
       }
     }
   }
