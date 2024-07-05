@@ -19,4 +19,4 @@ op registerParams(
   ...TenantIdParameter,
 ): void;
 
-@@extension(ErrorDetail, "x-ms-identifiers", ["message", "target"]);
+@@extension(ErrorDetail.details, "x-ms-identifiers", ["message", "target"]);
