@@ -1,6 +1,5 @@
 import { Program, listServices, Model, Enum } from "@typespec/compiler";
 import { createTCGCContext, TCGCContext } from "./internal-utils.js";
-import { getAllModelsWithDiagnostics } from "./types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getClientNameOverride } from "./decorators.js";
 

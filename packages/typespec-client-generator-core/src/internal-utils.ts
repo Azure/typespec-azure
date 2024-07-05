@@ -410,15 +410,25 @@ export interface TCGCContext {
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
+  const [emitterName, diagnostics] = parseEmitterName(program, getEmitterName(program));
   return {
     program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
+    emitterName: emitterName,
+    diagnostics: diagnostics,
     originalProgram: program,
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
   };
+}
+
+function getEmitterName(program: Program): string {
+  if (program.emitters.length > 0 && program.emitters[0].metadata.name !== undefined) {
+    return program.emitters[0].metadata.name;
+  }
+
+  // This is a fallback, but it should only be hit for testing
+  return "@azure-tools/typespec-csharp";
 }
 
 export function getNonNullOptions(type: Union): Type[] {
