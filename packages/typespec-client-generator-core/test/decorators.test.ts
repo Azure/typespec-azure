@@ -3464,9 +3464,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkVersionsEnum.name, "Versions");
       strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
       strictEqual(sdkVersionsEnum.values.length, 1);
-      strictEqual(sdkVersionsEnum.values[0].value, "v2024_10_01");
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
     });
-
   });
 
   describe("versioning impact for apis", () => {

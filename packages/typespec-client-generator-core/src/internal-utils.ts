@@ -30,7 +30,6 @@ import {
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
-  SdkContext,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -533,7 +532,9 @@ export function getHttpOperationResponseHeaders(
 }
 
 export function filterApiVersionsInEnum(
-  context: TCGCContext, client: SdkClient, sdkVersionsEnum: SdkEnumType
+  context: TCGCContext,
+  client: SdkClient,
+  sdkVersionsEnum: SdkEnumType
 ): void {
   // if they explicitly set an api version, remove previous versions
   if (
@@ -548,6 +549,8 @@ export function filterApiVersionsInEnum(
   }
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!defaultApiVersion?.value.endsWith("-preview")) {
-    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => typeof v.value === "string" && !v.value.endsWith("-preview"));
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
+      (v) => typeof v.value === "string" && !v.value.endsWith("-preview")
+    );
   }
 }
