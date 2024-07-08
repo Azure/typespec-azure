@@ -1385,7 +1385,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = getAllModels(runner.context);
     strictEqual(models.length, 1);
     strictEqual(models[0].kind, "model");
-    strictEqual(models[0].isError, true);
+    strictEqual((models[0].usage & UsageFlags.Error) > 0, true);
 
     const model = models[0];
     const rawModel = model.__raw;
@@ -1428,14 +1428,14 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = getAllModels(runner.context);
     strictEqual(models.length, 5);
-    const errorModels = models.filter((x) => x.kind === "model" && x.isError);
+    const errorModels = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) > 0);
     deepStrictEqual(errorModels.map((x) => x.name).sort(), [
       "ApiError",
       "FiveHundredError",
       "FourHundredError",
       "FourZeroFourError",
     ]);
-    const validModel = models.filter((x) => x.kind === "model" && !x.isError);
+    const validModel = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) === 0);
     deepStrictEqual(
       validModel.map((x) => x.name),
       ["ValidResponse"]
