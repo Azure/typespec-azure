@@ -556,6 +556,7 @@ export function getSdkModelWithDiagnostics(
     const docWrapper = getDocHelper(context, type);
     const generatedName = getGeneratedName(context, type);
     const name = getLibraryName(context, type) || generatedName;
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -565,11 +566,10 @@ export function getSdkModelWithDiagnostics(
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
-      usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
+      usage,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
-      isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType);
 
@@ -1351,9 +1351,6 @@ function updateTypesFromOperation(
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
-          if (sdkType.kind === "model" && isErrorModel(context.program, innerResponse.body.type)) {
-            updateUsageOfModel(context, UsageFlags.Error, sdkType);
-          }
         }
       }
       const headers = getHttpOperationResponseHeaders(innerResponse);
