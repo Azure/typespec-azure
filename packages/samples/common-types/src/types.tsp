@@ -18,3 +18,5 @@ op registerParams(
   ...SubscriptionIdParameter,
   ...TenantIdParameter,
 ): void;
+
+@@extension(ErrorDetail.details, "x-ms-identifiers", ["message", "target"]);
