@@ -2745,7 +2745,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams;
@@ -3074,7 +3074,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(models.length, 1);
       const model = models.find((x) => x.name === "TestRequest");
       ok(model);
-      strictEqual(model.usage, UsageFlags.Input);
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
 
       strictEqual(method.parameters.length, 2);
       const param = method.parameters[0];
@@ -3119,7 +3119,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(models.length, 1);
       const model = models.find((x) => x.name === "TestRequest");
       ok(model);
-      strictEqual(model.usage, UsageFlags.Input);
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
 
       strictEqual(method.parameters.length, 2);
       const param = method.parameters[0];
@@ -3190,7 +3190,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 2);
@@ -3246,7 +3246,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 1);
@@ -3295,7 +3295,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 2);
@@ -3356,7 +3356,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 1);
@@ -3409,7 +3409,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 2);
@@ -3472,7 +3472,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
-      strictEqual(bodyParameter.type.usage, UsageFlags.Spread);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 1);

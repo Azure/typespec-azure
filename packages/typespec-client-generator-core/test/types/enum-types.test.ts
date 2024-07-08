@@ -782,9 +782,9 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums.length, 2);
     strictEqual(enums[0].name, "LR");
     strictEqual(enums[0].crossLanguageDefinitionId, "N.LR");
-    strictEqual(enums[0].usage, UsageFlags.Input);
+    strictEqual(enums[0].usage, UsageFlags.Input | UsageFlags.Json);
     strictEqual(enums[1].name, "UD");
     strictEqual(enums[1].crossLanguageDefinitionId, "N.UD");
-    strictEqual(enums[1].usage, UsageFlags.Input);
+    strictEqual(enums[1].usage, UsageFlags.Input | UsageFlags.Json);
   });
 });

@@ -89,7 +89,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(modelB);
     strictEqual(modelB.kind, "model");
     strictEqual(modelB.isFormDataType, false);
-    strictEqual(modelB.usage, UsageFlags.Spread);
+    strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
     strictEqual(modelB.properties.length, 1);
     strictEqual(modelB.properties[0].type.kind, "bytes");
   });

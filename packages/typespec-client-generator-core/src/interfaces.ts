@@ -600,4 +600,5 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
+  Json = 1 << 7,
 }
