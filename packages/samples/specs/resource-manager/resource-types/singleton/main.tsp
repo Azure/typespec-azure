@@ -76,7 +76,7 @@ interface Employees {
   get is ArmResourceRead<Employee>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
   update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-  list is ArmResourceListByParent<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
   /** A sample resource action that move employee to different location */
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 

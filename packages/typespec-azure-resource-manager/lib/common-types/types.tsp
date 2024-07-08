@@ -253,7 +253,6 @@ model ErrorDetail {
   target?: string;
 
   /** The error details. */
-  @extension("x-ms-identifiers", ["message", "target"])
   @visibility("read")
   details?: ErrorDetail[];
 
