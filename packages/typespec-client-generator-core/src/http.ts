@@ -41,7 +41,9 @@ import {
   TCGCContext,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpOperationResponseHeaders,
   getLocationOfOperation,
+  getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
   isNeverOrVoidType,
@@ -126,17 +128,17 @@ function getSdkHttpParameters(
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody && tspBody?.bodyKind !== "multipart") {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
-    if (tspBody.parameter && !isNeverOrVoidType(tspBody.parameter.type)) {
+    if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.parameter, httpOperation.operation, "body")
+        getSdkHttpParameter(context, tspBody.property, httpOperation.operation, "body")
       );
       if (getParamResponse.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
             code: "unexpected-http-param-type",
-            target: tspBody.parameter,
+            target: tspBody.property,
             format: {
-              paramName: tspBody.parameter.name,
+              paramName: tspBody.property.name,
               expectedType: "body",
               actualType: getParamResponse.kind,
             },
@@ -165,6 +167,7 @@ function getSdkHttpParameters(
         optional: false,
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
+        decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
       };
     }
     if (retval.bodyParam) {
@@ -233,6 +236,7 @@ function createContentTypeOrAcceptHeader(
   let type: SdkType = {
     kind: "string",
     encode: "string",
+    decorators: [],
   };
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
@@ -253,6 +257,7 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
+      decorators: [],
     };
   }
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -265,6 +270,7 @@ function createContentTypeOrAcceptHeader(
     onClient: false,
     optional: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+    decorators: [],
   };
 }
 
@@ -379,7 +385,7 @@ function getSdkHttpResponseAndExceptions(
     let contentTypes: string[] = [];
 
     for (const innerResponse of response.responses) {
-      for (const header of Object.values(innerResponse.headers || [])) {
+      for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
         const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
         const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -500,62 +506,27 @@ export function getCorrespondingMethodParams(
     }
     return diagnostics.wrap([context.__subscriptionIdParameter]);
   }
-  const correspondingMethodParameter = methodParameters.find((x) => x.name === serviceParam.name);
-  if (correspondingMethodParameter) {
-    return diagnostics.wrap([correspondingMethodParameter]);
+
+  // to see if the service parameter is a method parameter or a property of a method parameter
+  const directMapping = findMapping(methodParameters, serviceParam);
+  if (directMapping) {
+    return diagnostics.wrap([directMapping]);
   }
 
-  const serviceParamType = serviceParam.type;
-  if (serviceParam.kind === "body" && serviceParamType.kind === "model") {
-    const serviceParamPropertyNames = Array.from(serviceParamType.properties.values())
-      .filter((x) => x.kind === "property")
-      .map((x) => x.name);
-    // Here we have a spread method parameter
-
-    // easy case is if the spread method parameter directly has the entire body as a property
-    const directBodyProperty = methodParameters
-      .map((x) => x.type)
-      .filter((x): x is SdkModelType => x.kind === "model")
-      .flatMap((x) => x.properties)
-      .find((x) => x.type === serviceParamType);
-    if (directBodyProperty) return diagnostics.wrap([directBodyProperty]);
-    let correspondingProperties: SdkModelPropertyType[] = methodParameters.filter((x) =>
-      serviceParamPropertyNames.includes(x.name)
-    );
-    for (const methodParam of methodParameters) {
-      const methodParamIterable =
-        methodParam.type.kind === "model" ? methodParam.type.properties : [methodParam];
-      correspondingProperties = correspondingProperties.concat(
-        methodParamIterable.filter(
-          (x) =>
-            serviceParamPropertyNames.includes(x.name) &&
-            !correspondingProperties.find((e) => e.name === x.name)
-        )
-      );
-    }
-    if (correspondingProperties.length === serviceParamPropertyNames.length)
-      return diagnostics.wrap(correspondingProperties);
-    diagnostics.add(
-      createDiagnostic({
-        code: "no-corresponding-method-param",
-        target: serviceParam.__raw!,
-        format: {
-          paramName: serviceParam.name,
-          methodName: operation.name,
-        },
-      })
-    );
-    return diagnostics.wrap([]);
-  }
-  for (const methodParam of methodParameters) {
-    if (methodParam.type.kind === "model") {
-      for (const prop of methodParam.type.properties) {
-        if (prop.name === serviceParam.name) {
-          return diagnostics.wrap([prop]);
-        }
+  // to see if all the property of service parameter could be mapped to a method parameter or a property of a method parameter
+  if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
+    const retVal = [];
+    for (const serviceParamProp of serviceParam.type.properties) {
+      const propertyMapping = findMapping(methodParameters, serviceParamProp);
+      if (propertyMapping) {
+        retVal.push(propertyMapping);
       }
     }
+    if (retVal.length === serviceParam.type.properties.length) {
+      return diagnostics.wrap(retVal);
+    }
   }
+
   diagnostics.add(
     createDiagnostic({
       code: "no-corresponding-method-param",
@@ -567,6 +538,52 @@ export function getCorrespondingMethodParams(
     })
   );
   return diagnostics.wrap([]);
+}
+
+function findMapping(
+  methodParameters: SdkModelPropertyType[],
+  serviceParam: SdkHttpParameter | SdkModelPropertyType
+): SdkModelPropertyType | undefined {
+  const queue: SdkModelPropertyType[] = [...methodParameters];
+  const visited: Set<SdkModelType> = new Set();
+  while (queue.length > 0) {
+    const methodParam = queue.shift()!;
+    // http operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter
+    if (
+      methodParam.__raw &&
+      serviceParam.__raw &&
+      (methodParam.__raw === serviceParam.__raw ||
+        methodParam.__raw === serviceParam.__raw.sourceProperty)
+    ) {
+      return methodParam;
+    }
+    // this following two hard code mapping is for the case that TCGC help to add content type and accept header is not exist
+    if (
+      serviceParam.kind === "header" &&
+      serviceParam.serializedName === "Content-Type" &&
+      methodParam.name === "contentType"
+    ) {
+      return methodParam;
+    }
+    if (
+      serviceParam.kind === "header" &&
+      serviceParam.serializedName === "Accept" &&
+      methodParam.name === "accept"
+    ) {
+      return methodParam;
+    }
+    if (methodParam.type.kind === "model" && !visited.has(methodParam.type)) {
+      visited.add(methodParam.type);
+      let current: SdkModelType | undefined = methodParam.type;
+      while (current) {
+        for (const prop of methodParam.type.properties) {
+          queue.push(prop);
+        }
+        current = current.baseModel;
+      }
+    }
+  }
+  return undefined;
 }
 
 function getCollectionFormat(

@@ -1,9 +1,9 @@
 /* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { UsageFlags, isErrorModel } from "@typespec/compiler";
+import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkBodyModelPropertyType } from "../../src/interfaces.js";
+import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -142,7 +142,7 @@ describe("typespec-client-generator-core: model types", () => {
     const recursiveModel = models[0];
     strictEqual(recursiveModel.name, "RecursiveModel");
     strictEqual(recursiveModel.kind, "model");
-    strictEqual(recursiveModel.tspNamespace, "TestService");
+    strictEqual(recursiveModel.crossLanguageDefinitionId, "TestService.RecursiveModel");
     strictEqual(recursiveModel.properties.length, 1);
     const prop = recursiveModel.properties[0];
     strictEqual(prop.kind, "property");
@@ -375,7 +375,7 @@ describe("typespec-client-generator-core: model types", () => {
       interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
       `);
     const sdkPackage = runner.context.sdkPackage;
-    strictEqual(sdkPackage.models.length, 1);
+    strictEqual(sdkPackage.models.length, 2);
     strictEqual(sdkPackage.enums.length, 1);
     const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.isGeneratedName);
     ok(prop);
@@ -384,6 +384,9 @@ describe("typespec-client-generator-core: model types", () => {
     const resp = sdkPackage.models.find((x) => x.name === "GetResponse" && x.isGeneratedName);
     ok(resp);
     strictEqual(resp.properties[0].type, prop);
+    const req = sdkPackage.models.find((x) => x.name === "SendRequest" && x.isGeneratedName);
+    ok(req);
+    strictEqual(req.usage, UsageFlags.Spread);
   });
 
   it("property of anonymous union as enum", async () => {
@@ -686,7 +689,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
-    strictEqual(models[0].tspNamespace, "My.Service");
+    strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("filterOutCoreModels false", async () => {
@@ -717,13 +720,13 @@ describe("typespec-client-generator-core: model types", () => {
     );
     strictEqual(models.length, 4);
     strictEqual(models[0].name, "Error");
-    strictEqual(models[0].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
     strictEqual(models[1].name, "ErrorResponse");
-    strictEqual(models[1].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[1].crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
     strictEqual(models[2].name, "InnerError");
-    strictEqual(models[2].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[2].crossLanguageDefinitionId, "Azure.Core.Foundations.InnerError");
     strictEqual(models[3].name, "User");
-    strictEqual(models[3].tspNamespace, "My.Service");
+    strictEqual(models[3].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("lro core filterOutCoreModels true", async () => {
@@ -752,7 +755,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
-    strictEqual(models[0].tspNamespace, "My.Service");
+    strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("lro core filterOutCoreModels false", async () => {
@@ -784,15 +787,15 @@ describe("typespec-client-generator-core: model types", () => {
     );
     strictEqual(models.length, 5);
     strictEqual(models[0].name, "Error");
-    strictEqual(models[0].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
     strictEqual(models[1].name, "ErrorResponse");
-    strictEqual(models[1].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[1].crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
     strictEqual(models[2].name, "InnerError");
-    strictEqual(models[2].tspNamespace, "Azure.Core.Foundations");
+    strictEqual(models[2].crossLanguageDefinitionId, "Azure.Core.Foundations.InnerError");
     strictEqual(models[3].name, "ResourceOperationStatusUserUserError");
-    strictEqual(models[3].tspNamespace, "Azure.Core");
+    strictEqual(models[3].crossLanguageDefinitionId, "Azure.Core.ResourceOperationStatus");
     strictEqual(models[4].name, "User");
-    strictEqual(models[4].tspNamespace, "My.Service");
+    strictEqual(models[4].crossLanguageDefinitionId, "My.Service.User");
     strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
     strictEqual(runnerWithCore.context.sdkPackage.enums[0].name, "OperationState");
   });
@@ -1332,7 +1335,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "Model1");
-    strictEqual(models[0].tspNamespace, "MyService");
+    strictEqual(models[0].crossLanguageDefinitionId, "MyService.Model1");
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
 

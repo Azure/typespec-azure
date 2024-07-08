@@ -10,6 +10,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
+  createSdkContext,
   getAccess,
   getClient,
   getClientNameOverride,
@@ -3333,8 +3334,14 @@ describe("typespec-client-generator-core: decorators", () => {
         "stableFunctionality"
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
-      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
-      strictEqual(runnerWithVersion.context.sdkPackage.models[1].name, "StableModel");
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[0].name,
+        "PreviewFunctionalityRequest"
+      );
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[1].name,
+        "StableFunctionalityRequest"
+      );
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -3348,8 +3355,16 @@ describe("typespec-client-generator-core: decorators", () => {
         runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "stableFunctionality"
       );
+<<<<<<< HEAD
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
       strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
+=======
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[0].name,
+        "StableFunctionalityRequest"
+      );
+>>>>>>> 2faf8ec80bea635511c6582ea0cbe5643a8a57a2
     });
     it("add client", async () => {
       await runner.compile(
@@ -3630,6 +3645,40 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(aOps.length, 1);
       a = aOps.find((x) => x.name === "a");
       ok(a);
+    });
+  });
+
+  describe("createSdkContext", () => {
+    it("multiple call with versioning", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+        }
+
+        @client({name: "TestClient"})
+        @test
+        interface Test {}
+      `;
+
+      const runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+      let clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
+
+      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      clients = listClients(newSdkContext);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
     });
   });
 });

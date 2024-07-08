@@ -29,6 +29,7 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
+import { defaultDecoratorsAllowList } from "./configs.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -189,22 +190,11 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface
 ): SdkClient | undefined {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    let client = getScopedDecoratorData(context, clientKey, type);
-    if (client && (client.type as Type).kind === "Intrinsic") client = undefined;
-    return client;
-  }
-
-  // if there is no explicit client or operation group,
-  // we need to find whether current namespace is an implicit client (namespace with @service decorator)
-  if (type.kind === "Namespace") {
-    for (const client of listClients(context)) {
-      if (client.type === type) {
-        return client;
-      }
+  for (const client of listClients(context)) {
+    if (client.type === type) {
+      return client;
     }
   }
-
   return undefined;
 }
 
@@ -269,9 +259,16 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
 
 function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
   if (context.apiVersion !== "all") {
-    clients.map((client) => serviceVersioningProjection(context, client));
-    // filter all the clients not existed in the current version
-    return clients.filter((client) => (client.type as Type).kind !== "Intrinsic");
+    const projectedClients = [];
+    for (const client of clients) {
+      const projectedClient = { ...client };
+      serviceVersioningProjection(context, projectedClient);
+      // filter client not existed in the current version
+      if ((projectedClient.type as Type).kind !== "Intrinsic") {
+        projectedClients.push(projectedClient);
+      }
+    }
+    return projectedClients;
   }
   return clients;
 }
@@ -322,6 +319,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");
+
 export function $operationGroup(
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -421,6 +419,7 @@ function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interfa
   }
   return path.reverse().join(".");
 }
+
 /**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
  * @param context TCGCContext
@@ -579,9 +578,9 @@ export function listOperationsInOperationGroup(
   addOperations(group.type);
   return operations;
 }
-
-interface CreateSdkContextOptions {
+export interface CreateSdkContextOptions {
   readonly versionStrategy?: "ignore";
+  additionalDecorators?: string[];
 }
 
 export function createSdkContext<
@@ -616,6 +615,7 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
+    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
   };
   sdkContext.sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
@@ -715,6 +715,7 @@ function modelTransitiveSet(
 }
 
 const clientFormatKey = createStateSymbol("clientFormat");
+
 const allowedClientFormatToTargetTypeMap: Record<ClientFormat, string[]> = {
   unixtime: ["int32", "int64"],
   iso8601: ["utcDateTime", "offsetDateTime", "duration"],

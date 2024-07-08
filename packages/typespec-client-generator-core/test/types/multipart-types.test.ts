@@ -75,21 +75,21 @@ describe("typespec-client-generator-core: multipart types", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    const modelA = models.find((x) => x.name === "A");
+    const modelA = models.find((x) => x.name === "MultipartOperationRequest");
     ok(modelA);
     strictEqual(modelA.kind, "model");
     strictEqual(modelA.isFormDataType, true);
-    ok((modelA.usage & UsageFlags.MultipartFormData) > 0);
+    strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Spread);
     strictEqual(modelA.properties.length, 1);
     const modelAProp = modelA.properties[0];
     strictEqual(modelAProp.kind, "property");
     strictEqual(modelAProp.isMultipartFileInput, true);
 
-    const modelB = models.find((x) => x.name === "B");
+    const modelB = models.find((x) => x.name === "NormalOperationRequest");
     ok(modelB);
     strictEqual(modelB.kind, "model");
     strictEqual(modelB.isFormDataType, false);
-    ok((modelB.usage & UsageFlags.MultipartFormData) === 0);
+    strictEqual(modelB.usage, UsageFlags.Spread);
     strictEqual(modelB.properties.length, 1);
     strictEqual(modelB.properties[0].type.kind, "bytes");
   });
@@ -214,17 +214,27 @@ describe("typespec-client-generator-core: multipart types", () => {
     const formDataMethod = client.methods[0];
     strictEqual(formDataMethod.kind, "basic");
     strictEqual(formDataMethod.name, "upload");
-    strictEqual(formDataMethod.parameters.length, 3);
+    strictEqual(formDataMethod.parameters.length, 6);
 
-    const widgetParam = formDataMethod.parameters.find((x) => x.name === "widget");
-    ok(widgetParam);
-    ok(formDataMethod.parameters.find((x) => x.name === "accept"));
-    strictEqual(formDataMethod.parameters[0].name, "contentType");
-    strictEqual(formDataMethod.parameters[0].type.kind, "constant");
-    strictEqual(formDataMethod.parameters[0].type.value, "multipart/form-data");
-    strictEqual(formDataMethod.parameters[1].name, "widget");
-    strictEqual(formDataMethod.parameters[1].type.kind, "model");
-    strictEqual(formDataMethod.parameters[1].type.name, "Widget");
+    strictEqual(formDataMethod.parameters[0].name, "name");
+    strictEqual(formDataMethod.parameters[0].type.kind, "string");
+
+    strictEqual(formDataMethod.parameters[1].name, "displayName");
+    strictEqual(formDataMethod.parameters[1].type.kind, "string");
+
+    strictEqual(formDataMethod.parameters[2].name, "description");
+    strictEqual(formDataMethod.parameters[2].type.kind, "string");
+
+    strictEqual(formDataMethod.parameters[3].name, "color");
+    strictEqual(formDataMethod.parameters[3].type.kind, "string");
+
+    strictEqual(formDataMethod.parameters[4].name, "contentType");
+    strictEqual(formDataMethod.parameters[4].type.kind, "constant");
+    strictEqual(formDataMethod.parameters[4].type.value, "multipart/form-data");
+
+    strictEqual(formDataMethod.parameters[5].name, "accept");
+    strictEqual(formDataMethod.parameters[5].type.kind, "constant");
+    strictEqual(formDataMethod.parameters[5].type.value, "application/json");
 
     const formDataOp = formDataMethod.operation;
     strictEqual(formDataOp.parameters.length, 2);
@@ -234,8 +244,8 @@ describe("typespec-client-generator-core: multipart types", () => {
     const formDataBodyParam = formDataOp.bodyParam;
     ok(formDataBodyParam);
     strictEqual(formDataBodyParam.type.kind, "model");
-    strictEqual(formDataBodyParam.type.name, "Widget");
-    strictEqual(formDataBodyParam.correspondingMethodParams[0], formDataMethod.parameters[1]);
+    strictEqual(formDataBodyParam.type.name, "UploadRequest");
+    strictEqual(formDataBodyParam.correspondingMethodParams.length, 4);
   });
 
   it("usage doesn't apply to properties of a form data", async function () {
