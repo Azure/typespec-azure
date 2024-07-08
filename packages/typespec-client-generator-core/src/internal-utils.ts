@@ -408,6 +408,7 @@ export interface TCGCContext {
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   originalProgram: Program;
   decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -419,6 +420,7 @@ export function createTCGCContext(program: Program): TCGCContext {
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
+    previewStringRegex: /-preview$/,
   };
 }
 
@@ -548,9 +550,9 @@ export function filterApiVersionsInEnum(
     }
   }
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
-  if (!defaultApiVersion?.value.endsWith("-preview")) {
+  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !v.value.endsWith("-preview")
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
     );
   }
 }
