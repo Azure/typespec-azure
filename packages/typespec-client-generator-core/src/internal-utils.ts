@@ -410,25 +410,15 @@ export interface TCGCContext {
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
-  const [emitterName, diagnostics] = parseEmitterName(program, getEmitterName(program));
   return {
     program,
-    emitterName: emitterName,
-    diagnostics: diagnostics,
+    emitterName: "__TCGC_INTERNAL__",
+    diagnostics: [],
     originalProgram: program,
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
   };
-}
-
-function getEmitterName(program: Program): string {
-  if (program.emitters.length > 0 && program.emitters[0].metadata.name !== undefined) {
-    return program.emitters[0].metadata.name;
-  }
-
-  // This is a fallback, but it should only be hit for testing
-  return "@azure-tools/typespec-csharp";
 }
 
 export function getNonNullOptions(type: Union): Type[] {
@@ -538,4 +528,33 @@ export function getHttpOperationResponseHeaders(
     headers.push(response.body.contentTypeProperty);
   }
   return headers;
+}
+
+export class DuplicateTracker<K, V> {
+  #entries = new Map<K, Set<V>>();
+
+  /**
+   * Track usage of K.
+   * @param k key that is being checked for duplicate.
+   * @param v value that map to the key
+   */
+  track(k: K, v: V) {
+    const existing = this.#entries.get(k);
+    if (existing === undefined) {
+      this.#entries.set(k, new Set<V>([v]));
+    } else {
+      existing.add(v);
+    }
+  }
+
+  /**
+   * Return iterator of all the duplicate entries.
+   */
+  *entries(): Iterable<[K, Set<V>]> {
+    for (const [k, v] of this.#entries.entries()) {
+      if (v.size > 1) {
+        yield [k, v];
+      }
+    }
+  }
 }

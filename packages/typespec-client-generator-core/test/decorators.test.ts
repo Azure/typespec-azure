@@ -2703,39 +2703,21 @@ describe("typespec-client-generator-core: decorators", () => {
       });
     });
 
-    it("duplicate model client name with all language scopes", async () => {
+    it("duplicate model client name with a random language scope", async () => {
       const diagnostics = await runner.diagnose(
       `
-      @service({
-        title: "Contoso Widget Manager",
-      })
+      @service
       namespace Contoso.WidgetManager;
       
-      @error
-      model Error {
-        code: string;
-        message?: string;
-      }
-      
-      @clientName("Test")
+      @clientName("Test", "random")
       model Widget {
         @key
         id: int32;
-      
-        description?: string;
       }
 
       model Test {
         prop1: string;
       }
-
-      @route("/test")
-      op test(): Test | Error;
-
-      op list(@query apiVersion: string): Widget[] | Error;
-      
-      @route("/widget/{id}")
-      op get(...Resource.KeysOf<Widget>): Widget | Error;
       `
       );
 
@@ -2753,16 +2735,8 @@ describe("typespec-client-generator-core: decorators", () => {
     it("duplicate enum client name with all language scopes", async () => {
       const diagnostics = await runner.diagnose(
       `
-      @service({
-        title: "Contoso Widget Manager",
-      })
+      @service
       namespace Contoso.WidgetManager;
-      
-      @error
-      model Error {
-        code: string;
-        message?: string;
-      }
         
       @clientName("EnumB")
       enum EnumA {
@@ -2776,27 +2750,6 @@ describe("typespec-client-generator-core: decorators", () => {
         two,
         three,
       }
-      
-      model Widget {
-        @key
-        id: int32;
-      
-        description?: string;
-        propertyA: EnumA;
-        propertyB: EnumB;
-      }
-
-      model Test {
-        prop1: string;
-      }
-
-      @route("/test")
-      op test(): Test | Error;
-
-      op list(@query apiVersion: string): Widget[] | Error;
-      
-      @route("/widget/{id}")
-      op get(...Resource.KeysOf<Widget>): Widget | Error;
       `
       );
 
@@ -2811,21 +2764,15 @@ describe("typespec-client-generator-core: decorators", () => {
       );
     });
   
-    it("duplicate model client name with csharp language scopes", async () => {
+    it("duplicate model client name with multiple language scopes", async () => {
       const diagnostics = await runner.diagnose(
       `
-      @service({
-        title: "Contoso Widget Manager",
-      })
+      @service
       namespace Contoso.WidgetManager;
       
-      @error
-      model Error {
-        code: string;
-        message?: string;
-      }
-      
       @clientName("Test", "csharp")
+      @clientName("Test", "python")
+      @clientName("Test", "java")
       model Widget {
         @key
         id: int32;
@@ -2836,14 +2783,6 @@ describe("typespec-client-generator-core: decorators", () => {
       model Test {
         prop1: string;
       }
-
-      @route("/test")
-      op test(): Test | Error;
-
-      op list(@query apiVersion: string): Widget[] | Error;
-      
-      @route("/widget/{id}")
-      op get(...Resource.KeysOf<Widget>): Widget | Error;
     `
     );
 
