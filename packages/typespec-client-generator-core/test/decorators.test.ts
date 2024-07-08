@@ -2705,7 +2705,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("duplicate model client name with a random language scope", async () => {
       const diagnostics = await runner.diagnose(
-      `
+        `
       @service
       namespace Contoso.WidgetManager;
       
@@ -2727,14 +2727,13 @@ describe("typespec-client-generator-core: decorators", () => {
         },
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
-        }
-        ]
-      );
+        },
+      ]);
     });
-    
+
     it("duplicate enum client name with all language scopes", async () => {
       const diagnostics = await runner.diagnose(
-      `
+        `
       @service
       namespace Contoso.WidgetManager;
         
@@ -2759,14 +2758,13 @@ describe("typespec-client-generator-core: decorators", () => {
         },
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
-        }
-        ]
-      );
+        },
+      ]);
     });
-  
+
     it("duplicate model client name with multiple language scopes", async () => {
       const diagnostics = await runner.diagnose(
-      `
+        `
       @service
       namespace Contoso.WidgetManager;
       
@@ -2784,17 +2782,16 @@ describe("typespec-client-generator-core: decorators", () => {
         prop1: string;
       }
     `
-    );
+      );
 
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
-      }
-      ]
-    );
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+        },
+      ]);
     });
   });
 

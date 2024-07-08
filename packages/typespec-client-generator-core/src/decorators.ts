@@ -50,14 +50,19 @@ import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 export const namespace = "Azure.ClientGenerator.Core";
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
-function getScopedDecoratorData(context: TCGCContext, key: symbol, target: Type, languageScope?: string | symbol): any {
+function getScopedDecoratorData(
+  context: TCGCContext,
+  key: symbol,
+  target: Type,
+  languageScope?: string | symbol
+): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
   if (languageScope === AllScopes) {
     return retval[languageScope];
   }
-  if (languageScope === undefined || typeof languageScope === 'string') {
-    const scope = languageScope ?? context.emitterName; 
+  if (languageScope === undefined || typeof languageScope === "string") {
+    const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
   }
   return retval[AllScopes]; // in this case it applies to all languages
@@ -994,6 +999,10 @@ export function $clientName(
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 
-export function getClientNameOverride(context: TCGCContext, entity: Type, languageScope?: string | symbol): string | undefined {
+export function getClientNameOverride(
+  context: TCGCContext,
+  entity: Type,
+  languageScope?: string | symbol
+): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
