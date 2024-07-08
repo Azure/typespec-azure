@@ -3433,7 +3433,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(test2Method.name, "test2");
       deepStrictEqual(test2Method.apiVersions, ["v2"]);
     });
-    it("default latest version with preview", async () => {
+    it("default latest GA version with preview", async () => {
       await runner.compile(
         `
         @service
@@ -3465,6 +3465,40 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
       strictEqual(sdkVersionsEnum.values.length, 1);
       strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+    });
+    it("default latest preview version with GA", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.experimental_sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-11-01-preview");
     });
   });
 
