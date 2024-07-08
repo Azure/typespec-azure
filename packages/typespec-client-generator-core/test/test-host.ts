@@ -9,7 +9,7 @@ import {
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { createSdkContext } from "../src/decorators.js";
+import { CreateSdkContextOptions, createSdkContext } from "../src/decorators.js";
 import {
   SdkContext,
   SdkEmitterOptions,
@@ -41,12 +41,12 @@ export interface SdkTestRunner extends BasicTestRunner {
 }
 
 export function createSdkContextTestHelper<
-  TOptions extends object = CreateSdkTestRunnerOptions,
+  TOptions extends Record<string, any> = CreateSdkTestRunnerOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   program: Program,
   options: TOptions,
-  emitterName?: string
+  sdkContextOption?: CreateSdkContextOptions
 ): SdkContext<TOptions, TServiceOperation> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
@@ -54,7 +54,11 @@ export function createSdkContextTestHelper<
     options: options,
     getAssetEmitter: null as any,
   };
-  return createSdkContext(emitContext, emitterName ?? "@azure-tools/typespec-csharp");
+  return createSdkContext(
+    emitContext,
+    options.emitterName ?? "@azure-tools/typespec-csharp",
+    sdkContextOption
+  );
 }
 
 export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
@@ -65,7 +69,8 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
 }
 
 export async function createSdkTestRunner(
-  options: CreateSdkTestRunnerOptions = {}
+  options: CreateSdkTestRunnerOptions = {},
+  sdkContextOption?: CreateSdkContextOptions
 ): Promise<SdkTestRunner> {
   const host = await createSdkTestHost(options);
   let autoUsings = [
@@ -88,7 +93,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -100,7 +105,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -112,7 +117,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -129,7 +134,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -151,7 +156,7 @@ export async function createSdkTestRunner(
       sdkTestRunner.context = createSdkContextTestHelper(
         sdkTestRunner.program,
         options,
-        options.emitterName
+        sdkContextOption
       );
       return result;
     };
@@ -181,7 +186,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -214,7 +219,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -227,7 +232,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };

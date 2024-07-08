@@ -1,7 +1,7 @@
 ---
-changeKind: fix
+changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-support new typespec emitter naming rule
+export decorators in allow list to all sdk types
