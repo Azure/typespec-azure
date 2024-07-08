@@ -132,19 +132,31 @@ export const $lib = createTypeSpecLibrary({
     "no-corresponding-method-param": {
       severity: "error",
       messages: {
-        default: `Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
+        default: paramMessage`Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
       },
     },
     "unsupported-protocol": {
       severity: "error",
       messages: {
-        default: paramMessage`Currently we only support HTTP and HTTPS protocols`,
+        default: "Currently we only support HTTP and HTTPS protocols",
       },
     },
     "no-emitter-name": {
       severity: "warning",
       messages: {
-        default: paramMessage`Can not find name for your emitter, please check your emitter name.`,
+        default: "Can not find name for your emitter, please check your emitter name.",
+      },
+    },
+    "unsupported-generic-decorator-arg-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Can not parse the arg type for decorator "${"decoratorName"}".`,
+      },
+    },
+    "empty-client-name": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
   },

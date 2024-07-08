@@ -1,7 +1,8 @@
 ---
 changeKind: fix
 packages:
+  - "@azure-tools/typespec-azure-resource-manager"
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-support new typespec emitter naming rule
+Fixing typo

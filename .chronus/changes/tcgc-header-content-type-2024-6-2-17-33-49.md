@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix armId not set for scalar type armResourceIdentifier.
+Add `Content-Type` to response headers
