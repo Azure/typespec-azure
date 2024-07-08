@@ -2739,15 +2739,11 @@ describe("typespec-client-generator-core: decorators", () => {
         
       @clientName("EnumB")
       enum EnumA {
-        one,
-        two,
-        three,
+        one
       }
 
       enum EnumB {
-        one,
-        two,
-        three,
+        one
       }
       `
       );
@@ -2774,10 +2770,9 @@ describe("typespec-client-generator-core: decorators", () => {
       model Widget {
         @key
         id: int32;
-      
-        description?: string;
       }
 
+      @clientName("Widget", "java")
       model Test {
         prop1: string;
       }
