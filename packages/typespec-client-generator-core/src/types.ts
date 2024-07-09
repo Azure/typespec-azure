@@ -354,7 +354,8 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(diagnostics.pipe(getAnyType(context, type)));
   }
 
-  if (nonNullOptions.length === 1) {
+  // if a union is `type | null`, then we will return a nullable wrapper type of the type
+  if (nonNullOptions.length === 1 && nullOption !== undefined) {
     retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
   } else if (
     // judge if the union can be converted to enum

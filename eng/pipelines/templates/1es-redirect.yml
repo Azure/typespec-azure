@@ -29,6 +29,10 @@ extends:
     settings:
       skipBuildTagsForGitHubPullRequests: true
     sdl:
+      codeql:
+        compiled:
+          enabled: false
+          justificationForDisabling: CodeQL times our pipelines out by running for 2+ hours before being force canceled.
       credscan:
         suppressionsFile: $(Build.SourcesDirectory)/eng/CredScanSuppression.json
       sourceAnalysisPool:
