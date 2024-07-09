@@ -597,5 +597,5 @@ export enum UsageFlags {
   // Used in spread.
   Spread = 1 << 6,
   // Output will also be set when Error is set.
-  Error = 1 << 6,
+  Error = 1 << 7,
 }
