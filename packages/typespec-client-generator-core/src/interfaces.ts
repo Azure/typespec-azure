@@ -325,10 +325,6 @@ export interface SdkModelType extends SdkTypeBase {
    * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */
   isFormDataType: boolean;
-  /**
-   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
-   */
-  isError: boolean;
   isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
@@ -600,4 +596,6 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
+  // Output will also be set when Error is set.
+  Error = 1 << 7,
 }
