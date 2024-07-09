@@ -355,7 +355,8 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(diagnostics.pipe(getAnyType(context, type)));
   }
 
-  if (nonNullOptions.length === 1) {
+  // if a union is `type | null`, then we will return a nullable wrapper type of the type
+  if (nonNullOptions.length === 1 && nullOption !== undefined) {
     retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
   } else if (
     // judge if the union can be converted to enum
@@ -557,6 +558,7 @@ export function getSdkModelWithDiagnostics(
     const docWrapper = getDocHelper(context, type);
     const generatedName = getGeneratedName(context, type);
     const name = getLibraryName(context, type) || generatedName;
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -566,11 +568,10 @@ export function getSdkModelWithDiagnostics(
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
-      usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
+      usage,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
-      isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType);
 
