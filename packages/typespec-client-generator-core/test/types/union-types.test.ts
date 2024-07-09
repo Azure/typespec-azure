@@ -584,4 +584,26 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(unionAsEnumInternal.usage, UsageFlags.Input | UsageFlags.Output);
     strictEqual(unionAsEnumInternal.access, "internal");
   });
+
+  it("union with only one literal", async function () {
+    await runner.compileWithBuiltInService(
+      `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          name: TestUnion;
+        }
+
+        union TestUnion {
+          "A"
+        }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "enum");
+    strictEqual(sdkType.name, "TestUnion");
+    const values = sdkType.values;
+    strictEqual(values.length, 1);
+    strictEqual(values[0].value, "A");
+  });
 });
