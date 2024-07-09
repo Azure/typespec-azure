@@ -25,7 +25,7 @@ export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  experimental_sdkPackage: SdkPackage<TServiceOperation>;
+  sdkPackage: SdkPackage<TServiceOperation>;
 }
 
 export interface SdkEmitterOptions {
@@ -325,10 +325,6 @@ export interface SdkModelType extends SdkTypeBase {
    * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */
   isFormDataType: boolean;
-  /**
-   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
-   */
-  isError: boolean;
   isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
@@ -594,10 +590,14 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
-  // Input will also be set when JsonMergePatch is set.
+  // Input and Json will also be set when JsonMergePatch is set.
   JsonMergePatch = 1 << 4,
   // Input will also be set when MultipartFormData is set.
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
+  // Output will also be set when Error is set.
+  Error = 1 << 7,
+  // Set when model is used in conjunction with an application/json content type.
+  Json = 1 << 8,
 }

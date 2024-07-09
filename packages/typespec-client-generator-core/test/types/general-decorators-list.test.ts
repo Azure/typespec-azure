@@ -24,7 +24,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Blob;
     `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].decorators, [{ name: "TypeSpec.@error", arguments: {} }]);
     expectDiagnostics(runner.context.diagnostics, []);
@@ -45,7 +45,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Blob;
     `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators, [
       {
@@ -70,7 +70,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Blob;
     `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators, [
       {
@@ -90,7 +90,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): void;
     `);
 
-    deepStrictEqual(runner.context.experimental_sdkPackage.clients[0].decorators, [
+    deepStrictEqual(runner.context.sdkPackage.clients[0].decorators, [
       {
         name: "TypeSpec.@service",
         arguments: { options: undefined },
@@ -113,7 +113,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): void;
     `);
 
-    deepStrictEqual(runner.context.experimental_sdkPackage.clients[0].methods[0].decorators, [
+    deepStrictEqual(runner.context.sdkPackage.clients[0].methods[0].decorators, [
       {
         name: "Azure.ClientGenerator.Core.@clientName",
         arguments: {
@@ -147,7 +147,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Blob;
     `);
 
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].properties[0].decorators, [
         {
@@ -173,7 +173,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Book;
     `);
 
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators, [
         {
@@ -208,7 +208,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Foo;
     `);
 
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators, [
         {
@@ -264,7 +264,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Foo;
     `);
 
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators, [
         {
@@ -306,7 +306,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): Pet;
     `);
 
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].properties[0].decorators, [
         {
@@ -330,7 +330,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       op test(): void;
     `);
 
-      const methods = runner.context.experimental_sdkPackage.clients[0].methods;
+      const methods = runner.context.sdkPackage.clients[0].methods;
       strictEqual(methods.length, 1);
       deepStrictEqual(methods[0].decorators, [
         {
