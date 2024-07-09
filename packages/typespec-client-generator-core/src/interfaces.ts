@@ -591,7 +591,7 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
-  // Input will also be set when JsonMergePatch is set.
+  // Input and Json will also be set when JsonMergePatch is set.
   JsonMergePatch = 1 << 4,
   // Input will also be set when MultipartFormData is set.
   MultipartFormData = 1 << 5,
@@ -599,4 +599,6 @@ export enum UsageFlags {
   Spread = 1 << 6,
   // Output will also be set when Error is set.
   Error = 1 << 7,
+  // Set when model is used in conjunction with an application/json content type.
+  Json = 1 << 8,
 }

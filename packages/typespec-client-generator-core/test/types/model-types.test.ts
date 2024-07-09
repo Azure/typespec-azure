@@ -386,7 +386,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(resp.properties[0].type, prop);
     const req = sdkPackage.models.find((x) => x.name === "SendRequest" && x.isGeneratedName);
     ok(req);
-    strictEqual(req.usage, UsageFlags.Spread);
+    strictEqual(req.usage, UsageFlags.Spread | UsageFlags.Json);
   });
 
   it("property of anonymous union as enum", async () => {
@@ -824,9 +824,9 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].usage, UsageFlags.Input);
-    strictEqual(models.filter((x) => x.usage === UsageFlags.Input).length, 1);
-    strictEqual(models.filter((x) => x.usage === UsageFlags.Output).length, 0);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
+    strictEqual(models.filter((x) => (x.usage & UsageFlags.Input) > 0).length, 1);
+    strictEqual(models.filter((x) => (x.usage & UsageFlags.Output) > 0).length, 0);
   });
 
   it("output usage", async () => {
@@ -838,10 +838,10 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].usage, UsageFlags.Output);
+    strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
 
-    strictEqual(models.filter((x) => x.usage === UsageFlags.Output).length, 1);
-    strictEqual(models.filter((x) => x.usage === UsageFlags.Input).length, 0);
+    strictEqual(models.filter((x) => (x.usage & UsageFlags.Output) > 0).length, 1);
+    strictEqual(models.filter((x) => (x.usage & UsageFlags.Input) > 0).length, 0);
   });
 
   it("roundtrip usage", async () => {
@@ -853,7 +853,7 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 
     strictEqual(models.filter((x) => (x.usage & UsageFlags.Output) > 0).length, 1);
     strictEqual(models.filter((x) => (x.usage & UsageFlags.Input) > 0).length, 1);
@@ -881,9 +881,12 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     strictEqual(
       models.find((x) => x.name === "RoundTripModel")?.usage,
-      UsageFlags.Input | UsageFlags.Output
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
     );
-    strictEqual(models.find((x) => x.name === "ResultModel")?.usage, UsageFlags.Output);
+    strictEqual(
+      models.find((x) => x.name === "ResultModel")?.usage,
+      UsageFlags.Output | UsageFlags.Json
+    );
   });
 
   it("usage propagation", async () => {
@@ -916,7 +919,7 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     ok(!(models[0].usage & UsageFlags.Error));
   });
 
@@ -950,7 +953,7 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   });
 
   it("usage propagation from subtype of type with another discriminated property", async () => {
@@ -987,7 +990,7 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 5);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   });
 
   it("unnamed model", async () => {
@@ -1196,15 +1199,18 @@ describe("typespec-client-generator-core: model types", () => {
 
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
-    strictEqual(AdditionalPropertiesModel.usage, UsageFlags.Input);
+    strictEqual(AdditionalPropertiesModel.usage, UsageFlags.Input | UsageFlags.Json);
     strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "model");
     strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
-    strictEqual(AdditionalPropertiesModel2.usage, UsageFlags.Output);
+    strictEqual(AdditionalPropertiesModel2.usage, UsageFlags.Output | UsageFlags.Json);
     strictEqual(AdditionalPropertiesModel3.additionalProperties?.kind, "model");
     strictEqual(AdditionalPropertiesModel3.baseModel, undefined);
-    strictEqual(AdditionalPropertiesModel3.usage, UsageFlags.Input | UsageFlags.Output);
-    strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output);
-    strictEqual(Test2.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(
+      AdditionalPropertiesModel3.usage,
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+    );
+    strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    strictEqual(Test2.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   });
 
   it("additionalProperties of different types", async () => {

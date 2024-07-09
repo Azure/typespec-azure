@@ -2203,9 +2203,12 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Model1: Model; Model2: Model; Model3: Model; Model4: Model };
 
-      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model3), UsageFlags.Input | UsageFlags.Output);
+      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Json);
+      strictEqual(getUsage(runner.context, Model2), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(
+        getUsage(runner.context, Model3),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
       strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
     });
 
@@ -2263,8 +2266,14 @@ describe("typespec-client-generator-core: decorators", () => {
       };
 
       strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model3), UsageFlags.Input | UsageFlags.Output);
+      strictEqual(
+        getUsage(runner.context, Model2),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(
+        getUsage(runner.context, Model3),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
       strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
       strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
       strictEqual(getUsage(runner.context, Enum2), UsageFlags.None);
@@ -2322,11 +2331,14 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
 
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Shark), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output);
+      strictEqual(getUsage(runner.context, Fish), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(
+        getUsage(runner.context, Shark),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output | UsageFlags.Json);
     });
 
     it("usage and convenience", async () => {
@@ -2348,7 +2360,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Fish: Model };
 
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Input);
+      strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Json);
 
       const { Dog } = (await runner.compile(`
         @service({})
@@ -2368,7 +2380,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Dog: Model };
 
-      strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
+      strictEqual(getUsage(runner.context, Dog), UsageFlags.Output | UsageFlags.Json);
     });
 
     it("patch usage", async () => {
@@ -2395,10 +2407,10 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { PatchModel: Model; JsonMergePatchModel: Model };
 
-      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
+      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input | UsageFlags.Json);
       strictEqual(
         getUsage(runner.context, JsonMergePatchModel),
-        UsageFlags.JsonMergePatch | UsageFlags.Input
+        UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json
       );
     });
   });
@@ -3457,7 +3469,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `
       );
-      const sdkVersionsEnum = runner.context.experimental_sdkPackage.enums[0];
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
       strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
       strictEqual(sdkVersionsEnum.values.length, 1);
@@ -3490,7 +3502,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `
       );
-      const sdkVersionsEnum = runner.context.experimental_sdkPackage.enums[0];
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
       strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
       strictEqual(sdkVersionsEnum.values.length, 2);
