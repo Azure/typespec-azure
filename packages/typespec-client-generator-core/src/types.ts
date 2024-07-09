@@ -87,6 +87,7 @@ import {
   getTypeDecorators,
   intOrFloat,
   isAzureCoreModel,
+  isJsonContentType,
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
@@ -1332,7 +1333,11 @@ function updateTypesFromOperation(
       } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }
+      if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
+        updateUsageOfModel(context, UsageFlags.Json, sdkType);
+      }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        // will also have Json type
         updateUsageOfModel(context, UsageFlags.JsonMergePatch, sdkType);
       }
     }
@@ -1352,6 +1357,9 @@ function updateTypesFromOperation(
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
+        }
+        if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
+          updateUsageOfModel(context, UsageFlags.Json, sdkType);
         }
       }
       const headers = getHttpOperationResponseHeaders(innerResponse);
@@ -1431,7 +1439,7 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
   for (const sdkType of context.modelsMap?.values() ?? []) {
     // if a type only has spread usage, then it could be internal
-    if (sdkType.usage === UsageFlags.Spread) {
+    if ((sdkType.usage & UsageFlags.Spread) > 0) {
       sdkType.access = "internal";
     }
   }
