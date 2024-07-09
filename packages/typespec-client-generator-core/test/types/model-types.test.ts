@@ -1385,7 +1385,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = getAllModels(runner.context);
     strictEqual(models.length, 1);
     strictEqual(models[0].kind, "model");
-    strictEqual((models[0].usage & UsageFlags.Error) > 0, true);
+    ok(models[0].usage & UsageFlags.Error);
 
     const model = models[0];
     const rawModel = model.__raw;
