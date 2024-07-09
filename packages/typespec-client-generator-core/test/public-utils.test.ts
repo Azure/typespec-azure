@@ -1579,7 +1579,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
-        strictEqual(models[0].usage, UsageFlags.Spread);
+        strictEqual(models[0].usage, UsageFlags.Spread | UsageFlags.Json);
       });
 
       it("anonymous model for body parameter", async () => {
@@ -1591,7 +1591,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
         strictEqual(models[0].name, "TestRequest");
-        strictEqual(models[0].usage, UsageFlags.Spread);
+        strictEqual(models[0].usage, UsageFlags.Spread | UsageFlags.Json);
       });
 
       it("anonymous union in response header", async () => {
