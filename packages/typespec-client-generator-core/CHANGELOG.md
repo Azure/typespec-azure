@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.43.2
+
+### Bug Fixes
+
+- [#1120](https://github.com/Azure/typespec-azure/pull/1120) fix wrong client resolving from multiple call of context creation for versioning tsp
+- [#1067](https://github.com/Azure/typespec-azure/pull/1067) Unify casing of datetime spelling to `DateTime`. Change interface names to `SdkDateTimeType`, `SdkUtcDateTimeType`, and `SdkOffsetDateTimeType`
+- [#1113](https://github.com/Azure/typespec-azure/pull/1113) Add `Content-Type` to response headers
+
+### Features
+
+- [#966](https://github.com/Azure/typespec-azure/pull/966) export decorators in allow list to all sdk types
+- [#1075](https://github.com/Azure/typespec-azure/pull/1075) Replace `tspNamespace` with `crossLanguageDefinitionId`.
+- Remove `tspNamespace` in `SdkEnumType`, `SdkModelType`, `SdkUnionType`, `SdkArrayType`.
+- Add `crossLanguageDefinitionId` to `SdkUnionType` and `SdkArrayType`.
+
+### Breaking Changes
+
+- [#886](https://github.com/Azure/typespec-azure/pull/886) always spread models and aliases with `...`
+
+
 ## 0.43.1
 
 ### Bug Fixes
