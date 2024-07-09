@@ -102,7 +102,9 @@ export async function getAllServicesAtAllVersions(
     { program, options: {} } as any,
     "@azure-tools/typespec-autorest",
     {
-      versionStrategy: "ignore",
+      versioning: {
+        strategy: "ignore"
+      }
     }
   );
 
