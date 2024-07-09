@@ -3355,16 +3355,11 @@ describe("typespec-client-generator-core: decorators", () => {
         runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "stableFunctionality"
       );
-<<<<<<< HEAD
-      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
-      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
-=======
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
       strictEqual(
         runnerWithVersion.context.sdkPackage.models[0].name,
         "StableFunctionalityRequest"
       );
->>>>>>> 2faf8ec80bea635511c6582ea0cbe5643a8a57a2
     });
     it("add client", async () => {
       await runner.compile(
