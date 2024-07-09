@@ -2165,7 +2165,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @@access(listRunSteps, Access.internal);
         `
       );
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 2);
       strictEqual(models[0].access, "public");
       strictEqual(models[1].access, "public");
@@ -2591,21 +2591,21 @@ describe("typespec-client-generator-core: decorators", () => {
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
       }
 
       // csharp
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
       }
 
       // python
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+        strictEqual(runner.context.sdkPackage.models[0].name, "Test");
       }
     });
 
@@ -2638,21 +2638,21 @@ describe("typespec-client-generator-core: decorators", () => {
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
       }
 
       // csharp
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
       }
 
       // python
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+        strictEqual(runner.context.sdkPackage.models[0].name, "Test");
       }
     });
 
@@ -2680,10 +2680,7 @@ describe("typespec-client-generator-core: decorators", () => {
         
       `);
 
-      strictEqual(
-        runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name,
-        "body"
-      );
+      strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
     });
     it("empty client name", async () => {
       const diagnostics = await runner.diagnose(`
@@ -2756,7 +2753,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2855,7 +2852,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2953,7 +2950,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3051,7 +3048,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3152,7 +3149,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
     `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3241,7 +3238,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
     `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3326,23 +3323,23 @@ describe("typespec-client-generator-core: decorators", () => {
 
       await runnerWithVersion.compile(tsp);
 
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 2);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 2);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "previewFunctionality"
       );
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[1].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[1].name,
         "stableFunctionality"
       );
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 2);
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.models[0].name,
+        runnerWithVersion.context.sdkPackage.models[0].name,
         "PreviewFunctionalityRequest"
       );
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.models[1].name,
+        runnerWithVersion.context.sdkPackage.models[1].name,
         "StableFunctionalityRequest"
       );
 
@@ -3352,15 +3349,15 @@ describe("typespec-client-generator-core: decorators", () => {
 
       await runnerWithVersion.compile(tsp);
 
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 1);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "stableFunctionality"
       );
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.models[0].name,
+        runnerWithVersion.context.sdkPackage.models[0].name,
         "StableFunctionalityRequest"
       );
     });
@@ -3392,7 +3389,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
       ok(versioningClient);
