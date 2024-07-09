@@ -38,9 +38,9 @@ describe("typespec-client-generator-core: enum types", () => {
       }
       `);
 
-    strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.models.length, 1);
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const sdkType = runner.context.sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
     strictEqual(sdkType.crossLanguageDefinitionId, "TestService.DaysOfWeekExtensibleEnum");
@@ -83,9 +83,9 @@ describe("typespec-client-generator-core: enum types", () => {
       }
       `);
 
-    strictEqual(runner.context.experimental_sdkPackage.models.length, 1);
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.models.length, 1);
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const sdkType = runner.context.sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "Integers");
     strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Integers");
@@ -119,7 +119,7 @@ describe("typespec-client-generator-core: enum types", () => {
       }
       `);
 
-    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    const sdkType = runner.context.sdkPackage.enums[0];
     ok(sdkType);
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "Floats");
@@ -155,7 +155,7 @@ describe("typespec-client-generator-core: enum types", () => {
       }
       `);
 
-    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    const sdkType = runner.context.sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, false);
     strictEqual(sdkType.name, "Floats");
     strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Floats");
@@ -195,7 +195,7 @@ describe("typespec-client-generator-core: enum types", () => {
         prop: ExtendedEnum
       }
       `);
-    const sdkType = runner.context.experimental_sdkPackage.enums[0];
+    const sdkType = runner.context.sdkPackage.enums[0];
     ok(sdkType);
     strictEqual(sdkType.isFixed, false);
     strictEqual(sdkType.name, "ExtendedEnum");
@@ -240,9 +240,9 @@ describe("typespec-client-generator-core: enum types", () => {
         prop: DaysOfWeekFixedEnum
       }
       `);
-    strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 1);
-    strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
-    const sdkType = runnerWithCore.context.experimental_sdkPackage.enums[0];
+    strictEqual(runnerWithCore.context.sdkPackage.models.length, 1);
+    strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
+    const sdkType = runnerWithCore.context.sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "DaysOfWeekFixedEnum");
     strictEqual(sdkType.crossLanguageDefinitionId, "My.Service.DaysOfWeekFixedEnum");
@@ -279,7 +279,7 @@ describe("typespec-client-generator-core: enum types", () => {
         ): void;
       `);
 
-    strictEqual(runner.context.experimental_sdkPackage.enums[0].access, "internal");
+    strictEqual(runner.context.sdkPackage.enums[0].access, "internal");
   });
 
   it("crossLanguageDefinitionId", async () => {
@@ -303,8 +303,8 @@ describe("typespec-client-generator-core: enum types", () => {
           }
         }
       `);
-    strictEqual(runner.context.experimental_sdkPackage.enums.length, 1);
-    const integersEnum = runner.context.experimental_sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const integersEnum = runner.context.sdkPackage.enums[0];
     strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
   });
 
@@ -321,7 +321,7 @@ describe("typespec-client-generator-core: enum types", () => {
         ): void;
       `);
 
-    strictEqual(runner.context.experimental_sdkPackage.enums[0].deprecation, "no longer support");
+    strictEqual(runner.context.sdkPackage.enums[0].deprecation, "no longer support");
   });
 
   it("orphan enum", async () => {
@@ -345,11 +345,8 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `);
 
-    strictEqual(runner.context.experimental_sdkPackage.enums[0].name, "Enum1");
-    strictEqual(
-      runner.context.experimental_sdkPackage.enums[0].usage,
-      UsageFlags.Input | UsageFlags.Output
-    );
+    strictEqual(runner.context.sdkPackage.enums[0].name, "Enum1");
+    strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
 
   it("projected name", async () => {
@@ -657,7 +654,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runner.context.experimental_sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -686,7 +683,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+    const enums = runnerWithVersion.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -715,7 +712,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+    const enums = runnerWithVersion.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -744,7 +741,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runnerWithVersion.context.experimental_sdkPackage.enums;
+    const enums = runnerWithVersion.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -778,7 +775,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runner.context.experimental_sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 2);
     strictEqual(enums[0].name, "LR");
     strictEqual(enums[0].crossLanguageDefinitionId, "N.LR");
