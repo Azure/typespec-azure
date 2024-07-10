@@ -101,7 +101,6 @@ function validateClientNamesCore(
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     const name = clientName ?? item.name;
-    // TODO: handle symbol name
     if (name !== undefined && typeof name === "string") {
       duplicateTracker.track(name, item);
     }
