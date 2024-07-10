@@ -262,7 +262,7 @@ export function armRenameListByOperationInternal(
     undefined as any
   );
 
-  if (updateOperationName === undefined || updateOperationName === true) {
+  if (updateOperationName) {
     // Set the operation name
     entity.name =
       parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1

@@ -125,7 +125,6 @@ extern dec armResourceCollectionAction(target: Operation);
  * @param resourceType Resource
  * @param parentTypeName: Parent type name.
  * @param parentFriendlyTypeName Friendly name for parent.
- * @param updateOperationName Whether to update the operation name in addition to the doc. Default: true
  */
 extern dec armRenameListByOperation(
   target: Operation,
