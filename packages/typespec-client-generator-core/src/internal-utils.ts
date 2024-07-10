@@ -46,6 +46,8 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 
+export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
 /**
  *
  * @param emitterName Full emitter name
@@ -528,33 +530,4 @@ export function getHttpOperationResponseHeaders(
     headers.push(response.body.contentTypeProperty);
   }
   return headers;
-}
-
-export class DuplicateTracker<K, V> {
-  #entries = new Map<K, Set<V>>();
-
-  /**
-   * Track usage of K.
-   * @param k key that is being checked for duplicate.
-   * @param v value that map to the key
-   */
-  track(k: K, v: V) {
-    const existing = this.#entries.get(k);
-    if (existing === undefined) {
-      this.#entries.set(k, new Set<V>([v]));
-    } else {
-      existing.add(v);
-    }
-  }
-
-  /**
-   * Return iterator of all the duplicate entries.
-   */
-  *entries(): Iterable<[K, Set<V>]> {
-    for (const [k, v] of this.#entries.entries()) {
-      if (v.size > 1) {
-        yield [k, v];
-      }
-    }
-  }
 }

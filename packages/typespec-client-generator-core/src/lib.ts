@@ -159,10 +159,10 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
-    "duplicate-model-name": {
+    "duplicate-name": {
       severity: "error",
       messages: {
-        default: `Duplicate model name: "${"name"}"`,
+        default: paramMessage`Duplicate name: "${"name"}" in language scope: "${"scope"}"`,
       },
     },
   },

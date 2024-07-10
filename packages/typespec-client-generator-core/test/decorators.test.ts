@@ -2723,10 +2723,12 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "Test" in language scope: "random"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "Test" in language scope: "random"',
         },
       ]);
     });
@@ -2750,10 +2752,12 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "EnumB" in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "EnumB" in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2781,10 +2785,20 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "Test" in language scope: "python"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-model-name",
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "Test" in language scope: "python"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "Test" in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "Test" in language scope: "csharp"',
         },
       ]);
     });

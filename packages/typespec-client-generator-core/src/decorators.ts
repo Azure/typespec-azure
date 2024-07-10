@@ -41,14 +41,13 @@ import {
   SdkServiceOperation,
   UsageFlags,
 } from "./interfaces.js";
-import { TCGCContext, parseEmitterName } from "./internal-utils.js";
+import { AllScopes, TCGCContext, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
-export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 function getScopedDecoratorData(
   context: TCGCContext,
