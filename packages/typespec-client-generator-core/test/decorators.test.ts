@@ -2959,7 +2959,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ]);
     });
 
-    it("duplicate eunm and model within nested namespace for all language scopes", async () => {
+    it("duplicate enum and model within nested namespace for all language scopes", async () => {
       const diagnostics = await runner.diagnose(
         `
         @service
