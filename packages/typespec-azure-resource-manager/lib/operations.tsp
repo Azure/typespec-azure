@@ -43,6 +43,7 @@ op ArmListBySubscription<
 @segmentOf(Resource)
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
 op ArmResourceListByParent<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,

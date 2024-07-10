@@ -199,7 +199,8 @@ export function $armRenameListByOperation(
   entity: Operation,
   resourceType: Model,
   parentTypeName?: string,
-  parentFriendlyTypeName?: string
+  parentFriendlyTypeName?: string,
+  updateOperationName?: boolean
 ) {
   const { program } = context;
   if (
@@ -244,11 +245,13 @@ export function $armRenameListByOperation(
     undefined as any
   );
 
-  // Set the operation name
-  entity.name =
-    parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1
-      ? "list"
-      : `listBy${parentTypeName}`;
+  if (updateOperationName === undefined || updateOperationName === true) {
+    // Set the operation name
+    entity.name =
+      parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1
+        ? "list"
+        : `listBy${parentTypeName}`;
+  }
 }
 
 function getArmParentName(program: Program, resource: Model): string[] {
