@@ -350,3 +350,12 @@ function hasProperty(program: Program, model: Model): boolean {
   if (model.baseModel) return hasProperty(program, model.baseModel);
   return false;
 }
+
+export function $azureResourceBase(context: DecoratorContext, resourceType: Model) {
+  context.program.stateMap(ArmStateKeys.azureResourceBase).set(resourceType, true);
+}
+
+export function isAzureResource(program: Program, resourceType: Model): boolean {
+  const isResourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
+  return isResourceBase ?? false;
+}

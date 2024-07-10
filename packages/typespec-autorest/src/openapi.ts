@@ -13,6 +13,7 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   isArmCommonType,
+  isAzureResource,
 } from "@azure-tools/typespec-azure-resource-manager";
 import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -1854,6 +1855,9 @@ export async function getOpenAPIForService(
   function attachExtensions(type: Type, emitObject: any) {
     // Attach any OpenAPI extensions
     const extensions = getExtensions(program, type);
+    if (isAzureResource(program, type as Model)) {
+      emitObject["x-ms-azure-resource"] = true;
+    }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
     }

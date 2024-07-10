@@ -66,3 +66,11 @@ extern dec defaultResourceKeySegmentName(
  * Note, this is intended for internal use only for now.
  */
 extern dec enforceConstraint(target: Operation | Model, sourceType: Model, constraintType: Model);
+
+/**
+ * This decorator is used to identify Azure Resource Manager resource. In generated
+ * swagger definition, it will be marked with `x-ms-azure-resource`.
+ *
+ * It is *not* meant to be used directly by a spec author,
+ */
+extern dec azureResourceBase(target: Model);
