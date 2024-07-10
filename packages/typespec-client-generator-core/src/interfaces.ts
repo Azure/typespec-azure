@@ -464,6 +464,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
+  description?: string;
 }
 
 interface SdkServiceOperationBase {}

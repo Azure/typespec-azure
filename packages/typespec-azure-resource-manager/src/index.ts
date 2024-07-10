@@ -12,6 +12,8 @@ export {
   type ArmCommonTypeVersions,
 } from "./common-types.js";
 
+export { isAzureResource } from "./private.decorators.js";
+
 export * from "./namespace.js";
 export * from "./operations.js";
 export * from "./resource.js";

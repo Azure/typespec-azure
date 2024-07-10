@@ -20,3 +20,6 @@ op registerParams(
 ): void;
 
 @@extension(ErrorDetail.details, "x-ms-identifiers", ["message", "target"]);
+
+@@extension(Resource, "x-ms-azure-resource", true);
+@@extension(ResourceModelWithAllowedPropertySet, "x-ms-azure-resource", true);
