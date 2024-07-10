@@ -131,8 +131,7 @@ extern dec armRenameListByOperation(
   target: Operation,
   resourceType: Model,
   parentTypeName?: valueof string,
-  parentFriendlyTypeName?: valueof string,
-  updateOperationName?: valueof boolean
+  parentFriendlyTypeName?: valueof string
 );
 
 /**

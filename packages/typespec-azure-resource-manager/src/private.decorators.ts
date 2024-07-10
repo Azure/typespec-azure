@@ -17,6 +17,7 @@ import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
+import { armRenameListByOperationInternal } from "./operations.js";
 import {
   ArmResourceDetails,
   ResourceBaseType,
@@ -349,4 +350,12 @@ function hasProperty(program: Program, model: Model): boolean {
   if (model.properties.size > 0) return true;
   if (model.baseModel) return hasProperty(program, model.baseModel);
   return false;
+}
+
+export function $defaultListByOperationDoc(
+  context: DecoratorContext,
+  entity: Operation,
+  resource: Model
+) {
+  armRenameListByOperationInternal(context, entity, resource, false);
 }

@@ -199,8 +199,25 @@ export function $armRenameListByOperation(
   entity: Operation,
   resourceType: Model,
   parentTypeName?: string,
-  parentFriendlyTypeName?: string,
-  updateOperationName?: boolean
+  parentFriendlyTypeName?: string
+) {
+  armRenameListByOperationInternal(
+    context,
+    entity,
+    resourceType,
+    true,
+    parentTypeName,
+    parentFriendlyTypeName
+  );
+}
+
+export function armRenameListByOperationInternal(
+  context: DecoratorContext,
+  entity: Operation,
+  resourceType: Model,
+  updateOperationName: boolean = true,
+  parentTypeName?: string,
+  parentFriendlyTypeName?: string
 ) {
   const { program } = context;
   if (

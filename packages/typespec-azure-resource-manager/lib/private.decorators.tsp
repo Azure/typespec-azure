@@ -66,3 +66,8 @@ extern dec defaultResourceKeySegmentName(
  * Note, this is intended for internal use only for now.
  */
 extern dec enforceConstraint(target: Operation | Model, sourceType: Model, constraintType: Model);
+
+/**
+ * Provides default doc for ArmResourceListByParent operation for back compat.
+ */
+extern dec defaultListByOperationDoc(target: Operation, resource: Model);
