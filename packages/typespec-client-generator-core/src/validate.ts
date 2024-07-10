@@ -43,40 +43,48 @@ function getDefinedLanguageScopes(program: Program): Set<string | symbol> {
 function validateClientNames(program: Program, tcgcContext: TCGCContext, scope: string | symbol) {
   const services = listServices(program);
   for (const service of services) {
+    validateClientNamesPerNamespace(program, tcgcContext, scope, service.type);
+  }
+}
+
+function validateClientNamesPerNamespace(program: Program, tcgcContext: TCGCContext, scope: string | symbol, namespace: Namespace) {
     // Check for duplicate client names for models, enums, and unions
     validateClientNamesCore(program, tcgcContext, scope, [
-      ...service.type.models.values(),
-      ...service.type.enums.values(),
-      ...service.type.unions.values(),
+      ...namespace.models.values(),
+      ...namespace.enums.values(),
+      ...namespace.unions.values(),
     ]);
 
     // Check for duplicate client names for operations
-    validateClientNamesCore(program, tcgcContext, scope, service.type.operations.values());
+    validateClientNamesCore(program, tcgcContext, scope, namespace.operations.values());
 
     // Check for duplicate client names for interfaces
-    validateClientNamesCore(program, tcgcContext, scope, service.type.interfaces.values());
+    validateClientNamesCore(program, tcgcContext, scope, namespace.interfaces.values());
 
     // Check for duplicate client names for scalars
-    validateClientNamesCore(program, tcgcContext, scope, service.type.scalars.values());
+    validateClientNamesCore(program, tcgcContext, scope, namespace.scalars.values());
 
     // Check for duplicate client names for namespaces
-    validateClientNamesCore(program, tcgcContext, scope, service.type.namespaces.values());
+    validateClientNamesCore(program, tcgcContext, scope, namespace.namespaces.values());
 
     // Check for duplicate client names for model properties
-    for (const model of service.type.models.values()) {
+    for (const model of namespace.models.values()) {
       validateClientNamesCore(program, tcgcContext, scope, model.properties.values());
     }
 
     // Check for duplicate client names for enum members
-    for (const item of service.type.enums.values()) {
+    for (const item of namespace.enums.values()) {
       validateClientNamesCore(program, tcgcContext, scope, item.members.values());
     }
 
     // Check for duplicate client names for union variants
-    for (const item of service.type.unions.values()) {
+    for (const item of namespace.unions.values()) {
       validateClientNamesCore(program, tcgcContext, scope, item.variants.values());
     }
-  }
+
+    for (const item of namespace.namespaces.values()) {
+      validateClientNamesPerNamespace(program, tcgcContext, scope, item);
+    }
 }
 
 function validateClientNamesCore(
