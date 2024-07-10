@@ -16,7 +16,7 @@ describe("typespec-client-generator-core: responses", () => {
         op get(): OkResponse & {@header("Content-Type") contentType: string; @bodyRoot body: bytes};
       }
     `);
-    const client = runner.context.experimental_sdkPackage.clients[0];
+    const client = runner.context.sdkPackage.clients[0];
     ok(client);
     const method = client.methods[0];
     ok(method);
