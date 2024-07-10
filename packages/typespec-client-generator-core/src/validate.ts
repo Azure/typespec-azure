@@ -1,4 +1,18 @@
-import { Enum, listServices, Model, Program } from "@typespec/compiler";
+import {
+  Enum,
+  EnumMember,
+  Interface,
+  listServices,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+  Program,
+  Scalar,
+  Type,
+  Union,
+  UnionVariant,
+} from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "./decorators.js";
 import { AllScopes, createTCGCContext, TCGCContext } from "./internal-utils.js";
@@ -8,7 +22,7 @@ export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program);
   const languageScopes = getDefinedLanguageScopes(program);
   for (const scope of languageScopes) {
-    validateClientNamesPerScope(program, tcgcContext, scope);
+    validateClientNames(program, tcgcContext, scope);
   }
 }
 
@@ -26,35 +40,92 @@ function getDefinedLanguageScopes(program: Program): Set<string | symbol> {
   return languageScopes;
 }
 
-function validateClientNamesPerScope(
-  program: Program,
-  tcgcContext: TCGCContext,
-  scope: string | symbol
-) {
+function validateClientNames(program: Program, tcgcContext: TCGCContext, scope: string | symbol) {
   const services = listServices(program);
   for (const service of services) {
-    const duplicateTracker = new DuplicateTracker<string, Model | Enum>();
-    for (const model of [...service.type.models.values(), ...service.type.enums.values()]) {
-      const clientName = getClientNameOverride(tcgcContext, model, scope);
-      const name = clientName ?? model.name;
-      duplicateTracker.track(name, model);
+    // Check for duplicate client names for models, enums, and unions
+    validateClientNamesCore(program, tcgcContext, scope, [
+      ...service.type.models.values(),
+      ...service.type.enums.values(),
+      ...service.type.unions.values(),
+    ]);
+
+    // Check for duplicate client names for operations
+    validateClientNamesCore(program, tcgcContext, scope, service.type.operations.values());
+
+    // Check for duplicate client names for interfaces
+    validateClientNamesCore(program, tcgcContext, scope, service.type.interfaces.values());
+
+    // Check for duplicate client names for scalars
+    validateClientNamesCore(program, tcgcContext, scope, service.type.scalars.values());
+
+    // Check for duplicate client names for model properties
+    for (const model of service.type.models.values()) {
+      validateClientNamesCore(program, tcgcContext, scope, model.properties.values());
     }
-    for (const [name, duplicates] of duplicateTracker.entries()) {
-      for (const model of duplicates) {
-        if (scope === AllScopes) {
-          reportDiagnostic(program, {
-            code: "duplicate-name",
-            format: { name, scope: "AllScopes" },
-            target: model,
-          });
-        }
-        if (typeof scope === "string") {
-          reportDiagnostic(program, {
-            code: "duplicate-name",
-            format: { name, scope },
-            target: model,
-          });
-        }
+
+    // Check for duplicate client names for enum members
+    for (const item of service.type.enums.values()) {
+      validateClientNamesCore(program, tcgcContext, scope, item.members.values());
+    }
+
+    // Check for duplicate client names for union variants
+    for (const item of service.type.unions.values()) {
+      validateClientNamesCore(program, tcgcContext, scope, item.variants.values());
+    }
+  }
+}
+
+function validateClientNamesCore(
+  program: Program,
+  tcgcContext: TCGCContext,
+  scope: string | symbol,
+  items: Iterable<
+    | Namespace
+    | Scalar
+    | Operation
+    | Interface
+    | Model
+    | Enum
+    | Union
+    | ModelProperty
+    | EnumMember
+    | UnionVariant
+  >
+) {
+  const duplicateTracker = new DuplicateTracker<string, Type>();
+
+  for (const item of items) {
+    const clientName = getClientNameOverride(tcgcContext, item, scope);
+    const name = clientName ?? item.name;
+    // TODO: handle symbol name
+    if (name !== undefined && typeof name === "string") {
+      duplicateTracker.track(name, item);
+    }
+  }
+
+  reportDuplicateClientNames(program, duplicateTracker, scope);
+}
+
+function reportDuplicateClientNames(
+  program: Program,
+  duplicateTracker: DuplicateTracker<string, Type>,
+  scope: string | symbol
+) {
+  for (const [name, duplicates] of duplicateTracker.entries()) {
+    for (const item of duplicates) {
+      if (scope === AllScopes) {
+        reportDiagnostic(program, {
+          code: "duplicate-name",
+          format: { name, scope: "AllScopes" },
+          target: item,
+        });
+      } else if (typeof scope === "string") {
+        reportDiagnostic(program, {
+          code: "duplicate-name",
+          format: { name, scope },
+          target: item,
+        });
       }
     }
   }

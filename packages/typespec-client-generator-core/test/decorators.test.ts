@@ -2733,19 +2733,105 @@ describe("typespec-client-generator-core: decorators", () => {
       ]);
     });
 
-    it("duplicate enum client name with all language scopes", async () => {
+    it("duplicate model, enum, union client name with all language scopes", async () => {
       const diagnostics = await runner.diagnose(
         `
       @service
       namespace Contoso.WidgetManager;
         
-      @clientName("EnumB")
-      enum EnumA {
+      @clientName("B")
+      enum A {
         one
       }
 
-      enum EnumB {
-        one
+      model B {}
+
+      @clientName("B")
+      union C {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate scalar with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      scalar a extends string;
+
+      scalar b extends string;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      @clientName("B")
+      @route("/a")
+      interface A {
+      }
+
+      @route("/b")
+      interface B {
       }
       `
       );
@@ -2753,11 +2839,89 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, [
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "EnumB" in language scope: "AllScopes"',
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
         },
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "EnumB" in language scope: "AllScopes"',
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model property with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      model A {
+        @clientName("prop2")
+        prop1: string;
+        prop2: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "prop2" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "prop2" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum member with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      enum A {
+        @clientName("two")
+        one,
+        two
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "two" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "two" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate union variant with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace Contoso.WidgetManager;
+
+        union Foo { 
+          @clientName("b")
+          a: {}, 
+          b: {} 
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "b" in language scope: "AllScopes"',
         },
       ]);
     });
