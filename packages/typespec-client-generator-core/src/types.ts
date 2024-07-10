@@ -79,6 +79,7 @@ import {
   getAnyType,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getNonNullOptions,
   getNullOption,
@@ -86,6 +87,7 @@ import {
   getTypeDecorators,
   intOrFloat,
   isAzureCoreModel,
+  isJsonContentType,
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
@@ -353,7 +355,8 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(diagnostics.pipe(getAnyType(context, type)));
   }
 
-  if (nonNullOptions.length === 1) {
+  // if a union is `type | null`, then we will return a nullable wrapper type of the type
+  if (nonNullOptions.length === 1 && nullOption !== undefined) {
     retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
   } else if (
     // judge if the union can be converted to enum
@@ -547,7 +550,6 @@ export function getSdkModelWithDiagnostics(
   operation?: Operation
 ): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  type = getEffectivePayloadType(context, type);
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
 
   if (sdkType) {
@@ -556,6 +558,7 @@ export function getSdkModelWithDiagnostics(
     const docWrapper = getDocHelper(context, type);
     const generatedName = getGeneratedName(context, type);
     const name = getLibraryName(context, type) || generatedName;
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -565,11 +568,10 @@ export function getSdkModelWithDiagnostics(
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
-      usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
+      usage,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
-      isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType);
 
@@ -1309,11 +1311,33 @@ function updateTypesFromOperation(
       getClientTypeWithDiagnostics(context, httpBody.type, operation)
     );
     if (generateConvenient) {
-      // spread body model should be none usage
-      if (sdkType.kind !== "model" || !sdkType.isGeneratedName) {
+      // Special logic for spread body model:
+      // If body is from spread, then it should be an anonymous model.
+      // Also all model properties should be
+      // either equal to one of operation parameters (for case spread from model without property with metadata decorator)
+      // or its source property equal to one of operation parameters (for case spread from model with property with metadata decorator)
+      if (
+        httpBody.type.kind === "Model" &&
+        httpBody.type.name === "" &&
+        [...httpBody.type.properties.keys()].every(
+          (k) =>
+            operation.parameters.properties.has(k) &&
+            (operation.parameters.properties.get(k) ===
+              (httpBody.type as Model).properties.get(k) ||
+              operation.parameters.properties.get(k) ===
+                (httpBody.type as Model).properties.get(k)?.sourceProperty)
+        ) &&
+        !context.spreadModels?.has(httpBody.type)
+      ) {
+        context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
+      } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }
+      if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
+        updateUsageOfModel(context, UsageFlags.Json, sdkType);
+      }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        // will also have Json type
         updateUsageOfModel(context, UsageFlags.JsonMergePatch, sdkType);
       }
     }
@@ -1326,15 +1350,21 @@ function updateTypesFromOperation(
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
-        const sdkType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, innerResponse.body.type, operation)
-        );
+        const body =
+          innerResponse.body.type.kind === "Model"
+            ? getEffectivePayloadType(context, innerResponse.body.type)
+            : innerResponse.body.type;
+        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
         }
+        if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
+          updateUsageOfModel(context, UsageFlags.Json, sdkType);
+        }
       }
-      if (innerResponse.headers) {
-        for (const header of Object.values(innerResponse.headers)) {
+      const headers = getHttpOperationResponseHeaders(innerResponse);
+      if (headers) {
+        for (const header of Object.values(headers)) {
           if (isNeverOrVoidType(header.type)) continue;
           const sdkType = diagnostics.pipe(
             getClientTypeWithDiagnostics(context, header.type, operation)
@@ -1398,6 +1428,18 @@ function updateAccessOfModel(context: TCGCContext): void {
     if (referredByPublic) {
       sdkType.access = "public";
     } else if (referredByInternal && !referredByUndefined) {
+      sdkType.access = "internal";
+    }
+  }
+}
+
+function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
+  for (const sdkType of context.spreadModels?.values() ?? []) {
+    updateUsageOfModel(context, UsageFlags.Spread, sdkType);
+  }
+  for (const sdkType of context.modelsMap?.values() ?? []) {
+    // if a type only has spread usage, then it could be internal
+    if ((sdkType.usage & UsageFlags.Spread) > 0) {
       sdkType.access = "internal";
     }
   }
@@ -1484,6 +1526,9 @@ export function getAllModelsWithDiagnostics(
   if (context.operationModelsMap === undefined) {
     context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
   }
+  if (context.spreadModels === undefined) {
+    context.spreadModels = new Map<Model, SdkModelType>();
+  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
@@ -1542,6 +1587,8 @@ export function getAllModelsWithDiagnostics(
   }
   // update access
   updateAccessOfModel(context);
+  // update spread model
+  updateSpreadModelUsageAndAccess(context);
   // filter out models
   filterOutModels(context);
   let filter = 0;

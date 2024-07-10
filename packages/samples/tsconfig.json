@@ -6,5 +6,5 @@
     "rootDir": ".",
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
   },
-  "include": ["rest-metadata-emitter/**/*.ts", "test/**/*.ts"]
+  "include": ["**/*.ts"]
 }

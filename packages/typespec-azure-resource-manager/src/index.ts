@@ -8,9 +8,11 @@ export {
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
   isArmCommonType,
-  type ArmCommonTypeVersions,
   type ArmCommonTypesResolutionOptions,
+  type ArmCommonTypeVersions,
 } from "./common-types.js";
+
+export { isAzureResource } from "./private.decorators.js";
 
 export * from "./namespace.js";
 export * from "./operations.js";

@@ -22,6 +22,7 @@ export const ArmStateKeys = {
   armBuiltInResource: azureResourceManagerCreateStateSymbol("armExternalResource"),
 
   // private.decorator.ts
+  azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),
   armConditionalClientFlatten: azureResourceManagerCreateStateSymbol("armConditionalClientFlatten"),
 
   // commontypes.private.decorators.ts
