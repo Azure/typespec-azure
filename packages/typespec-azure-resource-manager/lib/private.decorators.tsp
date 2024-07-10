@@ -71,3 +71,16 @@ extern dec enforceConstraint(target: Operation | Model, sourceType: Model, const
  * Provides default doc for ArmResourceListByParent operation for back compat.
  */
 extern dec defaultListByOperationDoc(target: Operation, resource: Model);
+
+/**
+ * Marks the operation as being a collection action
+ * @param resourceType Resource
+ * @param parentTypeName: Parent type name.
+ * @param parentFriendlyTypeName Friendly name for parent.
+ */
+extern dec armRenameListByOperation(
+  target: Operation,
+  resourceType: Model,
+  parentTypeName?: valueof string,
+  parentFriendlyTypeName?: valueof string
+);

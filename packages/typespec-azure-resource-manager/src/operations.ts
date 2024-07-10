@@ -194,23 +194,6 @@ export function $armResourceList(
   operations.lists[target.name] = operation as ArmResourceOperation;
 }
 
-export function $armRenameListByOperation(
-  context: DecoratorContext,
-  entity: Operation,
-  resourceType: Model,
-  parentTypeName?: string,
-  parentFriendlyTypeName?: string
-) {
-  armRenameListByOperationInternal(
-    context,
-    entity,
-    resourceType,
-    true,
-    parentTypeName,
-    parentFriendlyTypeName
-  );
-}
-
 export function armRenameListByOperationInternal(
   context: DecoratorContext,
   entity: Operation,

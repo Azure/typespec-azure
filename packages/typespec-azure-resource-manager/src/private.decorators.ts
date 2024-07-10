@@ -359,3 +359,20 @@ export function $defaultListByOperationDoc(
 ) {
   armRenameListByOperationInternal(context, entity, resource, false);
 }
+
+export function $armRenameListByOperation(
+  context: DecoratorContext,
+  entity: Operation,
+  resourceType: Model,
+  parentTypeName?: string,
+  parentFriendlyTypeName?: string
+) {
+  armRenameListByOperationInternal(
+    context,
+    entity,
+    resourceType,
+    true,
+    parentTypeName,
+    parentFriendlyTypeName
+  );
+}
