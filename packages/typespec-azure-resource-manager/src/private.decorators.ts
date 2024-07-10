@@ -352,27 +352,20 @@ function hasProperty(program: Program, model: Model): boolean {
   return false;
 }
 
-export function $defaultListByOperationDoc(
-  context: DecoratorContext,
-  entity: Operation,
-  resource: Model
-) {
-  armRenameListByOperationInternal(context, entity, resource, false);
-}
-
 export function $armRenameListByOperation(
   context: DecoratorContext,
   entity: Operation,
   resourceType: Model,
   parentTypeName?: string,
-  parentFriendlyTypeName?: string
+  parentFriendlyTypeName?: string,
+  applyOperationRename?: boolean
 ) {
   armRenameListByOperationInternal(
     context,
     entity,
     resourceType,
-    true,
     parentTypeName,
-    parentFriendlyTypeName
+    parentFriendlyTypeName,
+    applyOperationRename
   );
 }

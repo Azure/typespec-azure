@@ -68,19 +68,16 @@ extern dec defaultResourceKeySegmentName(
 extern dec enforceConstraint(target: Operation | Model, sourceType: Model, constraintType: Model);
 
 /**
- * Provides default doc for ArmResourceListByParent operation for back compat.
- */
-extern dec defaultListByOperationDoc(target: Operation, resource: Model);
-
-/**
  * Marks the operation as being a collection action
  * @param resourceType Resource
  * @param parentTypeName: Parent type name.
  * @param parentFriendlyTypeName Friendly name for parent.
+ * @param applyOperationRename If true, apply both doc and operation name update
  */
 extern dec armRenameListByOperation(
   target: Operation,
   resourceType: Model,
   parentTypeName?: valueof string,
-  parentFriendlyTypeName?: valueof string
+  parentFriendlyTypeName?: valueof string,
+  applyOperationRename?: valueof boolean
 );

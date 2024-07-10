@@ -41,9 +41,9 @@ op ArmListBySubscription<
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)
+@Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@Private.defaultListByOperationDoc(Resource)
 op ArmResourceListByParent<
   Resource extends Foundations.Resource,
   BaseParameters = DefaultBaseParameters<Resource>,

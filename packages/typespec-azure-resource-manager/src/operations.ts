@@ -198,9 +198,9 @@ export function armRenameListByOperationInternal(
   context: DecoratorContext,
   entity: Operation,
   resourceType: Model,
-  updateOperationName: boolean = true,
   parentTypeName?: string,
-  parentFriendlyTypeName?: string
+  parentFriendlyTypeName?: string,
+  applyOperationRename?: boolean
 ) {
   const { program } = context;
   if (
@@ -245,7 +245,7 @@ export function armRenameListByOperationInternal(
     undefined as any
   );
 
-  if (updateOperationName) {
+  if (applyOperationRename === undefined || applyOperationRename === true) {
     // Set the operation name
     entity.name =
       parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1
