@@ -533,22 +533,30 @@ export function getHttpOperationResponseHeaders(
   return headers;
 }
 
+export function removeVersionsPreviousToExplicitlySpecified(
+  context: TCGCContext,
+  versions: { value: string | number }[]
+): void {
+  // filter with specific api version
+  if (
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    const index = versions.findIndex((version) => version.value === context.apiVersion);
+    if (index >= 0) {
+      versions = versions.slice(0, index + 1);
+    }
+  }
+}
+
 export function filterApiVersionsInEnum(
   context: TCGCContext,
   client: SdkClient,
   sdkVersionsEnum: SdkEnumType
 ): void {
   // if they explicitly set an api version, remove previous versions
-  if (
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    const index = sdkVersionsEnum.values.findIndex((v) => v.value === context.apiVersion);
-    if (index >= 0) {
-      sdkVersionsEnum.values = sdkVersionsEnum.values.slice(0, index + 1);
-    }
-  }
+  removeVersionsPreviousToExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
