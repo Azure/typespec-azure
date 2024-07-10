@@ -448,16 +448,7 @@ export class DemoServiceClient {
 <TabItem value="java" label="Java" >
 
 ```java
-// Model class
-@Immutable
-public final class User implements JsonSerializable<User> {
-    public User(String firstName, String lastName);
-    public String getFirstName();
-    public String getLastName();
-}
-
-// Client API
-public void upload(User user);
+public void upload(String firstName, String lastName);
 ```
 
 </TabItem>
@@ -844,7 +835,7 @@ def scheduleRepairs(self, problem: str, contact: str, *, content_type: str = "ap
 <TabItem value="java" label="Java" >
 
 ```java
-
+public RepairResult scheduleRepairs(String widgetName, String problem, String contact);
 ```
 
 </TabItem>
@@ -931,7 +922,22 @@ def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str 
 <TabItem value="java" label="Java" >
 
 ```java
+// Model class
+@Immutable
+public final class RepairInfo implements JsonSerializable<RepairInfo> {
+    public RepairInfo(String problem, String contact);
+    public String getProblem();
+    public String getContact();
+}
 
+@Immutable
+public final class RepairResult implements JsonSerializable<RepairResult> {
+    public String getReason();
+    public String getInfo();
+}
+
+// Client API
+public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 ```
 
 </TabItem>
