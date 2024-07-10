@@ -59,6 +59,9 @@ function validateClientNames(program: Program, tcgcContext: TCGCContext, scope: 
     // Check for duplicate client names for scalars
     validateClientNamesCore(program, tcgcContext, scope, service.type.scalars.values());
 
+    // Check for duplicate client names for namespaces
+    validateClientNamesCore(program, tcgcContext, scope, service.type.namespaces.values());
+
     // Check for duplicate client names for model properties
     for (const model of service.type.models.values()) {
       validateClientNamesCore(program, tcgcContext, scope, model.properties.values());

@@ -2926,6 +2926,30 @@ describe("typespec-client-generator-core: decorators", () => {
       ]);
     });
 
+    it("duplicate namespace with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {}
+          @clientName("B")
+          namespace C {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
+          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
     it("duplicate model client name with multiple language scopes", async () => {
       const diagnostics = await runner.diagnose(
         `
