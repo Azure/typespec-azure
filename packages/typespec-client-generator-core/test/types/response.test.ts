@@ -39,7 +39,7 @@ describe("typespec-client-generator-core: responses", () => {
         }
       }
     `);
-    const client = runner.context.experimental_sdkPackage.clients[0];
+    const client = runner.context.sdkPackage.clients[0];
     ok(client);
     const method = client.methods[0];
     ok(method);
