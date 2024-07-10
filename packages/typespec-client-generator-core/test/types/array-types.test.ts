@@ -22,12 +22,12 @@ describe("typespec-client-generator-core: array types", () => {
         op get(): TestArray;
       }
     `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     strictEqual(model.kind, "model");
     strictEqual(model.name, "TestModel");
-    const client = runner.context.experimental_sdkPackage.clients[0];
+    const client = runner.context.sdkPackage.clients[0];
     ok(client);
     const method = client.methods[0];
     ok(method);
@@ -56,7 +56,7 @@ describe("typespec-client-generator-core: array types", () => {
         op get(): ModelWithEmbeddingVector;
       }
     `);
-    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     const property = model.properties[0];
@@ -85,7 +85,7 @@ describe("typespec-client-generator-core: array types", () => {
         op get(): ModelWithEmbeddingVector;
       }
     `);
-    const models = runnerWithCore.context.experimental_sdkPackage.models;
+    const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     const property = model.properties[0];

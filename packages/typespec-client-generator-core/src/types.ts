@@ -87,6 +87,7 @@ import {
   getTypeDecorators,
   intOrFloat,
   isAzureCoreModel,
+  isJsonContentType,
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
@@ -354,7 +355,8 @@ export function getSdkUnionWithDiagnostics(
     return diagnostics.wrap(diagnostics.pipe(getAnyType(context, type)));
   }
 
-  if (nonNullOptions.length === 1) {
+  // if a union is `type | null`, then we will return a nullable wrapper type of the type
+  if (nonNullOptions.length === 1 && nullOption !== undefined) {
     retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
   } else if (
     // judge if the union can be converted to enum
@@ -556,6 +558,7 @@ export function getSdkModelWithDiagnostics(
     const docWrapper = getDocHelper(context, type);
     const generatedName = getGeneratedName(context, type);
     const name = getLibraryName(context, type) || generatedName;
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -565,11 +568,10 @@ export function getSdkModelWithDiagnostics(
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
-      usage: UsageFlags.None, // dummy value since we need to update models map before we can set this
+      usage,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
-      isError: isErrorModel(context.program, type),
     };
     updateModelsMap(context, type, sdkType);
 
@@ -1331,7 +1333,11 @@ function updateTypesFromOperation(
       } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }
+      if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
+        updateUsageOfModel(context, UsageFlags.Json, sdkType);
+      }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
+        // will also have Json type
         updateUsageOfModel(context, UsageFlags.JsonMergePatch, sdkType);
       }
     }
@@ -1351,6 +1357,9 @@ function updateTypesFromOperation(
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
           updateUsageOfModel(context, UsageFlags.Output, sdkType);
+        }
+        if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
+          updateUsageOfModel(context, UsageFlags.Json, sdkType);
         }
       }
       const headers = getHttpOperationResponseHeaders(innerResponse);
@@ -1430,7 +1439,7 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
   for (const sdkType of context.modelsMap?.values() ?? []) {
     // if a type only has spread usage, then it could be internal
-    if (sdkType.usage === UsageFlags.Spread) {
+    if ((sdkType.usage & UsageFlags.Spread) > 0) {
       sdkType.access = "internal";
     }
   }
