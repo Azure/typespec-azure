@@ -138,7 +138,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.type.templateArguments.length, 1);
       const templateArg = endpointParam.type.templateArguments[0];
       strictEqual(templateArg.kind, "path");
-      strictEqual(templateArg.name, "endpoint");
+      strictEqual(templateArg.name, "baseUrl");
+      strictEqual(templateArg.serializedName, "baseUrl");
       strictEqual(templateArg.urlEncode, false);
       strictEqual(templateArg.type.kind, "string");
       strictEqual(templateArg.optional, false);

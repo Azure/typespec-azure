@@ -511,13 +511,13 @@ function getSdkEndpointParameter(
     if (templateArguments.length === 0) {
       templateArguments.push({
         kind: "path",
-        name: "endpoint",
+        name: "baseUrl",
         isGeneratedName: true,
         description: "Service host",
         onClient: true,
         urlEncode: false,
         optional: false,
-        serializedName: "endpoint",
+        serializedName: "baseUrl",
         correspondingMethodParams: [],
         type: {
           kind: "string",
@@ -527,7 +527,7 @@ function getSdkEndpointParameter(
         clientDefaultValue: servers[0].url,
         isApiVersionParam: false,
         apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.baseUrl`,
         decorators: [],
       });
     }
