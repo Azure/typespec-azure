@@ -13,6 +13,7 @@ import {
   Node,
   Operation,
   Program,
+  RekeyableMap,
   SyntaxKind,
   Type,
   Union,
@@ -990,4 +991,69 @@ export function $clientName(
 
 export function getClientNameOverride(context: TCGCContext, entity: Type): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity);
+}
+
+const overrideClientMethodKey = createStateSymbol("overrideClientMethod");
+
+// Recursive function to collect parameter names
+function collectParamNames(properties: RekeyableMap<string, ModelProperty>): string[] {
+  let paramNames: string[] = [];
+
+  properties.forEach((value, key) => {
+    // If the property is of type 'model', recurse into its properties
+    if (value.type.kind === "Model") {
+      paramNames = paramNames.concat(collectParamNames(value.type.properties));
+    } else {
+      paramNames.push(key);
+    }
+  });
+
+  return paramNames;
+}
+
+export function $overrideClientMethod(
+  context: DecoratorContext,
+  original: Operation,
+  override: Operation,
+  scope?: LanguageScopes
+) {
+  // Extract and sort parameter names
+  const originalParamNames = collectParamNames(original.parameters.properties).sort();
+  const overrideParamNames = collectParamNames(override.parameters.properties).sort();
+
+  // Check if the sorted parameter names arrays are equal
+  const parametersMatch =
+    originalParamNames.length === overrideParamNames.length &&
+    originalParamNames.every((value, index) => value === overrideParamNames[index]);
+
+  if (!parametersMatch) {
+    reportDiagnostic(context.program, {
+      code: "override-method-parameters-mismatch",
+      target: context.decoratorTarget,
+      format: { methodName: original.name },
+    });
+  }
+  setScopedDecoratorData(
+    context,
+    $overrideClientMethod,
+    overrideClientMethodKey,
+    original,
+    override,
+    scope
+  ); // eslint-disable-line deprecation/deprecation
+}
+
+/**
+ * Gets additional information on how to serialize / deserialize TYPESPEC standard types depending
+ * on whether additional serialization information is provided or needed
+ *
+ * @param context the Sdk Context
+ * @param entity the entity whose client format we are going to get
+ * @returns the format in which to serialize the typespec type or undefined
+ */
+export function getOverriddenClientMethod(
+  context: TCGCContext,
+  entity: Operation
+): Operation | undefined {
+  return getScopedDecoratorData(context, overrideClientMethodKey, entity);
 }

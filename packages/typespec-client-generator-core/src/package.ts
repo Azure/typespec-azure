@@ -13,6 +13,7 @@ import { resolveVersions } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import {
   getAccess,
+  getOverriddenClientMethod,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -249,7 +250,10 @@ function getSdkBasicServiceMethod<
     getLocationOfOperation(operation)
   );
 
-  for (const param of operation.parameters.properties.values()) {
+  const overrideClientMethod = getOverriddenClientMethod(context, operation);
+  const params = (overrideClientMethod ?? operation).parameters.properties.values();
+
+  for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
     methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
   }

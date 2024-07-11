@@ -159,6 +159,12 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
+    "override-method-parameters-mismatch": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Method "${"methodName"}" has different parameters than the method it overrides. The parameters must be the same.`,
+      },
+    },
   },
 });
 
