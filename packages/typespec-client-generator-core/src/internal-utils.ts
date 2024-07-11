@@ -545,7 +545,7 @@ export function removeVersionsPreviousToExplicitlySpecified(
   ) {
     const index = versions.findIndex((version) => version.value === context.apiVersion);
     if (index >= 0) {
-      versions = versions.slice(0, index + 1);
+      versions.splice(index + 1, versions.length - index - 1);
     }
   }
 }
