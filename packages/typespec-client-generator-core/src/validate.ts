@@ -41,6 +41,12 @@ function getDefinedLanguageScopes(program: Program): Set<string | symbol> {
 
 function validateClientNames(program: Program, tcgcContext: TCGCContext, scope: string | symbol) {
   const services = listServices(program);
+
+  // handle cases where there are no services
+  if (services.length === 0) {
+    services.push({ type: program.getGlobalNamespaceType() });
+  }
+
   for (const service of services) {
     validateClientNamesPerNamespace(program, tcgcContext, scope, service.type);
   }
@@ -114,7 +120,7 @@ function validateClientNamesCore(
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
-      var clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
+      const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
       if (clientNameDecorator?.definition !== undefined) {
         duplicateTracker.track(clientName, clientNameDecorator.definition);
       }

@@ -3000,6 +3000,29 @@ describe("typespec-client-generator-core: decorators", () => {
         },
       ]);
     });
+    
+    it("duplicate model with model only generation for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        model Foo {}
+
+        @clientName("Foo")
+        model Bar {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Foo" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Foo" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
 
     it("duplicate model client name with multiple language scopes", async () => {
       const diagnostics = await runner.diagnose(
