@@ -46,7 +46,7 @@ model ResourceNameParameter<
 @includeInapplicableMetadataInPayload(false)
 model TrackedResource<Properties extends {}> extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
   properties?: Properties;
 }
 
@@ -61,7 +61,7 @@ model TrackedResource<Properties extends {}> extends Foundations.TrackedResource
 @includeInapplicableMetadataInPayload(false)
 model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
   properties?: Properties;
 }
 
@@ -77,7 +77,7 @@ model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
 @includeInapplicableMetadataInPayload(false)
 model ExtensionResource<Properties extends {}> extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
   properties?: Properties;
 }
 //#region
