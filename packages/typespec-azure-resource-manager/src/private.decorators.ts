@@ -17,6 +17,7 @@ import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
+import { armRenameListByOperationInternal } from "./operations.js";
 import {
   ArmResourceDetails,
   ResourceBaseType,
@@ -373,4 +374,22 @@ export function $conditionalClientFlatten(context: DecoratorContext, entity: Mod
 export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
   const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
   return flatten ?? false;
+}
+
+export function $armRenameListByOperation(
+  context: DecoratorContext,
+  entity: Operation,
+  resourceType: Model,
+  parentTypeName?: string,
+  parentFriendlyTypeName?: string,
+  applyOperationRename?: boolean
+) {
+  armRenameListByOperationInternal(
+    context,
+    entity,
+    resourceType,
+    parentTypeName,
+    parentFriendlyTypeName,
+    applyOperationRename
+  );
 }
