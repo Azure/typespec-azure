@@ -4,6 +4,9 @@ using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
+@@Azure.ResourceManager.Private.conditionalClientFlatten(PrivateLinkResource.properties);
+@@Azure.ResourceManager.Private.conditionalClientFlatten(PrivateEndpointConnection.properties);
+
 /** The private endpoint */
 @@armCommonDefinition(PrivateEndpoint,
   "PrivateEndpoint",

@@ -41,6 +41,7 @@ import {
   TCGCContext,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getTypeDecorators,
   isAcceptHeader,
@@ -384,7 +385,7 @@ function getSdkHttpResponseAndExceptions(
     let contentTypes: string[] = [];
 
     for (const innerResponse of response.responses) {
-      for (const header of Object.values(innerResponse.headers || [])) {
+      for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
         const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
         const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -437,6 +438,7 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
         httpOperation.operation
       ),
+      description: response.description,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.set(response.statusCodes, sdkResponse);

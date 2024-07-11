@@ -395,7 +395,7 @@
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents": {
       "get": {
-        "operationId": "Dependents_ListByEmployee",
+        "operationId": "Dependents_List",
         "tags": [
           "Dependents"
         ],

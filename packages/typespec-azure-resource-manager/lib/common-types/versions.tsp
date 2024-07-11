@@ -1,3 +1,5 @@
+import "./commontypes.private.decorators.tsp";
+
 using TypeSpec.Versioning;
 
 @versioned(Versions)
