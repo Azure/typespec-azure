@@ -3688,4 +3688,37 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(clients[0].type);
     });
   });
+
+  describe("@overrideClientMethod", () => {
+    it("basic", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op original(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+        op customization(@bodyRoot params: MyService.Params): void;
+
+        @@overrideClientMethod(MyService.original, MyCustomizations.customization);
+        `
+      )
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.name, "original");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find(x => x.name === "contentType");
+      ok(contentTypeParam);
+      const paramsParam = method.parameters.find(x => x.name === "params");
+      ok(paramsParam);
+    });
+  })
 });
