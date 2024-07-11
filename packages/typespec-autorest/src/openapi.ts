@@ -202,12 +202,12 @@ export interface AutorestDocumentEmitterOptions {
    * readOnly property ARM resource flattening
    */
   readonly armResourceFlattening?: boolean;
-  
+
   /**
    * Determines whether and how to emit schema for arm common-types
    * @default "for-visibility-only"
    */
-  readonly emitCommonTypesSchema?: "reference-only" | "for-visibility-changes";
+  readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
 }
 
 /**
@@ -904,7 +904,7 @@ export async function getOpenAPIForService(
     const ref = resolveExternalRef(type);
     if (ref) {
       if (
-        options.emitCommonTypesSchema === "reference-only" ||
+        options.emitCommonTypesSchema === "never" ||
         !metadataInfo.isTransformed(type, schemaContext.visibility)
       ) {
         return ref;

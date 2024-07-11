@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Fix ArmResourcePatch templates and incorporate common-types updates Fix #859
+Fix ArmResourcePatch templates and incorporate common-types updates

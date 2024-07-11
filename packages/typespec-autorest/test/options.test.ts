@@ -432,9 +432,9 @@ op test(): void;
       }
       `;
 
-    it("emits only schema references with 'reference-only' setting", async () => {
+    it("emits only schema references with 'never' setting", async () => {
       const output = await openapiWithOptions(commonCode, {
-        "emit-common-types-schema": "reference-only",
+        "emit-common-types-schema": "never",
       });
       ok(output.definitions);
       ok(output.definitions["WidgetUpdate"]);

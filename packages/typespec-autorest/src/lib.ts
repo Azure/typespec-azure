@@ -100,7 +100,7 @@ export interface AutorestEmitterOptions {
    * Determines whether and how to emit schemas for common-types
    * @default "for-visibility-changes"
    */
-  "emit-common-types-schema"?: "reference-only" | "for-visibility-changes";
+  "emit-common-types-schema"?: "never" | "for-visibility-changes";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -213,7 +213,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
     },
     "emit-common-types-schema": {
       type: "string",
-      enum: ["reference-only", "for-visibility-changes"],
+      enum: ["never", "for-visibility-changes"],
       nullable: true,
       default: "for-visibility-changes",
       description:
