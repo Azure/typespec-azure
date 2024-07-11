@@ -38,7 +38,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
-import { createDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -47,6 +47,8 @@ import {
 } from "./public-utils.js";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
+export const clientNameKey = createStateSymbol("clientName");
 
 /**
  *

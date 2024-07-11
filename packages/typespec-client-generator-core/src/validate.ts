@@ -15,8 +15,8 @@ import {
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "./decorators.js";
-import { AllScopes, createTCGCContext, TCGCContext } from "./internal-utils.js";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { AllScopes, clientNameKey, createTCGCContext, TCGCContext } from "./internal-utils.js";
+import { reportDiagnostic } from "./lib.js";
 
 export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program);
@@ -28,8 +28,7 @@ export function $onValidate(program: Program) {
 
 function getDefinedLanguageScopes(program: Program): Set<string | symbol> {
   const languageScopes = new Set<string | symbol>();
-  const stateMap = program.stateMap(createStateSymbol("clientName"));
-  for (const value of stateMap.values()) {
+  for (const value of program.stateMap(clientNameKey).values()) {
     if (value[AllScopes]) {
       languageScopes.add(AllScopes);
     }
@@ -114,9 +113,15 @@ function validateClientNamesCore(
 
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
-    const name = clientName ?? item.name;
-    if (name !== undefined && typeof name === "string") {
-      duplicateTracker.track(name, item);
+    if (clientName !== undefined) {
+      var clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
+      if (clientNameDecorator?.definition !== undefined) {
+        duplicateTracker.track(clientName, clientNameDecorator.definition);
+      }
+    } else {
+      if (item.name !== undefined && typeof item.name === "string") {
+        duplicateTracker.track(item.name, item);
+      }
     }
   }
 
@@ -131,17 +136,35 @@ function reportDuplicateClientNames(
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {
       if (scope === AllScopes) {
-        reportDiagnostic(program, {
-          code: "duplicate-name",
-          format: { name, scope: "AllScopes" },
-          target: item,
-        });
+        if (item.kind === "Decorator") {
+          reportDiagnostic(program, {
+            code: "duplicate-client-name",
+            format: { name, scope: "AllScopes" },
+            target: item,
+          });
+        } else {
+          reportDiagnostic(program, {
+            code: "duplicate-client-name",
+            messageId: "nonDecorator",
+            format: { name, scope: "AllScopes" },
+            target: item,
+          });
+        }
       } else if (typeof scope === "string") {
-        reportDiagnostic(program, {
-          code: "duplicate-name",
-          format: { name, scope },
-          target: item,
-        });
+        if (item.kind === "Decorator") {
+          reportDiagnostic(program, {
+            code: "duplicate-client-name",
+            format: { name, scope },
+            target: item,
+          });
+        } else {
+          reportDiagnostic(program, {
+            code: "duplicate-client-name",
+            messageId: "nonDecorator",
+            format: { name, scope },
+            target: item,
+          });
+        }
       }
     }
   }

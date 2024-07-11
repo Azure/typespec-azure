@@ -41,7 +41,7 @@ import {
   SdkServiceOperation,
   UsageFlags,
 } from "./interfaces.js";
-import { AllScopes, TCGCContext, parseEmitterName } from "./internal-utils.js";
+import { AllScopes, TCGCContext, clientNameKey, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -959,8 +959,6 @@ export function $flattenProperty(
 export function shouldFlattenProperty(context: TCGCContext, target: ModelProperty): boolean {
   return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
 }
-
-const clientNameKey = createStateSymbol("clientName");
 
 export function $clientName(
   context: DecoratorContext,

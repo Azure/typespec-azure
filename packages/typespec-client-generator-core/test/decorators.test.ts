@@ -2732,12 +2732,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "Test" in language scope: "random"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "random"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "Test" in language scope: "random"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "random"',
         },
       ]);
     });
@@ -2762,16 +2763,17 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2793,12 +2795,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2818,12 +2821,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2847,12 +2851,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2873,12 +2878,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "prop2" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "prop2" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "prop2" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "prop2" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2899,12 +2905,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "two" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "two" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "two" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "two" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2925,12 +2932,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "b" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2949,12 +2957,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
         },
       ]);
     });
@@ -2981,12 +2990,13 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "B" in language scope: "AllScopes"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
         },
       ]);
     });
@@ -3014,20 +3024,22 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, [
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "Test" in language scope: "python"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "python"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "Test" in language scope: "python"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "Test" in language scope: "csharp"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "csharp"',
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-name",
-          message: 'Duplicate name: "Test" in language scope: "csharp"',
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "csharp"',
         },
       ]);
     });
