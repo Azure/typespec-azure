@@ -135,7 +135,15 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.type.kind, "endpoint");
       strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
       strictEqual(endpointParam.urlEncode, false);
-      strictEqual(endpointParam.type.templateArguments.length, 0);
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.name, "endpoint");
+      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.type.kind, "string");
+      strictEqual(templateArg.optional, false);
+      strictEqual(templateArg.onClient, true);
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
     });
 
     it("initialization default endpoint with apikey auth", async () => {
@@ -156,7 +164,11 @@ describe("typespec-client-generator-core: package", () => {
       )[0];
       strictEqual(endpointParam.type.kind, "endpoint");
       strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
-      strictEqual(endpointParam.type.templateArguments.length, 0);
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.type.kind, "string");
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -195,7 +207,13 @@ describe("typespec-client-generator-core: package", () => {
       )[0];
       strictEqual(endpointParam.type.kind, "endpoint");
       strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
-      strictEqual(endpointParam.type.templateArguments.length, 0);
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.type.kind, "string");
+      strictEqual(templateArg.optional, false);
+      strictEqual(templateArg.onClient, true);
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"

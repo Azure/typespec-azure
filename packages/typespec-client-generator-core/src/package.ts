@@ -508,7 +508,33 @@ function getSdkEndpointParameter(
         );
       }
     }
-    optional = Boolean(servers[0].url.length && templateArguments.every((param) => param.optional));
+    if (templateArguments.length === 0) {
+      templateArguments.push({
+        kind: "path",
+        name: "endpoint",
+        isGeneratedName: true,
+        description: "Service host",
+        onClient: true,
+        urlEncode: false,
+        optional: false,
+        serializedName: "endpoint",
+        correspondingMethodParams: [],
+        type: {
+          kind: "string",
+          encode: "string",
+          decorators: [],
+        },
+        clientDefaultValue: servers[0].url,
+        isApiVersionParam: false,
+        apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+        decorators: [],
+      });
+    }
+    optional = Boolean(
+      servers[0].url.length &&
+        templateArguments.every((param) => param.clientDefaultValue !== undefined)
+    );
   }
   return diagnostics.wrap({
     kind: "endpoint",
