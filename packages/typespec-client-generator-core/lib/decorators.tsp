@@ -433,7 +433,7 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  *
  * model Params {
  *  foo: string;
- *  bar: string;  
+ *  bar: string;
  * }
  * op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
  *

@@ -3711,17 +3711,17 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@overrideClientMethod(MyService.original, MyCustomizations.customization);
         `
-      )
+      );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
       strictEqual(client.methods.length, 1);
       const method = client.methods[0];
       strictEqual(method.name, "original");
       strictEqual(method.parameters.length, 2);
-      const contentTypeParam = method.parameters.find(x => x.name === "contentType");
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(contentTypeParam);
-      const paramsParam = method.parameters.find(x => x.name === "params");
+      const paramsParam = method.parameters.find((x) => x.name === "params");
       ok(paramsParam);
     });
-  })
+  });
 });
