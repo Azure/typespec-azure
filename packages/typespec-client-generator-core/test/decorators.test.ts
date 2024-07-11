@@ -3704,7 +3704,10 @@ describe("typespec-client-generator-core: decorators", () => {
         `,
         `
         namespace MyCustomizations;
-        op customization(@bodyRoot params: MyService.Params): void;
+        model NewModel {
+          params: MyService.Params;
+        }
+        op customization(...NewModel): void;
 
         @@overrideClientMethod(MyService.original, MyCustomizations.customization);
         `
