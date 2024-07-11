@@ -543,3 +543,8 @@ export function getHttpOperationResponseHeaders(
   }
   return headers;
 }
+
+export function isJsonContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
+  return regex.test(contentType);
+}
