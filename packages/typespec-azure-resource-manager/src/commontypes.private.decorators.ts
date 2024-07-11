@@ -5,6 +5,7 @@ import {
   Model,
   ModelProperty,
   Program,
+  Union,
 } from "@typespec/compiler";
 import { ArmStateKeys } from "./state.js";
 
@@ -18,7 +19,7 @@ function getArmTypesPath(program: Program): string {
 
 function storeCommonTypeRecord(
   context: DecoratorContext,
-  entity: Model | ModelProperty,
+  entity: Model | ModelProperty | Enum | Union,
   kind: "definitions" | "parameters",
   name: string,
   version?: string | EnumValue | ArmCommonTypeVersionSpec,
@@ -69,7 +70,7 @@ export interface ArmCommonTypeRecords {
 
 export function getCommonTypeRecords(
   program: Program,
-  entity: Model | ModelProperty
+  entity: Model | ModelProperty | Enum | Union
 ): ArmCommonTypeRecords {
   return program.stateMap(ArmStateKeys.armCommonDefinitions).get(entity) ?? { records: {} };
 }
@@ -114,14 +115,14 @@ export function $armCommonParameter(
  */
 export function $armCommonDefinition(
   context: DecoratorContext,
-  entity: Model,
+  entity: Model | Enum | Union,
   definitionName?: string,
   version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ): void {
   // Use the name of the model type if not specified
   if (!definitionName) {
-    definitionName = entity.name;
+    definitionName = entity.name!;
   }
 
   storeCommonTypeRecord(context, entity, "definitions", definitionName, version, referenceFile);
