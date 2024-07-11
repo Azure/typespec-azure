@@ -15,6 +15,21 @@ Azure services should always use the versioning library even if they have a sing
 namespace Azure.MyService;
 ```
 
+```tsp
+@service({
+  version: "2021-01-01",
+})
+namespace Azure.MyService;
+```
+
+```tsp
+@service
+@OpenAPI.info({
+  version: "2021-01-01",
+})
+namespace Azure.MyService;
+```
+
 #### ✅ Correct
 
 ```tsp
