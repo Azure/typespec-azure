@@ -14,6 +14,7 @@ import {
   getArmCommonTypeOpenAPIRef,
   isArmCommonType,
   isAzureResource,
+  isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -196,6 +197,11 @@ export interface AutorestDocumentEmitterOptions {
    * @default "final-state-only"
    */
   readonly emitLroOptions?: "none" | "final-state-only" | "all";
+
+  /**
+   * readOnly property ARM resource flattening
+   */
+  readonly armResourceFlattening?: boolean;
 }
 
 /**
@@ -1849,7 +1855,11 @@ export async function getOpenAPIForService(
       propSchema = getSchemaOrRef(prop.type, context);
     }
 
-    return applyIntrinsicDecorators(prop, propSchema);
+    if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
+      return { ...applyIntrinsicDecorators(prop, propSchema), "x-ms-client-flatten": true };
+    } else {
+      return applyIntrinsicDecorators(prop, propSchema);
+    }
   }
 
   function attachExtensions(type: Type, emitObject: any) {
