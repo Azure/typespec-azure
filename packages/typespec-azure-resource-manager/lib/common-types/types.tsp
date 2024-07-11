@@ -7,7 +7,6 @@ using Azure.Core;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** Common fields that are returned in the response for all Azure Resource Manager resources */
-@extension("x-ms-azure-resource", true)
 model Resource {
   /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
   @typeChangedFrom(Versions.v4, string)
@@ -60,7 +59,6 @@ model ExtensionResource extends Resource {}
 /**
  * The resource model definition containing the full set of allowed properties for a resource. Except properties bag, there cannot be a top level property outside of this set.
  */
-@extension("x-ms-azure-resource", true)
 model ResourceModelWithAllowedPropertySet extends TrackedResource {
   /** The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource.
    * If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource. */
