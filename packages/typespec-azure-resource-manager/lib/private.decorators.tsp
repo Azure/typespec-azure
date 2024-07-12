@@ -82,3 +82,18 @@ extern dec azureResourceBase(target: Model);
  * emitter flags to maintain compatibility in swagger.
  */
 extern dec conditionalClientFlatten(target: ModelProperty);
+
+/**
+ * Marks the operation as being a collection action
+ * @param resourceType Resource
+ * @param parentTypeName: Parent type name.
+ * @param parentFriendlyTypeName Friendly name for parent.
+ * @param applyOperationRename If true, apply both doc and operation name update
+ */
+extern dec armRenameListByOperation(
+  target: Operation,
+  resourceType: Model,
+  parentTypeName?: valueof string,
+  parentFriendlyTypeName?: valueof string,
+  applyOperationRename?: valueof boolean
+);
