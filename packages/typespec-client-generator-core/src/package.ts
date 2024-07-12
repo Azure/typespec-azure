@@ -16,6 +16,8 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldGenerateConvenient,
+  shouldGenerateProtocol,
 } from "./decorators.js";
 import { getCorrespondingMethodParams, getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
@@ -282,6 +284,8 @@ function getSdkBasicServiceMethod<
     },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
+    generateConvenient: shouldGenerateConvenient(context, operation),
+    generateProtocol: shouldGenerateProtocol(context, operation),
   });
 }
 

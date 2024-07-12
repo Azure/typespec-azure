@@ -307,3 +307,18 @@ it("emits a scalar string with decorator parameter for resource", async () => {
     type: "string",
   });
 });
+
+it("emits x-ms-azure-resource for resource with @azureResourceBase", async () => {
+  const openApi = await openApiFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    @Azure.ResourceManager.Private.azureResourceBase
+    model Widget {
+       name: string;
+    }
+`);
+  ok(openApi.definitions.Widget["x-ms-azure-resource"]);
+});

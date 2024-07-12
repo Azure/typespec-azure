@@ -463,6 +463,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
+  description?: string;
 }
 
 interface SdkServiceOperationBase {}
@@ -513,6 +514,8 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
+  generateConvenient: boolean;
+  generateProtocol: boolean;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
