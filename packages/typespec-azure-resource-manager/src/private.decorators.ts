@@ -17,6 +17,7 @@ import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
+import { armRenameListByOperationInternal } from "./operations.js";
 import {
   ArmResourceDetails,
   ResourceBaseType,
@@ -358,4 +359,37 @@ export function $azureResourceBase(context: DecoratorContext, resourceType: Mode
 export function isAzureResource(program: Program, resourceType: Model): boolean {
   const isResourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
   return isResourceBase ?? false;
+}
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+export function $conditionalClientFlatten(context: DecoratorContext, entity: ModelProperty) {
+  context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
+}
+
+export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
+  const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
+  return flatten ?? false;
+}
+
+export function $armRenameListByOperation(
+  context: DecoratorContext,
+  entity: Operation,
+  resourceType: Model,
+  parentTypeName?: string,
+  parentFriendlyTypeName?: string,
+  applyOperationRename?: boolean
+) {
+  armRenameListByOperationInternal(
+    context,
+    entity,
+    resourceType,
+    parentTypeName,
+    parentFriendlyTypeName,
+    applyOperationRename
+  );
 }

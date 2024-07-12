@@ -74,3 +74,26 @@ extern dec enforceConstraint(target: Operation | Model, sourceType: Model, const
  * It is *not* meant to be used directly by a spec author,
  */
 extern dec azureResourceBase(target: Model);
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+extern dec conditionalClientFlatten(target: ModelProperty);
+
+/**
+ * Marks the operation as being a collection action
+ * @param resourceType Resource
+ * @param parentTypeName: Parent type name.
+ * @param parentFriendlyTypeName Friendly name for parent.
+ * @param applyOperationRename If true, apply both doc and operation name update
+ */
+extern dec armRenameListByOperation(
+  target: Operation,
+  resourceType: Model,
+  parentTypeName?: valueof string,
+  parentFriendlyTypeName?: valueof string,
+  applyOperationRename?: valueof boolean
+);
