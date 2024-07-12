@@ -1749,6 +1749,7 @@
         },
         "properties": {
           "$ref": "#/definitions/AllPropertiesResourceUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
       }
@@ -2135,6 +2136,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/TestExtensionResourceUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
       }
@@ -2177,6 +2179,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/TestTenantResourceUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
       }
