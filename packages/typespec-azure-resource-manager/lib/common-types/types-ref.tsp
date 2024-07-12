@@ -7,6 +7,9 @@ using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
+@@azureResourceBase(Resource);
+@@azureResourceBase(ResourceModelWithAllowedPropertySet);
+
 /** Common resource fields that are returned in the response for all Azure Resource Manager resources. */
 @@armCommonDefinition(Resource, "Resource", Azure.ResourceManager.CommonTypes.Versions.v3);
 @@armCommonDefinition(Resource, "Resource", Azure.ResourceManager.CommonTypes.Versions.v4);
@@ -279,6 +282,10 @@ namespace Azure.ResourceManager.CommonTypes;
   "ErrorResponse",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
+
+@@armCommonDefinition(SkuTier, "SkuTier", Azure.ResourceManager.CommonTypes.Versions.v3);
+@@armCommonDefinition(SkuTier, "SkuTier", Azure.ResourceManager.CommonTypes.Versions.v4);
+@@armCommonDefinition(SkuTier, "SkuTier", Azure.ResourceManager.CommonTypes.Versions.v5);
 
 // -- Parameters
 /** ApiVersionParameter */
