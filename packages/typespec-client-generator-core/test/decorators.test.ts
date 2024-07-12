@@ -3000,7 +3000,7 @@ describe("typespec-client-generator-core: decorators", () => {
         },
       ]);
     });
-    
+
     it("duplicate model with model only generation for all language scopes", async () => {
       const diagnostics = await runner.diagnose(
         `

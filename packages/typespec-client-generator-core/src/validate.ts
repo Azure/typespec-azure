@@ -2,13 +2,13 @@ import {
   Enum,
   EnumMember,
   Interface,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
   Operation,
   Program,
   Scalar,
+  Service,
   Type,
   Union,
   UnionVariant,
@@ -40,12 +40,8 @@ function getDefinedLanguageScopes(program: Program): Set<string | symbol> {
 }
 
 function validateClientNames(program: Program, tcgcContext: TCGCContext, scope: string | symbol) {
-  const services = listServices(program);
-
-  // handle cases where there are no services
-  if (services.length === 0) {
-    services.push({ type: program.getGlobalNamespaceType() });
-  }
+  const services: Service[] = [];
+  services.push({ type: program.getGlobalNamespaceType() });
 
   for (const service of services) {
     validateClientNamesPerNamespace(program, tcgcContext, scope, service.type);
@@ -141,36 +137,20 @@ function reportDuplicateClientNames(
 ) {
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {
-      if (scope === AllScopes) {
-        if (item.kind === "Decorator") {
-          reportDiagnostic(program, {
-            code: "duplicate-client-name",
-            format: { name, scope: "AllScopes" },
-            target: item,
-          });
-        } else {
-          reportDiagnostic(program, {
-            code: "duplicate-client-name",
-            messageId: "nonDecorator",
-            format: { name, scope: "AllScopes" },
-            target: item,
-          });
-        }
-      } else if (typeof scope === "string") {
-        if (item.kind === "Decorator") {
-          reportDiagnostic(program, {
-            code: "duplicate-client-name",
-            format: { name, scope },
-            target: item,
-          });
-        } else {
-          reportDiagnostic(program, {
-            code: "duplicate-client-name",
-            messageId: "nonDecorator",
-            format: { name, scope },
-            target: item,
-          });
-        }
+      const scopeStr = scope === AllScopes ? "AllScopes" : scope;
+      if (item.kind === "Decorator") {
+        reportDiagnostic(program, {
+          code: "duplicate-client-name",
+          format: { name, scope: scopeStr as string },
+          target: item,
+        });
+      } else {
+        reportDiagnostic(program, {
+          code: "duplicate-client-name",
+          messageId: "nonDecorator",
+          format: { name, scope: scopeStr as string },
+          target: item,
+        });
       }
     }
   }
