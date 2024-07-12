@@ -12,6 +12,7 @@ import {
   Type,
   Union,
   UnionVariant,
+  Node,
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "./decorators.js";
@@ -111,14 +112,14 @@ function validateClientNamesCore(
     | UnionVariant
   >
 ) {
-  const duplicateTracker = new DuplicateTracker<string, Type>();
+  const duplicateTracker = new DuplicateTracker<string, Type | Node>();
 
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
       const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
-      if (clientNameDecorator?.definition !== undefined) {
-        duplicateTracker.track(clientName, clientNameDecorator.definition);
+      if (clientNameDecorator?.node?.parent !== undefined) {
+        duplicateTracker.track(clientName, clientNameDecorator.node.parent);
       }
     } else {
       if (item.name !== undefined && typeof item.name === "string") {
@@ -132,13 +133,14 @@ function validateClientNamesCore(
 
 function reportDuplicateClientNames(
   program: Program,
-  duplicateTracker: DuplicateTracker<string, Type>,
+  duplicateTracker: DuplicateTracker<string, Type | Node>,
   scope: string | symbol
 ) {
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {
       const scopeStr = scope === AllScopes ? "AllScopes" : scope;
-      if (item.kind === "Decorator") {
+      // If the item is a decorator application node
+      if (item instanceof Node) {
         reportDiagnostic(program, {
           code: "duplicate-client-name",
           format: { name, scope: scopeStr as string },
