@@ -53,7 +53,7 @@ function getScopedDecoratorData(
   context: TCGCContext,
   key: symbol,
   target: Type,
-  languageScope?: string | symbol
+  languageScope?: string | typeof AllScopes
 ): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
@@ -999,7 +999,7 @@ export function $clientName(
 export function getClientNameOverride(
   context: TCGCContext,
   entity: Type,
-  languageScope?: string | symbol
+  languageScope?: string | typeof AllScopes
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
