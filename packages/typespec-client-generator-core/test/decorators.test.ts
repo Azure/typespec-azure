@@ -3734,10 +3734,8 @@ describe("typespec-client-generator-core: decorators", () => {
         `,
         `
         namespace MyCustomizations;
-        model NewModel {
-          params: MyService.Params;
-        }
-        op customization(...NewModel): void;
+
+        op customization(params: MyService.Params): void;
 
         @@overrideClientMethod(MyService.original, MyCustomizations.customization);
         `
@@ -3752,6 +3750,10 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(contentTypeParam);
       const paramsParam = method.parameters.find((x) => x.name === "params");
       ok(paramsParam);
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+      strictEqual(paramsModel, paramsParam.type);
     });
   });
 });

@@ -39,6 +39,7 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
+  getOverriddenClientMethod,
   getUsageOverride,
   isExclude,
   isInclude,
@@ -1287,7 +1288,8 @@ function updateTypesFromOperation(
   const program = context.program;
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
-  for (const param of operation.parameters.properties.values()) {
+  const overriddenClientMethod = getOverriddenClientMethod(context, operation);
+  for (const param of (overriddenClientMethod ?? operation).parameters.properties.values()) {
     if (isNeverOrVoidType(param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {
