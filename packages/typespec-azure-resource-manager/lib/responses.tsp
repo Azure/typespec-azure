@@ -3,6 +3,7 @@ using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
+using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager;
 
@@ -240,19 +241,6 @@ model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foun
   @doc("The body type of the operation request or response.")
   @bodyRoot
   body: Resource;
-}
-
-/**
- * The standard Azure Resource Manager error response
- */
-@error
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v3)
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v4)
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v5)
-@doc("Common error response for all Azure Resource Manager APIs to return error details for failed operations.")
-model ErrorResponse {
-  @doc("The error object.")
-  error?: ErrorDetail;
 }
 
 /**

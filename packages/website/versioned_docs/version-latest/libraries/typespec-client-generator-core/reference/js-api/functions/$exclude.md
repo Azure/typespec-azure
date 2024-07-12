@@ -4,7 +4,7 @@ title: "[F] $exclude"
 
 ---
 ```ts
-$exclude(
+function $exclude(
    context, 
    entity, 
    scope?): void

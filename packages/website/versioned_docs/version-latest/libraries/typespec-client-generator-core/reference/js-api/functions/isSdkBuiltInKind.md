@@ -4,7 +4,7 @@ title: "[F] isSdkBuiltInKind"
 
 ---
 ```ts
-isSdkBuiltInKind(kind): kind is SdkBuiltInKinds
+function isSdkBuiltInKind(kind): kind is SdkBuiltInKinds
 ```
 
 ## Parameters

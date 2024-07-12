@@ -25,8 +25,7 @@ export interface SdkContext<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
-  experimental_sdkPackage: SdkPackage<TServiceOperation>;
-  __clients?: SdkClientType<TServiceOperation>[];
+  sdkPackage: SdkPackage<TServiceOperation>;
 }
 
 export interface SdkEmitterOptions {
@@ -54,7 +53,8 @@ export interface SdkInitializationType extends SdkModelType {
   properties: SdkParameter[];
 }
 
-export interface SdkClientType<TServiceOperation extends SdkServiceOperation> {
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   kind: "client";
   name: string;
   description?: string;
@@ -77,7 +77,21 @@ export interface SdkOperationGroup {
   service: Namespace;
 }
 
-interface SdkTypeBase {
+interface DecoratedType {
+  // Client types sourced from TypeSpec decorated types will have this generic decoratores list.
+  // Only decorators in allowed list will be included in this list.
+  // Language's emitter could set `additionalDecorators` in the option when `createSdkContext` to extend the allowed list.
+  decorators: DecoratorInfo[];
+}
+
+export interface DecoratorInfo {
+  // Fully qualified name of the decorator. For example, `TypeSpec.@encode`, `TypeSpec.Xml.@attribute`.
+  name: string;
+  // A dict of the decorator's arguments. For example, `{ encoding: "base64url" }`.
+  arguments: Record<string, any>;
+}
+
+interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
@@ -87,7 +101,7 @@ interface SdkTypeBase {
 
 export type SdkType =
   | SdkBuiltInType
-  | SdkDatetimeType
+  | SdkDateTimeType
   | SdkDurationType
   | SdkArrayType
   | SdkTupleType
@@ -128,14 +142,14 @@ enum SdkFloatKindsEnum {
   decimal128 = "decimal128",
 }
 
-enum SdkAzureBuiltInStringKindsEnum {
-  uuid = "uuid",
-  ipV4Address = "ipV4Address",
-  ipV6Address = "ipV6Address",
-  eTag = "eTag",
-  armId = "armId",
-  azureLocation = "azureLocation",
-}
+const SdkAzureBuiltInStringKindsMapping = {
+  uuid: "uuid",
+  ipV4Address: "ipV4Address",
+  ipV6Address: "ipV6Address",
+  eTag: "eTag",
+  armId: "armResourceIdentifier",
+  azureLocation: "azureLocation",
+};
 
 enum SdkGenericBuiltInStringKindsEnum {
   string = "string",
@@ -159,7 +173,7 @@ export type SdkBuiltInKinds =
   | keyof typeof SdkIntKindsEnum
   | keyof typeof SdkFloatKindsEnum
   | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkAzureBuiltInStringKindsEnum;
+  | keyof typeof SdkAzureBuiltInStringKindsMapping;
 
 export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
   const retval: Record<string, SdkBuiltInKinds> = {};
@@ -171,9 +185,11 @@ export function getKnownScalars(): Record<string, SdkBuiltInKinds> {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
     retval[`TypeSpec.${kind}`] = kind;
   }
-  for (const kind in SdkAzureBuiltInStringKindsEnum) {
+  for (const kind in SdkAzureBuiltInStringKindsMapping) {
     if (!isSdkBuiltInKind(kind)) continue; // it will always be true
-    retval[`Azure.Core.${kind}`] = kind;
+    const kindMappedName =
+      SdkAzureBuiltInStringKindsMapping[kind as keyof typeof SdkAzureBuiltInStringKindsMapping];
+    retval[`Azure.Core.${kindMappedName}`] = kind;
   }
   return retval;
 }
@@ -184,7 +200,7 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
     isSdkIntKind(kind) ||
     isSdkFloatKind(kind) ||
     kind in SdkGenericBuiltInStringKindsEnum ||
-    kind in SdkAzureBuiltInStringKindsEnum
+    kind in SdkAzureBuiltInStringKindsMapping
   );
 }
 
@@ -196,26 +212,41 @@ export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatKinds
   return kind in SdkFloatKindsEnum;
 }
 
-const SdkDatetimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
+const SdkDateTimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
-export function isSdkDatetimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
-  return SdkDatetimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
+export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
+  return SdkDateTimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
-interface SdkDatetimeTypeBase extends SdkTypeBase {
+interface SdkDateTimeTypeBase extends SdkTypeBase {
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
 }
 
-interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
+interface SdkUtcDateTimeType extends SdkDateTimeTypeBase {
   kind: "utcDateTime";
 }
 
-interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
+interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
   kind: "offsetDateTime";
 }
 
-export type SdkDatetimeType = SdkUtcDatetimeType | SdkOffsetDatetimeType;
+export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
+
+/**
+ * @deprecated: Use SdkDateTimeType instead.
+ */
+export type SdkDatetimeType = SdkDateTimeType;
+
+/**
+ * @deprecated: Use SdkUtcDateTimeType instead.
+ */
+export type SdkUtcDatetimeType = SdkUtcDateTimeType;
+
+/**
+ * @deprecated Use SdkOffsetDateTimeType instead.
+ */
+export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
@@ -225,7 +256,9 @@ export interface SdkDurationType extends SdkTypeBase {
 
 export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
+  name: string;
   valueType: SdkType;
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -279,6 +312,7 @@ export interface SdkUnionType extends SdkTypeBase {
   isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
+  crossLanguageDefinitionId: string;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -291,10 +325,6 @@ export interface SdkModelType extends SdkTypeBase {
    * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
    */
   isFormDataType: boolean;
-  /**
-   * @deprecated This property is deprecated. You should not need to check whether a model is an error model.
-   */
-  isError: boolean;
   isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
@@ -318,13 +348,9 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase {
+export interface SdkModelPropertyTypeBase extends DecoratedType {
   __raw?: ModelProperty;
   type: SdkType;
-  /**
-   * @deprecated This property is deprecated. Use `.name` instead.
-   */
-  nameInClient: string;
   name: string;
   isGeneratedName: boolean;
   description?: string;
@@ -437,6 +463,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
+  description?: string;
 }
 
 interface SdkServiceOperationBase {}
@@ -461,7 +488,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 export type SdkServiceOperation = SdkHttpOperation;
 export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase {
+interface SdkMethodBase extends DecoratedType {
   __raw?: Operation;
   name: string;
   access: AccessFlags;
@@ -487,6 +514,8 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
+  generateConvenient: boolean;
+  generateProtocol: boolean;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -529,7 +558,8 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation> extends SdkMethodBase {
+export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
+  extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
 }
@@ -563,8 +593,14 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
-  // Input will also be set when JsonMergePatch is set.
+  // Input and Json will also be set when JsonMergePatch is set.
   JsonMergePatch = 1 << 4,
   // Input will also be set when MultipartFormData is set.
   MultipartFormData = 1 << 5,
+  // Used in spread.
+  Spread = 1 << 6,
+  // Output will also be set when Error is set.
+  Error = 1 << 7,
+  // Set when model is used in conjunction with an application/json content type.
+  Json = 1 << 8,
 }

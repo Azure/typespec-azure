@@ -4,7 +4,7 @@ title: "[F] $include"
 
 ---
 ```ts
-$include(
+function $include(
    context, 
    entity, 
    scope?): void

@@ -121,19 +121,6 @@ extern dec armProviderNameValue(target: Operation | Model);
 extern dec armResourceCollectionAction(target: Operation);
 
 /**
- * Marks the operation as being a collection action
- * @param resourceType Resource
- * @param parentTypeName: Parent type name.
- * @param parentFriendlyTypeName Friendly name for parent.
- */
-extern dec armRenameListByOperation(
-  target: Operation,
-  resourceType: Model,
-  parentTypeName?: valueof string,
-  parentFriendlyTypeName?: valueof string
-);
-
-/**
  * @param resourceType Resource model
  */
 extern dec armResourceAction(target: Operation, resourceType: Model);
@@ -180,7 +167,7 @@ extern dec armResourceOperations(target: Interface, _?: unknown);
  * This decorator is used either on a namespace or a version enum value to indicate
  * the version of the Azure Resource Manager common-types to use for refs in emitted Swagger files.
  *
- * @param version The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value.
+ * @param version The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value like "v5".
  */
 extern dec armCommonTypesVersion(
   target: Namespace | EnumMember,

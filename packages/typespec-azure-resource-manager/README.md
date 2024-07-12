@@ -69,7 +69,6 @@ Available ruleSets:
 - [`@armLibraryNamespace`](#@armlibrarynamespace)
 - [`@armProviderNamespace`](#@armprovidernamespace)
 - [`@armProviderNameValue`](#@armprovidernamevalue)
-- [`@armRenameListByOperation`](#@armrenamelistbyoperation)
 - [`@armResourceAction`](#@armresourceaction)
 - [`@armResourceCollectionAction`](#@armresourcecollectionaction)
 - [`@armResourceCreateOrUpdate`](#@armresourcecreateorupdate)
@@ -103,9 +102,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 ##### Parameters
 
-| Name    | Type                           | Description                                                                                                        |
-| ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value. |
+| Name    | Type                           | Description                                                                                                                  |
+| ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value like "v5". |
 
 #### `@armLibraryNamespace`
 
@@ -177,26 +176,6 @@ property to the type of the Azure Resource Manager resource.
 ##### Parameters
 
 None
-
-#### `@armRenameListByOperation`
-
-Marks the operation as being a collection action
-
-```typespec
-@Azure.ResourceManager.armRenameListByOperation(resourceType: Model, parentTypeName?: valueof string, parentFriendlyTypeName?: valueof string)
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name                   | Type             | Description               |
-| ---------------------- | ---------------- | ------------------------- |
-| resourceType           | `Model`          | Resource                  |
-| parentTypeName         | `valueof string` | : Parent type name.       |
-| parentFriendlyTypeName | `valueof string` | Friendly name for parent. |
 
 #### `@armResourceAction`
 

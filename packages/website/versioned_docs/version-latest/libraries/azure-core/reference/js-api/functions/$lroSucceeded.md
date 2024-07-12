@@ -4,7 +4,7 @@ title: "[F] $lroSucceeded"
 
 ---
 ```ts
-$lroSucceeded(context, entity): void
+function $lroSucceeded(context, entity): void
 ```
 
 ## Parameters

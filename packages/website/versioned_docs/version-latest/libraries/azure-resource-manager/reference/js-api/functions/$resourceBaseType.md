@@ -4,7 +4,7 @@ title: "[F] $resourceBaseType"
 
 ---
 ```ts
-$resourceBaseType(
+function $resourceBaseType(
    context, 
    entity, 
    baseType): void

@@ -10,6 +10,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
+  createSdkContext,
   getAccess,
   getClient,
   getClientNameOverride,
@@ -21,7 +22,13 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkMethodResponse, SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperation,
+  SdkMethodResponse,
+  SdkOperationGroup,
+  UsageFlags,
+} from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -1304,7 +1311,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
       createSdkContextTestHelper(runner.context.program, {
@@ -1313,7 +1320,12 @@ describe("typespec-client-generator-core: decorators", () => {
       }),
       test as Operation
     );
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
     strictEqual(actual, protocolValue);
+    strictEqual(method.generateProtocol, protocolValue);
   }
   describe("@protocolAPI", () => {
     it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
@@ -1340,7 +1352,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
       createSdkContextTestHelper(runner.program, {
@@ -1350,6 +1362,11 @@ describe("typespec-client-generator-core: decorators", () => {
       test as Operation
     );
     strictEqual(actual, convenientValue);
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
+    strictEqual(method.generateConvenient, convenientValue);
   }
 
   describe("@convenientAPI", () => {
@@ -1367,7 +1384,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
-      const { test } = await runner.compile(`
+      const { test } = await runner.compileWithBuiltInService(`
         @convenientAPI
         @test
         op test(): void;
@@ -1381,6 +1398,10 @@ describe("typespec-client-generator-core: decorators", () => {
         test as Operation
       );
       strictEqual(actual, true);
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.generateConvenient, true);
     });
   });
 
@@ -1396,25 +1417,41 @@ describe("typespec-client-generator-core: decorators", () => {
       // java should get protocolAPI=true and convenientAPI=false
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(shouldGenerateProtocol(runner.context, test), true);
+        strictEqual(method.generateProtocol, true);
+
         strictEqual(
           shouldGenerateConvenient(runner.context, test),
           false,
           "convenientAPI should be false for java"
         );
+        strictEqual(method.generateConvenient, false, "convenientAPI should be false for java");
       }
 
       // csharp should get protocolAPI=false and convenientAPI=true
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(
           shouldGenerateProtocol(runner.context, test),
           false,
           "protocolAPI should be false for csharp"
         );
+        strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
+
         strictEqual(shouldGenerateConvenient(runner.context, test), true);
+        strictEqual(method.generateConvenient, true);
       }
     });
   });
@@ -1537,10 +1574,87 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "duplicate-decorator",
       });
     });
+
     it("duplicate-decorator diagnostic for multiple same scope", async () => {
       const diagnostics = await runner.diagnose(`
       @test
       @access(Access.internal, "csharp")
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "duplicate-decorator",
+      });
+    });
+
+    it("csv scope list", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          @access(Access.internal, "${language}")
+          model Test {
+            prop: string;
+          }
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("csv scope list augment", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          model Test {
+            prop: string;
+          }
+
+          @@access(Test, Access.public, "java, ts");
+          @@access(Test, Access.internal, "${language}");
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
+    });
+
+    it("duplicate-decorator diagnostic for csv scope list", async () => {
+      const diagnostics = await runner.diagnose(`
+      @test
+      @access(Access.internal, "csharp,ts")
       @access(Access.internal, "csharp")
       op func(
         @query("createdAt")
@@ -2081,7 +2195,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @@access(listRunSteps, Access.internal);
         `
       );
-      const models = runner.context.experimental_sdkPackage.models;
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 2);
       strictEqual(models[0].access, "public");
       strictEqual(models[1].access, "public");
@@ -2119,9 +2233,12 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Model1: Model; Model2: Model; Model3: Model; Model4: Model };
 
-      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model3), UsageFlags.Input | UsageFlags.Output);
+      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Json);
+      strictEqual(getUsage(runner.context, Model2), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(
+        getUsage(runner.context, Model3),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
       strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
     });
 
@@ -2179,8 +2296,14 @@ describe("typespec-client-generator-core: decorators", () => {
       };
 
       strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model3), UsageFlags.Input | UsageFlags.Output);
+      strictEqual(
+        getUsage(runner.context, Model2),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(
+        getUsage(runner.context, Model3),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
       strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
       strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
       strictEqual(getUsage(runner.context, Enum2), UsageFlags.None);
@@ -2238,11 +2361,14 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
 
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Shark), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output);
+      strictEqual(getUsage(runner.context, Fish), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(
+        getUsage(runner.context, Shark),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output | UsageFlags.Json);
+      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output | UsageFlags.Json);
     });
 
     it("usage and convenience", async () => {
@@ -2264,7 +2390,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Fish: Model };
 
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Input);
+      strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Json);
 
       const { Dog } = (await runner.compile(`
         @service({})
@@ -2284,7 +2410,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { Dog: Model };
 
-      strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
+      strictEqual(getUsage(runner.context, Dog), UsageFlags.Output | UsageFlags.Json);
     });
 
     it("patch usage", async () => {
@@ -2311,10 +2437,10 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { PatchModel: Model; JsonMergePatchModel: Model };
 
-      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
+      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input | UsageFlags.Json);
       strictEqual(
         getUsage(runner.context, JsonMergePatchModel),
-        UsageFlags.JsonMergePatch | UsageFlags.Input
+        UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json
       );
     });
   });
@@ -2507,21 +2633,21 @@ describe("typespec-client-generator-core: decorators", () => {
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
       }
 
       // csharp
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
       }
 
       // python
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+        strictEqual(runner.context.sdkPackage.models[0].name, "Test");
       }
     });
 
@@ -2554,21 +2680,21 @@ describe("typespec-client-generator-core: decorators", () => {
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
       }
 
       // csharp
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
       }
 
       // python
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+        strictEqual(runner.context.sdkPackage.models[0].name, "Test");
       }
     });
 
@@ -2596,10 +2722,23 @@ describe("typespec-client-generator-core: decorators", () => {
         
       `);
 
-      strictEqual(
-        runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name,
-        "body"
-      );
+      strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
+    });
+    it("empty client name", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        namespace MyService;
+        
+        @clientName(" ")
+        model Test {
+          id: string;
+          prop: string;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/empty-client-name",
+      });
     });
   });
 
@@ -2656,7 +2795,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2755,7 +2894,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2853,7 +2992,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2951,7 +3090,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3052,7 +3191,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
     `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3141,7 +3280,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
     `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3226,19 +3365,25 @@ describe("typespec-client-generator-core: decorators", () => {
 
       await runnerWithVersion.compile(tsp);
 
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 2);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 2);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "previewFunctionality"
       );
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[1].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[1].name,
         "stableFunctionality"
       );
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 2);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "PreviewModel");
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[1].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[0].name,
+        "PreviewFunctionalityRequest"
+      );
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[1].name,
+        "StableFunctionalityRequest"
+      );
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -3246,14 +3391,17 @@ describe("typespec-client-generator-core: decorators", () => {
 
       await runnerWithVersion.compile(tsp);
 
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 1);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "stableFunctionality"
       );
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[0].name,
+        "StableFunctionalityRequest"
+      );
     });
     it("add client", async () => {
       await runner.compile(
@@ -3283,8 +3431,8 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
       const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
       ok(versioningClient);
       strictEqual(versioningClient.methods.length, 2);
@@ -3306,7 +3454,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clientAccessor.name, "getInterfaceV2");
       deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
 
-      const interfaceV2 = sdkPackage.clients.find((x) => x.name === "InterfaceV2");
+      const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(interfaceV2);
       strictEqual(interfaceV2.methods.length, 1);
 
@@ -3533,6 +3682,40 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(aOps.length, 1);
       a = aOps.find((x) => x.name === "a");
       ok(a);
+    });
+  });
+
+  describe("createSdkContext", () => {
+    it("multiple call with versioning", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+        }
+
+        @client({name: "TestClient"})
+        @test
+        interface Test {}
+      `;
+
+      const runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+      let clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
+
+      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      clients = listClients(newSdkContext);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
     });
   });
 });

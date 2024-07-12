@@ -4,7 +4,7 @@ title: "[F] getExamples"
 
 ---
 ```ts
-getExamples(program, entity): Example[] | undefined
+function getExamples(program, entity): Example[] | undefined
 ```
 
 ## Parameters

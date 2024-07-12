@@ -4,7 +4,7 @@ title: "[F] getDisplayName"
 
 ---
 ```ts
-getDisplayName(program, target): string | undefined
+function getDisplayName(program, target): string | undefined
 ```
 
 ## Parameters

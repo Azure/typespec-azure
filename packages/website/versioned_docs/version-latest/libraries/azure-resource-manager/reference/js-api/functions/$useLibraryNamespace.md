@@ -4,7 +4,7 @@ title: "[F] $useLibraryNamespace"
 
 ---
 ```ts
-$useLibraryNamespace(
+function $useLibraryNamespace(
    context, 
    entity, ...
    namespaces): void

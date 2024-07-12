@@ -29,6 +29,7 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
+import { defaultDecoratorsAllowList } from "./configs.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -75,25 +76,31 @@ function setScopedDecoratorData(
   transitivity: boolean = false
 ): boolean {
   const targetEntry = context.program.stateMap(key).get(target);
+  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+
   // If target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
-    // value is going to be a list of tuples, each tuple is a value and a list of scopes
-    context.program.stateMap(key).set(target, { [scope ?? AllScopes]: value });
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, newObject);
     return true;
   }
 
   // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
   const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !scopes.includes(scope)) {
-    targetEntry[scope] = value;
+  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
     return true;
   }
+  // we only want to allow multiple decorators if they each specify a different scope
   if (!transitivity) {
     validateDecoratorUniqueOnNode(context, target, decorator);
     return false;
   }
-  if (!Reflect.ownKeys(targetEntry).includes(AllScopes) && !scope) {
-    context.program.stateMap(key).set(target, { AllScopes: value });
+  // for transitivity situation, we could allow scope extension
+  if (!scopes.includes(AllScopes) && !scope) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
   }
   return false;
 }
@@ -183,22 +190,11 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface
 ): SdkClient | undefined {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    let client = getScopedDecoratorData(context, clientKey, type);
-    if (client && (client.type as Type).kind === "Intrinsic") client = undefined;
-    return client;
-  }
-
-  // if there is no explicit client or operation group,
-  // we need to find whether current namespace is an implicit client (namespace with @service decorator)
-  if (type.kind === "Namespace") {
-    for (const client of listClients(context)) {
-      if (client.type === type) {
-        return client;
-      }
+  for (const client of listClients(context)) {
+    if (client.type === type) {
+      return client;
     }
   }
-
   return undefined;
 }
 
@@ -263,9 +259,16 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
 
 function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
   if (context.apiVersion !== "all") {
-    clients.map((client) => serviceVersioningProjection(context, client));
-    // filter all the clients not existed in the current version
-    return clients.filter((client) => (client.type as Type).kind !== "Intrinsic");
+    const projectedClients = [];
+    for (const client of clients) {
+      const projectedClient = { ...client };
+      serviceVersioningProjection(context, projectedClient);
+      // filter client not existed in the current version
+      if ((projectedClient.type as Type).kind !== "Intrinsic") {
+        projectedClients.push(projectedClient);
+      }
+    }
+    return projectedClients;
   }
   return clients;
 }
@@ -282,6 +285,9 @@ export function listClients(context: TCGCContext): SdkClient[] {
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     context.__rawClients = getClientsWithVersioning(context, explicitClients);
+    if (context.__rawClients.some((client) => isArm(client.service))) {
+      context.arm = true;
+    }
     return context.__rawClients;
   }
 
@@ -313,6 +319,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 }
 
 const operationGroupKey = createStateSymbol("operationGroup");
+
 export function $operationGroup(
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -412,6 +419,7 @@ function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interfa
   }
   return path.reverse().join(".");
 }
+
 /**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
  * @param context TCGCContext
@@ -570,9 +578,9 @@ export function listOperationsInOperationGroup(
   addOperations(group.type);
   return operations;
 }
-
-interface CreateSdkContextOptions {
+export interface CreateSdkContextOptions {
   readonly versionStrategy?: "ignore";
+  additionalDecorators?: string[];
 }
 
 export function createSdkContext<
@@ -592,7 +600,7 @@ export function createSdkContext<
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     program: context.program,
     emitContext: context,
-    experimental_sdkPackage: undefined!,
+    sdkPackage: undefined!,
     emitterName: diagnostics.pipe(
       parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
     ), // eslint-disable-line deprecation/deprecation
@@ -607,11 +615,12 @@ export function createSdkContext<
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
+    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
   };
-  sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  sdkContext.sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
     sdkContext.diagnostics = sdkContext.diagnostics.concat(
-      sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+      sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
     );
   }
   return sdkContext;
@@ -706,6 +715,7 @@ function modelTransitiveSet(
 }
 
 const clientFormatKey = createStateSymbol("clientFormat");
+
 const allowedClientFormatToTargetTypeMap: Record<ClientFormat, string[]> = {
   unixtime: ["int32", "int64"],
   iso8601: ["utcDateTime", "offsetDateTime", "duration"],
@@ -968,7 +978,13 @@ export function $clientName(
       }
     }
   }
-
+  if (value.trim() === "") {
+    reportDiagnostic(context.program, {
+      code: "empty-client-name",
+      format: {},
+      target: entity,
+    });
+  }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 }
 

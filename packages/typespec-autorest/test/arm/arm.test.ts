@@ -69,6 +69,7 @@ it("can share types with a library namespace", async () => {
 it("can use private links with common-types references", async () => {
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+     @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
       
@@ -120,6 +121,7 @@ it("can use private endpoints with common-types references", async () => {
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
       
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -160,6 +162,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
       
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -199,6 +202,7 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   const openapi = await openApiFor(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
       
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -231,4 +235,71 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
   strictEqual(openapi.paths[privateEndpointGet].get.parameters[1].pattern, "^[a-zA-Z0-9-]{3,24}$");
   ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+});
+
+it("can emit x-ms-client-flatten with optional configuration", async () => {
+  const openapi = await openApiFor(
+    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      namespace Microsoft.Contoso;
+      
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        age?: int32;
+        city?: string;
+        @visibility("read")
+        provisioningState?: ResourceProvisioningState;
+      }
+      @parentResource(Employee)
+      model Dependent is ProxyResource<DependentProperties> {
+        ...ResourceNameParameter<Dependent>;
+      }
+      model DependentProperties {
+        age?: int32;
+      }
+      `,
+    undefined,
+    {
+      "arm-resource-flattening": true,
+    }
+  );
+
+  ok(openapi.definitions.Employee.properties.properties["x-ms-client-flatten"]);
+  ok(openapi.definitions.Dependent.properties.properties["x-ms-client-flatten"]);
+});
+
+it("no x-ms-client-flatten emitted with default configuration", async () => {
+  const openapi = await openApiFor(
+    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      namespace Microsoft.Contoso;
+      
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        age?: int32;
+        city?: string;
+        @visibility("read")
+        provisioningState?: ResourceProvisioningState;
+      }
+      @parentResource(Employee)
+      model Dependent is ProxyResource<DependentProperties> {
+        ...ResourceNameParameter<Dependent>;
+      }
+      model DependentProperties {
+        age?: int32;
+      }
+      `
+  );
+
+  strictEqual(openapi.definitions.Employee.properties.properties["x-ms-client-flatten"], undefined);
+  strictEqual(
+    openapi.definitions.Dependent.properties.properties["x-ms-client-flatten"],
+    undefined
+  );
 });

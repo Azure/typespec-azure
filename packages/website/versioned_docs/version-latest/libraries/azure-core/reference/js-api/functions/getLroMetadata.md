@@ -4,7 +4,7 @@ title: "[F] getLroMetadata"
 
 ---
 ```ts
-getLroMetadata(program, operation): LroMetadata | undefined
+function getLroMetadata(program, operation): LroMetadata | undefined
 ```
 
 ## Parameters

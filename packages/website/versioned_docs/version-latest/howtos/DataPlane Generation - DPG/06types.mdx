@@ -39,7 +39,6 @@ model Foo {
       "serializedName": "prop",
       "flatten": true,
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "model",
         "name": "Properties",
@@ -50,7 +49,6 @@ model Foo {
             "serializedName": "name",
             "flatten": false,
             "optional": false,
-            "nullable": false,
             "type": {
               "kind": "string",
               "encode": "string"
@@ -87,9 +85,70 @@ print(f.name)  # Flattened access is dynamically supported, but not documented
 </TabItem>
 <TabItem value="csharp" label="CSharp" >
 
+CSharp will generate the model with properties being flattened. During serialization/deserialization, the model will be serialized/deserialized as a non-flattened model.
+
 ```csharp
-// Please note that this feature is not supported right now, and the model will be generated un-flattened.
-// Please comment and follow work status on: https://github.com/Azure/autorest.csharp/issues/4040
+public partial class Foo
+{
+    public Foo(string name)
+    {
+        Argument.AssertNotNull(name, nameof(name));
+
+        Name = name;
+    }
+
+    public string Name { get; set; }
+}
+
+public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
+{
+    void IJsonModel<Foo>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+    {
+        var format = options.Format == "W" ? ((IPersistableModel<Foo>)this).GetFormatFromOptions(options) : options.Format;
+        if (format != "J")
+        {
+            throw new FormatException($"The model {nameof(Foo)} does not support writing '{format}' format.");
+        }
+
+        writer.WriteStartObject();
+        writer.WritePropertyName("properties"u8);
+        writer.WriteStartObject();
+        writer.WritePropertyName("name"u8);
+        writer.WriteStringValue(Name);
+        writer.WriteEndObject();
+        writer.WriteEndObject();
+    }
+
+    internal static Foo DeserializeFoo(JsonElement element, ModelReaderWriterOptions options = null)
+    {
+        options ??= ModelSerializationExtensions.WireOptions;
+
+        if (element.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+        string name = default;
+        foreach (var property in element.EnumerateObject())
+        {
+            if (property.NameEquals("properties"u8))
+            {
+                if (property.Value.ValueKind == JsonValueKind.Null)
+                {
+                    property.ThrowNonNullablePropertyIsNull();
+                    continue;
+                }
+                foreach (var property0 in property.Value.EnumerateObject())
+                {
+                    if (property0.NameEquals("name"u8))
+                    {
+                        name = property0.Value.GetString();
+                    }
+                }
+            }
+        }
+        return new Foo(name);
+    }
+}
 ```
 
 </TabItem>
@@ -163,7 +222,6 @@ model Animal is Record<unknown> {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -174,7 +232,6 @@ model Animal is Record<unknown> {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -183,8 +240,7 @@ model Animal is Record<unknown> {
   ],
   "additionalProperties": {
     "kind": "any"
-  },
-  "additionalPropertiesNullable": false
+  }
 }
 ```
 
@@ -292,7 +348,6 @@ model Animal {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -303,7 +358,6 @@ model Animal {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -319,7 +373,6 @@ model Animal {
         "name": "category",
         "serializedName": "category",
         "optional": false,
-        "nullable": false,
         "type": {
           "kind": "string",
           "encode": "string"
@@ -330,16 +383,13 @@ model Animal {
         "name": "value",
         "serializedName": "value",
         "optional": false,
-        "nullable": false,
         "type": {
           "kind": "any"
         }
       }
     ],
-    "additionalProperties": undefined,
-    "additionalPropertiesNullable": undefined
-  },
-  "additionalPropertiesNullable": false
+    "additionalProperties": undefined
+  }
 }
 ```
 
@@ -520,7 +570,6 @@ model Animal {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -531,7 +580,6 @@ model Animal {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -551,8 +599,7 @@ model Animal {
         "kind": "int32"
       }
     ]
-  },
-  "additionalPropertiesNullable": false
+  }
 }
 ```
 
@@ -650,7 +697,6 @@ model Animal {
       "name": "name",
       "serializedName": "name",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -661,7 +707,6 @@ model Animal {
       "name": "kind",
       "serializedName": "kind",
       "optional": false,
-      "nullable": false,
       "type": {
         "kind": "string",
         "encode": "string"
@@ -669,9 +714,12 @@ model Animal {
     }
   ],
   "additionalProperties": {
-    "kind": "string"
-  },
-  "additionalPropertiesNullable": true
+    "kind": "nullable",
+    "valueType": {
+      "kind": "string",
+      "encode": "string"
+    }
+  }
 }
 ```
 
@@ -741,6 +789,210 @@ public final class Animal implements JsonSerializable<Animal> {
 }
 
 ```
+
+</TabItem>
+</Tabs>
+
+### Nullable
+
+TypeSpec uses `| null` to represent nullable types. Nullability is handled differently in languages, but emitter authors will find information
+about nullability by inspecting the type of a property.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Foo {
+  basicNullableProperty: string | null;
+  modelNullableProperty: Bar | null;
+  unionNullableProperty: Bar | Baz | null;
+  enumNullableProperty: LR | null;
+}
+
+model Bar {
+  prop: string;
+}
+
+model Baz {
+  prop: int32;
+}
+
+enum LR {
+  left,
+  right,
+}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+A nullable type has kind `nullable` and property `valueType`. The kind of the type tells you the property is nullable, while the `valueType` tells you the underlying type you want to generate.
+
+```json
+{
+  "kind": "model",
+  "name": "Foo",
+  "properties": [
+    {
+      "kind": "property",
+      "name": "basicNullableProperty",
+      "serializedName": "basicNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "nullable",
+        "valueType": {
+          "kind": "string",
+          "encode": "string"
+        }
+      }
+    },
+    {
+      "kind": "property",
+      "name": "modelNullableProperty",
+      "serializedName": "modelNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "nullable",
+        "valueType": {
+          "kind": "model",
+          "name": "Bar",
+          "properties": [
+            {
+              "kind": "property",
+              "name": "prop",
+              "serializedName": "prop",
+              "optional": false,
+              "type": {
+                "kind": "string",
+                "encode": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "property",
+      "name": "unionNullableProperty",
+      "serializedName": "unionNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "nullable",
+        "valueType": {
+          "kind": "union",
+          "values": [
+            {
+              "kind": "model",
+              "name": "Bar",
+              "properties": [
+                {
+                  "kind": "property",
+                  "name": "prop",
+                  "serializedName": "prop",
+                  "optional": false,
+                  "type": {
+                    "kind": "string",
+                    "encode": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "model",
+              "name": "Baz",
+              "properties": [
+                {
+                  "kind": "property",
+                  "name": "prop",
+                  "serializedName": "prop",
+                  "optional": false,
+                  "type": {
+                    "kind": "int32",
+                    "encode": "int32"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "property",
+      "name": "enumNullableProperty",
+      "serializedName": "enumNullableProperty",
+      "optional": false,
+      "type": {
+        "kind": "nullable",
+        "valueType": {
+          "kind": "enum",
+          "name": "LR",
+          "generatedName": false,
+          "valueType": {
+            "kind": "string"
+          },
+          "values": [
+            {
+              "kind": "enumvalue",
+              "name": "left",
+              "value": "left"
+            },
+            {
+              "kind": "enumvalue",
+              "name": "right",
+              "value": "right"
+            }
+          ],
+          "isFixed": true,
+          "isUnionAsEnum": false
+        }
+      }
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+Python treat nullable as optional. If you actually want to send the value `null` to the service without the property being ignored, you can send in `corehttp.serialization.NULL`. Python does not restrict you from setting any property to this value.
+
+```python
+from enum import Enum
+from corehttp.utils import CaseInsensitiveEnumMeta
+
+class Bar(_model_base.Model):
+  prop: Optional[str] = rest_field()
+
+class Baz(_model_base.Model):
+  prop: Optional[str] = rest_field()
+
+class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+  LEFT = "left"
+  RIGHT = "right"
+
+class Foo(_model_base.Model):
+  basicNullableProperty: Optional[str] = rest_field()
+  modelNullableProperty: Optional["_models.Bar"] = rest_field()
+  unionNullableProperty: Optional[Union["_models.Bar", "_models.Baz"]] = rest_field()
+  enumNullableProperty: Optional["LR"] = rest_field()
+
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+TODO
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
 
 </TabItem>
 </Tabs>

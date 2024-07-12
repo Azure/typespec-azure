@@ -4,7 +4,7 @@ title: "[F] getSdkTuple"
 
 ---
 ```ts
-getSdkTuple(
+function getSdkTuple(
    context, 
    type, 
    operation?): SdkTupleType

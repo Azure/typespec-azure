@@ -4,7 +4,7 @@ title: "[F] isArmCollectionAction"
 
 ---
 ```ts
-isArmCollectionAction(program, target): boolean
+function isArmCollectionAction(program, target): boolean
 ```
 
 ## Parameters

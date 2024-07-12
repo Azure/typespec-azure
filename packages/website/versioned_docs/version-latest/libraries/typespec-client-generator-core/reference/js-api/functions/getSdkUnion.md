@@ -4,7 +4,7 @@ title: "[F] getSdkUnion"
 
 ---
 ```ts
-getSdkUnion(
+function getSdkUnion(
    context, 
    type, 
    operation?): SdkType

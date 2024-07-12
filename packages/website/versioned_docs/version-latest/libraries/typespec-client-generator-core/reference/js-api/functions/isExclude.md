@@ -4,7 +4,7 @@ title: "[F] isExclude"
 
 ---
 ```ts
-isExclude(context, entity): boolean
+function isExclude(context, entity): boolean
 ```
 
 ## Parameters

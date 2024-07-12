@@ -3,49 +3,30 @@ using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
+using Azure.ResourceManager.CommonTypes;
+using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager;
 
 /**
  * The default api-version parameter type.
  */
-@doc("The default api-version parameter type.")
-model ApiVersionParameter {
-  @query("api-version")
-  @minLength(1)
-  @doc("The API version to use for this operation.")
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("ApiVersionParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
-  @resourceParameterBaseFor(
-    [
-      ResourceHome.ResourceGroup,
-      ResourceHome.Subscription,
-      ResourceHome.Location,
-      ResourceHome.Tenant,
-      ResourceHome.Extension
-    ]
-  )
-  apiVersion: string;
-}
+alias ApiVersionParameter = CommonTypes.ApiVersionParameter;
 
 /**
  * The default subscriptionId parameter type.
  */
-@doc("The default subscriptionId parameter type.")
-model SubscriptionIdParameter {
-  @path
-  @minLength(1)
-  @segment("subscriptions")
-  @doc("The ID of the target subscription.")
-  @armCommonParameter("SubscriptionIdParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("SubscriptionIdParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("SubscriptionIdParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
-  @resourceParameterBaseFor(
-    [ResourceHome.ResourceGroup, ResourceHome.Subscription, ResourceHome.Location]
-  )
-  subscriptionId: string;
-}
+alias SubscriptionIdParameter = CommonTypes.SubscriptionIdParameter;
+
+/**
+ * The default ResourceGroup parameter type.
+ */
+alias ResourceGroupParameter = CommonTypes.ResourceGroupNameParameter;
+
+/**
+ * The default LocationResource parameter type.
+ */
+alias LocationResourceParameter = CommonTypes.LocationResourceParameter;
 
 /**
  * DEPRECATED - DO NOT USE
@@ -61,22 +42,6 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor([ResourceHome.Location])
-  location: string;
-}
-
-/**
- * The default location parameter type.
- */
-@doc("The default location parameter type.")
-model LocationResourceParameter {
-  @path
-  @minLength(1)
-  @segment("locations")
-  @doc("The location name.")
-  @key
-  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   location: string;
 }
 
@@ -111,24 +76,6 @@ model ArmLocationResource<BaseType extends
   | "Location"
   | "Extension" = never> {
   ...LocationResourceParameter;
-}
-
-/**
- * The default resource group parameter type.
- */
-@doc("The default resource group parameter type.")
-model ResourceGroupParameter {
-  @path
-  @minLength(1)
-  @maxLength(90)
-  @segment("resourceGroups")
-  @pattern("^[-\\w\\._\\(\\)]+$")
-  @doc("The name of the resource group. The name is case insensitive.")
-  @armCommonParameter("ResourceGroupNameParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
-  @armCommonParameter("ResourceGroupNameParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
-  @armCommonParameter("ResourceGroupNameParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
-  @resourceParameterBaseFor([ResourceHome.ResourceGroup])
-  resourceGroupName: string;
 }
 
 /**

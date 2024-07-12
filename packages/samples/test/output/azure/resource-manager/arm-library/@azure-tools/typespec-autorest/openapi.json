@@ -1660,11 +1660,7 @@
         "properties": {
           "$ref": "#/definitions/AllPropertiesProperties",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         },
         "eTag": {
           "type": "string",
@@ -1822,11 +1818,7 @@
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionProperties",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         }
       },
       "allOf": [
@@ -1858,11 +1850,7 @@
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantProperties",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         }
       },
       "allOf": [
@@ -1878,11 +1866,7 @@
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TrackedChildProperties",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         }
       },
       "allOf": [
@@ -1918,11 +1902,7 @@
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedProperties",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         }
       },
       "allOf": [
@@ -1972,11 +1952,7 @@
         "properties": {
           "$ref": "#/definitions/Microsoft.OperationsTest.TestTrackedProperties2",
           "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true,
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
+          "x-ms-client-flatten": true
         }
       },
       "allOf": [

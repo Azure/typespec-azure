@@ -4,7 +4,7 @@ title: "[F] $locationResource"
 
 ---
 ```ts
-$locationResource(context, entity): void
+function $locationResource(context, entity): void
 ```
 
 ## Parameters

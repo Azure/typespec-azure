@@ -4,7 +4,7 @@ title: "[F] $requestParameter"
 
 ---
 ```ts
-$requestParameter(
+function $requestParameter(
    context, 
    entity, 
    name): void

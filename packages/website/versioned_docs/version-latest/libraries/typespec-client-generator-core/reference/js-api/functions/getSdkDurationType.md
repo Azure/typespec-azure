@@ -4,7 +4,7 @@ title: "[F] getSdkDurationType"
 
 ---
 ```ts
-getSdkDurationType(context, type): SdkDurationType
+function getSdkDurationType(context, type): SdkDurationType
 ```
 
 ## Parameters

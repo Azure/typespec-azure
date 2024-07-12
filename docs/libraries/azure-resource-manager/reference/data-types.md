@@ -8,20 +8,6 @@ toc_max_heading_level: 3
 
 ## Azure.ResourceManager
 
-### `ApiVersionParameter` {#Azure.ResourceManager.ApiVersionParameter}
-
-The default api-version parameter type.
-
-```typespec
-model Azure.ResourceManager.ApiVersionParameter
-```
-
-#### Properties
-
-| Name       | Type     | Description                                |
-| ---------- | -------- | ------------------------------------------ |
-| apiVersion | `string` | The API version to use for this operation. |
-
 ### `ArmAcceptedLroResponse` {#Azure.ResourceManager.ArmAcceptedLroResponse}
 
 ```typespec
@@ -201,9 +187,9 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 
 #### Properties
 
-| Name     | Type     | Description        |
-| -------- | -------- | ------------------ |
-| location | `string` | The location name. |
+| Name     | Type     | Description                   |
+| -------- | -------- | ----------------------------- |
+| location | `string` | The name of the Azure region. |
 
 ### `ArmLroLocationHeader` {#Azure.ResourceManager.ArmLroLocationHeader}
 
@@ -273,7 +259,7 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 | startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
 | endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
 | percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
 
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
@@ -352,10 +338,10 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 
 #### Properties
 
-| Name       | Type       | Description                                         |
-| ---------- | ---------- | --------------------------------------------------- |
-| statusCode | `200`      | The status code.                                    |
-| body       | `Resource` | The body type of the operation request or response. |
+| Name       | Type       | Description      |
+| ---------- | ---------- | ---------------- |
+| statusCode | `200`      | The status code. |
+| body       | `Resource` |                  |
 
 ### `ArmResponse` {#Azure.ResourceManager.ArmResponse}
 
@@ -377,23 +363,6 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 | ---------- | -------------- | ---------------- |
 | statusCode | `200`          | The status code. |
 | body       | `ResponseBody` |                  |
-
-### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CustomerManagedKeyEncryption}
-
-Customer-managed key encryption properties for the resource.
-
-```typespec
-model Azure.ResourceManager.CustomerManagedKeyEncryption
-```
-
-#### Properties
-
-| Name                            | Type                                                                                         | Description                                                                                                                                                                                                                                                                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| keyEncryptionKeyIdentity?       | [`KeyEncryptionKeyIdentity`](./data-types.md#Azure.ResourceManager.KeyEncryptionKeyIdentity) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
-| userAssignedIdentityResourceId? | `Core.armResourceIdentifier`                                                                 | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
-| federatedClientId?              | `Core.uuid`                                                                                  | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
-| delegatedIdentityClientId?      | `Core.uuid`                                                                                  | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
@@ -419,12 +388,13 @@ model FooProperties {
 | ------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------- |
 | provisioningState? | [`ResourceProvisioningState`](./data-types.md#Azure.ResourceManager.ResourceProvisioningState) | The provisioning state of the resource. |
 
-### `Encryption` {#Azure.ResourceManager.Encryption}
+### `EncryptionProperty` {#Azure.ResourceManager.EncryptionProperty}
 
 Model used only to spread in the `encryption` envelope property for a resource.
+All encryption configuration for a resource.
 
 ```typespec
-model Azure.ResourceManager.Encryption
+model Azure.ResourceManager.EncryptionProperty
 ```
 
 #### Examples
@@ -437,25 +407,9 @@ model Foo is TrackedResource<FooProperties> {
 
 #### Properties
 
-| Name       | Type                                                                                       | Description                                  |
-| ---------- | ------------------------------------------------------------------------------------------ | -------------------------------------------- |
-| encryption | [`EncryptionConfiguration`](./data-types.md#Azure.ResourceManager.EncryptionConfiguration) | All encryption configuration for a resource. |
-
-### `EncryptionConfiguration` {#Azure.ResourceManager.EncryptionConfiguration}
-
-All encryption configuration for a resource.
-
-```typespec
-model Azure.ResourceManager.EncryptionConfiguration
-```
-
-#### Properties
-
-| Name                          | Type                                                                                                 | Description                                                                                                                                                                                          |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.InfrastructureEncryption)         | Indicates if infrastructure encryption is enabled or disabled.                                                                                                                                       |
-| customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CustomerManagedKeyEncryption) | All customer-managed key encryption properties for the resource.                                                                                                                                     |
-| keyEncryptionKeyUrl?          | `string`                                                                                             | key encryption key Url, versioned or unversioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
+| Name       | Type                                                                         | Description                                  |
+| ---------- | ---------------------------------------------------------------------------- | -------------------------------------------- |
+| encryption | [`Encryption`](./data-types.md#Azure.ResourceManager.CommonTypes.Encryption) | All encryption configuration for a resource. |
 
 ### `EntityTagProperty` {#Azure.ResourceManager.EntityTagProperty}
 
@@ -480,20 +434,6 @@ model Foo is TrackedResource<FooProperties> {
 | ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | eTag? | `string` | If eTag is provided in the response body, it may also be provided as a header per the normal etag convention. Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
 
-### `ErrorResponse` {#Azure.ResourceManager.ErrorResponse}
-
-The standard Azure Resource Manager error response
-
-```typespec
-model Azure.ResourceManager.ErrorResponse
-```
-
-#### Properties
-
-| Name   | Type                                                                           | Description       |
-| ------ | ------------------------------------------------------------------------------ | ----------------- |
-| error? | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | The error object. |
-
 ### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
 
 Model representing the standard `extendedLocation` envelope property for a resource.
@@ -516,7 +456,7 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 | Name              | Type                                                                                     | Description |
 | ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
-| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocation) |             |
+| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) |             |
 
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
@@ -573,20 +513,6 @@ model Azure.ResourceManager.LocationParameter
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
 
-### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
-
-The default location parameter type.
-
-```typespec
-model Azure.ResourceManager.LocationResourceParameter
-```
-
-#### Properties
-
-| Name     | Type     | Description        |
-| -------- | -------- | ------------------ |
-| location | `string` | The location name. |
-
 ### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
 Model representing the standard `managedBy` envelope property for a resource.
@@ -633,7 +559,7 @@ model Foo is TrackedResource<FooProperties> {
 
 | Name      | Type                                                                                                 | Description                                               |
 | --------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| identity? | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentity) | The managed service identities assigned to this resource. |
+| identity? | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) | The managed service identities assigned to this resource. |
 
 ### `ManagedSystemAssignedIdentityProperty` {#Azure.ResourceManager.ManagedSystemAssignedIdentityProperty}
 
@@ -658,7 +584,7 @@ model Foo is TrackedResource<FooProperties> {
 
 | Name      | Type                                                                                                               | Description                                               |
 | --------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
-| identity? | [`SystemAssignedServiceIdentity`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity) | The managed service identities assigned to this resource. |
+| identity? | [`SystemAssignedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity) | The managed service identities assigned to this resource. |
 
 ### `ParentKeysOf` {#Azure.ResourceManager.ParentKeysOf}
 
@@ -677,163 +603,6 @@ model Azure.ResourceManager.ParentKeysOf<Resource>
 #### Properties
 
 None
-
-### `PrivateEndpoint` {#Azure.ResourceManager.PrivateEndpoint}
-
-The private endpoint resource
-
-```typespec
-model Azure.ResourceManager.PrivateEndpoint
-```
-
-#### Properties
-
-| Name | Type                         | Description                                  |
-| ---- | ---------------------------- | -------------------------------------------- |
-| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
-
-### `PrivateEndpointConnection` {#Azure.ResourceManager.PrivateEndpointConnection}
-
-The private endpoint connection resource
-
-```typespec
-model Azure.ResourceManager.PrivateEndpointConnection
-```
-
-#### Properties
-
-| Name        | Type                                                                                                               | Description                                |
-| ----------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
-
-### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.PrivateEndpointConnectionParameter}
-
-The name of the private endpoint connection associated with the Azure resource.
-
-```typespec
-model Azure.ResourceManager.PrivateEndpointConnectionParameter<Segment>
-```
-
-#### Template Parameters
-
-| Name    | Description                                                                                     |
-| ------- | ----------------------------------------------------------------------------------------------- |
-| Segment | The resource type name for private endpoint connections (default is privateEndpointConnections) |
-
-#### Properties
-
-| Name | Type     | Description                                                                     |
-| ---- | -------- | ------------------------------------------------------------------------------- |
-| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
-
-### `PrivateEndpointConnectionProperties` {#Azure.ResourceManager.PrivateEndpointConnectionProperties}
-
-Properties of he private endpoint connection resource
-
-```typespec
-model Azure.ResourceManager.PrivateEndpointConnectionProperties
-```
-
-#### Properties
-
-| Name                              | Type                                                                                                                             | Description                                                                                          |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| groupIds?                         | `string[]`                                                                                                                       | The group identifiers for the private endpoint resource                                              |
-| privateEndpoint?                  | [`PrivateEndpoint`](./data-types.md#Azure.ResourceManager.PrivateEndpoint)                                                       | The private endpoint resource                                                                        |
-| privateLinkServiceConnectionState | [`PrivateLinkServiceConnectionState`](./data-types.md#Azure.ResourceManager.PrivateLinkServiceConnectionState)                   | A collection of information about the state of the connection between service consumer and provider. |
-| provisioningState?                | [`PrivateEndpointConnectionProvisioningState`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState) | The provisioning state of the private endpoint connection resource.                                  |
-
-### `PrivateEndpointConnectionResourceListResult` {#Azure.ResourceManager.PrivateEndpointConnectionResourceListResult}
-
-List of private endpoint connections associated with the specified resource.
-
-```typespec
-model Azure.ResourceManager.PrivateEndpointConnectionResourceListResult
-```
-
-#### Properties
-
-| Name   | Type                                          | Description                           |
-| ------ | --------------------------------------------- | ------------------------------------- |
-| value? | `ResourceManager.PrivateEndpointConnection[]` | Array of private endpoint connections |
-
-### `PrivateLinkResource` {#Azure.ResourceManager.PrivateLinkResource}
-
-```typespec
-model Azure.ResourceManager.PrivateLinkResource
-```
-
-#### Properties
-
-| Name        | Type                                                                                                   | Description                              |
-| ----------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
-| properties? | [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.PrivateLinkResourceProperties) | Properties of the private link resource. |
-
-### `PrivateLinkResourceListResult` {#Azure.ResourceManager.PrivateLinkResourceListResult}
-
-A list of private link resources.
-
-```typespec
-model Azure.ResourceManager.PrivateLinkResourceListResult
-```
-
-#### Properties
-
-| Name   | Type                                    | Description                     |
-| ------ | --------------------------------------- | ------------------------------- |
-| value? | `ResourceManager.PrivateLinkResource[]` | Array of private link resources |
-
-### `PrivateLinkResourceParameter` {#Azure.ResourceManager.PrivateLinkResourceParameter}
-
-The name of the private link associated with the Azure resource.
-
-```typespec
-model Azure.ResourceManager.PrivateLinkResourceParameter<Segment>
-```
-
-#### Template Parameters
-
-| Name    | Description                                                                |
-| ------- | -------------------------------------------------------------------------- |
-| Segment | The resource type name for private links (default is privateLinkResources) |
-
-#### Properties
-
-| Name | Type     | Description                                                      |
-| ---- | -------- | ---------------------------------------------------------------- |
-| name | `string` | The name of the private link associated with the Azure resource. |
-
-### `PrivateLinkResourceProperties` {#Azure.ResourceManager.PrivateLinkResourceProperties}
-
-Properties of a private link resource.
-
-```typespec
-model Azure.ResourceManager.PrivateLinkResourceProperties
-```
-
-#### Properties
-
-| Name               | Type       | Description                                           |
-| ------------------ | ---------- | ----------------------------------------------------- |
-| groupId?           | `string`   | The private link resource group id.                   |
-| requiredMembers?   | `string[]` | The private link resource required member names.      |
-| requiredZoneNames? | `string[]` | The private link resource private link DNS zone name. |
-
-### `PrivateLinkServiceConnectionState` {#Azure.ResourceManager.PrivateLinkServiceConnectionState}
-
-A collection of information about the state of the connection between service consumer and provider.
-
-```typespec
-model Azure.ResourceManager.PrivateLinkServiceConnectionState
-```
-
-#### Properties
-
-| Name             | Type                                                                                                                     | Description                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| status?          | [`PrivateEndpointServiceConnectionStatus`](./data-types.md#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus) | Indicates whether the connection has been Approved/Rejected/Removed by the owner of the service. |
-| description?     | `string`                                                                                                                 | The reason for approval/rejection of the connection.                                             |
-| actionsRequired? | `string`                                                                                                                 | A message indicating if changes on the service provider require any updates on the consumer.     |
 
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
@@ -888,23 +657,9 @@ model Azure.ResourceManager.ResourceGroupLocationResource
 
 #### Properties
 
-| Name     | Type     | Description        |
-| -------- | -------- | ------------------ |
-| location | `string` | The location name. |
-
-### `ResourceGroupParameter` {#Azure.ResourceManager.ResourceGroupParameter}
-
-The default resource group parameter type.
-
-```typespec
-model Azure.ResourceManager.ResourceGroupParameter
-```
-
-#### Properties
-
-| Name              | Type     | Description                                                   |
-| ----------------- | -------- | ------------------------------------------------------------- |
-| resourceGroupName | `string` | The name of the resource group. The name is case insensitive. |
+| Name     | Type     | Description                   |
+| -------- | -------- | ----------------------------- |
+| location | `string` | The name of the Azure region. |
 
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
@@ -968,10 +723,10 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 
 #### Properties
 
-| Name      | Type                             | Description                        |
-| --------- | -------------------------------- | ---------------------------------- |
-| value     | `Array<Element>`                 | The {name} items on this page      |
-| nextLink? | `TypeSpec.Rest.ResourceLocation` | The link to the next page of items |
+| Name      | Type                             | Description |
+| --------- | -------------------------------- | ----------- |
+| value     | `Array<Element>`                 |             |
+| nextLink? | `TypeSpec.Rest.ResourceLocation` |             |
 
 ### `ResourceNameParameter` {#Azure.ResourceManager.ResourceNameParameter}
 
@@ -979,24 +734,27 @@ Spread this model into ARM resource models to specify resource name parameter fo
 is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
 automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
 
+For additional decorators such as
+
 ```typespec
-model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern>
+model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern, Type>
 ```
 
 #### Template Parameters
 
-| Name        | Description                                                       |
-| ----------- | ----------------------------------------------------------------- |
-| Resource    | The ARM resource this name parameter is applying to.              |
-| KeyName     | Override default key name of the resource.                        |
-| SegmentName | Override default segment name of the resource.                    |
-| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`. |
+| Name        | Description                                                                                              |
+| ----------- | -------------------------------------------------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.                                                     |
+| KeyName     | Override default key name of the resource.                                                               |
+| SegmentName | Override default segment name of the resource.                                                           |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                        |
+| Type        | The type of the name property. Default type is string. However you can pass an union with string values. |
 
 #### Properties
 
-| Name | Type     | Description |
-| ---- | -------- | ----------- |
-| name | `string` |             |
+| Name | Type   | Description |
+| ---- | ------ | ----------- |
+| name | `Type` |             |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
@@ -1042,7 +800,7 @@ model Foo is TrackedResource<FooProperties> {
 
 | Name  | Type                                                             | Description                   |
 | ----- | ---------------------------------------------------------------- | ----------------------------- |
-| plan? | [`Plan`](./data-types.md#Azure.ResourceManager.Foundations.Plan) | Details of the resource plan. |
+| plan? | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan) | Details of the resource plan. |
 
 ### `ResourceSkuProperty` {#Azure.ResourceManager.ResourceSkuProperty}
 
@@ -1066,7 +824,7 @@ model Foo is TrackedResource<FooProperties> {
 
 | Name | Type                                                           | Description                                             |
 | ---- | -------------------------------------------------------------- | ------------------------------------------------------- |
-| sku? | [`Sku`](./data-types.md#Azure.ResourceManager.Foundations.Sku) | The SKU (Stock Keeping Unit) assigned to this resource. |
+| sku? | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku) | The SKU (Stock Keeping Unit) assigned to this resource. |
 
 ### `ResourceUriParameter` {#Azure.ResourceManager.ResourceUriParameter}
 
@@ -1082,20 +840,6 @@ model Azure.ResourceManager.ResourceUriParameter
 | ----------- | -------- | ---------------------------------------------------------------------- |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
 
-### `SubscriptionIdParameter` {#Azure.ResourceManager.SubscriptionIdParameter}
-
-The default subscriptionId parameter type.
-
-```typespec
-model Azure.ResourceManager.SubscriptionIdParameter
-```
-
-#### Properties
-
-| Name           | Type     | Description                        |
-| -------------- | -------- | ---------------------------------- |
-| subscriptionId | `string` | The ID of the target subscription. |
-
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
 The location resource for subscription-based locations. This can be used as a parent
@@ -1107,9 +851,9 @@ model Azure.ResourceManager.SubscriptionLocationResource
 
 #### Properties
 
-| Name     | Type     | Description        |
-| -------- | -------- | ------------------ |
-| location | `string` | The location name. |
+| Name     | Type     | Description                   |
+| -------- | -------- | ----------------------------- |
+| location | `string` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 
@@ -1122,9 +866,9 @@ model Azure.ResourceManager.TenantLocationResource
 
 #### Properties
 
-| Name     | Type     | Description        |
-| -------- | -------- | ------------------ |
-| location | `string` | The location name. |
+| Name     | Type     | Description                   |
+| -------- | -------- | ----------------------------- |
+| location | `string` | The name of the Azure region. |
 
 ### `TrackedResource` {#Azure.ResourceManager.TrackedResource}
 
@@ -1156,38 +900,6 @@ Supported versions of Azure.ResourceManager building blocks.
 enum Azure.ResourceManager.Versions
 ```
 
-### `InfrastructureEncryption` {#Azure.ResourceManager.InfrastructureEncryption}
-
-(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
-
-```typespec
-union Azure.ResourceManager.InfrastructureEncryption
-```
-
-### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.KeyEncryptionKeyIdentity}
-
-The type of identity to use.
-
-```typespec
-union Azure.ResourceManager.KeyEncryptionKeyIdentity
-```
-
-### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.PrivateEndpointConnectionProvisioningState}
-
-The provisioning state of the connection
-
-```typespec
-union Azure.ResourceManager.PrivateEndpointConnectionProvisioningState
-```
-
-### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.PrivateEndpointServiceConnectionStatus}
-
-The private endpoint connection status
-
-```typespec
-union Azure.ResourceManager.PrivateEndpointServiceConnectionStatus
-```
-
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
 Standard terminal provisioning state of resource type. You can include in your
@@ -1211,12 +923,921 @@ union FooProvisioningState {
 
 ## Azure.ResourceManager.CommonTypes
 
+### `ApiVersionParameter` {#Azure.ResourceManager.CommonTypes.ApiVersionParameter}
+
+The default api-version parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ApiVersionParameter
+```
+
+#### Properties
+
+| Name       | Type     | Description                                |
+| ---------- | -------- | ------------------------------------------ |
+| apiVersion | `string` | The API version to use for this operation. |
+
+### `AzureEntityResource` {#Azure.ResourceManager.CommonTypes.AzureEntityResource}
+
+The resource model definition for an Azure Resource Manager resource with an etag.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AzureEntityResource
+```
+
+#### Properties
+
+| Name  | Type     | Description    |
+| ----- | -------- | -------------- |
+| etag? | `string` | Resource Etag. |
+
+### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
+
+The check availability request body.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest
+```
+
+#### Properties
+
+| Name  | Type     | Description                                                          |
+| ----- | -------- | -------------------------------------------------------------------- |
+| name? | `string` | The name of the resource for which availability needs to be checked. |
+| type? | `string` | The resource type.                                                   |
+
+### `CheckNameAvailabilityResponse` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityResponse}
+
+The check availability result.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.CheckNameAvailabilityResponse
+```
+
+#### Properties
+
+| Name           | Type                                                                                                           | Description                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| nameAvailable? | `boolean`                                                                                                      | Indicates if the resource name is available.         |
+| reason?        | [`CheckNameAvailabilityReason`](./data-types.md#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason) | The reason why the given name is not available.      |
+| message?       | `string`                                                                                                       | Detailed reason why the given name is not available. |
+
+### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption}
+
+Customer-managed key encryption properties for the resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption
+```
+
+#### Properties
+
+| Name                      | Type                                                                                                     | Description                                                                                                                                                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| keyEncryptionKeyIdentity? | [`KeyEncryptionKeyIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity) | All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.                                                                              |
+| keyEncryptionKeyUrl?      | `string`                                                                                                 | key encryption key Url, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
+
+### `Encryption` {#Azure.ResourceManager.CommonTypes.Encryption}
+
+(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Encryption
+```
+
+#### Properties
+
+| Name                          | Type                                                                                                             | Description                                                      |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption)         | Values are enabled and disabled.                                 |
+| customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
+
+### `EncryptionProperties` {#Azure.ResourceManager.CommonTypes.EncryptionProperties}
+
+Configuration of key for data encryption
+
+```typespec
+model Azure.ResourceManager.CommonTypes.EncryptionProperties
+```
+
+#### Properties
+
+| Name                | Type                                                                                         | Description                                                                |
+| ------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| status?             | [`EncryptionStatus`](./data-types.md#Azure.ResourceManager.CommonTypes.EncryptionStatus)     | Indicates whether or not the encryption is enabled for container registry. |
+| keyVaultProperties? | [`KeyVaultProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.KeyVaultProperties) | Key vault properties.                                                      |
+
+### `ErrorAdditionalInfo` {#Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo}
+
+The resource management error additional info.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo
+```
+
+#### Properties
+
+| Name  | Type     | Description               |
+| ----- | -------- | ------------------------- |
+| type? | `string` | The additional info type. |
+| info? | `{}`     | The additional info.      |
+
+### `ErrorDetail` {#Azure.ResourceManager.CommonTypes.ErrorDetail}
+
+The error detail.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ErrorDetail
+```
+
+#### Properties
+
+| Name            | Type                                                | Description                |
+| --------------- | --------------------------------------------------- | -------------------------- |
+| code?           | `string`                                            | The error code.            |
+| message?        | `string`                                            | The error message.         |
+| target?         | `string`                                            | The error target.          |
+| details?        | `ResourceManager.CommonTypes.ErrorDetail[]`         | The error details.         |
+| additionalInfo? | `ResourceManager.CommonTypes.ErrorAdditionalInfo[]` | The error additional info. |
+
+### `ErrorResponse` {#Azure.ResourceManager.CommonTypes.ErrorResponse}
+
+Common error response for all Azure Resource Manager APIs to return error details for failed operations.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Properties
+
+| Name   | Type                                                                           | Description       |
+| ------ | ------------------------------------------------------------------------------ | ----------------- |
+| error? | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | The error object. |
+
+### `ExtendedLocation` {#Azure.ResourceManager.CommonTypes.ExtendedLocation}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ExtendedLocation
+```
+
+#### Properties
+
+| Name | Type                                                                                             | Description                        |
+| ---- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name | `string`                                                                                         | The name of the extended location. |
+| type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocationType) | The type of the extended location. |
+
+### `ExtensionResource` {#Azure.ResourceManager.CommonTypes.ExtensionResource}
+
+The base extension resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ExtensionResource
+```
+
+#### Properties
+
+None
+
+### `Identity` {#Azure.ResourceManager.CommonTypes.Identity}
+
+Identity for the resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Identity
+```
+
+#### Properties
+
+| Name         | Type                                                                                             | Description                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| principalId? | `Core.uuid`                                                                                      | The principal ID of resource identity. The value must be an UUID. |
+| tenantId?    | `Core.uuid`                                                                                      | The tenant ID of resource. The value must be an UUID.             |
+| type?        | [`ResourceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceIdentityType) | The identity type.                                                |
+
+### `IfMatchHeader` {#Azure.ResourceManager.CommonTypes.IfMatchHeader}
+
+The default ARM If-Match header type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.IfMatchHeader
+```
+
+#### Properties
+
+| Name    | Type     | Description                                           |
+| ------- | -------- | ----------------------------------------------------- |
+| ifMatch | `string` | The If-Match header that makes a request conditional. |
+
+### `IfNoneMatchHeader` {#Azure.ResourceManager.CommonTypes.IfNoneMatchHeader}
+
+The default ARM If-Match header type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.IfNoneMatchHeader
+```
+
+#### Properties
+
+| Name        | Type     | Description                                                |
+| ----------- | -------- | ---------------------------------------------------------- |
+| ifNoneMatch | `string` | The If-None-Match header that makes a request conditional. |
+
+### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity}
+
+All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity
+```
+
+#### Properties
+
+| Name                            | Type                                                                                                             | Description                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| identityType?                   | [`KeyEncryptionKeyIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentityType) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
+| userAssignedIdentityResourceId? | `Core.armResourceIdentifier`                                                                                     | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
+| federatedClientId?              | `Core.uuid`                                                                                                      | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
+| delegatedIdentityClientId?      | `Core.uuid`                                                                                                      | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
+
+### `KeyVaultProperties` {#Azure.ResourceManager.CommonTypes.KeyVaultProperties}
+
+```typespec
+model Azure.ResourceManager.CommonTypes.KeyVaultProperties
+```
+
+#### Properties
+
+| Name           | Type     | Description                                                           |
+| -------------- | -------- | --------------------------------------------------------------------- |
+| keyIdentifier? | `string` | Key vault uri to access the encryption key.                           |
+| identity?      | `string` | The client ID of the identity which will be used to access key vault. |
+
+### `LocationData` {#Azure.ResourceManager.CommonTypes.LocationData}
+
+Metadata pertaining to the geographic location of the resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.LocationData
+```
+
+#### Properties
+
+| Name             | Type     | Description                                                     |
+| ---------------- | -------- | --------------------------------------------------------------- |
+| name             | `string` | A canonical name for the geographic or physical location.       |
+| city?            | `string` | The city or locality where the resource is located.             |
+| district?        | `string` | The district, state, or province where the resource is located. |
+| countryOrRegion? | `string` | The country or region where the resource is located             |
+
+### `LocationParameter` {#Azure.ResourceManager.CommonTypes.LocationParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.LocationParameter
+```
+
+#### Properties
+
+| Name     | Type     | Description               |
+| -------- | -------- | ------------------------- |
+| location | `string` | The name of Azure region. |
+
+### `LocationResourceParameter` {#Azure.ResourceManager.CommonTypes.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.LocationResourceParameter
+```
+
+#### Properties
+
+| Name     | Type     | Description                   |
+| -------- | -------- | ----------------------------- |
+| location | `string` | The name of the Azure region. |
+
+### `ManagedServiceIdentity` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity}
+
+Managed service identity (system assigned and/or user assigned identities)
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ManagedServiceIdentity
+```
+
+#### Properties
+
+| Name                    | Type                                                                                                         | Description                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| principalId?            | `Core.uuid`                                                                                                  | The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. |
+| tenantId?               | `Core.uuid`                                                                                                  | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
+| type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
+| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity \| null>`                                           | The identities assigned to this resource by the user.                                                                         |
+
+### `ManagementGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter}
+
+The default ManagementGroupName parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                     |
+| ------------------- | -------- | --------------------------------------------------------------- |
+| managementGroupName | `string` | The name of the management group. The name is case insensitive. |
+
+### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
+
+Details of a REST API operation, returned from the Resource Provider Operations API
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Operation
+```
+
+#### Properties
+
+| Name          | Type                                                                                     | Description                                                                                                                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name?         | `string`                                                                                 | The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action" |
+| isDataAction? | `boolean`                                                                                | Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.                          |
+| display?      | [`OperationDisplay`](./data-types.md#Azure.ResourceManager.CommonTypes.OperationDisplay) | Localized display information for this particular operation.                                                                                                                    |
+| origin?       | [`Origin`](./data-types.md#Azure.ResourceManager.CommonTypes.Origin)                     | The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"                                            |
+| actionType?   | [`ActionType`](./data-types.md#Azure.ResourceManager.CommonTypes.ActionType)             | Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.                                                                       |
+
+### `OperationDisplay` {#Azure.ResourceManager.CommonTypes.OperationDisplay}
+
+Localized display information for and operation.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.OperationDisplay
+```
+
+#### Properties
+
+| Name         | Type     | Description                                                                                                                                         |
+| ------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| provider?    | `string` | The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".                             |
+| resource?    | `string` | The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".                  |
+| operation?   | `string` | The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine". |
+| description? | `string` | The short, localized friendly description of the operation; suitable for tool tips and detailed views.                                              |
+
+### `OperationIdParameter` {#Azure.ResourceManager.CommonTypes.OperationIdParameter}
+
+The default operationId parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.OperationIdParameter
+```
+
+#### Properties
+
+| Name        | Type     | Description                           |
+| ----------- | -------- | ------------------------------------- |
+| operationId | `string` | The ID of an ongoing async operation. |
+
+### `OperationListResult` {#Azure.ResourceManager.CommonTypes.OperationListResult}
+
+A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.OperationListResult
+```
+
+#### Properties
+
+| Name      | Type                                      | Description                        |
+| --------- | ----------------------------------------- | ---------------------------------- |
+| value     | `ResourceManager.CommonTypes.Operation[]` | The Operation items on this page   |
+| nextLink? | `TypeSpec.Rest.ResourceLocation`          | The link to the next page of items |
+
+### `OperationStatusResult` {#Azure.ResourceManager.CommonTypes.OperationStatusResult}
+
+The current status of an async operation.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.OperationStatusResult
+```
+
+#### Properties
+
+| Name             | Type                                                                           | Description                                 |
+| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------- |
+| id?              | `string`                                                                       | Fully qualified ID for the async operation. |
+| name?            | `string`                                                                       | Name of the async operation.                |
+| status           | `string`                                                                       | Operation status.                           |
+| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
+| startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
+| endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
+| operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                        |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error. |
+
+### `Plan` {#Azure.ResourceManager.CommonTypes.Plan}
+
+Plan for the resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Plan
+```
+
+#### Properties
+
+| Name           | Type     | Description                                                                                                                                                 |
+| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name           | `string` | A user defined name of the 3rd Party Artifact that is being procured.                                                                                       |
+| publisher      | `string` | The publisher of the 3rd Party Artifact that is being bought. E.g. NewRelic                                                                                 |
+| product        | `string` | The 3rd Party artifact that is being procured. E.g. NewRelic. Product maps to the OfferID specified for the artifact at the time of Data Market onboarding. |
+| promotionCode? | `string` | A publisher provided promotion code as provisioned in Data Market for the said product/artifact.                                                            |
+| version?       | `string` | The version of the desired product/artifact.                                                                                                                |
+
+### `PrivateEndpoint` {#Azure.ResourceManager.CommonTypes.PrivateEndpoint}
+
+The Private Endpoint resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpoint
+```
+
+#### Properties
+
+| Name | Type                         | Description                                  |
+| ---- | ---------------------------- | -------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
+
+### `PrivateEndpointConnection` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnection}
+
+The private endpoint connection resource
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnection
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                           | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
+
+### `PrivateEndpointConnectionListResult` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult}
+
+List of private endpoint connections associated with the specified resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
+```
+
+#### Properties
+
+| Name   | Type                                                      | Description                            |
+| ------ | --------------------------------------------------------- | -------------------------------------- |
+| value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
+
+### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
+
+The name of the private endpoint connection associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter<Segment>
+```
+
+#### Template Parameters
+
+| Name    | Description                                                                                     |
+| ------- | ----------------------------------------------------------------------------------------------- |
+| Segment | The resource type name for private endpoint connections (default is privateEndpointConnections) |
+
+#### Properties
+
+| Name | Type     | Description                                                                     |
+| ---- | -------- | ------------------------------------------------------------------------------- |
+| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
+
+### `PrivateEndpointConnectionProperties` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties}
+
+Properties of the private endpoint connection.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties
+```
+
+#### Properties
+
+| Name                              | Type                                                                                                                                         | Description                                                                                          |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| groupIds?                         | `string[]`                                                                                                                                   | The group ids for the private endpoint resource.                                                     |
+| privateEndpoint?                  | [`PrivateEndpoint`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpoint)                                                       | The private endpoint resource.                                                                       |
+| privateLinkServiceConnectionState | [`PrivateLinkServiceConnectionState`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateLinkServiceConnectionState)                   | A collection of information about the state of the connection between service consumer and provider. |
+| provisioningState?                | [`PrivateEndpointConnectionProvisioningState`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProvisioningState) | The provisioning state of the private endpoint connection resource.                                  |
+
+### `PrivateLinkResource` {#Azure.ResourceManager.CommonTypes.PrivateLinkResource}
+
+A private link resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResource
+```
+
+#### Properties
+
+| Name        | Type                                                                                                               | Description          |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | -------------------- |
+| properties? | [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateLinkResourceProperties) | Resource properties. |
+
+### `PrivateLinkResourceListResult` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult}
+
+A list of private link resources.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
+```
+
+#### Properties
+
+| Name   | Type                                                | Description                     |
+| ------ | --------------------------------------------------- | ------------------------------- |
+| value? | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources |
+
+### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
+
+The name of the private link associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter<Segment>
+```
+
+#### Template Parameters
+
+| Name    | Description                                                                |
+| ------- | -------------------------------------------------------------------------- |
+| Segment | The resource type name for private links (default is privateLinkResources) |
+
+#### Properties
+
+| Name | Type     | Description                                                      |
+| ---- | -------- | ---------------------------------------------------------------- |
+| name | `string` | The name of the private link associated with the Azure resource. |
+
+### `PrivateLinkResourceProperties` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceProperties}
+
+Properties of a private link resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceProperties
+```
+
+#### Properties
+
+| Name               | Type       | Description                                           |
+| ------------------ | ---------- | ----------------------------------------------------- |
+| groupId?           | `string`   | The private link resource group id.                   |
+| requiredMembers?   | `string[]` | The private link resource required member names.      |
+| requiredZoneNames? | `string[]` | The private link resource private link DNS zone name. |
+
+### `PrivateLinkServiceConnectionState` {#Azure.ResourceManager.CommonTypes.PrivateLinkServiceConnectionState}
+
+A collection of information about the state of the connection between service consumer and provider.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkServiceConnectionState
+```
+
+#### Properties
+
+| Name             | Type                                                                                                                                 | Description                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| status?          | [`PrivateEndpointServiceConnectionStatus`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointServiceConnectionStatus) | Indicates whether the connection has been Approved/Rejected/Removed by the owner of the service. |
+| description?     | `string`                                                                                                                             | The reason for approval/rejection of the connection.                                             |
+| actionsRequired? | `string`                                                                                                                             | A message indicating if changes on the service provider require any updates on the consumer.     |
+
+### `ProxyResource` {#Azure.ResourceManager.CommonTypes.ProxyResource}
+
+The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a location
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ProxyResource
+```
+
+#### Properties
+
+None
+
+### `Resource` {#Azure.ResourceManager.CommonTypes.Resource}
+
+Common fields that are returned in the response for all Azure Resource Manager resources
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Resource
+```
+
+#### Properties
+
+| Name        | Type                                                                         | Description                                                                                                                                                                               |
+| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
+| type?       | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
+| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
+
+### `ResourceGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ResourceGroupNameParameter}
+
+The default resource group parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ResourceGroupNameParameter
+```
+
+#### Properties
+
+| Name              | Type     | Description                                                   |
+| ----------------- | -------- | ------------------------------------------------------------- |
+| resourceGroupName | `string` | The name of the resource group. The name is case insensitive. |
+
+### `ResourceModelWithAllowedPropertySet` {#Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet}
+
+The resource model definition containing the full set of allowed properties for a resource. Except properties bag, there cannot be a top level property outside of this set.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet
+```
+
+#### Properties
+
+| Name       | Type                                                                     | Description                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| managedBy? | `string`                                                                 | The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource.<br />If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.                                                                                                        |
+| kind?      | `string`                                                                 | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.<br />If supported, the resource provider must validate and persist this value.                                                                                                                                                                     |
+| eTag?      | `string`                                                                 | The etag field is _not_ required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.<br />Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),<br />If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
+| identity?  | [`Identity`](./data-types.md#Azure.ResourceManager.CommonTypes.Identity) |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)           |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)         |                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+### `ScopeParameter` {#Azure.ResourceManager.CommonTypes.ScopeParameter}
+
+The default Scope parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ScopeParameter
+```
+
+#### Properties
+
+| Name  | Type     | Description                                    |
+| ----- | -------- | ---------------------------------------------- |
+| scope | `string` | The scope at which the operation is performed. |
+
+### `Sku` {#Azure.ResourceManager.CommonTypes.Sku}
+
+The resource model definition representing SKU
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Sku
+```
+
+#### Properties
+
+| Name      | Type                                                                   | Description                                                                                                                                          |
+| --------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name      | `string`                                                               | The name of the SKU. Ex - P3. It is typically a letter+number code                                                                                   |
+| tier?     | [`SkuTier`](./data-types.md#Azure.ResourceManager.CommonTypes.SkuTier) | This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.               |
+| size?     | `string`                                                               | The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code.                                |
+| family?   | `string`                                                               | If the service has different generations of hardware, for the same SKU, then that can be captured here.                                              |
+| capacity? | `int32`                                                                | If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted. |
+
+### `SubscriptionIdParameter` {#Azure.ResourceManager.CommonTypes.SubscriptionIdParameter}
+
+The default subscriptionId parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.SubscriptionIdParameter
+```
+
+#### Properties
+
+| Name           | Type        | Description                                                   |
+| -------------- | ----------- | ------------------------------------------------------------- |
+| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
+
+### `SystemAssignedServiceIdentity` {#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity}
+
+Managed service identity (either system assigned, or none)
+
+```typespec
+model Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity
+```
+
+#### Properties
+
+| Name         | Type                                                                                                                       | Description                                                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| principalId? | `Core.uuid`                                                                                                                | The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. |
+| tenantId?    | `Core.uuid`                                                                                                                | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
+| type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
+
+### `SystemData` {#Azure.ResourceManager.CommonTypes.SystemData}
+
+Metadata pertaining to creation and last modification of the resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.SystemData
+```
+
+#### Properties
+
+| Name                | Type                                                                               | Description                                           |
+| ------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| createdBy?          | `string`                                                                           | The identity that created the resource.               |
+| createdByType?      | [`createdByType`](./data-types.md#Azure.ResourceManager.CommonTypes.createdByType) | The type of identity that created the resource.       |
+| createdAt?          | `utcDateTime`                                                                      | The timestamp of resource creation (UTC).             |
+| lastModifiedBy?     | `string`                                                                           | The identity that last modified the resource.         |
+| lastModifiedByType? | [`createdByType`](./data-types.md#Azure.ResourceManager.CommonTypes.createdByType) | The type of identity that last modified the resource. |
+| lastModifiedAt?     | `utcDateTime`                                                                      | The timestamp of resource last modification (UTC)     |
+
+### `TenantIdParameter` {#Azure.ResourceManager.CommonTypes.TenantIdParameter}
+
+The default ManagementGroupName parameter type.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.TenantIdParameter
+```
+
+#### Properties
+
+| Name     | Type        | Description                                                                                      |
+| -------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| tenantId | `Core.uuid` | The Azure tenant ID. This is a GUID-formatted string (e.g. 00000000-0000-0000-0000-000000000000) |
+
+### `TrackedResource` {#Azure.ResourceManager.CommonTypes.TrackedResource}
+
+The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'
+
+```typespec
+model Azure.ResourceManager.CommonTypes.TrackedResource
+```
+
+#### Properties
+
+| Name     | Type             | Description                               |
+| -------- | ---------------- | ----------------------------------------- |
+| tags?    | `Record<string>` | Resource tags.                            |
+| location | `string`         | The geo-location where the resource lives |
+
+### `UserAssignedIdentities` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentities}
+
+The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.UserAssignedIdentities
+```
+
+#### Properties
+
+| Name | Type                                                       | Description           |
+| ---- | ---------------------------------------------------------- | --------------------- |
+|      | `ResourceManager.CommonTypes.UserAssignedIdentity \| null` | Additional properties |
+
+### `UserAssignedIdentity` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentity}
+
+User assigned identity properties
+
+```typespec
+model Azure.ResourceManager.CommonTypes.UserAssignedIdentity
+```
+
+#### Properties
+
+| Name         | Type        | Description                                |
+| ------------ | ----------- | ------------------------------------------ |
+| principalId? | `Core.uuid` | The principal ID of the assigned identity. |
+| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
+
+### `ResourceHome` {#Azure.ResourceManager.CommonTypes.ResourceHome}
+
+An internal enum to indicate the resource support for various path types
+
+```typespec
+enum Azure.ResourceManager.CommonTypes.ResourceHome
+```
+
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 
 The Azure Resource Manager common-types versions.
 
 ```typespec
 enum Azure.ResourceManager.CommonTypes.Versions
+```
+
+### `ActionType` {#Azure.ResourceManager.CommonTypes.ActionType}
+
+Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.ActionType
+```
+
+### `CheckNameAvailabilityReason` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason}
+
+Possible reasons for a name not being available.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason
+```
+
+### `createdByType` {#Azure.ResourceManager.CommonTypes.createdByType}
+
+The kind of entity that created the resource.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.createdByType
+```
+
+### `EncryptionStatus` {#Azure.ResourceManager.CommonTypes.EncryptionStatus}
+
+Indicates whether or not the encryption is enabled for container registry.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.EncryptionStatus
+```
+
+### `ExtendedLocationType` {#Azure.ResourceManager.CommonTypes.ExtendedLocationType}
+
+The supported ExtendedLocation types.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.ExtendedLocationType
+```
+
+### `InfrastructureEncryption` {#Azure.ResourceManager.CommonTypes.InfrastructureEncryption}
+
+(Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.InfrastructureEncryption
+```
+
+### `KeyEncryptionKeyIdentityType` {#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentityType}
+
+The type of identity to use.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentityType
+```
+
+### `ManagedServiceIdentityType` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentityType}
+
+Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).
+
+```typespec
+union Azure.ResourceManager.CommonTypes.ManagedServiceIdentityType
+```
+
+### `Origin` {#Azure.ResourceManager.CommonTypes.Origin}
+
+The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+
+```typespec
+union Azure.ResourceManager.CommonTypes.Origin
+```
+
+### `PrivateEndpointConnectionProvisioningState` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProvisioningState}
+
+The current provisioning state.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProvisioningState
+```
+
+### `PrivateEndpointServiceConnectionStatus` {#Azure.ResourceManager.CommonTypes.PrivateEndpointServiceConnectionStatus}
+
+The private endpoint connection status.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.PrivateEndpointServiceConnectionStatus
+```
+
+### `ResourceIdentityType` {#Azure.ResourceManager.CommonTypes.ResourceIdentityType}
+
+```typespec
+union Azure.ResourceManager.CommonTypes.ResourceIdentityType
+```
+
+### `SkuTier` {#Azure.ResourceManager.CommonTypes.SkuTier}
+
+This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.SkuTier
+```
+
+### `SystemAssignedServiceIdentityType` {#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType}
+
+Type of managed service identity (either system assigned, or none).
+
+```typespec
+union Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType
 ```
 
 ## Azure.ResourceManager.Foundations
@@ -1226,6 +1847,7 @@ enum Azure.ResourceManager.CommonTypes.Versions
 Standard type definition for Azure Resource Manager Tags property.
 
 It is included in the TrackedResource template definition.
+The Azure Resource Manager Resource tags.
 
 ```typespec
 model Azure.ResourceManager.Foundations.ArmTagsProperty
@@ -1236,51 +1858,6 @@ model Azure.ResourceManager.Foundations.ArmTagsProperty
 | Name  | Type             | Description    |
 | ----- | ---------------- | -------------- |
 | tags? | `Record<string>` | Resource tags. |
-
-### `AzureEntityResource` {#Azure.ResourceManager.Foundations.AzureEntityResource}
-
-The resource model definition for an Azure Resource Manager resource with an etag.
-
-```typespec
-model Azure.ResourceManager.Foundations.AzureEntityResource
-```
-
-#### Properties
-
-| Name | Type     | Description    |
-| ---- | -------- | -------------- |
-| etag | `string` | Resource Etag. |
-
-### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest}
-
-The check availability request body.
-
-```typespec
-model Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest
-```
-
-#### Properties
-
-| Name  | Type     | Description                                                          |
-| ----- | -------- | -------------------------------------------------------------------- |
-| name? | `string` | The name of the resource for which availability needs to be checked. |
-| type? | `string` | The resource type.                                                   |
-
-### `CheckNameAvailabilityResponse` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityResponse}
-
-The check availability result.
-
-```typespec
-model Azure.ResourceManager.Foundations.CheckNameAvailabilityResponse
-```
-
-#### Properties
-
-| Name           | Type                                                                                                           | Description                                          |
-| -------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| nameAvailable? | `boolean`                                                                                                      | Indicates if the resource name is available.         |
-| reason?        | [`CheckNameAvailabilityReason`](./data-types.md#Azure.ResourceManager.Foundations.CheckNameAvailabilityReason) | The reason why the given name is not available.      |
-| message?       | `string`                                                                                                       | Detailed reason why the given name is not available. |
 
 ### `DefaultBaseParameters` {#Azure.ResourceManager.Foundations.DefaultBaseParameters}
 
@@ -1298,61 +1875,13 @@ model Azure.ResourceManager.Foundations.DefaultBaseParameters<Resource>
 
 #### Properties
 
-| Name              | Type     | Description                                                            |
-| ----------------- | -------- | ---------------------------------------------------------------------- |
-| apiVersion        | `string` | The API version to use for this operation.                             |
-| subscriptionId    | `string` | The ID of the target subscription.                                     |
-| location          | `string` | The location name.                                                     |
-| resourceGroupName | `string` | The name of the resource group. The name is case insensitive.          |
-| resourceUri       | `string` | The fully qualified Azure Resource manager identifier of the resource. |
-
-### `ErrorAdditionalInfo` {#Azure.ResourceManager.Foundations.ErrorAdditionalInfo}
-
-The resource management error additional info.
-
-```typespec
-model Azure.ResourceManager.Foundations.ErrorAdditionalInfo
-```
-
-#### Properties
-
-| Name  | Type     | Description               |
-| ----- | -------- | ------------------------- |
-| type? | `string` | The additional info type. |
-| info? | `{}`     | The additional info.      |
-
-### `ErrorDetail` {#Azure.ResourceManager.Foundations.ErrorDetail}
-
-The error detail.
-
-```typespec
-model Azure.ResourceManager.Foundations.ErrorDetail
-```
-
-#### Properties
-
-| Name            | Type                                                | Description                |
-| --------------- | --------------------------------------------------- | -------------------------- |
-| code?           | `string`                                            | The error code.            |
-| message?        | `string`                                            | The error message.         |
-| target?         | `string`                                            | The error target.          |
-| details?        | `ResourceManager.Foundations.ErrorDetail[]`         | The error details.         |
-| additionalInfo? | `ResourceManager.Foundations.ErrorAdditionalInfo[]` | The error additional info. |
-
-### `ExtendedLocation` {#Azure.ResourceManager.Foundations.ExtendedLocation}
-
-The complex type of the extended location.
-
-```typespec
-model Azure.ResourceManager.Foundations.ExtendedLocation
-```
-
-#### Properties
-
-| Name | Type                                                                                             | Description                        |
-| ---- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
-| name | `string`                                                                                         | The name of the extended location. |
-| type | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.Foundations.ExtendedLocationType) | The type of the extended location. |
+| Name              | Type        | Description                                                            |
+| ----------------- | ----------- | ---------------------------------------------------------------------- |
+| apiVersion        | `string`    | The API version to use for this operation.                             |
+| subscriptionId    | `Core.uuid` | The ID of the target subscription. The value must be an UUID.          |
+| location          | `string`    | The location name.                                                     |
+| resourceGroupName | `string`    | The name of the resource group. The name is case insensitive.          |
+| resourceUri       | `string`    | The fully qualified Azure Resource manager identifier of the resource. |
 
 ### `ExtensionBaseParameters` {#Azure.ResourceManager.Foundations.ExtensionBaseParameters}
 
@@ -1368,18 +1897,6 @@ model Azure.ResourceManager.Foundations.ExtensionBaseParameters
 | ----------- | -------- | ---------------------------------------------------------------------- |
 | apiVersion  | `string` | The API version to use for this operation.                             |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
-
-### `ExtensionResource` {#Azure.ResourceManager.Foundations.ExtensionResource}
-
-The base extension resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ExtensionResource
-```
-
-#### Properties
-
-None
 
 ### `ExtensionScope` {#Azure.ResourceManager.Foundations.ExtensionScope}
 
@@ -1401,7 +1918,7 @@ model Azure.ResourceManager.Foundations.ExtensionScope<Resource>
 | ----------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion  | `string`                         | The API version to use for this operation.                             |
 | resourceUri | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
-| provider    | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
+| provider    | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
 
 ### `LocationBaseParameters` {#Azure.ResourceManager.Foundations.LocationBaseParameters}
 
@@ -1413,11 +1930,11 @@ model Azure.ResourceManager.Foundations.LocationBaseParameters
 
 #### Properties
 
-| Name           | Type     | Description                                |
-| -------------- | -------- | ------------------------------------------ |
-| apiVersion     | `string` | The API version to use for this operation. |
-| subscriptionId | `string` | The ID of the target subscription.         |
-| location       | `string` | The location name.                         |
+| Name           | Type        | Description                                                   |
+| -------------- | ----------- | ------------------------------------------------------------- |
+| apiVersion     | `string`    | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
+| location       | `string`    | The location name.                                            |
 
 ### `LocationScope` {#Azure.ResourceManager.Foundations.LocationScope}
 
@@ -1435,144 +1952,12 @@ model Azure.ResourceManager.Foundations.LocationScope<Resource>
 
 #### Properties
 
-| Name           | Type                             | Description                                |
-| -------------- | -------------------------------- | ------------------------------------------ |
-| apiVersion     | `string`                         | The API version to use for this operation. |
-| subscriptionId | `string`                         | The ID of the target subscription.         |
-| location       | `string`                         | The location name.                         |
-| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
-
-### `ManagedServiceIdentity` {#Azure.ResourceManager.Foundations.ManagedServiceIdentity}
-
-The properties of the managed service identities assigned to this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ManagedServiceIdentity
-```
-
-#### Properties
-
-| Name                    | Type                                                                                                         | Description                                             |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| tenantId?               | `string`                                                                                                     | The Active Directory tenant id of the principal.        |
-| principalId?            | `string`                                                                                                     | The active directory identifier of this principal.      |
-| type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.ManagedServiceIdentityType) | The type of managed identity assigned to this resource. |
-| userAssignedIdentities? | `Record<ResourceManager.Foundations.UserAssignedIdentity>`                                                   | The identities assigned to this resource by the user.   |
-
-### `Operation` {#Azure.ResourceManager.Foundations.Operation}
-
-Details of a REST API operation, returned from the Resource Provider Operations API
-
-```typespec
-model Azure.ResourceManager.Foundations.Operation
-```
-
-#### Properties
-
-| Name          | Type                                                                                     | Description                                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name?         | `string`                                                                                 | The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action" |
-| isDataAction? | `boolean`                                                                                | Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.                          |
-| display?      | [`OperationDisplay`](./data-types.md#Azure.ResourceManager.Foundations.OperationDisplay) | Localized display information for this particular operation.                                                                                                                    |
-| origin?       | [`Origin`](./data-types.md#Azure.ResourceManager.Foundations.Origin)                     | The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"                                            |
-| actionType?   | [`ActionType`](./data-types.md#Azure.ResourceManager.Foundations.ActionType)             | Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.                                                                       |
-
-### `OperationDisplay` {#Azure.ResourceManager.Foundations.OperationDisplay}
-
-Localized display information for and operation.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationDisplay
-```
-
-#### Properties
-
-| Name         | Type     | Description                                                                                                                                         |
-| ------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| provider?    | `string` | The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".                             |
-| resource?    | `string` | The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".                  |
-| operation?   | `string` | The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine". |
-| description? | `string` | The short, localized friendly description of the operation; suitable for tool tips and detailed views.                                              |
-
-### `OperationIdParameter` {#Azure.ResourceManager.Foundations.OperationIdParameter}
-
-The default operationId parameter type.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationIdParameter
-```
-
-#### Properties
-
-| Name        | Type     | Description                           |
-| ----------- | -------- | ------------------------------------- |
-| operationId | `string` | The ID of an ongoing async operation. |
-
-### `OperationListResult` {#Azure.ResourceManager.Foundations.OperationListResult}
-
-A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationListResult
-```
-
-#### Properties
-
-| Name      | Type                                      | Description                        |
-| --------- | ----------------------------------------- | ---------------------------------- |
-| value     | `ResourceManager.Foundations.Operation[]` | The Operation items on this page   |
-| nextLink? | `TypeSpec.Rest.ResourceLocation`          | The link to the next page of items |
-
-### `OperationStatusResult` {#Azure.ResourceManager.Foundations.OperationStatusResult}
-
-The current status of an async operation.
-
-```typespec
-model Azure.ResourceManager.Foundations.OperationStatusResult
-```
-
-#### Properties
-
-| Name             | Type                                                                           | Description                                 |
-| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------- |
-| id?              | `string`                                                                       | Fully qualified ID for the async operation. |
-| name?            | `string`                                                                       | Name of the async operation.                |
-| status           | `string`                                                                       | Operation status.                           |
-| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
-| startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
-| endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
-| operations       | `ResourceManager.Foundations.OperationStatusResult[]`                          | The operations list.                        |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.Foundations.ErrorDetail) | If present, details of the operation error. |
-
-### `Plan` {#Azure.ResourceManager.Foundations.Plan}
-
-Details of the resource plan.
-
-```typespec
-model Azure.ResourceManager.Foundations.Plan
-```
-
-#### Properties
-
-| Name           | Type     | Description                                                                                                                                                 |
-| -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name           | `string` | A user defined name of the 3rd Party Artifact that is being procured.                                                                                       |
-| publisher      | `string` | The publisher of the 3rd Party Artifact that is being bought. E.g. NewRelic                                                                                 |
-| product        | `string` | The 3rd Party artifact that is being procured. E.g. NewRelic. Product maps to the OfferID specified for the artifact at the time of Data Market onboarding. |
-| promotionCode? | `string` | A publisher provided promotion code as provisioned in Data Market for the said product/artifact.                                                            |
-| version?       | `string` | The version of the desired product/artifact.                                                                                                                |
-
-### `ProxyResource` {#Azure.ResourceManager.Foundations.ProxyResource}
-
-The base proxy resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.ProxyResource
-```
-
-#### Properties
-
-None
+| Name           | Type                             | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion     | `string`                         | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| location       | `string`                         | The location name.                                            |
+| provider       | `"Microsoft.ThisWillBeReplaced"` |                                                               |
 
 ### `ProxyResourceUpdateModel` {#Azure.ResourceManager.Foundations.ProxyResourceUpdateModel}
 
@@ -1595,23 +1980,6 @@ model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<Resource, Prope
 | ----------- | --------------------------------------------------------------------------------- | ----------- |
 | properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
 
-### `Resource` {#Azure.ResourceManager.Foundations.Resource}
-
-Base model that defines common properties for all Azure Resource Manager resources.
-
-```typespec
-model Azure.ResourceManager.Foundations.Resource
-```
-
-#### Properties
-
-| Name        | Type                                                                         | Description                                                                                                                                                                               |
-| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id?         | `string`                                                                     | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
-| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
-| type?       | `string`                                                                     | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
-| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.Foundations.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
-
 ### `ResourceGroupBaseParameters` {#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters}
 
 The static parameters for a resource-group based resource
@@ -1622,11 +1990,11 @@ model Azure.ResourceManager.Foundations.ResourceGroupBaseParameters
 
 #### Properties
 
-| Name              | Type     | Description                                                   |
-| ----------------- | -------- | ------------------------------------------------------------- |
-| apiVersion        | `string` | The API version to use for this operation.                    |
-| subscriptionId    | `string` | The ID of the target subscription.                            |
-| resourceGroupName | `string` | The name of the resource group. The name is case insensitive. |
+| Name              | Type        | Description                                                   |
+| ----------------- | ----------- | ------------------------------------------------------------- |
+| apiVersion        | `string`    | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`    | The name of the resource group. The name is case insensitive. |
 
 ### `ResourceGroupScope` {#Azure.ResourceManager.Foundations.ResourceGroupScope}
 
@@ -1647,11 +2015,11 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | Name              | Type                             | Description                                                            |
 | ----------------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`                         | The API version to use for this operation.                             |
-| subscriptionId    | `string`                         | The ID of the target subscription.                                     |
+| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID.          |
 | location          | `string`                         | The location name.                                                     |
 | resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.                               |
+| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
 
 ### `ResourceUpdateModel` {#Azure.ResourceManager.Foundations.ResourceUpdateModel}
 
@@ -1695,24 +2063,6 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, 
 
 None
 
-### `Sku` {#Azure.ResourceManager.Foundations.Sku}
-
-The SKU (Stock Keeping Unit) assigned to this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.Sku
-```
-
-#### Properties
-
-| Name      | Type                                                                   | Description                                                                                                                                          |
-| --------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name      | `string`                                                               | The name of the SKU, usually a combination of letters and numbers, for example, 'P3'                                                                 |
-| tier?     | [`SkuTier`](./data-types.md#Azure.ResourceManager.Foundations.SkuTier) | This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.               |
-| size?     | `string`                                                               | The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code.                                |
-| family?   | `string`                                                               | If the service has different generations of hardware, for the same SKU, then that can be captured here.                                              |
-| capacity? | `int32`                                                                | If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted. |
-
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 
 The static parameters for a subscription based resource
@@ -1723,10 +2073,10 @@ model Azure.ResourceManager.Foundations.SubscriptionBaseParameters
 
 #### Properties
 
-| Name           | Type     | Description                                |
-| -------------- | -------- | ------------------------------------------ |
-| apiVersion     | `string` | The API version to use for this operation. |
-| subscriptionId | `string` | The ID of the target subscription.         |
+| Name           | Type        | Description                                                   |
+| -------------- | ----------- | ------------------------------------------------------------- |
+| apiVersion     | `string`    | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid` | The ID of the target subscription. The value must be an UUID. |
 
 ### `SubscriptionScope` {#Azure.ResourceManager.Foundations.SubscriptionScope}
 
@@ -1744,46 +2094,11 @@ model Azure.ResourceManager.Foundations.SubscriptionScope<Resource>
 
 #### Properties
 
-| Name           | Type                             | Description                                |
-| -------------- | -------------------------------- | ------------------------------------------ |
-| apiVersion     | `string`                         | The API version to use for this operation. |
-| subscriptionId | `string`                         | The ID of the target subscription.         |
-| provider       | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
-
-### `SystemAssignedServiceIdentity` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity}
-
-The properties of the service-assigned identity associated with this resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.SystemAssignedServiceIdentity
-```
-
-#### Properties
-
-| Name         | Type                                                                                                                       | Description                                             |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| tenantId?    | `string`                                                                                                                   | The Active Directory tenant id of the principal.        |
-| principalId? | `string`                                                                                                                   | The active directory identifier of this principal.      |
-| type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource. |
-
-### `SystemData` {#Azure.ResourceManager.Foundations.SystemData}
-
-Metadata pertaining to creation and last modification of the resource.
-
-```typespec
-model Azure.ResourceManager.Foundations.SystemData
-```
-
-#### Properties
-
-| Name                | Type                                                                               | Description                                           |
-| ------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| createdBy?          | `string`                                                                           | The identity that created the resource.               |
-| createdByType?      | [`createdByType`](./data-types.md#Azure.ResourceManager.Foundations.createdByType) | The type of identity that created the resource.       |
-| createdAt?          | `plainDate`                                                                        | The type of identity that created the resource.       |
-| lastModifiedBy?     | `string`                                                                           | The identity that last modified the resource.         |
-| lastModifiedByType? | [`createdByType`](./data-types.md#Azure.ResourceManager.Foundations.createdByType) | The type of identity that last modified the resource. |
-| lastModifiedAt?     | `plainDate`                                                                        | The timestamp of resource last modification (UTC)     |
+| Name           | Type                             | Description                                                   |
+| -------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion     | `string`                         | The API version to use for this operation.                    |
+| subscriptionId | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| provider       | `"Microsoft.ThisWillBeReplaced"` |                                                               |
 
 ### `TagsUpdateModel` {#Azure.ResourceManager.Foundations.TagsUpdateModel}
 
@@ -1838,120 +2153,59 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 | Name       | Type                             | Description                                |
 | ---------- | -------------------------------- | ------------------------------------------ |
 | apiVersion | `string`                         | The API version to use for this operation. |
-| provider   | `"Microsoft.ThisWillBeReplaced"` | The provider namespace for the resource.   |
+| provider   | `"Microsoft.ThisWillBeReplaced"` |                                            |
 
-### `TrackedResource` {#Azure.ResourceManager.Foundations.TrackedResource}
+## Azure.ResourceManager.Legacy
 
-The base tracked resource.
+### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
+
+Managed service identity (system assigned and/or user assigned identities)
 
 ```typespec
-model Azure.ResourceManager.Foundations.TrackedResource
+model Azure.ResourceManager.Legacy.ManagedServiceIdentityV4
 ```
 
 #### Properties
 
-| Name     | Type             | Description                               |
-| -------- | ---------------- | ----------------------------------------- |
-| location | `string`         | The geo-location where the resource lives |
-| tags?    | `Record<string>` | Resource tags.                            |
+| Name                    | Type                                                                                                    | Description                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| principalId?            | `Core.uuid`                                                                                             | The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. |
+| tenantId?               | `Core.uuid`                                                                                             | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
+| type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
+| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity>`                                              | The identities assigned to this resource by the user.                                                                         |
 
-### `UserAssignedIdentities` {#Azure.ResourceManager.Foundations.UserAssignedIdentities}
+### `ManagedServiceIdentityV4Property` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property}
 
-The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
+Model representing the standard `ManagedServiceIdentity` envelope property from V4 of common type.
+
+Please note that this is only included for legacy specs with mixed v3 and v4 types, which would cause
+breaking changes due to the ManagedServiceIdentityType.SystemAndUserAssigned value changes.
+
+Do not use this if you are already on CommonTypes.Version.v4 or beyond.
 
 ```typespec
-model Azure.ResourceManager.Foundations.UserAssignedIdentities
+model Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property
+```
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  ...ResourceNameParameter<Foo>;
+  ...Legacy.ManagedServiceIdentityV4Property;
+}
 ```
 
 #### Properties
 
-| Name | Type                                                                                             | Description           |
-| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
-|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.Foundations.UserAssignedIdentity) | Additional properties |
+| Name      | Type                                                                                                | Description                                               |
+| --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
 
-### `UserAssignedIdentity` {#Azure.ResourceManager.Foundations.UserAssignedIdentity}
+### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 
-A managed identity assigned by the user.
-
-```typespec
-model Azure.ResourceManager.Foundations.UserAssignedIdentity
-```
-
-#### Properties
-
-| Name         | Type     | Description                                                |
-| ------------ | -------- | ---------------------------------------------------------- |
-| clientId?    | `string` | The active directory client identifier for this principal. |
-| principalId? | `string` | The active directory identifier for this principal.        |
-
-### `ResourceHome` {#Azure.ResourceManager.Foundations.ResourceHome}
-
-An internal enum to indicate the resource support for various path types
+Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).
 
 ```typespec
-enum Azure.ResourceManager.Foundations.ResourceHome
-```
-
-### `SkuTier` {#Azure.ResourceManager.Foundations.SkuTier}
-
-Available service tiers for the SKU.
-
-```typespec
-enum Azure.ResourceManager.Foundations.SkuTier
-```
-
-### `ActionType` {#Azure.ResourceManager.Foundations.ActionType}
-
-Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
-
-```typespec
-union Azure.ResourceManager.Foundations.ActionType
-```
-
-### `CheckNameAvailabilityReason` {#Azure.ResourceManager.Foundations.CheckNameAvailabilityReason}
-
-Possible reasons for a name not being available.
-
-```typespec
-union Azure.ResourceManager.Foundations.CheckNameAvailabilityReason
-```
-
-### `createdByType` {#Azure.ResourceManager.Foundations.createdByType}
-
-The kind of entity that created the resource.
-
-```typespec
-union Azure.ResourceManager.Foundations.createdByType
-```
-
-### `ExtendedLocationType` {#Azure.ResourceManager.Foundations.ExtendedLocationType}
-
-The supported ExtendedLocation types.
-
-```typespec
-union Azure.ResourceManager.Foundations.ExtendedLocationType
-```
-
-### `ManagedServiceIdentityType` {#Azure.ResourceManager.Foundations.ManagedServiceIdentityType}
-
-The kind of managed identity assigned to this resource.
-
-```typespec
-union Azure.ResourceManager.Foundations.ManagedServiceIdentityType
-```
-
-### `Origin` {#Azure.ResourceManager.Foundations.Origin}
-
-The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
-
-```typespec
-union Azure.ResourceManager.Foundations.Origin
-```
-
-### `SystemAssignedServiceIdentityType` {#Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType}
-
-The kind of managemed identity assigned to this resource.
-
-```typespec
-union Azure.ResourceManager.Foundations.SystemAssignedServiceIdentityType
+union Azure.ResourceManager.Legacy.ManagedServiceIdentityType
 ```

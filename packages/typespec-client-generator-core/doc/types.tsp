@@ -84,7 +84,7 @@ model SdkBuiltInType extends SdkType {
  * @property encode: How to encode the datetime and represent to users
  * @property wireType: What type we end up sending over the wire for a datetime. Can be a string or an int type.
  */
-model SdkDatetimeType extends SdkType {
+model SdkDateTimeType extends SdkType {
   kind: "datetime";
   encode: DateTimeKnownEncoding;
   wireType: SdkType;
@@ -387,7 +387,7 @@ model SdkQueryServiceParameter extends SdkModelPropertyType {
  *
  * @property serializedName: The name of the property we send over the wire to the services
  * @property urlEncode: Whether to url encode the path parameter
- * @property validation: Any validation for the path parameter. Right now only including validation on path paramters because we only know about path params needing validation.
+ * @property validation: Any validation for the path parameter. Right now only including validation on path parameters because we only know about path params needing validation.
  * @property location: Whether the parameter is a client-level or operation-level parameter
  */
 model SdkPathServiceParameter extends SdkModelPropertyType {

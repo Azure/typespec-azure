@@ -15,39 +15,6 @@ extern dec armUpdateProviderNamespace(target: Reflection.Operation);
 extern dec assignProviderNameValue(target: ModelProperty, resource: Model);
 
 /**
- * Describes the shape of model literals accepted by the `version` parameter of
- * the `armCommonDefinition` and `armCommonParameter` decorators.
- */
-alias ArmCommonTypeVersionSpec = {
-  version: string | EnumMember;
-  isDefault: boolean;
-};
-
-/**
- * @param definitionName Definition name
- * @param version Azure Resource Manager Version
- * @param referenceFile Reference file
- */
-extern dec armCommonDefinition(
-  target: Model,
-  definitionName?: valueof string,
-  version?: valueof EnumMember | ArmCommonTypeVersionSpec | string,
-  referenceFile?: valueof string
-);
-
-/**
- * @param definitionName Definition name
- * @param version Azure Resource Manager Version
- * @param referenceFile Reference file
- */
-extern dec armCommonParameter(
-  target: ModelProperty,
-  definitionName?: valueof string,
-  version?: valueof EnumMember | ArmCommonTypeVersionSpec | string,
-  referenceFile?: valueof string
-);
-
-/**
  * This decorator is used to identify Azure Resource Manager resource types and extract their
  * metadata.  It is *not* meant to be used directly by a spec author, it instead
  * gets implicitly applied when the spec author defines a model type in this form:
@@ -79,11 +46,6 @@ extern dec resourceBaseParametersOf(target: Model, propertyName: Model);
 extern dec resourceParameterBaseFor(target: ModelProperty, values: unknown[]);
 
 /**
- * Marks an enum as representing the valid `common-types` versions.
- */
-extern dec armCommonTypesVersions(target: Enum);
-
-/**
  * Provides default name decoration on resource name property with
  * camelcased and pluralized key and segment name
  */
@@ -104,3 +66,34 @@ extern dec defaultResourceKeySegmentName(
  * Note, this is intended for internal use only for now.
  */
 extern dec enforceConstraint(target: Operation | Model, sourceType: Model, constraintType: Model);
+
+/**
+ * This decorator is used to identify Azure Resource Manager resource. In generated
+ * swagger definition, it will be marked with `x-ms-azure-resource`.
+ *
+ * It is *not* meant to be used directly by a spec author,
+ */
+extern dec azureResourceBase(target: Model);
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+extern dec conditionalClientFlatten(target: ModelProperty);
+
+/**
+ * Marks the operation as being a collection action
+ * @param resourceType Resource
+ * @param parentTypeName: Parent type name.
+ * @param parentFriendlyTypeName Friendly name for parent.
+ * @param applyOperationRename If true, apply both doc and operation name update
+ */
+extern dec armRenameListByOperation(
+  target: Operation,
+  resourceType: Model,
+  parentTypeName?: valueof string,
+  parentFriendlyTypeName?: valueof string,
+  applyOperationRename?: valueof boolean
+);
