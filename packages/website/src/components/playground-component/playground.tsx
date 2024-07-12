@@ -80,7 +80,7 @@ const PlaygroundFooter: FunctionComponent<PlaygroundFooterProps> = ({ versionDat
       latest: versionData.latest,
       onChange: changeVersion,
     };
-  }, []);
+  }, [versionData.latest, versionData.resolved]);
   return (
     <Footer>
       <FooterVersionItem versionSelector={versionSelectorProps} />

@@ -90,6 +90,12 @@ export interface AutorestEmitterOptions {
    * @default "final-state-only"
    */
   "emit-lro-options"?: "none" | "final-state-only" | "all";
+
+  /**
+   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
+   * ARM resource properties.
+   */
+  "arm-resource-flattening"?: boolean;
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -192,6 +198,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "final-state-only",
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
+    },
+    "arm-resource-flattening": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
     },
   },
   required: [],
