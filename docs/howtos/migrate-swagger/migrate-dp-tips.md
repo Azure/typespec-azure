@@ -24,9 +24,9 @@ linter:
   "Contoso Widget APIs",
   {
     /**
-Supported Widget Services endpoints (protocol and hostname, for example:
-https://westus.api.widget.contoso.com).
- */
+      * Supported Widget Services endpoints (protocol and hostname, for example:
+      * https://westus.api.widget.contoso.com).
+      */
     endpoint: url,
   }
 )
