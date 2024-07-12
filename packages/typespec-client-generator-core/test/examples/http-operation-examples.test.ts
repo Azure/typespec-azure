@@ -27,7 +27,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
@@ -65,7 +65,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
@@ -114,7 +114,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
@@ -154,7 +154,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
@@ -208,7 +208,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);

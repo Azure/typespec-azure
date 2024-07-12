@@ -37,7 +37,7 @@ describe("typespec-client-generator-core: load examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
@@ -61,7 +61,7 @@ describe("typespec-client-generator-core: load examples", () => {
     `);
 
     const operation = (
-      runner.context.experimental_sdkPackage.clients[0]
+      runner.context.sdkPackage.clients[0]
         .methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
@@ -95,7 +95,7 @@ describe("typespec-client-generator-core: load examples", () => {
     `
     );
 
-    const client = runner.context.experimental_sdkPackage.clients[0];
+    const client = runner.context.sdkPackage.clients[0];
     strictEqual(client.name, "FooClient");
     const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
     ok(method);
