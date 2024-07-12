@@ -120,7 +120,7 @@ model ResourceUpdateModel<
     Resource,
     "Name" | "name" | "properties"
   >>> {
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
@@ -184,7 +184,7 @@ model ProxyResourceUpdateModel<
   Resource extends Foundations.Resource,
   Properties extends TypeSpec.Reflection.Model
 > {
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 

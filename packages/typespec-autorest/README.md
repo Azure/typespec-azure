@@ -130,6 +130,12 @@ Create read-only property schema for lro status
 
 Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
 
+#### `arm-resource-flattening`
+
+**Type:** `boolean`
+
+Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.
+
 ## Decorators
 
 ### Autorest
