@@ -4,6 +4,7 @@ import { authRequiredRule } from "./rules/auth-required.js";
 import { byosRule } from "./rules/byos.js";
 import { casingRule } from "./rules/casing.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
+import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
@@ -69,6 +70,7 @@ const rules = [
   useStandardNames,
   useStandardOperations,
   noStringDiscriminatorRule,
+  friendlyNameRule,
 ];
 
 export const $linter = defineLinter({
