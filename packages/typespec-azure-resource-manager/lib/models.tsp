@@ -40,13 +40,16 @@ model ResourceNameParameter<
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
+ * @template OptionalProperties A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model TrackedResource<Properties extends {}> extends Foundations.TrackedResource {
+model TrackedResource<Properties extends {}, OptionalProperties extends valueof boolean = true>
+  extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
   @conditionalClientFlatten
+  @armResourcePropertiesOptionality(OptionalProperties)
   properties?: Properties;
 }
 
@@ -55,13 +58,16 @@ model TrackedResource<Properties extends {}> extends Foundations.TrackedResource
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
+ * @template OptionalProperties A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
+model ProxyResource<Properties extends {}, OptionalProperties extends valueof boolean = true>
+  extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
   @conditionalClientFlatten
+  @armResourcePropertiesOptionality(OptionalProperties)
   properties?: Properties;
 }
 
@@ -70,14 +76,17 @@ model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
+ * @template OptionalProperties A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
  */
 @extensionResource
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ExtensionResource<Properties extends {}> extends Foundations.ExtensionResource {
+model ExtensionResource<Properties extends {}, OptionalProperties extends valueof boolean = true>
+  extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
   @conditionalClientFlatten
+  @armResourcePropertiesOptionality(OptionalProperties)
   properties?: Properties;
 }
 //#region
