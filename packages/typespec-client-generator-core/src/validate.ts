@@ -9,13 +9,14 @@ import {
   Namespace,
   Operation,
   Program,
+  projectProgram,
   Scalar,
-  Service,
   Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
+import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import { getClientNameOverride } from "./decorators.js";
 import { AllScopes, clientNameKey, createTCGCContext, TCGCContext } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -24,7 +25,7 @@ export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program);
   const languageScopes = getDefinedLanguageScopes(program);
   for (const scope of languageScopes) {
-    validateClientNames(program, tcgcContext, scope);
+    validateClientNamesPerNamespace(program, tcgcContext, scope, program.getGlobalNamespaceType());
   }
 }
 
@@ -41,20 +42,55 @@ function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScop
   return languageScopes;
 }
 
-function validateClientNames(
+function validateClientNamesPerNamespace(
+  program: Program,
+  tcgcContext: TCGCContext,
+  scope: string | typeof AllScopes,
+  namespace: Namespace
+) {
+  const apiVersions = getVersions(program, namespace)[1]
+    ?.getVersions()
+    ?.map((x) => x.value);
+  if (apiVersions !== undefined) {
+    const versionProjections = buildVersionProjections(program, namespace);
+    for (const version of apiVersions) {
+      const versionProjection = versionProjections.find((x) => x.version === version);
+      if (versionProjection !== undefined) {
+        const projectedProgram = projectProgram(program, versionProjection.projections);
+        const projectedNamespace = projectedProgram.projector.projectedTypes.get(
+          namespace
+        ) as Namespace;
+        validateClientNamesPerNamespaceCore(
+          projectedProgram,
+          tcgcContext,
+          scope,
+          projectedNamespace
+        );
+        validateClientNameForNestedNamespaces(
+          projectedNamespace,
+          projectedProgram,
+          tcgcContext,
+          scope
+        );
+      }
+    }
+  } else {
+    validateClientNamesPerNamespaceCore(program, tcgcContext, scope, namespace);
+    validateClientNameForNestedNamespaces(namespace, program, tcgcContext, scope);
+  }
+}
+function validateClientNameForNestedNamespaces(
+  namespace: Namespace,
   program: Program,
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes
 ) {
-  const services: Service[] = [];
-  services.push({ type: program.getGlobalNamespaceType() });
-
-  for (const service of services) {
-    validateClientNamesPerNamespace(program, tcgcContext, scope, service.type);
+  for (const item of namespace.namespaces.values()) {
+    validateClientNamesPerNamespace(program, tcgcContext, scope, item);
   }
 }
 
-function validateClientNamesPerNamespace(
+function validateClientNamesPerNamespaceCore(
   program: Program,
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes,
@@ -92,11 +128,6 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for union variants
   for (const item of namespace.unions.values()) {
     validateClientNamesCore(program, tcgcContext, scope, item.variants.values());
-  }
-
-  // Check for duplicate client names for nested namespaces
-  for (const item of namespace.namespaces.values()) {
-    validateClientNamesPerNamespace(program, tcgcContext, scope, item);
   }
 }
 
