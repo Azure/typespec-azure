@@ -60,18 +60,21 @@ function validateClientNamesPerNamespace(
         const projectedNamespace = projectedProgram.projector.projectedTypes.get(
           namespace
         ) as Namespace;
-        validateClientNamesPerNamespaceCore(
-          projectedProgram,
-          tcgcContext,
-          scope,
-          projectedNamespace
-        );
-        validateClientNameForNestedNamespaces(
-          projectedNamespace,
-          projectedProgram,
-          tcgcContext,
-          scope
-        );
+
+        if (projectedNamespace !== undefined) {
+          validateClientNamesPerNamespaceCore(
+            projectedProgram,
+            tcgcContext,
+            scope,
+            projectedNamespace
+          );
+          validateClientNameForNestedNamespaces(
+            projectedNamespace,
+            projectedProgram,
+            tcgcContext,
+            scope
+          );
+        }
       }
     }
   } else {
@@ -79,6 +82,7 @@ function validateClientNamesPerNamespace(
     validateClientNameForNestedNamespaces(namespace, program, tcgcContext, scope);
   }
 }
+
 function validateClientNameForNestedNamespaces(
   namespace: Namespace,
   program: Program,
