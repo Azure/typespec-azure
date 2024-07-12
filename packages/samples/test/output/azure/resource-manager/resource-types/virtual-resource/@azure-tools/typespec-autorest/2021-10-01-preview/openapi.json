@@ -84,7 +84,7 @@
         "tags": [
           "Employees"
         ],
-        "description": "A resource list operation, at the scope of the resource's parent",
+        "description": "List Employee resources by Group",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
