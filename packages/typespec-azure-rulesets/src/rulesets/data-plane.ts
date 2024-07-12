@@ -22,6 +22,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-operation-id": true,
+    "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/prefer-csv-collection-format": true,
     "@azure-tools/typespec-azure-core/no-format": true,
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
