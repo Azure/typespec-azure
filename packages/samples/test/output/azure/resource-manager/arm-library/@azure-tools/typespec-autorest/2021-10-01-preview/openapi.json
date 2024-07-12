@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Microsoft.EnvelopeTest",
-    "version": "2021-09-21-preview",
+    "version": "2021-10-01-preview",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -70,7 +70,7 @@
         "description": "List TestExtensionResource resources by parent",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
@@ -86,7 +86,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -104,7 +104,7 @@
         "description": "Get a TestExtensionResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
@@ -128,7 +128,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -141,7 +141,7 @@
         "description": "Create a TestExtensionResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
@@ -191,7 +191,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -208,7 +208,7 @@
         "description": "Update a TestExtensionResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
@@ -241,7 +241,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -254,7 +254,7 @@
         "description": "Delete a TestExtensionResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
@@ -292,7 +292,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -311,20 +311,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -342,7 +342,7 @@
         "description": "List TestTenantResource resources by tenant",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -355,7 +355,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -373,7 +373,7 @@
         "description": "Get a TestTenantResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "tenantResourceName",
@@ -394,7 +394,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -407,7 +407,7 @@
         "description": "Create a TestTenantResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "tenantResourceName",
@@ -454,7 +454,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -471,7 +471,7 @@
         "description": "Update a TestTenantResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "tenantResourceName",
@@ -501,7 +501,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -514,7 +514,7 @@
         "description": "Delete a TestTenantResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "tenantResourceName",
@@ -549,7 +549,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -568,10 +568,10 @@
         "description": "List AllPropertiesResource resources by subscription ID",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -584,7 +584,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -602,10 +602,10 @@
         "description": "List TestTrackedResource2 resources by subscription ID",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -618,7 +618,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -636,10 +636,10 @@
         "description": "List TestTrackedResource resources by subscription ID",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -652,7 +652,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -670,13 +670,13 @@
         "description": "List AllPropertiesResource resources by resource group",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           }
         ],
         "responses": {
@@ -689,7 +689,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -707,13 +707,13 @@
         "description": "Get a AllPropertiesResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "allPropertiesName",
@@ -734,7 +734,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -747,13 +747,13 @@
         "description": "Create a AllPropertiesResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "allPropertiesName",
@@ -800,7 +800,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -817,13 +817,13 @@
         "description": "Update a AllPropertiesResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "allPropertiesName",
@@ -853,7 +853,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -866,13 +866,13 @@
         "description": "Delete a AllPropertiesResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "allPropertiesName",
@@ -907,7 +907,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -926,13 +926,13 @@
         "description": "List TestTrackedResource2 resources by resource group",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           }
         ],
         "responses": {
@@ -945,7 +945,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -963,13 +963,13 @@
         "description": "Get a TestTrackedResource2",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -990,7 +990,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1003,13 +1003,13 @@
         "description": "Create a TestTrackedResource2",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1045,7 +1045,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1058,13 +1058,13 @@
         "description": "Update a TestTrackedResource2",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1094,7 +1094,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1107,13 +1107,13 @@
         "description": "Delete a TestTrackedResource2",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1134,7 +1134,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1149,13 +1149,13 @@
         "description": "List TestTrackedResource resources by resource group",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           }
         ],
         "responses": {
@@ -1168,7 +1168,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1186,13 +1186,13 @@
         "description": "Get a TestTrackedResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1213,7 +1213,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1226,13 +1226,13 @@
         "description": "Create a TestTrackedResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1279,7 +1279,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1296,13 +1296,13 @@
         "description": "Update a TestTrackedResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1332,7 +1332,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1345,13 +1345,13 @@
         "description": "Delete a TestTrackedResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1386,7 +1386,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1405,13 +1405,13 @@
         "description": "List TestTrackedChild resources by TestTrackedResource",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1432,7 +1432,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1450,13 +1450,13 @@
         "description": "Get a TestTrackedChild",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1485,7 +1485,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1498,13 +1498,13 @@
         "description": "Create a TestTrackedChild",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1559,7 +1559,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1576,13 +1576,13 @@
         "description": "Delete a TestTrackedChild",
         "parameters": [
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "trackedResourceName",
@@ -1625,7 +1625,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1681,21 +1681,21 @@
           ]
         },
         "plan": {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
           "description": "Details of the resource plan."
         },
         "sku": {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
           "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         },
         "identity": {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
           "description": "The managed service identities assigned to this resource."
         }
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
         }
       ]
     },
@@ -1729,15 +1729,15 @@
           "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
         },
         "plan": {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
           "description": "Details of the resource plan."
         },
         "sku": {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
           "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         },
         "identity": {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
           "description": "The managed service identities assigned to this resource."
         },
         "tags": {
@@ -1823,7 +1823,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
         }
       ]
     },
@@ -1855,7 +1855,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
         }
       ]
     },
@@ -1871,7 +1871,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
         }
       ]
     },
@@ -1907,7 +1907,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
         }
       ]
     },
@@ -1957,7 +1957,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
         }
       ]
     },

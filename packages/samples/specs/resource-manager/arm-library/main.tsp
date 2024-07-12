@@ -17,11 +17,18 @@ using Azure.ResourceManager;
 @OpenAPI.info({
   version: "2021-09-21-preview",
 })
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
-@armCommonTypesVersion(CommonTypes.Versions.v5)
 @armProviderNamespace
+@versioned(Versions)
 namespace Microsoft.LibraryTest;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2021-10-01-preview`,
+}
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
