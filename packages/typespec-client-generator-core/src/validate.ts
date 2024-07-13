@@ -152,7 +152,10 @@ function reportDuplicateClientNames(
     for (const item of duplicates) {
       const scopeStr = scope === AllScopes ? "AllScopes" : scope;
       // If the item is a decorator application node
-      if (item.kind === SyntaxKind.DecoratorExpression || item.kind === SyntaxKind.AugmentDecoratorStatement) {
+      if (
+        item.kind === SyntaxKind.DecoratorExpression ||
+        item.kind === SyntaxKind.AugmentDecoratorStatement
+      ) {
         reportDiagnostic(program, {
           code: "duplicate-client-name",
           format: { name, scope: scopeStr },
