@@ -11,7 +11,6 @@ import {
   Operation,
   Program,
   Scalar,
-  Service,
   SyntaxKind,
   Type,
   Union,
