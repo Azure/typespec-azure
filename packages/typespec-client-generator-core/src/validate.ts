@@ -4,6 +4,7 @@ import {
   Enum,
   EnumMember,
   Interface,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -47,8 +48,10 @@ function validateClientNames(
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes
 ) {
-  const services: Service[] = [];
-  services.push({ type: program.getGlobalNamespaceType() });
+  const services = listServices(program);
+  if (services.length === 0) {
+    services.push({ type: program.getGlobalNamespaceType() });
+  }
 
   for (const service of services) {
     validateClientNamesPerNamespace(program, tcgcContext, scope, service.type);
