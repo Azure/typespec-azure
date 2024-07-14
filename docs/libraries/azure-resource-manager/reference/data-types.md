@@ -465,7 +465,7 @@ Concrete extension resource types can be created by aliasing this type using a s
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.ExtensionResource<Properties, OptionalProperties>
+model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 ```
 
 #### Template Parameters
@@ -473,7 +473,7 @@ model Azure.ResourceManager.ExtensionResource<Properties, OptionalProperties>
 | Name               | Description                                                                                                                                    |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Properties         | A model containing the provider-specific properties for this resource                                                                          |
-| OptionalProperties | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
 #### Properties
 
@@ -632,7 +632,7 @@ Concrete proxy resource types can be created by aliasing this type using a speci
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.ProxyResource<Properties, OptionalProperties>
+model Azure.ResourceManager.ProxyResource<Properties, PropertiesOptional>
 ```
 
 #### Template Parameters
@@ -640,7 +640,7 @@ model Azure.ResourceManager.ProxyResource<Properties, OptionalProperties>
 | Name               | Description                                                                                                                                    |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Properties         | A model containing the provider-specific properties for this resource                                                                          |
-| OptionalProperties | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
 #### Properties
 
@@ -879,7 +879,7 @@ Concrete tracked resource types can be created by aliasing this type using a spe
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.TrackedResource<Properties, OptionalProperties>
+model Azure.ResourceManager.TrackedResource<Properties, PropertiesOptional>
 ```
 
 #### Template Parameters
@@ -887,7 +887,7 @@ model Azure.ResourceManager.TrackedResource<Properties, OptionalProperties>
 | Name               | Description                                                                                                                                    |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Properties         | A model containing the provider-specific properties for this resource                                                                          |
-| OptionalProperties | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
 #### Properties
 
