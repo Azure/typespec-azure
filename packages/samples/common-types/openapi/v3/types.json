@@ -300,7 +300,8 @@
         },
         "display": {
           "$ref": "#/definitions/OperationDisplay",
-          "description": "Localized display information for this particular operation."
+          "description": "Localized display information for this particular operation.",
+          "readOnly": true
         },
         "origin": {
           "$ref": "#/definitions/Origin",
@@ -319,19 +320,23 @@
       "properties": {
         "provider": {
           "type": "string",
-          "description": "The localized friendly form of the resource provider name, e.g. \"Microsoft Monitoring Insights\" or \"Microsoft Compute\"."
+          "description": "The localized friendly form of the resource provider name, e.g. \"Microsoft Monitoring Insights\" or \"Microsoft Compute\".",
+          "readOnly": true
         },
         "resource": {
           "type": "string",
-          "description": "The localized friendly name of the resource type related to this operation. E.g. \"Virtual Machines\" or \"Job Schedule Collections\"."
+          "description": "The localized friendly name of the resource type related to this operation. E.g. \"Virtual Machines\" or \"Job Schedule Collections\".",
+          "readOnly": true
         },
         "operation": {
           "type": "string",
-          "description": "The concise, localized friendly name for the operation; suitable for dropdowns. E.g. \"Create or Update Virtual Machine\", \"Restart Virtual Machine\"."
+          "description": "The concise, localized friendly name for the operation; suitable for dropdowns. E.g. \"Create or Update Virtual Machine\", \"Restart Virtual Machine\".",
+          "readOnly": true
         },
         "description": {
           "type": "string",
-          "description": "The short, localized friendly description of the operation; suitable for tool tips and detailed views."
+          "description": "The short, localized friendly description of the operation; suitable for tool tips and detailed views.",
+          "readOnly": true
         }
       }
     },
