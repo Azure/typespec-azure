@@ -187,9 +187,9 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ArmLroLocationHeader` {#Azure.ResourceManager.ArmLroLocationHeader}
 
@@ -657,9 +657,9 @@ model Azure.ResourceManager.ResourceGroupLocationResource
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
@@ -851,9 +851,9 @@ model Azure.ResourceManager.SubscriptionLocationResource
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 
@@ -866,9 +866,9 @@ model Azure.ResourceManager.TenantLocationResource
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TrackedResource` {#Azure.ResourceManager.TrackedResource}
 
@@ -1216,9 +1216,9 @@ model Azure.ResourceManager.CommonTypes.LocationResourceParameter
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity}
 
@@ -2039,9 +2039,9 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties
 
 #### Properties
 
-| Name        | Type                                                                              | Description |
-| ----------- | --------------------------------------------------------------------------------- | ----------- |
-| properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
+| Name        | Type                                                                              | Description                                         |
+| ----------- | --------------------------------------------------------------------------------- | --------------------------------------------------- |
+| properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` | The resource-specific properties for this resource. |
 
 ### `ResourceUpdateModelProperties` {#Azure.ResourceManager.Foundations.ResourceUpdateModelProperties}
 
