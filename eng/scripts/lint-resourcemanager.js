@@ -53,6 +53,10 @@ const suppressedErrors = [
     id: "D5001",
     code: "XmsExamplesRequired",
   },
+  {
+    id: "R2026",
+    code: "AvoidAnonymousTypes",
+  },
 ];
 
 async function lintInternal(swagger) {

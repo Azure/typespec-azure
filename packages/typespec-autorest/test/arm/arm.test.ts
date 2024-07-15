@@ -303,3 +303,180 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
     undefined
   );
 });
+it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
+  const openapi = await openApiFor(
+    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      namespace Microsoft.PatchTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      /** The all properties resource */
+      model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
+        ...ResourceNameParameter<AllPropertiesResource>;
+        ...EncryptionProperty;
+        ...EntityTagProperty;
+        ...ExtendedLocationProperty;
+        ...ManagedByProperty;
+        ...ResourceKindProperty;
+        ...ResourcePlanProperty;
+        ...ResourceSkuProperty;
+        ...ManagedServiceIdentityProperty;
+      }
+      /** rp-specific property bag */
+      model AllPropertiesProperties {
+        ...DefaultProvisioningStateProperty;
+        /** An optional Property */
+        optProp?: string;
+        /** A required property */
+        reqProperty: string;
+      }
+      /** rp-specific property bag */
+      model SystemAssignedProperties {
+        ...DefaultProvisioningStateProperty;
+        /** An optional Property */
+        optProp?: string;
+        /** A required property */
+        reqProperty: string;
+      }
+      
+      /** The SystemAssignedResource */
+      model SystemAssignedResource is TrackedResource<SystemAssignedProperties> {
+        ...ResourceNameParameter<SystemAssignedResource>;
+        ...ManagedSystemAssignedIdentityProperty;
+      }
+      
+      @armResourceOperations(AllPropertiesResource)
+      interface AllProperties {
+        get is ArmResourceRead<AllPropertiesResource>;
+        put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+        update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
+        delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
+      }
+      @armResourceOperations(SystemAssignedResource)
+      interface AssignedOperations {
+        get is ArmResourceRead<SystemAssignedResource>;
+        put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
+        delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
+      }
+      `
+  );
+
+  const all = openapi.definitions["AllPropertiesResourceUpdate"];
+  const system = openapi.definitions["SystemAssignedResourceUpdate"];
+  ok(all);
+  ok(system);
+  deepStrictEqual(
+    all["properties"]["plan"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate"
+  );
+  deepStrictEqual(
+    all["properties"]["sku"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate"
+  );
+  deepStrictEqual(
+    all["properties"]["identity"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"
+  );
+  deepStrictEqual(
+    system["properties"]["identity"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"
+  );
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"]);
+  deepStrictEqual(
+    openapi.definitions["Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet"],
+    undefined
+  );
+});
+it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
+  const openapi = await openApiFor(
+    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      namespace Microsoft.PatchTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      /** The all properties resource */
+      model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
+        ...ResourceNameParameter<AllPropertiesResource>;
+        ...EncryptionProperty;
+        ...EntityTagProperty;
+        ...ExtendedLocationProperty;
+        ...ManagedByProperty;
+        ...ResourceKindProperty;
+        ...ResourcePlanProperty;
+        ...ResourceSkuProperty;
+        ...ManagedServiceIdentityProperty;
+      }
+      /** rp-specific property bag */
+      model AllPropertiesProperties {
+        ...DefaultProvisioningStateProperty;
+        /** An optional Property */
+        optProp?: string;
+        /** A required property */
+        reqProperty: string;
+      }
+      /** rp-specific property bag */
+      model SystemAssignedProperties {
+        ...DefaultProvisioningStateProperty;
+        /** An optional Property */
+        optProp?: string;
+        /** A required property */
+        reqProperty: string;
+      }
+      
+      /** The SystemAssignedResource */
+      model SystemAssignedResource is TrackedResource<SystemAssignedProperties> {
+        ...ResourceNameParameter<SystemAssignedResource>;
+        ...ManagedSystemAssignedIdentityProperty;
+      }
+      
+      @armResourceOperations(AllPropertiesResource)
+      interface AllProperties {
+        get is ArmResourceRead<AllPropertiesResource>;
+        put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+        update is ArmResourcePatchAsync<AllPropertiesResource, AllPropertiesProperties>;
+        delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
+      }
+      @armResourceOperations(SystemAssignedResource)
+      interface AssignedOperations {
+        get is ArmResourceRead<SystemAssignedResource>;
+        put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        update is ArmResourcePatchAsync<SystemAssignedResource, SystemAssignedProperties>;
+        delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
+      }
+      `
+  );
+
+  const all = openapi.definitions["AllPropertiesResourceUpdate"];
+  const system = openapi.definitions["SystemAssignedResourceUpdate"];
+  ok(all);
+  ok(system);
+  deepStrictEqual(
+    all["properties"]["plan"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate"
+  );
+  deepStrictEqual(
+    all["properties"]["sku"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate"
+  );
+  deepStrictEqual(
+    all["properties"]["identity"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"
+  );
+  deepStrictEqual(
+    system["properties"]["identity"]["$ref"],
+    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"
+  );
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
+  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"]);
+});
