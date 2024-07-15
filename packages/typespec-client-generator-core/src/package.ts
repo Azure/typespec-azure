@@ -16,6 +16,8 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldGenerateConvenient,
+  shouldGenerateProtocol,
 } from "./decorators.js";
 import { getCorrespondingMethodParams, getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
@@ -64,7 +66,6 @@ import {
   getCrossLanguageDefinitionId,
   getCrossLanguagePackageId,
   getDefaultApiVersion,
-  getEffectivePayloadType,
   getHttpOperationWithCache,
   getLibraryName,
 } from "./public-utils.js";
@@ -217,7 +218,7 @@ function getSdkMethodResponse<
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
       decorators: [],
     };
-  } else if (responseTypes) {
+  } else if (responseTypes.size === 1) {
     type = allResponseBodies[0];
   }
   if (nonBodyExists && type) {
@@ -249,38 +250,10 @@ function getSdkBasicServiceMethod<
     operation,
     getLocationOfOperation(operation)
   );
-  const httpOperation = getHttpOperationWithCache(context, operation);
-  const parameters = httpOperation.parameters;
-  // path/query/header parameters
-  for (const param of parameters.parameters) {
-    if (isNeverOrVoidType(param.param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation)));
-  }
-  // body parameters
-  if (
-    parameters.body?.bodyKind !== "multipart" &&
-    parameters.body?.property &&
-    !isNeverOrVoidType(parameters.body.property.type)
-  ) {
-    methodParameters.push(
-      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.property, operation))
-    );
-  } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
-    if (parameters.body.type.kind === "Model") {
-      const type = getEffectivePayloadType(context, parameters.body.type);
-      // spread case
-      if (type.name === "") {
-        for (const prop of type.properties.values()) {
-          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop, operation)));
-        }
-      } else {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, type, operation)));
-      }
-    } else {
-      methodParameters.push(
-        diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type, operation))
-      );
-    }
+
+  for (const param of operation.parameters.properties.values()) {
+    if (isNeverOrVoidType(param.type)) continue;
+    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
   }
 
   const serviceOperation = diagnostics.pipe(
@@ -311,6 +284,8 @@ function getSdkBasicServiceMethod<
     },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
+    generateConvenient: shouldGenerateConvenient(context, operation),
+    generateProtocol: shouldGenerateProtocol(context, operation),
   });
 }
 

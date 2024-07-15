@@ -395,7 +395,7 @@
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents": {
       "get": {
-        "operationId": "Dependents_ListByEmployee",
+        "operationId": "Dependents_List",
         "tags": [
           "Dependents"
         ],
@@ -791,6 +791,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/DependentUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
       }
@@ -885,6 +886,7 @@
         },
         "properties": {
           "$ref": "#/definitions/EmployeeUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
       }

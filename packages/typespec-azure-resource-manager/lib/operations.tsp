@@ -41,7 +41,7 @@ op ArmListBySubscription<
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)
-@armRenameListByOperation(Resource, ParentName, ParentFriendlyName) // This must come before @armResourceList!
+@Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListByParent<
@@ -70,7 +70,7 @@ op ArmResourceListByParent<
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)
-@armRenameListByOperation(Resource) // This must come before @armResourceList!
+@Private.armRenameListByOperation(Resource) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListAtScope<

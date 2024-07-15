@@ -18,15 +18,7 @@ import {
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  getHeaderFieldName,
-  getHttpOperation,
-  getPathParamName,
-  getQueryParamName,
-  isMetadata,
-  isStatusCode,
-} from "@typespec/http";
+import { HttpOperation, getHttpOperation, isMetadata } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -40,6 +32,7 @@ import {
   TCGCContext,
   TspLiteralType,
   getClientNamespaceStringHelper,
+  getHttpOperationResponseHeaders,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -119,16 +112,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  function isSchemaProperty(property: ModelProperty) {
-    const program = context.program;
-    const headerInfo = getHeaderFieldName(program, property);
-    const queryInfo = getQueryParamName(program, property);
-    const pathInfo = getPathParamName(program, property);
-    const statusCodeinfo = isStatusCode(program, property);
-    return !(headerInfo || queryInfo || pathInfo || statusCodeinfo);
-  }
-
-  const effective = getEffectiveModelType(program, type, isSchemaProperty);
+  const effective = getEffectiveModelType(program, type, (t) => !isMetadata(context.program, t));
   if (effective.name) {
     return effective;
   }
@@ -231,6 +215,7 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
   type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  operation?: Operation,
   appendNamespace: boolean = true
 ): string {
   let retval = type.name || "anonymous";
@@ -242,7 +227,9 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      const contextPath = findContextPath(context, type);
+      const contextPath = operation
+        ? getContextPath(context, operation, type)
+        : findContextPath(context, type);
       retval =
         contextPath
           .slice(findLastNonAnonymousModelNode(contextPath))
@@ -257,12 +244,12 @@ export function getCrossLanguageDefinitionId(
       break;
     case "ModelProperty":
       if (type.model) {
-        retval = `${getCrossLanguageDefinitionId(context, type.model, false)}.${retval}`;
+        retval = `${getCrossLanguageDefinitionId(context, type.model, undefined, false)}.${retval}`;
       }
       break;
     case "Operation":
       if (type.interface) {
-        retval = `${getCrossLanguageDefinitionId(context, type.interface, false)}.${retval}`;
+        retval = `${getCrossLanguageDefinitionId(context, type.interface, undefined, false)}.${retval}`;
       }
       break;
   }
@@ -347,12 +334,17 @@ function findContextPath(
         return result;
       }
     }
-    for (const operationGroup of listOperationGroups(context, client)) {
-      for (const operation of listOperationsInOperationGroup(context, operationGroup)) {
+    const ogs = listOperationGroups(context, client);
+    while (ogs.length) {
+      const operationGroup = ogs.pop();
+      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
+      }
+      if (operationGroup?.subOperationGroups) {
+        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
@@ -404,15 +396,20 @@ function getContextPath(
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
+          const body =
+            innerResponse.body.type.kind === "Model"
+              ? getEffectivePayloadType(context, innerResponse.body.type)
+              : innerResponse.body.type;
           visited.clear();
           result = [{ name: root.name }];
-          if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response")) {
+          if (dfsModelProperties(typeToFind, body, "Response")) {
             return result;
           }
         }
 
-        if (innerResponse.headers) {
-          for (const header of Object.values(innerResponse.headers)) {
+        const headers = getHttpOperationResponseHeaders(innerResponse);
+        if (headers) {
+          for (const header of Object.values(headers)) {
             visited.clear();
             result = [{ name: root.name }];
             if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {
@@ -475,7 +472,6 @@ function getContextPath(
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
     } else if (currentType.kind === "Model") {
-      currentType = getEffectivePayloadType(context, currentType);
       // handle model
       result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
