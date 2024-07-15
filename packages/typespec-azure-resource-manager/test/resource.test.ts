@@ -717,3 +717,47 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     strictEqual(nameProperty?.type.name, "WidgetNameType");
   });
 });
+
+it("emits default optional properties for resource", async () => {
+  const { program, diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is TrackedResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+       size: int32;
+    }
+`);
+  const resources = getArmResources(program);
+  expectDiagnosticEmpty(diagnostics);
+  strictEqual(resources.length, 1);
+  strictEqual(resources[0].typespecType.properties.get("properties")?.optional, true);
+});
+
+it("emits required properties for resource with @armResourcePropertiesOptionality override ", async () => {
+  const { program, diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is ProxyResource<WidgetProperties, false> {
+       ...ResourceNameParameter<Widget>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+       size: int32;
+    }
+`);
+  const resources = getArmResources(program);
+  expectDiagnosticEmpty(diagnostics);
+  strictEqual(resources.length, 1);
+  strictEqual(resources[0].typespecType.properties.get("properties")?.optional, false);
+});

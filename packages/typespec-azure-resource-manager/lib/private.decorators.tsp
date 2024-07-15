@@ -97,3 +97,9 @@ extern dec armRenameListByOperation(
   parentFriendlyTypeName?: valueof string,
   applyOperationRename?: valueof boolean
 );
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * This decorator is used to adjust optionality on ARM Resource's `properties` field for brownfield service conversion.
+ */
+extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: valueof boolean);
