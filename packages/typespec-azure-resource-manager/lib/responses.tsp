@@ -138,7 +138,7 @@ model ArmOperationStatus<
 model ArmAsyncOperationHeader<
   StatusMonitor extends {} = ArmOperationStatus,
   UrlValue extends string = string,
-  FinalResult extends {} = never
+  FinalResult extends {} | void = never
 > {
   /** A link to the status monitor */
   @header("Azure-AsyncOperation")
