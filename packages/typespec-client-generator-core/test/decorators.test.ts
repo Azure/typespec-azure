@@ -3730,30 +3730,108 @@ describe("typespec-client-generator-core: decorators", () => {
           bar: string;
         }
 
-        op original(...Params): void;
+        op func(...Params): void;
         `,
         `
         namespace MyCustomizations;
 
-        op customization(params: MyService.Params): void;
+        op func(params: MyService.Params): void;
 
-        @@overrideClientMethod(MyService.original, MyCustomizations.customization);
+        @@overrideClientMethod(MyService.func, MyCustomizations.func);
         `
       );
       const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
       const client = sdkPackage.clients[0];
       strictEqual(client.methods.length, 1);
       const method = client.methods[0];
-      strictEqual(method.name, "original");
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
       strictEqual(method.parameters.length, 2);
       const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(contentTypeParam);
       const paramsParam = method.parameters.find((x) => x.name === "params");
       ok(paramsParam);
-
-      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
-      ok(paramsModel);
       strictEqual(paramsModel, paramsParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
+      strictEqual(method.operation.bodyParam.type, paramsModel);
+    });
+
+    it("basic with scope", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@overrideClientMethod(MyService.func, MyCustomizations.func, "csharp");
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const fooParam = method.parameters.find((x) => x.name === "foo");
+      ok(fooParam);
+
+      const barParam = method.parameters.find((x) => x.name === "bar");
+      ok(barParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCsharp.compileWithCustomization(mainCode, customizationCode);
+      ok(runnerWithCsharp.context.sdkPackage.models.find((x) => x.name === "Params"));
+
+      const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
+      strictEqual(sdkPackageWithCsharp.clients.length, 1);
+
+      // strictEqual(method.operationGroup.language.csharp, undefined);
+
+      // const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      // ok(contentTypeParam);
+      // const paramsParam = method.parameters.find((x) => x.name === "params");
+      // ok(paramsParam);
+
+      // const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      // ok(paramsModel);
+      // strictEqual(paramsModel, paramsParam.type);
     });
   });
 });
