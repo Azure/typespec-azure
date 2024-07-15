@@ -1572,16 +1572,6 @@ export function getAllModelsWithDiagnostics(
         getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum)
       );
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
-      if (
-        context.apiVersion !== undefined &&
-        context.apiVersion !== "latest" &&
-        context.apiVersion !== "all"
-      ) {
-        const index = sdkVersionsEnum.values.findIndex((v) => v.value === context.apiVersion);
-        if (index >= 0) {
-          sdkVersionsEnum.values = sdkVersionsEnum.values.slice(0, index + 1);
-        }
-      }
       updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
     }
   }
