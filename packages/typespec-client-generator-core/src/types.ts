@@ -307,7 +307,7 @@ export function getSdkArrayOrDictWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
           name: getLibraryName(context, type),
           valueType: valueType,
-          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
         });
       }
     }
@@ -378,12 +378,12 @@ export function getSdkUnionWithDiagnostics(
   if (retval === undefined) {
     retval = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
-      name: getLibraryName(context, type) || getGeneratedName(context, type),
+      name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
       isGeneratedName: !type.name,
       values: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation))
       ),
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     };
   }
 
@@ -557,8 +557,7 @@ export function getSdkModelWithDiagnostics(
     updateModelsMap(context, type, sdkType, operation);
   } else {
     const docWrapper = getDocHelper(context, type);
-    const generatedName = getGeneratedName(context, type);
-    const name = getLibraryName(context, type) || generatedName;
+    const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
     const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
@@ -570,7 +569,7 @@ export function getSdkModelWithDiagnostics(
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
       usage,
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isFormDataType: isMultipartFormData(context, type, operation),
     };
@@ -715,7 +714,7 @@ function getSdkEnumWithDiagnostics(
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: "public", // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       isUnionAsEnum: false,
     };
@@ -766,8 +765,7 @@ function getSdkUnionEnumWithDiagnostics(
   let sdkType = context.modelsMap?.get(union) as SdkEnumType | undefined;
   if (!sdkType) {
     const docWrapper = getDocHelper(context, union);
-    const generatedName = getGeneratedName(context, union);
-    const name = getLibraryName(context, type.union) || generatedName;
+    const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
       name,
@@ -782,7 +780,7 @@ function getSdkUnionEnumWithDiagnostics(
       isFlags: false,
       usage: UsageFlags.None, // We will add usage as we loop through the operations
       access: "public", // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, union),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, union, operation),
       apiVersions: getAvailableApiVersions(context, type.union, type.union.namespace),
       isUnionAsEnum: true,
     };
@@ -821,7 +819,7 @@ function getKnownValuesEnum(
         isFlags: false,
         usage: UsageFlags.None, // We will add usage as we loop through the operations
         access: "public", // Dummy value until we update models map
-        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
         apiVersions: getAvailableApiVersions(context, type, type.namespace),
         isUnionAsEnum: false,
       };
@@ -1058,7 +1056,7 @@ export function getSdkModelPropertyTypeBase(
       type,
       operation ? getLocationOfOperation(operation) : undefined
     ),
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
 }

@@ -206,6 +206,7 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
   type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  operation?: Operation,
   appendNamespace: boolean = true
 ): string {
   let retval = type.name || "anonymous";
@@ -217,7 +218,9 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      const contextPath = findContextPath(context, type);
+      const contextPath = operation
+        ? getContextPath(context, operation, type)
+        : findContextPath(context, type);
       retval =
         contextPath
           .slice(findLastNonAnonymousModelNode(contextPath))
@@ -232,12 +235,12 @@ export function getCrossLanguageDefinitionId(
       break;
     case "ModelProperty":
       if (type.model) {
-        retval = `${getCrossLanguageDefinitionId(context, type.model, false)}.${retval}`;
+        retval = `${getCrossLanguageDefinitionId(context, type.model, undefined, false)}.${retval}`;
       }
       break;
     case "Operation":
       if (type.interface) {
-        retval = `${getCrossLanguageDefinitionId(context, type.interface, false)}.${retval}`;
+        retval = `${getCrossLanguageDefinitionId(context, type.interface, undefined, false)}.${retval}`;
       }
       break;
   }
@@ -322,12 +325,17 @@ function findContextPath(
         return result;
       }
     }
-    for (const operationGroup of listOperationGroups(context, client)) {
-      for (const operation of listOperationsInOperationGroup(context, operationGroup)) {
+    const ogs = listOperationGroups(context, client);
+    while (ogs.length) {
+      const operationGroup = ogs.pop();
+      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
+      }
+      if (operationGroup?.subOperationGroups) {
+        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
