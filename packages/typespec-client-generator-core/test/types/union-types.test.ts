@@ -1,7 +1,6 @@
-import { UsageFlags } from "@typespec/compiler";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkArrayType } from "../../src/interfaces.js";
+import { SdkArrayType, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
@@ -161,7 +160,7 @@ describe("typespec-client-generator-core: union types", () => {
         }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
 
     const extendsType = models.find((x) => x.name === "TestExtends");
@@ -211,7 +210,7 @@ describe("typespec-client-generator-core: union types", () => {
         }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
 
     const extendsType = models.find((x) => x.name === "TestExtends");
@@ -312,7 +311,7 @@ describe("typespec-client-generator-core: union types", () => {
       }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
     const modelWithNamedUnionProperty = models.find(
       (x) => x.kind === "model" && x.name === "ModelWithNamedUnionProperty"
@@ -399,7 +398,7 @@ describe("typespec-client-generator-core: union types", () => {
       }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const model = models.find((x) => x.kind === "model" && x.name === "Test");
     ok(model);
@@ -432,7 +431,7 @@ describe("typespec-client-generator-core: union types", () => {
       }
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const model = models.find((x) => x.kind === "model" && x.name === "Test");
     ok(model);
@@ -494,17 +493,17 @@ describe("typespec-client-generator-core: union types", () => {
       ): void;
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const foo = models.find((x) => x.name === "Foo");
     ok(foo);
-    strictEqual(foo.usage, UsageFlags.Input);
+    strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Json);
     strictEqual(foo.access, "internal");
-    const enums = runner.context.experimental_sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
     ok(unionAsEnum);
-    strictEqual(unionAsEnum.usage, UsageFlags.Input);
+    strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Json);
     strictEqual(unionAsEnum.access, "internal");
   });
 
@@ -540,17 +539,17 @@ describe("typespec-client-generator-core: union types", () => {
       ): void;
       `);
 
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const foo = models.find((x) => x.name === "Foo");
     ok(foo);
-    strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     strictEqual(foo.access, "public");
-    const enums = runner.context.experimental_sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
     ok(unionAsEnum);
-    strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     strictEqual(unionAsEnum.access, "public");
   });
 
@@ -573,7 +572,7 @@ describe("typespec-client-generator-core: union types", () => {
       }
       `);
 
-    const enums = runner.context.experimental_sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 2);
     const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
     ok(unionAsEnum);

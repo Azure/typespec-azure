@@ -19,13 +19,11 @@
 - [#811](https://github.com/Azure/typespec-azure/pull/811) Remove dependency on `typespec-autorest` emitter
 - [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
 
-
 ## 0.42.1
 
 ### Bug Fixes
 
 - [#868](https://github.com/Azure/typespec-azure/pull/868) Changing back `ManagedServiceIdentity.userAssignedIdentities` back to `Record<UserAssignedIdentity`. Adding ARM common-type references for on all Managed Identity models.
-
 
 ## 0.42.0
 
@@ -50,7 +48,7 @@
 ### Deprecations
 
 - [#762](https://github.com/Azure/typespec-azure/pull/762) Renaming internal TypeSpec ARM foundation model names to be consistent with ARM common-type definitions.
-However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
+  However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
 
 - Deprecate `Foundations.ArmResource`. `Foundations.Resource` should be used instead.
 
@@ -68,6 +66,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ManagedServiceIdentity`. `ManagedServiceIdentityProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ManagedServiceIdentity;
   +...ManagedServiceIdentityProperty;
@@ -76,6 +75,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ManagedSystemAssignedIdentity`. `ManagedSystemAssignedIdentityProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ManagedSystemAssignedIdentity;
   +...ManagedSystemAssignedIdentityProperty;
@@ -84,6 +84,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `EntityTag`. `EntityTagProperty` should be used instead.
 
   Example:
+
   ```diff
   -...EntityTag;
   +...EntityTagProperty;
@@ -92,6 +93,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ResourceKind`. `ResourceKindProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ResourceKind;
   +...ResourceKindProperty;
@@ -100,6 +102,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ResourcePlan`. `ResourcePlanProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ResourcePlan;
   +...ResourcePlanProperty;
@@ -108,6 +111,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ResourceSku`. `ResourceSkuProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ResourceSku;
   +...ResourceSkuProperty;
@@ -116,6 +120,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ManagedBy`. `ManagedByProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ManagedBy;
   +...ManagedByProperty;
@@ -124,7 +129,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 ### Breaking Changes
 
 - [#521](https://github.com/Azure/typespec-azure/pull/521) Switching ProvisioningState from enum to Open union
-
 
 ## 0.41.0
 
@@ -148,7 +152,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 
 - [#407](https://github.com/Azure/typespec-azure/pull/407) Deprecate `ResourceIdentifier` in favor of new `Azure.Core.armResourceIdentifier`
 
-
 ## 0.40.0
 
 ### Bug Fixes
@@ -167,7 +170,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - [#298](https://github.com/Azure/typespec-azure/pull/298) ARM: add `arm-delete-response-codes` rule.
 - [#317](https://github.com/Azure/typespec-azure/pull/317) Add ruleset `canonical-versioning` to Azure Resource Manager library.
 
-
 ## 0.39.1
 
 ### Patch Changes
@@ -180,7 +182,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 
 - ebfe639: Fix Location resource issue, add mechanism for additional path segments
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
-
 
 ## 0.38.0
 

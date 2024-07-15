@@ -84,7 +84,7 @@
         "tags": [
           "Employees"
         ],
-        "description": "A resource list operation, at the scope of the resource's parent",
+        "description": "List Employee resources by Location",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -505,6 +505,7 @@
         },
         "properties": {
           "$ref": "#/definitions/EmployeeUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
       }

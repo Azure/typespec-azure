@@ -600,7 +600,7 @@ export function createSdkContext<
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     program: context.program,
     emitContext: context,
-    experimental_sdkPackage: undefined!,
+    sdkPackage: undefined!,
     emitterName: diagnostics.pipe(
       parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
     ), // eslint-disable-line deprecation/deprecation
@@ -617,10 +617,10 @@ export function createSdkContext<
     __namespaceToApiVersionClientDefaultValue: new Map(),
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
   };
-  sdkContext.experimental_sdkPackage = getSdkPackage(sdkContext);
+  sdkContext.sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
     sdkContext.diagnostics = sdkContext.diagnostics.concat(
-      sdkContext.experimental_sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+      sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
     );
   }
   return sdkContext;
