@@ -515,7 +515,7 @@ model LocationResourceParameter {
   @minLength(1)
   @segment("locations")
   @key
-  location: string;
+  location: azureLocation;
 }
 
 /**
