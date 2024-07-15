@@ -298,7 +298,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(multiPartRequest);
@@ -324,7 +324,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
@@ -362,7 +362,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
@@ -405,7 +405,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       @post
       op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
       `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
     const fileOptionalFileName = MultiPartRequest.properties.find(
@@ -429,7 +429,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
@@ -479,7 +479,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
@@ -499,7 +499,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
@@ -530,7 +530,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
@@ -588,7 +588,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
         `);
-    const models = runner.context.experimental_sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
 
@@ -598,5 +598,22 @@ describe("typespec-client-generator-core: multipart types", () => {
       strictEqual(p.multipartOptions.isFilePart, true);
       strictEqual(p.multipartOptions.multi, p.name.toLowerCase().includes("array"));
     }
+  });
+
+  it("check serialized name with @multipartBody for model", async function () {
+    await runner.compileWithBuiltInService(`
+        model MultiPartRequest {
+            name: HttpPart<bytes, #{ name: "serializedName" }>,
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runner.context.sdkPackage.models;
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const nameProperty = MultiPartRequest.properties.find((x) => x.name === "name");
+    ok(nameProperty);
+    strictEqual(nameProperty.name, "name");
+    strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
   });
 });

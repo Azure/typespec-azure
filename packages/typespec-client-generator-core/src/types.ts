@@ -1114,6 +1114,11 @@ function updateMultiPartInfo(
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
+    // after https://github.com/microsoft/typespec/issues/3779 fixed, could use httpOperationPart.name directly
+    const httpPart = getHttpPart(context.program, type.type);
+    if (httpPart?.options?.name) {
+      base.serializedName = httpPart?.options?.name;
+    }
   } else if (operation) {
     // common body
     const httpOperation = getHttpOperationWithCache(context, operation);
