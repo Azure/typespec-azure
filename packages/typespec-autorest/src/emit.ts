@@ -92,6 +92,7 @@ export function resolveAutorestOptions(
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
     emitLroOptions: resolvedOptions["emit-lro-options"],
     armResourceFlattening: resolvedOptions["arm-resource-flattening"],
+    emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
   };
 }
 
