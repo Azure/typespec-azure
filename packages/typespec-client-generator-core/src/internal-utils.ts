@@ -481,8 +481,8 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
     : undefined;
   return Boolean(
     httpBody &&
-    httpBody.type.kind === "Model" &&
-    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+      httpBody.type.kind === "Model" &&
+      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 
