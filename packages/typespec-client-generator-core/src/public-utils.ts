@@ -35,6 +35,7 @@ import {
   getClientNamespaceStringHelper,
   getHttpOperationResponseHeaders,
   parseEmitterName,
+  removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
@@ -49,18 +50,8 @@ export function getDefaultApiVersion(
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
-    let versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    // filter with specific api version
-    if (
-      context.apiVersion !== undefined &&
-      context.apiVersion !== "latest" &&
-      context.apiVersion !== "all"
-    ) {
-      const index = versions.findIndex((version) => version.value === context.apiVersion);
-      if (index >= 0) {
-        versions = versions.slice(0, index + 1);
-      }
-    }
+    const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {

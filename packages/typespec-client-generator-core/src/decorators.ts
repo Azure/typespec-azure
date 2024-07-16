@@ -572,8 +572,14 @@ export function listOperationsInOperationGroup(
   addOperations(group.type);
   return operations;
 }
+
+interface VersioningStrategy {
+  readonly strategy?: "ignore";
+  readonly previewStringRegex?: RegExp; // regex to match preview versions
+}
+
 export interface CreateSdkContextOptions {
-  readonly versionStrategy?: "ignore";
+  readonly versioning?: VersioningStrategy;
   additionalDecorators?: string[];
 }
 
@@ -604,13 +610,14 @@ export async function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     diagnostics: diagnostics.diagnostics,
-    apiVersion: options?.versionStrategy === "ignore" ? "all" : context.options["api-version"],
+    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
     originalProgram: context.program,
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
     examplesDirectory: context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
+    previewStringRegex: options?.versioning?.previewStringRegex || /-preview$/,
   };
   sdkContext.sdkPackage = getSdkPackage(sdkContext);
   for (const client of sdkContext.sdkPackage.clients) {

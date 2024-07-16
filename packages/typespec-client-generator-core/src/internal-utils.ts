@@ -42,6 +42,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
+  getDefaultApiVersion,
   getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
@@ -410,6 +411,7 @@ export interface TCGCContext {
   originalProgram: Program;
   examplesDirectory?: string;
   decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
 }
 
 export function createTCGCContext(program: Program): TCGCContext {
@@ -421,6 +423,7 @@ export function createTCGCContext(program: Program): TCGCContext {
     __namespaceToApiVersionParameter: new Map(),
     __tspTypeToApiVersions: new Map(),
     __namespaceToApiVersionClientDefaultValue: new Map(),
+    previewStringRegex: /-preview$/,
   };
 }
 
@@ -542,6 +545,38 @@ export function getHttpOperationResponseHeaders(
     headers.push(response.body.contentTypeProperty);
   }
   return headers;
+}
+
+export function removeVersionsLargerThanExplicitlySpecified(
+  context: TCGCContext,
+  versions: { value: string | number }[]
+): void {
+  // filter with specific api version
+  if (
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    const index = versions.findIndex((version) => version.value === context.apiVersion);
+    if (index >= 0) {
+      versions.splice(index + 1, versions.length - index - 1);
+    }
+  }
+}
+
+export function filterApiVersionsInEnum(
+  context: TCGCContext,
+  client: SdkClient,
+  sdkVersionsEnum: SdkEnumType
+): void {
+  // if they explicitly set an api version, remove larger versions
+  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  const defaultApiVersion = getDefaultApiVersion(context, client.service);
+  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
+    );
+  }
 }
 
 export function isJsonContentType(contentType: string): boolean {
