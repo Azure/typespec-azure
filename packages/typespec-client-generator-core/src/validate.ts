@@ -4,7 +4,6 @@ import {
   Enum,
   EnumMember,
   Interface,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -25,7 +24,7 @@ export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program);
   const languageScopes = getDefinedLanguageScopes(program);
   for (const scope of languageScopes) {
-    validateClientNames(program, tcgcContext, scope);
+    validateClientNamesPerNamespace(program, tcgcContext, scope, program.getGlobalNamespaceType());
   }
 }
 
@@ -40,21 +39,6 @@ function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScop
     }
   }
   return languageScopes;
-}
-
-function validateClientNames(
-  program: Program,
-  tcgcContext: TCGCContext,
-  scope: string | typeof AllScopes
-) {
-  const services = listServices(program);
-  if (services.length === 0) {
-    services.push({ type: program.getGlobalNamespaceType() });
-  }
-
-  for (const service of services) {
-    validateClientNamesPerNamespace(program, tcgcContext, scope, service.type);
-  }
 }
 
 function validateClientNamesPerNamespace(
