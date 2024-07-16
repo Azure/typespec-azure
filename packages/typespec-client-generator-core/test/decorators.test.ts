@@ -1311,7 +1311,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
       await createSdkContextTestHelper(runner.context.program, {
@@ -1320,7 +1320,12 @@ describe("typespec-client-generator-core: decorators", () => {
       }),
       test as Operation
     );
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
     strictEqual(actual, protocolValue);
+    strictEqual(method.generateProtocol, protocolValue);
   }
   describe("@protocolAPI", () => {
     it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
@@ -1347,7 +1352,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
       await createSdkContextTestHelper(runner.program, {
@@ -1357,6 +1362,11 @@ describe("typespec-client-generator-core: decorators", () => {
       test as Operation
     );
     strictEqual(actual, convenientValue);
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
+    strictEqual(method.generateConvenient, convenientValue);
   }
 
   describe("@convenientAPI", () => {
@@ -1374,7 +1384,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
-      const { test } = await runner.compile(`
+      const { test } = await runner.compileWithBuiltInService(`
         @convenientAPI
         @test
         op test(): void;
@@ -1388,6 +1398,10 @@ describe("typespec-client-generator-core: decorators", () => {
         test as Operation
       );
       strictEqual(actual, true);
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.generateConvenient, true);
     });
   });
 
@@ -1403,25 +1417,41 @@ describe("typespec-client-generator-core: decorators", () => {
       // java should get protocolAPI=true and convenientAPI=false
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(shouldGenerateProtocol(runner.context, test), true);
+        strictEqual(method.generateProtocol, true);
+
         strictEqual(
           shouldGenerateConvenient(runner.context, test),
           false,
           "convenientAPI should be false for java"
         );
+        strictEqual(method.generateConvenient, false, "convenientAPI should be false for java");
       }
 
       // csharp should get protocolAPI=false and convenientAPI=true
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(
           shouldGenerateProtocol(runner.context, test),
           false,
           "protocolAPI should be false for csharp"
         );
+        strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
+
         strictEqual(shouldGenerateConvenient(runner.context, test), true);
+        strictEqual(method.generateConvenient, true);
       }
     });
   });

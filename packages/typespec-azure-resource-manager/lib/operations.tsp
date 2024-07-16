@@ -41,6 +41,7 @@ op ArmListBySubscription<
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)
+@Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListByParent<
@@ -69,7 +70,7 @@ op ArmResourceListByParent<
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)
-@armRenameListByOperation(Resource) // This must come before @armResourceList!
+@Private.armRenameListByOperation(Resource) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListAtScope<
@@ -294,13 +295,7 @@ op ArmResourcePatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {}
-> is ArmCustomPatchAsync<
-  Resource,
-  ResourceUpdateModel<Resource, Properties>,
-  BaseParameters,
-  LroHeaders,
-  Parameters
->;
+> is ArmCustomPatchAsync<Resource, Resource, BaseParameters, LroHeaders, Parameters>;
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
@@ -366,12 +361,7 @@ op ArmResourcePatchSync<
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {}
-> is ArmCustomPatchSync<
-  Resource,
-  ResourceUpdateModel<Resource, Properties>,
-  BaseParameters,
-  Parameters
->;
+> is ArmCustomPatchSync<Resource, Resource, BaseParameters, Parameters>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)

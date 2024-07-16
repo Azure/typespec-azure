@@ -90,6 +90,17 @@ export interface AutorestEmitterOptions {
    * @default "final-state-only"
    */
   "emit-lro-options"?: "none" | "final-state-only" | "all";
+
+  /**
+   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
+   * ARM resource properties.
+   */
+  "arm-resource-flattening"?: boolean;
+  /**
+   * Determines whether and how to emit schemas for common-types
+   * @default "for-visibility-changes"
+   */
+  "emit-common-types-schema"?: "never" | "for-visibility-changes";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -192,6 +203,21 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "final-state-only",
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
+    },
+    "arm-resource-flattening": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
+    },
+    "emit-common-types-schema": {
+      type: "string",
+      enum: ["never", "for-visibility-changes"],
+      nullable: true,
+      default: "for-visibility-changes",
+      description:
+        "Determine whether and how to emit schemas for common-types rather than referencing them",
     },
   },
   required: [],

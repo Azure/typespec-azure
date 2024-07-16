@@ -121,19 +121,6 @@ extern dec armProviderNameValue(target: Operation | Model);
 extern dec armResourceCollectionAction(target: Operation);
 
 /**
- * Marks the operation as being a collection action
- * @param resourceType Resource
- * @param parentTypeName: Parent type name.
- * @param parentFriendlyTypeName Friendly name for parent.
- */
-extern dec armRenameListByOperation(
-  target: Operation,
-  resourceType: Model,
-  parentTypeName?: valueof string,
-  parentFriendlyTypeName?: valueof string
-);
-
-/**
  * @param resourceType Resource model
  */
 extern dec armResourceAction(target: Operation, resourceType: Model);

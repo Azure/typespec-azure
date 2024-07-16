@@ -194,12 +194,13 @@ export function $armResourceList(
   operations.lists[target.name] = operation as ArmResourceOperation;
 }
 
-export function $armRenameListByOperation(
+export function armRenameListByOperationInternal(
   context: DecoratorContext,
   entity: Operation,
   resourceType: Model,
   parentTypeName?: string,
-  parentFriendlyTypeName?: string
+  parentFriendlyTypeName?: string,
+  applyOperationRename?: boolean
 ) {
   const { program } = context;
   if (
@@ -244,11 +245,13 @@ export function $armRenameListByOperation(
     undefined as any
   );
 
-  // Set the operation name
-  entity.name =
-    parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1
-      ? "list"
-      : `listBy${parentTypeName}`;
+  if (applyOperationRename === undefined || applyOperationRename === true) {
+    // Set the operation name
+    entity.name =
+      parentTypeName === "Extension" || parentTypeName === undefined || parentTypeName.length < 1
+        ? "list"
+        : `listBy${parentTypeName}`;
+  }
 }
 
 function getArmParentName(program: Program, resource: Model): string[] {

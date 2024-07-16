@@ -17,6 +17,7 @@ import {
   getClientNamespaceString,
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
+  getGeneratedName,
   getLibraryName,
   getPropertyNames,
   isApiVersion,
@@ -1641,11 +1642,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
+        strictEqual(unionEnum.name, "TestRequestRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "RequestParameterWithAnonymousUnion.repeatabilityResult.anonymous"
+          "test.RequestRepeatabilityResult.anonymous"
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1675,12 +1676,36 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].kind, "enumvalue");
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.valueType.kind, "string");
-        strictEqual(stringType.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
+        strictEqual(stringType.name, "TestRequestRepeatabilityResult");
         strictEqual(stringType.isGeneratedName, true);
         strictEqual(
           stringType.crossLanguageDefinitionId,
-          "RequestParameterWithAnonymousUnion.repeatabilityResult.anonymous"
+          "test.RequestRepeatabilityResult.anonymous"
         );
+      });
+
+      it("anonymous model naming in multi layer operation group", async () => {
+        const { TestModel } = (await runner.compile(`
+        @service({})
+        namespace MyService {
+          namespace Test {
+            namespace InnerTest {
+              @test
+              model TestModel {
+                anonymousProp: {prop: string}
+              }
+              op test(): TestModel;
+            }
+          }
+        }
+        `)) as { TestModel: Model };
+
+        runner.context.generatedNames?.clear();
+        const name = getGeneratedName(
+          runner.context,
+          [...TestModel.properties.values()][0].type as Model
+        );
+        strictEqual(name, "TestModelAnonymousProp");
       });
     });
 
