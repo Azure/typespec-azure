@@ -22,7 +22,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-operation-id": true,
-    "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/prefer-csv-collection-format": true,
     "@azure-tools/typespec-azure-core/no-format": true,
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
@@ -38,6 +37,9 @@ export default {
     "@azure-tools/typespec-azure-core/use-standard-names": true,
     "@azure-tools/typespec-azure-core/use-standard-operations": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
+
+    // Rules to enable later https://github.com/Azure/typespec-azure/issues/1171
+    "@azure-tools/typespec-azure-core/friendly-name": false,
 
     // Azure core rules enabled via an optional rulesets
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
