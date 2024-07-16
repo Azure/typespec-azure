@@ -181,7 +181,7 @@ describe("typespec-autorest: decorators", () => {
       const diagnostics = await runner.diagnose(
         `
         model A {
-          @example("./someExample.json", "Some example")
+          @Autorest.example("./someExample.json", "Some example")
           name: string;
         }
         `
@@ -203,7 +203,7 @@ describe("typespec-autorest: decorators", () => {
 
         @get
         @operationId("Pets_Get")
-        @example("./getPet.json", "Get a pet")
+        @Autorest.example("./getPet.json", "Get a pet")
         op read(): Pet;
         `
       );
@@ -224,8 +224,8 @@ describe("typespec-autorest: decorators", () => {
 
         @get
         @operationId("Pets_Get")
-        @example("./getPet.json", "Get a pet")
-        @example("./getAnotherPet.json", "Get another pet")
+        @Autorest.example("./getPet.json", "Get a pet")
+        @Autorest.example("./getAnotherPet.json", "Get another pet")
         op read(): Pet;
         `
       );
@@ -250,8 +250,8 @@ describe("typespec-autorest: decorators", () => {
 
         @get
         @operationId("Pets_Get")
-        @example("./getPet.json", "Get a pet")
-        @example("./getPet.json", "Get another pet")
+        @Autorest.example("./getPet.json", "Get a pet")
+        @Autorest.example("./getPet.json", "Get another pet")
         op read(): Pet;
         `
       );
@@ -272,8 +272,8 @@ describe("typespec-autorest: decorators", () => {
 
         @get
         @operationId("Pets_Get")
-        @example("./getPet.json", "Get a pet")
-        @example("./getAnotherPet.json", "Get a pet")
+        @Autorest.example("./getPet.json", "Get a pet")
+        @Autorest.example("./getAnotherPet.json", "Get a pet")
         op read(): Pet;
         `
       );
