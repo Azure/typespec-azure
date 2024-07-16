@@ -3539,6 +3539,48 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
       strictEqual(sdkVersionsEnum.values[1].value, "2024-11-01-preview");
     });
+
+    it("specify api version with preview filter", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "2024-10-01",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2023_10_01: "2023-10-01",
+          v2023_11_01_preview: "2023-11-01-preview",
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2023-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
+    });
   });
 
   describe("versioning impact for apis", () => {
