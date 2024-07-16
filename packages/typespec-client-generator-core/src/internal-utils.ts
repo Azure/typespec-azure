@@ -481,8 +481,8 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
     : undefined;
   return Boolean(
     httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+    httpBody.type.kind === "Model" &&
+    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 
@@ -533,7 +533,7 @@ export function getHttpOperationResponseHeaders(
   return headers;
 }
 
-export function removeVersionsPreviousToExplicitlySpecified(
+export function removeVersionsLargerThanExplicitlySpecified(
   context: TCGCContext,
   versions: { value: string | number }[]
 ): void {
@@ -555,8 +555,8 @@ export function filterApiVersionsInEnum(
   client: SdkClient,
   sdkVersionsEnum: SdkEnumType
 ): void {
-  // if they explicitly set an api version, remove previous versions
-  removeVersionsPreviousToExplicitlySpecified(context, sdkVersionsEnum.values);
+  // if they explicitly set an api version, remove larger versions
+  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter(

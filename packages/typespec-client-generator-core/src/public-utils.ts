@@ -34,7 +34,7 @@ import {
   getClientNamespaceStringHelper,
   getHttpOperationResponseHeaders,
   parseEmitterName,
-  removeVersionsPreviousToExplicitlySpecified,
+  removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
@@ -50,7 +50,7 @@ export function getDefaultApiVersion(
 ): Version | undefined {
   try {
     const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    removeVersionsPreviousToExplicitlySpecified(context, versions);
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {
