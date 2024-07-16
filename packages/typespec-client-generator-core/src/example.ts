@@ -98,7 +98,7 @@ async function loadExamples<TServiceOperation extends SdkServiceOperation>(
         continue;
       }
 
-      if (!map.has(example.operationId)) {
+      if (!map.has(example.operationId.toLowerCase())) {
         map.set(example.operationId.toLowerCase(), {});
       }
       const examples = map.get(example.operationId.toLowerCase())!;

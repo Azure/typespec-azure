@@ -68,6 +68,24 @@ describe("typespec-client-generator-core: load examples", () => {
     strictEqual(operation.examples?.length, 1);
   });
 
+  it("load multiple example for one operation", async () => {
+    await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+    await runner.host.addRealTypeSpecFile("./examples/getAnother.json", `${__dirname}/load/getAnother.json`);
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op get(): string;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0]
+        .methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 2);
+  });
+
   it("load example with client customization", async () => {
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
     await runner.compile(`
