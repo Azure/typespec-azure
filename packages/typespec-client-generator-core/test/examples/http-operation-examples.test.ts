@@ -27,8 +27,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.sdkPackage.clients[0]
-        .methods[0] as SdkServiceMethod<SdkHttpOperation>
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
@@ -65,8 +64,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.sdkPackage.clients[0]
-        .methods[0] as SdkServiceMethod<SdkHttpOperation>
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
@@ -114,8 +112,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.sdkPackage.clients[0]
-        .methods[0] as SdkServiceMethod<SdkHttpOperation>
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
@@ -154,8 +151,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.sdkPackage.clients[0]
-        .methods[0] as SdkServiceMethod<SdkHttpOperation>
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
@@ -208,8 +204,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     `);
 
     const operation = (
-      runner.context.sdkPackage.clients[0]
-        .methods[0] as SdkServiceMethod<SdkHttpOperation>
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);

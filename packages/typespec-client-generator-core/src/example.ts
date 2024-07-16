@@ -47,20 +47,18 @@ interface LoadedExample {
  * Load all examples for a client
  *
  * @param context
- * @param client
+ * @param apiVersion
  * @returns a map of all operations' examples, key is operation's operation id,
  * value is a map of examples, key is example's title, value is example's details
  */
-async function loadExamples<TServiceOperation extends SdkServiceOperation>(
+async function loadExamples(
   context: TCGCContext,
-  client: SdkClientType<TServiceOperation>
+  apiVersion: string | undefined
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
   if (!context.examplesDirectory) {
     return diagnostics.wrap(new Map());
   }
-
-  const apiVersion = getValidApiVersion(context, client.apiVersions);
 
   const exampleDir = apiVersion
     ? resolvePath(context.examplesDirectory, apiVersion)
@@ -142,7 +140,9 @@ export async function handleClientExamples(
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
-  const examples = diagnostics.pipe(await loadExamples(context, client));
+  const examples = diagnostics.pipe(
+    await loadExamples(context, getValidApiVersion(context, client.apiVersions))
+  );
   const methodQueue = [...client.methods];
   while (methodQueue.length > 0) {
     const method = methodQueue.pop()!;
@@ -227,9 +227,13 @@ function handleHttpParameters(
   const parameterExamples = [] as SdkHttpParameterExample[];
   if ("parameters" in example && typeof example.parameters === "object") {
     for (const name of Object.keys(example.parameters)) {
-      const parameter = parameters.find(
+      let parameter = parameters.find(
         (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name
       );
+      // fallback to body in example for any body parameter
+      if (!parameter && name === "body") {
+        parameter = parameters.find((p) => p.kind === "body");
+      }
       if (parameter) {
         const value = diagnostics.pipe(
           getSdkTypeExample(parameter.type, example.parameters[parameter.name], relativePath)
