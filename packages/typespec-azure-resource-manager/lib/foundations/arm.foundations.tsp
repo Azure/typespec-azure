@@ -120,6 +120,7 @@ model ResourceUpdateModel<
     Resource,
     "Name" | "name" | "properties"
   >>> {
+  /** The resource-specific properties for this resource. */
   @conditionalClientFlatten
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
