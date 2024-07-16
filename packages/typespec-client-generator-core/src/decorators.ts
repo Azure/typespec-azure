@@ -1003,20 +1003,31 @@ export function getClientNameOverride(context: TCGCContext, entity: Type): strin
 const overrideClientMethodKey = createStateSymbol("overrideClientMethod");
 
 // Recursive function to collect parameter names
-function collectParamNames(properties: RekeyableMap<string, ModelProperty>): string[] {
-  let paramNames: string[] = [];
+function collectParams(properties: RekeyableMap<string, ModelProperty>): ModelProperty[] {
+  let params: ModelProperty[] = [];
 
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
     if (value.type.kind === "Model") {
-      paramNames = paramNames.concat(collectParamNames(value.type.properties));
+      params = params.concat(collectParams(value.type.properties));
     } else {
-      paramNames.push(key);
+      params.push(value);
     }
   });
 
-  return paramNames;
+  return params;
 }
+
+function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProperty): boolean {
+  // can't rely fully on equals because the `.model` property may be different
+  return (
+    modelPropA.name === modelPropB.name &&
+    modelPropA.type === modelPropB.type &&
+    modelPropA.node === modelPropB.node
+  )
+}
+
+
 
 export function $overrideClientMethod(
   context: DecoratorContext,
@@ -1025,13 +1036,13 @@ export function $overrideClientMethod(
   scope?: LanguageScopes
 ) {
   // Extract and sort parameter names
-  const originalParamNames = collectParamNames(original.parameters.properties).sort();
-  const overrideParamNames = collectParamNames(override.parameters.properties).sort();
+  const originalParams = collectParams(original.parameters.properties).sort((a, b) => a.name.localeCompare(b.name));
+  const overrideParams = collectParams(override.parameters.properties).sort((a, b) => a.name.localeCompare(b.name));
 
   // Check if the sorted parameter names arrays are equal
   const parametersMatch =
-    originalParamNames.length === overrideParamNames.length &&
-    originalParamNames.every((value, index) => value === overrideParamNames[index]);
+    originalParams.length === overrideParams.length &&
+    originalParams.every((value, index) => compareModelProperties(value, overrideParams[index]));
 
   if (!parametersMatch) {
     reportDiagnostic(context.program, {
