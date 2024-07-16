@@ -562,7 +562,7 @@ export function listOperationsInOperationGroup(
     for (const op of current.operations.values()) {
       // Skip templated operations
       if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(op);
+        operations.push(getOverriddenClientMethod(context, op) ?? op);
       }
     }
 
@@ -1024,10 +1024,8 @@ function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProp
     modelPropA.name === modelPropB.name &&
     modelPropA.type === modelPropB.type &&
     modelPropA.node === modelPropB.node
-  )
+  );
 }
-
-
 
 export function $overrideClientMethod(
   context: DecoratorContext,
@@ -1036,8 +1034,12 @@ export function $overrideClientMethod(
   scope?: LanguageScopes
 ) {
   // Extract and sort parameter names
-  const originalParams = collectParams(original.parameters.properties).sort((a, b) => a.name.localeCompare(b.name));
-  const overrideParams = collectParams(override.parameters.properties).sort((a, b) => a.name.localeCompare(b.name));
+  const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+  const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
   // Check if the sorted parameter names arrays are equal
   const parametersMatch =

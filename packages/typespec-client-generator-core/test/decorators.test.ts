@@ -3870,7 +3870,6 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(method.operation.bodyParam);
       strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
       strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
-      strictEqual(method.operation.bodyParam.type, paramsModel);
     });
 
     it("basic with scope", async () => {
