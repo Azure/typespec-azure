@@ -162,7 +162,7 @@ export const $lib = createTypeSpecLibrary({
     "override-method-parameters-mismatch": {
       severity: "error",
       messages: {
-        default: paramMessage`Method "${"methodName"}" has different parameters than the method it overrides. The parameters must be the same.`,
+        default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. There needs to be a 1-1 mapping.`,
       },
     },
   },

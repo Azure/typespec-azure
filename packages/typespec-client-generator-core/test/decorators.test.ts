@@ -4037,7 +4037,9 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@overrideClientMethod(MyService.func, MyCustomizations.func);
         `;
-      const diagnostics = (await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode))[1];
+      const diagnostics = (
+        await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+      )[1];
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
       });
