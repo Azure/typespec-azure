@@ -393,3 +393,13 @@ export function $armRenameListByOperation(
     applyOperationRename
   );
 }
+
+export function $armResourcePropertiesOptionality(
+  context: DecoratorContext,
+  target: ModelProperty,
+  isOptional: boolean
+) {
+  if (target.name === "properties") {
+    target.optional = isOptional;
+  }
+}

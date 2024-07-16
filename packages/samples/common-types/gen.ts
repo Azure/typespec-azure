@@ -81,21 +81,22 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   }
   document.paths = {};
 
-  replaceUuidRefs(document);
+  replaceUuidRefs(document, "Azure.Core.uuid");
+  replaceUuidRefs(document, "Azure.Core.azureLocation");
 
   return document;
 }
 
-function replaceUuidRefs(document: OpenAPI2Document) {
-  if (document.definitions?.["Azure.Core.uuid"]) {
-    const uuidDef = document.definitions["Azure.Core.uuid"];
-    delete document.definitions["Azure.Core.uuid"];
+function replaceUuidRefs(document: OpenAPI2Document, refId: string) {
+  if (document.definitions?.[refId]) {
+    const refDef = document.definitions[refId];
+    delete document.definitions[refId];
 
     for (const definition of Object.values(document.definitions)) {
       for (const property of Object.values(definition.properties || {})) {
-        if ("$ref" in property && property.$ref === "#/definitions/Azure.Core.uuid") {
+        if ("$ref" in property && property.$ref === `#/definitions/${refId}`) {
           delete (property as any).$ref;
-          Object.assign(property, { ...uuidDef, ...property });
+          Object.assign(property, { ...refDef, ...property });
         }
       }
     }
