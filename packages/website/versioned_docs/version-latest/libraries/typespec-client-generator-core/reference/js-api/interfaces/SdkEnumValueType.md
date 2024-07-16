@@ -10,13 +10,14 @@ title: "[I] SdkEnumValueType"
 ## Properties
 
 | Property | Type | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
-| `deprecation?` | `string` | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | `SdkTypeBase.details` | `SdkTypeBase.details` |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` |
 | `enumType` | [`SdkEnumType`](SdkEnumType.md) | - | - |
-| `kind` | `"enumvalue"` | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
+| `kind` | `"enumvalue"` | `SdkTypeBase.kind` | - |
 | `name` | `string` | - | - |
 | `value` | `string` \| `number` | - | - |
 | `valueType` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |

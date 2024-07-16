@@ -19,7 +19,7 @@ clients.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `interfaceType` | `Interface` |
 

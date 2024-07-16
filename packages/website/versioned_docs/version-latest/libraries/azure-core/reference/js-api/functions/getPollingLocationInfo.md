@@ -12,7 +12,7 @@ Gets polling information stored with a field that contains a link to an Lro poll
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program to check |
 | `target` | `ModelProperty` | The ModelProperty to check for polling info |
 

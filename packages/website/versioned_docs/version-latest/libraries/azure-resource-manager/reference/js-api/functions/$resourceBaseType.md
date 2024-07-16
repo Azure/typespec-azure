@@ -13,7 +13,7 @@ function $resourceBaseType(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
 | `baseType` | `Type` |

@@ -10,7 +10,7 @@ function getAllServicesAtAllVersions(program, options): Promise<AutorestServiceR
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `options` | `ResolvedAutorestEmitterOptions` |
 

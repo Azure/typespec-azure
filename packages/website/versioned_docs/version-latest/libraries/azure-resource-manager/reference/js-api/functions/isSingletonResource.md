@@ -10,7 +10,7 @@ function isSingletonResource(program, resourceType): boolean
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resourceType` | `Model` |
 

@@ -1,8 +1,8 @@
 ---
 jsApi: true
-title: "[T] SdkDatetimeType"
+title: "[T] SdkDateTimeType"
 
 ---
 ```ts
-type SdkDatetimeType: SdkUtcDatetimeType | SdkOffsetDatetimeType;
+type SdkDateTimeType: SdkUtcDateTimeType | SdkOffsetDateTimeType;
 ```

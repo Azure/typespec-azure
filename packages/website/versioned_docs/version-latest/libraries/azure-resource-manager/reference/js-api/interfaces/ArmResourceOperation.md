@@ -10,7 +10,7 @@ title: "[I] ArmResourceOperation"
 ## Properties
 
 | Property | Type | Inherited from |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `httpOperation` | `HttpOperation` | - |
 | `kind` | [`ArmOperationKind`](../type-aliases/ArmOperationKind.md) | `ArmResourceOperationData.kind` |
 | `name` | `string` | `ArmResourceOperationData.name` |

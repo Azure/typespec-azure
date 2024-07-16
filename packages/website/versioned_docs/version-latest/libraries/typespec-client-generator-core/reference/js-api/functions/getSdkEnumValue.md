@@ -13,7 +13,7 @@ function getSdkEnumValue(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `enumType` | [`SdkEnumType`](../interfaces/SdkEnumType.md) |
 | `type` | `EnumMember` |

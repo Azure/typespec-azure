@@ -10,7 +10,7 @@ function checkEnsureVerb(program): void
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 
 ## Returns

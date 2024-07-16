@@ -9,12 +9,15 @@ title: "[P] JS API"
 
 ## Interfaces
 
+- [CreateSdkContextOptions](interfaces/CreateSdkContextOptions.md)
+- [DecoratorInfo](interfaces/DecoratorInfo.md)
 - [SdkArrayType](interfaces/SdkArrayType.md)
 - [SdkBasicServiceMethod](interfaces/SdkBasicServiceMethod.md)
 - [SdkBodyModelPropertyType](interfaces/SdkBodyModelPropertyType.md)
 - [SdkBodyParameter](interfaces/SdkBodyParameter.md)
 - [SdkBuiltInType](interfaces/SdkBuiltInType.md)
 - [SdkClient](interfaces/SdkClient.md)
+- [SdkClientAccessor](interfaces/SdkClientAccessor.md)
 - [SdkClientType](interfaces/SdkClientType.md)
 - [SdkConstantType](interfaces/SdkConstantType.md)
 - [SdkContext](interfaces/SdkContext.md)
@@ -55,16 +58,19 @@ title: "[P] JS API"
 - [CollectionFormat](type-aliases/CollectionFormat.md)
 - [LanguageScopes](type-aliases/LanguageScopes.md)
 - [SdkBuiltInKinds](type-aliases/SdkBuiltInKinds.md)
-- [SdkDatetimeType](type-aliases/SdkDatetimeType.md)
+- [SdkDateTimeType](type-aliases/SdkDateTimeType.md)
+- [SdkDatetimeType](type-aliases/SdkDatetimeType-1.md)
 - [SdkHttpPackage](type-aliases/SdkHttpPackage.md)
 - [SdkHttpParameter](type-aliases/SdkHttpParameter.md)
 - [SdkMethod](type-aliases/SdkMethod.md)
 - [SdkModelPropertyType](type-aliases/SdkModelPropertyType.md)
+- [SdkOffsetDatetimeType](type-aliases/SdkOffsetDatetimeType.md)
 - [SdkParameter](type-aliases/SdkParameter.md)
 - [SdkServiceMethod](type-aliases/SdkServiceMethod.md)
 - [SdkServiceOperation](type-aliases/SdkServiceOperation.md)
 - [SdkServiceParameter](type-aliases/SdkServiceParameter.md)
 - [SdkType](type-aliases/SdkType.md)
+- [SdkUtcDatetimeType](type-aliases/SdkUtcDatetimeType.md)
 
 ## Variables
 
@@ -132,7 +138,6 @@ title: "[P] JS API"
 - [getUsageOverride](functions/getUsageOverride.md)
 - [getWireName](functions/getWireName.md)
 - [isApiVersion](functions/isApiVersion.md)
-- [isErrorOrChildOfError](functions/isErrorOrChildOfError.md)
 - [isExclude](functions/isExclude.md)
 - [isInOperationGroup](functions/isInOperationGroup.md)
 - [isInclude](functions/isInclude.md)
@@ -140,7 +145,7 @@ title: "[P] JS API"
 - [isOperationGroup](functions/isOperationGroup.md)
 - [isReadOnly](functions/isReadOnly.md)
 - [isSdkBuiltInKind](functions/isSdkBuiltInKind.md)
-- [isSdkDatetimeEncodings](functions/isSdkDatetimeEncodings.md)
+- [isSdkDateTimeEncodings](functions/isSdkDateTimeEncodings.md)
 - [isSdkFloatKind](functions/isSdkFloatKind.md)
 - [isSdkIntKind](functions/isSdkIntKind.md)
 - [listClients](functions/listClients.md)

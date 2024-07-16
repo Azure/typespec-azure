@@ -10,7 +10,7 @@ function getFinalLocationValue(program, entity): Model | IntrinsicType | undefin
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `ModelProperty` |
 

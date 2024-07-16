@@ -3,22 +3,27 @@ jsApi: true
 title: "[I] SdkClientType"
 
 ---
-## Type parameters
+## Extends
 
-| Type parameter |
-| :------ |
+- `DecoratedType`
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
 | `TServiceOperation` *extends* [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) |
 
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
-| `apiVersions` | `string`[] | - |
-| ~~`arm`~~ | `boolean` | <p>**Deprecated**</p><p>This property is deprecated. Look at `.arm` on `SdkContext` instead.</p> |
-| `description?` | `string` | - |
-| `details?` | `string` | - |
-| `initialization` | [`SdkInitializationType`](SdkInitializationType.md) | - |
-| `kind` | `"client"` | - |
-| `methods` | [`SdkMethod`](../type-aliases/SdkMethod.md)<`TServiceOperation`\>[] | - |
-| `name` | `string` | - |
-| `nameSpace` | `string` | - |
+| Property | Type | Description | Inherited from |
+| ------ | ------ | ------ | ------ |
+| `apiVersions` | `string`[] | - | - |
+| ~~`arm`~~ | `boolean` | **Deprecated** This property is deprecated. Look at `.arm` on `SdkContext` instead. | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `DecoratedType.decorators` |
+| `description?` | `string` | - | - |
+| `details?` | `string` | - | - |
+| `initialization` | [`SdkInitializationType`](SdkInitializationType.md) | - | - |
+| `kind` | `"client"` | - | - |
+| `methods` | [`SdkMethod`](../type-aliases/SdkMethod.md)<`TServiceOperation`\>[] | - | - |
+| `name` | `string` | - | - |
+| `nameSpace` | `string` | - | - |

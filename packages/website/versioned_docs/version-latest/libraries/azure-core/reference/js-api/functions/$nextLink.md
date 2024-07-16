@@ -10,7 +10,7 @@ function $nextLink(context, entity): void
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
 

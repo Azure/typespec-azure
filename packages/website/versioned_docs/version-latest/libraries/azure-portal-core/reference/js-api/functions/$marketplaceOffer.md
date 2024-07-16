@@ -13,7 +13,7 @@ function $marketplaceOffer(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `options` | `Model` |
