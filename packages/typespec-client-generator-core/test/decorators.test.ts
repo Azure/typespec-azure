@@ -3930,16 +3930,32 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
       strictEqual(sdkPackageWithCsharp.clients.length, 1);
 
-      // strictEqual(method.operationGroup.language.csharp, undefined);
+      strictEqual(sdkPackageWithCsharp.clients[0].methods.length, 1);
+      const methodWithCsharp = sdkPackageWithCsharp.clients[0].methods[0];
+      strictEqual(methodWithCsharp.kind, "basic");
+      strictEqual(methodWithCsharp.name, "func");
+      strictEqual(methodWithCsharp.parameters.length, 2);
+      const contentTypeParamWithCsharp = methodWithCsharp.parameters.find(
+        (x) => x.name === "contentType"
+      );
+      ok(contentTypeParamWithCsharp);
 
-      // const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
-      // ok(contentTypeParam);
-      // const paramsParam = method.parameters.find((x) => x.name === "params");
-      // ok(paramsParam);
+      const paramsParamWithCsharp = methodWithCsharp.parameters.find((x) => x.name === "params");
+      ok(paramsParamWithCsharp);
+      strictEqual(
+        sdkPackageWithCsharp.models.find((x) => x.name === "Params"),
+        paramsParamWithCsharp.type
+      );
 
-      // const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
-      // ok(paramsModel);
-      // strictEqual(paramsModel, paramsParam.type);
+      const httpOpWithCsharp = methodWithCsharp.operation;
+      strictEqual(httpOpWithCsharp.parameters.length, 1);
+      strictEqual(
+        httpOpWithCsharp.parameters[0].correspondingMethodParams[0],
+        contentTypeParamWithCsharp
+      );
+      ok(httpOpWithCsharp.bodyParam);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
     });
   });
 });
