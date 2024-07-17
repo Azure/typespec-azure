@@ -10,10 +10,13 @@ title: "[I] SdkArrayType"
 ## Properties
 
 | Property | Type | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
-| `deprecation?` | `string` | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | `SdkTypeBase.details` | `SdkTypeBase.details` |
-| `kind` | `"array"` | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `crossLanguageDefinitionId` | `string` | - | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` |
+| `kind` | `"array"` | `SdkTypeBase.kind` | - |
+| `name` | `string` | - | - |
 | `valueType` | [`SdkType`](../type-aliases/SdkType.md) | - | - |

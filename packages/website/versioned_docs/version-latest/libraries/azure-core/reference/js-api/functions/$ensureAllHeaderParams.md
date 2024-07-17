@@ -13,7 +13,7 @@ function $ensureAllHeaderParams(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `paramModel` | `Model` |

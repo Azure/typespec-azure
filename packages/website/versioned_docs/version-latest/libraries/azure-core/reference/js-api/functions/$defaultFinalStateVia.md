@@ -13,7 +13,7 @@ function $defaultFinalStateVia(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `states` | `LroHeader`[] |

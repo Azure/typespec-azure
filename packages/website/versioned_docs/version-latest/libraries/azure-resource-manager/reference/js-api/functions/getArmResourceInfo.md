@@ -10,7 +10,7 @@ function getArmResourceInfo(program, resourceType): ArmResourceDetails | undefin
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resourceType` | `Model` |
 

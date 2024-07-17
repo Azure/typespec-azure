@@ -12,7 +12,7 @@ Returns `true` if the enum member represents a "failed" state.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `EnumMember` \| `UnionVariant` |
 

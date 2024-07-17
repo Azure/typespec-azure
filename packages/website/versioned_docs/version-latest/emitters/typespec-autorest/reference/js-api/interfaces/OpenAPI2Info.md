@@ -10,7 +10,7 @@ title: "[I] OpenAPI2Info"
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `description?` | `string` |
 | `termsOfService?` | `string` |
 | `title` | `string` |

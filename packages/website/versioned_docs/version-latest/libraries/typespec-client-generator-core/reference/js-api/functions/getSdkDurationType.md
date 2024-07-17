@@ -10,7 +10,7 @@ function getSdkDurationType(context, type): SdkDurationType
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `type` | `Scalar` |
 

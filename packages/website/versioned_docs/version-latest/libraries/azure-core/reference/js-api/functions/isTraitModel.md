@@ -10,7 +10,7 @@ function isTraitModel(program, model): boolean
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `model` | `Model` |
 

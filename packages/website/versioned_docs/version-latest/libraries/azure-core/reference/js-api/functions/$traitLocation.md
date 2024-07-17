@@ -13,7 +13,7 @@ function $traitLocation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
 | `traitLocation` | `EnumMember` |

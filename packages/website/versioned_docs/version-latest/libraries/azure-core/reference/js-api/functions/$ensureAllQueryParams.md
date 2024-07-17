@@ -13,7 +13,7 @@ function $ensureAllQueryParams(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `paramModel` | `Model` |

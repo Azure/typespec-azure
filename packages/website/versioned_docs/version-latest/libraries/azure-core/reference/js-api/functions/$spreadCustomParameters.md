@@ -13,7 +13,7 @@ function $spreadCustomParameters(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
 | `customizations` | `Model` |

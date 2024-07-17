@@ -13,7 +13,7 @@ of a failed operation.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | The decorator execution context. |
 | `entity` | `ModelProperty` | The model property that contains the error result. |
 

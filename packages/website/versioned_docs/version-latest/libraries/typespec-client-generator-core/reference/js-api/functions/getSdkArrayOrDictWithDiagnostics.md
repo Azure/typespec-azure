@@ -13,7 +13,7 @@ function getSdkArrayOrDictWithDiagnostics(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `type` | `Model` |
 | `operation`? | `Operation` |

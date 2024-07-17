@@ -12,7 +12,7 @@ Whether a model property should be flattened or not.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `TCGCContext` | TCGCContext |
 | `target` | `ModelProperty` | ModelProperty that we want to check whether it should be flattened or not |
 

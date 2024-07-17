@@ -13,7 +13,7 @@ All trace area logged via this tracer will be prefixed with the library name.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 
 ## Returns
