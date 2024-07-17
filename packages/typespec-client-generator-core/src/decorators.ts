@@ -579,6 +579,20 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+export function createTCGCContext(program: Program, emitterName: string): TCGCContext {
+  const diagnostics = createDiagnosticCollector();
+  return {
+    program,
+    emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
+    diagnostics: diagnostics.diagnostics,
+    originalProgram: program,
+    __namespaceToApiVersionParameter: new Map(),
+    __tspTypeToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
+    previewStringRegex: /-preview$/,
+  };
+}
+
 interface VersioningStrategy {
   readonly strategy?: "ignore";
   readonly previewStringRegex?: RegExp; // regex to match preview versions
@@ -589,35 +603,6 @@ export interface CreateSdkContextOptions {
   additionalDecorators?: string[];
 }
 
-export function createTcgcContext(program: Program, emitterName?: string): TCGCContext {
-  const diagnostics = createDiagnosticCollector();
-  const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
-  const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
-  const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
-  const generateConvenienceMethods =
-    context.options["generate-convenience-methods"] ?? convenienceOptions;
-  return {
-    program: context.program,
-    emitContext: context,
-    emitterName: diagnostics.pipe(
-      parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
-    ), // eslint-disable-line deprecation/deprecation
-    generateProtocolMethods: generateProtocolMethods,
-    generateConvenienceMethods: generateConvenienceMethods,
-    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
-    packageName: context.options["package-name"],
-    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
-    diagnostics: diagnostics.diagnostics,
-    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    originalProgram: context.program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
-    previewStringRegex: options?.versioning?.previewStringRegex || /-preview$/,
-  };
-}
-
 export function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -625,23 +610,25 @@ export function createSdkContext<
   context: EmitContext<TOptions>,
   emitterName?: string,
   options?: CreateSdkContextOptions
-): Omit<SdkContext<TOptions, TServiceOperation>, "sdkPackage"> {
-  
-}
-
-export function populateSdkPackage<
-TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(sdkContext: Omit<SdkContext<TOptions, TServiceOperation>, "sdkPackage">): SdkContext<TOptions, TServiceOperation> {
-  const sdkPackage = getSdkPackage<TServiceOperation>(sdkContext);
-  if (sdkContext.diagnostics) {
-    sdkContext.diagnostics = sdkContext.diagnostics.concat(
-      sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
-    );
-  }
+): SdkContext<TOptions, TServiceOperation> {
+  const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
+  const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
+  const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
+  const generateConvenienceMethods =
+    context.options["generate-convenience-methods"] ?? convenienceOptions;
+  const tcgcContext = createTCGCContext(context.program, (emitterName ?? context.program.emitters[0]?.metadata?.name)!)
   return {
-    ...sdkContext,
-    sdkPackage,
+    ...tcgcContext,
+    emitContext: context,
+    sdkPackage: getSdkPackage(tcgcContext),
+    generateProtocolMethods: generateProtocolMethods,
+    generateConvenienceMethods: generateConvenienceMethods,
+    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
+    packageName: context.options["package-name"],
+    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
+    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
+    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
+    previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
   }
 }
 

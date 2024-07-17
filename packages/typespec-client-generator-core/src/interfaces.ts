@@ -5,10 +5,14 @@ import {
   DurationKnownEncoding,
   EmitContext,
   Interface,
+  Model,
   ModelProperty,
   Namespace,
   Operation,
+  Program,
+  ProjectedProgram,
   Type,
+  Union,
 } from "@typespec/compiler";
 import {
   HttpAuth,
@@ -18,7 +22,37 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { TCGCContext } from "./internal-utils.js";
+import { TspLiteralType } from "./internal-utils.js";
+
+export interface TCGCContext {
+  program: Program;
+  emitterName: string;
+  generateProtocolMethods?: boolean;
+  generateConvenienceMethods?: boolean;
+  filterOutCoreModels?: boolean;
+  packageName?: string;
+  flattenUnionAsEnum?: boolean;
+  arm?: boolean;
+  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  spreadModels?: Map<Model, SdkModelType>;
+  httpOperationCache?: Map<Operation, HttpOperation>;
+  unionsMap?: Map<Union, SdkUnionType>;
+  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
+  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  knownScalars?: Record<string, SdkBuiltInKinds>;
+  diagnostics: readonly Diagnostic[];
+  __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
+  apiVersion?: string;
+  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  originalProgram: Program;
+  decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
+}
+
 
 
 export interface SdkContext<

@@ -5,7 +5,7 @@ import {
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
 import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
-import { SdkContext, createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
@@ -51,7 +51,7 @@ interface ResolvedAutorestCanonicalEmitterOptions extends AutorestDocumentEmitte
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = createSdkContext(context, "@azure-tools/typespec-autorest-canonical");
+  const tcgcSdkContext = createTCGCContext(context.program, "@azure-tools/typespec-autorest-canonical");
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {

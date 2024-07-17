@@ -47,8 +47,6 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 
-export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
-
 /**
  *
  * @param emitterName Full emitter name
@@ -411,19 +409,6 @@ export interface TCGCContext {
   originalProgram: Program;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
-}
-
-export function createTCGCContext(program: Program): TCGCContext {
-  return {
-    program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
-    originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-    previewStringRegex: /-preview$/,
-  };
 }
 
 export function getNonNullOptions(type: Union): Type[] {
