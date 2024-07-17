@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix access of properties in spreaded model
+fix access and usage calculation for nested model/enum in spread model
