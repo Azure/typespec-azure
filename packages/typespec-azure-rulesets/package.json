@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-rulesets",
-  "version": "0.43.0",
+  "version": "0.44.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec ruleset for Azure specs",
   "homepage": "https://azure.github.io/typespec-azure",

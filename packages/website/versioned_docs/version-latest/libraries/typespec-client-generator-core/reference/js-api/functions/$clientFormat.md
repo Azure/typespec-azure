@@ -14,7 +14,7 @@ function $clientFormat(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
 | `format` | [`ClientFormat`](../type-aliases/ClientFormat.md) |

@@ -3,14 +3,14 @@ jsApi: true
 title: "[I] Ref"
 
 ---
-## Type parameters
+## Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `$ref` | `string` |

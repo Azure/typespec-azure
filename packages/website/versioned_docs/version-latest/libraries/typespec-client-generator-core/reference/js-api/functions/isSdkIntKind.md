@@ -10,7 +10,7 @@ function isSdkIntKind(kind): kind is "numeric" | "integer" | "int8" | "uint8" | 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `kind` | `string` |
 
 ## Returns

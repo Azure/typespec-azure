@@ -15,7 +15,7 @@ function $operationLink(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |

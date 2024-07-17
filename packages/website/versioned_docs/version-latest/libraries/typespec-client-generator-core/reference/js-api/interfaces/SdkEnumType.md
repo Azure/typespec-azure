@@ -10,19 +10,20 @@ title: "[I] SdkEnumType"
 ## Properties
 
 | Property | Type | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
 | `access` | [`AccessFlags`](../type-aliases/AccessFlags.md) | - | - |
 | `apiVersions` | `string`[] | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - |
-| `deprecation?` | `string` | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | `SdkTypeBase.details` | `SdkTypeBase.details` |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` |
 | `isFixed` | `boolean` | - | - |
 | `isFlags` | `boolean` | - | - |
 | `isGeneratedName` | `boolean` | - | - |
 | `isUnionAsEnum` | `boolean` | - | - |
-| `kind` | `"enum"` | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
+| `kind` | `"enum"` | `SdkTypeBase.kind` | - |
 | `name` | `string` | - | - |
 | `usage` | [`UsageFlags`](../enumerations/UsageFlags.md) | - | - |
 | `valueType` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |

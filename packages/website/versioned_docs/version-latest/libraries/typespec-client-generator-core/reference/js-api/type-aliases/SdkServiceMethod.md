@@ -7,8 +7,8 @@ title: "[T] SdkServiceMethod"
 type SdkServiceMethod<TServiceOperation>: SdkBasicServiceMethod<TServiceOperation> | SdkPagingServiceMethod<TServiceOperation> | SdkLroServiceMethod<TServiceOperation> | SdkLroPagingServiceMethod<TServiceOperation>;
 ```
 
-## Type parameters
+## Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `TServiceOperation` *extends* [`SdkServiceOperation`](SdkServiceOperation.md) |

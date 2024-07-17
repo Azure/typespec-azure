@@ -10,7 +10,7 @@ function $onValidate(program): Promise<boolean>
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 
 ## Returns

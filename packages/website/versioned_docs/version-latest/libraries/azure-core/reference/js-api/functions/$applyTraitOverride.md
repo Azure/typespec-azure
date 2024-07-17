@@ -13,7 +13,7 @@ function $applyTraitOverride(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `traitModel` | `Model` |

@@ -13,7 +13,7 @@ function getSdkConstant(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `type` | `BooleanLiteral` \| `NumericLiteral` \| `StringLiteral` |
 | `operation`? | `Operation` |
