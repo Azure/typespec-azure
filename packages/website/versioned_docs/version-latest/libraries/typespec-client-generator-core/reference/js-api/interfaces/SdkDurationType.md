@@ -10,11 +10,12 @@ title: "[I] SdkDurationType"
 ## Properties
 
 | Property | Type | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
-| `deprecation?` | `string` | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | `SdkTypeBase.details` | `SdkTypeBase.details` |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` |
 | `encode` | `DurationKnownEncoding` | - | - |
-| `kind` | `"duration"` | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
+| `kind` | `"duration"` | `SdkTypeBase.kind` | - |
 | `wireType` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |

@@ -12,7 +12,7 @@ Filter the model properties of a model, using the given predicate
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `model` | `Model` | The model to filter |
 | `predicate` | (`prop`) => `boolean` | - |
 

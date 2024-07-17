@@ -15,7 +15,7 @@ function $armProviderNamespace(
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | DecoratorContext object |
 | `entity` | `Namespace` | Target of the decorator. Must be `namespace` type |
 | `armProviderNamespace`? | `string` | Provider namespace |

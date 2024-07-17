@@ -13,7 +13,7 @@ function checkIsValidApiVersion(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Model` |
 | `version` | `string` |

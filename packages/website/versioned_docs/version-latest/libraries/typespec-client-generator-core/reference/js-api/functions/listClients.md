@@ -12,7 +12,7 @@ List all the clients.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `TCGCContext` | TCGCContext |
 
 ## Returns

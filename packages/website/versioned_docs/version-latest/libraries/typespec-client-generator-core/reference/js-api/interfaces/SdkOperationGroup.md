@@ -6,7 +6,7 @@ title: "[I] SdkOperationGroup"
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `groupPath` | `string` |
 | `kind` | `"SdkOperationGroup"` |
 | `service` | `Namespace` |

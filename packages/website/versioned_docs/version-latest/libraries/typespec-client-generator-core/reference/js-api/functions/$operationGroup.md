@@ -13,7 +13,7 @@ function $operationGroup(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Namespace` \| `Interface` |
 | `scope`? | `string` |

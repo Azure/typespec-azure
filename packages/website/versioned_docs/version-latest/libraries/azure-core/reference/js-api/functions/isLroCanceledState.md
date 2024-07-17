@@ -12,7 +12,7 @@ Returns `true` if the enum member represents a "canceled" state.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `EnumMember` \| `UnionVariant` |
 

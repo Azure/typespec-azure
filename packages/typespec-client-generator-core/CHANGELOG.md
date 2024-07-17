@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.44.0
+
+### Bug Fixes
+
+- [#1142](https://github.com/Azure/typespec-azure/pull/1142) TCGC, Add description to `SdkHttpResponse`
+- [#1102](https://github.com/Azure/typespec-azure/pull/1102) Fixing typo
+- [#1157](https://github.com/Azure/typespec-azure/pull/1157) findContextPath need to handle nested operation group, also refine the logic for naming and composing cross language definition id
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1152](https://github.com/Azure/typespec-azure/pull/1152) add `.generateConvenient` and `.generateProtocol` for service methods. These booleans tell emitters whether to generate convenient and protocol versions for the method
+- [#1129](https://github.com/Azure/typespec-azure/pull/1129) add `UsageFlags.Json`. Will be set if a model is used with a JSON content type
+- [#1045](https://github.com/Azure/typespec-azure/pull/1045) filter api versions enum to only include GA versions if default value is GA
+
+### Breaking Changes
+
+- [#1078](https://github.com/Azure/typespec-azure/pull/1078) remove `experimental_` prefix from `sdkPackage`. Now it's just called `sdkPackage`.
+
+
 ## 0.43.2
 
 ### Bug Fixes

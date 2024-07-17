@@ -1,5 +1,47 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.44.0
+
+### Bug Fixes
+
+- [#1166](https://github.com/Azure/typespec-azure/pull/1166) Fix #1048 Allow void in final result for Azure-AsyncOperation header
+- [#1156](https://github.com/Azure/typespec-azure/pull/1156) Minor fix to make foundations and common-type more consistent.
+- [#1102](https://github.com/Azure/typespec-azure/pull/1102) Fixing typo
+- [#1139](https://github.com/Azure/typespec-azure/pull/1139) LocationResourceParameter should be azureLocation instead of string
+- [#1111](https://github.com/Azure/typespec-azure/pull/1111) Fix the type discrepancy issue for property userAssignedIdentities in common types V5 ManagedServiceIdentity
+- [#927](https://github.com/Azure/typespec-azure/pull/927) Remove explicit `all` rulesets
+- [#1081](https://github.com/Azure/typespec-azure/pull/1081) Fix ArmResourcePatch templates and incorporate common-types updates
+- [#1144](https://github.com/Azure/typespec-azure/pull/1144) Tweak regex to validate Arm keys
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1116](https://github.com/Azure/typespec-azure/pull/1116) Link CommonTypes enums and unions to the swagger common types
+- [#1161](https://github.com/Azure/typespec-azure/pull/1161) Added an optional template parameter on `TrackedResource`, `ProxyResource`, and `ExtensionResource` ARM templates that allows brownfield services to customize the optionality of the ARM resource `properties` field.
+- [#1123](https://github.com/Azure/typespec-azure/pull/1123) Removed direct reference to OpenAPI extension `x-ms-azure-resource` in ARM library and replaced with `@Azure.ResourceManager.Private.azureResourceBase` decorator. It is only used internally on base resource types. `autorest` emitter has been updated to check the decorator and still emit `x-ms-azure-resource` extension in swagger.
+
+### Breaking Changes
+
+- [#1093](https://github.com/Azure/typespec-azure/pull/1093) Removing $armRenameListByOperation decorator so operation id is directly derived from operation name. Previously operation id is statically resolved and fixed :
+
+- For top level resources, `[Resource]_ListByResourceGroup`
+- For child resources, `[Resource]_ListBy[ParentResource]`
+
+With this change, the operation name will form the second part of the operation id, just like other ARM operation templates.
+
+```diff
+-list is ArmResourceListByParent<Employee>;
++listByLocation is ArmResourceListByParent<Employee>;
+```
+
+You can modify the operation name to match existing spec to avoid breaking changes.
+- [#1146](https://github.com/Azure/typespec-azure/pull/1146) Moved `@armRenameListByOperation` into `Azure.ResourceManager.Private` namespace. Adding back original listByParent doc resolution logic to keep swagger changes to minimal.
+- [#1105](https://github.com/Azure/typespec-azure/pull/1105) `x-ms-client-flatten` extension on some of resource properties property is now configurable to be emitted by autorest emitter. Default is false which will skip emission of that extension.
+
+
 ## 0.43.0
 
 ### Bug Fixes
