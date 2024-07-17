@@ -27,6 +27,7 @@ import {
   getVersion,
 } from "@typespec/versioning";
 import { AutorestCanonicalEmitterOptions, reportDiagnostic } from "./lib.js";
+import { TCGCContext } from "../../typespec-client-generator-core/dist/src/internal-utils.js";
 
 const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/canonical/openapi.json",
@@ -74,7 +75,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
 
 async function emitAllServices(
   program: Program,
-  tcgcSdkContext: SdkContext<any, any>,
+  tcgcSdkContext: TCGCContext,
   options: ResolvedAutorestCanonicalEmitterOptions
 ) {
   const services = listServices(program);

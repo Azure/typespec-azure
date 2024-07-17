@@ -20,6 +20,7 @@ import {
 } from "@typespec/http";
 import { TCGCContext } from "./internal-utils.js";
 
+
 export interface SdkContext<
   TOptions extends object = Record<string, any>,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,

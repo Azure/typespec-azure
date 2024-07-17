@@ -47,6 +47,8 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 
+export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
 /**
  *
  * @param emitterName Full emitter name

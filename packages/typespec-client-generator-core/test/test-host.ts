@@ -9,7 +9,7 @@ import {
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { CreateSdkContextOptions, createSdkContext } from "../src/decorators.js";
+import { CreateSdkContextOptions, createSdkContext, populateSdkPackage } from "../src/decorators.js";
 import {
   SdkContext,
   SdkEmitterOptions,
@@ -54,11 +54,12 @@ export function createSdkContextTestHelper<
     options: options,
     getAssetEmitter: null as any,
   };
-  return createSdkContext(
+  const sdkContext = createSdkContext(
     emitContext,
     options.emitterName ?? "@azure-tools/typespec-csharp",
     sdkContextOption
   );
+  return populateSdkPackage<TOptions, TServiceOperation>(sdkContext);
 }
 
 export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {

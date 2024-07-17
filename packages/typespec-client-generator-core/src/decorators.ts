@@ -589,24 +589,16 @@ export interface CreateSdkContextOptions {
   additionalDecorators?: string[];
 }
 
-export function createSdkContext<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  context: EmitContext<TOptions>,
-  emitterName?: string,
-  options?: CreateSdkContextOptions
-): SdkContext<TOptions, TServiceOperation> {
+export function createTcgcContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
+  return {
     program: context.program,
     emitContext: context,
-    sdkPackage: undefined!,
     emitterName: diagnostics.pipe(
       parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
     ), // eslint-disable-line deprecation/deprecation
@@ -624,13 +616,33 @@ export function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || /-preview$/,
   };
-  sdkContext.sdkPackage = getSdkPackage(sdkContext);
+}
+
+export function createSdkContext<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
+  context: EmitContext<TOptions>,
+  emitterName?: string,
+  options?: CreateSdkContextOptions
+): Omit<SdkContext<TOptions, TServiceOperation>, "sdkPackage"> {
+  
+}
+
+export function populateSdkPackage<
+TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(sdkContext: Omit<SdkContext<TOptions, TServiceOperation>, "sdkPackage">): SdkContext<TOptions, TServiceOperation> {
+  const sdkPackage = getSdkPackage<TServiceOperation>(sdkContext);
   if (sdkContext.diagnostics) {
     sdkContext.diagnostics = sdkContext.diagnostics.concat(
-      sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+      sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
     );
   }
-  return sdkContext;
+  return {
+    ...sdkContext,
+    sdkPackage,
+  }
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
