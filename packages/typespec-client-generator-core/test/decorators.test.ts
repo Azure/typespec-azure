@@ -3056,7 +3056,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("duplicate model client name with multiple language scopes", async () => {
       const diagnostics = await runner.diagnose(
-      `
+        `
       @service
       namespace Contoso.WidgetManager;
       
