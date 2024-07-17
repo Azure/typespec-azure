@@ -42,6 +42,9 @@ export default {
     // Rules to enable later https://github.com/Azure/typespec-azure/issues/1171
     "@azure-tools/typespec-azure-core/friendly-name": false,
 
+    // Rules to enable later https://github.com/Azure/typespec-azure/issues/1171
+    "@azure-tools/typespec-azure-core/friendly-name": false,
+
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,
 
