@@ -784,4 +784,24 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums[1].crossLanguageDefinitionId, "N.UD");
     strictEqual(enums[1].usage, UsageFlags.Input | UsageFlags.Json);
   });
+
+  it("spread and union as enum", async () => {
+    await runner.compile(
+      `
+        @service({})
+        namespace N {
+          union StringExtensibleNamedUnion {
+            string,
+            OptionB: "b",
+            "c",
+          }
+          
+          op read(prop: StringExtensibleNamedUnion): void;
+        }
+      `
+    );
+    const enums = runner.context.sdkPackage.enums;
+    strictEqual(enums.length, 1);
+    strictEqual(enums[0].access, "public");
+  });
 });

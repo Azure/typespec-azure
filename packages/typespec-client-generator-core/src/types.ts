@@ -1434,7 +1434,7 @@ function updateAccessOfModel(context: TCGCContext): void {
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   for (const sdkType of context.spreadModels?.values() ?? []) {
-    updateUsageOfModel(context, UsageFlags.Spread, sdkType);
+    updateUsageOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
   }
   for (const sdkType of context.modelsMap?.values() ?? []) {
     // if a type only has spread usage, then it could be internal
