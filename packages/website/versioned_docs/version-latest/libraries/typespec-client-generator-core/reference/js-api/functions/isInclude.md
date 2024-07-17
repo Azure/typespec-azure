@@ -10,7 +10,7 @@ function isInclude(context, entity): boolean
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `entity` | `Model` |
 

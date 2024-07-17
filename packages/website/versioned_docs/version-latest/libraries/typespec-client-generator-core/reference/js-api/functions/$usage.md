@@ -14,7 +14,7 @@ function $usage(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Enum` \| `Model` \| `Union` |
 | `value` | `EnumMember` \| `Union` |

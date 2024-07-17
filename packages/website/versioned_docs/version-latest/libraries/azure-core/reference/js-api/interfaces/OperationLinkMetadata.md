@@ -6,7 +6,7 @@ title: "[I] OperationLinkMetadata"
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `link?` | [`OperationLink`](OperationLink.md) |
 | `linkType` | `string` |
 | `linkedOperation` | `Operation` |

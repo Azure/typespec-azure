@@ -12,7 +12,7 @@ Return the client object for the given namespace or interface, or undefined if t
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `TCGCContext` | TCGCContext |
 | `type` | `Namespace` \| `Interface` | Type to check |
 

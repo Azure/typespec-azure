@@ -13,7 +13,7 @@ function $include(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
 | `scope`? | `string` |

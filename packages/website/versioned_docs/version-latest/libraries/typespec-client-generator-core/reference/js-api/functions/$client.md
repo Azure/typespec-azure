@@ -14,7 +14,7 @@ function $client(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Namespace` \| `Interface` |
 | `options`? | `Model` |

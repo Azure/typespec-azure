@@ -63,25 +63,6 @@ const rules = [
   unsupportedTypeRule,
 ];
 
-const allRulesEnabled = Object.fromEntries(
-  rules.map((rule) => [`@azure-tools/typespec-azure-resource-manager/${rule.name}`, true])
-);
-
 export const $linter = defineLinter({
   rules,
-  ruleSets: {
-    all: {
-      extends: [
-        "@azure-tools/typespec-azure-core/all",
-        "@azure-tools/typespec-azure-core/canonical-versioning",
-      ],
-      enable: {
-        ...allRulesEnabled,
-      },
-      disable: {
-        [`@azure-tools/typespec-azure-core/bad-record-type`]:
-          "This clashes with the ARM `no-record` rule.",
-      },
-    },
-  },
 });

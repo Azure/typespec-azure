@@ -12,7 +12,7 @@ Mark the target namespace as containign only ARM library types.  This is used to
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | The doecorator context, automatically supplied by the compiler |
 | `entity` | `Namespace` | The decorated namespace |
 

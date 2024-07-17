@@ -19,7 +19,7 @@ Returns name in the following order of priority
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `TCGCContext` |  |
 | `type` | `Type` & `object` |  |
 

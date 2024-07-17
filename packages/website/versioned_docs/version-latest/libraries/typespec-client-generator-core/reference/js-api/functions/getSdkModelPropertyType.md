@@ -13,7 +13,7 @@ function getSdkModelPropertyType(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `type` | `ModelProperty` |
 | `operation`? | `Operation` |

@@ -16,7 +16,7 @@ to end customers
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | DecoratorContext |
 | `target` | `Operation` | Operation to mark as internal |
 | `scope`? | `string` | Names of the projection (e.g. "python", "csharp", "java", "javascript") |

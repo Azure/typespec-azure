@@ -9,7 +9,7 @@ type XMSLongRunningOperationOptions: object;
 
 ## Type declaration
 
-| Member | Type |
-| :------ | :------ |
+| Name | Type |
+| ------ | ------ |
 | `final-state-schema` | `string` |
 | `final-state-via` | [`XMSLongRunningFinalState`](XMSLongRunningFinalState.md) |
