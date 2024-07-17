@@ -795,13 +795,20 @@ describe("typespec-client-generator-core: enum types", () => {
             OptionB: "b",
             "c",
           }
-          
-          op read(prop: StringExtensibleNamedUnion): void;
+
+          model Test { name: string; }
+          op read(prop1: StringExtensibleNamedUnion; prop2: Test): void;
         }
       `
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].access, "public");
+    strictEqual(enums[0].usage, UsageFlags.Input | UsageFlags.Json);
+    const models = runner.context.sdkPackage.models;
+    const testModel = models.find((x) => x.name === "Test");
+    ok(testModel);
+    strictEqual(testModel.access, "public");
+    strictEqual(testModel.usage, UsageFlags.Input | UsageFlags.Json);
   });
 });
