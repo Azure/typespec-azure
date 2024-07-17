@@ -3056,13 +3056,11 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("duplicate model client name with multiple language scopes", async () => {
       const diagnostics = await runner.diagnose(
-        `
+      `
       @service
       namespace Contoso.WidgetManager;
       
-      @clientName("Test", "csharp")
-      @clientName("Test", "python")
-      @clientName("Test", "java")
+      @clientName("Test", "csharp,python,java")
       model Widget {
         @key
         id: int32;
@@ -3072,19 +3070,10 @@ describe("typespec-client-generator-core: decorators", () => {
       model Test {
         prop1: string;
       }
-    `
+      `
       );
 
       expectDiagnostics(diagnostics, [
-        {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-          message: 'Client name: "Test" is duplicated in language scope: "python"',
-        },
-        {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-          message:
-            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
-        },
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
           message: 'Client name: "Test" is duplicated in language scope: "csharp"',
@@ -3093,6 +3082,15 @@ describe("typespec-client-generator-core: decorators", () => {
           code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
           message:
             'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "python"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
         },
       ]);
     });
