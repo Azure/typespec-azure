@@ -5,7 +5,7 @@ import {
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
 import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
-import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
+import { createTCGCContext, TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
@@ -27,7 +27,6 @@ import {
   getVersion,
 } from "@typespec/versioning";
 import { AutorestCanonicalEmitterOptions, reportDiagnostic } from "./lib.js";
-import { TCGCContext } from "../../typespec-client-generator-core/dist/src/internal-utils.js";
 
 const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/canonical/openapi.json",
