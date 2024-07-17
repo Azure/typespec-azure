@@ -1325,10 +1325,11 @@ function updateTypesFromOperation(
               (httpBody.type as Model).properties.get(k) ||
               operation.parameters.properties.get(k) ===
                 (httpBody.type as Model).properties.get(k)?.sourceProperty)
-        ) &&
-        !context.spreadModels?.has(httpBody.type)
+        )
       ) {
-        context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
+        if (!context.spreadModels?.has(httpBody.type)) {
+          context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
+        }
       } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }
