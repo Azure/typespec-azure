@@ -22,6 +22,6 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securit
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `description?` | `string` | A short description for security scheme. |
 | `type` | `"basic"` \| `"apiKey"` \| `"oauth2"` | The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2". |

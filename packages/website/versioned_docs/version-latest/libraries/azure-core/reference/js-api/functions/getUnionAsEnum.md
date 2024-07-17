@@ -14,7 +14,7 @@ the base scalar to mark extensibility we can represent this union as an enum of 
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `union` | `Union` | Union to try to convert |
 
 ## Returns

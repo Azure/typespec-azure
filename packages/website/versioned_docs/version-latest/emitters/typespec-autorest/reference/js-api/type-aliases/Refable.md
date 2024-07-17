@@ -7,8 +7,8 @@ title: "[T] Refable"
 type Refable<T>: Ref<T> | T;
 ```
 
-## Type parameters
+## Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |

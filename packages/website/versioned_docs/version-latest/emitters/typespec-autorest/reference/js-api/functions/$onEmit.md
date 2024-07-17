@@ -10,7 +10,7 @@ function $onEmit(context): Promise<void>
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `EmitContext`<[`AutorestEmitterOptions`](../interfaces/AutorestEmitterOptions.md)\> |
 
 ## Returns

@@ -14,7 +14,7 @@ function $pollingOperation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `linkedOperation` | `Operation` |

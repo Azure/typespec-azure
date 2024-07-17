@@ -13,7 +13,7 @@ function $traitContext(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
 | `traitContext` | `EnumMember` \| `Union` \| `UnknownType` |

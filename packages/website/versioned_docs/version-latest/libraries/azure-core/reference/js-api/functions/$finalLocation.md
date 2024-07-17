@@ -13,7 +13,7 @@ function $finalLocation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
 | `finalResult`? | `IntrinsicType` \| `Model` |

@@ -1,16 +1,16 @@
 ---
 jsApi: true
-title: "[F] isSdkDatetimeEncodings"
+title: "[F] isSdkDateTimeEncodings"
 
 ---
 ```ts
-function isSdkDatetimeEncodings(encoding): encoding is DateTimeKnownEncoding
+function isSdkDateTimeEncodings(encoding): encoding is DateTimeKnownEncoding
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `encoding` | `string` |
 
 ## Returns

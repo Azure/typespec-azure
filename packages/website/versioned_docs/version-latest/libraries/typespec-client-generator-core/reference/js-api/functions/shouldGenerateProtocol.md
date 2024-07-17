@@ -10,7 +10,7 @@ function shouldGenerateProtocol(context, entity): boolean
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `entity` | `Operation` |
 

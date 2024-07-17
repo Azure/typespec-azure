@@ -120,6 +120,7 @@ describe("typespec-autorest: Long-running Operations", () => {
         delete is ArmResourceDeleteWithoutOkAsync<Widget>;
         restart is ArmResourceActionAsync<Widget, void, never>;
         munge is ArmResourceActionAsync<Widget, void, Widget>;
+        alter is ArmResourceActionAsync<Widget, void, void, LroHeaders=ArmAsyncOperationHeader<FinalResult = void>>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
@@ -161,6 +162,11 @@ describe("typespec-autorest: Long-running Operations", () => {
     deepStrictEqual(openapi.paths[mungePath].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/Widget",
+    });
+    const alterPath = `${itemPath}/alter`;
+    deepStrictEqual(openapi.paths[alterPath].post["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[alterPath].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "azure-async-operation",
     });
   });
   it("Uses final-state-via: location when location is provided for ARM PUT", async () => {

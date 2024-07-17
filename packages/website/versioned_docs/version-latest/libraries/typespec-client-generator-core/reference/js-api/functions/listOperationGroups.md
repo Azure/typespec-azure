@@ -15,7 +15,7 @@ List all the operation groups inside a client or an operation group. If ignoreHi
 ## Parameters
 
 | Parameter | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
+| ------ | ------ | ------ | ------ |
 | `context` | `TCGCContext` | `undefined` | TCGCContext |
 | `group` | [`SdkClient`](../interfaces/SdkClient.md) \| [`SdkOperationGroup`](../interfaces/SdkOperationGroup.md) | `undefined` | Client or operation group to list operation groups |
 | `ignoreHierarchy` | `boolean` | `false` | Whether to get all nested operation groups |

@@ -10,7 +10,7 @@ function resolveResourceBaseType(type?): ResourceBaseType
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `type`? | `string` |
 
 ## Returns

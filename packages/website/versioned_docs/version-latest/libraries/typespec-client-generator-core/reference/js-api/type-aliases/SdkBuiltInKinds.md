@@ -9,5 +9,5 @@ type SdkBuiltInKinds:
   | keyof typeof SdkIntKindsEnum
   | keyof typeof SdkFloatKindsEnum
   | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkAzureBuiltInStringKindsEnum;
+  | keyof typeof SdkAzureBuiltInStringKindsMapping;
 ```

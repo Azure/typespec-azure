@@ -18,7 +18,7 @@ lists.
 ## Parameters
 
 | Parameter | Type | Default value |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | `undefined` |
 | `resourceType` | `Model` | `undefined` |
 | `keyValue` | `string` | `"default"` |

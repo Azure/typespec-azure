@@ -12,7 +12,7 @@ Determine which library namespaces are used in this provider
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program to check |
 | `namespace` | `Namespace` | The provider namespace |
 
