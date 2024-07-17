@@ -15,6 +15,7 @@ import {
   SdkServiceMethod,
   UsageFlags,
 } from "../src/interfaces.js";
+import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: package", () => {
@@ -3477,6 +3478,25 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 1);
       deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
+    });
+
+    it("spread idempotent", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+          alias FooAlias = {
+              @path id: string;
+              @doc("name of the Foo")
+              name: string;
+          };
+          op test(...FooAlias): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+      getAllModels(runner.context);
+
+      strictEqual(sdkPackage.models[0].name, "TestRequest");
+      strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Json);
     });
   });
   describe("versioning", () => {
