@@ -27,16 +27,15 @@ import {
   EnsureTraitsPresentDecorator,
   TraitSourceDecorator,
 } from "../generated-defs/Azure.Core.Traits.Private.js";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { AzureCoreStateKeys, reportDiagnostic } from "./lib.js";
 
-const traitSourceKey = createStateSymbol("traitSource");
 export const $traitSource: TraitSourceDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   traitName: string
 ) => {
   // Store the source trait name on the envelope property
-  context.program.stateMap(traitSourceKey).set(target, traitName);
+  context.program.stateMap(AzureCoreStateKeys.traitSource).set(target, traitName);
 };
 
 /**
@@ -45,12 +44,11 @@ export const $traitSource: TraitSourceDecorator = (
  * @param property The model property for which the trait name should be retrieved
  */
 export function getSourceTraitName(program: Program, property: ModelProperty): string | undefined {
-  return program.stateMap(traitSourceKey).get(property);
+  return program.stateMap(AzureCoreStateKeys.traitSource).get(property);
 }
 
 setTypeSpecNamespace("Traits.Private", $traitSource);
 
-const traitKey = createStateSymbol("trait");
 export const $trait: TraitDecorator = (
   context: DecoratorContext,
   target: Model,
@@ -114,7 +112,7 @@ export const $trait: TraitDecorator = (
   });
 
   // Mark the model as a trait type and store its name
-  context.program.stateMap(traitKey).set(target, traitName);
+  context.program.stateMap(AzureCoreStateKeys.trait).set(target, traitName);
 };
 
 setTypeSpecNamespace("Traits", $trait);
@@ -125,7 +123,7 @@ setTypeSpecNamespace("Traits", $trait);
  * @param property The model type to consider
  */
 export function isTraitModel(program: Program, model: Model): boolean {
-  return program.stateMap(traitKey).has(model) !== undefined;
+  return program.stateMap(AzureCoreStateKeys.trait).has(model) !== undefined;
 }
 
 /*
@@ -134,17 +132,16 @@ export function isTraitModel(program: Program, model: Model): boolean {
  * @param property The model type to consider
  */
 export function getTraitName(program: Program, model: Model): string | undefined {
-  return program.stateMap(traitKey).get(model);
+  return program.stateMap(AzureCoreStateKeys.trait).get(model);
 }
 
-const traitContextKey = createStateSymbol("traitContext");
 export const $traitContext: TraitContextDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   traitContext: Type
 ) => {
   context.program
-    .stateMap(traitContextKey)
+    .stateMap(AzureCoreStateKeys.traitContext)
     .set(target, normalizeTraitContexts(context.program, traitContext));
 };
 
@@ -188,7 +185,7 @@ function getTraitContextsOrUndefined(
 ): EnumMember[] | undefined {
   // Sometimes we need to know whether a trait context was explicitly set on a
   // property without defaulting to an empty array
-  return program.stateMap(traitContextKey).get(property);
+  return program.stateMap(AzureCoreStateKeys.traitContext).get(property);
 }
 
 /*
@@ -198,16 +195,15 @@ function getTraitContextsOrUndefined(
  * @param property The model property for which the trait contexts should be retrieved
  */
 export function getTraitContexts(program: Program, property: ModelProperty): EnumMember[] {
-  return program.stateMap(traitContextKey).get(property) || [];
+  return program.stateMap(AzureCoreStateKeys.traitContext).get(property) || [];
 }
 
-const traitLocationKey = createStateSymbol("traitLocation");
 export const $traitLocation: TraitLocationDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   traitLocation: EnumMember
 ) => {
-  context.program.stateMap(traitLocationKey).set(target, traitLocation);
+  context.program.stateMap(AzureCoreStateKeys.traitLocation).set(target, traitLocation);
 };
 
 setTypeSpecNamespace("Traits", $traitLocation);
@@ -221,7 +217,7 @@ export function getTraitLocation(
   program: Program,
   property: ModelProperty
 ): EnumMember | undefined {
-  return program.stateMap(traitLocationKey).get(property);
+  return program.stateMap(AzureCoreStateKeys.traitLocation).get(property);
 }
 
 const traitAddedKey = Symbol("traitLocation");

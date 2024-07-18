@@ -1,4 +1,4 @@
-import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
+import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js";
 import { getAllProperties } from "./utils.js";
 
 import {
@@ -84,22 +84,18 @@ export const FinalOperationKey = "final";
 
 // @fixed
 
-const fixedKey = createStateSymbol("fixed");
-
 export const $fixed: FixedDecorator = (context: DecoratorContext, target: Enum) => {
-  context.program.stateMap(fixedKey).set(target, true);
+  context.program.stateMap(AzureCoreStateKeys.fixed).set(target, true);
 };
 
 export function isFixed(program: Program, target: Enum): boolean {
-  return program.stateMap(fixedKey).get(target) !== undefined;
+  return program.stateMap(AzureCoreStateKeys.fixed).get(target) !== undefined;
 }
 
 // pagedResult
 
-const pagedResultsKey = createStateSymbol("pagedResult");
-
 export const $pagedResult: PagedResultDecorator = (context: DecoratorContext, entity: Model) => {
-  context.program.stateMap(pagedResultsKey).set(entity, true);
+  context.program.stateMap(AzureCoreStateKeys.pagedResult).set(entity, true);
 };
 
 export interface PagedResultMetadata {
@@ -188,7 +184,7 @@ export function getPagedResult(
   let metadata: PagedResultMetadata | undefined = undefined;
   switch (entity.kind) {
     case "Model":
-      if (program.stateMap(pagedResultsKey).get(entity)) {
+      if (program.stateMap(AzureCoreStateKeys.pagedResult).get(entity)) {
         metadata = { modelType: entity };
         const items = _getItems(program, entity);
         if (items !== undefined) {
@@ -260,30 +256,26 @@ export function getPagedResult(
   return metadata;
 }
 
-const itemsPropertyKey = createStateSymbol("items");
-
 export const $items: ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(itemsPropertyKey).set(entity, true);
+  context.program.stateMap(AzureCoreStateKeys.items).set(entity, true);
 };
 
 /**
  * Returns `true` if the property is marked with `@items`.
  */
 export function getItems(program: Program, entity: Type): boolean | undefined {
-  return program.stateMap(itemsPropertyKey).get(entity);
+  return program.stateMap(AzureCoreStateKeys.items).get(entity);
 }
 
-const nextLinkPropertyKey = createStateSymbol("nextLink");
-
 export const $nextLink: NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(nextLinkPropertyKey).set(entity, true);
+  context.program.stateMap(AzureCoreStateKeys.nextLink).set(entity, true);
 };
 
 /**
  * Returns `true` if the property is marked with `@nextLink`.
  */
 export function getNextLink(program: Program, entity: Type): boolean | undefined {
-  return program.stateMap(nextLinkPropertyKey).get(entity);
+  return program.stateMap(AzureCoreStateKeys.nextLink).get(entity);
 }
 
 /**
@@ -304,15 +296,13 @@ export interface LongRunningStates {
   states: string[];
 }
 
-const lroStatusKey = createStateSymbol("lroStatus");
-
 export const $lroStatus: LroStatusDecorator = (
   context: DecoratorContext,
   entity: Enum | Union | ModelProperty
 ) => {
   const [states, diagnostics] = extractLroStates(context.program, entity);
   if (diagnostics.length > 0) context.program.reportDiagnostics(diagnostics);
-  context.program.stateMap(lroStatusKey).set(entity, states);
+  context.program.stateMap(AzureCoreStateKeys.lroStatus).set(entity, states);
 };
 
 // Internal use only
@@ -465,7 +455,7 @@ export function getLongRunningStates(
   }
 
   // Otherwise just check the type itself
-  return program.stateMap(lroStatusKey).get(entity);
+  return program.stateMap(AzureCoreStateKeys.lroStatus).get(entity);
 }
 
 /**
@@ -492,10 +482,10 @@ export function getLroStatusProperty(program: Program, target: Model): ModelProp
   }
   const props = getAllProperties(target);
   for (const [_, prop] of props.entries()) {
-    let values = program.stateMap(lroStatusKey).get(prop);
+    let values = program.stateMap(AzureCoreStateKeys.lroStatus).get(prop);
     if (values !== undefined) return prop;
     if (prop.type.kind === "Enum" || prop.type.kind === "Union") {
-      values = program.stateMap(lroStatusKey).get(prop.type);
+      values = program.stateMap(AzureCoreStateKeys.lroStatus).get(prop.type);
       if (values !== undefined) return prop;
     }
   }
@@ -511,8 +501,6 @@ export function getLroStatusProperty(program: Program, target: Model): ModelProp
 
 //@lroResult
 
-const lroResultKey = createStateSymbol("lroResult");
-
 /**
  * Marks the property in a StatusMonitor that contains the logical result
  * of a successful operation.
@@ -520,7 +508,7 @@ const lroResultKey = createStateSymbol("lroResult");
  * @param entity The model property that contains the logical result.
  */
 export const $lroResult = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(lroResultKey).set(entity, entity);
+  context.program.stateMap(AzureCoreStateKeys.lroResult).set(entity, entity);
 };
 
 /**
@@ -540,7 +528,7 @@ export function getLroResult(
   let resultProperty: ModelProperty | undefined = undefined;
   let defaultProperty: ModelProperty | undefined = undefined;
   for (const prop of walkPropertiesInherited(entity)) {
-    const candidateProperty = program.stateMap(lroResultKey).get(prop);
+    const candidateProperty = program.stateMap(AzureCoreStateKeys.lroResult).get(prop);
     if (candidateProperty !== undefined) {
       resultProperty = candidateProperty;
       count++;
@@ -566,8 +554,6 @@ export function getLroResult(
 
 //@lroErrorResult
 
-const lroErrorResultKey = createStateSymbol("lroErrorResult");
-
 /**
  * Marks the property in a StatusMonitor that contains the error result
  * of a failed operation.
@@ -579,7 +565,7 @@ export const $lroErrorResult: LroErrorResultDecorator = (
   entity: ModelProperty
 ) => {
   const { program } = context;
-  program.stateMap(lroErrorResultKey).set(entity, entity);
+  program.stateMap(AzureCoreStateKeys.lroErrorResult).set(entity, entity);
 };
 
 /**
@@ -599,7 +585,7 @@ export function getLroErrorResult(
   let resultProperty: ModelProperty | undefined = undefined;
   let defaultProperty: ModelProperty | undefined = undefined;
   for (const prop of walkPropertiesInherited(entity)) {
-    const candidateProperty = program.stateMap(lroErrorResultKey).get(prop);
+    const candidateProperty = program.stateMap(AzureCoreStateKeys.lroErrorResult).get(prop);
     if (candidateProperty !== undefined) {
       resultProperty = candidateProperty;
       count++;
@@ -624,7 +610,6 @@ export function getLroErrorResult(
 
 //@pollingOperationParameter
 
-const pollingParameterKey = createStateSymbol("pollingOperationParameter");
 export const $pollingOperationParameter: PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
@@ -642,74 +627,67 @@ export const $pollingOperationParameter: PollingOperationParameterDecorator = (
     default:
       storedValue = undefined;
   }
-  program.stateMap(pollingParameterKey).set(entity, storedValue ?? entity.name);
+  program
+    .stateMap(AzureCoreStateKeys.pollingOperationParameter)
+    .set(entity, storedValue ?? entity.name);
 };
 
 export function getPollingOperationParameter(
   program: Program,
   entity: ModelProperty
 ): string | ModelProperty | undefined {
-  return program.stateMap(pollingParameterKey).get(entity);
+  return program.stateMap(AzureCoreStateKeys.pollingOperationParameter).get(entity);
 }
 
 // @lroSucceeded
-
-const lroSucceededKey = createStateSymbol("lroSucceeded");
 
 export const $lroSucceeded: LroSucceededDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant
 ) => {
-  context.program.stateSet(lroSucceededKey).add(entity);
+  context.program.stateSet(AzureCoreStateKeys.lroSucceeded).add(entity);
 };
 
 /**
  *  Returns `true` if the enum member represents a "succeeded" state.
  */
 export function isLroSucceededState(program: Program, entity: EnumMember | UnionVariant) {
-  return program.stateSet(lroSucceededKey).has(entity);
+  return program.stateSet(AzureCoreStateKeys.lroSucceeded).has(entity);
 }
 
 // @lroCanceled
-
-const lroCanceledKey = createStateSymbol("lroCanceled");
 
 export const $lroCanceled: LroCanceledDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant
 ) => {
-  context.program.stateSet(lroCanceledKey).add(entity);
+  context.program.stateSet(AzureCoreStateKeys.lroCanceled).add(entity);
 };
 
 /**
  *  Returns `true` if the enum member represents a "canceled" state.
  */
 export function isLroCanceledState(program: Program, entity: EnumMember | UnionVariant) {
-  return program.stateSet(lroCanceledKey).has(entity);
+  return program.stateSet(AzureCoreStateKeys.lroCanceled).has(entity);
 }
 
 // @lroFailed
-
-const lroFailedKey = createStateSymbol("lroFailed");
 
 export const $lroFailed: LroFailedDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant
 ) => {
-  context.program.stateSet(lroFailedKey).add(entity);
+  context.program.stateSet(AzureCoreStateKeys.lroFailed).add(entity);
 };
 
 /**
  *  Returns `true` if the enum member represents a "failed" state.
  */
 export function isLroFailedState(program: Program, entity: EnumMember | UnionVariant): boolean {
-  return program.stateSet(lroFailedKey).has(entity);
+  return program.stateSet(AzureCoreStateKeys.lroFailed).has(entity);
 }
 
 // @pollingLocation
-
-const pollingLocationsKey = createStateSymbol("pollingLocations");
-const pollingLocationInfoKey = createStateSymbol("pollingLocationInfo");
 
 /** Extra information about polling control stored with a polling link */
 export type PollingLocationInfo = StatusMonitorPollingLocationInfo;
@@ -753,11 +731,11 @@ export const $pollingLocation: PollingLocationDecorator = (
     if (isNeverType(options)) return;
     const info = extractPollingLocationInfo(program, entity, options);
     if (info) {
-      program.stateMap(pollingLocationInfoKey).set(entity, info);
+      program.stateMap(AzureCoreStateKeys.pollingLocationInfo).set(entity, info);
     }
   }
 
-  program.stateSet(pollingLocationsKey).add(entity);
+  program.stateSet(AzureCoreStateKeys.pollingOperationParameter).add(entity);
 };
 
 /**
@@ -769,7 +747,7 @@ export function getPollingLocationInfo(
   program: Program,
   target: ModelProperty
 ): PollingLocationInfo | undefined {
-  return program.stateMap(pollingLocationInfoKey).get(target);
+  return program.stateMap(AzureCoreStateKeys.pollingLocationInfo).get(target);
 }
 
 function extractUnionVariantValue(type: Type): string | undefined {
@@ -854,13 +832,10 @@ function extractStatusMonitorLocationInfo(
  *  Returns `true` if the property is marked with @pollingLocation.
  */
 export function isPollingLocation(program: Program, entity: ModelProperty): boolean {
-  return program.stateSet(pollingLocationsKey).has(entity);
+  return program.stateSet(AzureCoreStateKeys.pollingOperationParameter).has(entity);
 }
 
 // @finalLocation
-
-const finalLocationsKey = createStateSymbol("finalLocations");
-const finalLocationResultsKey = createStateSymbol("finalLocationResults");
 
 export const $finalLocation: FinalLocationDecorator = (
   context: DecoratorContext,
@@ -869,14 +844,14 @@ export const $finalLocation: FinalLocationDecorator = (
 ) => {
   const { program } = context;
   if (finalResult !== undefined && isNeverType(finalResult)) return;
-  program.stateSet(finalLocationsKey).add(entity);
+  program.stateSet(AzureCoreStateKeys.finalLocations).add(entity);
   switch (finalResult?.kind) {
     case "Model":
-      program.stateMap(finalLocationResultsKey).set(entity, finalResult);
+      program.stateMap(AzureCoreStateKeys.finalLocationResults).set(entity, finalResult);
       break;
     case "Intrinsic":
       if (isVoidType(finalResult)) {
-        program.stateMap(finalLocationResultsKey).set(entity, finalResult);
+        program.stateMap(AzureCoreStateKeys.finalLocationResults).set(entity, finalResult);
       }
   }
 };
@@ -885,17 +860,16 @@ export const $finalLocation: FinalLocationDecorator = (
  *  Returns `true` if the property is marked with @finalLocation.
  */
 export function isFinalLocation(program: Program, entity: ModelProperty): boolean {
-  return program.stateSet(finalLocationsKey).has(entity);
+  return program.stateSet(AzureCoreStateKeys.finalLocations).has(entity);
 }
 
 export function getFinalLocationValue(
   program: Program,
   entity: ModelProperty
 ): Model | IntrinsicType | undefined {
-  return program.stateMap(finalLocationResultsKey).get(entity);
+  return program.stateMap(AzureCoreStateKeys.finalLocationResults).get(entity);
 }
 
-const finalStateOverrideKey = createStateSymbol("finalStateOverride");
 /**
  * overrides the final state for an lro
  * @param context The execution context for the decorator
@@ -935,7 +909,7 @@ export const $useFinalStateVia: UseFinalStateViaDecorator = (
   const operation = ignoreDiagnostics(getHttpOperation(program, entity));
   const storedValue = validateFinalState(program, operation, finalStateVia);
   if (storedValue !== undefined || operation.verb === "put") {
-    program.stateMap(finalStateOverrideKey).set(entity, finalStateVia);
+    program.stateMap(AzureCoreStateKeys.finalStateOverride).set(entity, finalStateVia);
   }
   if (
     storedValue === undefined &&
@@ -1059,7 +1033,7 @@ export function getFinalStateOverride(
   program: Program,
   operation: Operation
 ): FinalStateValue | undefined {
-  return program.stateMap(finalStateOverrideKey).get(operation);
+  return program.stateMap(AzureCoreStateKeys.finalStateOverride).get(operation);
 }
 
 export const $omitKeyProperties: OmitKeyPropertiesDecorator = (
@@ -1084,8 +1058,6 @@ export interface OperationLinkMetadata {
   result?: ResultInfo;
 }
 
-const operationLinkKey = createStateSymbol("operationLink");
-
 export const $operationLink: OperationLinkDecorator = (
   context: DecoratorContext,
   entity: Operation,
@@ -1108,7 +1080,7 @@ export const $operationLink: OperationLinkDecorator = (
   }
 
   // An operation may have many operationLinks, so treat them as a collection
-  let items = context.program.stateMap(operationLinkKey).get(entity) as Map<
+  let items = context.program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
     string,
     OperationLinkMetadata
   >;
@@ -1123,7 +1095,7 @@ export const $operationLink: OperationLinkDecorator = (
     parameterMap: operationInfo?.getInvocationInfo()?.parameterMap,
     result: operationInfo?.getResultInfo(),
   } as OperationLinkMetadata);
-  context.program.stateMap(operationLinkKey).set(entity, items);
+  context.program.stateMap(AzureCoreStateKeys.operationLink).set(entity, items);
 };
 
 /**
@@ -1134,7 +1106,7 @@ export function getOperationLink(
   entity: Operation,
   linkType: string
 ): OperationLinkMetadata | undefined {
-  const items = program.stateMap(operationLinkKey).get(entity) as Map<
+  const items = program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
     string,
     OperationLinkMetadata
   >;
@@ -1151,7 +1123,10 @@ export function getOperationLinks(
   program: Program,
   entity: Operation
 ): Map<string, OperationLinkMetadata> | undefined {
-  return program.stateMap(operationLinkKey).get(entity) as Map<string, OperationLinkMetadata>;
+  return program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
+    string,
+    OperationLinkMetadata
+  >;
 }
 
 export const $pollingOperation: PollingOperationDecorator = (
@@ -1240,27 +1215,27 @@ export const $nextPageOperation: NextPageOperationDecorator = (
   context.call($operationLink, entity, linkedOperation, "nextPage", parameters);
 };
 
-const requestParameterKey = createStateSymbol("requestParameter");
-
 export const $requestParameter = (context: DecoratorContext, entity: Model, name: string) => {
-  context.program.stateMap(requestParameterKey).set(entity, name);
+  context.program.stateMap(AzureCoreStateKeys.requestParameter).set(entity, name);
 };
 
 export function getRequestParameter(program: Program, entity: ModelProperty): string | undefined {
   if (entity.type.kind !== "Model") return undefined;
-  const parameterName: string | undefined = program.stateMap(requestParameterKey).get(entity.type);
+  const parameterName: string | undefined = program
+    .stateMap(AzureCoreStateKeys.requestParameter)
+    .get(entity.type);
   return parameterName;
 }
 
-const responsePropertyKey = createStateSymbol("responseParameter");
-
 export const $responseProperty = (context: DecoratorContext, entity: Model, name: string) => {
-  context.program.stateMap(responsePropertyKey).set(entity, name);
+  context.program.stateMap(AzureCoreStateKeys.responseParameter).set(entity, name);
 };
 
 export function getResponseProperty(program: Program, entity: ModelProperty): string | undefined {
   if (entity.type.kind !== "Model") return undefined;
-  const parameterName: string | undefined = program.stateMap(responsePropertyKey).get(entity.type);
+  const parameterName: string | undefined = program
+    .stateMap(AzureCoreStateKeys.responseParameter)
+    .get(entity.type);
   return parameterName;
 }
 
@@ -1320,8 +1295,6 @@ export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDeco
   }
 };
 
-const resourceOperationKey = createStateSymbol("resourceOperation");
-
 export const $ensureResourceType: EnsureResourceTypeDecorator = (
   context: DecoratorContext,
   entity: Operation,
@@ -1332,7 +1305,7 @@ export const $ensureResourceType: EnsureResourceTypeDecorator = (
   }
 
   // Mark the operation as a resource operation
-  context.program.stateSet(resourceOperationKey).add(entity);
+  context.program.stateSet(AzureCoreStateKeys.resourceOperation).add(entity);
 
   if (resourceType.kind !== "Model") {
     context.program.reportDiagnostic({
@@ -1378,21 +1351,19 @@ export const $ensureResourceType: EnsureResourceTypeDecorator = (
 };
 
 export function isResourceOperation(program: Program, operation: Operation): boolean {
-  return program.stateSet(resourceOperationKey).has(operation);
+  return program.stateSet(AzureCoreStateKeys.resourceOperation).has(operation);
 }
-
-const needsRouteKey = createStateSymbol("needsRoute");
 
 export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => {
   // If the operation is not templated, add it to the list of operations to
   // check later
   if (entity.node.templateParameters.length === 0) {
-    context.program.stateSet(needsRouteKey).add(entity);
+    context.program.stateSet(AzureCoreStateKeys.needsRoute).add(entity);
   }
 };
 
 export function checkRpcRoutes(program: Program) {
-  (program.stateSet(needsRouteKey) as Set<Operation>).forEach((op: Operation) => {
+  (program.stateSet(AzureCoreStateKeys.needsRoute) as Set<Operation>).forEach((op: Operation) => {
     if (
       op.node.templateParameters.length === 0 &&
       !isAutoRoute(program, op) &&
@@ -1406,19 +1377,17 @@ export function checkRpcRoutes(program: Program) {
   });
 }
 
-const ensureVerbKey = createStateSymbol("ensureVerb");
-
 export const $ensureVerb: EnsureVerbDecorator = (
   context: DecoratorContext,
   entity: Operation,
   templateName: string,
   verb: string
 ) => {
-  context.program.stateMap(ensureVerbKey).set(entity, [templateName, verb]);
+  context.program.stateMap(AzureCoreStateKeys.ensureVerb).set(entity, [templateName, verb]);
 };
 
 export function checkEnsureVerb(program: Program) {
-  const opMap = program.stateMap(ensureVerbKey) as Map<Operation, string>;
+  const opMap = program.stateMap(AzureCoreStateKeys.ensureVerb) as Map<Operation, string>;
   for (const [operation, [templateName, requiredVerb]] of opMap.entries()) {
     if (isTemplateDeclarationOrInstance(operation)) continue;
     const verb = getHttpOperation(program, operation)[0].verb.toString().toLowerCase();
@@ -1437,8 +1406,6 @@ export function checkEnsureVerb(program: Program) {
   }
 }
 
-const embeddingVectorKey = createStateSymbol("embeddingVector");
-
 export interface EmbeddingVectorMetadata {
   elementType: Type;
 }
@@ -1452,7 +1419,7 @@ export const $embeddingVector: EmbeddingVectorDecorator = (
   const metadata: EmbeddingVectorMetadata = {
     elementType: elementType,
   };
-  context.program.stateMap(embeddingVectorKey).set(entity, metadata);
+  context.program.stateMap(AzureCoreStateKeys.embeddingVector).set(entity, metadata);
 };
 
 /**
@@ -1465,10 +1432,8 @@ export function getAsEmbeddingVector(
   program: Program,
   model: Model
 ): EmbeddingVectorMetadata | undefined {
-  return program.stateMap(embeddingVectorKey).get(model);
+  return program.stateMap(AzureCoreStateKeys.embeddingVector).get(model);
 }
-
-const armResourceIdentifierConfigKey = createStateSymbol("armResourceIdentifierConfig");
 
 export interface ArmResourceIdentifierConfig {
   readonly allowedResources: readonly ArmResourceIdentifierAllowedResource[];
@@ -1509,7 +1474,7 @@ export const $armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator 
 
   if (data) {
     context.program
-      .stateMap(armResourceIdentifierConfigKey)
+      .stateMap(AzureCoreStateKeys.armResourceIdentifierConfig)
       .set(entity, { allowedResources: data });
   }
 };
@@ -1519,7 +1484,7 @@ export function getArmResourceIdentifierConfig(
   program: Program,
   entity: Scalar
 ): ArmResourceIdentifierConfig {
-  return program.stateMap(armResourceIdentifierConfigKey).get(entity);
+  return program.stateMap(AzureCoreStateKeys.armResourceIdentifierConfig).get(entity);
 }
 
 export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
@@ -1552,7 +1517,7 @@ export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   }
   const storedValue = validateFinalStates(program, target, finalStateValues);
   if (storedValue !== undefined) {
-    program.stateMap(finalStateOverrideKey).set(target, storedValue);
+    program.stateMap(AzureCoreStateKeys.finalStateOverride).set(target, storedValue);
   }
 };
 
