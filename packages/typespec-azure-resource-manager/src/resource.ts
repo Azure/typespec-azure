@@ -16,6 +16,18 @@ import {
 } from "@typespec/compiler";
 import { isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
+import {
+  ArmProviderNameValueDecorator,
+  ArmResourceOperationsDecorator,
+  ArmVirtualResourceDecorator,
+  ExtensionResourceDecorator,
+  LocationResourceDecorator,
+  ResourceBaseTypeDecorator,
+  ResourceGroupResourceDecorator,
+  SingletonDecorator,
+  SubscriptionResourceDecorator,
+  TenantResourceDecorator,
+} from "../generated-defs/Azure.ResourceManager.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
@@ -49,7 +61,10 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
  * @param entity The resource model
  * @param propertiesType The type of the resource properties
  */
-export function $armVirtualResource(context: DecoratorContext, entity: Model) {
+export const $armVirtualResource: ArmVirtualResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
   program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
@@ -75,7 +90,7 @@ export function $armVirtualResource(context: DecoratorContext, entity: Model) {
     });
     return;
   }
-}
+};
 
 function getProperty(
   target: Model,
@@ -231,7 +246,10 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
  * of the operations will be grouped based on the interface name in generated
  * clients.
  */
-export function $armResourceOperations(context: DecoratorContext, interfaceType: Interface): void {
+export const $armResourceOperations: ArmResourceOperationsDecorator = (
+  context: DecoratorContext,
+  interfaceType: Interface
+) => {
   const { program } = context;
 
   // All resource interfaces should use @autoRoute
@@ -241,7 +259,7 @@ export function $armResourceOperations(context: DecoratorContext, interfaceType:
   if (getTags(program, interfaceType).length === 0) {
     context.call($tag, interfaceType, interfaceType.name);
   }
-}
+};
 
 /**
  * This decorator is used to mark a resource type as a "singleton", a type with
@@ -249,13 +267,13 @@ export function $armResourceOperations(context: DecoratorContext, interfaceType:
  * such a resource type, they will generate the correct routes and parameter
  * lists.
  */
-export function $singleton(
+export const $singleton: SingletonDecorator = (
   context: DecoratorContext,
   resourceType: Model,
   keyValue: string = "default"
-): void {
+) => {
   context.program.stateMap(ArmStateKeys.armSingletonResources).set(resourceType, keyValue);
-}
+};
 
 export function isSingletonResource(program: Program, resourceType: Model): boolean {
   return program.stateMap(ArmStateKeys.armSingletonResources).has(resourceType);
@@ -273,34 +291,56 @@ export enum ResourceBaseType {
   Extension = "Extension",
 }
 
-export function $resourceBaseType(context: DecoratorContext, entity: Model, baseType: Type) {
+export const $resourceBaseType: ResourceBaseTypeDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  baseType: Type
+) => {
   let baseTypeString: string = "";
   if (isNeverType(baseType)) return;
   if (baseType?.kind === "String") baseTypeString = baseType.value;
   setResourceBaseType(context.program, entity, baseTypeString);
-}
+};
 
-export function $tenantResource(context: DecoratorContext, entity: Model) {
+export const $tenantResource: TenantResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   setResourceBaseType(context.program, entity, "Tenant");
-}
+};
 
-export function $subscriptionResource(context: DecoratorContext, entity: Model) {
+export const $subscriptionResource: SubscriptionResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   setResourceBaseType(context.program, entity, "Subscription");
-}
+};
 
-export function $locationResource(context: DecoratorContext, entity: Model) {
+export const $locationResource: LocationResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   setResourceBaseType(context.program, entity, "Location");
-}
+};
 
-export function $resourceGroupResource(context: DecoratorContext, entity: Model) {
+export const $resourceGroupResource: ResourceGroupResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   setResourceBaseType(context.program, entity, "ResourceGroup");
-}
+};
 
-export function $extensionResource(context: DecoratorContext, entity: Model) {
+export const $extensionResource: ExtensionResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   setResourceBaseType(context.program, entity, "Extension");
-}
+};
 
-export function $armProviderNameValue(context: DecoratorContext, entity: Operation) {
+export const $armProviderNameValue: ArmProviderNameValueDecorator = (
+  context: DecoratorContext,
+  entity: Operation
+) => {
   const armProvider = getServiceNamespace(context.program, entity);
   if (armProvider === undefined) return;
   for (const [_, property] of entity.parameters.properties) {
@@ -308,7 +348,7 @@ export function $armProviderNameValue(context: DecoratorContext, entity: Operati
     if (segment === "providers" && property.type.kind === "String")
       property.type.value = armProvider;
   }
-}
+};
 
 function getServiceNamespace(program: Program, type: Type | undefined): string | undefined {
   if (type === undefined) return undefined;
