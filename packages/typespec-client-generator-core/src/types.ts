@@ -1104,7 +1104,7 @@ function updateMultiPartInfo(
     // body decorated with @multipartBody
     base.multipartOptions = {
       isFilePart: isFilePart(context, base.type),
-      multi: httpOperationPart.multi,
+      isMulti: httpOperationPart.multi,
       filename: httpOperationPart.filename
         ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
         : undefined,
@@ -1141,7 +1141,7 @@ function updateMultiPartInfo(
       }
       base.multipartOptions = {
         isFilePart: isBytesInput,
-        multi: base.type.kind === "array",
+        isMulti: base.type.kind === "array",
         defaultContentTypes: [],
       };
     }
@@ -1149,7 +1149,7 @@ function updateMultiPartInfo(
   if (base.multipartOptions !== undefined) {
     base.isMultipartFileInput = base.multipartOptions.isFilePart;
   }
-  if (base.multipartOptions?.multi && base.type.kind === "array") {
+  if (base.multipartOptions?.isMulti && base.type.kind === "array") {
     // for "images: T[]" or "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"
     base.type = base.type.valueType;
   }

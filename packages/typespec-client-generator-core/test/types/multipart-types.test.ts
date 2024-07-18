@@ -146,7 +146,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(pictures.isMultipartFileInput, true);
     ok(pictures.multipartOptions);
     strictEqual(pictures.multipartOptions.isFilePart, true);
-    strictEqual(pictures.multipartOptions.multi, true);
+    strictEqual(pictures.multipartOptions.isMulti, true);
   });
 
   it("multipart with encoding bytes raises error", async function () {
@@ -307,7 +307,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       strictEqual(p.kind, "property");
       ok(p.multipartOptions);
       ok(p.type.kind === "bytes" || p.type.kind === "model");
-      strictEqual(p.multipartOptions.multi, true);
+      strictEqual(p.multipartOptions.isMulti, true);
     }
   });
 
@@ -372,7 +372,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileArrayOnePart);
     ok(fileArrayOnePart.multipartOptions);
     strictEqual(fileArrayOnePart.type.kind, "array");
-    strictEqual(fileArrayOnePart.multipartOptions.multi, false);
+    strictEqual(fileArrayOnePart.multipartOptions.isMulti, false);
     strictEqual(fileArrayOnePart.multipartOptions.filename, undefined);
     strictEqual(fileArrayOnePart.multipartOptions.contentType, undefined);
     // Maybe we won't meet this case in real world, but we still need to test it.
@@ -384,7 +384,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileArrayMultiParts);
     ok(fileArrayMultiParts.multipartOptions);
     strictEqual(fileArrayMultiParts.type.kind, "model");
-    strictEqual(fileArrayMultiParts.multipartOptions.multi, true);
+    strictEqual(fileArrayMultiParts.multipartOptions.isMulti, true);
     ok(fileArrayMultiParts.multipartOptions.filename);
     strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
     ok(fileArrayMultiParts.multipartOptions.contentType);
@@ -486,7 +486,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     for (const p of MultiPartRequest.properties.values()) {
       strictEqual(p.kind, "property");
       ok(p.multipartOptions);
-      strictEqual(p.multipartOptions.multi, p.name.toLowerCase().includes("multi"));
+      strictEqual(p.multipartOptions.isMulti, p.name.toLowerCase().includes("multi"));
     }
   });
 
@@ -509,14 +509,14 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(stringsOnePart);
     strictEqual(stringsOnePart.type.kind, "array");
     ok(stringsOnePart.multipartOptions);
-    strictEqual(stringsOnePart.multipartOptions.multi, false);
+    strictEqual(stringsOnePart.multipartOptions.isMulti, false);
     const stringsMultiParts = MultiPartRequest.properties.find(
       (x) => x.name === "stringsMultiParts"
     ) as SdkBodyModelPropertyType;
     ok(stringsMultiParts);
     strictEqual(stringsMultiParts.type.kind, "string");
     ok(stringsMultiParts.multipartOptions);
-    strictEqual(stringsMultiParts.multipartOptions.multi, true);
+    strictEqual(stringsMultiParts.multipartOptions.isMulti, true);
   });
 
   it("check content-type in multipart with @multipartBody for model", async function () {
@@ -596,7 +596,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       strictEqual(p.kind, "property");
       ok(p.multipartOptions);
       strictEqual(p.multipartOptions.isFilePart, true);
-      strictEqual(p.multipartOptions.multi, p.name.toLowerCase().includes("array"));
+      strictEqual(p.multipartOptions.isMulti, p.name.toLowerCase().includes("array"));
     }
   });
 
