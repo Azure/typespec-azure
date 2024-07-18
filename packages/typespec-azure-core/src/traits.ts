@@ -6,23 +6,38 @@ import {
   Model,
   ModelProperty,
   Namespace,
-  NullType,
   Operation,
   Program,
   setTypeSpecNamespace,
-  Tuple,
-  Union,
-  UnknownType,
+  Type,
 } from "@typespec/compiler";
 import { isHeader, isQueryParam } from "@typespec/http";
 import { $added } from "@typespec/versioning";
+import {
+  TraitAddedDecorator,
+  TraitContextDecorator,
+  TraitDecorator,
+  TraitLocationDecorator,
+} from "../generated-defs/Azure.Core.Traits.js";
+import {
+  AddTraitPropertiesDecorator,
+  ApplyTraitOverrideDecorator,
+  EnsureAllHeaderParamsDecorator,
+  EnsureAllQueryParamsDecorator,
+  EnsureTraitsPresentDecorator,
+  TraitSourceDecorator,
+} from "../generated-defs/Azure.Core.Traits.Private.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 
 const traitSourceKey = createStateSymbol("traitSource");
-export function $traitSource(context: DecoratorContext, target: ModelProperty, traitName: string) {
+export const $traitSource: TraitSourceDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  traitName: string
+) => {
   // Store the source trait name on the envelope property
   context.program.stateMap(traitSourceKey).set(target, traitName);
-}
+};
 
 /**
  * Retrieves the `traitName` stored for the given `property`, if any.
@@ -36,7 +51,11 @@ export function getSourceTraitName(program: Program, property: ModelProperty): s
 setTypeSpecNamespace("Traits.Private", $traitSource);
 
 const traitKey = createStateSymbol("trait");
-export function $trait(context: DecoratorContext, target: Model, traitName?: string) {
+export const $trait: TraitDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  traitName?: string
+) => {
   if (target.properties.size !== 1) {
     reportDiagnostic(context.program, {
       code: "invalid-trait-property-count",
@@ -96,7 +115,7 @@ export function $trait(context: DecoratorContext, target: Model, traitName?: str
 
   // Mark the model as a trait type and store its name
   context.program.stateMap(traitKey).set(target, traitName);
-}
+};
 
 setTypeSpecNamespace("Traits", $trait);
 
@@ -119,22 +138,19 @@ export function getTraitName(program: Program, model: Model): string | undefined
 }
 
 const traitContextKey = createStateSymbol("traitContext");
-export function $traitContext(
+export const $traitContext: TraitContextDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  traitContext: EnumMember | Union | UnknownType
-) {
+  traitContext: Type
+) => {
   context.program
     .stateMap(traitContextKey)
     .set(target, normalizeTraitContexts(context.program, traitContext));
-}
+};
 
 setTypeSpecNamespace("Traits", $traitContext);
 
-function normalizeTraitContexts(
-  program: Program,
-  contexts: EnumMember | Union | UnknownType
-): EnumMember[] {
+function normalizeTraitContexts(program: Program, contexts: Type): EnumMember[] {
   if (contexts.kind === "EnumMember") {
     return [contexts];
   } else if (contexts.kind === "Union") {
@@ -186,13 +202,13 @@ export function getTraitContexts(program: Program, property: ModelProperty): Enu
 }
 
 const traitLocationKey = createStateSymbol("traitLocation");
-export function $traitLocation(
+export const $traitLocation: TraitLocationDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   traitLocation: EnumMember
-) {
+) => {
   context.program.stateMap(traitLocationKey).set(target, traitLocation);
-}
+};
 
 setTypeSpecNamespace("Traits", $traitLocation);
 
@@ -210,11 +226,11 @@ export function getTraitLocation(
 
 const traitAddedKey = Symbol("traitLocation");
 
-export function $traitAdded(
+export const $traitAdded: TraitAddedDecorator = (
   context: DecoratorContext,
   target: Model | ModelProperty,
-  addedVersion: EnumMember | NullType
-) {
+  addedVersion: Type
+) => {
   if (addedVersion.kind !== "EnumMember") {
     // The type is probably "null" so don't do anything
     return;
@@ -241,7 +257,7 @@ export function $traitAdded(
   // Save the version on the envelope property so that it can be used later when
   // we copy out trait properties
   context.program.stateMap(traitAddedKey).set(target, addedVersion);
-}
+};
 
 function getTraitAddedVersion(
   program: Program,
@@ -252,13 +268,13 @@ function getTraitAddedVersion(
 
 setTypeSpecNamespace("Traits", $traitAdded);
 
-export function $addTraitProperties(
+export const $addTraitProperties: AddTraitPropertiesDecorator = (
   context: DecoratorContext,
   target: Model,
   traitModel: Model,
   traitLocation: EnumMember,
-  traitContexts: EnumMember | Union | UnknownType
-) {
+  traitContexts: Type
+) => {
   // Keep track of all traits applied
   const appliedTraits = new Set<string>();
 
@@ -334,7 +350,7 @@ export function $addTraitProperties(
       }
     }
   }
-}
+};
 
 function checkTraitPropertyCriteria(
   program: Program,
@@ -365,7 +381,11 @@ setTypeSpecNamespace("Traits.Private", $addTraitProperties);
 // unique envelope property name.
 let traitOverrideCounter = 1;
 
-export function $applyTraitOverride(context: DecoratorContext, target: Model, traitModel: Model) {
+export const $applyTraitOverride: ApplyTraitOverrideDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  traitModel: Model
+) => {
   if (traitModel.properties.size !== 1) {
     // The @trait decorator has already raised a diagnostic so skip it.
     return;
@@ -390,16 +410,20 @@ export function $applyTraitOverride(context: DecoratorContext, target: Model, tr
       sourceProperty: envelopeProperty,
     })
   );
-}
+};
 
 setTypeSpecNamespace("Traits.Private", $applyTraitOverride);
 
-export function $ensureTraitsPresent(
+export const $ensureTraitsPresent: EnsureTraitsPresentDecorator = (
   context: DecoratorContext,
   target: Interface | Operation,
   traitModel: Model,
-  expectedTraits: Tuple
-) {
+  expectedTraits: Type
+) => {
+  if (expectedTraits.kind !== "Tuple") {
+    return;
+  }
+
   // Gather all of the trait names from the envelope properties
   const traitsPresent = new Set();
   for (const [_, envelopeProperty] of traitModel.properties) {
@@ -435,11 +459,15 @@ export function $ensureTraitsPresent(
       }
     }
   }
-}
+};
 
 setTypeSpecNamespace("Traits.Private", $ensureTraitsPresent);
 
-export function $ensureAllQueryParams(context: DecoratorContext, target: Model, paramModel: Model) {
+export const $ensureAllQueryParams: EnsureAllQueryParamsDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  paramModel: Model
+) => {
   for (const [_, param] of paramModel.properties) {
     if (!isQueryParam(context.program, param)) {
       reportDiagnostic(context.program, {
@@ -452,15 +480,15 @@ export function $ensureAllQueryParams(context: DecoratorContext, target: Model, 
       });
     }
   }
-}
+};
 
 setTypeSpecNamespace("Traits.Private", $ensureAllQueryParams);
 
-export function $ensureAllHeaderParams(
+export const $ensureAllHeaderParams: EnsureAllHeaderParamsDecorator = (
   context: DecoratorContext,
   target: Model,
   paramModel: Model
-) {
+) => {
   for (const [_, param] of paramModel.properties) {
     if (!isHeader(context.program, param)) {
       reportDiagnostic(context.program, {
@@ -473,6 +501,6 @@ export function $ensureAllHeaderParams(
       });
     }
   }
-}
+};
 
 setTypeSpecNamespace("Traits.Private", $ensureAllHeaderParams);

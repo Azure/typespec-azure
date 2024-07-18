@@ -226,6 +226,13 @@ export const $lib = createTypeSpecLibrary({
       },
     },
   },
+
+  state: {},
 });
 
-export const { reportDiagnostic, createDiagnostic, createStateSymbol } = $lib;
+export const {
+  reportDiagnostic,
+  createDiagnostic,
+  createStateSymbol,
+  stateKeys: AzureCoreStateKeys,
+} = $lib;

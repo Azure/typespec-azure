@@ -24,7 +24,6 @@ import {
   Program,
   Scalar,
   setTypeSpecNamespace,
-  StringLiteral,
   Type,
   typespecTypeToJson,
   Union,
@@ -38,6 +37,35 @@ import {
   HttpOperationResponse,
 } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
+import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
+import {
+  ArmResourceIdentifierConfigDecorator,
+  DefaultFinalStateViaDecorator,
+  EmbeddingVectorDecorator,
+  EnsureResourceTypeDecorator,
+  EnsureVerbDecorator,
+  NeedsRouteDecorator,
+  SpreadCustomResponsePropertiesDecorator,
+} from "../generated-defs/Azure.Core.Foundations.Private.js";
+import {
+  FinalLocationDecorator,
+  FinalOperationDecorator,
+  FixedDecorator,
+  ItemsDecorator,
+  LroCanceledDecorator,
+  LroErrorResultDecorator,
+  LroFailedDecorator,
+  LroStatusDecorator,
+  LroSucceededDecorator,
+  NextLinkDecorator,
+  NextPageOperationDecorator,
+  OperationLinkDecorator,
+  PagedResultDecorator,
+  PollingLocationDecorator,
+  PollingOperationDecorator,
+  PollingOperationParameterDecorator,
+  UseFinalStateViaDecorator,
+} from "../generated-defs/Azure.Core.js";
 import { FinalStateValue, OperationLink } from "./lro-helpers.js";
 import {
   extractStatusMonitorInfo,
@@ -58,9 +86,9 @@ export const FinalOperationKey = "final";
 
 const fixedKey = createStateSymbol("fixed");
 
-export function $fixed(context: DecoratorContext, target: Enum) {
+export const $fixed: FixedDecorator = (context: DecoratorContext, target: Enum) => {
   context.program.stateMap(fixedKey).set(target, true);
-}
+};
 
 export function isFixed(program: Program, target: Enum): boolean {
   return program.stateMap(fixedKey).get(target) !== undefined;
@@ -70,9 +98,9 @@ export function isFixed(program: Program, target: Enum): boolean {
 
 const pagedResultsKey = createStateSymbol("pagedResult");
 
-export function $pagedResult(context: DecoratorContext, entity: Model) {
+export const $pagedResult: PagedResultDecorator = (context: DecoratorContext, entity: Model) => {
   context.program.stateMap(pagedResultsKey).set(entity, true);
-}
+};
 
 export interface PagedResultMetadata {
   modelType: Model;
@@ -234,9 +262,9 @@ export function getPagedResult(
 
 const itemsPropertyKey = createStateSymbol("items");
 
-export function $items(context: DecoratorContext, entity: ModelProperty) {
+export const $items: ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => {
   context.program.stateMap(itemsPropertyKey).set(entity, true);
-}
+};
 
 /**
  * Returns `true` if the property is marked with `@items`.
@@ -247,9 +275,9 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
 
 const nextLinkPropertyKey = createStateSymbol("nextLink");
 
-export function $nextLink(context: DecoratorContext, entity: ModelProperty) {
+export const $nextLink: NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => {
   context.program.stateMap(nextLinkPropertyKey).set(entity, true);
-}
+};
 
 /**
  * Returns `true` if the property is marked with `@nextLink`.
@@ -278,11 +306,14 @@ export interface LongRunningStates {
 
 const lroStatusKey = createStateSymbol("lroStatus");
 
-export function $lroStatus(context: DecoratorContext, entity: Enum | Union | ModelProperty) {
+export const $lroStatus: LroStatusDecorator = (
+  context: DecoratorContext,
+  entity: Enum | Union | ModelProperty
+) => {
   const [states, diagnostics] = extractLroStates(context.program, entity);
   if (diagnostics.length > 0) context.program.reportDiagnostics(diagnostics);
   context.program.stateMap(lroStatusKey).set(entity, states);
-}
+};
 
 // Internal use only
 type PartialLongRunningStates = Partial<LongRunningStates> &
@@ -488,10 +519,9 @@ const lroResultKey = createStateSymbol("lroResult");
  * @param context The decorator execution context.
  * @param entity The model property that contains the logical result.
  */
-export function $lroResult(context: DecoratorContext, entity: ModelProperty) {
-  const { program } = context;
-  program.stateMap(lroResultKey).set(entity, entity);
-}
+export const $lroResult = (context: DecoratorContext, entity: ModelProperty) => {
+  context.program.stateMap(lroResultKey).set(entity, entity);
+};
 
 /**
  * Gets the logical result property from a StatusMonitor
@@ -544,10 +574,13 @@ const lroErrorResultKey = createStateSymbol("lroErrorResult");
  * @param context The decorator execution context.
  * @param entity The model property that contains the error result.
  */
-export function $lroErrorResult(context: DecoratorContext, entity: ModelProperty) {
+export const $lroErrorResult: LroErrorResultDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty
+) => {
   const { program } = context;
   program.stateMap(lroErrorResultKey).set(entity, entity);
-}
+};
 
 /**
  * Gets the error result property from a StatusMonitor
@@ -592,11 +625,11 @@ export function getLroErrorResult(
 //@pollingOperationParameter
 
 const pollingParameterKey = createStateSymbol("pollingOperationParameter");
-export function $pollingOperationParameter(
+export const $pollingOperationParameter: PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  target?: ModelProperty | StringLiteral
-) {
+  target?: Type
+) => {
   const { program } = context;
   let storedValue: ModelProperty | string | undefined;
   switch (target?.kind) {
@@ -610,7 +643,7 @@ export function $pollingOperationParameter(
       storedValue = undefined;
   }
   program.stateMap(pollingParameterKey).set(entity, storedValue ?? entity.name);
-}
+};
 
 export function getPollingOperationParameter(
   program: Program,
@@ -623,9 +656,12 @@ export function getPollingOperationParameter(
 
 const lroSucceededKey = createStateSymbol("lroSucceeded");
 
-export function $lroSucceeded(context: DecoratorContext, entity: EnumMember | UnionVariant) {
+export const $lroSucceeded: LroSucceededDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember | UnionVariant
+) => {
   context.program.stateSet(lroSucceededKey).add(entity);
-}
+};
 
 /**
  *  Returns `true` if the enum member represents a "succeeded" state.
@@ -638,9 +674,12 @@ export function isLroSucceededState(program: Program, entity: EnumMember | Union
 
 const lroCanceledKey = createStateSymbol("lroCanceled");
 
-export function $lroCanceled(context: DecoratorContext, entity: EnumMember | UnionVariant) {
+export const $lroCanceled: LroCanceledDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember | UnionVariant
+) => {
   context.program.stateSet(lroCanceledKey).add(entity);
-}
+};
 
 /**
  *  Returns `true` if the enum member represents a "canceled" state.
@@ -653,9 +692,12 @@ export function isLroCanceledState(program: Program, entity: EnumMember | UnionV
 
 const lroFailedKey = createStateSymbol("lroFailed");
 
-export function $lroFailed(context: DecoratorContext, entity: EnumMember | UnionVariant) {
+export const $lroFailed: LroFailedDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember | UnionVariant
+) => {
   context.program.stateSet(lroFailedKey).add(entity);
-}
+};
 
 /**
  *  Returns `true` if the enum member represents a "failed" state.
@@ -701,11 +743,11 @@ const finalResultKey = "finalResult";
 export enum pollingOptionsKind {
   StatusMonitor = "statusMonitor",
 }
-export function $pollingLocation(
+export const $pollingLocation: PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  options?: Model
-) {
+  options?: Type
+) => {
   const { program } = context;
   if (options) {
     if (isNeverType(options)) return;
@@ -716,7 +758,7 @@ export function $pollingLocation(
   }
 
   program.stateSet(pollingLocationsKey).add(entity);
-}
+};
 
 /**
  * Gets polling information stored with a field that contains a link to an Lro polling endpoint
@@ -738,8 +780,9 @@ function extractUnionVariantValue(type: Type): string | undefined {
 function extractPollingLocationInfo(
   program: Program,
   target: ModelProperty,
-  options: Model
+  options: Type
 ): PollingLocationInfo | undefined {
+  if (options.kind !== "Model") return undefined;
   const kind = options.properties.get(optionsKindKey);
   if (kind === undefined) return undefined;
   const kindValue: string | undefined = extractUnionVariantValue(kind.type);
@@ -819,11 +862,11 @@ export function isPollingLocation(program: Program, entity: ModelProperty): bool
 const finalLocationsKey = createStateSymbol("finalLocations");
 const finalLocationResultsKey = createStateSymbol("finalLocationResults");
 
-export function $finalLocation(
+export const $finalLocation: FinalLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  finalResult?: Model | IntrinsicType
-) {
+  finalResult?: Type
+) => {
   const { program } = context;
   if (finalResult !== undefined && isNeverType(finalResult)) return;
   program.stateSet(finalLocationsKey).add(entity);
@@ -836,7 +879,7 @@ export function $finalLocation(
         program.stateMap(finalLocationResultsKey).set(entity, finalResult);
       }
   }
-}
+};
 
 /**
  *  Returns `true` if the property is marked with @finalLocation.
@@ -859,11 +902,11 @@ const finalStateOverrideKey = createStateSymbol("finalStateOverride");
  * @param entity The decorated operation
  * @param finalState The desired value for final-state-via
  */
-export function $useFinalStateVia(
+export const $useFinalStateVia: UseFinalStateViaDecorator = (
   context: DecoratorContext,
   entity: Operation,
   finalState: string
-) {
+) => {
   const { program } = context;
   let finalStateVia: FinalStateValue;
   switch (finalState?.toLowerCase()) {
@@ -909,7 +952,7 @@ export function $useFinalStateVia(
       format: { finalStateValue: finalStateVia },
     });
   }
-}
+};
 
 type LroHeader = "azure-asyncoperation" | "location" | "operation-location";
 
@@ -1019,14 +1062,17 @@ export function getFinalStateOverride(
   return program.stateMap(finalStateOverrideKey).get(operation);
 }
 
-export function $omitKeyProperties(context: DecoratorContext, entity: Model) {
+export const $omitKeyProperties: OmitKeyPropertiesDecorator = (
+  context: DecoratorContext,
+  entity: Model
+) => {
   // Delete any key properties from the model
   for (const [key, prop] of entity.properties) {
     if (isKey(context.program, prop)) {
       entity.properties.delete(key);
     }
   }
-}
+};
 
 export interface OperationLinkMetadata {
   parameters?: Type;
@@ -1040,13 +1086,16 @@ export interface OperationLinkMetadata {
 
 const operationLinkKey = createStateSymbol("operationLink");
 
-export function $operationLink(
+export const $operationLink: OperationLinkDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
   linkType: string,
-  parameters?: Model
-) {
+  parameters?: Type
+) => {
+  if (parameters && parameters.kind !== "Model") {
+    return;
+  }
   const { program } = context;
   const [operationInfo, diagnostics] = getLroOperationInfo(
     program,
@@ -1075,7 +1124,7 @@ export function $operationLink(
     result: operationInfo?.getResultInfo(),
   } as OperationLinkMetadata);
   context.program.stateMap(operationLinkKey).set(entity, items);
-}
+};
 
 /**
  * Returns the `OperationLinkMetadata` for a given operation and link type, or undefined.
@@ -1105,12 +1154,12 @@ export function getOperationLinks(
   return program.stateMap(operationLinkKey).get(entity) as Map<string, OperationLinkMetadata>;
 }
 
-export function $pollingOperation(
+export const $pollingOperation: PollingOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
   linkedOperation: Operation,
-  parameters?: Model
-) {
+  parameters?: Type
+) => {
   const { program } = context;
   const isValidReturnType =
     target.returnType.kind === "Model" ||
@@ -1162,14 +1211,14 @@ export function $pollingOperation(
       target: target,
     });
   }
-}
+};
 
-export function $finalOperation(
+export const $finalOperation: FinalOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Model
-) {
+  parameters?: Type
+) => {
   const { program } = context;
   context.call($operationLink, entity, linkedOperation, FinalOperationKey, parameters);
 
@@ -1180,22 +1229,22 @@ export function $finalOperation(
       target: entity,
     });
   }
-}
+};
 
-export function $nextPageOperation(
+export const $nextPageOperation: NextPageOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Model
-) {
+  parameters?: Type
+) => {
   context.call($operationLink, entity, linkedOperation, "nextPage", parameters);
-}
+};
 
 const requestParameterKey = createStateSymbol("requestParameter");
 
-export function $requestParameter(context: DecoratorContext, entity: Model, name: string) {
+export const $requestParameter = (context: DecoratorContext, entity: Model, name: string) => {
   context.program.stateMap(requestParameterKey).set(entity, name);
-}
+};
 
 export function getRequestParameter(program: Program, entity: ModelProperty): string | undefined {
   if (entity.type.kind !== "Model") return undefined;
@@ -1205,9 +1254,9 @@ export function getRequestParameter(program: Program, entity: ModelProperty): st
 
 const responsePropertyKey = createStateSymbol("responseParameter");
 
-export function $responseProperty(context: DecoratorContext, entity: Model, name: string) {
+export const $responseProperty = (context: DecoratorContext, entity: Model, name: string) => {
   context.program.stateMap(responsePropertyKey).set(entity, name);
-}
+};
 
 export function getResponseProperty(program: Program, entity: ModelProperty): string | undefined {
   if (entity.type.kind !== "Model") return undefined;
@@ -1215,11 +1264,11 @@ export function getResponseProperty(program: Program, entity: ModelProperty): st
   return parameterName;
 }
 
-export function $spreadCustomParameters(
+export const $spreadCustomParameters = (
   context: DecoratorContext,
   entity: Model,
   customizations: Model
-) {
+) => {
   const customParameters: Type | undefined = customizations.properties.get("parameters")?.type;
   if (customParameters) {
     if (customParameters.kind !== "Model") {
@@ -1240,15 +1289,16 @@ export function $spreadCustomParameters(
       );
     }
   }
-}
+};
 
-export function $spreadCustomResponseProperties(
+export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Model
-) {
-  const customResponseProperties: Type | undefined =
-    customizations.properties.get("response")?.type;
+  customizations: Type
+) => {
+  const customResponseProperties: Type | undefined = (customizations as any).properties.get(
+    "response"
+  )?.type;
   if (customResponseProperties) {
     if (customResponseProperties.kind !== "Model") {
       // The constraint checker will have complained about this already.
@@ -1268,15 +1318,15 @@ export function $spreadCustomResponseProperties(
       );
     }
   }
-}
+};
 
 const resourceOperationKey = createStateSymbol("resourceOperation");
 
-export function $ensureResourceType(
+export const $ensureResourceType: EnsureResourceTypeDecorator = (
   context: DecoratorContext,
   entity: Operation,
   resourceType: Type
-) {
+) => {
   if (resourceType.kind === "TemplateParameter") {
     return;
   }
@@ -1325,7 +1375,7 @@ export function $ensureResourceType(
       },
     });
   }
-}
+};
 
 export function isResourceOperation(program: Program, operation: Operation): boolean {
   return program.stateSet(resourceOperationKey).has(operation);
@@ -1333,13 +1383,13 @@ export function isResourceOperation(program: Program, operation: Operation): boo
 
 const needsRouteKey = createStateSymbol("needsRoute");
 
-export function $needsRoute(context: DecoratorContext, entity: Operation) {
+export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => {
   // If the operation is not templated, add it to the list of operations to
   // check later
   if (entity.node.templateParameters.length === 0) {
     context.program.stateSet(needsRouteKey).add(entity);
   }
-}
+};
 
 export function checkRpcRoutes(program: Program) {
   (program.stateSet(needsRouteKey) as Set<Operation>).forEach((op: Operation) => {
@@ -1358,14 +1408,14 @@ export function checkRpcRoutes(program: Program) {
 
 const ensureVerbKey = createStateSymbol("ensureVerb");
 
-export function $ensureVerb(
+export const $ensureVerb: EnsureVerbDecorator = (
   context: DecoratorContext,
   entity: Operation,
   templateName: string,
   verb: string
-) {
+) => {
   context.program.stateMap(ensureVerbKey).set(entity, [templateName, verb]);
-}
+};
 
 export function checkEnsureVerb(program: Program) {
   const opMap = program.stateMap(ensureVerbKey) as Map<Operation, string>;
@@ -1394,12 +1444,16 @@ export interface EmbeddingVectorMetadata {
 }
 
 /** @internal */
-export function $embeddingVector(context: DecoratorContext, entity: Model, elementType: Type) {
+export const $embeddingVector: EmbeddingVectorDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  elementType: Type
+) => {
   const metadata: EmbeddingVectorMetadata = {
     elementType: elementType,
   };
   context.program.stateMap(embeddingVectorKey).set(entity, metadata);
-}
+};
 
 /**
  * If the provided model is an embedding vector, returns the appropriate metadata; otherwise,
@@ -1439,11 +1493,11 @@ export interface ArmResourceIdentifierAllowedResource {
 }
 
 /** @internal */
-export function $armResourceIdentifierConfig(
+export const $armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator = (
   context: DecoratorContext,
   entity: Scalar,
   config: Type
-) {
+) => {
   if (config.kind !== "Model") return;
   const prop = config.properties.get("allowedResources");
   if (prop === undefined || prop.type.kind !== "Tuple") return;
@@ -1458,7 +1512,7 @@ export function $armResourceIdentifierConfig(
       .stateMap(armResourceIdentifierConfigKey)
       .set(entity, { allowedResources: data });
   }
-}
+};
 
 /** Returns the config attached to an armResourceIdentifierScalar */
 export function getArmResourceIdentifierConfig(
@@ -1468,14 +1522,14 @@ export function getArmResourceIdentifierConfig(
   return program.stateMap(armResourceIdentifierConfigKey).get(entity);
 }
 
-export function $defaultFinalStateVia(
+export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   context: DecoratorContext,
   target: Operation,
-  states: LroHeader[]
-) {
+  states: unknown // TODO: replace with actual type when available
+) => {
   const { program } = context;
   const finalStateValues: FinalStateValue[] = [];
-  for (const finalState of states) {
+  for (const finalState of states as string[]) {
     switch (finalState?.toLowerCase()) {
       case "operation-location":
         finalStateValues.push(FinalStateValue.operationLocation);
@@ -1500,7 +1554,7 @@ export function $defaultFinalStateVia(
   if (storedValue !== undefined) {
     program.stateMap(finalStateOverrideKey).set(target, storedValue);
   }
-}
+};
 
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
