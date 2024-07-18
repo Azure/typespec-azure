@@ -28,6 +28,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
+import { TCGCContext } from "./interfaces.js";
 import {
   TspLiteralType,
   getClientNamespaceStringHelper,
@@ -36,7 +37,6 @@ import {
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { TCGCContext } from "./interfaces.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist

@@ -43,8 +43,8 @@ import {
   SdkServiceOperation,
   SdkServiceParameter,
   SdkType,
-  UsageFlags,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   createGeneratedName,

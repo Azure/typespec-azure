@@ -39,8 +39,8 @@ import {
   SdkHttpOperation,
   SdkOperationGroup,
   SdkServiceOperation,
-  UsageFlags,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import { AllScopes, clientNameKey, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -650,7 +650,7 @@ export function createSdkContext<
       sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
     );
   }
-  return sdkContext
+  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");

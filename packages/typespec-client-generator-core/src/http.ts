@@ -36,7 +36,7 @@ import {
   SdkQueryParameter,
   SdkServiceResponseHeader,
   SdkType,
-  TCGCContext
+  TCGCContext,
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
