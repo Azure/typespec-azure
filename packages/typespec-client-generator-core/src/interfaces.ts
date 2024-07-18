@@ -27,26 +27,6 @@ import { TspLiteralType } from "./internal-utils.js";
 export interface TCGCContext {
   program: Program;
   emitterName: string;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  diagnostics: readonly Diagnostic[];
-  originalProgram: Program;
-  previewStringRegex: RegExp;
-}
-
-export interface SdkContext<
-  TOptions extends object = Record<string, any>,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
-> extends TCGCContext {
-  emitContext: EmitContext<TOptions>;
-  sdkPackage: SdkPackage<TServiceOperation>;
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  apiVersion?: string;
-  decoratorsAllowList?: string[];
-  __subscriptionIdParameter?: SdkParameter;
-  __rawClients?: SdkClient[];
-  knownScalars?: Record<string, SdkBuiltInKinds>;
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
   filterOutCoreModels?: boolean;
@@ -59,6 +39,26 @@ export interface SdkContext<
   spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
+  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
+  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  knownScalars?: Record<string, SdkBuiltInKinds>;
+  diagnostics: readonly Diagnostic[];
+  __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
+  apiVersion?: string;
+  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  originalProgram: Program;
+  decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
+}
+
+export interface SdkContext<
+  TOptions extends object = Record<string, any>,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+> extends TCGCContext {
+  emitContext: EmitContext<TOptions>;
+  sdkPackage: SdkPackage<TServiceOperation>;
 }
 
 export interface SdkEmitterOptions {

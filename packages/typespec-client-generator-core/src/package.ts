@@ -44,9 +44,9 @@ import {
   SdkServiceParameter,
   SdkType,
   UsageFlags,
+  TCGCContext,
 } from "./interfaces.js";
 import {
-  TCGCContext,
   createGeneratedName,
   filterApiVersionsWithDecorators,
   getAllResponseBodiesAndNonBodyExists,

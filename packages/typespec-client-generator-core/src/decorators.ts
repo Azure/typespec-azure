@@ -40,8 +40,9 @@ import {
   SdkOperationGroup,
   SdkServiceOperation,
   UsageFlags,
+  TCGCContext,
 } from "./interfaces.js";
-import { AllScopes, TCGCContext, clientNameKey, parseEmitterName } from "./internal-utils.js";
+import { AllScopes, clientNameKey, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -630,10 +631,10 @@ export function createSdkContext<
     context.program,
     (emitterName ?? context.program.emitters[0]?.metadata?.name)!
   );
-  return {
+  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,
-    sdkPackage: getSdkPackage(tcgcContext),
+    sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
@@ -643,6 +644,13 @@ export function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
   };
+  sdkContext.sdkPackage = getSdkPackage(sdkContext);
+  if (sdkContext.diagnostics) {
+    sdkContext.diagnostics = sdkContext.diagnostics.concat(
+      sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
+    );
+  }
+  return sdkContext
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
