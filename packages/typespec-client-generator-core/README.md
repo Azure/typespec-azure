@@ -169,7 +169,7 @@ op func8(@body body: Test5): void;
 Create a ClientGenerator.Core client out of a namespace or interface
 
 ```typespec
-@Azure.ClientGenerator.Core.client(value?: {}, scope?: valueof string)
+@Azure.ClientGenerator.Core.client(value?: Model, scope?: valueof string)
 ```
 
 ##### Target
@@ -180,7 +180,7 @@ Create a ClientGenerator.Core client out of a namespace or interface
 
 | Name  | Type             | Description                                                                                                   |
 | ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `{}`             | Optional configuration for the service.                                                                       |
+| value | `Model`          | Optional configuration for the service.                                                                       |
 | scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 ##### Examples
