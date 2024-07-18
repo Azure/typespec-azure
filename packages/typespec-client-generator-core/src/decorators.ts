@@ -824,6 +824,8 @@ const internalKey = createStateSymbol("internal");
  * @param target Operation to mark as internal
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated Use `access` decorator instead.
+ *
+ * @internal
  */
 export const $internal: InternalDecorator = (
   context: DecoratorContext,
