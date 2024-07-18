@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.44.1
+
+### Bug Fixes
+
+- [#1186](https://github.com/Azure/typespec-azure/pull/1186) fix access and usage calculation for nested model/enum in spread model
+- [#1185](https://github.com/Azure/typespec-azure/pull/1185) fix idempotent issue for spread
+
+### Features
+
+- [#1119](https://github.com/Azure/typespec-azure/pull/1119) Report diagnostics on `@clientName` conflicts
+
+
 ## 0.44.0
 
 ### Bug Fixes
