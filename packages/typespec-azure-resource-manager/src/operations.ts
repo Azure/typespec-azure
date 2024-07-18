@@ -9,6 +9,15 @@ import {
 } from "@typespec/compiler";
 import { getHttpOperation, HttpOperation } from "@typespec/http";
 import { $actionSegment, getActionSegment, getParentResource, getSegment } from "@typespec/rest";
+import {
+  ArmResourceActionDecorator,
+  ArmResourceCollectionActionDecorator,
+  ArmResourceCreateOrUpdateDecorator,
+  ArmResourceDeleteDecorator,
+  ArmResourceListDecorator,
+  ArmResourceReadDecorator,
+  ArmResourceUpdateDecorator,
+} from "../generated-defs/Azure.ResourceManager.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -133,19 +142,19 @@ function setResourceLifecycleOperation(
   operations.lifecycle[kind] = operation as ArmResourceOperation;
 }
 
-export function $armResourceRead(
+export const $armResourceRead: ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model
-) {
+) => {
   setResourceLifecycleOperation(context, target, resourceType, "read", "@armResourceRead");
-}
+};
 
-export function $armResourceCreateOrUpdate(
+export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model
-) {
+) => {
   setResourceLifecycleOperation(
     context,
     target,
@@ -153,29 +162,29 @@ export function $armResourceCreateOrUpdate(
     "createOrUpdate",
     "@armResourceCreateOrUpdate"
   );
-}
+};
 
-export function $armResourceUpdate(
+export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model
-) {
+) => {
   setResourceLifecycleOperation(context, target, resourceType, "update", "@armResourceUpdate");
-}
+};
 
-export function $armResourceDelete(
+export const $armResourceDelete: ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model
-) {
+) => {
   setResourceLifecycleOperation(context, target, resourceType, "delete", "@armResourceDelete");
-}
+};
 
-export function $armResourceList(
+export const $armResourceList: ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model
-) {
+) => {
   // Only register methods from non-templated interface types
   if (target.interface === undefined || target.interface.node.templateParameters.length > 0) {
     return;
@@ -192,7 +201,7 @@ export function $armResourceList(
   };
 
   operations.lists[target.name] = operation as ArmResourceOperation;
-}
+};
 
 export function armRenameListByOperationInternal(
   context: DecoratorContext,
@@ -281,11 +290,11 @@ function getArmParentName(program: Program, resource: Model): string[] {
   }
 }
 
-export function $armResourceAction(
+export const $armResourceAction: ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model
-) {
+) => {
   const { program } = context;
 
   // Only register methods from non-templated interface types
@@ -310,7 +319,7 @@ export function $armResourceAction(
     // Also apply the @actionSegment decorator to the operation
     context.call($actionSegment, target, uncapitalize(target.name));
   }
-}
+};
 
 function uncapitalize(name: string): string {
   if (name === "") {
@@ -319,9 +328,12 @@ function uncapitalize(name: string): string {
   return name[0].toLowerCase() + name.substring(1);
 }
 
-export function $armResourceCollectionAction(context: DecoratorContext, target: Operation) {
+export const $armResourceCollectionAction: ArmResourceCollectionActionDecorator = (
+  context: DecoratorContext,
+  target: Operation
+) => {
   context.program.stateMap(ArmStateKeys.armResourceCollectionAction).set(target, true);
-}
+};
 
 export function isArmCollectionAction(program: Program, target: Operation): boolean {
   return program.stateMap(ArmStateKeys.armResourceCollectionAction).get(target) === true;
