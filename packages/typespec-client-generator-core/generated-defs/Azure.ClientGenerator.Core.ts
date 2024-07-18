@@ -1,18 +1,26 @@
-using TypeSpec.Reflection;
-
-namespace Azure.ClientGenerator.Core;
+import type {
+  DecoratorContext,
+  Enum,
+  EnumMember,
+  Interface,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+  Type,
+  Union,
+} from "@typespec/compiler";
 
 /**
  * Changes the name of a method, parameter, property, or model generated in the client SDK
+ *
  * @param rename The rename you want applied to the object
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
  * @example
  * ```typespec
  * @clientName("nameInClient")
  * op nameInService: void;
  * ```
- *
  * @example
  * ```typespec
  * @clientName("nameForJava", "java")
@@ -22,45 +30,59 @@ namespace Azure.ClientGenerator.Core;
  * op nameInService: void;
  * ```
  */
-extern dec clientName(target: unknown, rename: valueof string, scope?: valueof string);
+export type ClientNameDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  rename: string,
+  scope?: string
+) => void;
 
 /**
  * Whether you want to generate an operation as a convenient operation.
+ *
  * @param value Whether to generate the operation as convenience method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
  * @example
  * ```typespec
  * @convenientAPI(false)
  * op test: void;
  * ```
  */
-extern dec convenientAPI(target: Operation, value?: valueof boolean, scope?: valueof string);
+export type ConvenientAPIDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  value?: boolean,
+  scope?: string
+) => void;
 
 /**
  * Whether you want to generate an operation as a protocol operation.
+ *
  * @param value Whether to generate the operation as protocol or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
  * @example
  * ```typespec
  * @protocolAPI(false)
  * op test: void;
  * ```
  */
-extern dec protocolAPI(target: Operation, value?: valueof boolean, scope?: valueof string);
+export type ProtocolAPIDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  value?: boolean,
+  scope?: string
+) => void;
 
 /**
  * Create a ClientGenerator.Core client out of a namespace or interface
+ *
  * @param value Optional configuration for the service.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
  * @example Basic client setting
  * ```typespec
  * @client
  * namespace MyService {}
  * ```
- *
  * @example Setting with other service
  * ```typespec
  * namespace MyService {}
@@ -68,36 +90,45 @@ extern dec protocolAPI(target: Operation, value?: valueof boolean, scope?: value
  * @client({service: MyService})
  * interface MyInterface {}
  * ```
- *
  * @example Changing client name if you don't want <Interface/Namespace>Client
  * ```typespec
  * @client({client: MySpecialClient})
  * interface MyInterface {}
  * ```
- *
  * @example
+ *
+ *
  */
-extern dec client(target: Namespace | Interface, value?: Model, scope?: valueof string);
+export type ClientDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  value?: Model,
+  scope?: string
+) => void;
 
 /**
  * Create a ClientGenerator.Core operation group out of a namespace or interface
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
  * @operationGroup
  * interface MyInterface{}
  * ```
  */
-extern dec operationGroup(target: Namespace | Interface, scope?: valueof string);
+export type OperationGroupDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  scope?: string
+) => void;
 
 /**
  * DEPRECATED: Use `@usage` and `@access` decorator instead.
  *
  * Whether to exclude a model from generation for specific languages. By default we generate
  * all models that are included in operations.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
  * @exclude("python")
@@ -106,16 +137,15 @@ extern dec operationGroup(target: Namespace | Interface, scope?: valueof string)
  * }
  * ```
  */
-#deprecated "@exclude decorator is deprecated. Use `@usage` and `@access` decorator instead."
-extern dec exclude(target: Model, scope?: valueof string);
+export type ExcludeDecorator = (context: DecoratorContext, target: Model, scope?: string) => void;
 
 /**
  * DEPRECATED: Use `@usage` and `@access` decorator instead.
  *
  * Whether to include a model in generation for specific languages. By default we generate
  * all models that are included in operations.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
  * @include("python")
@@ -124,16 +154,14 @@ extern dec exclude(target: Model, scope?: valueof string);
  * }
  * ```
  */
-#deprecated "@include decorator is deprecated. Use `@usage` and `@access` decorator instead."
-extern dec include(target: Model, scope?: valueof string);
-
-alias ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
+export type IncludeDecorator = (context: DecoratorContext, target: Model, scope?: string) => void;
 
 /**
  * DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
  *
  * Can be used to explain the client type that the current TYPESPEC
  * type should map to.
+ *
  * @param value The client format to apply.
  * @example
  * ```typespec
@@ -143,39 +171,30 @@ alias ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
  * }
  * ```
  */
-#deprecated "@clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead."
-extern dec clientFormat(target: ModelProperty, value: valueof ClientFormat);
+export type ClientFormatDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value: "unixtime" | "iso8601" | "rfc1123" | "seconds"
+) => void;
 
 /**
  * DEPRECATED: Use `@access` decorator instead.
  *
  * Whether to mark an operation as internal for specific languages,
  * meaning it should not be exposed to end SDK users
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
  * @internal("python")
  * op test: void;
  * ```
  */
-#deprecated "@internal decorator is deprecated. Use `@access` decorator instead."
-extern dec internal(target: Operation, scope?: valueof string);
-
-/**
- * Usage value.
- */
-enum Usage {
-  /**
-   * Used in request
-   */
-  input: 2,
-
-  /**
-   * Used in response
-   */
-  output: 4,
-}
+export type InternalDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: string
+) => void;
 
 /**
  * Expand usage for models/enums.
@@ -190,9 +209,9 @@ enum Usage {
  * But the expanded usage from `@usage` decorator will not be propagated.
  * If you want to do any customization for the usage of a model,
  * you need to take care of all related models/enums.
+ *
  * @param value The usage info you want to set for this model.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
  * @example Expand usage for model
  * ```typespec
  * op test(): OutputModel;
@@ -203,7 +222,6 @@ enum Usage {
  *   prop: string
  * }
  * ```
- *
  * @example Propagation of usage
  * ```typespec
  * // Usage.output
@@ -241,22 +259,12 @@ enum Usage {
  * op getModel(): Fish;
  * ```
  */
-extern dec usage(target: Model | Enum | Union, value: EnumMember | Union, scope?: valueof string);
-
-/**
- * Access value.
- */
-enum Access {
-  /**
-   * Open to user
-   */
-  public: "public",
-
-  /**
-   * Hide from user
-   */
-  internal: "internal",
-}
+export type UsageDecorator = (
+  context: DecoratorContext,
+  target: Model | Enum | Union,
+  value: EnumMember | Union,
+  scope?: string
+) => void;
 
 /**
  * Set explicit access for operations, models and enums.
@@ -270,9 +278,9 @@ enum Access {
  * But this influence will be override by `@usage` decorator on models/enums directly.
  * If an operation/model/enum has no `@access` decorator and is not influenced by any operation with `@access` decorator,
  * the access result is undefined.
+ *
  * @param value The access info you want to set for this model or operation.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
  * @example Set access
  * ```typespec
  * // Access.internal
@@ -397,16 +405,17 @@ enum Access {
  * ): void;
  * ```
  */
-extern dec access(
+export type AccessDecorator = (
+  context: DecoratorContext,
   target: Model | Operation | Enum | Union,
   value: EnumMember,
-  scope?: valueof string
-);
+  scope?: string
+) => void;
 
 /**
  * Set whether a model property should be flattened or not.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
  * model Foo {
@@ -417,5 +426,8 @@ extern dec access(
  * }
  * ```
  */
-#deprecated "@flattenProperty decorator is not recommended to use."
-extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
+export type FlattenPropertyDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: string
+) => void;
