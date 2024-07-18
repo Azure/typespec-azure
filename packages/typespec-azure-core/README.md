@@ -486,7 +486,7 @@ checks.
 ##### Target
 
 The model type to mark as a trait.
-`unknown`
+`Model`
 
 ##### Parameters
 
