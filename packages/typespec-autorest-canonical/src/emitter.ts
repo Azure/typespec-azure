@@ -5,7 +5,7 @@ import {
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
 import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
-import { createTCGCContext, TCGCContext } from "@azure-tools/typespec-client-generator-core";
+import { createTCGCContext, type TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   emitFile,

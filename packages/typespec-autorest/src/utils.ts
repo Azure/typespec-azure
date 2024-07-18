@@ -1,4 +1,4 @@
-import { getClientNameOverride, TCGCContext } from "@azure-tools/typespec-client-generator-core";
+import { getClientNameOverride, type TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   getFriendlyName,
   getProjectedName,
