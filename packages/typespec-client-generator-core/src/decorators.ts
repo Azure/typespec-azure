@@ -29,6 +29,20 @@ import {
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
+import {
+  AccessDecorator,
+  ClientDecorator,
+  ClientFormatDecorator,
+  ClientNameDecorator,
+  ConvenientAPIDecorator,
+  ExcludeDecorator,
+  FlattenPropertyDecorator,
+  IncludeDecorator,
+  InternalDecorator,
+  OperationGroupDecorator,
+  ProtocolAPIDecorator,
+  UsageDecorator,
+} from "../generated-defs/Azure.ClientGenerator.Core.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import {
   AccessFlags,
@@ -123,12 +137,12 @@ function isArm(service: Namespace): boolean {
   );
 }
 
-export function $client(
+export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Model,
   scope?: LanguageScopes
-) {
+) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
       code: "wrong-client-decorator",
@@ -168,7 +182,7 @@ export function $client(
     crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
-}
+};
 
 function findClientService(
   program: Program,
@@ -330,11 +344,11 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
 const operationGroupKey = createStateSymbol("operationGroup");
 
-export function $operationGroup(
+export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   scope?: LanguageScopes
-) {
+) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
       code: "wrong-client-decorator",
@@ -363,7 +377,7 @@ export function $operationGroup(
     },
     scope
   );
-}
+};
 
 /**
  * Check a namespace or interface is an operation group.
@@ -645,25 +659,25 @@ export function createSdkContext<
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
 
-export function $protocolAPI(
+export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  value: boolean,
+  value?: boolean,
   scope?: LanguageScopes
-) {
+) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
-}
+};
 
 const convenientAPIKey = createStateSymbol("convenientAPI");
 
-export function $convenientAPI(
+export const $convenientAPI: ConvenientAPIDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  value: boolean,
+  value?: boolean,
   scope?: LanguageScopes
-) {
+) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
-}
+};
 
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
   const value = getScopedDecoratorData(context, protocolAPIKey, entity);
@@ -680,18 +694,26 @@ const excludeKey = createStateSymbol("exclude");
 /**
  * @deprecated Use `usage` and `access` decorator instead.
  */
-export function $exclude(context: DecoratorContext, entity: Model, scope?: LanguageScopes) {
+export const $exclude: ExcludeDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  scope?: LanguageScopes
+) => {
   setScopedDecoratorData(context, $exclude, excludeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
-}
+};
 
 const includeKey = createStateSymbol("include");
 
 /**
  * @deprecated Use `usage` and `access` decorator instead.
  */
-export function $include(context: DecoratorContext, entity: Model, scope?: LanguageScopes) {
+export const $include: IncludeDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  scope?: LanguageScopes
+) => {
   modelTransitiveSet(context, $include, includeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
-}
+};
 
 /**
  * @deprecated This function is unused and will be removed in a future release.
@@ -745,12 +767,12 @@ export type ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
 /**
  * @deprecated Use `encode` decorator in `@typespec/core` instead.
  */
-export function $clientFormat(
+export const $clientFormat: ClientFormatDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   format: ClientFormat,
   scope?: LanguageScopes
-) {
+) => {
   const expectedTargetTypes = allowedClientFormatToTargetTypeMap[format];
   if (
     context.program.checker.isStdType(target.type) &&
@@ -764,7 +786,7 @@ export function $clientFormat(
       target: context.decoratorTarget,
     });
   }
-}
+};
 
 /**
  * Gets additional information on how to serialize / deserialize TYPESPEC standard types depending
@@ -803,9 +825,13 @@ const internalKey = createStateSymbol("internal");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated Use `access` decorator instead.
  */
-export function $internal(context: DecoratorContext, target: Operation, scope?: LanguageScopes) {
+export const $internal: InternalDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes
+) => {
   setScopedDecoratorData(context, $internal, internalKey, target, true, scope); // eslint-disable-line deprecation/deprecation
-}
+};
 
 /**
  * Whether a model / operation is internal or not. If it's internal, emitters
@@ -840,12 +866,12 @@ export function isInternal(
 
 const usageKey = createStateSymbol("usage");
 
-export function $usage(
+export const $usage: UsageDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union,
   value: EnumMember | Union,
   scope?: LanguageScopes
-) {
+) => {
   const isValidValue = (value: number): boolean => value === 2 || value === 4;
 
   if (value.kind === "EnumMember") {
@@ -876,7 +902,7 @@ export function $usage(
     format: {},
     target: entity,
   });
-}
+};
 
 export function getUsageOverride(
   context: TCGCContext,
@@ -893,12 +919,12 @@ export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags
 
 const accessKey = createStateSymbol("access");
 
-export function $access(
+export const $access: AccessDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Operation | Union,
   value: EnumMember,
   scope?: LanguageScopes
-) {
+) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
       code: "access",
@@ -907,7 +933,7 @@ export function $access(
     });
   }
   setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
-}
+};
 
 export function getAccessOverride(
   context: TCGCContext,
@@ -948,13 +974,13 @@ const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  * @deprecated This decorator is not recommended to use.
  */
-export function $flattenProperty(
+export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   scope?: LanguageScopes
-) {
+) => {
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
-}
+};
 
 /**
  * Whether a model property should be flattened or not.
@@ -967,12 +993,12 @@ export function shouldFlattenProperty(context: TCGCContext, target: ModelPropert
   return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
 }
 
-export function $clientName(
+export const $clientName: ClientNameDecorator = (
   context: DecoratorContext,
   entity: Type,
   value: string,
   scope?: LanguageScopes
-) {
+) => {
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
@@ -1001,7 +1027,7 @@ export function $clientName(
     });
   }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
-}
+};
 
 export function getClientNameOverride(
   context: TCGCContext,
