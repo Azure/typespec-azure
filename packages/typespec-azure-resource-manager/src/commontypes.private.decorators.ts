@@ -7,6 +7,11 @@ import {
   Program,
   Union,
 } from "@typespec/compiler";
+import {
+  ArmCommonDefinitionDecorator,
+  ArmCommonParameterDecorator,
+  ArmCommonTypesVersionsDecorator,
+} from "../generated-defs/Azure.ResourceManager.CommonTypes.Private.js";
 import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.CommonTypes.Private";
@@ -24,7 +29,7 @@ function storeCommonTypeRecord(
   name: string,
   version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
-): void {
+) {
   const basePath: string = getArmTypesPath(context.program).trim();
 
   // NOTE: Right now we don't try to prevent multiple versions from declaring that they are the default
@@ -89,20 +94,27 @@ interface ArmCommonTypeVersionSpec {
  * @param {string?} referenceFile Optional common file path
  * @returns void
  */
-export function $armCommonParameter(
+export const $armCommonParameter: ArmCommonParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   parameterName?: string,
-  version?: string | EnumValue | ArmCommonTypeVersionSpec,
+  version?: unknown, // TODO: switch to precise type when tspd supports it: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
-): void {
+) => {
   // Use the name of the model type if not specified
   if (!parameterName) {
     parameterName = entity.name;
   }
 
-  storeCommonTypeRecord(context, entity, "parameters", parameterName, version, referenceFile);
-}
+  storeCommonTypeRecord(
+    context,
+    entity,
+    "parameters",
+    parameterName,
+    version as any,
+    referenceFile
+  );
+};
 
 /**
  * Using ARM common definition for a Model
@@ -113,20 +125,27 @@ export function $armCommonParameter(
  * @param {string?} referenceFile Optional common file path
  * @returns {void}
  */
-export function $armCommonDefinition(
+export const $armCommonDefinition: ArmCommonDefinitionDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union,
   definitionName?: string,
-  version?: string | EnumValue | ArmCommonTypeVersionSpec,
+  version?: unknown, // TODO: switch to precise type when tspd supports it: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
-): void {
+) => {
   // Use the name of the model type if not specified
   if (!definitionName) {
     definitionName = entity.name!;
   }
 
-  storeCommonTypeRecord(context, entity, "definitions", definitionName, version, referenceFile);
-}
+  storeCommonTypeRecord(
+    context,
+    entity,
+    "definitions",
+    definitionName,
+    version as any,
+    referenceFile
+  );
+};
 
 /**
  * Specify the ARM commont type version reference for a particular spec version or namespace.
@@ -134,9 +153,12 @@ export function $armCommonDefinition(
  * @param enumType entity Decorator target type. Must be `Model`
  * @returns void
  */
-export function $armCommonTypesVersions(context: DecoratorContext, enumType: Enum) {
+export const $armCommonTypesVersions: ArmCommonTypesVersionsDecorator = (
+  context: DecoratorContext,
+  enumType: Enum
+) => {
   context.program.stateMap(ArmStateKeys.armCommonTypesVersions).set(enumType, {
     type: enumType,
     allVersions: Array.from(enumType.members.values()).reverse(),
   });
-}
+};
