@@ -626,7 +626,10 @@ export function createSdkContext<
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
-  const tcgcContext = createTCGCContext(context.program, (emitterName ?? context.program.emitters[0]?.metadata?.name)!)
+  const tcgcContext = createTCGCContext(
+    context.program,
+    (emitterName ?? context.program.emitters[0]?.metadata?.name)!
+  );
   return {
     ...tcgcContext,
     emitContext: context,
@@ -639,7 +642,7 @@ export function createSdkContext<
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
-  }
+  };
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");

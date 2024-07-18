@@ -16,10 +16,10 @@ import {
   UnionVariant,
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
-import { getClientNameOverride, createTCGCContext } from "./decorators.js";
+import { createTCGCContext, getClientNameOverride } from "./decorators.js";
+import { TCGCContext } from "./interfaces.js";
 import { AllScopes, clientNameKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
-import { TCGCContext } from "./interfaces.js";
 
 export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core");

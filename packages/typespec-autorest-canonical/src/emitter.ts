@@ -8,17 +8,17 @@ import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
 import { createTCGCContext, TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
-  Namespace,
-  Program,
-  Service,
-  Type,
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
   interpolatePath,
   listServices,
+  Namespace,
   navigateType,
+  Program,
   resolvePath,
+  Service,
+  Type,
 } from "@typespec/compiler";
 import {
   getRenamedFrom,
@@ -50,7 +50,10 @@ interface ResolvedAutorestCanonicalEmitterOptions extends AutorestDocumentEmitte
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = createTCGCContext(context.program, "@azure-tools/typespec-autorest-canonical");
+  const tcgcSdkContext = createTCGCContext(
+    context.program,
+    "@azure-tools/typespec-autorest-canonical"
+  );
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {

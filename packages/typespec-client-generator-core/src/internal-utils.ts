@@ -10,14 +10,12 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
-  Model,
   ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
@@ -27,16 +25,12 @@ import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
-  SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkModelType,
-  SdkParameter,
   SdkType,
-  SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";

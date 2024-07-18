@@ -1,16 +1,16 @@
 import { getClientNameOverride, TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
-  ModelProperty,
-  Operation,
-  Program,
-  Service,
-  Type,
   getFriendlyName,
   getProjectedName,
   getVisibility,
   isGlobalNamespace,
   isService,
   isTemplateInstance,
+  ModelProperty,
+  Operation,
+  Program,
+  Service,
+  Type,
 } from "@typespec/compiler";
 import { getOperationId } from "@typespec/openapi";
 import { pascalCase } from "change-case";

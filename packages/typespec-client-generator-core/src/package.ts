@@ -75,9 +75,7 @@ import {
   getSdkModelPropertyType,
 } from "./types.js";
 
-function getSdkServiceOperation<
-  TServiceOperation extends SdkServiceOperation,
->(
+function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   methodParameters: SdkMethodParameter[]
@@ -99,9 +97,7 @@ function getSdkServiceOperation<
   );
   return diagnostics.wrap(undefined as any);
 }
-function getSdkLroPagingServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->(
+function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation
 ): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
@@ -113,17 +109,13 @@ function getSdkLroPagingServiceMethod<
   });
 }
 
-function getSdkPagingServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->(
+function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const pagedMetadata = getPagedResult(context.program, operation)!;
-  const basic = diagnostics.pipe(
-    getSdkBasicServiceMethod<TServiceOperation>(context, operation)
-  );
+  const basic = diagnostics.pipe(getSdkBasicServiceMethod<TServiceOperation>(context, operation));
   if (pagedMetadata.itemsProperty) {
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type)
@@ -150,9 +142,7 @@ function getSdkPagingServiceMethod<
   });
 }
 
-function getSdkLroServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->(
+function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
@@ -226,9 +216,7 @@ function getSdkMethodResponse(
   };
 }
 
-function getSdkBasicServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->(
+function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
@@ -280,9 +268,7 @@ function getSdkBasicServiceMethod<
   });
 }
 
-function getSdkServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->(
+function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
@@ -401,13 +387,13 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInOperationGroup(context, client)) {
-    retval.push(
-      diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation))
-    );
+    retval.push(diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation)));
   }
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
-    const operationGroupClient = diagnostics.pipe(createSdkClientType<TServiceOperation>(context, operationGroup));
+    const operationGroupClient = diagnostics.pipe(
+      createSdkClientType<TServiceOperation>(context, operationGroup)
+    );
     const name = `get${operationGroup.type.name}`;
     retval.push({
       kind: "clientaccessor",
@@ -514,9 +500,7 @@ function getSdkEndpointParameter(
   });
 }
 
-function createSdkClientType<
-  TServiceOperation extends SdkServiceOperation,
->(
+function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
@@ -534,9 +518,7 @@ function createSdkClientType<
     methods: methods,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    initialization: diagnostics.pipe(
-      getSdkInitializationType(context, client)
-    ), // MUST call this after getSdkMethods has been called
+    initialization: diagnostics.pipe(getSdkInitializationType(context, client)), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
@@ -575,9 +557,9 @@ function populateApiVersionInformation(context: TCGCContext): void {
   }
 }
 
-export function getSdkPackage<
-  TServiceOperation extends SdkServiceOperation,
->(context: TCGCContext): SdkPackage<TServiceOperation> {
+export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext
+): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
