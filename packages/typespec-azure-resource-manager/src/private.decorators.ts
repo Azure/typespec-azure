@@ -45,6 +45,7 @@ import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
+/** @internal */
 export const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
