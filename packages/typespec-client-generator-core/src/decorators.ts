@@ -774,7 +774,7 @@ export const $clientFormat: ClientFormatDecorator = (
     setScopedDecoratorData(context, $clientFormat, clientFormatKey, target, format, scope); // eslint-disable-line deprecation/deprecation
   } else {
     reportDiagnostic(context.program, {
-      code: "incorrect-client-format",
+      code: "invalid-client-format",
       format: { format, expectedTargetTypes: expectedTargetTypes.join('", "') },
       target: context.decoratorTarget,
     });
@@ -922,7 +922,7 @@ export const $access: AccessDecorator = (
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
-      code: "access",
+      code: "incorrect-access",
       format: {},
       target: entity,
     });
