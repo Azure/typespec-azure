@@ -14,7 +14,7 @@ function $ensureVerb(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `templateName` | `string` |

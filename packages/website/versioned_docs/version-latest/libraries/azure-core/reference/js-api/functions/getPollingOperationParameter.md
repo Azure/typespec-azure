@@ -10,7 +10,7 @@ function getPollingOperationParameter(program, entity): string | ModelProperty |
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `ModelProperty` |
 

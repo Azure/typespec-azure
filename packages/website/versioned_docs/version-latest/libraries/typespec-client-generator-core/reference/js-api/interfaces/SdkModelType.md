@@ -14,23 +14,23 @@ title: "[I] SdkModelType"
 ## Properties
 
 | Property | Type | Description | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | - | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
+| ------ | ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | - | `SdkTypeBase.__raw` |
 | `access` | [`AccessFlags`](../type-aliases/AccessFlags.md) | - | - | - |
 | `additionalProperties?` | [`SdkType`](../type-aliases/SdkType.md) | - | - | - |
 | `apiVersions` | `string`[] | - | - | - |
 | `baseModel?` | [`SdkModelType`](SdkModelType.md) | - | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - | - |
-| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | - | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | - | `SdkTypeBase.details` | `SdkTypeBase.details` |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | - | `SdkTypeBase.details` |
 | `discriminatedSubtypes?` | `Record`<`string`, [`SdkModelType`](SdkModelType.md)\> | - | - | - |
 | `discriminatorProperty?` | [`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md) | - | - | - |
 | `discriminatorValue?` | `string` | - | - | - |
-| ~~`isError`~~ | `boolean` | <p>**Deprecated**</p><p>This property is deprecated. You should not need to check whether a model is an error model.</p> | - | - |
-| ~~`isFormDataType`~~ | `boolean` | <p>**Deprecated**</p><p>This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.</p> | - | - |
+| ~~`isFormDataType`~~ | `boolean` | **Deprecated** This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model. | - | - |
 | `isGeneratedName` | `boolean` | - | - | - |
-| `kind` | `"model"` | - | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
+| `kind` | `"model"` | - | `SdkTypeBase.kind` | - |
 | `name` | `string` | - | - | - |
 | `properties` | [`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md)[] | - | - | - |
 | `usage` | [`UsageFlags`](../enumerations/UsageFlags.md) | - | - | - |

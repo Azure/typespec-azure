@@ -35,7 +35,6 @@ export interface SdkEmitterOptions {
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
-  flavor?: "azure";
 }
 
 export interface SdkClient {

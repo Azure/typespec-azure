@@ -12,7 +12,7 @@ Get the library and wire name of a model property. Takes
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `TCGCContext` |  |
 | `property` | `ModelProperty` |  |
 

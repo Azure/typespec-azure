@@ -10,7 +10,7 @@ function getSingletonResourceKey(program, resourceType): string | undefined
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resourceType` | `Model` |
 

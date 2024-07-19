@@ -13,7 +13,7 @@ returns undefined.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | - |
 | `model` | `Model` | the model to query |
 

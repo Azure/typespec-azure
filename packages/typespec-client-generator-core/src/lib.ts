@@ -165,6 +165,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. There needs to be a 1-1 mapping.`,
       },
     },
+    "duplicate-client-name": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
+      },
+    },
   },
 });
 

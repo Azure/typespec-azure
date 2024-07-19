@@ -10,11 +10,12 @@ title: "[I] SdkDictionaryType"
 ## Properties
 
 | Property | Type | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
-| `deprecation?` | `string` | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | `SdkTypeBase.details` | `SdkTypeBase.details` |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` |
 | `keyType` | [`SdkType`](../type-aliases/SdkType.md) | - | - |
-| `kind` | `"dict"` | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
+| `kind` | `"dict"` | `SdkTypeBase.kind` | - |
 | `valueType` | [`SdkType`](../type-aliases/SdkType.md) | - | - |

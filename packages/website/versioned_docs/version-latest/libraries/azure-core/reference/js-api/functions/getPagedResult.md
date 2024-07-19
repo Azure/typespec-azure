@@ -14,7 +14,7 @@ response and return the PagedResultMetadata for that response.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Model` \| `Operation` |
 

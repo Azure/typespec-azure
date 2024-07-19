@@ -10,7 +10,7 @@ title: "[I] OpenAPI2BodyParameter"
 ## Properties
 
 | Property | Type | Description | Inherited from |
-| :------ | :------ | :------ | :------ |
+| ------ | ------ | ------ | ------ |
 | `allowEmptyValue?` | `boolean` | - | - |
 | `description?` | `string` | - | - |
 | `example?` | `unknown` | - | - |

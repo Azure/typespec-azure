@@ -10,7 +10,7 @@ function getResourceBaseType(program, resource): ResourceBaseType
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resource` | `Model` |
 

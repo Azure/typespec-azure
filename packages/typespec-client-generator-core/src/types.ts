@@ -1327,13 +1327,13 @@ function updateTypesFromOperation(
               (httpBody.type as Model).properties.get(k) ||
               operation.parameters.properties.get(k) ===
                 (httpBody.type as Model).properties.get(k)?.sourceProperty)
-        ) &&
-        !context.spreadModels?.has(httpBody.type)
+        )
       ) {
-        context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
-      } else {
-        updateUsageOfModel(context, UsageFlags.Input, sdkType);
+        if (!context.spreadModels?.has(httpBody.type)) {
+          context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
+        }
       }
+      updateUsageOfModel(context, UsageFlags.Input, sdkType);
       if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
         updateUsageOfModel(context, UsageFlags.Json, sdkType);
       }
@@ -1436,13 +1436,9 @@ function updateAccessOfModel(context: TCGCContext): void {
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   for (const sdkType of context.spreadModels?.values() ?? []) {
-    updateUsageOfModel(context, UsageFlags.Spread, sdkType);
-  }
-  for (const sdkType of context.modelsMap?.values() ?? []) {
-    // if a type only has spread usage, then it could be internal
-    if ((sdkType.usage & UsageFlags.Spread) > 0) {
-      sdkType.access = "internal";
-    }
+    // if a type has spread usage, then it must be internal
+    sdkType.access = "internal";
+    sdkType.usage = (sdkType.usage & ~UsageFlags.Input) | UsageFlags.Spread;
   }
 }
 

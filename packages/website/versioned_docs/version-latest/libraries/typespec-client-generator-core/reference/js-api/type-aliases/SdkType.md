@@ -6,7 +6,7 @@ title: "[T] SdkType"
 ```ts
 type SdkType: 
   | SdkBuiltInType
-  | SdkDatetimeType
+  | SdkDateTimeType
   | SdkDurationType
   | SdkArrayType
   | SdkTupleType

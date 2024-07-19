@@ -10,7 +10,7 @@ function isSdkBuiltInKind(kind): kind is SdkBuiltInKinds
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `kind` | `string` |
 
 ## Returns

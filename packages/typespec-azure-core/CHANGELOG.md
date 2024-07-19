@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.44.0
+
+### Bug Fixes
+
+- [#927](https://github.com/Azure/typespec-azure/pull/927) Remove explicit `all` rulesets
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+
 ## 0.43.0
 
 ### Bug Fixes

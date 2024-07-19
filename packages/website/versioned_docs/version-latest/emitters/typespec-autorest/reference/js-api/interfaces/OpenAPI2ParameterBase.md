@@ -19,6 +19,6 @@ title: "[I] OpenAPI2ParameterBase"
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `x-ms-client-name?` | `string` | Provide a different name to be used in the client. |
 | `x-ms-parameter-location?` | `string` | - |

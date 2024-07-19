@@ -7,7 +7,8 @@ title: "[F] getCrossLanguageDefinitionId"
 function getCrossLanguageDefinitionId(
    context, 
    type, 
-   appendNamespace): string
+   operation?, 
+   appendNamespace?): string
 ```
 
 Helper function to return cross language definition id for a type
@@ -15,10 +16,11 @@ Helper function to return cross language definition id for a type
 ## Parameters
 
 | Parameter | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
+| ------ | ------ | ------ | ------ |
 | `context` | `TCGCContext` | `undefined` | - |
-| `type` |  \| `Namespace` \| `Enum` \| `Interface` \| `Model` \| `ModelProperty` \| `Operation` \| `Scalar` \| `Union` | `undefined` |  |
-| `appendNamespace` | `boolean` | `true` | - |
+| `type` | \| `Namespace` \| `Enum` \| `Interface` \| `Model` \| `ModelProperty` \| `Operation` \| `Scalar` \| `Union` | `undefined` |  |
+| `operation`? | `Operation` | `undefined` | - |
+| `appendNamespace`? | `boolean` | `true` | - |
 
 ## Returns
 

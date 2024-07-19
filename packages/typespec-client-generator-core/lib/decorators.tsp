@@ -77,7 +77,7 @@ extern dec protocolAPI(target: Operation, value?: valueof boolean, scope?: value
  *
  * @example
  */
-extern dec client(target: Namespace | Interface, value?: {}, scope?: valueof string);
+extern dec client(target: Namespace | Interface, value?: Model, scope?: valueof string);
 
 /**
  * Create a ClientGenerator.Core operation group out of a namespace or interface
