@@ -1,6 +1,6 @@
 import { defineLinter } from "@typespec/compiler";
-import { requireClientSuffixRule } from "./rules/require-client-suffix.js";
-import { propertyNameConflictRule } from "./rules/property-name-conflict.js";
+import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
+import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 
 const rules = [
   requireClientSuffixRule,

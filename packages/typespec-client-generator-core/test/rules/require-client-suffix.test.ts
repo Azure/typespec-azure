@@ -4,7 +4,7 @@ import {
   LinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.js";
+import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import { createTcgcTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: require-client-suffix", () => {
