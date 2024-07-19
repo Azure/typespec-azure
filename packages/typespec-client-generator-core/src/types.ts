@@ -859,7 +859,14 @@ export function getClientTypeWithDiagnostics(
     case "Model":
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        const httpPart = getHttpPart(context.program, type);
+        if (httpPart === undefined) {
+          retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        } else {
+          retval = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, httpPart.type, operation)
+          );
+        }
       }
       break;
     case "Intrinsic":
@@ -1036,9 +1043,7 @@ export function getSdkModelPropertyTypeBase(
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
-  const httpPart = getHttpPart(context.program, type.type);
-  const realType = httpPart ? httpPart.type : type.type;
-  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, realType, operation));
+  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
@@ -1095,14 +1100,32 @@ function getHttpOperationParts(context: TCGCContext, operation: Operation): Http
   return [];
 }
 
+function getHttpOperationPart(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation: Operation
+): HttpOperationPart | undefined {
+  const httpOperationParts = getHttpOperationParts(context, operation);
+  if (
+    type.model &&
+    httpOperationParts.length > 0 &&
+    httpOperationParts.length === type.model.properties.size
+  ) {
+    const index = Array.from(type.model.properties.values()).findIndex((p) => p === type);
+    if (index !== -1) {
+      return httpOperationParts[index];
+    }
+  }
+  return undefined;
+}
+
 function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
   base: SdkBodyModelPropertyType,
   operation: Operation
 ): [void, readonly Diagnostic[]] {
-  const httpOperationParts = getHttpOperationParts(context, operation);
-  const httpOperationPart = httpOperationParts.find((x) => x.body.type === type.type);
+  const httpOperationPart = getHttpOperationPart(context, type, operation);
   const diagnostics = createDiagnosticCollector();
   if (httpOperationPart) {
     // body decorated with @multipartBody
