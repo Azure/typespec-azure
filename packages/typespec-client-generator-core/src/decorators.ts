@@ -53,9 +53,10 @@ import {
   SdkHttpOperation,
   SdkOperationGroup,
   SdkServiceOperation,
+  TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
-import { AllScopes, TCGCContext, clientNameKey, parseEmitterName } from "./internal-utils.js";
+import { AllScopes, clientNameKey, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -603,6 +604,20 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+export function createTCGCContext(program: Program, emitterName: string): TCGCContext {
+  const diagnostics = createDiagnosticCollector();
+  return {
+    program,
+    emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
+    diagnostics: diagnostics.diagnostics,
+    originalProgram: program,
+    __namespaceToApiVersionParameter: new Map(),
+    __tspTypeToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
+    previewStringRegex: /-preview$/,
+  };
+}
+
 interface VersioningStrategy {
   readonly strategy?: "ignore";
   readonly previewStringRegex?: RegExp; // regex to match preview versions
@@ -621,32 +636,27 @@ export function createSdkContext<
   emitterName?: string,
   options?: CreateSdkContextOptions
 ): SdkContext<TOptions, TServiceOperation> {
-  const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
+  const tcgcContext = createTCGCContext(
+    context.program,
+    (emitterName ?? context.program.emitters[0]?.metadata?.name)!
+  );
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
-    program: context.program,
+    ...tcgcContext,
     emitContext: context,
     sdkPackage: undefined!,
-    emitterName: diagnostics.pipe(
-      parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
-    ), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
-    diagnostics: diagnostics.diagnostics,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    originalProgram: context.program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
-    previewStringRegex: options?.versioning?.previewStringRegex || /-preview$/,
+    previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
   };
   sdkContext.sdkPackage = getSdkPackage(sdkContext);
   if (sdkContext.diagnostics) {
