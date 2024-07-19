@@ -13,7 +13,6 @@ import { resolveVersions } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import {
   getAccess,
-  getClientNameOverride,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -75,6 +74,7 @@ import {
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
+  getTypeSpecBuiltInType,
 } from "./types.js";
 
 function getSdkServiceOperation<
@@ -468,11 +468,7 @@ function getSdkEndpointParameter(
           optional: false,
           serializedName: "endpoint",
           correspondingMethodParams: [],
-          type: {
-            kind: "string",
-            encode: "string",
-            decorators: [],
-          },
+          type: getTypeSpecBuiltInType(context, "string"),
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
@@ -540,18 +536,13 @@ function createSdkClientType<
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
-  let name = "";
-  if (isClient) {
-    name = client.name;
-  } else {
-    name = getClientNameOverride(context, client.type) ?? client.type.name;
-  }
+  const clientName = isClient ? client.name : client.type.name;
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client));
   const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
-    name,
+    name: clientName,
     description: docWrapper.description,
     details: docWrapper.details,
     methods: methods,

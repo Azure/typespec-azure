@@ -435,27 +435,6 @@ describe("typespec-client-generator-core: decorators", () => {
         },
       ]);
     });
-
-    it("with @clientName", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        @operationGroup
-        @clientName("ClientModel")
-        interface Model {
-          op foo(): void;
-        }
-        `
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      strictEqual(sdkPackage.clients.length, 1);
-      const mainClient = sdkPackage.clients[0];
-      strictEqual(mainClient.methods.length, 1);
-
-      const clientAccessor = mainClient.methods[0];
-      strictEqual(clientAccessor.kind, "clientaccessor");
-      strictEqual(clientAccessor.response.kind, "client");
-      strictEqual(clientAccessor.response.name, "ClientModel");
-    });
   });
 
   describe("listOperationGroups without @client and @operationGroup", () => {
