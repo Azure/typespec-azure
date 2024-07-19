@@ -14,6 +14,8 @@ import {
   Type,
   Union,
   UnionVariant,
+  isTemplateDeclarationOrInstance,
+  isTemplateDeclaration
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "./decorators.js";
@@ -54,7 +56,7 @@ function validateClientNamesPerNamespace(
   ]);
 
   // Check for duplicate client names for operations
-  validateClientNamesCore(tcgcContext, scope, namespace.operations.values());
+  validateClientNamesCore(tcgcContext, scope, getOperationsPerNamespace());
 
   // Check for duplicate client names for interfaces
   validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
@@ -83,6 +85,32 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for nested namespaces
   for (const item of namespace.namespaces.values()) {
     validateClientNamesPerNamespace(tcgcContext, scope, item);
+  }
+
+  function getOperationsPerNamespace(): Operation[] {
+    const operations : Operation[] = [];
+    addOperations(namespace);
+    return operations;
+    
+    function addOperations(current: Namespace | Interface) {
+      if (current.kind === "Interface" && isTemplateDeclaration(current)) {
+        // Skip template interface operations
+        return;
+      }
+
+      for (const op of current.operations.values()) {
+        // Skip templated operations
+        if (!isTemplateDeclarationOrInstance(op)) {
+          operations.push(op);
+        }
+      }
+
+      if (current.kind === "Namespace") {
+        for (const subItem of current.interfaces.values()) {
+          addOperations(subItem);
+        }
+      }
+    }
   }
 }
 

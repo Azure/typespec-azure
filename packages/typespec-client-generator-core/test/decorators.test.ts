@@ -2818,8 +2818,10 @@ describe("typespec-client-generator-core: decorators", () => {
       @route("/a")
       op a(): void;
 
-      @route("/b")
-      op b(): void;
+      interface C {
+        @route("/b")
+        op b(): void;
+      }
       `
       );
 
