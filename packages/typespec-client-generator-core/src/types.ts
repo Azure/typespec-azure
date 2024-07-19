@@ -1100,20 +1100,38 @@ function getHttpOperationParts(context: TCGCContext, operation: Operation): Http
   return [];
 }
 
+function hasHttpPart(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "Model") {
+    if (type.indexer) {
+      // HttpPart<T>[]
+      return (
+        type.indexer.key.name === "integer" &&
+        getHttpPart(context.program, type.indexer.value) !== undefined
+      );
+    } else {
+      // HttpPart<T>
+      return getHttpPart(context.program, type) !== undefined;
+    }
+  }
+  return false;
+}
+
 function getHttpOperationPart(
   context: TCGCContext,
   type: ModelProperty,
   operation: Operation
 ): HttpOperationPart | undefined {
-  const httpOperationParts = getHttpOperationParts(context, operation);
-  if (
-    type.model &&
-    httpOperationParts.length > 0 &&
-    httpOperationParts.length === type.model.properties.size
-  ) {
-    const index = Array.from(type.model.properties.values()).findIndex((p) => p === type);
-    if (index !== -1) {
-      return httpOperationParts[index];
+  if (hasHttpPart(context, type.type)) {
+    const httpOperationParts = getHttpOperationParts(context, operation);
+    if (
+      type.model &&
+      httpOperationParts.length > 0 &&
+      httpOperationParts.length === type.model.properties.size
+    ) {
+      const index = Array.from(type.model.properties.values()).findIndex((p) => p === type);
+      if (index !== -1) {
+        return httpOperationParts[index];
+      }
     }
   }
   return undefined;
