@@ -4,8 +4,6 @@ import {
   Enum,
   EnumMember,
   Interface,
-  isTemplateDeclaration,
-  isTemplateDeclarationOrInstance,
   Model,
   ModelProperty,
   Namespace,
