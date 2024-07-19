@@ -10,14 +10,12 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
-  Model,
   ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
@@ -27,16 +25,13 @@ import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
-  SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkModelType,
-  SdkParameter,
   SdkType,
-  SdkUnionType,
+  TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
@@ -385,48 +380,6 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 }
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
-
-export interface TCGCContext {
-  program: Program;
-  emitterName: string;
-  generateProtocolMethods?: boolean;
-  generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  spreadModels?: Map<Model, SdkModelType>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
-  __rawClients?: SdkClient[];
-  apiVersion?: string;
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  originalProgram: Program;
-  decoratorsAllowList?: string[];
-  previewStringRegex: RegExp;
-}
-
-export function createTCGCContext(program: Program): TCGCContext {
-  return {
-    program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
-    originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-    previewStringRegex: /-preview$/,
-  };
-}
 
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
