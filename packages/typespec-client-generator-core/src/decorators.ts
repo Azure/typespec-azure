@@ -157,13 +157,6 @@ export const $client: ClientDecorator = (
     explicitService?.kind === "Namespace"
       ? explicitService
       : findClientService(context.program, target) ?? (target as any);
-  if (!name.endsWith("Client")) {
-    reportDiagnostic(context.program, {
-      code: "client-name",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-  }
 
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {

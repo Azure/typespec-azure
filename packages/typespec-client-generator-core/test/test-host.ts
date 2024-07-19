@@ -68,6 +68,19 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
   packageName?: string;
 }
 
+export async function createTcgcTestRunner(): Promise<SdkTestRunner> {
+  const host = await createSdkTestHost();
+  const autoUsings = [
+    "Azure.ClientGenerator.Core",
+    "TypeSpec.Rest",
+    "TypeSpec.Http",
+    "TypeSpec.Versioning",
+  ];
+  return createTestWrapper(host, {
+    autoUsings: autoUsings,
+  }) as SdkTestRunner;
+}
+
 export async function createSdkTestRunner(
   options: CreateSdkTestRunnerOptions = {},
   sdkContextOption?: CreateSdkContextOptions
