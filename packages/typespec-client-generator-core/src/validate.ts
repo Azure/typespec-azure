@@ -4,6 +4,8 @@ import {
   Enum,
   EnumMember,
   Interface,
+  isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
   Model,
   ModelProperty,
   Namespace,
@@ -14,8 +16,6 @@ import {
   Type,
   Union,
   UnionVariant,
-  isTemplateDeclarationOrInstance,
-  isTemplateDeclaration
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "./decorators.js";
@@ -88,10 +88,10 @@ function validateClientNamesPerNamespace(
   }
 
   function getOperationsPerNamespace(): Operation[] {
-    const operations : Operation[] = [];
+    const operations: Operation[] = [];
     addOperations(namespace);
     return operations;
-    
+
     function addOperations(current: Namespace | Interface) {
       if (current.kind === "Interface" && isTemplateDeclaration(current)) {
         // Skip template interface operations
