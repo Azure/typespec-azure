@@ -859,14 +859,7 @@ export function getClientTypeWithDiagnostics(
     case "Model":
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        const httpPart = getHttpPart(context.program, type);
-        if (httpPart === undefined) {
-          retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
-        } else {
-          retval = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, httpPart.type, operation)
-          );
-        }
+        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
       }
       break;
     case "Intrinsic":
@@ -1043,7 +1036,9 @@ export function getSdkModelPropertyTypeBase(
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
-  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+  const httpPart = getHttpPart(context.program, type.type);
+  const realType = httpPart ? httpPart.type : type.type;
+  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, realType, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
@@ -1092,13 +1087,22 @@ function isFilePart(context: TCGCContext, type: SdkType): boolean {
   return false;
 }
 
+function getHttpOperationParts(context: TCGCContext, operation: Operation): HttpOperationPart[] {
+  const body = getHttpOperationWithCache(context, operation).parameters.body;
+  if (body?.bodyKind === "multipart") {
+    return body.parts;
+  }
+  return [];
+}
+
 function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
   base: SdkBodyModelPropertyType,
-  operation?: Operation,
-  httpOperationPart?: HttpOperationPart
+  operation: Operation
 ): [void, readonly Diagnostic[]] {
+  const httpOperationParts = getHttpOperationParts(context, operation);
+  const httpOperationPart = httpOperationParts.find((x) => x.body.type === type.type);
   const diagnostics = createDiagnosticCollector();
   if (httpOperationPart) {
     // body decorated with @multipartBody
@@ -1120,7 +1124,7 @@ function updateMultiPartInfo(
     if (httpPart?.options?.name) {
       base.serializedName = httpPart?.options?.name;
     }
-  } else if (operation) {
+  } else {
     // common body
     const httpOperation = getHttpOperationWithCache(context, operation);
     const operationIsMultipart = Boolean(
@@ -1160,8 +1164,7 @@ function updateMultiPartInfo(
 export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
-  operation?: Operation,
-  httpOperationPart?: HttpOperationPart
+  operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
@@ -1177,18 +1180,10 @@ export function getSdkModelPropertyType(
     isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
   };
-  diagnostics.pipe(updateMultiPartInfo(context, type, result, operation, httpOperationPart));
-  return diagnostics.wrap(result);
-}
-
-function getHttpOperationParts(context: TCGCContext, operation?: Operation): HttpOperationPart[] {
   if (operation) {
-    const body = getHttpOperationWithCache(context, operation).parameters.body;
-    if (body?.bodyKind === "multipart") {
-      return body.parts;
-    }
+    diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
   }
-  return [];
+  return diagnostics.wrap(result);
 }
 
 function addPropertiesToModelType(
@@ -1198,8 +1193,7 @@ function addPropertiesToModelType(
   operation?: Operation
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const httpOpParts = getHttpOperationParts(context, operation);
-  for (const [index, property] of Array.from(type.properties.values()).entries()) {
+  for (const property of type.properties.values()) {
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
@@ -1207,10 +1201,7 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const httpOpPart = httpOpParts.length > index ? httpOpParts[index] : undefined;
-    const clientProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, property, operation, httpOpPart)
-    );
+    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
