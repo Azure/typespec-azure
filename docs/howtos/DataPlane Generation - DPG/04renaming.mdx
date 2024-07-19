@@ -40,11 +40,10 @@ op GetModel is ResourceRead<InputModel>;
 <TabItem value="python" label="Python">
 
 ```python
-class OutputModel:
+class InputModel:
   name: str = rest_field(readonly=True)
 
-response: OutputModel = client.get(name="name")
-FIXME
+response: InputModel = client.get(name="name")
 ```
 
 </TabItem>
@@ -136,9 +135,10 @@ using Azure.ClientGenerator.Core;
 <TabItem value="python" label="Python">
 
 ```python
-class OutputOptions:
-  output_name: str = rest_field(rest_name="name", readonly=True)
-FIXME
+class InputModel:
+  input_name: str = rest_field(rest_name="name", readonly=True)
+
+response: InputModel = client.get_computed_model(name="name")
 ```
 
 </TabItem>
@@ -212,7 +212,10 @@ using Azure.ClientGenerator.Core;
 <TabItem value="python" label="Python">
 
 ```python
-client.get_computed_model()
+class InputModel:
+  input_name: str = rest_field(rest_name="name", readonly=True)
+
+client.get_computed_model(name="name")
 # FIXME
 ```
 
