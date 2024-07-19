@@ -5,6 +5,7 @@ export const requireClientSuffixRule = createRule({
   name: "require-client-suffix",
   description: "Client names should end with 'Client'.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix",
   messages: {
     default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"}`,
   },
