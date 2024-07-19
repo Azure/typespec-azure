@@ -2,8 +2,9 @@ import { defineLinter } from "@typespec/compiler";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.js";
 
-const genericRules = [
+const rules = [
   requireClientSuffixRule,
+  propertyNameConflictRule,
 ]
 
 const csharpRules = [
@@ -12,10 +13,7 @@ const csharpRules = [
 
 
 export const $linter = defineLinter({
-  rules: [
-    ...genericRules,
-    ...csharpRules,
-  ],
+  rules,
   ruleSets: {
     "best-practices:csharp": {
       enable: {
