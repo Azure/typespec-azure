@@ -573,3 +573,8 @@ export function isJsonContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
   return regex.test(contentType);
 }
+
+export function isXmlContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
+  return regex.test(contentType);
+}
