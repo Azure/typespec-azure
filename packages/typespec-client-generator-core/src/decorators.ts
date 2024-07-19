@@ -932,7 +932,7 @@ export const $access: AccessDecorator = (
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
-      code: "incorrect-access",
+      code: "invalid-access",
       format: {},
       target: entity,
     });

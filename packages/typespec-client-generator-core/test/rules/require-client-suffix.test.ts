@@ -7,7 +7,7 @@ import { beforeEach, describe, it } from "vitest";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.js";
 import { createTcgcTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: client names end with 'Client'", () => {
+describe("typespec-client-generator-core: require-client-suffix", () => {
   let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
@@ -20,7 +20,43 @@ describe("typespec-client-generator-core: client names end with 'Client'", () =>
     );
   });
 
-  it("namespace", async () => {
+  it("namespace doesn't end in client", async () => {
+    await tester
+      .expect(
+        `
+      @client
+      @service({})
+      namespace MyService;
+      `
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
+          severity: "warning",
+          message: `Client name "MyService" must end with Client. Use @client({name: "...Client"}`,
+        },
+      ]);
+  });
+
+  it("explicit client name doesn't ends with Client", async () => {
+    await tester
+      .expect(
+        `
+      @client({name: "MySDK"})
+      @service({})
+      namespace MyService;
+      `
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
+          severity: "warning",
+          message: `Client name "MySDK" must end with Client. Use @client({name: "...Client"}`,
+        },
+      ]);
+  });
+
+  it("interface", async () => {
     await tester
       .expect(
         `
@@ -28,7 +64,9 @@ describe("typespec-client-generator-core: client names end with 'Client'", () =>
       namespace MyService;
 
       namespace MyCustomizations {
-        @@client(MyService);
+        @client({service: MyService})
+        interface MyInterface {
+        };
       }
       `
       )
@@ -36,7 +74,7 @@ describe("typespec-client-generator-core: client names end with 'Client'", () =>
         {
           code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
           severity: "warning",
-          message: `Client name "MyNamespace" must end with Client. Use @client({name: "...Client"}`,
+          message: `Client name "MyInterface" must end with Client. Use @client({name: "...Client"}`,
         },
       ]);
   });

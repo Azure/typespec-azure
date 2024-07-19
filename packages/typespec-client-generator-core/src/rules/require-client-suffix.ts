@@ -1,6 +1,5 @@
 import { createRule, Interface, Namespace, paramMessage } from "@typespec/compiler";
-import { getClient } from "../decorators.js";
-import { createTCGCContext } from "../internal-utils.js";
+import { getClient, createTCGCContext } from "../decorators.js";
 
 export const requireClientSuffixRule = createRule({
   name: "require-client-suffix",
@@ -10,7 +9,7 @@ export const requireClientSuffixRule = createRule({
     default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"}`,
   },
   create(context) {
-    const tcgcContext = createTCGCContext(context.program);
+    const tcgcContext = createTCGCContext(context.program, "@azure-tools/typespec-client-generator-core");
     return {
       namespace: (namespace: Namespace) => {
         const sdkClient = getClient(tcgcContext, namespace);
