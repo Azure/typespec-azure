@@ -81,6 +81,13 @@ public User get();
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientGetOptions struct {
+}
+
+type ClientGetResponse struct {
+}
+
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
 ```
 
@@ -171,7 +178,13 @@ public void post(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientPostOptions struct {
+}
 
+type ClientPostResponse struct {
+}
+
+func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
 </TabItem>
@@ -269,6 +282,13 @@ public void upload(String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -368,7 +388,13 @@ public void upload(String id, String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientUploadOptions struct {
+}
 
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </TabItem>
@@ -455,7 +481,13 @@ public void upload(String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientUploadOptions struct {
+}
 
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </TabItem>
@@ -557,7 +589,18 @@ public void upload(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+type User struct {
+	firstName *string
+  lastName *string
+}
 
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </TabItem>
@@ -650,7 +693,13 @@ public void getBlobProperties(String name, String testHeader);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientGetBlobPropertiesOptions struct {
+}
 
+type ClientGetBlobPropertiesResponse struct {
+}
+
+func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
 ```
 
 </TabItem>
@@ -761,7 +810,13 @@ public void register(Schema schema);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientRegisterOptions struct {
+}
 
+type ClientRegisterResponse struct {
+}
+
+func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
 ```
 
 </TabItem>
@@ -842,7 +897,19 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientScheduleRepairsOptions struct {
+}
 
+type RepairResult struct {
+	reason *string
+  info *string
+}
+
+type ClientScheduleRepairsResponse struct {
+  RepairResult
+}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </TabItem>
@@ -944,7 +1011,24 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 <TabItem value="go" label="Go" >
 
 ```go
+type RepairInfo struct {
+	problem *string
+  contact *string
+}
 
+type ClientScheduleRepairsOptions struct {
+}
+
+type RepairResult struct {
+	reason *string
+  info *string
+}
+
+type ClientScheduleRepairsResponse struct {
+  RepairResult
+}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </TabItem>
