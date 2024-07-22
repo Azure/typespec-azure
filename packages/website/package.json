@@ -21,7 +21,7 @@
     "@docusaurus/plugin-content-docs": "~3.4.0",
     "@docusaurus/preset-classic": "^3.4.0",
     "@docusaurus/theme-common": "~3.4.0",
-    "@fluentui/react-components": "~9.54.2",
+    "@fluentui/react-components": "~9.54.5",
     "@mdx-js/react": "^3.0.1",
     "@typespec/playground": "workspace:~",
     "@typespec/website": "workspace:~",
@@ -45,14 +45,14 @@
     "@docusaurus/module-type-aliases": "^3.4.0",
     "@docusaurus/tsconfig": "^3.4.0",
     "@docusaurus/types": "^3.4.0",
-    "@types/node": "~18.11.19",
+    "@types/node": "~20.14.11",
     "@types/react": "~18.3.3",
     "@typespec/tspd": "workspace:~",
     "dotenv": "~16.4.5",
     "file-loader": "~6.2.0",
     "monaco-editor-webpack-plugin": "~7.1.0",
-    "rimraf": "~5.0.7",
-    "typescript": "~5.5.3"
+    "rimraf": "~6.0.1",
+    "typescript": "~5.5.4"
   },
   "browserslist": {
     "production": [
