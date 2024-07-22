@@ -618,4 +618,6 @@ export enum UsageFlags {
   Error = 1 << 7,
   // Set when model is used in conjunction with an application/json content type.
   Json = 1 << 8,
+  // Set when model is used in conjunction with an application/xml content type.
+  Xml = 1 << 8,
 }
