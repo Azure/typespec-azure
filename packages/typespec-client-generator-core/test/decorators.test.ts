@@ -2813,6 +2813,36 @@ describe("typespec-client-generator-core: decorators", () => {
       ]);
     });
 
+    it("duplicate operation in interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      interface C {
+        @clientName("b")
+        @route("/a")
+        op a(): void;
+
+        @route("/b")
+        op b(): void;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
     it("duplicate scalar with all language scopes", async () => {
       const diagnostics = await runner.diagnose(
         `
