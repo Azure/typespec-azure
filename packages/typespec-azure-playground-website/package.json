@@ -71,7 +71,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.45.3",
-    "@types/node": "~20.14.11",
+    "@types/node": "~18.11.19",
     "@types/react-dom": "~18.3.0",
     "@typespec/bundler": "workspace:~",
     "@typespec/playground": "workspace:~",

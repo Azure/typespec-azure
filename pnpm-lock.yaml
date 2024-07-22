@@ -28,8 +28,8 @@ importers:
         specifier: ^6.0.9
         version: 6.0.9(@pnpm/logger@5.0.0)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typescript-eslint/parser':
         specifier: ^7.17.0
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
@@ -56,7 +56,7 @@ importers:
         version: 54.0.0(eslint@9.7.0)
       eslint-plugin-vitest:
         specifier: ^0.5.4
-        version: 0.5.4(eslint@9.7.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 0.5.4(eslint@9.7.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       prettier:
         specifier: ~3.3.3
         version: 3.3.3
@@ -80,7 +80,7 @@ importers:
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core:
     devDependencies:
@@ -106,8 +106,8 @@ importers:
         specifier: ^6.0.9
         version: 6.0.9(@pnpm/logger@5.0.0)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typescript-eslint/parser':
         specifier: ^7.17.0
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
@@ -116,7 +116,7 @@ importers:
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       c8:
         specifier: ^10.1.2
         version: 10.1.2
@@ -140,7 +140,7 @@ importers:
         version: 54.0.0(eslint@9.7.0)
       eslint-plugin-vitest:
         specifier: ^0.5.4
-        version: 0.5.4(eslint@9.7.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 0.5.4(eslint@9.7.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       picocolors:
         specifier: ~1.0.1
         version: 1.0.1
@@ -167,7 +167,7 @@ importers:
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
       yaml:
         specifier: ~2.4.5
         version: 2.4.5
@@ -175,14 +175,14 @@ importers:
   core/packages/best-practices:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -197,7 +197,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/bundle-uploader:
     dependencies:
@@ -224,14 +224,14 @@ importers:
         version: 7.6.3
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/semver':
         specifier: ^7.5.8
         version: 7.5.8
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -246,7 +246,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/bundler:
     dependencies:
@@ -282,14 +282,14 @@ importers:
         version: 17.7.2
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/yargs':
         specifier: ~17.0.32
         version: 17.0.32
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -304,10 +304,10 @@ importers:
         version: 5.5.4
       vite:
         specifier: ^5.3.4
-        version: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+        version: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/compiler:
     dependencies:
@@ -361,8 +361,8 @@ importers:
         specifier: ~4.2.5
         version: 4.2.5
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/prompts':
         specifier: ~2.4.9
         version: 2.4.9
@@ -377,7 +377,7 @@ importers:
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -398,13 +398,13 @@ importers:
         version: link:../tmlanguage-generator
       ts-node:
         specifier: ~10.9.2
-        version: 10.9.2(@swc/core@1.7.0)(@types/node@20.14.11)(typescript@5.5.4)
+        version: 10.9.2(@swc/core@1.7.0)(@types/node@18.11.19)(typescript@5.5.4)
       typescript:
         specifier: ~5.5.4
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
       vscode-oniguruma:
         specifier: ~2.0.1
         version: 2.0.1
@@ -419,8 +419,8 @@ importers:
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typescript-eslint/parser':
         specifier: ^7.17.0
         version: 7.17.0(eslint@9.7.0)(typescript@5.5.4)
@@ -432,7 +432,7 @@ importers:
         version: 7.17.0
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -450,7 +450,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/html-program-viewer:
     dependencies:
@@ -481,13 +481,13 @@ importers:
         version: 10.4.0
       '@testing-library/jest-dom':
         specifier: ^6.4.7
-        version: 6.4.7(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 6.4.7(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react':
         specifier: ~18.3.3
         version: 18.3.3
@@ -502,10 +502,10 @@ importers:
         version: link:../react-components
       '@vitejs/plugin-react':
         specifier: ~4.3.1
-        version: 4.3.1(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.3.1(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -520,22 +520,22 @@ importers:
         version: 5.5.4
       vite:
         specifier: ^5.3.4
-        version: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+        version: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4))
+        version: 0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4))
       vite-plugin-dts:
         specifier: 4.0.0-beta.1
-        version: 4.0.0-beta.1(@types/node@20.14.11)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.0.0-beta.1(@types/node@18.11.19)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/http:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -547,7 +547,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -562,7 +562,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/http-server-javascript:
     dependencies:
@@ -571,8 +571,8 @@ importers:
         version: 3.3.3
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -605,8 +605,8 @@ importers:
         version: 17.7.2
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/semver':
         specifier: ^7.5.8
         version: 7.5.8
@@ -615,7 +615,7 @@ importers:
         version: 17.0.32
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -633,7 +633,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/json-schema:
     dependencies:
@@ -642,8 +642,8 @@ importers:
         version: 2.4.5
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -658,7 +658,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -679,19 +679,19 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/library-linter:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -706,7 +706,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/monarch:
     dependencies:
@@ -715,11 +715,11 @@ importers:
         version: 0.50.0
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -737,13 +737,13 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/openapi:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -761,7 +761,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -776,7 +776,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/openapi3:
     dependencies:
@@ -788,8 +788,8 @@ importers:
         version: 2.4.5
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/yargs':
         specifier: ~17.0.32
         version: 17.0.32
@@ -816,7 +816,7 @@ importers:
         version: link:../versioning
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -834,7 +834,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/playground:
     dependencies:
@@ -881,8 +881,8 @@ importers:
         specifier: 0.6.3
         version: 0.6.3
       monaco-editor:
-        specifier: ~0.50.0
-        version: 0.50.0
+        specifier: ~0.46.0
+        version: 0.46.0
       react:
         specifier: ~18.3.1
         version: 18.3.1
@@ -919,10 +919,10 @@ importers:
         version: 8.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)
       '@storybook/react-vite':
         specifier: ^8.2.5
-        version: 8.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.19.0)(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 8.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.19.0)(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       '@storybook/test':
         specifier: ^8.2.5
-        version: 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@storybook/types':
         specifier: ^8.2.5
         version: 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
@@ -930,8 +930,8 @@ importers:
         specifier: ~1.2.4
         version: 1.2.4
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react':
         specifier: ~18.3.3
         version: 18.3.3
@@ -946,7 +946,7 @@ importers:
         version: link:../react-components
       '@vitejs/plugin-react':
         specifier: ~4.3.1
-        version: 4.3.1(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.3.1(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       c8:
         specifier: ^10.1.2
         version: 10.1.2
@@ -964,13 +964,13 @@ importers:
         version: 5.5.4
       vite:
         specifier: ^5.3.4
-        version: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+        version: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4))
+        version: 0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4))
       vite-plugin-dts:
         specifier: 4.0.0-beta.1
-        version: 4.0.0-beta.1(@types/node@20.14.11)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.0.0-beta.1(@types/node@18.11.19)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
 
   core/packages/playground-website:
     dependencies:
@@ -1030,8 +1030,8 @@ importers:
         specifier: ~1.2.4
         version: 1.2.4
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react':
         specifier: ~18.3.3
         version: 18.3.3
@@ -1043,10 +1043,10 @@ importers:
         version: 3.52.4
       '@vitejs/plugin-react':
         specifier: ~4.3.1
-        version: 4.3.1(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.3.1(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1067,13 +1067,13 @@ importers:
         version: 5.5.4
       vite:
         specifier: ^5.3.4
-        version: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+        version: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
       vite-plugin-dts:
         specifier: 4.0.0-beta.1
-        version: 4.0.0-beta.1(@types/node@20.14.11)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.0.0-beta.1(@types/node@18.11.19)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/prettier-plugin-typespec:
     dependencies:
@@ -1104,7 +1104,7 @@ importers:
         version: 4.19.0
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/protobuf:
     devDependencies:
@@ -1112,8 +1112,8 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -1122,7 +1122,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1140,7 +1140,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/react-components:
     dependencies:
@@ -1165,13 +1165,13 @@ importers:
         version: 10.4.0
       '@testing-library/jest-dom':
         specifier: ^6.4.7
-        version: 6.4.7(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 6.4.7(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react':
         specifier: ~18.3.3
         version: 18.3.3
@@ -1180,10 +1180,10 @@ importers:
         version: 18.3.0
       '@vitejs/plugin-react':
         specifier: ~4.3.1
-        version: 4.3.1(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.3.1(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1198,22 +1198,22 @@ importers:
         version: 5.5.4
       vite:
         specifier: ^5.3.4
-        version: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+        version: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4))
+        version: 0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4))
       vite-plugin-dts:
         specifier: 4.0.0-beta.1
-        version: 4.0.0-beta.1(@types/node@20.14.11)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.0.0-beta.1(@types/node@18.11.19)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/rest:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -1228,7 +1228,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1243,7 +1243,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/samples:
     dependencies:
@@ -1279,14 +1279,14 @@ importers:
         version: link:../versioning
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/internal-build-utils':
         specifier: workspace:~
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1304,13 +1304,13 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/spec:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/internal-build-utils':
         specifier: workspace:~
         version: link:../internal-build-utils
@@ -1328,8 +1328,8 @@ importers:
         version: 3.1.0
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/plist':
         specifier: ~3.0.5
         version: 3.0.5
@@ -1359,8 +1359,8 @@ importers:
         version: 17.7.2
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/yargs':
         specifier: ~17.0.32
         version: 17.0.32
@@ -1369,7 +1369,7 @@ importers:
         version: link:../prettier-plugin-typespec
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1393,7 +1393,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/typespec-vs:
     devDependencies:
@@ -1416,8 +1416,8 @@ importers:
         specifier: ~11.1.6
         version: 11.1.6(rollup@4.19.0)(tslib@2.6.3)(typescript@5.5.4)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/vscode':
         specifier: ~1.91.0
         version: 1.91.0
@@ -1429,7 +1429,7 @@ importers:
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1450,7 +1450,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
       vscode-languageclient:
         specifier: ~9.0.1
         version: 9.0.1
@@ -1458,8 +1458,8 @@ importers:
   core/packages/versioning:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -1471,7 +1471,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1486,7 +1486,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   core/packages/website:
     dependencies:
@@ -1552,8 +1552,8 @@ importers:
         specifier: ^1.7.0
         version: 1.7.0(@swc/helpers@0.5.12)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react':
         specifier: ~18.3.3
         version: 18.3.3
@@ -1630,8 +1630,8 @@ importers:
   core/packages/xml:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../compiler
@@ -1643,7 +1643,7 @@ importers:
         version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1658,7 +1658,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/e2e-tests:
     devDependencies:
@@ -1709,8 +1709,8 @@ importers:
         version: link:../../core/packages/versioning
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/internal-build-utils':
         specifier: workspace:~
         version: link:../../core/packages/internal-build-utils
@@ -1719,7 +1719,7 @@ importers:
         version: link:../../core/packages/samples
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1737,7 +1737,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-autorest:
     devDependencies:
@@ -1751,8 +1751,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -1779,7 +1779,7 @@ importers:
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1797,7 +1797,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-autorest-canonical:
     devDependencies:
@@ -1814,8 +1814,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -1839,7 +1839,7 @@ importers:
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1857,13 +1857,13 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-azure-core:
     devDependencies:
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -1887,7 +1887,7 @@ importers:
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1902,7 +1902,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-azure-playground-website:
     dependencies:
@@ -1944,7 +1944,7 @@ importers:
         version: link:../../core/packages/versioning
       '@vitejs/plugin-react':
         specifier: ~4.3.1
-        version: 4.3.1(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+        version: 4.3.1(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       es-module-shims:
         specifier: ~1.10.0
         version: 1.10.0
@@ -1956,14 +1956,14 @@ importers:
         version: 18.3.1(react@18.3.1)
       vite:
         specifier: ^5.3.4
-        version: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+        version: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
     devDependencies:
       '@playwright/test':
         specifier: ^1.45.3
         version: 1.45.3
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react-dom':
         specifier: ~18.3.0
         version: 18.3.0
@@ -1975,7 +1975,7 @@ importers:
         version: link:../../core/packages/playground
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -1990,7 +1990,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-azure-portal-core:
     devDependencies:
@@ -2007,8 +2007,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -2032,7 +2032,7 @@ importers:
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -2047,7 +2047,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-azure-resource-manager:
     dependencies:
@@ -2062,8 +2062,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-azure-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/pluralize':
         specifier: ^0.0.33
         version: 0.0.33
@@ -2090,7 +2090,7 @@ importers:
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -2105,7 +2105,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-azure-rulesets:
     devDependencies:
@@ -2119,8 +2119,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -2129,7 +2129,7 @@ importers:
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -2147,7 +2147,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-client-generator-core:
     dependencies:
@@ -2162,8 +2162,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-azure-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/pluralize':
         specifier: ^0.0.33
         version: 0.0.33
@@ -2193,7 +2193,7 @@ importers:
         version: link:../../core/packages/xml
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@vitest/ui':
         specifier: ^2.0.4
         version: 2.0.4(vitest@2.0.4)
@@ -2208,7 +2208,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/typespec-service-csharp:
     dependencies:
@@ -2226,8 +2226,8 @@ importers:
         specifier: workspace:~
         version: link:../typespec-azure-core
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
@@ -2248,7 +2248,7 @@ importers:
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: ^2.0.4
-        version: 2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       c8:
         specifier: ^10.1.2
         version: 10.1.2
@@ -2260,7 +2260,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.4
-        version: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   packages/website:
     dependencies:
@@ -2344,8 +2344,8 @@ importers:
         specifier: ^3.4.0
         version: 3.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/node':
-        specifier: ~20.14.11
-        version: 20.14.11
+        specifier: ~18.11.19
+        version: 18.11.19
       '@types/react':
         specifier: ~18.3.3
         version: 18.3.3
@@ -5555,8 +5555,8 @@ packages:
   '@types/node@17.0.45':
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
 
-  '@types/node@18.19.41':
-    resolution: {integrity: sha512-LX84pRJ+evD2e2nrgYCHObGWkiQJ1mL+meAgbvnwk/US6vmMY7S2ygBTGV2Jw91s9vUsLSXeDEkUHZIJGLrhsg==}
+  '@types/node@18.11.19':
+    resolution: {integrity: sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==}
 
   '@types/node@20.14.11':
     resolution: {integrity: sha512-kprQpL8MMeszbz6ojB5/tU8PLN4kesnN8Gjzw349rDlNgsSzg90lAVj3llK99Dh7JON+t9AuscPPFW6mPbTnSA==}
@@ -9534,6 +9534,9 @@ packages:
     peerDependencies:
       monaco-editor: '>= 0.31.0'
       webpack: ^4.5.0 || 5.x
+
+  monaco-editor@0.46.0:
+    resolution: {integrity: sha512-ADwtLIIww+9FKybWscd7OCfm9odsFYHImBRI1v9AviGce55QY8raT+9ihH8jX/E/e6QVSGM+pKj4jSUSRmALNQ==}
 
   monaco-editor@0.50.0:
     resolution: {integrity: sha512-8CclLCmrRRh+sul7C08BmPBP3P8wVWfBHomsTcndxg5NRCEPfu/mc2AGU8k37ajjDVXcXFc12ORAMUkmk+lkFA==}
@@ -16338,17 +16341,17 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       '@types/yargs': 17.0.32
       chalk: 4.1.2
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.3.1(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.3.1(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))':
     dependencies:
       glob: 7.2.3
       glob-promise: 4.2.2(glob@7.2.3)
       magic-string: 0.27.0
       react-docgen-typescript: 2.2.2(typescript@5.5.4)
-      vite: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
     optionalDependencies:
       typescript: 5.5.4
 
@@ -16417,23 +16420,23 @@ snapshots:
       '@types/react': 18.3.3
       react: 18.3.1
 
-  '@microsoft/api-extractor-model@7.29.3(@types/node@20.14.11)':
+  '@microsoft/api-extractor-model@7.29.3(@types/node@18.11.19)':
     dependencies:
       '@microsoft/tsdoc': 0.15.0
       '@microsoft/tsdoc-config': 0.17.0
-      '@rushstack/node-core-library': 5.5.0(@types/node@20.14.11)
+      '@rushstack/node-core-library': 5.5.0(@types/node@18.11.19)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.47.2(@types/node@20.14.11)':
+  '@microsoft/api-extractor@7.47.2(@types/node@18.11.19)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.29.3(@types/node@20.14.11)
+      '@microsoft/api-extractor-model': 7.29.3(@types/node@18.11.19)
       '@microsoft/tsdoc': 0.15.0
       '@microsoft/tsdoc-config': 0.17.0
-      '@rushstack/node-core-library': 5.5.0(@types/node@20.14.11)
+      '@rushstack/node-core-library': 5.5.0(@types/node@18.11.19)
       '@rushstack/rig-package': 0.5.2
-      '@rushstack/terminal': 0.13.2(@types/node@20.14.11)
-      '@rushstack/ts-command-line': 4.22.2(@types/node@20.14.11)
+      '@rushstack/terminal': 0.13.2(@types/node@18.11.19)
+      '@rushstack/ts-command-line': 4.22.2(@types/node@18.11.19)
       lodash: 4.17.21
       minimatch: 3.0.8
       resolve: 1.22.8
@@ -17084,7 +17087,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.19.0':
     optional: true
 
-  '@rushstack/node-core-library@5.5.0(@types/node@20.14.11)':
+  '@rushstack/node-core-library@5.5.0(@types/node@18.11.19)':
     dependencies:
       ajv: 8.13.0
       ajv-draft-04: 1.0.0(ajv@8.13.0)
@@ -17095,23 +17098,23 @@ snapshots:
       resolve: 1.22.8
       semver: 7.5.4
     optionalDependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@rushstack/rig-package@0.5.2':
     dependencies:
       resolve: 1.22.8
       strip-json-comments: 3.1.1
 
-  '@rushstack/terminal@0.13.2(@types/node@20.14.11)':
+  '@rushstack/terminal@0.13.2(@types/node@18.11.19)':
     dependencies:
-      '@rushstack/node-core-library': 5.5.0(@types/node@20.14.11)
+      '@rushstack/node-core-library': 5.5.0(@types/node@18.11.19)
       supports-color: 8.1.1
     optionalDependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
-  '@rushstack/ts-command-line@4.22.2(@types/node@20.14.11)':
+  '@rushstack/ts-command-line@4.22.2(@types/node@18.11.19)':
     dependencies:
-      '@rushstack/terminal': 0.13.2(@types/node@20.14.11)
+      '@rushstack/terminal': 0.13.2(@types/node@18.11.19)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -17185,7 +17188,7 @@ snapshots:
       storybook: 8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9))
       uuid: 9.0.1
 
-  '@storybook/builder-vite@8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))':
+  '@storybook/builder-vite@8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))':
     dependencies:
       '@storybook/csf-plugin': 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
       '@types/find-cache-dir': 3.2.1
@@ -17197,7 +17200,7 @@ snapshots:
       magic-string: 0.30.10
       storybook: 8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9))
       ts-dedent: 2.2.0
-      vite: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
     optionalDependencies:
       typescript: 5.5.4
     transitivePeerDependencies:
@@ -17240,7 +17243,7 @@ snapshots:
     dependencies:
       '@storybook/csf': 0.1.11
       '@types/express': 4.17.21
-      '@types/node': 18.19.41
+      '@types/node': 18.11.19
       browser-assert: 1.2.1
       esbuild: 0.21.5
       esbuild-register: 3.5.0(esbuild@0.21.5)
@@ -17286,11 +17289,11 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       storybook: 8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9))
 
-  '@storybook/react-vite@8.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.19.0)(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))':
+  '@storybook/react-vite@8.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.19.0)(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.3.1(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.3.1(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       '@rollup/pluginutils': 5.1.0(rollup@4.19.0)
-      '@storybook/builder-vite': 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))
+      '@storybook/builder-vite': 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))
       '@storybook/react': 8.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(typescript@5.5.4)
       find-up: 5.0.0
       magic-string: 0.30.10
@@ -17300,7 +17303,7 @@ snapshots:
       resolve: 1.22.8
       storybook: 8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9))
       tsconfig-paths: 4.2.0
-      vite: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
     transitivePeerDependencies:
       - '@preact/preset-vite'
       - rollup
@@ -17318,7 +17321,7 @@ snapshots:
       '@storybook/theming': 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
       '@types/escodegen': 0.0.6
       '@types/estree': 0.0.51
-      '@types/node': 18.19.41
+      '@types/node': 18.11.19
       acorn: 7.4.1
       acorn-jsx: 5.3.2(acorn@7.4.1)
       acorn-walk: 7.2.0
@@ -17337,12 +17340,12 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.4
 
-  '@storybook/test@8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
+  '@storybook/test@8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
     dependencies:
       '@storybook/csf': 0.1.11
       '@storybook/instrumenter': 8.2.5(storybook@8.2.5(@babel/preset-env@7.24.8(@babel/core@7.24.9)))
       '@testing-library/dom': 10.1.0
-      '@testing-library/jest-dom': 6.4.5(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+      '@testing-library/jest-dom': 6.4.5(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
       '@testing-library/user-event': 14.5.2(@testing-library/dom@10.1.0)
       '@vitest/expect': 1.6.0
       '@vitest/spy': 1.6.0
@@ -17539,7 +17542,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.5(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
+  '@testing-library/jest-dom@6.4.5(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.24.8
@@ -17550,9 +17553,9 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
     optionalDependencies:
-      vitest: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+      vitest: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
-  '@testing-library/jest-dom@6.4.7(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
+  '@testing-library/jest-dom@6.4.7(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.24.8
@@ -17563,7 +17566,7 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
     optionalDependencies:
-      vitest: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+      vitest: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   '@testing-library/react@16.0.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -17634,26 +17637,26 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/bonjour@3.5.13':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/braces@3.0.4': {}
 
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
       '@types/express-serve-static-core': 4.19.5
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/cross-spawn@6.0.6':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/d3-scale-chromatic@3.0.3': {}
 
@@ -17695,7 +17698,7 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.5':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       '@types/qs': 6.9.15
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -17712,7 +17715,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/gtag.js@0.0.12': {}
 
@@ -17730,7 +17733,7 @@ snapshots:
 
   '@types/http-proxy@1.17.14':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -17770,17 +17773,16 @@ snapshots:
 
   '@types/node-forge@1.3.11':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/node@17.0.45': {}
 
-  '@types/node@18.19.41':
-    dependencies:
-      undici-types: 5.26.5
+  '@types/node@18.11.19': {}
 
   '@types/node@20.14.11':
     dependencies:
       undici-types: 5.26.5
+    optional: true
 
   '@types/normalize-package-data@2.4.4': {}
 
@@ -17788,7 +17790,7 @@ snapshots:
 
   '@types/plist@3.0.5':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       xmlbuilder: 15.1.1
 
   '@types/pluralize@0.0.33': {}
@@ -17797,7 +17799,7 @@ snapshots:
 
   '@types/prompts@2.4.9':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       kleur: 3.0.3
 
   '@types/prop-types@15.7.12': {}
@@ -17840,14 +17842,14 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/semver@7.5.8': {}
 
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/serve-index@1.9.4':
     dependencies:
@@ -17856,16 +17858,16 @@ snapshots:
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       '@types/send': 0.17.4
 
   '@types/sockjs@0.3.36':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/ssri@7.1.5':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/swagger-ui-dist@3.30.5': {}
 
@@ -17881,7 +17883,7 @@ snapshots:
 
   '@types/ws@8.5.11':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -17986,18 +17988,18 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.1(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))':
+  '@vitejs/plugin-react@4.3.1(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))':
     dependencies:
       '@babel/core': 7.24.9
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.24.9)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.24.9)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@2.0.4(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
+  '@vitest/coverage-v8@2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -18011,7 +18013,7 @@ snapshots:
       std-env: 3.7.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+      vitest: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -18060,7 +18062,7 @@ snapshots:
       pathe: 1.1.2
       sirv: 2.0.4
       tinyrainbow: 1.2.0
-      vitest: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+      vitest: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
 
   '@vitest/utils@1.6.0':
     dependencies:
@@ -20249,12 +20251,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-vitest@0.5.4(eslint@9.7.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)):
+  eslint-plugin-vitest@0.5.4(eslint@9.7.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)):
     dependencies:
       '@typescript-eslint/utils': 7.17.0(eslint@9.7.0)(typescript@5.5.4)
       eslint: 9.7.0
     optionalDependencies:
-      vitest: 2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+      vitest: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -20374,7 +20376,7 @@ snapshots:
 
   eval@0.1.8:
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       require-like: 0.1.2
 
   event-target-shim@5.0.1: {}
@@ -21567,7 +21569,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -21575,13 +21577,13 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -22843,6 +22845,8 @@ snapshots:
       loader-utils: 2.0.4
       monaco-editor: 0.50.0
       webpack: 5.93.0
+
+  monaco-editor@0.46.0: {}
 
   monaco-editor@0.50.0: {}
 
@@ -25066,14 +25070,14 @@ snapshots:
 
   ts-dedent@2.2.0: {}
 
-  ts-node@10.9.2(@swc/core@1.7.0)(@types/node@20.14.11)(typescript@5.5.4):
+  ts-node@10.9.2(@swc/core@1.7.0)(@types/node@18.11.19)(typescript@5.5.4):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 20.14.11
+      '@types/node': 18.11.19
       acorn: 8.12.1
       acorn-walk: 8.3.3
       arg: 4.1.3
@@ -25239,7 +25243,8 @@ snapshots:
 
   underscore@1.13.6: {}
 
-  undici-types@5.26.5: {}
+  undici-types@5.26.5:
+    optional: true
 
   unicode-canonical-property-names-ecmascript@2.0.0: {}
 
@@ -25462,6 +25467,23 @@ snapshots:
       unist-util-stringify-position: 4.0.0
       vfile-message: 4.0.2
 
+  vite-node@2.0.4(@types/node@18.11.19)(terser@5.31.3):
+    dependencies:
+      cac: 6.7.14
+      debug: 4.3.5
+      pathe: 1.1.2
+      tinyrainbow: 1.2.0
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
   vite-node@2.0.4(@types/node@20.14.11)(terser@5.31.3):
     dependencies:
       cac: 6.7.14
@@ -25479,7 +25501,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-checker@0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4)):
+  vite-plugin-checker@0.7.2(eslint@9.7.0)(optionator@0.9.4)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3))(vue-tsc@2.0.28(typescript@5.5.4)):
     dependencies:
       '@babel/code-frame': 7.24.7
       ansi-escapes: 4.3.2
@@ -25491,7 +25513,7 @@ snapshots:
       npm-run-path: 4.0.1
       strip-ansi: 6.0.1
       tiny-invariant: 1.3.3
-      vite: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
       vscode-languageclient: 7.0.0
       vscode-languageserver: 7.0.0
       vscode-languageserver-textdocument: 1.0.11
@@ -25502,9 +25524,9 @@ snapshots:
       typescript: 5.5.4
       vue-tsc: 2.0.28(typescript@5.5.4)
 
-  vite-plugin-dts@4.0.0-beta.1(@types/node@20.14.11)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@20.14.11)(terser@5.31.3)):
+  vite-plugin-dts@4.0.0-beta.1(@types/node@18.11.19)(rollup@4.19.0)(typescript@5.5.4)(vite@5.3.4(@types/node@18.11.19)(terser@5.31.3)):
     dependencies:
-      '@microsoft/api-extractor': 7.47.2(@types/node@20.14.11)
+      '@microsoft/api-extractor': 7.47.2(@types/node@18.11.19)
       '@rollup/pluginutils': 5.1.0(rollup@4.19.0)
       '@volar/typescript': 2.3.4
       '@vue/language-core': 2.0.19(typescript@5.5.4)
@@ -25516,11 +25538,21 @@ snapshots:
       typescript: 5.5.4
       vue-tsc: 2.0.19(typescript@5.5.4)
     optionalDependencies:
-      vite: 5.3.4(@types/node@20.14.11)(terser@5.31.3)
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
+
+  vite@5.3.4(@types/node@18.11.19)(terser@5.31.3):
+    dependencies:
+      esbuild: 0.21.5
+      postcss: 8.4.39
+      rollup: 4.19.0
+    optionalDependencies:
+      '@types/node': 18.11.19
+      fsevents: 2.3.3
+      terser: 5.31.3
 
   vite@5.3.4(@types/node@20.14.11)(terser@5.31.3):
     dependencies:
@@ -25532,7 +25564,42 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.31.3
 
-  vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3):
+  vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3):
+    dependencies:
+      '@ampproject/remapping': 2.3.0
+      '@vitest/expect': 2.0.4
+      '@vitest/pretty-format': 2.0.4
+      '@vitest/runner': 2.0.4
+      '@vitest/snapshot': 2.0.4
+      '@vitest/spy': 2.0.4
+      '@vitest/utils': 2.0.4
+      chai: 5.1.1
+      debug: 4.3.5
+      execa: 8.0.1
+      magic-string: 0.30.10
+      pathe: 1.1.2
+      std-env: 3.7.0
+      tinybench: 2.8.0
+      tinypool: 1.0.0
+      tinyrainbow: 1.2.0
+      vite: 5.3.4(@types/node@18.11.19)(terser@5.31.3)
+      vite-node: 2.0.4(@types/node@18.11.19)(terser@5.31.3)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 18.11.19
+      '@vitest/ui': 2.0.4(vitest@2.0.4)
+      happy-dom: 14.12.3
+      jsdom: 24.1.1
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
+  vitest@2.0.4(@types/node@20.14.11)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@vitest/expect': 2.0.4
