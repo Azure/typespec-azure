@@ -10,7 +10,7 @@ title: "[I] OpenAPI2Document"
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `consumes?` | `string`[] | A list of MIME types the APIs can consume. This is global to all APIs but can be overridden on specific API calls |
 | `definitions?` | `Record`<`string`, [`OpenAPI2Schema`](../type-aliases/OpenAPI2Schema.md)\> | Data types that can be consumed and produced by operations |
 | `externalDocs?` | [`OpenAPI2ExternalDocs`](OpenAPI2ExternalDocs.md) | Additional external documentation. |
@@ -25,4 +25,4 @@ title: "[I] OpenAPI2Document"
 | `swagger` | `"2.0"` | - |
 | `tags?` | [`OpenAPI2Tag`](OpenAPI2Tag.md)[] | A list of tags used by the specification with additional metadata. The order of the tags can be used to reflect on their order by the parsing tools. Not all tags that are used by the Operation Object must be declared. The tags that are not declared may be organized randomly or based on the tools' logic. Each tag name in the list MUST be unique. |
 | `x-ms-parameterized-host?` | [`XMSParameterizedHost`](XMSParameterizedHost.md) | When used, replaces the standard OpenAPI "host" attribute with a host that contains variables to be replaced as part of method execution or client construction, very similar to how path parameters work. |
-| `x-ms-paths?` | `Record`<`string`, [`OpenAPI2PathItem`](../type-aliases/OpenAPI2PathItem.md)\> | <p>Additional paths and operations that cannot be used in `paths` as the url is not unique. This can be used to provide operation overload using a query param.</p><p>**Example**</p><code>"/foo?type=abc" returning FooA and "/foo?type=xyz" returning FooB are not allowed in `paths` as there is query params.</code> |
+| `x-ms-paths?` | `Record`<`string`, [`OpenAPI2PathItem`](../type-aliases/OpenAPI2PathItem.md)\> | Additional paths and operations that cannot be used in `paths` as the url is not unique. This can be used to provide operation overload using a query param. **Example** `"/foo?type=abc" returning FooA and "/foo?type=xyz" returning FooB are not allowed in `paths` as there is query params.` |

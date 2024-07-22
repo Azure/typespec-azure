@@ -12,7 +12,7 @@ Get the first success response of an operation
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program being processed |
 | `operation` | `HttpOperation` | The operation to process |
 

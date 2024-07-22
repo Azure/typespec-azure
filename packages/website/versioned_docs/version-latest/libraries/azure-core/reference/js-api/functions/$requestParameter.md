@@ -13,7 +13,7 @@ function $requestParameter(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
 | `name` | `string` |

@@ -13,7 +13,7 @@ function checkIsArmTrackedResource(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Model` |
 | `decoratorName` | `"browse"` |

@@ -10,7 +10,7 @@ function getArmCommonTypesVersions(program): ArmCommonTypeVersions
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 
 ## Returns

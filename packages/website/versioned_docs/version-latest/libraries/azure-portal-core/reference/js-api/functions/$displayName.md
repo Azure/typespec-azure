@@ -13,7 +13,7 @@ function $displayName(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
 | `name` | `string` |

@@ -12,7 +12,7 @@ Interface for ARM resource detail base.
 ## Properties
 
 | Property | Type | Inherited from |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `armProviderNamespace` | `string` | [`ArmResourceDetailsBase`](ArmResourceDetailsBase.md).`armProviderNamespace` |
 | `collectionName` | `string` | [`ArmResourceDetailsBase`](ArmResourceDetailsBase.md).`collectionName` |
 | `keyName` | `string` | [`ArmResourceDetailsBase`](ArmResourceDetailsBase.md).`keyName` |

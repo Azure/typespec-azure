@@ -6,7 +6,7 @@ title: "[I] SdkServiceResponseHeader"
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `__raw` | `ModelProperty` |
 | `description?` | `string` |
 | `details?` | `string` |

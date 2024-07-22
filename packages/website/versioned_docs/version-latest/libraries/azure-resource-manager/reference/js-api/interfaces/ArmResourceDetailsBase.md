@@ -12,7 +12,7 @@ Interface for ARM resource detail base.
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `armProviderNamespace` | `string` |
 | `collectionName` | `string` |
 | `keyName` | `string` |

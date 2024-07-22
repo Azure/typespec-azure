@@ -10,7 +10,7 @@ function getTraitContexts(program, property): EnumMember[]
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `property` | `ModelProperty` |
 

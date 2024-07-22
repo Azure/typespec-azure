@@ -521,6 +521,24 @@
     }
   },
   "definitions": {
+    "Azure.ResourceManager.CommonTypes.TrackedResourceUpdate": {
+      "type": "object",
+      "description": "The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Resource"
+        }
+      ]
+    },
     "Division": {
       "type": "object",
       "description": "The company division",
@@ -599,40 +617,19 @@
     },
     "EmployeeUpdate": {
       "type": "object",
-      "description": "The type used for update operations of the Employee.",
+      "description": "A ContosoProviderHub resource",
       "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
         "properties": {
-          "$ref": "#/definitions/EmployeeUpdateProperties",
+          "$ref": "#/definitions/EmployeeProperties",
+          "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
-      }
-    },
-    "EmployeeUpdateProperties": {
-      "type": "object",
-      "description": "The updatable properties of the Employee.",
-      "properties": {
-        "age": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Age of employee"
-        },
-        "city": {
-          "type": "string",
-          "description": "City of employee"
-        },
-        "profile": {
-          "type": "string",
-          "format": "base64url",
-          "description": "Profile of employee"
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"
         }
-      }
+      ]
     },
     "Group": {
       "type": "object",

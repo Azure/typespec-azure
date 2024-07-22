@@ -10,7 +10,7 @@ function getAllModelsWithDiagnostics(context, options): [(SdkModelType | SdkEnum
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `options` | `GetAllModelsOptions` |
 

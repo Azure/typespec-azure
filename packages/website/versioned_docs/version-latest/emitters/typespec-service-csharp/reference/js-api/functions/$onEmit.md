@@ -10,7 +10,7 @@ function $onEmit(context): Promise<void>
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `EmitContext`<[`CSharpServiceEmitterOptions`](../interfaces/CSharpServiceEmitterOptions.md)\> |
 
 ## Returns

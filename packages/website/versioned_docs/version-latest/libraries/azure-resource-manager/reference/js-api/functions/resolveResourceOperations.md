@@ -10,7 +10,7 @@ function resolveResourceOperations(program, resourceType): ArmResourceOperations
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resourceType` | `Model` |
 

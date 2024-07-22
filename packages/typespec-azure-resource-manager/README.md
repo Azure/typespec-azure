@@ -69,7 +69,6 @@ Available ruleSets:
 - [`@armLibraryNamespace`](#@armlibrarynamespace)
 - [`@armProviderNamespace`](#@armprovidernamespace)
 - [`@armProviderNameValue`](#@armprovidernamevalue)
-- [`@armRenameListByOperation`](#@armrenamelistbyoperation)
 - [`@armResourceAction`](#@armresourceaction)
 - [`@armResourceCollectionAction`](#@armresourcecollectionaction)
 - [`@armResourceCreateOrUpdate`](#@armresourcecreateorupdate)
@@ -172,31 +171,11 @@ property to the type of the Azure Resource Manager resource.
 
 ##### Target
 
-`Operation | Model`
-
-##### Parameters
-
-None
-
-#### `@armRenameListByOperation`
-
-Marks the operation as being a collection action
-
-```typespec
-@Azure.ResourceManager.armRenameListByOperation(resourceType: Model, parentTypeName?: valueof string, parentFriendlyTypeName?: valueof string)
-```
-
-##### Target
-
 `Operation`
 
 ##### Parameters
 
-| Name                   | Type             | Description               |
-| ---------------------- | ---------------- | ------------------------- |
-| resourceType           | `Model`          | Resource                  |
-| parentTypeName         | `valueof string` | : Parent type name.       |
-| parentFriendlyTypeName | `valueof string` | Friendly name for parent. |
+None
 
 #### `@armResourceAction`
 

@@ -1,49 +1,50 @@
 import {
   BooleanLiteral,
+  createDiagnosticCollector,
   Diagnostic,
+  getDeprecationDetails,
+  getDoc,
+  getNamespaceFullName,
+  getSummary,
   Interface,
-  Model,
+  isNeverType,
+  isNullType,
+  isVoidType,
+  ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
   Value,
-  createDiagnosticCollector,
-  getDeprecationDetails,
-  getDoc,
-  getNamespaceFullName,
-  getSummary,
-  isNeverType,
-  isNullType,
-  isVoidType,
 } from "@typespec/compiler";
-import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
-  SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkModelType,
-  SdkParameter,
   SdkType,
-  SdkUnionType,
+  TCGCContext,
 } from "./interfaces.js";
-import { createDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
+  getDefaultApiVersion,
   getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
+
+export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
+export const clientNameKey = createStateSymbol("clientName");
 
 /**
  *
@@ -380,45 +381,6 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
 
-export interface TCGCContext {
-  program: Program;
-  emitterName: string;
-  generateProtocolMethods?: boolean;
-  generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
-  __rawClients?: SdkClient[];
-  apiVersion?: string;
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  originalProgram: Program;
-  decoratorsAllowList?: string[];
-}
-
-export function createTCGCContext(program: Program): TCGCContext {
-  return {
-    program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
-    originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-  };
-}
-
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
@@ -516,4 +478,51 @@ export function getAnyType(
     encode: "string",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
+}
+
+export function getHttpOperationResponseHeaders(
+  response: HttpOperationResponseContent
+): ModelProperty[] {
+  const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];
+  if (response.body?.contentTypeProperty) {
+    headers.push(response.body.contentTypeProperty);
+  }
+  return headers;
+}
+
+export function removeVersionsLargerThanExplicitlySpecified(
+  context: TCGCContext,
+  versions: { value: string | number }[]
+): void {
+  // filter with specific api version
+  if (
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    const index = versions.findIndex((version) => version.value === context.apiVersion);
+    if (index >= 0) {
+      versions.splice(index + 1, versions.length - index - 1);
+    }
+  }
+}
+
+export function filterApiVersionsInEnum(
+  context: TCGCContext,
+  client: SdkClient,
+  sdkVersionsEnum: SdkEnumType
+): void {
+  // if they explicitly set an api version, remove larger versions
+  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  const defaultApiVersion = getDefaultApiVersion(context, client.service);
+  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
+    );
+  }
+}
+
+export function isJsonContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
+  return regex.test(contentType);
 }

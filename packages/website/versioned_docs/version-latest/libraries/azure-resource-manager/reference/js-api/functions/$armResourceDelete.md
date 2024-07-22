@@ -13,7 +13,7 @@ function $armResourceDelete(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `resourceType` | `Model` |

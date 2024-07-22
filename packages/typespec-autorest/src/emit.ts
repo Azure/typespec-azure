@@ -1,4 +1,4 @@
-import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
@@ -91,6 +91,8 @@ export function resolveAutorestOptions(
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
     emitLroOptions: resolvedOptions["emit-lro-options"],
+    armResourceFlattening: resolvedOptions["arm-resource-flattening"],
+    emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
   };
 }
 
@@ -98,13 +100,7 @@ export async function getAllServicesAtAllVersions(
   program: Program,
   options: ResolvedAutorestEmitterOptions
 ): Promise<AutorestServiceRecord[]> {
-  const tcgcSdkContext = createSdkContext(
-    { program, options: {} } as any,
-    "@azure-tools/typespec-autorest",
-    {
-      versionStrategy: "ignore",
-    }
-  );
+  const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
 
   const services = listServices(program);
   if (services.length === 0) {

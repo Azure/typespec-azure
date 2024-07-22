@@ -13,7 +13,7 @@ function $pollingOperationParameter(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
 | `target`? | `ModelProperty` \| `StringLiteral` |

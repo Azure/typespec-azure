@@ -16,12 +16,13 @@ import {
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
+  shouldGenerateConvenient,
+  shouldGenerateProtocol,
 } from "./decorators.js";
 import { getCorrespondingMethodParams, getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
   SdkClient,
   SdkClientType,
-  SdkContext,
   SdkEndpointParameter,
   SdkEndpointType,
   SdkEnumType,
@@ -42,10 +43,10 @@ import {
   SdkServiceOperation,
   SdkServiceParameter,
   SdkType,
+  TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
-  TCGCContext,
   createGeneratedName,
   filterApiVersionsWithDecorators,
   getAllResponseBodiesAndNonBodyExists,
@@ -64,7 +65,6 @@ import {
   getCrossLanguageDefinitionId,
   getCrossLanguagePackageId,
   getDefaultApiVersion,
-  getEffectivePayloadType,
   getHttpOperationWithCache,
   getLibraryName,
 } from "./public-utils.js";
@@ -75,11 +75,8 @@ import {
   getSdkModelPropertyType,
 } from "./types.js";
 
-function getSdkServiceOperation<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   operation: Operation,
   methodParameters: SdkMethodParameter[]
 ): [TServiceOperation, readonly Diagnostic[]] {
@@ -100,33 +97,25 @@ function getSdkServiceOperation<
   );
   return diagnostics.wrap(undefined as any);
 }
-function getSdkLroPagingServiceMethod<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   operation: Operation
 ): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkLroServiceMethod<TOptions, TServiceOperation>(context, operation)),
-    ...diagnostics.pipe(getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, operation)),
+    ...diagnostics.pipe(getSdkLroServiceMethod<TServiceOperation>(context, operation)),
+    ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation)),
     kind: "lropaging",
   });
 }
 
-function getSdkPagingServiceMethod<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   operation: Operation
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const pagedMetadata = getPagedResult(context.program, operation)!;
-  const basic = diagnostics.pipe(
-    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
-  );
+  const basic = diagnostics.pipe(getSdkBasicServiceMethod<TServiceOperation>(context, operation));
   if (pagedMetadata.itemsProperty) {
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type)
@@ -140,7 +129,7 @@ function getSdkPagingServiceMethod<
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TOptions, TServiceOperation>(
+          getSdkServiceOperation<TServiceOperation>(
             context,
             pagedMetadata.nextLinkOperation,
             basic.parameters
@@ -153,17 +142,14 @@ function getSdkPagingServiceMethod<
   });
 }
 
-function getSdkLroServiceMethod<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   operation: Operation
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const metadata = getLroMetadata(context.program, operation)!;
   const basicServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation)
+    getSdkBasicServiceMethod<TServiceOperation>(context, operation)
   );
 
   if (metadata.finalResult === undefined || metadata.finalResult === "void") {
@@ -181,7 +167,7 @@ function getSdkLroServiceMethod<
     kind: "lro",
     __raw_lro_metadata: metadata,
     operation: diagnostics.pipe(
-      getSdkServiceOperation<TOptions, TServiceOperation>(
+      getSdkServiceOperation<TServiceOperation>(
         context,
         metadata.operation,
         basicServiceMethod.parameters
@@ -193,11 +179,8 @@ function getSdkLroServiceMethod<
   });
 }
 
-function getSdkMethodResponse<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkMethodResponse(
+  context: TCGCContext,
   operation: Operation,
   sdkOperation: SdkServiceOperation
 ): SdkMethodResponse {
@@ -217,7 +200,7 @@ function getSdkMethodResponse<
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
       decorators: [],
     };
-  } else if (responseTypes) {
+  } else if (responseTypes.size === 1) {
     type = allResponseBodies[0];
   }
   if (nonBodyExists && type) {
@@ -233,11 +216,8 @@ function getSdkMethodResponse<
   };
 }
 
-function getSdkBasicServiceMethod<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -249,42 +229,14 @@ function getSdkBasicServiceMethod<
     operation,
     getLocationOfOperation(operation)
   );
-  const httpOperation = getHttpOperationWithCache(context, operation);
-  const parameters = httpOperation.parameters;
-  // path/query/header parameters
-  for (const param of parameters.parameters) {
-    if (isNeverOrVoidType(param.param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param.param, operation)));
-  }
-  // body parameters
-  if (
-    parameters.body?.bodyKind !== "multipart" &&
-    parameters.body?.property &&
-    !isNeverOrVoidType(parameters.body.property.type)
-  ) {
-    methodParameters.push(
-      diagnostics.pipe(getSdkMethodParameter(context, parameters.body?.property, operation))
-    );
-  } else if (parameters.body && !isNeverOrVoidType(parameters.body.type)) {
-    if (parameters.body.type.kind === "Model") {
-      const type = getEffectivePayloadType(context, parameters.body.type);
-      // spread case
-      if (type.name === "") {
-        for (const prop of type.properties.values()) {
-          methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, prop, operation)));
-        }
-      } else {
-        methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, type, operation)));
-      }
-    } else {
-      methodParameters.push(
-        diagnostics.pipe(getSdkMethodParameter(context, parameters.body.type, operation))
-      );
-    }
+
+  for (const param of operation.parameters.properties.values()) {
+    if (isNeverOrVoidType(param.type)) continue;
+    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TOptions, TServiceOperation>(context, operation, methodParameters)
+    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters)
   );
   const response = getSdkMethodResponse(context, operation, serviceOperation);
   const name = getLibraryName(context, operation);
@@ -311,33 +263,29 @@ function getSdkBasicServiceMethod<
     },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
+    generateConvenient: shouldGenerateConvenient(context, operation),
+    generateProtocol: shouldGenerateProtocol(context, operation),
   });
 }
 
-function getSdkServiceMethod<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   operation: Operation
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
   const paging = getPagedResult(context.program, operation);
   if (lro && paging) {
-    return getSdkLroPagingServiceMethod<TOptions, TServiceOperation>(context, operation);
+    return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation);
   } else if (paging) {
-    return getSdkPagingServiceMethod<TOptions, TServiceOperation>(context, operation);
+    return getSdkPagingServiceMethod<TServiceOperation>(context, operation);
   } else if (lro) {
-    return getSdkLroServiceMethod<TOptions, TServiceOperation>(context, operation);
+    return getSdkLroServiceMethod<TServiceOperation>(context, operation);
   }
-  return getSdkBasicServiceMethod<TOptions, TServiceOperation>(context, operation);
+  return getSdkBasicServiceMethod<TServiceOperation>(context, operation);
 }
 
-function getClientDefaultApiVersion<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getClientDefaultApiVersion(
+  context: TCGCContext,
   client: SdkClient | SdkOperationGroup
 ): string | undefined {
   if (context.apiVersion && !["latest", "all"].includes(context.apiVersion)) {
@@ -351,11 +299,8 @@ function getClientDefaultApiVersion<
   return defaultVersion;
 }
 
-function getSdkInitializationType<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkInitializationType(
+  context: TCGCContext,
   client: SdkClient | SdkOperationGroup
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -435,20 +380,20 @@ function getSdkMethodParameter(
   });
 }
 
-function getSdkMethods<TOptions extends object, TServiceOperation extends SdkServiceOperation>(
-  context: SdkContext<TOptions, TServiceOperation>,
+function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   client: SdkClient | SdkOperationGroup
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInOperationGroup(context, client)) {
-    retval.push(
-      diagnostics.pipe(getSdkServiceMethod<TOptions, TServiceOperation>(context, operation))
-    );
+    retval.push(diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation)));
   }
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
-    const operationGroupClient = diagnostics.pipe(createSdkClientType(context, operationGroup));
+    const operationGroupClient = diagnostics.pipe(
+      createSdkClientType<TServiceOperation>(context, operationGroup)
+    );
     const name = `get${operationGroup.type.name}`;
     retval.push({
       kind: "clientaccessor",
@@ -555,18 +500,15 @@ function getSdkEndpointParameter(
   });
 }
 
-function createSdkClientType<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   client: SdkClient | SdkOperationGroup
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
   const clientName = isClient ? client.name : client.type.name;
   // NOTE: getSdkMethods recursively calls createSdkClientType
-  const methods = diagnostics.pipe(getSdkMethods(context, client));
+  const methods = diagnostics.pipe(getSdkMethods<TServiceOperation>(context, client));
   const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
@@ -576,9 +518,7 @@ function createSdkClientType<
     methods: methods,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    initialization: diagnostics.pipe(
-      getSdkInitializationType<TOptions, TServiceOperation>(context, client)
-    ), // MUST call this after getSdkMethods has been called
+    initialization: diagnostics.pipe(getSdkInitializationType(context, client)), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
@@ -586,7 +526,7 @@ function createSdkClientType<
   return diagnostics.wrap(sdkClientType);
 }
 
-function populateApiVersionInformation(context: SdkContext): void {
+function populateApiVersionInformation(context: TCGCContext): void {
   for (const client of listClients(context)) {
     let clientApiVersions = resolveVersions(context.program, client.service)
       .filter((x) => x.rootVersion)
@@ -617,10 +557,9 @@ function populateApiVersionInformation(context: SdkContext): void {
   }
 }
 
-export function getSdkPackage<
-  TOptions extends object,
-  TServiceOperation extends SdkServiceOperation,
->(context: SdkContext<TOptions, TServiceOperation>): SdkPackage<TServiceOperation> {
+export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext
+): SdkPackage<TServiceOperation> {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));

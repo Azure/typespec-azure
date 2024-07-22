@@ -13,7 +13,7 @@ function $armResourceRead(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `resourceType` | `Model` |

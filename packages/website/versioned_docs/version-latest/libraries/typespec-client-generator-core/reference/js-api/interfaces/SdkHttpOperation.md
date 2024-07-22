@@ -10,7 +10,7 @@ title: "[I] SdkHttpOperation"
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `__raw` | `HttpOperation` |
 | `bodyParam?` | [`SdkBodyParameter`](SdkBodyParameter.md) |
 | `exceptions` | `Map`<`number` \| `"*"` \| `HttpStatusCodeRange`, [`SdkHttpResponse`](SdkHttpResponse.md)\> |

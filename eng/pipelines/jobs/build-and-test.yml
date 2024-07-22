@@ -24,6 +24,9 @@ steps:
 
   - template: /eng/pipelines/templates/upload-coverage.yml
 
+  - script: pnpm run regen-samples
+    displayName: Regen samples
+
   - script: node eng/scripts/check-for-changed-files.js
     displayName: Check Git Status For Changed Files
 

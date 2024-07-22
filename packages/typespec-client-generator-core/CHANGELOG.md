@@ -1,5 +1,62 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.44.1
+
+### Bug Fixes
+
+- [#1186](https://github.com/Azure/typespec-azure/pull/1186) fix access and usage calculation for nested model/enum in spread model
+- [#1185](https://github.com/Azure/typespec-azure/pull/1185) fix idempotent issue for spread
+
+### Features
+
+- [#1119](https://github.com/Azure/typespec-azure/pull/1119) Report diagnostics on `@clientName` conflicts
+
+
+## 0.44.0
+
+### Bug Fixes
+
+- [#1142](https://github.com/Azure/typespec-azure/pull/1142) TCGC, Add description to `SdkHttpResponse`
+- [#1102](https://github.com/Azure/typespec-azure/pull/1102) Fixing typo
+- [#1157](https://github.com/Azure/typespec-azure/pull/1157) findContextPath need to handle nested operation group, also refine the logic for naming and composing cross language definition id
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1152](https://github.com/Azure/typespec-azure/pull/1152) add `.generateConvenient` and `.generateProtocol` for service methods. These booleans tell emitters whether to generate convenient and protocol versions for the method
+- [#1129](https://github.com/Azure/typespec-azure/pull/1129) add `UsageFlags.Json`. Will be set if a model is used with a JSON content type
+- [#1045](https://github.com/Azure/typespec-azure/pull/1045) filter api versions enum to only include GA versions if default value is GA
+
+### Breaking Changes
+
+- [#1078](https://github.com/Azure/typespec-azure/pull/1078) remove `experimental_` prefix from `sdkPackage`. Now it's just called `sdkPackage`.
+
+
+## 0.43.2
+
+### Bug Fixes
+
+- [#1120](https://github.com/Azure/typespec-azure/pull/1120) fix wrong client resolving from multiple call of context creation for versioning tsp
+- [#1067](https://github.com/Azure/typespec-azure/pull/1067) Unify casing of datetime spelling to `DateTime`. Change interface names to `SdkDateTimeType`, `SdkUtcDateTimeType`, and `SdkOffsetDateTimeType`
+- [#1113](https://github.com/Azure/typespec-azure/pull/1113) Add `Content-Type` to response headers
+- [#1135](https://github.com/Azure/typespec-azure/pull/1135) fix wrong handling for one variant union
+
+### Features
+
+- [#966](https://github.com/Azure/typespec-azure/pull/966) export decorators in allow list to all sdk types
+- [#1075](https://github.com/Azure/typespec-azure/pull/1075) Replace `tspNamespace` with `crossLanguageDefinitionId`.
+- Remove `tspNamespace` in `SdkEnumType`, `SdkModelType`, `SdkUnionType`, `SdkArrayType`.
+- Add `crossLanguageDefinitionId` to `SdkUnionType` and `SdkArrayType`.
+- [#1069](https://github.com/Azure/typespec-azure/pull/1069) Add `Error` usage to `UsageFlags`
+
+### Breaking Changes
+
+- [#886](https://github.com/Azure/typespec-azure/pull/886) always spread models and aliases with `...`
+
+
 ## 0.43.1
 
 ### Bug Fixes

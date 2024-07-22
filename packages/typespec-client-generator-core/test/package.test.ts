@@ -13,7 +13,9 @@ import {
   SdkPackage,
   SdkQueryParameter,
   SdkServiceMethod,
+  UsageFlags,
 } from "../src/interfaces.js";
+import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: package", () => {
@@ -65,7 +67,7 @@ describe("typespec-client-generator-core: package", () => {
         namespace Not.My.Package.Name;
       `);
 
-      strictEqual(runnerWithPackageName.context.experimental_sdkPackage.name, "My.Package.Name");
+      strictEqual(runnerWithPackageName.context.sdkPackage.name, "My.Package.Name");
     });
     it("from namespace", async () => {
       await runner.compile(`
@@ -74,7 +76,7 @@ describe("typespec-client-generator-core: package", () => {
         namespace My.Package.Name;
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.name, "My.Package.Name");
+      strictEqual(runner.context.sdkPackage.name, "My.Package.Name");
     });
   });
   describe("root namespace", () => {
@@ -85,7 +87,7 @@ describe("typespec-client-generator-core: package", () => {
         namespace My.Namespace;
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.rootNamespace, "My.Namespace");
+      strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
     });
 
     it("nested namespaces", async () => {
@@ -99,7 +101,7 @@ describe("typespec-client-generator-core: package", () => {
         namespace My.Namespace.Sub {};
       `);
 
-      strictEqual(runner.context.experimental_sdkPackage.rootNamespace, "My.Namespace");
+      strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
     });
   });
   describe("SdkClientType", () => {
@@ -109,7 +111,7 @@ describe("typespec-client-generator-core: package", () => {
         @service({})
         namespace NotMyClient;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       strictEqual(sdkPackage.clients[0].name, "MyClient");
       strictEqual(sdkPackage.clients[0].kind, "client");
@@ -120,7 +122,7 @@ describe("typespec-client-generator-core: package", () => {
         @service({})
         namespace My.Service;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -144,7 +146,7 @@ describe("typespec-client-generator-core: package", () => {
         @service({})
         namespace My.Service;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -183,7 +185,7 @@ describe("typespec-client-generator-core: package", () => {
           scopes: ["https://security.microsoft.com/.default"];
         }
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -228,7 +230,7 @@ describe("typespec-client-generator-core: package", () => {
           scopes: ["https://security.microsoft.com/.default"];
         }
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -287,7 +289,7 @@ describe("typespec-client-generator-core: package", () => {
         @service({})
         namespace My.Service;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -349,7 +351,7 @@ describe("typespec-client-generator-core: package", () => {
           v1_0: "v1.0",
         }
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -441,7 +443,7 @@ describe("typespec-client-generator-core: package", () => {
 
         op delete is Operations.ResourceDelete<User>;
       `);
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -510,7 +512,7 @@ describe("typespec-client-generator-core: package", () => {
 
         op delete is Operations.ResourceDelete<User>;
       `);
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
@@ -550,7 +552,7 @@ describe("typespec-client-generator-core: package", () => {
         @service({name: "ServiceTwo"})
         namespace My.Service.Two {};
       `);
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
       const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
       strictEqual(clientOne.nameSpace, "My.Service.One");
@@ -566,7 +568,7 @@ describe("typespec-client-generator-core: package", () => {
           op func(): void;
         }
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
@@ -609,7 +611,7 @@ describe("typespec-client-generator-core: package", () => {
           two(): void;
         }
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const mainClient = sdkPackage.clients[0];
@@ -703,7 +705,7 @@ describe("typespec-client-generator-core: package", () => {
         op withoutApiVersion(): OkResponse;
         `)
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const client = sdkPackage.clients[0];
@@ -732,7 +734,7 @@ describe("typespec-client-generator-core: package", () => {
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
         `)
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
 
@@ -777,7 +779,7 @@ describe("typespec-client-generator-core: package", () => {
       op withoutApiVersion(): OkResponse;
       `)
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const client = sdkPackage.clients[0];
@@ -807,7 +809,7 @@ describe("typespec-client-generator-core: package", () => {
         op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
       `)
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const client = sdkPackage.clients[0];
@@ -858,7 +860,7 @@ describe("typespec-client-generator-core: package", () => {
         op withPathApiVersion(@path apiVersion: string): OkResponse;
       `)
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const client = sdkPackage.clients[0];
@@ -906,7 +908,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@path path: string): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
@@ -951,7 +953,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@path path: string | null): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       const methodParam = method.parameters[0];
       strictEqual(methodParam.type.kind, "nullable");
@@ -974,7 +976,7 @@ describe("typespec-client-generator-core: package", () => {
         name: string;
       }
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "pathInModel");
       strictEqual(method.kind, "basic");
@@ -1011,7 +1013,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@header header: string): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
@@ -1054,7 +1056,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@header header: string | null): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       const methodParam = method.parameters[0];
       strictEqual(methodParam.type.kind, "nullable");
@@ -1071,7 +1073,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@header({format: "multi"}) header: string): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.kind, "basic");
 
@@ -1088,7 +1090,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@query query: string): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
@@ -1129,7 +1131,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@query query: string | null): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       const methodParam = method.parameters[0];
       strictEqual(methodParam.type.kind, "nullable");
@@ -1146,7 +1148,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op myOp(@query({format: "multi"}) query: string): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.kind, "basic");
 
@@ -1167,7 +1169,7 @@ describe("typespec-client-generator-core: package", () => {
 
         op myOp(@body body: Input): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.models[0].name, "Input");
@@ -1228,7 +1230,7 @@ describe("typespec-client-generator-core: package", () => {
 
         op myOp(@body body: Input | null): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       const methodBodyParam = method.parameters.find((x) => x.name === "body");
       ok(methodBodyParam);
@@ -1250,7 +1252,7 @@ describe("typespec-client-generator-core: package", () => {
 
         op myOp(@body body?: Input): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.models[0].name, "Input");
@@ -1314,39 +1316,46 @@ describe("typespec-client-generator-core: package", () => {
         op myOp(options: RequestOptions): void;
         `);
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.models.length, 1);
 
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 4);
+      strictEqual(method.parameters.length, 2);
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.name, "header");
+      strictEqual(methodParam.name, "options");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
+      strictEqual(methodParam.type.kind, "model");
+      strictEqual(methodParam.type.properties.length, 3);
+
+      const model = methodParam.type;
+      strictEqual(model.properties[0].kind, "header");
+      strictEqual(model.properties[0].name, "header");
+      strictEqual(model.properties[0].optional, false);
+      strictEqual(model.properties[0].onClient, false);
+      strictEqual(model.properties[0].isApiVersionParam, false);
+      strictEqual(model.properties[0].type.kind, "string");
+
+      strictEqual(model.properties[1].kind, "query");
+      strictEqual(model.properties[1].name, "query");
+      strictEqual(model.properties[1].optional, false);
+      strictEqual(model.properties[1].onClient, false);
+      strictEqual(model.properties[1].isApiVersionParam, false);
+      strictEqual(model.properties[1].type.kind, "string");
+
+      strictEqual(model.properties[2].kind, "body");
+      strictEqual(model.properties[2].name, "body");
+      strictEqual(model.properties[2].optional, false);
+      strictEqual(model.properties[2].onClient, false);
+      strictEqual(model.properties[2].isApiVersionParam, false);
+      strictEqual(model.properties[2].type.kind, "string");
 
       methodParam = method.parameters[1];
-      strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.name, "query");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
-
-      methodParam = method.parameters[2];
-      strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.name, "body");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "string");
-
-      methodParam = method.parameters[3];
       strictEqual(methodParam.kind, "method");
       strictEqual(methodParam.name, "contentType");
       strictEqual(methodParam.optional, false);
@@ -1386,7 +1395,7 @@ describe("typespec-client-generator-core: package", () => {
       await runner.compileWithBuiltInService(`
       @patch op patchNull(@body body: string): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "patchNull");
@@ -1430,7 +1439,7 @@ describe("typespec-client-generator-core: package", () => {
       }
       @post op default(@body body: DefaultDatetimeProperty): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
 
       strictEqual(method.parameters.length, 2);
@@ -1468,7 +1477,7 @@ describe("typespec-client-generator-core: package", () => {
       }
       @get op default(): DefaultDatetimeProperty;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
 
       strictEqual(method.parameters.length, 1);
@@ -1508,7 +1517,7 @@ describe("typespec-client-generator-core: package", () => {
         value: bytes;
       };
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
 
       strictEqual(method.parameters.length, 1);
@@ -1560,13 +1569,13 @@ describe("typespec-client-generator-core: package", () => {
         op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
       `)
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
 
       strictEqual(method.parameters.length, 4);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["apiVersion", "generationOptions", "contentType", "accept"]
+        ["apiVersion", "prompt", "contentType", "accept"]
       );
     });
 
@@ -1584,7 +1593,7 @@ describe("typespec-client-generator-core: package", () => {
         };
         op test is TestTemplate<void, void, void, void, void>;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.parameters.length, 0);
       strictEqual(method.response.type, undefined);
@@ -1606,7 +1615,7 @@ describe("typespec-client-generator-core: package", () => {
         @delete op delete(@path id: string): void | Error;
         `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "delete");
@@ -1641,7 +1650,7 @@ describe("typespec-client-generator-core: package", () => {
         @delete op delete(@path id: string): void | Error;
         `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "delete");
@@ -1684,9 +1693,9 @@ describe("typespec-client-generator-core: package", () => {
       @post op create(...Widget): Widget | Error;
       `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 2);
+      strictEqual(sdkPackage.models.length, 3);
       strictEqual(method.name, "create");
       const serviceResponses = method.operation.responses;
       strictEqual(serviceResponses.size, 1);
@@ -1719,15 +1728,15 @@ describe("typespec-client-generator-core: package", () => {
     it("Headers and body", async () => {
       await runner.compileWithBuiltInService(
         `
-      model Widget {
-        @header id: string;
-        weight: int32;
-      }
-
-      op operation(): Widget;
-      `
+        model Widget {
+          @header id: string;
+          weight: int32;
+        }
+  
+        op operation(): Widget;
+        `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "operation");
@@ -1745,13 +1754,9 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(createResponse.headers.length, 1);
       strictEqual(createResponse.headers[0].serializedName, "id");
-      strictEqual(
-        createResponse.type,
-        sdkPackage.models.find((x) => x.name === "Widget")
-      );
-      strictEqual(method.response.resultPath, undefined);
 
       strictEqual(method.response.kind, "method");
+      strictEqual(method.response.resultPath, undefined);
       const methodResponseType = method.response.type;
       ok(methodResponseType);
       strictEqual(
@@ -1772,7 +1777,7 @@ describe("typespec-client-generator-core: package", () => {
       op operation(): {@header id: string | null, @body body: Widget | null};
       `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       const serviceResponses = method.operation.responses;
 
@@ -1793,7 +1798,7 @@ describe("typespec-client-generator-core: package", () => {
       op operation(): Widget | NoContentResponse;
       `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       const serviceResponses = method.operation.responses;
 
@@ -1816,7 +1821,7 @@ describe("typespec-client-generator-core: package", () => {
         @delete op delete(@path id: string): NoContentResponse;
         `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "delete");
@@ -1874,24 +1879,26 @@ describe("typespec-client-generator-core: package", () => {
     it("vanilla widget create", async () => {
       await compileVanillaWidgetService(runner, "@post create(...Widget): Widget | Error;");
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "create");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 3);
+      strictEqual(method.parameters.length, 5);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["widget", "contentType", "accept"]
+        ["id", "weight", "color", "contentType", "accept"]
       );
 
       const bodyParameter = method.operation.bodyParam;
       ok(bodyParameter);
       strictEqual(bodyParameter.kind, "body");
-      strictEqual(bodyParameter.name, "widget");
+      strictEqual(bodyParameter.name, "createRequest");
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.name, "Widget");
+      strictEqual(bodyParameter.type.name, "CreateRequest");
+      strictEqual(bodyParameter.type.properties.length, 2);
+      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
 
       strictEqual(method.operation.parameters.length, 2);
 
@@ -1933,7 +1940,7 @@ describe("typespec-client-generator-core: package", () => {
     it("vanilla widget read", async () => {
       await compileVanillaWidgetService(runner, "@get read(@path id: string): Widget | Error;");
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "read");
       strictEqual(method.kind, "basic");
@@ -1979,11 +1986,11 @@ describe("typespec-client-generator-core: package", () => {
     it("vanilla widget update", async () => {
       await compileVanillaWidgetService(runner, "@patch update(...Widget): Widget | Error;");
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "update");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 4);
+      strictEqual(method.parameters.length, 5);
 
       let methodParam = method.parameters[0];
       strictEqual(methodParam.kind, "method");
@@ -1995,11 +2002,19 @@ describe("typespec-client-generator-core: package", () => {
 
       methodParam = method.parameters[1];
       strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.name, "widget");
+      strictEqual(methodParam.name, "weight");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "model");
+      strictEqual(methodParam.type.kind, "int32");
+
+      methodParam = method.parameters[2];
+      strictEqual(methodParam.kind, "method");
+      strictEqual(methodParam.name, "color");
+      strictEqual(methodParam.optional, false);
+      strictEqual(methodParam.onClient, false);
+      strictEqual(methodParam.isApiVersionParam, false);
+      strictEqual(methodParam.type.kind, "enum");
 
       const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(methodContentTypeParam);
@@ -2033,7 +2048,10 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.optional, false);
 
       strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type, sdkPackage.models.filter((m) => m.name === "Widget")[0]);
+      strictEqual(
+        bodyParameter.type,
+        sdkPackage.models.filter((m) => m.name === "UpdateRequest")[0]
+      );
 
       const headerParams = serviceOperation.parameters.filter(
         (x): x is SdkHeaderParameter => x.kind === "header"
@@ -2051,11 +2069,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationAcceptParam.optional, false);
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams.map((x) => x.name);
-      deepStrictEqual(correspondingMethodParams, ["widget"]);
-      deepStrictEqual(
-        bodyParameter.type.properties.map((p) => p.name),
-        ["id", "weight", "color"]
-      );
+      deepStrictEqual(correspondingMethodParams, ["weight", "color"]);
 
       strictEqual(operationContentTypeParam.correspondingMethodParams[0], methodContentTypeParam);
       strictEqual(operationAcceptParam.correspondingMethodParams[0], methodAcceptParam);
@@ -2063,7 +2077,7 @@ describe("typespec-client-generator-core: package", () => {
     it("vanilla widget delete", async () => {
       await compileVanillaWidgetService(runner, "@delete delete(@path id: string): void | Error;");
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "basic");
@@ -2096,7 +2110,7 @@ describe("typespec-client-generator-core: package", () => {
     it("vanilla widget list", async () => {
       await compileVanillaWidgetService(runner, "@get list(): Widget[] | Error;");
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "list");
       strictEqual(method.kind, "basic");
@@ -2304,7 +2318,7 @@ describe("typespec-client-generator-core: package", () => {
       getWidget is Operations.ResourceRead<Widget>;
       `
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       const parentClient = sdkPackage.clients.filter(
         (c) => c.initialization.access === "public"
       )[0];
@@ -2391,7 +2405,7 @@ describe("typespec-client-generator-core: package", () => {
       createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       const parentClient = sdkPackage.clients[0];
       const client = parentClient.methods.find((x) => x.kind === "clientaccessor")
@@ -2491,6 +2505,7 @@ describe("typespec-client-generator-core: package", () => {
           "apiVersion",
           "widgetName",
           "contentType",
+          "resource",
           "repeatabilityRequestId",
           "repeatabilityFirstSent",
           "ifMatch",
@@ -2498,7 +2513,6 @@ describe("typespec-client-generator-core: package", () => {
           "ifUnmodifiedSince",
           "ifModifiedSince",
           "clientRequestId",
-          "resource",
           "accept",
         ]
       );
@@ -2587,12 +2601,12 @@ describe("typespec-client-generator-core: package", () => {
         op delete is ResourceOperations.LongRunningResourceDelete<Widget>;
         `
       );
-      const method = getServiceMethodOfClient(runnerWithCore.context.experimental_sdkPackage);
+      const method = getServiceMethodOfClient(runnerWithCore.context.sdkPackage);
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
-      strictEqual(runnerWithCore.context.experimental_sdkPackage.models.length, 0);
-      strictEqual(runnerWithCore.context.experimental_sdkPackage.enums.length, 1);
+      strictEqual(runnerWithCore.context.sdkPackage.models.length, 0);
+      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -2607,7 +2621,7 @@ describe("typespec-client-generator-core: package", () => {
         listManufacturers is Operations.ResourceList<Manufacturer>;
       `
       );
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(sdkPackage.models[0].name, "Manufacturer");
@@ -2702,19 +2716,19 @@ describe("typespec-client-generator-core: package", () => {
 
         op myOp(...Input): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
 
-      const methodParam = method.parameters.find((x) => x.name === "input");
+      const methodParam = method.parameters.find((x) => x.name === "key");
       ok(methodParam);
       strictEqual(methodParam.kind, "method");
       strictEqual(methodParam.optional, false);
       strictEqual(methodParam.onClient, false);
       strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "model");
+      strictEqual(methodParam.type.kind, "string");
 
       const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
       ok(contentTypeParam);
@@ -2732,10 +2746,12 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams;
       strictEqual(correspondingMethodParams.length, 1);
-      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
+      strictEqual(correspondingMethodParams[0].name, "key");
     });
 
     it("alias with no decorators", async () => {
@@ -2749,9 +2765,10 @@ describe("typespec-client-generator-core: package", () => {
 
         op myOp(...BodyParameter): void;
         `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
       const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 0);
       strictEqual(method.name, "myOp");
       strictEqual(method.kind, "basic");
       strictEqual(method.parameters.length, 2);
@@ -2786,63 +2803,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.type.properties[0].name, correspondingMethodParams[0].name);
     });
 
-    it("spread with discriminate type with implicit property", async () => {
-      await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
-        namespace My.Service;
-
-        @discriminator("kind")
-        model Pet {
-          name?: string;
-        }
-
-        model Dog {
-          kind: "dog";
-        }
-
-        model Cat {
-          kind: "cat";
-        }
-
-        op test(...Pet): void;
-        `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(method.name, "test");
-      strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 2);
-
-      const methodParam = method.parameters.find((x) => x.name === "pet");
-      ok(methodParam);
-      strictEqual(methodParam.kind, "method");
-      strictEqual(methodParam.optional, false);
-      strictEqual(methodParam.onClient, false);
-      strictEqual(methodParam.isApiVersionParam, false);
-      strictEqual(methodParam.type.kind, "model");
-
-      const contentTypeMethodParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeMethodParam);
-      strictEqual(contentTypeMethodParam.clientDefaultValue, undefined);
-      strictEqual(contentTypeMethodParam.type.kind, "constant");
-
-      const serviceOperation = method.operation;
-      const bodyParameter = serviceOperation.bodyParam;
-      ok(bodyParameter);
-      strictEqual(bodyParameter.kind, "body");
-      deepStrictEqual(bodyParameter.contentTypes, ["application/json"]);
-      strictEqual(bodyParameter.defaultContentType, "application/json");
-      strictEqual(bodyParameter.onClient, false);
-      strictEqual(bodyParameter.optional, false);
-      strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.properties.length, 2);
-      strictEqual(bodyParameter.type.properties[0].name, "kind");
-      strictEqual(bodyParameter.type.properties[1].name, "name");
-
-      const correspondingMethodParams = bodyParameter.correspondingMethodParams;
-      strictEqual(correspondingMethodParams.length, 1);
-      strictEqual(bodyParameter.type, correspondingMethodParams[0].type);
-    });
     it("rest template spreading of multiple models", async () => {
       await runner.compile(`
       @service({
@@ -2876,7 +2836,7 @@ describe("typespec-client-generator-core: package", () => {
         extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
           ExtensionResourceList<Checkup, Pet, PetStoreError> {}
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.models.length, 4);
       deepStrictEqual(
         sdkPackage.models.map((x) => x.name).sort(),
@@ -2976,7 +2936,7 @@ describe("typespec-client-generator-core: package", () => {
           deleteDataConnection is Operations.ResourceDelete<DataConnection>;
         }
       `);
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.models.length, 2);
 
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
@@ -2985,18 +2945,16 @@ describe("typespec-client-generator-core: package", () => {
       const createOrReplace = client.methods[1];
       strictEqual(createOrReplace.kind, "basic");
       strictEqual(createOrReplace.name, "createOrReplaceDataConnection");
-      strictEqual(createOrReplace.parameters.length, 5);
+      strictEqual(createOrReplace.parameters.length, 6);
       ok(
         createOrReplace.parameters.find(
           (x) => x.name === "dataConnectionName" && x.type.kind === "string"
         )
       );
+      ok(createOrReplace.parameters.find((x) => x.name === "name" && x.type.kind === "string"));
       ok(
         createOrReplace.parameters.find(
-          (x) =>
-            x.name === "dataConnectionData" &&
-            x.type.kind === "model" &&
-            x.type.name === "DataConnectionData"
+          (x) => x.name === "frequencyOffset" && x.type.kind === "int32"
         )
       );
       ok(createOrReplace.parameters.find((x) => x.name === "contentType"));
@@ -3010,10 +2968,17 @@ describe("typespec-client-generator-core: package", () => {
       ok(opParams.find((x) => x.kind === "header" && x.serializedName === "Content-Type"));
       ok(opParams.find((x) => x.kind === "header" && x.serializedName === "Accept"));
       strictEqual(createOrReplace.operation.bodyParam?.type.kind, "model");
-      strictEqual(createOrReplace.operation.bodyParam?.type.name, "DataConnectionData");
+      strictEqual(
+        createOrReplace.operation.bodyParam?.type.name,
+        "CreateOrReplaceDataConnectionRequest"
+      );
       deepStrictEqual(
         createOrReplace.operation.bodyParam.correspondingMethodParams[0],
         createOrReplace.parameters[2]
+      );
+      deepStrictEqual(
+        createOrReplace.operation.bodyParam.correspondingMethodParams[1],
+        createOrReplace.parameters[3]
       );
       strictEqual(createOrReplace.operation.responses.size, 1);
       const response200 = createOrReplace.operation.responses.get(200);
@@ -3035,8 +3000,8 @@ describe("typespec-client-generator-core: package", () => {
         }
         op createShelf(...CreateShelfRequest): Shelf;
         `);
-      const method = getServiceMethodOfClient(runner.context.experimental_sdkPackage);
-      const models = runner.context.experimental_sdkPackage.models;
+      const method = getServiceMethodOfClient(runner.context.sdkPackage);
+      const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       const shelfModel = models.find((x) => x.name === "Shelf");
       ok(shelfModel);
@@ -3090,17 +3055,448 @@ describe("typespec-client-generator-core: package", () => {
       alias Intersected = DocumentTranslateContent & {};
       op test(...Intersected): void;
       `);
-      const method = getServiceMethodOfClient(runner.context.experimental_sdkPackage);
-      const documentMethodParam = method.parameters.find(
-        (x) => x.name === "documentTranslateContent"
-      );
+      const method = getServiceMethodOfClient(runner.context.sdkPackage);
+      const documentMethodParam = method.parameters.find((x) => x.name === "document");
       ok(documentMethodParam);
       strictEqual(documentMethodParam.kind, "method");
       const op = method.operation;
       ok(op.bodyParam);
       strictEqual(op.bodyParam.kind, "body");
-      strictEqual(op.bodyParam.name, "documentTranslateContent");
+      strictEqual(op.bodyParam.name, "testRequest");
       deepStrictEqual(op.bodyParam.correspondingMethodParams, [documentMethodParam]);
+    });
+
+    it("anonymous model with @body should not be spread", async () => {
+      await runner.compileWithBuiltInService(`
+        op test(@body body: {prop: string}): void;
+        `);
+      const method = getServiceMethodOfClient(runner.context.sdkPackage);
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      const model = models.find((x) => x.name === "TestRequest");
+      ok(model);
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
+
+      strictEqual(method.parameters.length, 2);
+      const param = method.parameters[0];
+      strictEqual(param.kind, "method");
+      strictEqual(param.name, "body");
+      strictEqual(param.optional, false);
+      strictEqual(param.isGeneratedName, false);
+      deepStrictEqual(param.type, model);
+      const contentTypeMethoParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethoParam);
+
+      const op = method.operation;
+      strictEqual(op.parameters.length, 1);
+      ok(
+        op.parameters.find(
+          (x) =>
+            x.kind === "header" &&
+            x.serializedName === "Content-Type" &&
+            x.correspondingMethodParams[0] === contentTypeMethoParam
+        )
+      );
+
+      const bodyParam = op.bodyParam;
+      ok(bodyParam);
+      strictEqual(bodyParam.kind, "body");
+      strictEqual(bodyParam.name, "body");
+      strictEqual(bodyParam.optional, false);
+      strictEqual(bodyParam.isGeneratedName, false);
+      deepStrictEqual(bodyParam.type, model);
+      deepStrictEqual(bodyParam.correspondingMethodParams[0].type, model);
+    });
+
+    it("anonymous model from spread with @bodyRoot should not be spread", async () => {
+      await runner.compileWithBuiltInService(`
+        model Test {
+          prop: string;
+        }
+        op test(@bodyRoot body: {...Test}): void;
+        `);
+      const method = getServiceMethodOfClient(runner.context.sdkPackage);
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      const model = models.find((x) => x.name === "TestRequest");
+      ok(model);
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
+
+      strictEqual(method.parameters.length, 2);
+      const param = method.parameters[0];
+      strictEqual(param.kind, "method");
+      strictEqual(param.name, "body");
+      strictEqual(param.optional, false);
+      strictEqual(param.isGeneratedName, false);
+      deepStrictEqual(param.type, model);
+      const contentTypeMethoParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeMethoParam);
+
+      const op = method.operation;
+      strictEqual(op.parameters.length, 1);
+      ok(
+        op.parameters.find(
+          (x) =>
+            x.kind === "header" &&
+            x.serializedName === "Content-Type" &&
+            x.correspondingMethodParams[0] === contentTypeMethoParam
+        )
+      );
+
+      const bodyParam = op.bodyParam;
+      ok(bodyParam);
+      strictEqual(bodyParam.kind, "body");
+      strictEqual(bodyParam.name, "body");
+      strictEqual(bodyParam.optional, false);
+      strictEqual(bodyParam.isGeneratedName, false);
+      deepStrictEqual(bodyParam.type, model);
+      deepStrictEqual(bodyParam.correspondingMethodParams[0].type, model);
+    });
+
+    it("implicit spread", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+        op myOp(a: string, b: string): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 3);
+
+      const a = method.parameters.find((x) => x.name === "a");
+      ok(a);
+      strictEqual(a.kind, "method");
+      strictEqual(a.optional, false);
+      strictEqual(a.onClient, false);
+      strictEqual(a.isApiVersionParam, false);
+      strictEqual(a.type.kind, "string");
+
+      const b = method.parameters.find((x) => x.name === "b");
+      ok(b);
+      strictEqual(b.kind, "method");
+      strictEqual(b.optional, false);
+      strictEqual(b.onClient, false);
+      strictEqual(b.isApiVersionParam, false);
+      strictEqual(b.type.kind, "string");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
+
+      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], a);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[1], b);
+    });
+
+    it("implicit spread with metadata", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+        op myOp(@header a: string, b: string): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 3);
+
+      const a = method.parameters.find((x) => x.name === "a");
+      ok(a);
+      strictEqual(a.kind, "method");
+      strictEqual(a.optional, false);
+      strictEqual(a.onClient, false);
+      strictEqual(a.isApiVersionParam, false);
+      strictEqual(a.type.kind, "string");
+
+      const b = method.parameters.find((x) => x.name === "b");
+      ok(b);
+      strictEqual(b.kind, "method");
+      strictEqual(b.optional, false);
+      strictEqual(b.onClient, false);
+      strictEqual(b.isApiVersionParam, false);
+      strictEqual(b.type.kind, "string");
+
+      const serviceOperation = method.operation;
+      const headerParameter = serviceOperation.parameters.find((p) => (p.name = "a"));
+      ok(headerParameter);
+      strictEqual(headerParameter.kind, "header");
+      strictEqual(headerParameter.onClient, false);
+      strictEqual(headerParameter.optional, false);
+      strictEqual(headerParameter.type.kind, "string");
+
+      strictEqual(headerParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(headerParameter.correspondingMethodParams[0], a);
+
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
+
+      strictEqual(bodyParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
+    });
+
+    it("explicit spread", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+        model Test {
+          a: string;
+          b: string;
+        }
+        op myOp(...Test): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 3);
+
+      const a = method.parameters.find((x) => x.name === "a");
+      ok(a);
+      strictEqual(a.kind, "method");
+      strictEqual(a.optional, false);
+      strictEqual(a.onClient, false);
+      strictEqual(a.isApiVersionParam, false);
+      strictEqual(a.type.kind, "string");
+
+      const b = method.parameters.find((x) => x.name === "b");
+      ok(b);
+      strictEqual(b.kind, "method");
+      strictEqual(b.optional, false);
+      strictEqual(b.onClient, false);
+      strictEqual(b.isApiVersionParam, false);
+      strictEqual(b.type.kind, "string");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
+
+      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], a);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[1], b);
+    });
+
+    it("explicit spread with metadata", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+        model Test {
+          @header
+          a: string;
+          b: string;
+        }
+        op myOp(...Test): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 3);
+
+      const a = method.parameters.find((x) => x.name === "a");
+      ok(a);
+      strictEqual(a.kind, "method");
+      strictEqual(a.optional, false);
+      strictEqual(a.onClient, false);
+      strictEqual(a.isApiVersionParam, false);
+      strictEqual(a.type.kind, "string");
+
+      const b = method.parameters.find((x) => x.name === "b");
+      ok(b);
+      strictEqual(b.kind, "method");
+      strictEqual(b.optional, false);
+      strictEqual(b.onClient, false);
+      strictEqual(b.isApiVersionParam, false);
+      strictEqual(b.type.kind, "string");
+
+      const serviceOperation = method.operation;
+      const headerParameter = serviceOperation.parameters.find((p) => (p.name = "a"));
+      ok(headerParameter);
+      strictEqual(headerParameter.kind, "header");
+      strictEqual(headerParameter.onClient, false);
+      strictEqual(headerParameter.optional, false);
+      strictEqual(headerParameter.type.kind, "string");
+
+      strictEqual(headerParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(headerParameter.correspondingMethodParams[0], a);
+
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
+
+      strictEqual(bodyParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
+    });
+
+    it("explicit multiple spread", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+        model Test1 {
+          a: string;
+          
+        }
+
+        model Test2 {
+          b: string;
+        }
+        op myOp(...Test1, ...Test2): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 3);
+
+      const a = method.parameters.find((x) => x.name === "a");
+      ok(a);
+      strictEqual(a.kind, "method");
+      strictEqual(a.optional, false);
+      strictEqual(a.onClient, false);
+      strictEqual(a.isApiVersionParam, false);
+      strictEqual(a.type.kind, "string");
+
+      const b = method.parameters.find((x) => x.name === "b");
+      ok(b);
+      strictEqual(b.kind, "method");
+      strictEqual(b.optional, false);
+      strictEqual(b.onClient, false);
+      strictEqual(b.isApiVersionParam, false);
+      strictEqual(b.type.kind, "string");
+
+      const serviceOperation = method.operation;
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
+
+      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], a);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[1], b);
+    });
+
+    it("explicit multiple spread with metadata", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+        model Test1 {
+          @header
+          a: string;
+        }
+        model Test2 {
+          b: string;
+        }
+        op myOp(...Test1, ...Test2): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "myOp");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 3);
+
+      const a = method.parameters.find((x) => x.name === "a");
+      ok(a);
+      strictEqual(a.kind, "method");
+      strictEqual(a.optional, false);
+      strictEqual(a.onClient, false);
+      strictEqual(a.isApiVersionParam, false);
+      strictEqual(a.type.kind, "string");
+
+      const b = method.parameters.find((x) => x.name === "b");
+      ok(b);
+      strictEqual(b.kind, "method");
+      strictEqual(b.optional, false);
+      strictEqual(b.onClient, false);
+      strictEqual(b.isApiVersionParam, false);
+      strictEqual(b.type.kind, "string");
+
+      const serviceOperation = method.operation;
+      const headerParameter = serviceOperation.parameters.find((p) => (p.name = "a"));
+      ok(headerParameter);
+      strictEqual(headerParameter.kind, "header");
+      strictEqual(headerParameter.onClient, false);
+      strictEqual(headerParameter.optional, false);
+      strictEqual(headerParameter.type.kind, "string");
+
+      strictEqual(headerParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(headerParameter.correspondingMethodParams[0], a);
+
+      const bodyParameter = serviceOperation.bodyParam;
+      ok(bodyParameter);
+
+      strictEqual(bodyParameter.kind, "body");
+      strictEqual(bodyParameter.onClient, false);
+      strictEqual(bodyParameter.optional, false);
+      strictEqual(bodyParameter.type, sdkPackage.models[0]);
+      strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
+      strictEqual(bodyParameter.type.access, "internal");
+
+      strictEqual(bodyParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
+    });
+
+    it("spread idempotent", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+          alias FooAlias = {
+              @path id: string;
+              @doc("name of the Foo")
+              name: string;
+          };
+          op test(...FooAlias): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+      getAllModels(runner.context);
+
+      strictEqual(sdkPackage.models[0].name, "TestRequest");
+      strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Json);
     });
   });
   describe("versioning", () => {
@@ -3116,7 +3512,7 @@ describe("typespec-client-generator-core: package", () => {
 
       op getPet(...ApiVersionParam): void;
       `);
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.operation.parameters.length, 1);
       const apiVersionParam = method.operation.parameters[0];
@@ -3148,7 +3544,7 @@ describe("typespec-client-generator-core: package", () => {
         }      
       `);
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       strictEqual(client.methods[0].parameters[0].clientDefaultValue, "v2");
@@ -3175,7 +3571,7 @@ describe("typespec-client-generator-core: package", () => {
         }      
       `);
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
     });
     it("add method", async () => {
@@ -3186,7 +3582,7 @@ describe("typespec-client-generator-core: package", () => {
       op v2(@header headerV2: string): void;
       `);
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.kind, "basic");
@@ -3210,7 +3606,7 @@ describe("typespec-client-generator-core: package", () => {
       op v1(@added(Versions.v2) @header headerV2: string): void;
       `);
 
-      const sdkPackage = runner.context.experimental_sdkPackage;
+      const sdkPackage = runner.context.sdkPackage;
       deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.kind, "basic");
@@ -3274,7 +3670,7 @@ describe("typespec-client-generator-core: package", () => {
           name?: string;
         }
       `);
-      const sdkPackage = runnerWithCore.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.models.length, 0);
       strictEqual(sdkPackage.enums.length, 1);
     });

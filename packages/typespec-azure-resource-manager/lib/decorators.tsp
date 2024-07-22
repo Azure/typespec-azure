@@ -113,25 +113,12 @@ extern dec extensionResource(target: Model);
  * property to the type of the Azure Resource Manager resource.
  * @param resource The resource to get the type of
  */
-extern dec armProviderNameValue(target: Operation | Model);
+extern dec armProviderNameValue(target: Operation);
 
 /**
  * Marks the operation as being a collection action
  */
 extern dec armResourceCollectionAction(target: Operation);
-
-/**
- * Marks the operation as being a collection action
- * @param resourceType Resource
- * @param parentTypeName: Parent type name.
- * @param parentFriendlyTypeName Friendly name for parent.
- */
-extern dec armRenameListByOperation(
-  target: Operation,
-  resourceType: Model,
-  parentTypeName?: valueof string,
-  parentFriendlyTypeName?: valueof string
-);
 
 /**
  * @param resourceType Resource model

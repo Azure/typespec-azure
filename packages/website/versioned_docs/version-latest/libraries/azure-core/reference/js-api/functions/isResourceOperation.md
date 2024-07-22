@@ -10,7 +10,7 @@ function isResourceOperation(program, operation): boolean
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `operation` | `Operation` |
 
