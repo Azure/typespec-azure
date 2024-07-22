@@ -16,12 +16,13 @@ import {
   UnionVariant,
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
-import { getClientNameOverride } from "./decorators.js";
-import { AllScopes, clientNameKey, createTCGCContext, TCGCContext } from "./internal-utils.js";
+import { createTCGCContext, getClientNameOverride } from "./decorators.js";
+import { TCGCContext } from "./interfaces.js";
+import { AllScopes, clientNameKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 export function $onValidate(program: Program) {
-  const tcgcContext = createTCGCContext(program);
+  const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core");
   const languageScopes = getDefinedLanguageScopes(program);
   for (const scope of languageScopes) {
     validateClientNamesPerNamespace(tcgcContext, scope, program.getGlobalNamespaceType());
@@ -55,6 +56,11 @@ function validateClientNamesPerNamespace(
 
   // Check for duplicate client names for operations
   validateClientNamesCore(tcgcContext, scope, namespace.operations.values());
+
+  // check for duplicate client names for operations in interfaces
+  for (const item of namespace.interfaces.values()) {
+    validateClientNamesCore(tcgcContext, scope, item.operations.values());
+  }
 
   // Check for duplicate client names for interfaces
   validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
