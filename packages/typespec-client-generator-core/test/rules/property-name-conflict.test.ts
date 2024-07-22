@@ -4,15 +4,19 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
+import { propertyNameConflictRule } from "../../src/rules/property-name-conflict.rule.js";
 import { createSdkTestRunner } from "../test-host.js";
-import { propertyNameConflictRule } from "../../src/rules/property-name-conflict.js";
 
 let runner: BasicTestRunner;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await createSdkTestRunner();
-  tester = createLinterRuleTester(runner, propertyNameConflictRule, "@azure-tools/typespec-azure-core");
+  tester = createLinterRuleTester(
+    runner,
+    propertyNameConflictRule,
+    "@azure-tools/typespec-azure-core"
+  );
 });
 
 it("emit warning if property name conflicts with model name", async () => {

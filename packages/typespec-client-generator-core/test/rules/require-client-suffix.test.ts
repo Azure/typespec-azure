@@ -5,14 +5,14 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
-import { createTcgcTestRunner } from "../test-host.js";
+import { createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: require-client-suffix", () => {
   let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createTcgcTestRunner();
+    runner = await createSdkTestRunner();
     tester = createLinterRuleTester(
       runner,
       requireClientSuffixRule,

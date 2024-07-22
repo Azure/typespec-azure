@@ -11,11 +11,10 @@ The process for adding a rule starts off the same for both: for language-specifi
 
 1. Write the rule in `typespec-azure/packages/typespec-client-generator-core/src/rules/[rule-name].rule.ts
 2. Add reference to the rule in the `rules` array in [`typespec-azure/packages/typespec-client-generator-core/src/linter.ts`][tcgc-linter]
-    - This will automatically add it to a ruleset called `:all` for `@azure-tools/typespec-client-generator-core`
+   - This will automatically add it to a ruleset called `:all` for `@azure-tools/typespec-client-generator-core`
 3. Add the rule to the enable list for [`data-plane.ts`][data-plane-ruleset] and/or [`resource-manager.ts`][resource-manager-ruleset] in the [rulesets][rulesets] package. You can set `enable` to `false` here, if you want to delay enabling
 
-**If you are adding a language-specific rule**, you will also need this extra step
-4. Add reference to the rule in the `[language]Rules` array in [`typespec-azure/packages/typespec-client-generator-core/src/linter.ts`][tcgc-linter]
+**If you are adding a language-specific rule**, you will also need this extra step 4. Add reference to the rule in the `[language]Rules` array in [`typespec-azure/packages/typespec-client-generator-core/src/linter.ts`][tcgc-linter]
 
 For Azure generations then, all rules, including all language-specific rules, will be run on the specs.
 For unbranded generations, since we've added the rules into specific `best-practices:[language]` rulesets, you can explicitly specify a subset of rules in your `tsp-config.yaml`, i.e. if I only want Python best-practices, I could add this in my `tsp-config.yaml`:
@@ -25,7 +24,6 @@ linter:
   extends:
     - best-practices: python
 ```
-
 
 Finally, we recommend that every warning or error you throw in your language emitter has a corresponding warning in TCGC. This is part of our shift-left policy, so tsp authors can catch these potential pitfalls earlier in the process.
 
