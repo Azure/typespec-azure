@@ -13,6 +13,7 @@ import { resolveVersions } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import {
   getAccess,
+  getClientNameOverride,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -536,13 +537,18 @@ function createSdkClientType<
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
-  const clientName = isClient ? client.name : client.type.name;
+  let name = "";
+  if (isClient) {
+    name = client.name;
+  } else {
+    name = getClientNameOverride(context, client.type) ?? client.type.name;
+  }
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods(context, client));
   const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
-    name: clientName,
+    name,
     description: docWrapper.description,
     details: docWrapper.details,
     methods: methods,
