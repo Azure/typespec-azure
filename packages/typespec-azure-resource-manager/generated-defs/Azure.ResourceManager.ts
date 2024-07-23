@@ -1,6 +1,7 @@
 import type {
   DecoratorContext,
   EnumMember,
+  EnumValue,
   Interface,
   Model,
   Namespace,
@@ -237,7 +238,7 @@ export type ArmResourceOperationsDecorator = (
 export type ArmCommonTypesVersionDecorator = (
   context: DecoratorContext,
   target: Namespace | EnumMember,
-  version: string | unknown
+  version: string | EnumValue
 ) => void;
 
 /**

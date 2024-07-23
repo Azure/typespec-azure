@@ -479,6 +479,11 @@ Supported versions of Azure.Core TypeSpec building blocks.
 enum Azure.Core.Versions
 ```
 
+| Name           | Value             | Description           |
+| -------------- | ----------------- | --------------------- |
+| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
+| v1_0_Preview_2 | `"1.0-preview.2"` | Version 1.0-preview.2 |
+
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 
 ```typespec
@@ -1231,6 +1236,16 @@ Enumerates the standard trait contexts for Azure.Core operations.
 enum Azure.Core.Traits.TraitContext
 ```
 
+| Name      | Value | Description                                                                                    |
+| --------- | ----- | ---------------------------------------------------------------------------------------------- |
+| Read      |       | Trait is applicable for resource 'read' operations.                                            |
+| Create    |       | Trait is applicable for resource 'create' operations.                                          |
+| Update    |       | Trait is applicable for resource 'update' operations.                                          |
+| Delete    |       | Trait is applicable for resource 'delete' operations.                                          |
+| List      |       | Trait is applicable for resource 'list' operations.                                            |
+| Action    |       | Trait is applicable for resource actions.                                                      |
+| Undefined |       | Only traits that did not specify a trait context (and therefore always apply) will be exposed. |
+
 ### `TraitLocation` {#Azure.Core.Traits.TraitLocation}
 
 Enumerates the standard trait locations for Azure.Core operations.
@@ -1238,3 +1253,9 @@ Enumerates the standard trait locations for Azure.Core operations.
 ```typespec
 enum Azure.Core.Traits.TraitLocation
 ```
+
+| Name                | Value | Description                                               |
+| ------------------- | ----- | --------------------------------------------------------- |
+| Parameters          |       | Identifies operation parameters as the trait target.      |
+| Response            |       | Identifies operation response as the trait target.        |
+| ApiVersionParameter |       | Identifies the API version parameter as the trait target. |
