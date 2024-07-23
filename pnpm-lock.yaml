@@ -22,8 +22,8 @@ importers:
         specifier: ^0.4.1
         version: 0.4.1
       '@eslint/js':
-        specifier: ^9.7.0
-        version: 9.7.0
+        specifier: ^8.57.0
+        version: 8.57.0
       '@pnpm/find-workspace-packages':
         specifier: ^6.0.9
         version: 6.0.9(@pnpm/logger@5.0.0)
@@ -91,8 +91,8 @@ importers:
         specifier: ^0.4.1
         version: 0.4.1
       '@eslint/js':
-        specifier: ^9.7.0
-        version: 9.7.0
+        specifier: ^8.57.0
+        version: 8.57.0
       '@octokit/core':
         specifier: ^6.1.2
         version: 6.1.2
