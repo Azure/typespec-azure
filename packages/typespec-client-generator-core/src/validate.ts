@@ -56,6 +56,11 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for operations
   validateClientNamesCore(tcgcContext, scope, namespace.operations.values());
 
+  // check for duplicate client names for operations in interfaces
+  for (const item of namespace.interfaces.values()) {
+    validateClientNamesCore(tcgcContext, scope, item.operations.values());
+  }
+
   // Check for duplicate client names for interfaces
   validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
 
