@@ -39,7 +39,7 @@ import {
   SdkType,
   SdkUnionType,
 } from "./interfaces.js";
-import { createDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
@@ -47,6 +47,11 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
+
+export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
+export const clientNameKey = createStateSymbol("clientName");
 
 /**
  *
@@ -298,7 +303,7 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
-            getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
           );
         }
         retval.push(decoratorInfo);
@@ -309,6 +314,7 @@ export function getTypeDecorators(
 }
 
 function getDecoratorArgValue(
+  context: TCGCContext,
   arg:
     | Type
     | Record<string, unknown>
@@ -325,7 +331,7 @@ function getDecoratorArgValue(
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
     if (arg.kind === "EnumMember") {
-      return diagnostics.wrap(arg.value ?? arg.name);
+      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
     if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
       return diagnostics.wrap(arg.value);
@@ -521,7 +527,9 @@ export function getAnyType(
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
     kind: "any",
+    name: "any",
     encode: "string",
+    crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
 }
@@ -581,5 +589,10 @@ export function filterApiVersionsInEnum(
 
 export function isJsonContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
+  return regex.test(contentType);
+}
+
+export function isXmlContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
   return regex.test(contentType);
 }

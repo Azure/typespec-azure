@@ -15,6 +15,7 @@ import {
   SdkServiceMethod,
   UsageFlags,
 } from "../src/interfaces.js";
+import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: package", () => {
@@ -2693,6 +2694,12 @@ describe("typespec-client-generator-core: package", () => {
       ok(nextLinkProperty);
       strictEqual(nextLinkProperty.kind, "property");
       strictEqual(nextLinkProperty.type.kind, "url");
+      strictEqual(nextLinkProperty.type.name, "ResourceLocation");
+      strictEqual(
+        nextLinkProperty.type.crossLanguageDefinitionId,
+        "TypeSpec.Rest.ResourceLocation"
+      );
+      strictEqual(nextLinkProperty.type.baseType?.kind, "url");
       strictEqual(nextLinkProperty.serializedName, "nextLink");
       strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
@@ -2703,6 +2710,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
+
   describe("spread", () => {
     it("plain model with no decorators", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
@@ -3477,6 +3485,25 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(bodyParameter.correspondingMethodParams.length, 1);
       deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
+    });
+
+    it("spread idempotent", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+        @service({})
+        namespace My.Service;
+          alias FooAlias = {
+              @path id: string;
+              @doc("name of the Foo")
+              name: string;
+          };
+          op test(...FooAlias): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.models.length, 1);
+      getAllModels(runner.context);
+
+      strictEqual(sdkPackage.models[0].name, "TestRequest");
+      strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Json);
     });
   });
   describe("versioning", () => {
