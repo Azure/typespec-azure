@@ -43,7 +43,7 @@ op GetModel is ResourceRead<InputModel>;
 class InputModel:
   name: str = rest_field(readonly=True)
 
-response: InputModel = client.get(name="name")
+response: InputModel = client.get_model(name="name")
 ```
 
 </TabItem>
