@@ -2566,6 +2566,34 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "decorator-wrong-target",
       });
     });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+
+          @test
+          @route("/func1")
+          op func1(@body body: Model1): void;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
+      });
+    });
   });
 
   describe("@clientName", () => {

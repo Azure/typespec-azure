@@ -166,6 +166,12 @@ export const $lib = createTypeSpecLibrary({
         nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
       },
     },
+    "flatten-polymorphism": {
+      severity: "error",
+      messages: {
+        default: `Flattening polymorphic types is not supported.`,
+      },
+    },
   },
 });
 
