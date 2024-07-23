@@ -127,8 +127,8 @@ export interface SdkBuiltInType extends SdkTypeBase {
 
 type TypeEquality<T, U> = keyof T extends keyof U
   ? keyof U extends keyof T
-    ? true
-    : false
+  ? true
+  : false
   : false;
 
 // these two vars are used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
@@ -482,7 +482,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   description?: string;
 }
 
-interface SdkServiceOperationBase {}
+interface SdkServiceOperationBase { }
 
 export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
@@ -548,7 +548,7 @@ interface SdkPagingServiceMethodOptions {
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+  SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
@@ -558,14 +558,14 @@ interface SdkLroServiceMethodOptions {
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions {
+  SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+  SdkLroServiceMethodOptions,
+  SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
@@ -646,7 +646,7 @@ export interface SdkHttpParameterExample {
 export interface SdkHttpResponseExample {
   response: SdkHttpResponse;
   headers: SdkHttpResponseHeaderExample[];
-  value?: SdkTypeExample;
+  bodyValue?: SdkTypeExample;
 }
 
 export interface SdkHttpResponseHeaderExample {
@@ -673,13 +673,13 @@ export interface SdkExampleTypeBase {
 
 export interface SdkStringExample extends SdkExampleTypeBase {
   kind: "string";
-  type: SdkBuiltInType | SdkDateTimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  type: SdkBuiltInType | SdkDateTimeType | SdkDurationType | SdkEnumType | SdkEnumValueType | SdkConstantType;
   value: string;
 }
 
 export interface SdkNumberExample extends SdkExampleTypeBase {
   kind: "number";
-  type: SdkBuiltInType | SdkDateTimeType | SdkDurationType | SdkEnumType | SdkConstantType;
+  type: SdkBuiltInType | SdkDateTimeType | SdkDurationType | SdkEnumType | SdkEnumValueType | SdkConstantType;
   value: number;
 }
 
@@ -723,5 +723,5 @@ export interface SdkModelExample extends SdkExampleTypeBase {
   kind: "model";
   type: SdkModelType;
   value: Record<string, SdkTypeExample>;
-  additionalProperties?: Record<string, SdkTypeExample>;
+  additionalPropertiesValue?: Record<string, SdkTypeExample>;
 }

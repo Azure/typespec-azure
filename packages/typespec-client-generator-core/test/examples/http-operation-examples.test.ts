@@ -160,17 +160,17 @@ describe("typespec-client-generator-core: http operation examples", () => {
     const okResponse = operation.examples[0].responses.get(200);
     ok(okResponse);
     deepStrictEqual(okResponse.response, operation.responses.get(200));
-    ok(okResponse.value);
+    ok(okResponse.bodyValue);
 
-    strictEqual(okResponse.value.kind, "string");
-    strictEqual(okResponse.value.value, "test");
-    strictEqual(okResponse.value.type.kind, "string");
+    strictEqual(okResponse.bodyValue.kind, "string");
+    strictEqual(okResponse.bodyValue.value, "test");
+    strictEqual(okResponse.bodyValue.type.kind, "string");
 
     const createdResponse = operation.examples[0].responses.get(201);
     ok(createdResponse);
     deepStrictEqual(createdResponse.response, operation.responses.get(201));
 
-    strictEqual(createdResponse.value, undefined);
+    strictEqual(createdResponse.bodyValue, undefined);
     strictEqual(createdResponse.headers.length, 1);
 
     deepStrictEqual(createdResponse.headers[0].header, operation.responses.get(201)?.headers[0]);
@@ -215,7 +215,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(createdResponse);
     deepStrictEqual(createdResponse.response, operation.responses.get(201));
 
-    strictEqual(createdResponse.value, undefined);
+    strictEqual(createdResponse.bodyValue, undefined);
     strictEqual(createdResponse.headers.length, 0);
 
     expectDiagnostics(runner.context.diagnostics, [

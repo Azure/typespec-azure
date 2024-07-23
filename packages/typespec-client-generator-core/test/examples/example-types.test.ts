@@ -37,9 +37,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "test");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "test");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "string");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -61,7 +61,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getStringDiagnostic.json' does not follow its definition:\n123`,
@@ -85,9 +85,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "test");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "constant");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "test");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "constant");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -109,7 +109,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getStringFromConstantDiagnostic.json' does not follow its definition:\n123`,
@@ -136,9 +136,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "one");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "enum");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "one");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "enum");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -163,7 +163,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getStringFromEnumDiagnostic.json' does not follow its definition:\n"four"`,
@@ -190,9 +190,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "one");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "enumvalue");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "one");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "enumvalue");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -217,7 +217,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getStringFromEnumValueDiagnostic.json' does not follow its definition:\n"four"`,
@@ -241,11 +241,11 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "2022-08-26T18:38:00.000Z");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "utcDateTime");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "2022-08-26T18:38:00.000Z");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "utcDateTime");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkDateTimeType).wireType.kind,
+      (operation.examples[0].responses.get(200)?.bodyValue?.type as SdkDateTimeType).wireType.kind,
       "string"
     );
 
@@ -269,11 +269,11 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "P40D");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "duration");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "P40D");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "duration");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkDurationType).wireType.kind,
+      (operation.examples[0].responses.get(200)?.bodyValue?.type as SdkDurationType).wireType.kind,
       "string"
     );
 
@@ -297,9 +297,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "number");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, 31.752);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "float32");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "number");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, 31.752);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "float32");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -321,7 +321,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getNumberDiagnostic.json' does not follow its definition:\n"123"`,
@@ -348,11 +348,11 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "number");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, 1686566864);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "utcDateTime");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "number");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, 1686566864);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "utcDateTime");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkDateTimeType).wireType.kind,
+      (operation.examples[0].responses.get(200)?.bodyValue?.type as SdkDateTimeType).wireType.kind,
       "int64"
     );
 
@@ -379,11 +379,11 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "number");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, 62.525);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "duration");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "number");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, 62.525);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "duration");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkDurationType).wireType.kind,
+      (operation.examples[0].responses.get(200)?.bodyValue?.type as SdkDurationType).wireType.kind,
       "float"
     );
 
@@ -407,9 +407,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "boolean");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, true);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "boolean");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "boolean");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, true);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "boolean");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -431,7 +431,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getBooleanDiagnostic.json' does not follow its definition:\n123`,
@@ -455,11 +455,11 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "null");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, null);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "nullable");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "null");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, null);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "nullable");
     strictEqual(
-      (operation.examples[0].responses.get(200)?.value?.type as SdkNullableType).type.kind,
+      (operation.examples[0].responses.get(200)?.bodyValue?.type as SdkNullableType).type.kind,
       "string"
     );
 
@@ -483,8 +483,8 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "any");
-    deepStrictEqual(operation.examples[0].responses.get(200)?.value?.value, { test: 123 });
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "any");
+    deepStrictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, { test: 123 });
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
@@ -506,9 +506,9 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value?.kind, "union");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.value, "test");
-    strictEqual(operation.examples[0].responses.get(200)?.value?.type.kind, "union");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "union");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "test");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "union");
   });
 
   it("SdkArrayExample", async () => {
@@ -528,7 +528,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    const example = operation.examples[0].responses.get(200)?.value;
+    const example = operation.examples[0].responses.get(200)?.bodyValue;
     ok(example);
     strictEqual(example.kind, "array");
     strictEqual(example.value.length, 3);
@@ -564,7 +564,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getArrayDiagnostic.json' does not follow its definition:\n"test"`,
@@ -588,7 +588,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    const example = operation.examples[0].responses.get(200)?.value;
+    const example = operation.examples[0].responses.get(200)?.bodyValue;
     ok(example);
     strictEqual(example.kind, "dict");
     strictEqual(Object.keys(example.value).length, 3);
@@ -622,7 +622,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getDictionaryDiagnostic.json' does not follow its definition:\n"test"`,
@@ -651,7 +651,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    const example = operation.examples[0].responses.get(200)?.value;
+    const example = operation.examples[0].responses.get(200)?.bodyValue;
     ok(example);
     strictEqual(example.kind, "model");
     strictEqual(example.type.kind, "model");
@@ -739,7 +739,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    const example = operation.examples[0].responses.get(200)?.value;
+    const example = operation.examples[0].responses.get(200)?.bodyValue;
     ok(example);
     strictEqual(example.kind, "model");
     strictEqual(example.type.kind, "model");
@@ -831,7 +831,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.value, undefined);
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue, undefined);
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getModelDiscriminatorDiagnostic.json' does not follow its definition:\n{"kind":"shark","sharktype":"test","age":2}`,
@@ -862,7 +862,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    const example = operation.examples[0].responses.get(200)?.value;
+    const example = operation.examples[0].responses.get(200)?.bodyValue;
     ok(example);
     strictEqual(example.kind, "model");
     strictEqual(example.type.kind, "model");
@@ -875,14 +875,14 @@ describe("typespec-client-generator-core: example types", () => {
     strictEqual(example.value["b"].kind, "number");
     strictEqual(example.value["b"].type.kind, "int32");
 
-    ok(example.additionalProperties);
-    strictEqual(Object.keys(example.additionalProperties).length, 2);
-    strictEqual(example.additionalProperties["c"].value, true);
-    strictEqual(example.additionalProperties["c"].kind, "any");
-    strictEqual(example.additionalProperties["c"].type.kind, "any");
-    deepStrictEqual(example.additionalProperties["d"].value, [1, 2, 3]);
-    strictEqual(example.additionalProperties["d"].kind, "any");
-    strictEqual(example.additionalProperties["d"].type.kind, "any");
+    ok(example.additionalPropertiesValue);
+    strictEqual(Object.keys(example.additionalPropertiesValue).length, 2);
+    strictEqual(example.additionalPropertiesValue["c"].value, true);
+    strictEqual(example.additionalPropertiesValue["c"].kind, "any");
+    strictEqual(example.additionalPropertiesValue["c"].type.kind, "any");
+    deepStrictEqual(example.additionalPropertiesValue["d"].value, [1, 2, 3]);
+    strictEqual(example.additionalPropertiesValue["d"].kind, "any");
+    strictEqual(example.additionalPropertiesValue["d"].type.kind, "any");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });

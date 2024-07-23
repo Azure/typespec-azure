@@ -316,7 +316,7 @@ function handleHttpResponse(
         continue;
       } else if (name === "body") {
         if (response.type) {
-          responseExample.value = diagnostics.pipe(
+          responseExample.bodyValue = diagnostics.pipe(
             getSdkTypeExample(response.type, example.body, relativePath)
           );
         } else {
@@ -367,17 +367,7 @@ function getSdkTypeExample(
         return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
       case "boolean":
         return getSdkBaseTypeExample("boolean", type as SdkType, example, relativePath);
-      case "password":
-      case "guid":
       case "url":
-      case "uri":
-      case "ipAddress":
-      case "uuid":
-      case "ipV4Address":
-      case "ipV6Address":
-      case "eTag":
-      case "armId":
-      case "azureLocation":
       case "plainDate":
       case "plainTime":
         return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
@@ -612,7 +602,7 @@ function getSdkModelExample(
       kind: "model",
       type,
       value: propertiesExample,
-      additionalProperties:
+      additionalPropertiesValue:
         Object.keys(additionalPropertiesExample).length > 0
           ? additionalPropertiesExample
           : undefined,
