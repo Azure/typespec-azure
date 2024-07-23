@@ -115,9 +115,9 @@ export function getTypeSpecBuiltInType(
 ): SdkBuiltInType {
   const global = context.program.getGlobalNamespaceType();
   const typeSpecNamespace = global.namespaces!.get("TypeSpec");
-  const sdkType = typeSpecNamespace!.scalars.get(kind)!;
+  const type = typeSpecNamespace!.scalars.get(kind)!;
 
-  return getClientType(context, sdkType) as SdkBuiltInType;
+  return getSdkBuiltInType(context, type) as SdkBuiltInType;
 }
 
 function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly Diagnostic[]] {
