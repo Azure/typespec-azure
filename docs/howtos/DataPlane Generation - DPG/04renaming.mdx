@@ -138,7 +138,7 @@ using Azure.ClientGenerator.Core;
 class InputModel:
   input_name: str = rest_field(rest_name="name", readonly=True)
 
-response: InputModel = client.get_computed_model(name="name")
+response: InputOptions = client.get_computed_model(input_name="name")
 ```
 
 </TabItem>
