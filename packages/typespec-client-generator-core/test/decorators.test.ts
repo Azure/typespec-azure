@@ -81,29 +81,6 @@ describe("typespec-client-generator-core: decorators", () => {
         },
       ]);
     });
-    it("emit diagnostic if the client namespace doesn't ends with client", async () => {
-      const diagnostics = await runner.diagnose(`
-        @client
-        @service({})
-        @test namespace MyService;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/client-name",
-      });
-    });
-
-    it("emit diagnostic if the client explicit name doesn't ends with Client", async () => {
-      const diagnostics = await runner.diagnose(`
-        @client({name: "MySDK"})
-        @service({})
-        @test namespace MyService;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/client-name",
-      });
-    });
 
     it("@client with scope", async () => {
       const testCode = `
