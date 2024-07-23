@@ -42,7 +42,13 @@ import {
   SdkServiceOperation,
   UsageFlags,
 } from "./interfaces.js";
-import { AllScopes, TCGCContext, clientNameKey, getValidApiVersion, parseEmitterName } from "./internal-utils.js";
+import {
+  AllScopes,
+  TCGCContext,
+  clientNameKey,
+  getValidApiVersion,
+  parseEmitterName,
+} from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";

@@ -242,7 +242,10 @@ describe("typespec-client-generator-core: example types", () => {
     ok(operation);
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "string");
-    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, "2022-08-26T18:38:00.000Z");
+    strictEqual(
+      operation.examples[0].responses.get(200)?.bodyValue?.value,
+      "2022-08-26T18:38:00.000Z"
+    );
     strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.type.kind, "utcDateTime");
     strictEqual(
       (operation.examples[0].responses.get(200)?.bodyValue?.type as SdkDateTimeType).wireType.kind,
