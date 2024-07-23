@@ -75,6 +75,7 @@ import {
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
+  getTypeSpecBuiltInType,
 } from "./types.js";
 
 function getSdkServiceOperation<
@@ -468,11 +469,7 @@ function getSdkEndpointParameter(
           optional: false,
           serializedName: "endpoint",
           correspondingMethodParams: [],
-          type: {
-            kind: "string",
-            encode: "string",
-            decorators: [],
-          },
+          type: getTypeSpecBuiltInType(context, "string"),
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,

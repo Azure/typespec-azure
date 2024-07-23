@@ -524,7 +524,9 @@ export function getAnyType(
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
     kind: "any",
+    name: "any",
     encode: "string",
+    crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
 }
