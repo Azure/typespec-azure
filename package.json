@@ -42,7 +42,7 @@
     "@typescript-eslint/utils": "^7.17.0",
     "c8": "^10.1.2",
     "cspell": "^8.12.1",
-    "eslint": "^9.7.0",
+    "eslint": "^8.57.0",
     "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-unicorn": "^54.0.0",
