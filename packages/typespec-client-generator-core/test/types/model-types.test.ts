@@ -1467,4 +1467,22 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[0].name, "Test");
     strictEqual(models[0].properties.length, 0);
   });
+
+  it("xml usage", async () => {
+    await runner.compileAndDiagnose(`
+        @service({})
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+
+          op test(@header("content-type") contentType: "application/xml", @body body: Test): Test;
+        }
+      `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].name, "Test");
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Xml);
+  });
 });

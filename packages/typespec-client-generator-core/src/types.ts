@@ -95,6 +95,7 @@ import {
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
+  isXmlContentType,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -1458,6 +1459,9 @@ function updateTypesFromOperation(
       }
       updateUsageOfModel(context, UsageFlags.Input, sdkType);
       if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
+        updateUsageOfModel(context, UsageFlags.Json, sdkType);
+      }
+      if (httpBody.contentTypes.some((x) => isXmlContentType(x))) {
         updateUsageOfModel(context, UsageFlags.Json, sdkType);
       }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
