@@ -1048,3 +1048,12 @@ export function getClientNameOverride(
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
+
+const hasJSONConverterKey = createStateSymbol("hasJSONConverterKey");
+export const $hasJSONConverter: DecoratorFunction = (
+  context: DecoratorContext,
+  entity: Model,
+  value?: boolean,
+  scope?: LanguageScopes) => {
+  setScopedDecoratorData(context, $hasJSONConverter, hasJSONConverterKey, entity, value, scope);
+}
