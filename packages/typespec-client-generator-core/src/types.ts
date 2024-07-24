@@ -70,6 +70,7 @@ import {
   SdkTupleType,
   SdkType,
   SdkUnionType,
+  TCGCContext,
   UsageFlags,
   getKnownScalars,
   isSdkBuiltInKind,
@@ -107,7 +108,6 @@ import {
 import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
-import { TCGCContext } from "./internal-utils.js";
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
