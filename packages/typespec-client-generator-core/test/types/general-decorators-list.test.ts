@@ -342,4 +342,23 @@ describe("typespec-client-generator-core: general decorators list", () => {
       ]);
     });
   });
+  
+  describe("csharp only decorator", () => {
+    it("@hasJSONConverter", async function () {
+      runner = await createSdkTestRunner({}, 
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.Csharp\\.@hasJSONConverter"] });
+
+      await runner.compileWithBuiltInService(`
+        @hasJSONConverter(true)
+        model A {
+          id: string;
+        }
+      `);
+  
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].decorators, [{ name: "TypeSpec.@error", arguments: {} }]);
+      expectDiagnostics(runner.context.diagnostics, []);
+    });
+  });
 });

@@ -25,7 +25,6 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
-  validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
@@ -56,7 +55,7 @@ import {
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
-import { AllScopes, clientNameKey, parseEmitterName } from "./internal-utils.js";
+import { AllScopes, clientNameKey, parseEmitterName, setScopedDecoratorData } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -89,45 +88,6 @@ function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
       return targetEntry[context.emitterName] || targetEntry[AllScopes];
     })
     .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
-}
-
-function setScopedDecoratorData(
-  context: DecoratorContext,
-  decorator: DecoratorFunction,
-  key: symbol,
-  target: Type,
-  value: unknown,
-  scope?: LanguageScopes,
-  transitivity: boolean = false
-): boolean {
-  const targetEntry = context.program.stateMap(key).get(target);
-  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
-
-  // If target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, newObject);
-    return true;
-  }
-
-  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
-  const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-    return true;
-  }
-  // we only want to allow multiple decorators if they each specify a different scope
-  if (!transitivity) {
-    validateDecoratorUniqueOnNode(context, target, decorator);
-    return false;
-  }
-  // for transitivity situation, we could allow scope extension
-  if (!scopes.includes(AllScopes) && !scope) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-  }
-  return false;
 }
 
 const clientKey = createStateSymbol("client");
@@ -1047,13 +1007,4 @@ export function getClientNameOverride(
   languageScope?: string | typeof AllScopes
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
-}
-
-const hasJSONConverterKey = createStateSymbol("hasJSONConverterKey");
-export const $hasJSONConverter: DecoratorFunction = (
-  context: DecoratorContext,
-  entity: Model,
-  value?: boolean,
-  scope?: LanguageScopes) => {
-  setScopedDecoratorData(context, $hasJSONConverter, hasJSONConverterKey, entity, value, scope);
 }
