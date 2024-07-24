@@ -1568,7 +1568,7 @@ function updateTypesFromOperation(
         updateUsageOfModel(context, UsageFlags.Json, sdkType);
       }
       if (httpBody.contentTypes.some((x) => isXmlContentType(x))) {
-        updateUsageOfModel(context, UsageFlags.Json, sdkType);
+        updateUsageOfModel(context, UsageFlags.Xml, sdkType);
       }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
         // will also have Json type

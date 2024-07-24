@@ -1484,6 +1484,9 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "Test");
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Xml);
+    strictEqual(
+      models[0].usage,
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json | UsageFlags.Xml
+    );
   });
 });
