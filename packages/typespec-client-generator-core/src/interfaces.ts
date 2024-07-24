@@ -402,11 +402,28 @@ export type SdkModelPropertyType =
   | SdkBodyParameter
   | SdkHeaderParameter;
 
+export interface MultipartOptions {
+  // whether this part is for file
+  isFilePart: boolean;
+  // whether this part is multi in request payload
+  isMulti: boolean;
+  // undefined if filename is not set explicitly in Typespec
+  filename?: SdkModelPropertyType;
+  // undefined if contentType is not set explicitly in Typespec
+  contentType?: SdkModelPropertyType;
+  // defined in Typespec or calculated by Typespec complier
+  defaultContentTypes: string[];
+}
+
 export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
   serializedName: string;
+  /*
+    @deprecated This property is deprecated. Use `.multipartOptions?.isFilePart` instead.
+  */
   isMultipartFileInput: boolean;
+  multipartOptions?: MultipartOptions;
   visibility?: Visibility[];
   flatten: boolean;
 }

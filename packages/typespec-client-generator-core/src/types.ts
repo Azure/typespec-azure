@@ -31,10 +31,13 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationPart,
   Visibility,
   getAuthentication,
+  getHttpPart,
   getServers,
   isHeader,
+  isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
 import {
@@ -991,7 +994,14 @@ export function getClientTypeWithDiagnostics(
     case "Model":
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        const httpPart = getHttpPart(context.program, type);
+        if (httpPart === undefined) {
+          retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
+        } else {
+          retval = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, httpPart.type, operation)
+          );
+        }
       }
       break;
     case "Intrinsic":
@@ -1168,6 +1178,137 @@ export function getSdkModelPropertyTypeBase(
   });
 }
 
+function isFilePart(context: TCGCContext, type: SdkType): boolean {
+  if (type.kind === "array") {
+    // HttpFile<T>[]
+    return isFilePart(context, type.valueType);
+  } else if (type.kind === "bytes") {
+    // Http<bytes>
+    return true;
+  } else if (type.kind === "model") {
+    if (type.__raw && isOrExtendsHttpFile(context.program, type.__raw)) {
+      // Http<File>
+      return true;
+    }
+    // HttpPart<{@body body: bytes}> or HttpPart<{@body body: File}>
+    const body = type.properties.find((x) => x.kind === "body");
+    if (body) {
+      return isFilePart(context, body.type);
+    }
+  }
+  return false;
+}
+
+function getHttpOperationParts(context: TCGCContext, operation: Operation): HttpOperationPart[] {
+  const body = getHttpOperationWithCache(context, operation).parameters.body;
+  if (body?.bodyKind === "multipart") {
+    return body.parts;
+  }
+  return [];
+}
+
+function hasHttpPart(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "Model") {
+    if (type.indexer) {
+      // HttpPart<T>[]
+      return (
+        type.indexer.key.name === "integer" &&
+        getHttpPart(context.program, type.indexer.value) !== undefined
+      );
+    } else {
+      // HttpPart<T>
+      return getHttpPart(context.program, type) !== undefined;
+    }
+  }
+  return false;
+}
+
+function getHttpOperationPart(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation: Operation
+): HttpOperationPart | undefined {
+  if (hasHttpPart(context, type.type)) {
+    const httpOperationParts = getHttpOperationParts(context, operation);
+    if (
+      type.model &&
+      httpOperationParts.length > 0 &&
+      httpOperationParts.length === type.model.properties.size
+    ) {
+      const index = Array.from(type.model.properties.values()).findIndex((p) => p === type);
+      if (index !== -1) {
+        return httpOperationParts[index];
+      }
+    }
+  }
+  return undefined;
+}
+
+function updateMultiPartInfo(
+  context: TCGCContext,
+  type: ModelProperty,
+  base: SdkBodyModelPropertyType,
+  operation: Operation
+): [void, readonly Diagnostic[]] {
+  const httpOperationPart = getHttpOperationPart(context, type, operation);
+  const diagnostics = createDiagnosticCollector();
+  if (httpOperationPart) {
+    // body decorated with @multipartBody
+    base.multipartOptions = {
+      isFilePart: isFilePart(context, base.type),
+      isMulti: httpOperationPart.multi,
+      filename: httpOperationPart.filename
+        ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
+        : undefined,
+      contentType: httpOperationPart.body.contentTypeProperty
+        ? diagnostics.pipe(
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
+        : undefined,
+      defaultContentTypes: httpOperationPart.body.contentTypes,
+    };
+    // after https://github.com/microsoft/typespec/issues/3779 fixed, could use httpOperationPart.name directly
+    const httpPart = getHttpPart(context.program, type.type);
+    if (httpPart?.options?.name) {
+      base.serializedName = httpPart?.options?.name;
+    }
+  } else {
+    // common body
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    const operationIsMultipart = Boolean(
+      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
+    );
+    if (operationIsMultipart) {
+      const isBytesInput =
+        base.type.kind === "bytes" ||
+        (base.type.kind === "array" && base.type.valueType.kind === "bytes");
+      // Currently we only recognize bytes and list of bytes as potential file inputs
+      if (isBytesInput && getEncode(context.program, type)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "encoding-multipart-bytes",
+            target: type,
+          })
+        );
+      }
+      base.multipartOptions = {
+        isFilePart: isBytesInput,
+        isMulti: base.type.kind === "array",
+        defaultContentTypes: [],
+      };
+    }
+  }
+  if (base.multipartOptions !== undefined) {
+    base.isMultipartFileInput = base.multipartOptions.isFilePart;
+  }
+  if (base.multipartOptions?.isMulti && base.type.kind === "array") {
+    // for "images: T[]" or "images: HttpPart<T>[]", return type shall be "T" instead of "T[]"
+    base.type = base.type.valueType;
+  }
+
+  return diagnostics.wrap(undefined);
+}
+
 export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
@@ -1177,36 +1318,20 @@ export function getSdkModelPropertyType(
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
-  // I'm a body model property
-  let operationIsMultipart = false;
-  if (operation) {
-    const httpOperation = getHttpOperationWithCache(context, operation);
-    operationIsMultipart = Boolean(
-      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
-    );
-  }
-  // Currently we only recognize bytes and list of bytes as potential file inputs
-  const isBytesInput =
-    base.type.kind === "bytes" ||
-    (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-  if (isBytesInput && operationIsMultipart && getEncode(context.program, type)) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "encoding-multipart-bytes",
-        target: type,
-      })
-    );
-  }
-  return diagnostics.wrap({
+  const result: SdkBodyModelPropertyType = {
     ...base,
     kind: "property",
     optional: type.optional,
     visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
-    isMultipartFileInput: isBytesInput && operationIsMultipart,
+    isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
-  });
+  };
+  if (operation) {
+    diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+  }
+  return diagnostics.wrap(result);
 }
 
 function addPropertiesToModelType(
