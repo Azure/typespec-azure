@@ -31,6 +31,7 @@ import {
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
+  SdkHttpOperationExample,
   SdkHttpResponse,
   SdkModelPropertyType,
   SdkModelType,
@@ -412,7 +413,9 @@ export interface TCGCContext {
   __rawClients?: SdkClient[];
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
+  examplesDirectory?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
 }
@@ -529,6 +532,17 @@ export function getAnyType(
     crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
+}
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
 }
 
 export function getHttpOperationResponseHeaders(

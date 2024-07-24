@@ -1335,7 +1335,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
@@ -1376,7 +1376,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
@@ -1412,7 +1412,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
@@ -4226,7 +4226,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);
