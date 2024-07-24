@@ -135,7 +135,7 @@ using Azure.ClientGenerator.Core;
 <TabItem value="python" label="Python">
 
 ```python
-class InputModel:
+class InputOptions:
   input_name: str = rest_field(rest_name="name", readonly=True)
 
 response: InputOptions = client.get_computed_model(input_name="name")
