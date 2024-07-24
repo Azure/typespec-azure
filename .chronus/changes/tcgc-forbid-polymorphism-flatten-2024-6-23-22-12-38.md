@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-throw error when trying to flattening a model with polymorphsim
+Report error diagnostic when trying to flattening a model with polymorphism
