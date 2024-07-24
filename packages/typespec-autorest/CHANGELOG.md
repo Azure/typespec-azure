@@ -1,5 +1,9 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.45.0
+
+No changes, version bump only.
+
 ## 0.44.0
 
 ### Bug Fixes

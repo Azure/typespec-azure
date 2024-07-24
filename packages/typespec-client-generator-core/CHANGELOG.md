@@ -1,5 +1,22 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1076](https://github.com/Azure/typespec-azure/pull/1076) have @clientName work for operation groups as well
+- [#1076](https://github.com/Azure/typespec-azure/pull/1076) Fix `@clientName` conflict validation that operation defined within an interface
+
+### Features
+
+- [#1090](https://github.com/Azure/typespec-azure/pull/1090) Support model format of `@multipartBody`
+- [#1076](https://github.com/Azure/typespec-azure/pull/1076) add xml usage and change enumvalue arg representation in generic decorators
+
+### Breaking Changes
+
+- [#1015](https://github.com/Azure/typespec-azure/pull/1015) refactor tcgc build-in types, please refer pr's description for details and migration guides
+
+
 ## 0.44.1
 
 ### Bug Fixes
