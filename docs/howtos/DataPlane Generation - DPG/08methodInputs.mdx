@@ -455,8 +455,8 @@ export type DemoServiceContext = Client & {
       post(
         options: {
           body: {
-            firstName: string,
-            lastName: string
+            firstName: string;
+            lastName: string;
           };
         } & RequestParameters
       ): StreamableMethod<PostUserDefaultResponse>;
@@ -465,7 +465,11 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export async function upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+export async function upload(
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams
+): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
@@ -886,7 +890,46 @@ def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, conte
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export interface RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+export type WidgetServiceContext = Client & {
+  path: {
+    (
+      path: "/widgets/{widgetName}:scheduleRepairs",
+      widgetName: string
+    ): {
+      post(
+        options: {
+          body: RepairInfo;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular api layer
+export async function scheduleRepairs(
+  context: Client,
+  widgetName: string,
+  problem: string,
+  contact: string,
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+): Promise<RepairResult>;
+
+// Modular classical client layer
+export class WidgetServiceClient {
+  scheduleRepairs(
+    widgetName: string,
+    problem: string,
+    contact: string,
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  ): Promise<RepairResult>;
+}
 ```
 
 </TabItem>
@@ -985,7 +1028,44 @@ def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str 
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
+// from user experience perspective
 
+export interface RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+export type WidgetServiceContext = Client & {
+  path: {
+    (
+      path: "/widgets/{widgetName}:scheduleRepairs",
+      widgetName: string
+    ): {
+      post(
+        options: {
+          body: RepairInfo;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular api layer
+export async function scheduleRepairs(
+  context: Client,
+  widgetName: string,
+  body: RepairInfo,
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+): Promise<RepairResult>;
+
+// Modular classical client layer
+export class WidgetServiceClient {
+  scheduleRepairs(
+    widgetName: string,
+    body: RepairInfo,
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  ): Promise<RepairResult>;
+}
 ```
 
 </TabItem>
