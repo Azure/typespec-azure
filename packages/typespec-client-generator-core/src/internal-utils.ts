@@ -1,9 +1,9 @@
 import {
   BooleanLiteral,
   createDiagnosticCollector,
-  Diagnostic,
   DecoratorContext,
   DecoratorFunction,
+  Diagnostic,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
@@ -21,8 +21,8 @@ import {
   StringLiteral,
   Type,
   Union,
-  Value,
   validateDecoratorUniqueOnNode,
+  Value,
 } from "@typespec/compiler";
 import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";

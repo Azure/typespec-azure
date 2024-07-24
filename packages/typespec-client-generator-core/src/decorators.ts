@@ -55,7 +55,12 @@ import {
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
-import { AllScopes, clientNameKey, parseEmitterName, setScopedDecoratorData } from "./internal-utils.js";
+import {
+  AllScopes,
+  clientNameKey,
+  parseEmitterName,
+  setScopedDecoratorData,
+} from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -117,7 +122,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : (findClientService(context.program, target) ?? (target as any));
+      : findClientService(context.program, target) ?? (target as any);
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
