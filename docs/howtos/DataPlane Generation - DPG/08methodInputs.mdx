@@ -454,7 +454,10 @@ export type DemoServiceContext = Client & {
     (path: "/users"): {
       post(
         options: {
-          body: User;
+          body: {
+            firstName: string,
+            lastName: string
+          };
         } & RequestParameters
       ): StreamableMethod<PostUserDefaultResponse>;
     };
@@ -462,11 +465,11 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export async function upload(body: User, options: UploadOptionalParams): Promise<void>;
+export async function upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  upload(body: User, options: UploadOptionalParams): Promise<void>;
+  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
 ```
 
@@ -766,7 +769,7 @@ export type DemoServiceContext = Client & {
             "content-type": "application/json";
           } & RawHttpHeaders;
           body: {
-            schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+            schema: string;
           };
         } & RequestParameters
       ): StreamableMethod<PostUserDefaultResponse>;
@@ -776,7 +779,7 @@ export type DemoServiceContext = Client & {
 
 // Modular model
 export interface Schema {
-  schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+  schema: string;
 }
 
 // Modular api layer
