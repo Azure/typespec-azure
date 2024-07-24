@@ -2569,7 +2569,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("throws error when used on a polymorphism type", async () => {
       const diagnostics = await runner.diagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
           @test
