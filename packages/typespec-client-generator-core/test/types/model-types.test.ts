@@ -1473,20 +1473,33 @@ describe("typespec-client-generator-core: model types", () => {
     await runner.compileAndDiagnose(`
         @service({})
         namespace MyService {
-          model Test {
+          model RoundTrip {
             prop: string;
           }
 
-          op test(@header("content-type") contentType: "application/xml", @body body: Test): Test;
+          model Input {
+            prop: string;
+          }
+
+          @route("/test1")
+          op test1(@header("content-type") contentType: "application/xml", @body body: RoundTrip): RoundTrip;
+          
+          @route("/test2")
+          op test2(@header("content-type") contentType: "application/xml", @body body: Input): void;
         }
       `);
 
     const models = runner.context.sdkPackage.models;
-    strictEqual(models.length, 1);
-    strictEqual(models[0].name, "Test");
+    strictEqual(models.length, 2);
+    const roundTripModel = models.find((x) => x.name === "RoundTrip");
+    const inputModel = models.find((x) => x.name === "Input");
+    ok(roundTripModel);
     strictEqual(
-      models[0].usage,
+      roundTripModel.usage,
       UsageFlags.Input | UsageFlags.Output | UsageFlags.Json | UsageFlags.Xml
     );
+
+    ok(inputModel);
+    strictEqual(inputModel.usage, UsageFlags.Input | UsageFlags.Xml);
   });
 });
