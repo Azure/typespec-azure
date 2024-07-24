@@ -293,7 +293,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
           })
@@ -309,7 +309,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
           })
@@ -323,7 +323,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "azure-pick-me",
@@ -338,7 +338,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "Azure.Pick.Me",
@@ -356,7 +356,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "azure.pick.me",
@@ -371,7 +371,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
           })
