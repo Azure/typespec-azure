@@ -2583,10 +2583,6 @@ describe("typespec-client-generator-core: decorators", () => {
           model Model2{
             kind: string;
           }
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model1): void;
         }
       `);
 
