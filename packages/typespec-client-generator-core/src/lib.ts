@@ -169,7 +169,7 @@ export const $lib = createTypeSpecLibrary({
     "flatten-polymorphism": {
       severity: "error",
       messages: {
-        default: `Flattening polymorphic types is not supported.`,
+        default: `Cannot flatten property of polymorphic type.`,
       },
     },
   },
