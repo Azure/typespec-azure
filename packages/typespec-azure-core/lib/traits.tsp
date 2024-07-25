@@ -55,7 +55,7 @@ enum TraitContext {
  */
 @added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.applyTraitOverride(Trait)
-model TraitOverride<Trait> {}
+model TraitOverride<Trait extends Model> {}
 
 /**
  * Declares a trait that is applied as a query parameter.
@@ -220,7 +220,7 @@ model NoRepeatableRequests {
  * @param traitName An optional name to uniquely identify the trait.  If unspecified,
  *        the model type name is used.
  */
-extern dec trait(target: unknown, traitName?: valueof string);
+extern dec trait(target: Model, traitName?: valueof string);
 
 /**
  * `@traitContext` sets the applicable context for a trait on its envelope property.
@@ -300,7 +300,7 @@ namespace Azure {
          * @param target The model into which the trait will be copied.
          * @param traitModel The trait model type to be overridden.
          */
-        extern dec applyTraitOverride(target: unknown, traitModel: unknown);
+        extern dec applyTraitOverride(target: Model, traitModel: Model);
 
         /**
          * `@ensureTraitsPresent` checks the envelope properties of `traitModel` to ensure all
@@ -323,7 +323,7 @@ namespace Azure {
          * @param target The model type where this check will be established.
          * @param paramModel The actual model type to check for query parameters.
          */
-        extern dec ensureAllQueryParams(target: unknown, paramModel: Model);
+        extern dec ensureAllQueryParams(target: Model, paramModel: Model);
 
         /**
          * `@ensureAllHeaderParams` checks the properties of `paramModel` to ensure they all are marked
@@ -332,7 +332,7 @@ namespace Azure {
          * @param target The model type where this check will be established.
          * @param paramModel The actual model type to check for header properties.
          */
-        extern dec ensureAllHeaderParams(target: unknown, paramModel: Model);
+        extern dec ensureAllHeaderParams(target: Model, paramModel: Model);
       }
     }
   }

@@ -1063,7 +1063,7 @@ op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscri
 ### `checkLocalNameAvailability` {#Azure.ResourceManager.checkLocalNameAvailability}
 
 ```typespec
-op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: string, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: Azure.Core.azureLocation, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters

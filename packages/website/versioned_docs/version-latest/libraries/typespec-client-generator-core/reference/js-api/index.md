@@ -59,7 +59,6 @@ title: "[P] JS API"
 - [LanguageScopes](type-aliases/LanguageScopes.md)
 - [SdkBuiltInKinds](type-aliases/SdkBuiltInKinds.md)
 - [SdkDateTimeType](type-aliases/SdkDateTimeType.md)
-- [SdkDatetimeType](type-aliases/SdkDatetimeType-1.md)
 - [SdkHttpPackage](type-aliases/SdkHttpPackage.md)
 - [SdkHttpParameter](type-aliases/SdkHttpParameter.md)
 - [SdkMethod](type-aliases/SdkMethod.md)
