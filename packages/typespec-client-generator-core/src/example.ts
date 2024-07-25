@@ -31,10 +31,11 @@ import {
   SdkType,
   SdkTypeExample,
   SdkUnionExample,
+  TCGCContext,
   isSdkFloatKind,
   isSdkIntKind,
 } from "./interfaces.js";
-import { TCGCContext, getValidApiVersion } from "./internal-utils.js";
+import { getValidApiVersion } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
 interface LoadedExample {

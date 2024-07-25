@@ -5,20 +5,20 @@ import {
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
 import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
-import { SdkContext, createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createTCGCContext, type TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
-  Namespace,
-  Program,
-  Service,
-  Type,
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
   interpolatePath,
   listServices,
+  Namespace,
   navigateType,
+  Program,
   resolvePath,
+  Service,
+  Type,
 } from "@typespec/compiler";
 import {
   getRenamedFrom,
@@ -50,8 +50,8 @@ interface ResolvedAutorestCanonicalEmitterOptions extends AutorestDocumentEmitte
 
 export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptions>) {
   const resolvedOptions = { ...defaultOptions, ...context.options };
-  const tcgcSdkContext = await createSdkContext(
-    context,
+  const tcgcSdkContext = createTCGCContext(
+    context.program,
     "@azure-tools/typespec-autorest-canonical"
   );
   const armTypesDir = interpolatePath(
@@ -77,7 +77,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
 
 async function emitAllServices(
   program: Program,
-  tcgcSdkContext: SdkContext<any, any>,
+  tcgcSdkContext: TCGCContext,
   options: ResolvedAutorestCanonicalEmitterOptions
 ) {
   const services = listServices(program);

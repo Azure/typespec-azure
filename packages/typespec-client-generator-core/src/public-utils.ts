@@ -28,9 +28,8 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkHttpOperationExample } from "./interfaces.js";
+import { SdkHttpOperationExample, TCGCContext } from "./interfaces.js";
 import {
-  TCGCContext,
   TspLiteralType,
   getClientNamespaceStringHelper,
   getHttpOperationResponseHeaders,

@@ -1,4 +1,4 @@
-import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
@@ -100,15 +100,7 @@ export async function getAllServicesAtAllVersions(
   program: Program,
   options: ResolvedAutorestEmitterOptions
 ): Promise<AutorestServiceRecord[]> {
-  const tcgcSdkContext = await createSdkContext(
-    { program, options: {} } as any,
-    "@azure-tools/typespec-autorest",
-    {
-      versioning: {
-        strategy: "ignore",
-      },
-    }
-  );
+  const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
 
   const services = listServices(program);
   if (services.length === 0) {

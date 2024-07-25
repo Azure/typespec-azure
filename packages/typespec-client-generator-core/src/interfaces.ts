@@ -6,10 +6,14 @@ import {
   EmitContext,
   Interface,
   IntrinsicScalarName,
+  Model,
   ModelProperty,
   Namespace,
   Operation,
+  Program,
+  ProjectedProgram,
   Type,
+  Union,
 } from "@typespec/compiler";
 import {
   HttpAuth,
@@ -19,7 +23,38 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { TCGCContext } from "./internal-utils.js";
+import { TspLiteralType } from "./internal-utils.js";
+
+export interface TCGCContext {
+  program: Program;
+  emitterName: string;
+  generateProtocolMethods?: boolean;
+  generateConvenienceMethods?: boolean;
+  filterOutCoreModels?: boolean;
+  packageName?: string;
+  flattenUnionAsEnum?: boolean;
+  arm?: boolean;
+  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
+  generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  spreadModels?: Map<Model, SdkModelType>;
+  httpOperationCache?: Map<Operation, HttpOperation>;
+  unionsMap?: Map<Union, SdkUnionType>;
+  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
+  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  knownScalars?: Record<string, SdkBuiltInKinds>;
+  diagnostics: readonly Diagnostic[];
+  __subscriptionIdParameter?: SdkParameter;
+  __rawClients?: SdkClient[];
+  apiVersion?: string;
+  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
+  originalProgram: Program;
+  examplesDirectory?: string;
+  decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
+}
 
 export interface SdkContext<
   TOptions extends object = Record<string, any>,
@@ -608,10 +643,6 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
-  /**
-   * @deprecated This property is deprecated. Look at `.diagnostics` on SdkContext instead.
-   */
-  diagnostics: readonly Diagnostic[];
   crossLanguagePackageId: string;
 }
 
