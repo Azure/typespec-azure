@@ -17,6 +17,7 @@ import {
   Type,
   Union,
   createDiagnosticCollector,
+  getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
@@ -958,6 +959,13 @@ export function $flattenProperty(
   target: ModelProperty,
   scope?: LanguageScopes
 ) {
+  if (getDiscriminator(context.program, target.type)) {
+    reportDiagnostic(context.program, {
+      code: "flatten-polymorphism",
+      format: {},
+      target: target,
+    });
+  }
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 }
 

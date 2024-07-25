@@ -186,6 +186,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Value in example file '${"relativePath"}' does not follow its definition:\n${"value"}`,
       },
     },
+    "flatten-polymorphism": {
+      severity: "error",
+      messages: {
+        default: `Cannot flatten property of polymorphic type.`,
+      },
+    },
   },
 });
 
