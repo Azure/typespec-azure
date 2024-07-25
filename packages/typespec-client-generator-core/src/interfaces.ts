@@ -96,6 +96,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
+  crossLanguageDefinitionId: string;
   /**
    * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
    */
