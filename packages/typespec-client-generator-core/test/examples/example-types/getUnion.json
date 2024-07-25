@@ -1,0 +1,10 @@
+{
+  "operationId": "getUnion",
+  "title": "getUnion",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}
