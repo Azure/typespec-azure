@@ -256,7 +256,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       ): void;
     `
     );
-    expectDiagnostics(runner.context.sdkPackage.diagnostics, []);
     expectDiagnostics(runner.context.diagnostics, []);
     const m = runner.context.sdkPackage.models.find((x) => x.name === "TestModel");
     const e1 = runner.context.sdkPackage.enums.find((x) => x.name === "TestEnum");

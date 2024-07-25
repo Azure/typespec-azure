@@ -73,6 +73,7 @@ import {
   SdkTupleType,
   SdkType,
   SdkUnionType,
+  TCGCContext,
   UsageFlags,
   getKnownScalars,
   isSdkBuiltInKind,
@@ -110,7 +111,6 @@ import {
 import { getVersions } from "@typespec/versioning";
 import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
-import { TCGCContext } from "./internal-utils.js";
 
 export function getTypeSpecBuiltInType(
   context: TCGCContext,

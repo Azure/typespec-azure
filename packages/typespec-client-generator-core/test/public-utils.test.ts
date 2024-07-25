@@ -1430,7 +1430,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.sdkPackage.models;
         const diagnostics = runner.context.diagnostics;
         ok(diagnostics);
-        deepStrictEqual(diagnostics, runner.context.sdkPackage.diagnostics);
         strictEqual(models.length, 4);
         const union = models[0].properties[0].type;
         strictEqual(union.kind, "union");

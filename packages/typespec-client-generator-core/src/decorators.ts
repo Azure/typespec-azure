@@ -41,11 +41,11 @@ import {
   SdkHttpOperation,
   SdkOperationGroup,
   SdkServiceOperation,
+  TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
   AllScopes,
-  TCGCContext,
   clientNameKey,
   getValidApiVersion,
   parseEmitterName,
@@ -590,6 +590,20 @@ export function listOperationsInOperationGroup(
   return operations;
 }
 
+export function createTCGCContext(program: Program, emitterName: string): TCGCContext {
+  const diagnostics = createDiagnosticCollector();
+  return {
+    program,
+    emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
+    diagnostics: diagnostics.diagnostics,
+    originalProgram: program,
+    __namespaceToApiVersionParameter: new Map(),
+    __tspTypeToApiVersions: new Map(),
+    __namespaceToApiVersionClientDefaultValue: new Map(),
+    previewStringRegex: /-preview$/,
+  };
+}
+
 interface VersioningStrategy {
   readonly strategy?: "ignore";
   readonly previewStringRegex?: RegExp; // regex to match preview versions
@@ -614,38 +628,29 @@ export async function createSdkContext<
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? convenienceOptions;
+  const tcgcContext = createTCGCContext(
+    context.program,
+    (emitterName ?? context.program.emitters[0]?.metadata?.name)!
+  );
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
-    program: context.program,
+    ...tcgcContext,
     emitContext: context,
     sdkPackage: undefined!,
-    emitterName: diagnostics.pipe(
-      parseEmitterName(context.program, emitterName ?? context.program.emitters[0]?.metadata?.name)
-    ), // eslint-disable-line deprecation/deprecation
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
-    diagnostics: diagnostics.diagnostics,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    originalProgram: context.program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
     examplesDirectory: context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
-    previewStringRegex: options?.versioning?.previewStringRegex || /-preview$/,
+    previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
   };
-  sdkContext.sdkPackage = getSdkPackage(sdkContext);
+  sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-
-  if (sdkContext.diagnostics) {
-    sdkContext.diagnostics = sdkContext.diagnostics.concat(
-      sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
-    );
-  }
+  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
   return sdkContext;
 }
 
