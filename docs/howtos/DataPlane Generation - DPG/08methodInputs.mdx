@@ -430,7 +430,7 @@ def upload(self, first_name: str, last_name: str, *, content_type: str = "applic
 ```csharp
 public partial class User
 {
-  public User(string firstName, string lastName){}
+  public User(string firstName, string lastName) { }
   public string FirstName { get; }
   public string LastName { get; }
 }
@@ -439,7 +439,7 @@ public virtual async Task<Response> UploadAsync(RequestContent content, RequestC
 public virtual Response Upload(RequestContent content, RequestContext context = null)
 //convenience method
 public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
-public virtual Response Upload(User user, CancellationToken cancellationToken = default)
+public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
