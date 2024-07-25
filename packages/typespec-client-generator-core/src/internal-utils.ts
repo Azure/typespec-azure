@@ -47,10 +47,6 @@ export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/
 
 export const clientNameKey = createStateSymbol("clientName");
 
-export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
-
-export const clientNameKey = createStateSymbol("clientName");
-
 /**
  *
  * @param emitterName Full emitter name
