@@ -447,6 +447,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
+      strictEqual(client.crossLanguageDefinitionId, "My.Service.ServiceClient");
       strictEqual(client.initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "2022-12-01-preview");
@@ -516,6 +517,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
+      strictEqual(client.crossLanguageDefinitionId, "My.Service.ServiceClient");
       strictEqual(client.initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 2);
       deepStrictEqual(client.apiVersions, ["2022-12-01-preview", "2022-12-01"]);
@@ -579,6 +581,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(mainClient.methods.length, 1);
       strictEqual(mainClient.initialization.properties.length, 1);
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
+      strictEqual(mainClient.crossLanguageDefinitionId, "TestService.TestServiceClient");
 
       const clientAccessor = mainClient.methods[0];
       strictEqual(clientAccessor.kind, "clientaccessor");
@@ -596,6 +599,7 @@ describe("typespec-client-generator-core: package", () => {
         operationGroup.methods[0].crossLanguageDefintionId,
         "TestService.MyOperationGroup.func"
       );
+      strictEqual(operationGroup.crossLanguageDefinitionId, "TestService.MyOperationGroup")
     });
 
     it("operationGroup2", async () => {
@@ -629,6 +633,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(mainClient.initialization);
       strictEqual(mainClient.initialization.properties.length, 1);
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
+      strictEqual(mainClient.crossLanguageDefinitionId, "TestService.TestServiceClient")
 
       const fooAccessor = mainClient.methods[0];
       strictEqual(fooAccessor.kind, "clientaccessor");
@@ -649,6 +654,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(fooClient.initialization.properties.length, 1);
       strictEqual(fooClient.initialization.access, "internal");
       strictEqual(fooClient.methods.length, 1);
+      strictEqual(fooClient.crossLanguageDefinitionId, "TestService.Foo")
+
 
       const fooBarAccessor = fooClient.methods[0];
       strictEqual(fooBarAccessor.kind, "clientaccessor");
@@ -660,6 +667,7 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(fooBarClient.initialization.properties.length, 1);
       strictEqual(fooBarClient.initialization.access, "internal");
+      strictEqual(fooBarClient.crossLanguageDefinitionId, "TestService.Foo.Bar");
       strictEqual(fooBarClient.methods.length, 1);
       strictEqual(fooBarClient.methods[0].kind, "basic");
       strictEqual(fooBarClient.methods[0].name, "one");
@@ -667,6 +675,7 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(barClient.initialization.properties.length, 1);
       strictEqual(barClient.initialization.access, "internal");
+      strictEqual(barClient.crossLanguageDefinitionId, "TestService.Bar");
       strictEqual(barClient.methods.length, 1);
       strictEqual(barClient.methods[0].kind, "basic");
       strictEqual(barClient.methods[0].name, "two");
