@@ -8,17 +8,19 @@ namespace Azure.ResourceManager.CommonTypes;
 @@extension(ApiVersionParameter.apiVersion, "x-ms-parameter-location", "client");
 @@extension(SubscriptionIdParameter.subscriptionId, "x-ms-parameter-location", "client");
 
-op registerParams(
-  ...ApiVersionParameter,
-  ...LocationParameter,
-  ...ManagementGroupNameParameter,
-  ...OperationIdParameter,
-  ...ResourceGroupNameParameter,
-  ...ScopeParameter,
-  ...SubscriptionIdParameter,
-  ...TenantIdParameter,
-): void;
+interface RegisterParams {
+  v3(
+    ...ApiVersionParameter,
+    ...LocationParameter,
+    ...OperationIdParameter,
+    ...ResourceGroupNameParameter,
+    ...SubscriptionIdParameter,
+  ): void;
 
+  // Params added in v4
+  @Versioning.added(Versions.v4)
+  v4(...ManagementGroupNameParameter, ...ScopeParameter, ...TenantIdParameter): void;
+}
 @@extension(ErrorDetail.details, "x-ms-identifiers", ["message", "target"]);
 
 @@extension(Resource, "x-ms-azure-resource", true);

@@ -903,6 +903,10 @@ Supported versions of Azure.ResourceManager building blocks.
 enum Azure.ResourceManager.Versions
 ```
 
+| Name           | Value             | Description           |
+| -------------- | ----------------- | --------------------- |
+| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
+
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
 Standard terminal provisioning state of resource type. You can include in your
@@ -1725,6 +1729,14 @@ An internal enum to indicate the resource support for various path types
 enum Azure.ResourceManager.CommonTypes.ResourceHome
 ```
 
+| Name          | Value | Description                               |
+| ------------- | ----- | ----------------------------------------- |
+| Tenant        |       | The resource is bound to a tenant         |
+| Subscription  |       | The resource is bound to a subscription   |
+| Location      |       | The resource is bound to a location       |
+| ResourceGroup |       | The resource is bound to a resource group |
+| Extension     |       | The resource is bound to an extension     |
+
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 
 The Azure Resource Manager common-types versions.
@@ -1732,6 +1744,12 @@ The Azure Resource Manager common-types versions.
 ```typespec
 enum Azure.ResourceManager.CommonTypes.Versions
 ```
+
+| Name | Value | Description                                 |
+| ---- | ----- | ------------------------------------------- |
+| v3   |       | The Azure Resource Manager v3 common types. |
+| v4   |       | The Azure Resource Manager v4 common types. |
+| v5   |       | The Azure Resource Manager v5 common types. |
 
 ### `ActionType` {#Azure.ResourceManager.CommonTypes.ActionType}
 
