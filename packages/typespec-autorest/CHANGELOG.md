@@ -19,8 +19,15 @@
 
 ### Breaking Changes
 
-- [#1105](https://github.com/Azure/typespec-azure/pull/1105) `x-ms-client-flatten` extension on some of resource properties property is now configurable to be emitted by autorest emitter. Default is false which will skip emission of that extension.
+- [#1105](https://github.com/Azure/typespec-azure/pull/1105) `x-ms-client-flatten` extension on some of resource properties property is now configurable to be emitted by autorest emitter(`arm-resource-flattening` option). Default is false which will skip emission of that extension.
+  To revert to previous behavior update your `tspconfig.yaml` with the following
 
+  ```diff
+  options:
+    "@azure-tools/typespec-autorest":
+      # ...other options
+  +   arm-resource-flattening: true
+  ```
 
 ## 0.43.0
 
