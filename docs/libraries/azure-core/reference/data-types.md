@@ -510,13 +510,33 @@ union Azure.Core.RepeatabilityResult
 
 A type definition that refers the id to an Azure Resource Manager resource.
 
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
-
 ```typespec
 scalar Azure.Core.armResourceIdentifier
+```
+
+#### Examples
+
+```tsp
+model MyModel {
+  otherArmId: armResourceIdentifier;
+  networkId: armResourceIdentifier<[
+    {
+      type: "Microsoft.Network/vnet";
+    }
+  ]>;
+  vmIds: armResourceIdentifier<[
+    {
+      type: "Microsoft.Compute/vm";
+      scopes: ["*"];
+    }
+  ]>;
+  scoped: armResourceIdentifier<[
+    {
+      type: "Microsoft.Compute/vm";
+      scopes: ["tenant", "resourceGroup"];
+    }
+  ]>;
+}
 ```
 
 ### `azureLocation` {#Azure.Core.azureLocation}

@@ -358,11 +358,18 @@ scalar azureLocation extends string;
 /**
  * A type definition that refers the id to an Azure Resource Manager resource.
  *
- * Sample usage:
- *   otherArmId: ResourceIdentifier;
- *   networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
- *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
  * @template AllowedResourceTypes An array of allowed resource types for the resource reference
+ *
+ * @example
+ *
+ * ```tsp
+ * model MyModel {
+ *   otherArmId: armResourceIdentifier;
+ *   networkId: armResourceIdentifier<[{type:"Microsoft.Network/vnet"}]>
+ *   vmIds: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["*"]}]>
+ *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["tenant", "resourceGroup"]}]>
+ * }
+ * ```
  */
 @doc("A type definition that refers the id to an Azure Resource Manager resource.")
 @format("arm-id")
