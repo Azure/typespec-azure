@@ -1,0 +1,10 @@
+{
+  "operationId": "getNumberFromDuration",
+  "title": "getNumberFromDuration",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": 62.525
+    }
+  }
+}

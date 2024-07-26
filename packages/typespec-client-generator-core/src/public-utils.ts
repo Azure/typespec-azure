@@ -28,7 +28,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { TCGCContext } from "./interfaces.js";
+import { SdkHttpOperationExample, TCGCContext } from "./interfaces.js";
 import {
   TspLiteralType,
   getClientNamespaceStringHelper,
@@ -613,4 +613,14 @@ export function getHttpOperationWithCache(
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
   context.httpOperationCache.set(operation, httpOperation);
   return httpOperation;
+}
+
+/**
+ * Get the examples for a given http operation.
+ */
+export function getHttpOperationExamples(
+  context: TCGCContext,
+  operation: HttpOperation
+): SdkHttpOperationExample[] {
+  return context.__httpOperationExamples?.get(operation) ?? [];
 }

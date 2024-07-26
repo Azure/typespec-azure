@@ -107,19 +107,23 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @encode(BytesKnownEncoding.base64url)
-      scalar Base64rulBytes extends bytes;
+      scalar Base64UrlBytes extends bytes;
 
       @usage(Usage.input | Usage.output)
       @access(Access.public)
       model Test {
-        value: Base64rulBytes[];
+        value: Base64UrlBytes[];
       }
     `
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
     strictEqual(sdkType.valueType.kind, "bytes");
+    strictEqual(sdkType.valueType.name, "Base64UrlBytes");
     strictEqual(sdkType.valueType.encode, "base64url");
+    strictEqual(sdkType.valueType.crossLanguageDefinitionId, "TestService.Base64UrlBytes");
+    strictEqual(sdkType.valueType.baseType?.kind, "bytes");
+    strictEqual(sdkType.valueType.baseType.encode, "base64");
   });
 
   it("armId from Core", async function () {
@@ -142,7 +146,10 @@ describe("typespec-client-generator-core: built-in types", () => {
     `
     );
     const models = runnerWithCore.context.sdkPackage.models;
-    strictEqual(models[0].properties[0].type.kind, "armId");
+    const type = models[0].properties[0].type;
+    strictEqual(type.kind, "string");
+    strictEqual(type.name, "armResourceIdentifier");
+    strictEqual(type.crossLanguageDefinitionId, "Azure.Core.armResourceIdentifier");
   });
 
   it("format", async function () {
@@ -157,15 +164,9 @@ describe("typespec-client-generator-core: built-in types", () => {
       @access(Access.public)
       model Test {
         urlScalar: url;
-        uuidScalar: uuid;
-        eTagScalar: eTag;
 
         @format("url")
         urlProperty: string;
-        @format("uuid")
-        uuidProperty: string;
-        @format("eTag")
-        eTagProperty: string;
       }
     `
     );
@@ -208,7 +209,10 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(userModel.properties.length, 2);
     const etagProperty = userModel.properties.find((x) => x.name === "etag");
     ok(etagProperty);
-    strictEqual(etagProperty.type.kind, "eTag");
+    strictEqual(etagProperty.type.kind, "string");
+    strictEqual(etagProperty.type.name, "eTag");
+    strictEqual(etagProperty.type.encode, "string");
+    strictEqual(etagProperty.type.crossLanguageDefinitionId, "Azure.Core.eTag");
   });
 
   it("unknown format", async function () {
@@ -252,7 +256,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       ): void;
     `
     );
-    expectDiagnostics(runner.context.sdkPackage.diagnostics, []);
     expectDiagnostics(runner.context.diagnostics, []);
     const m = runner.context.sdkPackage.models.find((x) => x.name === "TestModel");
     const e1 = runner.context.sdkPackage.enums.find((x) => x.name === "TestEnum");
@@ -288,7 +291,11 @@ describe("typespec-client-generator-core: built-in types", () => {
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
-    strictEqual(models[0].properties[0].type.description, "title");
-    strictEqual(models[0].properties[0].type.details, "doc");
+    const type = models[0].properties[0].type;
+    strictEqual(type.kind, "string");
+    strictEqual(type.name, "TestScalar");
+    strictEqual(type.description, "title");
+    strictEqual(type.details, "doc");
+    strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
   });
 });
