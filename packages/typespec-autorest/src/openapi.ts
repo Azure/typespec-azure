@@ -1317,6 +1317,7 @@ export async function getOpenAPIForService(
     let collectionFormat = getQueryParamOptions(program, param).format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
       collectionFormat = undefined;
+      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
     }
 
     return {
@@ -1351,6 +1352,7 @@ export async function getOpenAPIForService(
     let collectionFormat = getHeaderFieldOptions(program, param).format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
       collectionFormat = undefined;
+      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
     }
     return {
       in: "header",
