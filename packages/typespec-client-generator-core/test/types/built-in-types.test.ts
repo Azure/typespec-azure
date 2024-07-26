@@ -3,6 +3,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { SdkBuiltInType } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
@@ -12,6 +13,86 @@ describe("typespec-client-generator-core: built-in types", () => {
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  });
+
+  it("string", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: string;
+      }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "string");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.string");
+    strictEqual(sdkType.baseType, undefined);
+  });
+
+  it("boolean", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: boolean;
+      }
+    `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "boolean");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.boolean");
+    strictEqual(sdkType.baseType, undefined);
+  });
+
+  it("integers", async function () {
+    const types = [
+      "int8",
+      "int16",
+      "int32",
+      "int64",
+      "uint8",
+      "uint16",
+      "uint32",
+      "uint64",
+      "integer",
+    ];
+    for (const type of types) {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          prop: ${type};
+        }
+      `
+      );
+      const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
+      strictEqual(sdkType.kind, type);
+      strictEqual(sdkType?.crossLanguageDefinitionId, `TypeSpec.${type}`);
+      strictEqual(sdkType?.baseType, undefined);
+    }
+  });
+
+  it("floats", async function () {
+    const types = ["numeric", "float", "float32", "float64"];
+    for (const type of types) {
+      await runner.compileWithBuiltInService(
+        `
+        @usage(Usage.input | Usage.output)
+        @access(Access.public)
+        model Test {
+          prop: ${type};
+        }
+      `
+      );
+      const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
+      strictEqual(sdkType.kind, type);
+      strictEqual(sdkType.crossLanguageDefinitionId, `TypeSpec.${type}`);
+      strictEqual(sdkType.baseType, undefined);
+    }
   });
 
   it("decimal", async function () {
@@ -26,6 +107,8 @@ describe("typespec-client-generator-core: built-in types", () => {
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "decimal");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.decimal");
+    strictEqual(sdkType.baseType, undefined);
   });
 
   it("decimal128", async function () {
@@ -40,6 +123,8 @@ describe("typespec-client-generator-core: built-in types", () => {
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "decimal128");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.decimal128");
+    strictEqual(sdkType.baseType, undefined);
   });
 
   it("unknown", async function () {
@@ -69,6 +154,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
     strictEqual(sdkType.encode, "base64");
+    strictEqual(sdkType.baseType, undefined);
   });
 
   it("bytes base64", async function () {
@@ -85,6 +171,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
     strictEqual(sdkType.encode, "base64");
+    strictEqual(sdkType.baseType, undefined);
   });
 
   it("bytes base64url", async function () {
@@ -101,6 +188,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
     strictEqual(sdkType.encode, "base64url");
+    strictEqual(sdkType.baseType, undefined);
   });
 
   it("bytes base64url scalar", async function () {
@@ -124,6 +212,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(sdkType.valueType.crossLanguageDefinitionId, "TestService.Base64UrlBytes");
     strictEqual(sdkType.valueType.baseType?.kind, "bytes");
     strictEqual(sdkType.valueType.baseType.encode, "base64");
+    strictEqual(sdkType.valueType.baseType.baseType, undefined);
   });
 
   it("armId from Core", async function () {
