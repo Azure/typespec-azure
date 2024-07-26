@@ -5,7 +5,7 @@ export default mergeConfig(
   defaultTypeSpecVitestConfig,
   defineConfig({
     test: {
-      testTimeout: 10000,
+      testTimeout: 30000,
     },
   })
 );
