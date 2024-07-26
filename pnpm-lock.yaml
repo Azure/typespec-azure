@@ -2151,6 +2151,9 @@ importers:
 
   packages/typespec-client-generator-core:
     dependencies:
+      '@typespec/versioning':
+        specifier: workspace:~
+        version: link:../../core/packages/versioning
       change-case:
         specifier: ~5.4.4
         version: 5.4.4
@@ -2176,6 +2179,9 @@ importers:
       '@typespec/library-linter':
         specifier: workspace:~
         version: link:../../core/packages/library-linter
+      '@typespec/openapi':
+        specifier: workspace:~
+        version: link:../../core/packages/openapi
       '@typespec/prettier-plugin-typespec':
         specifier: workspace:~
         version: link:../../core/packages/prettier-plugin-typespec
@@ -2185,9 +2191,6 @@ importers:
       '@typespec/tspd':
         specifier: workspace:~
         version: link:../../core/packages/tspd
-      '@typespec/versioning':
-        specifier: workspace:~
-        version: link:../../core/packages/versioning
       '@typespec/xml':
         specifier: workspace:~
         version: link:../../core/packages/xml
