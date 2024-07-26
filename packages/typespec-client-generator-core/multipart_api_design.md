@@ -58,7 +58,7 @@ Since all language emitters emit multipart body as model format, TCGC will unifo
 export interface multipartOptionsType {
   isNameDefined: boolean; // whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts
   isFilePart: boolean; // whether this part is for file
-  multi: boolean; // whether this part is multi in request payload
+  isMulti: boolean; // whether this part is multi in request payload
   headers: HeaderProperty[]; // relates to custom header
   filename?: SdkModelPropertyTypeBase;
   contentType?: SdkModelPropertyTypeBase;
@@ -78,9 +78,9 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
 notes:
 - `isNameDefined`: Whether name is defined in Typespec. For multipart/mixed, name may not be defined for some parts.
 - `isFilePart`: Same with `isMultipartFileInput` before
-- `multi`: Mainly for explicity of `Type[]`. In old design for `Model[]`, Typespec can't declare it clearly that SDK shall
+- `isMulti`: Mainly for explicity of `Type[]`. In old design for `Model[]`, Typespec can't declare it clearly that SDK shall
  (a) serialize array of model as single part or (b) serialize model as single part then send it multi times. With new design, if
- `HttpPart<Model[]>`, multi is false and SDK shall follow (a); if `HttpPart<Model>[]`, multi is true and follow (b)
+ `HttpPart<Model[]>`, isMulti is false and SDK shall follow (a); if `HttpPart<Model>[]`, isMulti is true and follow (b)
 - `headers`: Equals to custom headers in swagger https://swagger.io/docs/specification/describing-request-body/multipart-requests/  
 - `filename`: When Typespec author use `httpFile` change requiredness for optional metadata properties "filename", this property has value; otherwise it is "undefined".
 - `contentType`: When Typespec author use `httpFile` change requiredness for optional metadata properties "contentType", this property has value; otherwise it is "undefined".
@@ -120,7 +120,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": false,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -130,7 +130,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": false,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -140,7 +140,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -150,7 +150,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": false,
-        "multi": true,
+        "isMulti": true,
         "headers": []
       }
     },
@@ -160,7 +160,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": true,
+        "isMulti": true,
         "headers": []
       }
     }
@@ -213,7 +213,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": false,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -223,7 +223,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": false,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -233,7 +233,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -243,7 +243,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": false,
+        "isMulti": false,
         "headers": [],
         "fileName": { "optional": true },
         "contentType": { "optional": true }
@@ -254,7 +254,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": false,
+        "isMulti": false,
         "headers": [],
         "fileName": { "optional": false },
         "contentType": { "optional": false }
@@ -266,7 +266,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": false,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     },
@@ -276,7 +276,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": true,
+        "isMulti": true,
         "headers": []
       }
     },
@@ -286,7 +286,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": true,
+        "isMulti": true,
         "headers": []
       }
     },
@@ -296,7 +296,7 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": true,
         "isFilePart": true,
-        "multi": false,
+        "isMulti": false,
         "headers": [{"kind": "header", "name": "x-ms-header"}]
       }
     }
@@ -325,11 +325,10 @@ TCGC API example:
       "multipartOptions": {
         "isNameDefined": false,
         "isFilePart": false,
-        "multi": false,
+        "isMulti": false,
         "headers": []
       }
     }
   ]
 }
 ```
-
