@@ -239,6 +239,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.kind, "string");
     strictEqual(type.name, "armResourceIdentifier");
     strictEqual(type.crossLanguageDefinitionId, "Azure.Core.armResourceIdentifier");
+    strictEqual(type.baseType?.kind, "string");
   });
 
   it("format", async function () {
@@ -302,6 +303,35 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(etagProperty.type.name, "eTag");
     strictEqual(etagProperty.type.encode, "string");
     strictEqual(etagProperty.type.crossLanguageDefinitionId, "Azure.Core.eTag");
+    strictEqual(etagProperty.type.baseType?.kind, "string");
+  });
+
+  it("multiple layers of inheritance of scalars", async () => {
+    await runner.compileWithBuiltInService(
+      `
+      scalar Base extends string;
+      scalar Derived extends Base;
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: Derived;
+      }
+      `
+    );
+    const models = getAllModels(runner.context);
+    strictEqual(models[0].kind, "model");
+    const type = models[0].properties[0].type;
+    strictEqual(type.kind, "string");
+    strictEqual(type.name, "Derived");
+    strictEqual(type.crossLanguageDefinitionId, "TestService.Derived");
+    strictEqual(type.baseType?.kind, "string");
+    strictEqual(type.baseType?.name, "Base");
+    strictEqual(type.baseType?.crossLanguageDefinitionId, "TestService.Base");
+    strictEqual(type.baseType?.baseType?.kind, "string");
+    strictEqual(type.baseType.baseType.name, "string");
+    strictEqual(type.baseType.baseType.crossLanguageDefinitionId, "TypeSpec.string");
+    strictEqual(type.baseType.baseType.baseType, undefined);
   });
 
   it("unknown format", async function () {
