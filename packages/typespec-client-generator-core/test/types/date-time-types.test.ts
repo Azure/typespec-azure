@@ -61,23 +61,23 @@ describe("typespec-client-generator-core: date-time types", () => {
   });
 
   // TODO -- uncomment or modify when https://github.com/microsoft/typespec/issues/4042 is resolved.
-  // it("unixTimestamp32", async () => {
-  //   await runner.compileWithBuiltInService(
-  //     `
-  //     @usage(Usage.input | Usage.output)
-  //     @access(Access.public)
-  //     model Test {
-  //       prop: unixTimestamp32;
-  //     }
-  //     `
-  //   );
-  //   const sdkType = getSdkTypeHelper(runner);
-  //   strictEqual(sdkType.kind, "utcDateTime");
-  //   strictEqual(sdkType.wireType.kind, "int32");
-  //   strictEqual(sdkType.encode, "unixTimestamp");
-  //   strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.unixTimestamp32");
-  //   strictEqual(sdkType.baseType, undefined);
-  // });
+  it.skip("unixTimestamp32", async () => {
+    await runner.compileWithBuiltInService(
+      `
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        prop: unixTimestamp32;
+      }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "utcDateTime");
+    strictEqual(sdkType.wireType.kind, "int32");
+    strictEqual(sdkType.encode, "unixTimestamp");
+    strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.unixTimestamp32");
+    strictEqual(sdkType.baseType, undefined);
+  });
 
   it("unixTimestamp", async function () {
     await runner.compileWithBuiltInService(
