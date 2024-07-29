@@ -302,9 +302,10 @@ function getSdkDateTimeType(
 ): [SdkDateTimeType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const docWrapper = getDocHelper(context, type);
-  const baseType = type.baseScalar
-    ? diagnostics.pipe(getSdkDateTimeType(context, type.baseScalar, kind))
-    : undefined;
+  const baseType =
+    type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
+      ? diagnostics.pipe(getSdkDateTimeType(context, type.baseScalar, kind))
+      : undefined;
   const [encode, wireType] = getEncodeInfoForDateTimeOrDuration(
     context,
     getEncode(context.program, type),
@@ -400,9 +401,10 @@ function getSdkDurationTypeWithDiagnostics(
 ): [SdkDurationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const docWrapper = getDocHelper(context, type);
-  const baseType = type.baseScalar
-    ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
-    : undefined;
+  const baseType =
+    type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
+      ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
+      : undefined;
   const [encode, wireType] = getEncodeInfoForDateTimeOrDuration(
     context,
     getEncode(context.program, type),
