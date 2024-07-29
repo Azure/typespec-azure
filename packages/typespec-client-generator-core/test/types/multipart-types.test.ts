@@ -306,7 +306,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     for (const p of multiPartRequest.properties.values()) {
       strictEqual(p.kind, "property");
       ok(p.multipartOptions);
-      ok(p.type.kind === "bytes" || p.type.kind === "model");
+      ok(p.type.kind === "array");
       strictEqual(p.multipartOptions.isMulti, true);
     }
   });
@@ -383,7 +383,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(fileArrayMultiParts);
     ok(fileArrayMultiParts.multipartOptions);
-    strictEqual(fileArrayMultiParts.type.kind, "model");
+    strictEqual(fileArrayMultiParts.type.kind, "array");
     strictEqual(fileArrayMultiParts.multipartOptions.isMulti, true);
     ok(fileArrayMultiParts.multipartOptions.filename);
     strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
@@ -514,7 +514,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       (x) => x.name === "stringsMultiParts"
     ) as SdkBodyModelPropertyType;
     ok(stringsMultiParts);
-    strictEqual(stringsMultiParts.type.kind, "string");
+    strictEqual(stringsMultiParts.type.kind, "array");
     ok(stringsMultiParts.multipartOptions);
     strictEqual(stringsMultiParts.multipartOptions.isMulti, true);
   });
