@@ -1,5 +1,6 @@
 import { DecoratorContext, Model, ModelProperty, Program, Type } from "@typespec/compiler";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { ExampleDecorator, UseRefDecorator } from "../generated-defs/Autorest.js";
+import { AutorestStateKeys, reportDiagnostic } from "./lib.js";
 
 export const namespace = "Autorest";
 
@@ -8,7 +9,6 @@ export interface Example {
   title: string;
 }
 
-const exampleKey = createStateSymbol("example");
 /**
  * `@example` - attaches example files to an operation. Multiple examples can be specified.
  *
@@ -17,18 +17,18 @@ const exampleKey = createStateSymbol("example");
  *
  * `@example` can be specified on Operations.
  */
-export function $example(
+export const $example: ExampleDecorator = (
   context: DecoratorContext,
   entity: Type,
   pathOrUri: string,
   title: string
-) {
+) => {
   const { program } = context;
-  if (!program.stateMap(exampleKey).has(entity)) {
-    program.stateMap(exampleKey).set(entity, []);
+  if (!program.stateMap(AutorestStateKeys.example).has(entity)) {
+    program.stateMap(AutorestStateKeys.example).set(entity, []);
   } else if (
     program
-      .stateMap(exampleKey)
+      .stateMap(AutorestStateKeys.example)
       .get(entity)
       .find((e: Example) => e.title === title || e.pathOrUri === pathOrUri)
   ) {
@@ -37,17 +37,16 @@ export function $example(
       target: entity,
     });
   }
-  program.stateMap(exampleKey).get(entity).push({
+  program.stateMap(AutorestStateKeys.example).get(entity).push({
     pathOrUri,
     title,
   });
-}
+};
 
 export function getExamples(program: Program, entity: Type): Example[] | undefined {
-  return program.stateMap(exampleKey).get(entity);
+  return program.stateMap(AutorestStateKeys.example).get(entity);
 }
 
-const refTargetsKey = createStateSymbol("autorest.ref");
 /**
  * `@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as ARM common types.
  *
@@ -55,11 +54,15 @@ const refTargetsKey = createStateSymbol("autorest.ref");
  *
  * `@useRef` can be specified on Models and ModelProperty.
  */
-export function $useRef(context: DecoratorContext, entity: Model | ModelProperty, jsonRef: string) {
-  context.program.stateMap(refTargetsKey).set(entity, jsonRef);
-}
+export const $useRef: UseRefDecorator = (
+  context: DecoratorContext,
+  entity: Model | ModelProperty,
+  jsonRef: string
+) => {
+  context.program.stateMap(AutorestStateKeys.useRef).set(entity, jsonRef);
+};
 
 export function getRef(program: Program, entity: Type): string | undefined {
-  const refOrProducer = program.stateMap(refTargetsKey).get(entity);
+  const refOrProducer = program.stateMap(AutorestStateKeys.useRef).get(entity);
   return refOrProducer;
 }
