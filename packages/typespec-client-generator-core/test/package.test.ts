@@ -447,7 +447,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.crossLanguageDefinitionId, "My.Service.ServiceClient");
+      strictEqual(client.crossLanguageDefinitionId, "My.Service");
       strictEqual(client.initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "2022-12-01-preview");
@@ -517,7 +517,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
-      strictEqual(client.crossLanguageDefinitionId, "My.Service.ServiceClient");
+      strictEqual(client.crossLanguageDefinitionId, "My.Service");
       strictEqual(client.initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 2);
       deepStrictEqual(client.apiVersions, ["2022-12-01-preview", "2022-12-01"]);
@@ -581,7 +581,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(mainClient.methods.length, 1);
       strictEqual(mainClient.initialization.properties.length, 1);
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
-      strictEqual(mainClient.crossLanguageDefinitionId, "TestService.TestServiceClient");
+      strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
       const clientAccessor = mainClient.methods[0];
       strictEqual(clientAccessor.kind, "clientaccessor");
@@ -633,7 +633,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(mainClient.initialization);
       strictEqual(mainClient.initialization.properties.length, 1);
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
-      strictEqual(mainClient.crossLanguageDefinitionId, "TestService.TestServiceClient");
+      strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
       const fooAccessor = mainClient.methods[0];
       strictEqual(fooAccessor.kind, "clientaccessor");

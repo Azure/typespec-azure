@@ -523,9 +523,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     // if it is client, the crossLanguageDefinitionId is the namespace.TestClient, if it is operation group, the crosslanguageDefinitionId is the namespace.Test
-    crossLanguageDefinitionId: isClient
-      ? `${getClientNamespaceStringHelper(context, client.service)}.${clientName}`
-      : getCrossLanguageDefinitionId(context, client.type),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type),
   };
   return diagnostics.wrap(sdkClientType);
 }
