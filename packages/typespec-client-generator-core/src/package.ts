@@ -502,7 +502,7 @@ function getSdkEndpointParameter(
 function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
-  parent?: SdkClientType<TServiceOperation>,
+  parent?: SdkClientType<TServiceOperation>
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
@@ -521,15 +521,29 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    initialization: diagnostics.pipe(getSdkInitializationType(context, client)), // MUST call this after getSdkMethods has been called
+    initialization: {
+      kind: "model",
+      properties: [],
+      name: "",
+      isGeneratedName: true,
+      access: "internal",
+      usage: UsageFlags.None,
+      crossLanguageDefinitionId: "",
+      apiVersions: [],
+      isFormDataType: false,
+      decorators: [],
+    },
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
   };
   // NOTE: getSdkMethods recursively calls createSdkClientType
-  sdkClientType.methods = diagnostics.pipe(getSdkMethods<TServiceOperation>(context, client, sdkClientType));
-  
+  sdkClientType.methods = diagnostics.pipe(
+    getSdkMethods<TServiceOperation>(context, client, sdkClientType)
+  );
+  sdkClientType.initialization = diagnostics.pipe(getSdkInitializationType(context, client)); // MUST call this after getSdkMethods has been called
+
   return diagnostics.wrap(sdkClientType);
 }
 
