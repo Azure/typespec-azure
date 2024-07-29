@@ -104,6 +104,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
    * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
    */
   arm: boolean;
+  parent?: SdkClientType<TServiceOperation>;
 }
 
 export interface SdkOperationGroup {

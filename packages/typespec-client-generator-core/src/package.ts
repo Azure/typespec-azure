@@ -384,7 +384,8 @@ function getSdkMethodParameter(
 
 function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup
+  client: SdkClient | SdkOperationGroup,
+  sdkClientType: SdkClientType<TServiceOperation>
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
@@ -394,7 +395,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
     const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup)
+      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType)
     );
     const name = `get${operationGroup.type.name}`;
     retval.push({
@@ -500,7 +501,8 @@ function getSdkEndpointParameter(
 
 function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup
+  client: SdkClient | SdkOperationGroup,
+  parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
@@ -510,22 +512,24 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   } else {
     name = getClientNameOverride(context, client.type) ?? client.type.name;
   }
-  // NOTE: getSdkMethods recursively calls createSdkClientType
-  const methods = diagnostics.pipe(getSdkMethods<TServiceOperation>(context, client));
   const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
     name,
     description: docWrapper.description,
     details: docWrapper.details,
-    methods: methods,
+    methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)), // MUST call this after getSdkMethods has been called
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
+    parent,
   };
+  // NOTE: getSdkMethods recursively calls createSdkClientType
+  sdkClientType.methods = diagnostics.pipe(getSdkMethods<TServiceOperation>(context, client, sdkClientType));
+  
   return diagnostics.wrap(sdkClientType);
 }
 
