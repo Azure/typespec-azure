@@ -2262,8 +2262,8 @@ We will take the `@encode` decorator into account, determining how we serialize 
 <TabItem value="typespec" label="TypeSpec" default>
 
 model Test {
-  @encode(DateTimeKnownEncoding.rfc3339)
-  prop: utcDateTime;
+@encode(DateTimeKnownEncoding.rfc3339)
+prop: utcDateTime;
 }
 
 </TabItem>
@@ -2278,7 +2278,7 @@ model Test {
     "encode": "rfc3339",
     "wireType": {
       "kind": "string"
-    },
+    }
   }
 }
 ```
@@ -2301,7 +2301,7 @@ TODO
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO
+TODO;
 ```
 
 </TabItem>
@@ -2320,8 +2320,8 @@ When you specify an encoding type, say that you want to encode an integer as a s
 <TabItem value="typespec" label="TypeSpec" default>
 
 model Test {
-  @encode(string)
-  prop: int64;
+@encode(string)
+prop: int64;
 }
 
 </TabItem>
@@ -2335,7 +2335,7 @@ model Test {
     "kind": "int64",
     "encode": "string",
     "wireType": {
-      "kind": "string",
+      "kind": "string"
     }
   }
 }
@@ -2359,7 +2359,7 @@ TODO
 <TabItem value="typescript" label="Typescript" >
 
 ```typescript
-TODO
+TODO;
 ```
 
 </TabItem>
@@ -2371,4 +2371,3 @@ TODO
 
 </TabItem>
 </Tabs>
-
