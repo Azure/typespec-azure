@@ -7,6 +7,7 @@ import {
   SdkClientType,
   SdkHttpOperation,
   UsageFlags,
+  isSdkBuiltInKind,
 } from "../../src/interfaces.js";
 import { getAllModelsWithDiagnostics } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -372,6 +373,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileArrayOnePart);
     ok(fileArrayOnePart.multipartOptions);
     strictEqual(fileArrayOnePart.type.kind, "array");
+    strictEqual(fileArrayOnePart.type.valueType.kind, "model");
     strictEqual(fileArrayOnePart.multipartOptions.isMulti, false);
     strictEqual(fileArrayOnePart.multipartOptions.filename, undefined);
     strictEqual(fileArrayOnePart.multipartOptions.contentType, undefined);
@@ -384,6 +386,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileArrayMultiParts);
     ok(fileArrayMultiParts.multipartOptions);
     strictEqual(fileArrayMultiParts.type.kind, "array");
+    strictEqual(fileArrayMultiParts.type.valueType.kind, "model");
     strictEqual(fileArrayMultiParts.multipartOptions.isMulti, true);
     ok(fileArrayMultiParts.multipartOptions.filename);
     strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
@@ -508,6 +511,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringsOnePart);
     strictEqual(stringsOnePart.type.kind, "array");
+    strictEqual(stringsOnePart.type.valueType.kind, "string");
     ok(stringsOnePart.multipartOptions);
     strictEqual(stringsOnePart.multipartOptions.isMulti, false);
     const stringsMultiParts = MultiPartRequest.properties.find(
@@ -515,6 +519,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringsMultiParts);
     strictEqual(stringsMultiParts.type.kind, "array");
+    strictEqual(stringsMultiParts.type.valueType.kind, "string");
     ok(stringsMultiParts.multipartOptions);
     strictEqual(stringsMultiParts.multipartOptions.isMulti, true);
   });
