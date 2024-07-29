@@ -7,7 +7,6 @@ import {
   SdkClientType,
   SdkHttpOperation,
   UsageFlags,
-  isSdkBuiltInKind,
 } from "../../src/interfaces.js";
 import { getAllModelsWithDiagnostics } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
