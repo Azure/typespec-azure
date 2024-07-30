@@ -2694,6 +2694,12 @@ describe("typespec-client-generator-core: package", () => {
       ok(nextLinkProperty);
       strictEqual(nextLinkProperty.kind, "property");
       strictEqual(nextLinkProperty.type.kind, "url");
+      strictEqual(nextLinkProperty.type.name, "ResourceLocation");
+      strictEqual(
+        nextLinkProperty.type.crossLanguageDefinitionId,
+        "TypeSpec.Rest.ResourceLocation"
+      );
+      strictEqual(nextLinkProperty.type.baseType?.kind, "url");
       strictEqual(nextLinkProperty.serializedName, "nextLink");
       strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
@@ -2704,6 +2710,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
+
   describe("spread", () => {
     it("plain model with no decorators", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")

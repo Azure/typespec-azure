@@ -41,6 +41,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -296,7 +297,7 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
-            getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
           );
         }
         retval.push(decoratorInfo);
@@ -307,6 +308,7 @@ export function getTypeDecorators(
 }
 
 function getDecoratorArgValue(
+  context: TCGCContext,
   arg:
     | Type
     | Record<string, unknown>
@@ -323,7 +325,7 @@ function getDecoratorArgValue(
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
     if (arg.kind === "EnumMember") {
-      return diagnostics.wrap(arg.value ?? arg.name);
+      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
     if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
       return diagnostics.wrap(arg.value);
@@ -475,9 +477,22 @@ export function getAnyType(
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
     kind: "any",
+    name: "any",
     encode: "string",
+    crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
+}
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
 }
 
 export function getHttpOperationResponseHeaders(
@@ -524,5 +539,10 @@ export function filterApiVersionsInEnum(
 
 export function isJsonContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
+  return regex.test(contentType);
+}
+
+export function isXmlContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
   return regex.test(contentType);
 }
