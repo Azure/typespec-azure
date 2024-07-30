@@ -461,7 +461,6 @@ function getSdkEndpointParameter(
       const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
       if (sdkParam.kind === "path") {
         templateArguments.push(sdkParam);
-        sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
         const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;

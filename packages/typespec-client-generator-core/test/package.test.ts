@@ -313,7 +313,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
-      strictEqual(templateArg.description, "Testserver endpoint");
+      strictEqual(templateArg.description, undefined);
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
