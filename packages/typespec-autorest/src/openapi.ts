@@ -1244,7 +1244,7 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPI2PArameterBase(
+  function getOpenAPI2ParameterBase(
     param: ModelProperty,
     name: string | undefined
   ): OpenAPI2ParameterBase {
