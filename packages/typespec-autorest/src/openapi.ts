@@ -1030,7 +1030,7 @@ export async function getOpenAPIForService(
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? (viaProjection ?? type.name) : encodedName;
+    return encodedName === type.name ? viaProjection ?? type.name : encodedName;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {

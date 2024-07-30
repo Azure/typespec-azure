@@ -25,8 +25,8 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
-  validateDecoratorUniqueOnNode,
   setTypeSpecNamespace,
+  validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
@@ -158,7 +158,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : (findClientService(context.program, target) ?? (target as any));
+      : findClientService(context.program, target) ?? (target as any);
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
