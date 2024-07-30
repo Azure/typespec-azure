@@ -338,10 +338,6 @@ op Azure.Core.LongRunningResourceCollectionAction(apiVersion: string): Azure.Cor
 
 ### `LongRunningResourceCreateOrReplace` {#Azure.Core.LongRunningResourceCreateOrReplace}
 
-:::warning
-**Deprecated**: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
-:::
-
 DEPRECATED: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
 See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
@@ -361,10 +357,6 @@ op Azure.Core.LongRunningResourceCreateOrReplace(apiVersion: string, resource: R
 
 ### `LongRunningResourceCreateOrUpdate` {#Azure.Core.LongRunningResourceCreateOrUpdate}
 
-:::warning
-**Deprecated**: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
-:::
-
 DEPRECATED: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
 See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
@@ -383,10 +375,6 @@ op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType:
 | Traits   | Traits to apply to the operation. |
 
 ### `LongRunningResourceCreateWithServiceProvidedName` {#Azure.Core.LongRunningResourceCreateWithServiceProvidedName}
-
-:::warning
-**Deprecated**: Use `LongRunningResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
-:::
 
 DEPRECATED: Use `LongRunningResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
@@ -488,10 +476,6 @@ op Azure.Core.ResourceCollectionAction(apiVersion: string): {} | Azure.Core.Foun
 
 ### `ResourceCreateOrReplace` {#Azure.Core.ResourceCreateOrReplace}
 
-:::warning
-**Deprecated**: Use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance.
-:::
-
 DEPRECATED: Use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
 See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
@@ -511,10 +495,6 @@ op Azure.Core.ResourceCreateOrReplace(apiVersion: string, resource: Resource): {
 
 ### `ResourceCreateOrUpdate` {#Azure.Core.ResourceCreateOrUpdate}
 
-:::warning
-**Deprecated**: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
-:::
-
 DEPRECATED: Use `ResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
 See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
@@ -533,10 +513,6 @@ op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: "applicati
 | Traits   | Traits to apply to the operation. |
 
 ### `ResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceCreateWithServiceProvidedName}
-
-:::warning
-**Deprecated**: Use `ResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
-:::
 
 DEPRECATED: Use `ResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
@@ -613,10 +589,6 @@ op Azure.Core.ResourceRead(apiVersion: string): {} | Azure.Core.Foundations.Erro
 | Traits   | Traits to apply to the operation. |
 
 ### `ResourceUpdate` {#Azure.Core.ResourceUpdate}
-
-:::warning
-**Deprecated**: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
-:::
 
 DEPRECATED: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
 This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
