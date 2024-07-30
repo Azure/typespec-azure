@@ -25,6 +25,7 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
+  setTypeSpecNamespace,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
@@ -1013,3 +1014,14 @@ export function getClientNameOverride(
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
+
+const hasJSONConverterKey = createStateSymbol("hasJSONConverterKey");
+export const $hasJSONConverter: DecoratorFunction = (
+  context: DecoratorContext,
+  entity: Model,
+  scope?: LanguageScopes
+) => {
+  setScopedDecoratorData(context, $hasJSONConverter, hasJSONConverterKey, entity, true, scope);
+};
+
+setTypeSpecNamespace("CSharp", $hasJSONConverter);

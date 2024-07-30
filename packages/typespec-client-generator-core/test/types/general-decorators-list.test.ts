@@ -355,12 +355,14 @@ describe("typespec-client-generator-core: general decorators list", () => {
         model A {
           id: string;
         }
+
+        op test(): A;
       `);
 
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators, [
-        { name: "Azure\\.ClientGenerator\\.Core\\.CSharp\\.@hasJSONConverter", arguments: {} },
+        { name: "Azure.ClientGenerator.Core.CSharp.@hasJSONConverter", arguments: {} },
       ]);
       expectDiagnostics(runner.context.diagnostics, []);
     });
