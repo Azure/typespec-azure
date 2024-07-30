@@ -405,6 +405,38 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(scheme.name, "x-ms-api-key");
     });
 
+    it("endpoint with path param default value", async () => {
+      await runner.compile(`
+        @server(
+          "{endpoint}",
+          "Test server endpoint",
+          {
+            endpoint: string = "http://localhost:3000",
+          }
+        )
+        @service({})
+        namespace MyService;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 1);
+
+      const endpointParam = client.initialization.properties.filter(
+        (p): p is SdkEndpointParameter => p.kind === "endpoint"
+      )[0];
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const endpointTemplateArg = endpointParam.type.templateArguments[0];
+      strictEqual(endpointTemplateArg.name, "endpoint");
+      strictEqual(endpointTemplateArg.onClient, true);
+      strictEqual(endpointTemplateArg.optional, false);
+      strictEqual(endpointTemplateArg.kind, "path");
+      strictEqual(endpointParam.clientDefaultValue, "http://localhost:3000");
+    });
+
     it("single with core", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
