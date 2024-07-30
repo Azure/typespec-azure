@@ -1269,7 +1269,7 @@ export async function getOpenAPIForService(
   ): OpenAPI2BodyParameter {
     return {
       in: "body",
-      ...getOpenAPI2PArameterBase(param, name),
+      ...getOpenAPI2ParameterBase(param, name),
       schema: bodySchema,
     };
   }
@@ -1279,7 +1279,7 @@ export async function getOpenAPIForService(
     schemaContext: SchemaContext,
     name?: string
   ): OpenAPI2FormDataParameter {
-    const base = getOpenAPI2PArameterBase(param, name);
+    const base = getOpenAPI2ParameterBase(param, name);
     return {
       in: "formData",
       ...base,
@@ -1313,7 +1313,7 @@ export async function getOpenAPIForService(
     schemaContext: SchemaContext,
     name?: string
   ): OpenAPI2QueryParameter {
-    const base = getOpenAPI2PArameterBase(param, name);
+    const base = getOpenAPI2ParameterBase(param, name);
     let collectionFormat = getQueryParamOptions(program, param).format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
       collectionFormat = undefined;
@@ -1334,7 +1334,7 @@ export async function getOpenAPIForService(
     schemaContext: SchemaContext,
     name?: string
   ): OpenAPI2PathParameter {
-    const base = getOpenAPI2PArameterBase(param, name);
+    const base = getOpenAPI2ParameterBase(param, name);
 
     return {
       in: "path",
@@ -1348,7 +1348,7 @@ export async function getOpenAPIForService(
     schemaContext: SchemaContext,
     name?: string
   ): OpenAPI2HeaderParameter {
-    const base = getOpenAPI2PArameterBase(param, name);
+    const base = getOpenAPI2ParameterBase(param, name);
     let collectionFormat = getHeaderFieldOptions(program, param).format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
       collectionFormat = undefined;
