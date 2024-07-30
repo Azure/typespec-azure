@@ -41,6 +41,7 @@ describe("typespec-client-generator-core: duration types", () => {
     strictEqual(sdkType.wireType.kind, "string");
     strictEqual(sdkType.encode, "ISO8601");
   });
+
   it("int32 seconds", async function () {
     await runner.compileWithBuiltInService(
       `
