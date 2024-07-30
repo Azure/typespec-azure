@@ -1,0 +1,10 @@
+{
+  "operationId": "getArrayDiagnostic",
+  "title": "getArrayDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}
