@@ -1,8 +1,6 @@
 import {
   BooleanLiteral,
   createDiagnosticCollector,
-  DecoratorContext,
-  DecoratorFunction,
   Diagnostic,
   getDeprecationDetails,
   getDoc,
@@ -21,14 +19,12 @@ import {
   StringLiteral,
   Type,
   Union,
-  validateDecoratorUniqueOnNode,
   Value,
 } from "@typespec/compiler";
 import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
-  LanguageScopes,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
@@ -529,43 +525,4 @@ export function filterApiVersionsInEnum(
 export function isJsonContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
   return regex.test(contentType);
-}
-
-export function setScopedDecoratorData(
-  context: DecoratorContext,
-  decorator: DecoratorFunction,
-  key: symbol,
-  target: Type,
-  value: unknown,
-  scope?: LanguageScopes,
-  transitivity: boolean = false
-): boolean {
-  const targetEntry = context.program.stateMap(key).get(target);
-  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
-
-  // If target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, newObject);
-    return true;
-  }
-
-  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
-  const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-    return true;
-  }
-  // we only want to allow multiple decorators if they each specify a different scope
-  if (!transitivity) {
-    validateDecoratorUniqueOnNode(context, target, decorator);
-    return false;
-  }
-  // for transitivity situation, we could allow scope extension
-  if (!scopes.includes(AllScopes) && !scope) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-  }
-  return false;
 }

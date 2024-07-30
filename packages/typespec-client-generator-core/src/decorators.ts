@@ -25,6 +25,7 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
+  validateDecoratorUniqueOnNode,
   setTypeSpecNamespace,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
@@ -56,12 +57,7 @@ import {
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
-import {
-  AllScopes,
-  clientNameKey,
-  parseEmitterName,
-  setScopedDecoratorData,
-} from "./internal-utils.js";
+import { AllScopes, clientNameKey, parseEmitterName } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -96,6 +92,45 @@ function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
     .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
+function setScopedDecoratorData(
+  context: DecoratorContext,
+  decorator: DecoratorFunction,
+  key: symbol,
+  target: Type,
+  value: unknown,
+  scope?: LanguageScopes,
+  transitivity: boolean = false
+): boolean {
+  const targetEntry = context.program.stateMap(key).get(target);
+  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+
+  // If target doesn't exist in decorator map, create a new entry
+  if (!targetEntry) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, newObject);
+    return true;
+  }
+
+  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
+  const scopes = Reflect.ownKeys(targetEntry);
+  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+    return true;
+  }
+  // we only want to allow multiple decorators if they each specify a different scope
+  if (!transitivity) {
+    validateDecoratorUniqueOnNode(context, target, decorator);
+    return false;
+  }
+  // for transitivity situation, we could allow scope extension
+  if (!scopes.includes(AllScopes) && !scope) {
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+  }
+  return false;
+}
+
 const clientKey = createStateSymbol("client");
 
 function isArm(service: Namespace): boolean {
@@ -123,7 +158,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : findClientService(context.program, target) ?? (target as any);
+      : (findClientService(context.program, target) ?? (target as any));
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
