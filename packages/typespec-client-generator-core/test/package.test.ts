@@ -434,7 +434,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointTemplateArg.onClient, true);
       strictEqual(endpointTemplateArg.optional, false);
       strictEqual(endpointTemplateArg.kind, "path");
-      strictEqual(endpointParam.clientDefaultValue, "http://localhost:3000");
+      strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
     });
 
     it("single with core", async () => {

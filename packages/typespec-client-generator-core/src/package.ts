@@ -462,9 +462,16 @@ function getSdkEndpointParameter(
       if (sdkParam.kind === "path") {
         templateArguments.push(sdkParam);
         sdkParam.onClient = true;
+        if (param.defaultValue && "value" in param.defaultValue) {
+          sdkParam.clientDefaultValue = param.defaultValue.value;
+        }
         const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
-        sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
         sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+        if (sdkParam.isApiVersionParam) {
+          sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+        } else if (param.defaultValue && "value" in param.defaultValue) {
+          sdkParam.clientDefaultValue = param.defaultValue.value;
+        }
         sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
       } else {
         diagnostics.add(
