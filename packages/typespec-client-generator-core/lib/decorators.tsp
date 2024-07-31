@@ -420,7 +420,7 @@ extern dec access(
 #deprecated "@flattenProperty decorator is not recommended to use."
 extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
 
-namespace Azure.ClientGenerator.Core.CSharp {
+namespace CSharp {
   /**
    * Whether a model needs the custom JSON converter, this is only used for backward compatibility.
    * @param scope The language scope you want this decorator to apply to. If not specified, will only apply to csharp emitter.
