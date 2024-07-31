@@ -38,8 +38,7 @@
             "schema": {
               "type": "integer",
               "format": "int64"
-            },
-            "default": 123
+            }
           }
         ],
         "responses": {

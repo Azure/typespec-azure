@@ -105,6 +105,9 @@ importers:
       '@pnpm/find-workspace-packages':
         specifier: ^6.0.9
         version: 6.0.9(@pnpm/logger@5.0.0)
+      '@types/micromatch':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
@@ -141,6 +144,9 @@ importers:
       eslint-plugin-vitest:
         specifier: ^0.5.4
         version: 0.5.4(eslint@8.57.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+      micromatch:
+        specifier: ^4.0.7
+        version: 4.0.7
       picocolors:
         specifier: ~1.0.1
         version: 1.0.1
@@ -205,8 +211,8 @@ importers:
         specifier: ~4.4.0
         version: 4.4.0
       '@azure/storage-blob':
-        specifier: ~12.23.0
-        version: 12.23.0
+        specifier: ~12.24.0
+        version: 12.24.0
       '@pnpm/find-workspace-packages':
         specifier: ^6.0.9
         version: 6.0.9(@pnpm/logger@5.0.0)
@@ -2151,6 +2157,9 @@ importers:
 
   packages/typespec-client-generator-core:
     dependencies:
+      '@typespec/versioning':
+        specifier: workspace:~
+        version: link:../../core/packages/versioning
       change-case:
         specifier: ~5.4.4
         version: 5.4.4
@@ -2176,6 +2185,9 @@ importers:
       '@typespec/library-linter':
         specifier: workspace:~
         version: link:../../core/packages/library-linter
+      '@typespec/openapi':
+        specifier: workspace:~
+        version: link:../../core/packages/openapi
       '@typespec/prettier-plugin-typespec':
         specifier: workspace:~
         version: link:../../core/packages/prettier-plugin-typespec
@@ -2185,9 +2197,6 @@ importers:
       '@typespec/tspd':
         specifier: workspace:~
         version: link:../../core/packages/tspd
-      '@typespec/versioning':
-        specifier: workspace:~
-        version: link:../../core/packages/versioning
       '@typespec/xml':
         specifier: workspace:~
         version: link:../../core/packages/xml
@@ -2512,8 +2521,8 @@ packages:
     resolution: {integrity: sha512-8ECtug4RL+zsgh20VL8KYHjrRO3MJOeAKEPRXT2lwtiu5U3BdyIdBb50+QZthEkIi60K6pc/pdOx/k5Jp4sLng==}
     engines: {node: '>=16'}
 
-  '@azure/storage-blob@12.23.0':
-    resolution: {integrity: sha512-c1KJ5R5hqR/HtvmFtTn/Y1BNMq45NUBp0LZH7yF8WFMET+wmESgEr0FVTu/Z5NonmfUjbgJZG5Nh8xHc5RdWGQ==}
+  '@azure/storage-blob@12.24.0':
+    resolution: {integrity: sha512-l8cmWM4C7RoNCBOImoFMxhTXe1Lr+8uQ/IgnhRNMpfoA9bAFWoLG4XrWm6O5rKXortreVQuD+fc1hbzWklOZbw==}
     engines: {node: '>=18.0.0'}
 
   '@babel/code-frame@7.12.11':
@@ -12631,7 +12640,7 @@ snapshots:
       jsonwebtoken: 9.0.2
       uuid: 8.3.2
 
-  '@azure/storage-blob@12.23.0':
+  '@azure/storage-blob@12.24.0':
     dependencies:
       '@azure/abort-controller': 1.1.0
       '@azure/core-auth': 1.7.2
