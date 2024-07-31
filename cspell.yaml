@@ -27,7 +27,6 @@ enableFiletypes:
   - typespec
 words:
   - allof
-  - mobo
   - apim
   - apos
   - armId
@@ -35,6 +34,7 @@ words:
   - Bazs
   - byos
   - clsx
+  - contosowidgetmanager
   - DMSS
   - Donezo
   - dynatrace
@@ -49,12 +49,14 @@ words:
   - LINUXNEXTVMIMAGE
   - LINUXOS
   - LINUXVMIMAGE
+  - locationyaml
   - logz
   - LRO
   - lropaging
   - Lucene
   - MACVMIMAGE
   - mgmt
+  - mobo
   - msazure
   - msdata
   - mylocation
@@ -64,8 +66,8 @@ words:
   - oncophenotype
   - PAYG
   - prismjs
-  - pytest
   - psscriptanalyzer
+  - pytest
   - qnas
   - regionality
   - Reranker
@@ -74,6 +76,5 @@ words:
   - SERVICERP
   - tcgc
   - userrp
+  - vnet
   - WINDOWSVMIMAGE
-  - contosowidgetmanager
-  - locationyaml

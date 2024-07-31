@@ -301,10 +301,10 @@ export type OpenAPI2ParameterType = OpenAPI2Parameter["in"];
 
 export interface OpenAPI2HeaderDefinition {
   type: "string" | "number" | "integer" | "boolean" | "array";
-  items?: OpenAPI2Schema;
   collectionFormat?: "csv" | "ssv" | "tsv" | "pipes";
   description?: string;
   format?: string;
+  items?: PrimitiveItems;
 }
 
 export type OpenAPI2Parameter =
@@ -315,6 +315,10 @@ export type OpenAPI2Parameter =
   | OpenAPI2PathParameter;
 
 export interface OpenAPI2ParameterBase extends Extensions {
+  name: string;
+  description?: string;
+  required?: boolean;
+
   /**
    * Provide a different name to be used in the client.
    */
@@ -323,11 +327,8 @@ export interface OpenAPI2ParameterBase extends Extensions {
 }
 
 export interface OpenAPI2BodyParameter extends OpenAPI2ParameterBase {
-  name: string;
   in: "body";
   schema: OpenAPI2Schema;
-  description?: string;
-  required?: boolean;
   allowEmptyValue?: boolean;
   example?: unknown;
 
@@ -338,6 +339,7 @@ export interface OpenAPI2HeaderParameter extends OpenAPI2HeaderDefinition, OpenA
   name: string;
   in: "header";
   required?: boolean;
+  default?: unknown;
 }
 
 export interface OpenAPI2FormDataParameter extends OpenAPI2ParameterBase {
@@ -359,7 +361,7 @@ export interface OpenAPI2FormDataParameter extends OpenAPI2ParameterBase {
   "x-ms-client-flatten"?: boolean;
 }
 
-export interface PrimitiveItems extends OpenAPI2ParameterBase {
+export interface PrimitiveItems {
   type: "string" | "number" | "integer" | "boolean" | "array" | "file";
   format?: string;
   items?: PrimitiveItems;
@@ -376,7 +378,9 @@ export interface OpenAPI2PathParameter extends OpenAPI2ParameterBase {
   required?: boolean;
   format?: string;
   enum?: string[];
+  items?: PrimitiveItems;
   "x-ms-skip-url-encoding"?: boolean;
+  default?: unknown;
 }
 
 export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
@@ -389,6 +393,8 @@ export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
   required?: boolean;
   format?: string;
   enum?: string[];
+  items?: PrimitiveItems;
+  default?: unknown;
 }
 
 export type HttpMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";

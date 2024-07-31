@@ -313,7 +313,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
-      strictEqual(templateArg.description, "Testserver endpoint");
+      strictEqual(templateArg.description, undefined);
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -2702,6 +2702,12 @@ describe("typespec-client-generator-core: package", () => {
       ok(nextLinkProperty);
       strictEqual(nextLinkProperty.kind, "property");
       strictEqual(nextLinkProperty.type.kind, "url");
+      strictEqual(nextLinkProperty.type.name, "ResourceLocation");
+      strictEqual(
+        nextLinkProperty.type.crossLanguageDefinitionId,
+        "TypeSpec.Rest.ResourceLocation"
+      );
+      strictEqual(nextLinkProperty.type.baseType?.kind, "url");
       strictEqual(nextLinkProperty.serializedName, "nextLink");
       strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
@@ -2712,6 +2718,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(clientRequestIdProperty.kind, "header");
     });
   });
+
   describe("spread", () => {
     it("plain model with no decorators", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")

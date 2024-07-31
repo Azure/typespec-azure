@@ -1,4 +1,5 @@
 {
   "extends": "./core/tsconfig.base.json",
-  "include": ["./eng", "./core/eng"]
+  "include": ["./eng", "./core/eng"],
+  "exclude": ["./core/eng/vitest.config.ts"]
 }

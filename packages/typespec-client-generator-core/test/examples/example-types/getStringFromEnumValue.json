@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringFromEnumValue",
+  "title": "getStringFromEnumValue",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "one"
+    }
+  }
+}

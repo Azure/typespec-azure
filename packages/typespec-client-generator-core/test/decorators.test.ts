@@ -435,6 +435,27 @@ describe("typespec-client-generator-core: decorators", () => {
         },
       ]);
     });
+
+    it("with @clientName", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @operationGroup
+        @clientName("ClientModel")
+        interface Model {
+          op foo(): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const mainClient = sdkPackage.clients[0];
+      strictEqual(mainClient.methods.length, 1);
+
+      const clientAccessor = mainClient.methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      strictEqual(clientAccessor.response.kind, "client");
+      strictEqual(clientAccessor.response.name, "ClientModel");
+    });
   });
 
   describe("listOperationGroups without @client and @operationGroup", () => {
@@ -1314,7 +1335,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
@@ -1355,7 +1376,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
@@ -1391,7 +1412,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
@@ -2545,6 +2566,30 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "decorator-wrong-target",
       });
     });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
+      });
+    });
   });
 
   describe("@clientName", () => {
@@ -2820,6 +2865,36 @@ describe("typespec-client-generator-core: decorators", () => {
 
       @route("/b")
       op b(): void;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation in interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      interface C {
+        @clientName("b")
+        @route("/a")
+        op a(): void;
+
+        @route("/b")
+        op b(): void;
+      }
       `
       );
 
@@ -4175,7 +4250,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);
