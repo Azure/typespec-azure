@@ -571,10 +571,10 @@ op getModel(): Fish;
 
 #### `@hasJsonConverter`
 
-Whether a model needs the custom JSON converter, this is only used for backward compatibility.
+Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
 
 ```typespec
-@Azure.ClientGenerator.Core.CSharp.hasJsonConverter(scope?: "csharp")
+@Azure.ClientGenerator.Core.CSharp.hasJsonConverter
 ```
 
 ##### Target
@@ -583,9 +583,7 @@ Whether a model needs the custom JSON converter, this is only used for backward 
 
 ##### Parameters
 
-| Name  | Type       | Description                                                                                                  |
-| ----- | ---------- | ------------------------------------------------------------------------------------------------------------ |
-| scope | `"csharp"` | The language scope you want this decorator to apply to. If not specified, will only apply to csharp emitter. |
+None
 
 ##### Examples
 

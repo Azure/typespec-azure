@@ -422,8 +422,7 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
 
 namespace CSharp {
   /**
-   * Whether a model needs the custom JSON converter, this is only used for backward compatibility.
-   * @param scope The language scope you want this decorator to apply to. If not specified, will only apply to csharp emitter.
+   * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
    *
    * @example
    * ```typespec
@@ -433,5 +432,5 @@ namespace CSharp {
    * }
    * ```
    */
-  extern dec hasJsonConverter(target: Model, scope?: "csharp");
+  extern dec hasJsonConverter(target: Model);
 }
