@@ -79,5 +79,5 @@ export type EnsureVerbDecorator = (
 export type DefaultFinalStateViaDecorator = (
   context: DecoratorContext,
   target: Operation,
-  states: unknown
+  states: readonly ("operation-location" | "location" | "azure-async-operation")[]
 ) => void;
