@@ -97,7 +97,7 @@ async function emitAllServices(
     const result = await getOpenAPIForService(context, options);
     const includedVersions = getVersion(program, service.type)
       ?.getVersions()
-      ?.map((item) => item.value);
+      ?.map((item) => item.value ?? item.name);
     result.document.info["x-canonical-included-versions"] = includedVersions;
     result.document.info["x-typespec-generated"] = [
       {
