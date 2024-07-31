@@ -75,7 +75,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
     strictEqual(models.length, 1);
     strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.@encode");
     const encodeInfo = models[0].properties[0].decorators[0].arguments[
-      "encoding"
+      "encodingOrEncodeAs"
     ] as SdkEnumValueType;
     strictEqual(encodeInfo.value, "base64url");
     expectDiagnostics(runner.context.diagnostics, []);
