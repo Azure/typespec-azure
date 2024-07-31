@@ -12,11 +12,11 @@ it("works with models", async () => {
     namespace MyService {
       enum Versions {
         @useDependency(MyLibrary.Versions.A)
-        v1,
+        v1: "2020-11-01-preview",
         @useDependency(MyLibrary.Versions.B)
-        v2,
+        v2: "2021-05-01-preview",
         @useDependency(MyLibrary.Versions.C)
-        v3
+        v3: "2022-05-01-preview"
       }
 
       model Test {
@@ -44,7 +44,11 @@ it("works with models", async () => {
   `
   );
   strictEqual(v.info.version, canonicalVersion);
-  deepStrictEqual(v.info["x-canonical-included-versions"], ["v1", "v2", "v3"]);
+  deepStrictEqual(v.info["x-canonical-included-versions"], [
+    "2020-11-01-preview",
+    "2021-05-01-preview",
+    "2022-05-01-preview",
+  ]);
   deepStrictEqual(v.definitions.Test, {
     type: "object",
     properties: {
