@@ -669,4 +669,22 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(formDataBodyParam.type.properties[3].type.kind, "model");
     strictEqual(formDataBodyParam.type.properties[3].type.name, "File");
   });
+
+  it("check multipartOptions for property of base model", async function () {
+    await runner.compileWithBuiltInService(`
+      model MultiPartRequest{
+          fileProperty: HttpPart<File>;
+      }
+      @post
+      op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+      `);
+    const models = runner.context.sdkPackage.models;
+    const fileModel = models.find((x) => x.name === "File");
+    ok(fileModel);
+    for (const p of fileModel.properties) {
+      strictEqual(p.kind, "property");
+      strictEqual(p.isMultipartFileInput, false);
+      strictEqual(p.multipartOptions, undefined);
+    }
+  });
 });
