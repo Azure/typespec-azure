@@ -560,12 +560,12 @@ op getModel(): Fish;
 
 ## Azure.ClientGenerator.Core.CSharp
 
-### `@hasJSONConverter` {#@Azure.ClientGenerator.Core.CSharp.hasJSONConverter}
+### `@hasJsonConverter` {#@Azure.ClientGenerator.Core.CSharp.hasJsonConverter}
 
 Whether a model needs the custom JSON converter, this is only used for backward compatibility.
 
 ```typespec
-@Azure.ClientGenerator.Core.CSharp.hasJSONConverter(scope?: "csharp")
+@Azure.ClientGenerator.Core.CSharp.hasJsonConverter(scope?: "csharp")
 ```
 
 #### Target
@@ -581,7 +581,7 @@ Whether a model needs the custom JSON converter, this is only used for backward 
 #### Examples
 
 ```typespec
-@hasJSONConverter
+@hasJsonConverter
 model MyModel {
   prop: string;
 }

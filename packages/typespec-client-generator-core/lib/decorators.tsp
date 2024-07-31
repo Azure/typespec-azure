@@ -427,11 +427,11 @@ namespace Azure.ClientGenerator.Core.CSharp {
    *
    * @example
    * ```typespec
-   * @hasJSONConverter
+   * @hasJsonConverter
    * model MyModel {
    *   prop: string;
    * }
    * ```
    */
-  extern dec hasJSONConverter(target: Model, scope?: "csharp");
+  extern dec hasJsonConverter(target: Model, scope?: "csharp");
 }

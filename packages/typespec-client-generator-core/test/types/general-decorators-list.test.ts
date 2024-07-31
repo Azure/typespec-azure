@@ -329,14 +329,14 @@ describe("typespec-client-generator-core: general decorators list", () => {
   });
 
   describe("csharp only decorator", () => {
-    it("@hasJSONConverter", async function () {
+    it("@hasJsonConverter", async function () {
       runner = await createSdkTestRunner(
         {},
-        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.CSharp\\.@hasJSONConverter"] }
+        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.CSharp\\.@hasJsonConverter"] }
       );
 
       await runner.compileWithBuiltInService(`
-        @hasJSONConverter
+        @hasJsonConverter
         model A {
           id: string;
         }
@@ -347,7 +347,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators, [
-        { name: "Azure.ClientGenerator.Core.CSharp.@hasJSONConverter", arguments: {} },
+        { name: "Azure.ClientGenerator.Core.CSharp.@hasJsonConverter", arguments: {} },
       ]);
       expectDiagnostics(runner.context.diagnostics, []);
     });

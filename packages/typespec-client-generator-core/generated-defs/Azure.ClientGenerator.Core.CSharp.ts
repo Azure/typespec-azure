@@ -6,13 +6,13 @@ import type { DecoratorContext, Model, Type } from "@typespec/compiler";
  * @param scope The language scope you want this decorator to apply to. If not specified, will only apply to csharp emitter.
  * @example
  * ```typespec
- * @hasJSONConverter
+ * @hasJsonConverter
  * model MyModel {
  *   prop: string;
  * }
  * ```
  */
-export type HasJSONConverterDecorator = (
+export type HasJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
   scope?: Type
