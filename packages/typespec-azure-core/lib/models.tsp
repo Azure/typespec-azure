@@ -356,6 +356,17 @@ scalar eTag extends string;
 scalar azureLocation extends string;
 
 /**
+ * Represents an Azure Resource Type.
+ *
+ * @example
+ *
+ * ```
+ * Microsoft.Network/virtualNetworks/subnets
+ * ```
+ */
+scalar resourceType extends string;
+
+/**
  * A type definition that refers the id to an Azure Resource Manager resource.
  *
  * @template AllowedResourceTypes An array of allowed resource types for the resource reference
@@ -398,7 +409,7 @@ alias AllArmResourceDeploymentScopes = [
 
 model ArmResourceIdentifierAllowedResource {
   /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
-  type: string;
+  type: resourceType;
 
   /**
    * An array of scopes. If not specified, the default scope is ["ResourceGroup"].
