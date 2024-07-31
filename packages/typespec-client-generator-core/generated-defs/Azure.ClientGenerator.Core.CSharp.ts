@@ -1,9 +1,8 @@
-import type { DecoratorContext, Model, Type } from "@typespec/compiler";
+import type { DecoratorContext, Model } from "@typespec/compiler";
 
 /**
- * Whether a model needs the custom JSON converter, this is only used for backward compatibility.
+ * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
  *
- * @param scope The language scope you want this decorator to apply to. If not specified, will only apply to csharp emitter.
  * @example
  * ```typespec
  * @hasJsonConverter
@@ -12,8 +11,4 @@ import type { DecoratorContext, Model, Type } from "@typespec/compiler";
  * }
  * ```
  */
-export type HasJsonConverterDecorator = (
-  context: DecoratorContext,
-  target: Model,
-  scope?: Type
-) => void;
+export type HasJsonConverterDecorator = (context: DecoratorContext, target: Model) => void;
