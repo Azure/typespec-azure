@@ -2251,3 +2251,125 @@ public enum Orientation {
 
 </TabItem>
 </Tabs>
+
+## Scalars
+
+### Encoding
+
+We will take the `@encode` decorator into account, determining how we serialize inputted scalars to send over the wire.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+model Test {
+@encode(DateTimeKnownEncoding.rfc3339)
+prop: utcDateTime;
+}
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "property",
+  "name": "prop",
+  "type": {
+    "kind": "utcDateTime",
+    "encode": "rfc3339",
+    "wireType": {
+      "kind": "string"
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="rfc3339")
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+// Internal implementation
+jsonWriter.writeStringField("prop",
+    this.value == null ? null : DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(this.value));
+```
+
+</TabItem>
+</Tabs>
+
+When you specify an encoding type, say that you want to encode an integer as a string, that will also be represented in our generated SDKs.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+model Test {
+@encode(string)
+prop: int64;
+}
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+```json
+{
+  "kind": "property",
+  "name": "prop",
+  "type": {
+    "kind": "int64",
+    "encode": "string",
+    "wireType": {
+      "kind": "string"
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="string")
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO
+```
+
+</TabItem>
+</Tabs>
