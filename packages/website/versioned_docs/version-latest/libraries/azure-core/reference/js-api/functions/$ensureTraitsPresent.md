@@ -14,7 +14,7 @@ function $ensureTraitsPresent(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Interface` \| `Operation` |
 | `traitModel` | `Model` |

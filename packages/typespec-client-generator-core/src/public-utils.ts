@@ -28,12 +28,13 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
+import { SdkHttpOperationExample, TCGCContext } from "./interfaces.js";
 import {
-  TCGCContext,
   TspLiteralType,
   getClientNamespaceStringHelper,
   getHttpOperationResponseHeaders,
   parseEmitterName,
+  removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
@@ -48,18 +49,8 @@ export function getDefaultApiVersion(
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
-    let versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    // filter with specific api version
-    if (
-      context.apiVersion !== undefined &&
-      context.apiVersion !== "latest" &&
-      context.apiVersion !== "all"
-    ) {
-      const index = versions.findIndex((version) => version.value === context.apiVersion);
-      if (index >= 0) {
-        versions = versions.slice(0, index + 1);
-      }
-    }
+    const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {
@@ -215,6 +206,7 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
   type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  operation?: Operation,
   appendNamespace: boolean = true
 ): string {
   let retval = type.name || "anonymous";
@@ -226,7 +218,9 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      const contextPath = findContextPath(context, type);
+      const contextPath = operation
+        ? getContextPath(context, operation, type)
+        : findContextPath(context, type);
       retval =
         contextPath
           .slice(findLastNonAnonymousModelNode(contextPath))
@@ -241,12 +235,12 @@ export function getCrossLanguageDefinitionId(
       break;
     case "ModelProperty":
       if (type.model) {
-        retval = `${getCrossLanguageDefinitionId(context, type.model, false)}.${retval}`;
+        retval = `${getCrossLanguageDefinitionId(context, type.model, undefined, false)}.${retval}`;
       }
       break;
     case "Operation":
       if (type.interface) {
-        retval = `${getCrossLanguageDefinitionId(context, type.interface, false)}.${retval}`;
+        retval = `${getCrossLanguageDefinitionId(context, type.interface, undefined, false)}.${retval}`;
       }
       break;
   }
@@ -331,12 +325,17 @@ function findContextPath(
         return result;
       }
     }
-    for (const operationGroup of listOperationGroups(context, client)) {
-      for (const operation of listOperationsInOperationGroup(context, operationGroup)) {
+    const ogs = listOperationGroups(context, client);
+    while (ogs.length) {
+      const operationGroup = ogs.pop();
+      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
+      }
+      if (operationGroup?.subOperationGroups) {
+        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
@@ -614,4 +613,14 @@ export function getHttpOperationWithCache(
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
   context.httpOperationCache.set(operation, httpOperation);
   return httpOperation;
+}
+
+/**
+ * Get the examples for a given http operation.
+ */
+export function getHttpOperationExamples(
+  context: TCGCContext,
+  operation: HttpOperation
+): SdkHttpOperationExample[] {
+  return context.__httpOperationExamples?.get(operation) ?? [];
 }

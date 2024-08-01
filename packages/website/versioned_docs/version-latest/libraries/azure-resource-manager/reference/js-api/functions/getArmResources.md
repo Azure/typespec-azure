@@ -16,7 +16,7 @@ This function returns fully-resolved details about all ARM resources
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 
 ## Returns

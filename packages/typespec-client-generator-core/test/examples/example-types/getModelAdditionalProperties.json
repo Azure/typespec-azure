@@ -1,0 +1,15 @@
+{
+  "operationId": "getModelAdditionalProperties",
+  "title": "getModelAdditionalProperties",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "a": "a",
+        "b": 2,
+        "c": true,
+        "d": [1, 2, 3]
+      }
+    }
+  }
+}

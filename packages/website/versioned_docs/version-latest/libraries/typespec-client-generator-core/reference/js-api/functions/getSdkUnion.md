@@ -13,7 +13,7 @@ function getSdkUnion(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `type` | `Union` |
 | `operation`? | `Operation` |

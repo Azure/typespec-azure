@@ -13,7 +13,7 @@ function checkIsArmResource(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Model` |
 | `decoratorName` | `"about"` \| `"marketplaceOffer"` \| `"promotion"` |

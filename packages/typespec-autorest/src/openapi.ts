@@ -131,16 +131,20 @@ import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
+  OpenAPI2BodyParameter,
   OpenAPI2Document,
   OpenAPI2FileSchema,
   OpenAPI2FormDataParameter,
   OpenAPI2HeaderDefinition,
+  OpenAPI2HeaderParameter,
   OpenAPI2OAuth2FlowType,
   OpenAPI2Operation,
   OpenAPI2Parameter,
+  OpenAPI2ParameterBase,
   OpenAPI2ParameterType,
   OpenAPI2PathItem,
   OpenAPI2PathParameter,
+  OpenAPI2QueryParameter,
   OpenAPI2Response,
   OpenAPI2Schema,
   OpenAPI2SchemaProperty,
@@ -202,6 +206,12 @@ export interface AutorestDocumentEmitterOptions {
    * readOnly property ARM resource flattening
    */
   readonly armResourceFlattening?: boolean;
+
+  /**
+   * Determines whether and how to emit schema for arm common-types
+   * @default "for-visibility-only"
+   */
+  readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
 }
 
 /**
@@ -236,6 +246,14 @@ interface PendingSchema {
    * must be emitted for the type for different visibilities.
    */
   ref: Ref;
+
+  /**
+   * Determines the schema name if an override has been set
+   * @param name The default name of the schema
+   * @param visibility The visibility in which the schema is used
+   * @returns The name of the given schema in the given visibility context
+   */
+  getSchemaNameOverride?: (name: string, visibility: Visibility) => string;
 }
 
 /**
@@ -885,9 +903,20 @@ export async function getOpenAPIForService(
     return undefined;
   }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+    let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
+      undefined;
     const ref = resolveExternalRef(type);
     if (ref) {
-      return ref;
+      if (
+        options.emitCommonTypesSchema === "never" ||
+        !metadataInfo.isTransformed(type, schemaContext.visibility)
+      ) {
+        return ref;
+      }
+
+      // Reference schemas will only be generated when they differ from READ
+      schemaNameOverride = (n: string, v: Visibility) =>
+        `${n}${getVisibilitySuffix(v, Visibility.Read)}`;
     }
 
     if (type.kind === "Scalar" && program.checker.isStdType(type)) {
@@ -945,6 +974,7 @@ export async function getOpenAPIForService(
         type,
         visibility: schemaContext.visibility,
         ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
+        getSchemaNameOverride: schemaNameOverride,
       }));
       return { $ref: pending.ref };
     }
@@ -1004,7 +1034,7 @@ export async function getOpenAPIForService(
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? viaProjection ?? type.name : encodedName;
+    return encodedName === type.name ? (viaProjection ?? type.name) : encodedName;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1016,6 +1046,7 @@ export async function getOpenAPIForService(
         currentEndpoint.parameters.push(shared);
         continue;
       }
+
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
@@ -1181,7 +1212,7 @@ export async function getOpenAPIForService(
     type: Type,
     schemaContext: SchemaContext,
     paramName: string
-  ): Omit<OpenAPI2FormDataParameter, "in" | "name"> | undefined {
+  ): PrimitiveItems | undefined {
     if (isBytes(type)) {
       return { type: "file" };
     }
@@ -1213,66 +1244,166 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPI2Parameter<T extends OpenAPI2ParameterType>(
+  function getOpenAPI2ParameterBase(
+    param: ModelProperty,
+    name: string | undefined
+  ): OpenAPI2ParameterBase {
+    const base: OpenAPI2ParameterBase = {
+      name: name ?? param.name,
+      required: !param.optional,
+      description: getDoc(program, param),
+    };
+    if (param.name !== base.name) {
+      base["x-ms-client-name"] = param.name;
+    }
+
+    attachExtensions(param, base);
+
+    return base;
+  }
+
+  function getOpenAPI2BodyParameter(
+    param: ModelProperty,
+    name?: string,
+    bodySchema?: any
+  ): OpenAPI2BodyParameter {
+    return {
+      in: "body",
+      ...getOpenAPI2ParameterBase(param, name),
+      schema: bodySchema,
+    };
+  }
+
+  function getOpenAPI2FormDataParameter(
+    param: ModelProperty,
+    schemaContext: SchemaContext,
+    name?: string
+  ): OpenAPI2FormDataParameter {
+    const base = getOpenAPI2ParameterBase(param, name);
+    return {
+      in: "formData",
+      ...base,
+      ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
+      default: param.defaultValue && getDefaultValue(param.defaultValue),
+    };
+  }
+
+  function getSimpleParameterSchema(
+    param: ModelProperty,
+    schemaContext: SchemaContext,
+    name: string
+  ): Pick<
+    OpenAPI2QueryParameter | OpenAPI2HeaderParameter | OpenAPI2PathParameter,
+    "type" | "items"
+  > {
+    if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
+      const itemSchema = getSchemaForPrimitiveItems(param.type.indexer.value, schemaContext, name);
+      const schema = itemSchema && {
+        ...itemSchema,
+      };
+      delete (schema as any).description;
+      return { type: "array", items: schema };
+    } else {
+      return getSchemaForPrimitiveItems(param.type, schemaContext, name) as any;
+    }
+  }
+
+  function getOpenAPI2QueryParameter(
+    param: ModelProperty,
+    schemaContext: SchemaContext,
+    name?: string
+  ): OpenAPI2QueryParameter {
+    const base = getOpenAPI2ParameterBase(param, name);
+    let collectionFormat = getQueryParamOptions(program, param).format;
+    if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
+      collectionFormat = undefined;
+      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
+    }
+
+    return {
+      in: "query",
+      collectionFormat: collectionFormat as any,
+      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      ...base,
+      ...getSimpleParameterSchema(param, schemaContext, base.name),
+    };
+  }
+
+  function getOpenAPI2PathParameter(
+    param: ModelProperty,
+    schemaContext: SchemaContext,
+    name?: string
+  ): OpenAPI2PathParameter {
+    const base = getOpenAPI2ParameterBase(param, name);
+
+    return {
+      in: "path",
+      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      ...base,
+      ...getSimpleParameterSchema(param, schemaContext, base.name),
+    };
+  }
+  function getOpenAPI2HeaderParameter(
+    param: ModelProperty,
+    schemaContext: SchemaContext,
+    name?: string
+  ): OpenAPI2HeaderParameter {
+    const base = getOpenAPI2ParameterBase(param, name);
+    let collectionFormat = getHeaderFieldOptions(program, param).format;
+    if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
+      collectionFormat = undefined;
+      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
+    }
+    return {
+      in: "header",
+      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      ...base,
+      collectionFormat: collectionFormat as any,
+      ...getSimpleParameterSchema(param, schemaContext, base.name),
+    };
+  }
+
+  function getOpenAPI2ParameterInternal<T extends OpenAPI2Parameter["in"]>(
     param: ModelProperty,
     kind: T,
     schemaContext: SchemaContext,
     name?: string,
     bodySchema?: any
   ): OpenAPI2Parameter & { in: T } {
-    const ph: any = {
-      name: name ?? param.name,
-      in: kind,
-      required: !param.optional,
-      description: getDoc(program, param),
-    };
-    if (param.name !== ph.name) {
-      ph["x-ms-client-name"] = param.name;
+    switch (kind) {
+      case "body":
+        return getOpenAPI2BodyParameter(param, name, bodySchema) as any;
+      case "formData":
+        return getOpenAPI2FormDataParameter(param, schemaContext, name) as any;
+      case "query":
+        return getOpenAPI2QueryParameter(param, schemaContext, name) as any;
+      case "path":
+        return getOpenAPI2PathParameter(param, schemaContext, name) as any;
+      case "header":
+        return getOpenAPI2HeaderParameter(param, schemaContext, name) as any;
+      default:
+        const _assertNever: never = kind;
+        compilerAssert(false, "Unreachable");
     }
-    if (param.defaultValue) {
-      ph.default = getDefaultValue(param.defaultValue);
-    }
+  }
 
-    if (ph.in === "body") {
-      compilerAssert(bodySchema, "bodySchema argument is required to populate body parameter");
-      ph.schema = bodySchema;
-    } else if (ph.in === "formData") {
-      Object.assign(ph, getFormDataSchema(param.type, schemaContext, ph.name));
-    } else {
-      const collectionFormat = (
-        kind === "query"
-          ? getQueryParamOptions(program, param)
-          : kind === "header"
-            ? getHeaderFieldOptions(program, param)
-            : undefined
-      )?.format;
-      if (collectionFormat === "multi" && !["query", "header", "formData"].includes(ph.in)) {
-        reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
-      }
-      if (collectionFormat) {
-        ph.collectionFormat = collectionFormat;
-      }
-
-      if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
-        ph.type = "array";
-        const schema = {
-          ...getSchemaForPrimitiveItems(param.type.indexer.value, schemaContext, ph.name),
-        };
-        delete (schema as any).description;
-        ph.items = schema;
-      } else {
-        Object.assign(ph, getSchemaForPrimitiveItems(param.type, schemaContext, ph.name));
-      }
-    }
-
-    attachExtensions(param, ph);
-
+  function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
+    param: ModelProperty,
+    kind: T,
+    schemaContext: SchemaContext,
+    name?: string,
+    bodySchema?: any
+  ): OpenAPI2Parameter & { in: T } {
+    const value = getOpenAPI2ParameterInternal(param, kind, schemaContext, name, bodySchema);
     // Apply decorators to a copy of the parameter definition.  We use
     // Object.assign here because applyIntrinsicDecorators returns a new object
     // based on the target object and we need to apply its changes back to the
     // original parameter.
-    Object.assign(ph, applyIntrinsicDecorators(param, { type: ph.type, format: ph.format }));
-    return ph;
+    Object.assign(
+      value,
+      applyIntrinsicDecorators(param, { type: (value as any).type, format: (value as any).format })
+    );
+    return value;
   }
 
   function populateParameter(
@@ -1319,7 +1450,9 @@ export async function getOpenAPIForService(
     for (const group of processedSchemas.values()) {
       for (const [visibility, processed] of group) {
         let name = getOpenAPITypeName(program, processed.type, typeNameOptions);
-        if (group.size > 1) {
+        if (processed.getSchemaNameOverride !== undefined) {
+          name = processed.getSchemaNameOverride(name, visibility);
+        } else if (group.size > 1) {
           name += getVisibilitySuffix(visibility, Visibility.Read);
         }
 
@@ -1646,6 +1779,7 @@ export async function getOpenAPIForService(
 
   function includeDerivedModel(model: Model): boolean {
     return (
+      !resolveExternalRef(model) &&
       !isTemplateDeclaration(model) &&
       (model.templateMapper?.args === undefined ||
         model.templateMapper?.args.length === 0 ||
@@ -1703,7 +1837,9 @@ export async function getOpenAPIForService(
       modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, schemaContext);
     }
 
-    const derivedModels = model.derivedModels.filter(includeDerivedModel);
+    const derivedModels = resolveExternalRef(model)
+      ? []
+      : model.derivedModels.filter(includeDerivedModel);
 
     // getSchemaOrRef on all children to push them into components.schemas
     for (const child of derivedModels) {

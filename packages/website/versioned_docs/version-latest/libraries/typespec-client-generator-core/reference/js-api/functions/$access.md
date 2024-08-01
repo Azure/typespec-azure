@@ -14,7 +14,7 @@ function $access(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Enum` \| `Model` \| `Operation` \| `Union` |
 | `value` | `EnumMember` |

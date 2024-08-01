@@ -12,8 +12,8 @@ The abstract type for polling control information
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `finalResult?` | `IntrinsicType` \| `Model` | The type of the final result after polling completes |
-| `kind` | `StatusMonitor` | The kind of polling being done |
+| `kind` | `pollingOptionsKind` | The kind of polling being done |
 | `pollingModel?` | `IntrinsicType` \| `Model` | The type of the poller |
 | `target` | `ModelProperty` | The model property containing the polling link |

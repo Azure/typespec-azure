@@ -247,6 +247,10 @@ op Azure.ResourceManager.ResourceCreateSync.createOrUpdate(provider: "Microsoft.
 
 ### `ResourceDeleteAsync` {#Azure.ResourceManager.ResourceDeleteAsync}
 
+:::warning
+**Deprecated**: This should be deprecated in a future release
+:::
+
 ```typespec
 interface Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>
 ```
@@ -389,6 +393,10 @@ op Azure.ResourceManager.ResourceListBySubscription.listBySubscription(apiVersio
 ```
 
 ### `ResourceOperations` {#Azure.ResourceManager.ResourceOperations}
+
+:::warning
+**Deprecated**: Use Azure.ResourceManager.TrackedResourceOperations instead
+:::
 
 ```typespec
 interface Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>
@@ -845,6 +853,10 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
+:::warning
+**Deprecated**: Please use ArmResourceCreateOrReplaceSync instead
+:::
+
 DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
 
 ```typespec
@@ -862,6 +874,10 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 | Error          | Optional. The error response, if non-standard.                  |
 
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
+
+:::warning
+**Deprecated**: Use 'ArmResourceDeleteWithoutOkAsync' instead
+:::
 
 ```typespec
 op Azure.ResourceManager.ArmResourceDeleteAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -970,7 +986,7 @@ op Azure.ResourceManager.ArmResourceListByParent(provider: "Microsoft.ThisWillBe
 ### `ArmResourcePatchAsync` {#Azure.ResourceManager.ArmResourcePatchAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourcePatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmResourcePatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -986,7 +1002,7 @@ op Azure.ResourceManager.ArmResourcePatchAsync(provider: "Microsoft.ThisWillBeRe
 ### `ArmResourcePatchSync` {#Azure.ResourceManager.ArmResourcePatchSync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourcePatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmResourcePatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -1063,7 +1079,7 @@ op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscri
 ### `checkLocalNameAvailability` {#Azure.ResourceManager.checkLocalNameAvailability}
 
 ```typespec
-op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: string, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: Azure.Core.azureLocation, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters

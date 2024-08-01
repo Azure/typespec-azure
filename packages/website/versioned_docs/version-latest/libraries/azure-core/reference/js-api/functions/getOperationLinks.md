@@ -12,7 +12,7 @@ Returns the collection of `OperationLinkMetadata` for a given operation, if any,
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Operation` |
 

@@ -10,7 +10,7 @@ function extractLroStates(program, entity): [LongRunningStates | undefined, read
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Type` |
 

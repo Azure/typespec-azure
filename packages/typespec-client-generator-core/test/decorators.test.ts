@@ -177,7 +177,7 @@ describe("typespec-client-generator-core: decorators", () => {
           service: MyService,
           type: MyService,
           arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
     });
@@ -431,9 +431,30 @@ describe("typespec-client-generator-core: decorators", () => {
           service: MyService,
           type: MyService,
           arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
+    });
+
+    it("with @clientName", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @operationGroup
+        @clientName("ClientModel")
+        interface Model {
+          op foo(): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const mainClient = sdkPackage.clients[0];
+      strictEqual(mainClient.methods.length, 1);
+
+      const clientAccessor = mainClient.methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      strictEqual(clientAccessor.response.kind, "client");
+      strictEqual(clientAccessor.response.name, "ClientModel");
     });
   });
 
@@ -1311,16 +1332,21 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
       test as Operation
     );
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
     strictEqual(actual, protocolValue);
+    strictEqual(method.generateProtocol, protocolValue);
   }
   describe("@protocolAPI", () => {
     it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
@@ -1347,16 +1373,21 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
       test as Operation
     );
     strictEqual(actual, convenientValue);
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
+    strictEqual(method.generateConvenient, convenientValue);
   }
 
   describe("@convenientAPI", () => {
@@ -1374,20 +1405,24 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
-      const { test } = await runner.compile(`
+      const { test } = await runner.compileWithBuiltInService(`
         @convenientAPI
         @test
         op test(): void;
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
         test as Operation
       );
       strictEqual(actual, true);
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.generateConvenient, true);
     });
   });
 
@@ -1403,25 +1438,41 @@ describe("typespec-client-generator-core: decorators", () => {
       // java should get protocolAPI=true and convenientAPI=false
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(shouldGenerateProtocol(runner.context, test), true);
+        strictEqual(method.generateProtocol, true);
+
         strictEqual(
           shouldGenerateConvenient(runner.context, test),
           false,
           "convenientAPI should be false for java"
         );
+        strictEqual(method.generateConvenient, false, "convenientAPI should be false for java");
       }
 
       // csharp should get protocolAPI=false and convenientAPI=true
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(
           shouldGenerateProtocol(runner.context, test),
           false,
           "protocolAPI should be false for csharp"
         );
+        strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
+
         strictEqual(shouldGenerateConvenient(runner.context, test), true);
+        strictEqual(method.generateConvenient, true);
       }
     });
   });
@@ -2515,6 +2566,30 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "decorator-wrong-target",
       });
     });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
+      });
+    });
   });
 
   describe("@clientName", () => {
@@ -2694,6 +2769,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
     });
+
     it("empty client name", async () => {
       const diagnostics = await runner.diagnose(`
         @service({})
@@ -2709,6 +2785,389 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/empty-client-name",
       });
+    });
+
+    it("duplicate model client name with a random language scope", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      @clientName("Test", "random")
+      model Widget {
+        @key
+        id: int32;
+      }
+
+      model Test {
+        prop1: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "random"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "random"',
+        },
+      ]);
+    });
+
+    it("duplicate model, enum, union client name with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("B")
+      enum A {
+        one
+      }
+
+      model B {}
+
+      @clientName("B")
+      union C {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation in interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      interface C {
+        @clientName("b")
+        @route("/a")
+        op a(): void;
+
+        @route("/b")
+        op b(): void;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate scalar with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      scalar a extends string;
+
+      scalar b extends string;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      @clientName("B")
+      @route("/a")
+      interface A {
+      }
+
+      @route("/b")
+      interface B {
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model property with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      model A {
+        @clientName("prop2")
+        prop1: string;
+        prop2: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "prop2" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "prop2" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum member with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      enum A {
+        @clientName("two")
+        one,
+        two
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "two" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "two" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate union variant with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace Contoso.WidgetManager;
+
+        union Foo { 
+          @clientName("b")
+          a: {}, 
+          b: {} 
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate namespace with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {}
+          @clientName("B")
+          namespace C {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum and model within nested namespace for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {
+            @clientName("B")
+            enum A {
+              one
+            }
+
+            model B {}
+          }
+
+          @clientName("B")
+          model A {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model with model only generation for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        model Foo {}
+
+        @clientName("Foo")
+        model Bar {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Foo" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Foo" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model client name with multiple language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      @clientName("Test", "csharp,python,java")
+      model Widget {
+        @key
+        id: int32;
+      }
+
+      @clientName("Widget", "java")
+      model Test {
+        prop1: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "python"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
+        },
+      ]);
     });
   });
 
@@ -3442,6 +3901,115 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(test2Method.name, "test2");
       deepStrictEqual(test2Method.apiVersions, ["v2"]);
     });
+    it("default latest GA version with preview", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2022_10_01_preview: "2022-10-01-preview",
+          v2024_10_01: "2024-10-01",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 1);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+    });
+    it("default latest preview version with GA", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-11-01-preview");
+    });
+
+    it("specify api version with preview filter", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "2024-10-01",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2023_10_01: "2023-10-01",
+          v2023_11_01_preview: "2023-11-01-preview",
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2023-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
+    });
   });
 
   describe("versioning impact for apis", () => {
@@ -3682,7 +4250,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);

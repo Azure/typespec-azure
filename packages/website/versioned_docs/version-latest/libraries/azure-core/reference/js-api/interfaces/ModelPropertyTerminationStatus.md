@@ -8,7 +8,7 @@ Definition of a status monitor that uses a status field
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `canceledState` | `string`[] | The status values that indicate operation cancellation, by the user or another actor |
 | `failedState` | `string`[] | The status values that indicate operation failure |
 | `kind` | `"model-property"` | - |

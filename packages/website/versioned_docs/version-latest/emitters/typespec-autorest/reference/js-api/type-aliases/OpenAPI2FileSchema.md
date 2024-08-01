@@ -9,8 +9,8 @@ type OpenAPI2FileSchema: object;
 
 ## Type declaration
 
-| Member | Type |
-| :------ | :------ |
+| Name | Type |
+| ------ | ------ |
 | `default` | `unknown` |
 | `description` | `string` |
 | `example` | `unknown` |

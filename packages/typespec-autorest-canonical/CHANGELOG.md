@@ -1,5 +1,25 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.5.1
+
+### Features
+
+- [#1237](https://github.com/Azure/typespec-azure/pull/1237) Use new `createTcgcContext` from tcgc lib, which is the minimal context object that handles scope
+
+
+## 0.5.0
+
+### Bug Fixes
+
+- [#1065](https://github.com/Azure/typespec-azure/pull/1065) set option "use-read-only-status-schema" to true to fix ProvisioningStateMustBeReadOnly bug; 
+add isArmCommonType check to avoid decorator validation in canonical emitter
+- [#1065](https://github.com/Azure/typespec-azure/pull/1065) update the canonical swagger file folder name
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+
 ## 0.4.0
 
 ### Bug Fixes

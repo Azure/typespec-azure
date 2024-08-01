@@ -152,7 +152,7 @@ op func8(@body body: Test5): void;
 Create a ClientGenerator.Core client out of a namespace or interface
 
 ```typespec
-@Azure.ClientGenerator.Core.client(value?: {}, scope?: valueof string)
+@Azure.ClientGenerator.Core.client(value?: Model, scope?: valueof string)
 ```
 
 #### Target
@@ -163,7 +163,7 @@ Create a ClientGenerator.Core client out of a namespace or interface
 
 | Name  | Type             | Description                                                                                                   |
 | ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `{}`             | Optional configuration for the service.                                                                       |
+| value | `Model`          | Optional configuration for the service.                                                                       |
 | scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 #### Examples
@@ -200,6 +200,10 @@ interface MyInterface {}
 ```
 
 ### `@clientFormat` {#@Azure.ClientGenerator.Core.clientFormat}
+
+:::warning
+**Deprecated**: @clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead.
+:::
 
 DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
 
@@ -291,6 +295,10 @@ op test: void;
 
 ### `@exclude` {#@Azure.ClientGenerator.Core.exclude}
 
+:::warning
+**Deprecated**: @exclude decorator is deprecated. Use `@usage` and `@access` decorator instead.
+:::
+
 DEPRECATED: Use `@usage` and `@access` decorator instead.
 
 Whether to exclude a model from generation for specific languages. By default we generate
@@ -321,6 +329,10 @@ model ModelToExclude {
 
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
 
+:::warning
+**Deprecated**: @flattenProperty decorator is not recommended to use.
+:::
+
 Set whether a model property should be flattened or not.
 
 ```typespec
@@ -348,6 +360,10 @@ model Bar {}
 ```
 
 ### `@include` {#@Azure.ClientGenerator.Core.include}
+
+:::warning
+**Deprecated**: @include decorator is deprecated. Use `@usage` and `@access` decorator instead.
+:::
 
 DEPRECATED: Use `@usage` and `@access` decorator instead.
 
@@ -378,6 +394,10 @@ model ModelToInclude {
 ```
 
 ### `@internal` {#@Azure.ClientGenerator.Core.internal}
+
+:::warning
+**Deprecated**: @internal decorator is deprecated. Use `@access` decorator instead.
+:::
 
 DEPRECATED: Use `@access` decorator instead.
 

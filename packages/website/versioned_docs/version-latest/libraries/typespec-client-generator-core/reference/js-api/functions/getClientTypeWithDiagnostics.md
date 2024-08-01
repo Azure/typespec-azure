@@ -13,7 +13,7 @@ function getClientTypeWithDiagnostics(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 | `type` | `Type` |
 | `operation`? | `Operation` |

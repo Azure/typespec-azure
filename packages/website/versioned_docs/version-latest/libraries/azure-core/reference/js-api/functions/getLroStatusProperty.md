@@ -12,7 +12,7 @@ Return the property that contains the lro status
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program to process |
 | `target` | `Model` | The model to check for lro status |
 

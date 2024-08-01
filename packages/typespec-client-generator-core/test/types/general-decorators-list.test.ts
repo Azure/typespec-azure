@@ -3,6 +3,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { XmlTestLibrary } from "@typespec/xml/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { SdkEnumValueType } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: general decorators list", () => {
@@ -72,14 +73,11 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].properties[0].decorators, [
-      {
-        name: "TypeSpec.@encode",
-        arguments: {
-          encoding: "base64url",
-        },
-      },
-    ]);
+    strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.@encode");
+    const encodeInfo = models[0].properties[0].decorators[0].arguments[
+      "encoding"
+    ] as SdkEnumValueType;
+    strictEqual(encodeInfo.value, "base64url");
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
@@ -266,30 +264,17 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].decorators, [
-        {
-          name: "TypeSpec.Xml.@ns",
-          arguments: {
-            ns: "https://example.com/ns1",
-          },
-        },
-      ]);
-      deepStrictEqual(models[0].properties[0].decorators, [
-        {
-          name: "TypeSpec.Xml.@ns",
-          arguments: {
-            ns: "https://example.com/ns1",
-          },
-        },
-      ]);
-      deepStrictEqual(models[0].properties[1].decorators, [
-        {
-          name: "TypeSpec.Xml.@ns",
-          arguments: {
-            ns: "https://example.com/ns2",
-          },
-        },
-      ]);
+      strictEqual(models[0].decorators[0].name, "TypeSpec.Xml.@ns");
+      const modelArg = models[0].decorators[0].arguments["ns"] as SdkEnumValueType;
+      strictEqual(modelArg.value, "https://example.com/ns1");
+
+      strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.Xml.@ns");
+      let propArg = models[0].properties[0].decorators[0].arguments["ns"] as SdkEnumValueType;
+      strictEqual(propArg.value, "https://example.com/ns1");
+
+      strictEqual(models[0].properties[1].decorators[0].name, "TypeSpec.Xml.@ns");
+      propArg = models[0].properties[1].decorators[0].arguments["ns"] as SdkEnumValueType;
+      strictEqual(propArg.value, "https://example.com/ns2");
     });
 
     it("@unwrapped", async function () {

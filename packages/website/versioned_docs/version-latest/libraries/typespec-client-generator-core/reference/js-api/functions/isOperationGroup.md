@@ -12,7 +12,7 @@ Check a namespace or interface is an operation group.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `TCGCContext` | TCGCContext |
 | `type` | `Namespace` \| `Interface` | Type to check |
 

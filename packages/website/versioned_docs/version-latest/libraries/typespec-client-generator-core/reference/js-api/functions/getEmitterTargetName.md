@@ -10,7 +10,7 @@ function getEmitterTargetName(context): string
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `TCGCContext` |
 
 ## Returns

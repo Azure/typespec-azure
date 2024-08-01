@@ -12,7 +12,7 @@ Returns `true` if the property is marked with @pollingLocation.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `ModelProperty` |
 

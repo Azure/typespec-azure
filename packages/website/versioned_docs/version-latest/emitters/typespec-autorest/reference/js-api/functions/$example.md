@@ -16,7 +16,7 @@ function $example(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Type` |
 | `pathOrUri` | `string` |

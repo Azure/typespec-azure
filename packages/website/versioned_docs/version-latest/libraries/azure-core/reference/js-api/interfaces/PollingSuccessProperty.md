@@ -13,7 +13,7 @@ property of the StatusMonitor that contains the success response
 ## Properties
 
 | Property | Type | Description | Overrides |
-| :------ | :------ | :------ | :------ |
+| ------ | ------ | ------ | ------ |
 | `kind` | `"pollingSuccessProperty"` | - | - |
 | `responseModel` | `Model` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep`](LogicalOperationStep.md).`responseModel` |
 | `sourceProperty` | `undefined` \| `ModelProperty` | The property in the response that contained a url to the status monitor | - |

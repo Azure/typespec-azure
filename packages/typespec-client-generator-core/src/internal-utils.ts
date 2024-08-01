@@ -10,14 +10,12 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
-  Model,
   ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
@@ -27,24 +25,27 @@ import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
-  SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkModelType,
-  SdkParameter,
   SdkType,
-  SdkUnionType,
+  TCGCContext,
 } from "./interfaces.js";
-import { createDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
+  getDefaultApiVersion,
   getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
+
+export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
+export const clientNameKey = createStateSymbol("clientName");
 
 /**
  *
@@ -296,7 +297,7 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
-            getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
           );
         }
         retval.push(decoratorInfo);
@@ -307,6 +308,7 @@ export function getTypeDecorators(
 }
 
 function getDecoratorArgValue(
+  context: TCGCContext,
   arg:
     | Type
     | Record<string, unknown>
@@ -323,7 +325,7 @@ function getDecoratorArgValue(
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
     if (arg.kind === "EnumMember") {
-      return diagnostics.wrap(arg.value ?? arg.name);
+      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
     if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
       return diagnostics.wrap(arg.value);
@@ -380,46 +382,6 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 }
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
-
-export interface TCGCContext {
-  program: Program;
-  emitterName: string;
-  generateProtocolMethods?: boolean;
-  generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  spreadModels?: Map<Model, SdkModelType>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
-  __rawClients?: SdkClient[];
-  apiVersion?: string;
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  originalProgram: Program;
-  decoratorsAllowList?: string[];
-}
-
-export function createTCGCContext(program: Program): TCGCContext {
-  return {
-    program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
-    originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-  };
-}
 
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
@@ -515,9 +477,22 @@ export function getAnyType(
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
     kind: "any",
+    name: "any",
     encode: "string",
+    crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
+}
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
 }
 
 export function getHttpOperationResponseHeaders(
@@ -530,7 +505,44 @@ export function getHttpOperationResponseHeaders(
   return headers;
 }
 
+export function removeVersionsLargerThanExplicitlySpecified(
+  context: TCGCContext,
+  versions: { value: string | number }[]
+): void {
+  // filter with specific api version
+  if (
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    const index = versions.findIndex((version) => version.value === context.apiVersion);
+    if (index >= 0) {
+      versions.splice(index + 1, versions.length - index - 1);
+    }
+  }
+}
+
+export function filterApiVersionsInEnum(
+  context: TCGCContext,
+  client: SdkClient,
+  sdkVersionsEnum: SdkEnumType
+): void {
+  // if they explicitly set an api version, remove larger versions
+  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  const defaultApiVersion = getDefaultApiVersion(context, client.service);
+  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
+    );
+  }
+}
+
 export function isJsonContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
+  return regex.test(contentType);
+}
+
+export function isXmlContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
   return regex.test(contentType);
 }

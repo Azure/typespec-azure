@@ -15,6 +15,6 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#pathIte
 
 ## Type declaration
 
-| Member | Type |
-| :------ | :------ |
+| Name | Type |
+| ------ | ------ |
 | `parameters` | [`OpenAPI2Parameter`](OpenAPI2Parameter.md)[] |

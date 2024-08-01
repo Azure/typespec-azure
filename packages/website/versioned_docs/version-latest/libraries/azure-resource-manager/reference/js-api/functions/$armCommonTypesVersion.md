@@ -15,7 +15,7 @@ function $armCommonTypesVersion(
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | DecoratorContext object |
 | `entity` | `Namespace` \| `EnumMember` | Target of the decorator. Must be `Namespace` or `EnumMember` type |
 | `version` | `string` \| `EnumValue` | - |

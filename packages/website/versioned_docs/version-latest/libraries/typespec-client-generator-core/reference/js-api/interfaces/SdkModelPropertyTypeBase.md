@@ -3,6 +3,10 @@ jsApi: true
 title: "[I] SdkModelPropertyTypeBase"
 
 ---
+## Extends
+
+- `DecoratedType`
+
 ## Extended by
 
 - [`SdkEndpointParameter`](SdkEndpointParameter.md)
@@ -16,18 +20,18 @@ title: "[I] SdkModelPropertyTypeBase"
 
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
+| Property | Type | Inherited from |
+| ------ | ------ | ------ |
 | `__raw?` | `ModelProperty` | - |
 | `apiVersions` | `string`[] | - |
 | `clientDefaultValue?` | `any` | - |
 | `crossLanguageDefinitionId` | `string` | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | `DecoratedType.decorators` |
 | `description?` | `string` | - |
 | `details?` | `string` | - |
 | `isApiVersionParam` | `boolean` | - |
 | `isGeneratedName` | `boolean` | - |
 | `name` | `string` | - |
-| ~~`nameInClient`~~ | `string` | <p>**Deprecated**</p><p>This property is deprecated. Use `.name` instead.</p> |
 | `onClient` | `boolean` | - |
 | `optional` | `boolean` | - |
 | `type` | [`SdkType`](../type-aliases/SdkType.md) | - |

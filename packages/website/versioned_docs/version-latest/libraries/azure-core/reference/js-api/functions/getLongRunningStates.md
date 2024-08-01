@@ -12,7 +12,7 @@ Returns the `LongRunningStates` associated with `entity`.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Enum` \| `Model` \| `ModelProperty` \| `Scalar` |
 
