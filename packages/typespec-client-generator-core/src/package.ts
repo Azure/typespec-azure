@@ -469,8 +469,6 @@ function getSdkEndpointParameter(
         sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
         if (sdkParam.isApiVersionParam) {
           sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
-        } else if (param.defaultValue && "value" in param.defaultValue) {
-          sdkParam.clientDefaultValue = param.defaultValue.value;
         }
         sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
       } else {
