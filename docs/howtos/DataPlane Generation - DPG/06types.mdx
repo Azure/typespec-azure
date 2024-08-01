@@ -2261,7 +2261,7 @@ We will take the `@encode` decorator into account, determining how we serialize 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
-```ts
+```tsp
 model Test {
   @encode(DateTimeKnownEncoding.rfc3339)
   prop: utcDateTime;
@@ -2323,7 +2323,7 @@ When you specify an encoding type, say that you want to encode an integer as a s
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
-```ts
+```tsp
 model Test {
   @encode(string)
   prop: int64;
