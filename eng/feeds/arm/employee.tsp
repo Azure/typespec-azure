@@ -52,8 +52,6 @@ union ProvisioningState {
   string,
 }
 
-interface Operations extends Azure.ResourceManager.Operations {}
-
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;

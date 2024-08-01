@@ -1,0 +1,10 @@
+{
+  "operationId": "getNull",
+  "title": "getNull",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": null
+    }
+  }
+}

@@ -18,6 +18,7 @@ import {
   Type,
   Union,
   createDiagnosticCollector,
+  getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
@@ -45,6 +46,7 @@ import {
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
+import { handleClientExamples } from "./example.js";
 import {
   AccessFlags,
   LanguageScopes,
@@ -57,7 +59,12 @@ import {
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
-import { AllScopes, clientNameKey, parseEmitterName } from "./internal-utils.js";
+import {
+  AllScopes,
+  clientNameKey,
+  getValidApiVersion,
+  parseEmitterName,
+} from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
@@ -158,7 +165,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : findClientService(context.program, target) ?? (target as any);
+      : (findClientService(context.program, target) ?? (target as any));
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
@@ -246,14 +253,7 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
       ?.getVersions()
       .map((x) => x.value);
     if (!allApiVersions) return;
-    let apiVersion = context.apiVersion;
-    if (
-      apiVersion === "latest" ||
-      apiVersion === undefined ||
-      !allApiVersions.includes(apiVersion)
-    ) {
-      apiVersion = allApiVersions[allApiVersions.length - 1];
-    }
+    const apiVersion = getValidApiVersion(context, allApiVersions);
     if (apiVersion === undefined) return;
     const versionProjections = buildVersionProjections(context.program, client.service).filter(
       (v) => apiVersion === v.version
@@ -336,7 +336,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
       service: service.type,
       type: service.type,
       arm: isArm(service.type),
-      crossLanguageDefinitionId: `${getNamespaceFullName(service.type)}.${clientName}`,
+      crossLanguageDefinitionId: getNamespaceFullName(service.type),
     } as SdkClient;
   });
 
@@ -629,14 +629,15 @@ export interface CreateSdkContextOptions {
   additionalDecorators?: string[];
 }
 
-export function createSdkContext<
+export async function createSdkContext<
   TOptions extends Record<string, any> = SdkEmitterOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: EmitContext<TOptions>,
   emitterName?: string,
   options?: CreateSdkContextOptions
-): SdkContext<TOptions, TServiceOperation> {
+): Promise<SdkContext<TOptions, TServiceOperation>> {
+  const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
   const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
   const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
@@ -656,15 +657,15 @@ export function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
+    examplesDirectory: context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
   };
-  sdkContext.sdkPackage = getSdkPackage(sdkContext);
-  if (sdkContext.diagnostics) {
-    sdkContext.diagnostics = sdkContext.diagnostics.concat(
-      sdkContext.sdkPackage.diagnostics // eslint-disable-line deprecation/deprecation
-    );
+  sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
+  for (const client of sdkContext.sdkPackage.clients) {
+    diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
+  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
   return sdkContext;
 }
 
@@ -992,6 +993,13 @@ export const $flattenProperty: FlattenPropertyDecorator = (
   target: ModelProperty,
   scope?: LanguageScopes
 ) => {
+  if (getDiscriminator(context.program, target.type)) {
+    reportDiagnostic(context.program, {
+      code: "flatten-polymorphism",
+      format: {},
+      target: target,
+    });
+  }
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
 };
 

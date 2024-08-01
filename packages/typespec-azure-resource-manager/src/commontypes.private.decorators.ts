@@ -98,7 +98,7 @@ export const $armCommonParameter: ArmCommonParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   parameterName?: string,
-  version?: unknown, // TODO: switch to precise type when tspd supports it: string | EnumValue | ArmCommonTypeVersionSpec,
+  version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ) => {
   // Use the name of the model type if not specified
@@ -106,14 +106,7 @@ export const $armCommonParameter: ArmCommonParameterDecorator = (
     parameterName = entity.name;
   }
 
-  storeCommonTypeRecord(
-    context,
-    entity,
-    "parameters",
-    parameterName,
-    version as any,
-    referenceFile
-  );
+  storeCommonTypeRecord(context, entity, "parameters", parameterName, version, referenceFile);
 };
 
 /**
@@ -129,7 +122,7 @@ export const $armCommonDefinition: ArmCommonDefinitionDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union,
   definitionName?: string,
-  version?: unknown, // TODO: switch to precise type when tspd supports it: string | EnumValue | ArmCommonTypeVersionSpec,
+  version?: string | EnumValue | ArmCommonTypeVersionSpec,
   referenceFile?: string
 ) => {
   // Use the name of the model type if not specified
@@ -137,14 +130,7 @@ export const $armCommonDefinition: ArmCommonDefinitionDecorator = (
     definitionName = entity.name!;
   }
 
-  storeCommonTypeRecord(
-    context,
-    entity,
-    "definitions",
-    definitionName,
-    version as any,
-    referenceFile
-  );
+  storeCommonTypeRecord(context, entity, "definitions", definitionName, version, referenceFile);
 };
 
 /**

@@ -177,7 +177,7 @@ describe("typespec-client-generator-core: decorators", () => {
           service: MyService,
           type: MyService,
           arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
     });
@@ -431,9 +431,30 @@ describe("typespec-client-generator-core: decorators", () => {
           service: MyService,
           type: MyService,
           arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
+    });
+
+    it("with @clientName", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @operationGroup
+        @clientName("ClientModel")
+        interface Model {
+          op foo(): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const mainClient = sdkPackage.clients[0];
+      strictEqual(mainClient.methods.length, 1);
+
+      const clientAccessor = mainClient.methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      strictEqual(clientAccessor.response.kind, "client");
+      strictEqual(clientAccessor.response.name, "ClientModel");
     });
   });
 
@@ -1314,7 +1335,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
@@ -1355,7 +1376,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
@@ -1391,7 +1412,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
@@ -2543,6 +2564,30 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, {
         code: "decorator-wrong-target",
+      });
+    });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
       });
     });
   });
@@ -4205,7 +4250,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);

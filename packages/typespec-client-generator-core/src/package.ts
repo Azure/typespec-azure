@@ -13,6 +13,7 @@ import { resolveVersions } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import {
   getAccess,
+  getClientNameOverride,
   getOverriddenClientMethod,
   listClients,
   listOperationGroups,
@@ -74,6 +75,7 @@ import {
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
+  getTypeSpecBuiltInType,
 } from "./types.js";
 
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
@@ -441,11 +443,7 @@ function getSdkEndpointParameter(
           optional: false,
           serializedName: "endpoint",
           correspondingMethodParams: [],
-          type: {
-            kind: "string",
-            encode: "string",
-            decorators: [],
-          },
+          type: getTypeSpecBuiltInType(context, "string"),
           isApiVersionParam: false,
           apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
           crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
@@ -467,11 +465,15 @@ function getSdkEndpointParameter(
       const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
       if (sdkParam.kind === "path") {
         templateArguments.push(sdkParam);
-        sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
+        if (param.defaultValue && "value" in param.defaultValue) {
+          sdkParam.clientDefaultValue = param.defaultValue.value;
+        }
         const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
-        sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
         sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+        if (sdkParam.isApiVersionParam) {
+          sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+        }
         sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
       } else {
         diagnostics.add(
@@ -510,13 +512,18 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
-  const clientName = isClient ? client.name : client.type.name;
+  let name = "";
+  if (isClient) {
+    name = client.name;
+  } else {
+    name = getClientNameOverride(context, client.type) ?? client.type.name;
+  }
   // NOTE: getSdkMethods recursively calls createSdkClientType
   const methods = diagnostics.pipe(getSdkMethods<TServiceOperation>(context, client));
   const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
-    name: clientName,
+    name,
     description: docWrapper.description,
     details: docWrapper.details,
     methods: methods,
@@ -526,6 +533,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
+    // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type),
   };
   return diagnostics.wrap(sdkClientType);
 }
@@ -563,18 +572,17 @@ function populateApiVersionInformation(context: TCGCContext): void {
 
 export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext
-): SdkPackage<TServiceOperation> {
+): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
   const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
-  return {
+  return diagnostics.wrap({
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
     enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
-    diagnostics: diagnostics.diagnostics,
     crossLanguagePackageId,
-  };
+  });
 }

@@ -247,6 +247,10 @@ op Azure.ResourceManager.ResourceCreateSync.createOrUpdate(provider: "Microsoft.
 
 ### `ResourceDeleteAsync` {#Azure.ResourceManager.ResourceDeleteAsync}
 
+:::warning
+**Deprecated**: This should be deprecated in a future release
+:::
+
 ```typespec
 interface Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>
 ```
@@ -389,6 +393,10 @@ op Azure.ResourceManager.ResourceListBySubscription.listBySubscription(apiVersio
 ```
 
 ### `ResourceOperations` {#Azure.ResourceManager.ResourceOperations}
+
+:::warning
+**Deprecated**: Use Azure.ResourceManager.TrackedResourceOperations instead
+:::
 
 ```typespec
 interface Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>
@@ -845,6 +853,10 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
+:::warning
+**Deprecated**: Please use ArmResourceCreateOrReplaceSync instead
+:::
+
 DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
 
 ```typespec
@@ -862,6 +874,10 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 | Error          | Optional. The error response, if non-standard.                  |
 
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
+
+:::warning
+**Deprecated**: Use 'ArmResourceDeleteWithoutOkAsync' instead
+:::
 
 ```typespec
 op Azure.ResourceManager.ArmResourceDeleteAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
