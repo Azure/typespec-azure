@@ -1502,4 +1502,71 @@ describe("typespec-client-generator-core: model types", () => {
     ok(inputModel);
     strictEqual(inputModel.usage, UsageFlags.Input | UsageFlags.Xml);
   });
+
+  it("check bodyParam for @multipartBody", async function () {
+    await runner.compileWithBuiltInService(`
+        model Address {
+          city: string;
+        }
+        model MultiPartRequest{
+          id?: HttpPart<string>;
+          profileImage: HttpPart<bytes>;
+          address: HttpPart<Address>;
+          picture: HttpPart<File>;
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const formDataMethod = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(formDataMethod.kind, "basic");
+    strictEqual(formDataMethod.name, "upload");
+    strictEqual(formDataMethod.parameters.length, 2);
+
+    strictEqual(formDataMethod.parameters[0].name, "contentType");
+    strictEqual(formDataMethod.parameters[0].type.kind, "constant");
+    strictEqual(formDataMethod.parameters[0].type.value, "multipart/form-data");
+
+    strictEqual(formDataMethod.parameters[1].name, "body");
+    strictEqual(formDataMethod.parameters[1].type.kind, "model");
+    strictEqual(formDataMethod.parameters[1].type.name, "MultiPartRequest");
+
+    const formDataOp = formDataMethod.operation;
+    strictEqual(formDataOp.parameters.length, 1);
+    ok(formDataOp.parameters.find((x) => x.name === "contentType" && x.kind === "header"));
+
+    const formDataBodyParam = formDataOp.bodyParam;
+    ok(formDataBodyParam);
+    strictEqual(formDataBodyParam.type.kind, "model");
+    strictEqual(formDataBodyParam.type.name, "MultiPartRequest");
+    strictEqual(formDataBodyParam.correspondingMethodParams.length, 1);
+    strictEqual(formDataBodyParam.type.properties.length, 4);
+    strictEqual(formDataBodyParam.type.properties[0].name, "id");
+    strictEqual(formDataBodyParam.type.properties[0].type.kind, "string");
+    strictEqual(formDataBodyParam.type.properties[1].name, "profileImage");
+    strictEqual(formDataBodyParam.type.properties[1].type.kind, "bytes");
+    strictEqual(formDataBodyParam.type.properties[2].name, "address");
+    strictEqual(formDataBodyParam.type.properties[2].type.kind, "model");
+    strictEqual(formDataBodyParam.type.properties[2].type.name, "Address");
+    strictEqual(formDataBodyParam.type.properties[3].name, "picture");
+    strictEqual(formDataBodyParam.type.properties[3].type.kind, "model");
+    strictEqual(formDataBodyParam.type.properties[3].type.name, "File");
+  });
+
+  it("check multipartOptions for property of base model", async function () {
+    await runner.compileWithBuiltInService(`
+      model MultiPartRequest{
+          fileProperty: HttpPart<File>;
+      }
+      @post
+      op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+      `);
+    const models = runner.context.sdkPackage.models;
+    const fileModel = models.find((x) => x.name === "File");
+    ok(fileModel);
+    for (const p of fileModel.properties) {
+      strictEqual(p.kind, "property");
+      strictEqual(p.isMultipartFileInput, false);
+      strictEqual(p.multipartOptions, undefined);
+    }
+  });
 });

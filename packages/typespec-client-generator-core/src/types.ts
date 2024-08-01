@@ -31,6 +31,7 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperation,
   HttpOperationPart,
   Visibility,
   getAuthentication,
@@ -1251,7 +1252,8 @@ function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
   base: SdkBodyModelPropertyType,
-  operation: Operation
+  operation: Operation,
+  httpOperation: HttpOperation
 ): [void, readonly Diagnostic[]] {
   const httpOperationPart = getHttpOperationPart(context, type, operation);
   const diagnostics = createDiagnosticCollector();
@@ -1277,7 +1279,6 @@ function updateMultiPartInfo(
     }
   } else {
     // common body
-    const httpOperation = getHttpOperationWithCache(context, operation);
     const operationIsMultipart = Boolean(
       httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
     );
@@ -1328,7 +1329,15 @@ export function getSdkModelPropertyType(
     flatten: shouldFlattenProperty(context, type),
   };
   if (operation) {
-    diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    if (
+      type.model &&
+      httpOperation.parameters.body &&
+      httpOperation.parameters.body.type === type.model
+    ) {
+      // only add multipartOptions for property of multipart body
+      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation, httpOperation));
+    }
   }
   return diagnostics.wrap(result);
 }
