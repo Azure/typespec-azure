@@ -2180,12 +2180,12 @@ export async function getOpenAPIForService(
   }
   function mergeFormatAndEncoding(
     format: string | undefined,
-    encoding: string,
+    encoding: string | undefined,
     encodeAsFormat: string | undefined
-  ): string {
+  ): string | undefined {
     switch (format) {
       case undefined:
-        return encodeAsFormat ?? encoding;
+        return encodeAsFormat ?? encoding ?? format;
       case "date-time":
         switch (encoding) {
           case "rfc3339":
@@ -2205,7 +2205,7 @@ export async function getOpenAPIForService(
             return encodeAsFormat ?? encoding;
         }
       default:
-        return encodeAsFormat ?? encoding;
+        return encodeAsFormat ?? encoding ?? format;
     }
   }
 

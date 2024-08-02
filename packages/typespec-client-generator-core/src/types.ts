@@ -137,7 +137,15 @@ function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding || kind;
+    const encode = getEncode(context.program, type);
+    if (encode?.encoding) {
+      return encode.encoding;
+    }
+    if (encode?.type) {
+      // if we specify the encoding type in the decorator, we set the `.encode` string
+      // to the kind of the encoding type
+      return getSdkBuiltInType(context, encode.type).kind;
+    }
   }
   return kind;
 }
