@@ -442,8 +442,8 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  *
  * op myOperationCustomization(@bodyRoot params: Params): void;
  *
- * @@overrideClientMethod(MyService.myOperation, MyCustomizations.myOperationCustomization);
+ * @@methodSignature(MyService.myOperation, MyCustomizations.myOperationCustomization);
  * // method signature is now `op myOperation(params: Params)`
  * ```
  */
-extern dec overrideClientMethod(original: Operation, override: Operation, scope?: valueof string);
+extern dec methodSignature(original: Operation, override: Operation, scope?: valueof string);

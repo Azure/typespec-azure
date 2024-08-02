@@ -1058,7 +1058,7 @@ export function getClientNameOverride(
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
 
-const overrideClientMethodKey = createStateSymbol("overrideClientMethod");
+const methodSignatureKey = createStateSymbol("methodSignature");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -1088,7 +1088,7 @@ function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProp
   );
 }
 
-export function $overrideClientMethod(
+export function $methodSignature(
   context: DecoratorContext,
   original: Operation,
   override: Operation,
@@ -1114,14 +1114,7 @@ export function $overrideClientMethod(
       format: { methodName: original.name },
     });
   }
-  setScopedDecoratorData(
-    context,
-    $overrideClientMethod,
-    overrideClientMethodKey,
-    original,
-    override,
-    scope
-  ); // eslint-disable-line deprecation/deprecation
+  setScopedDecoratorData(context, $methodSignature, methodSignatureKey, original, override, scope); // eslint-disable-line deprecation/deprecation
 }
 
 /**
@@ -1136,5 +1129,5 @@ export function getOverriddenClientMethod(
   context: TCGCContext,
   entity: Operation
 ): Operation | undefined {
-  return getScopedDecoratorData(context, overrideClientMethodKey, entity);
+  return getScopedDecoratorData(context, methodSignatureKey, entity);
 }
