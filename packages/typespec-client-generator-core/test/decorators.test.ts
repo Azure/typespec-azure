@@ -4473,5 +4473,48 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
       });
     });
+
+    it("recursive params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(input: MyService.Params): void;
+
+        @@overrideClientMethod(MyService.func, MyCustomizations.func);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const inputParam = method.parameters.find((x) => x.name === "input");
+      ok(inputParam);
+      strictEqual(paramsModel, inputParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
+    });
   });
 });

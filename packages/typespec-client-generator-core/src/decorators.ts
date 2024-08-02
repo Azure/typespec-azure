@@ -1061,15 +1061,18 @@ export function getClientNameOverride(
 const overrideClientMethodKey = createStateSymbol("overrideClientMethod");
 
 // Recursive function to collect parameter names
-function collectParams(properties: RekeyableMap<string, ModelProperty>): ModelProperty[] {
-  let params: ModelProperty[] = [];
-
+function collectParams(
+  properties: RekeyableMap<string, ModelProperty>,
+  params: ModelProperty[] = []
+): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (value.type.kind === "Model") {
-      params = params.concat(collectParams(value.type.properties));
-    } else {
-      params.push(value);
+    if (params.filter((x) => compareModelProperties(x, value)).length === 0) {
+      if (value.type.kind === "Model") {
+        collectParams(value.type.properties, params);
+      } else {
+        params.push(value);
+      }
     }
   });
 
