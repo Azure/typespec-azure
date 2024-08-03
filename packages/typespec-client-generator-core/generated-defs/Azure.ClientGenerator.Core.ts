@@ -454,11 +454,11 @@ export type FlattenPropertyDecorator = (
  *
  * op myOperationCustomization(@bodyRoot params: Params): void;
  *
- * @@methodSignature(MyService.myOperation, MyCustomizations.myOperationCustomization);
+ * @@override(MyService.myOperation, MyCustomizations.myOperationCustomization);
  * // method signature is now `op myOperation(params: Params)`
  * ```
  */
-export type MethodSignatureDecorator = (
+export type OverrideDecorator = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,

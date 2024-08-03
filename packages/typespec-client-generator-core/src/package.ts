@@ -233,8 +233,8 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     getLocationOfOperation(operation)
   );
 
-  const methodSignature = getOverriddenClientMethod(context, operation);
-  const params = (methodSignature ?? operation).parameters.properties.values();
+  const override = getOverriddenClientMethod(context, operation);
+  const params = (override ?? operation).parameters.properties.values();
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;

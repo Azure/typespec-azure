@@ -4257,7 +4257,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
-  describe("@methodSignature", () => {
+  describe("@override", () => {
     it("basic", async () => {
       await runner.compileWithCustomization(
         `
@@ -4275,7 +4275,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         op func(params: MyService.Params): void;
 
-        @@methodSignature(MyService.func, MyCustomizations.func);
+        @@override(MyService.func, MyCustomizations.func);
         `
       );
       const sdkPackage = runner.context.sdkPackage;
@@ -4318,7 +4318,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         op func(params: MyService.Params): void;
 
-        @@methodSignature(MyService.func, MyCustomizations.func, "csharp");
+        @@override(MyService.func, MyCustomizations.func, "csharp");
         `;
       await runner.compileWithCustomization(mainCode, customizationCode);
       // runner has python scope, so shouldn't be overridden
@@ -4409,7 +4409,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
 
-        @@methodSignature(MyService.func, MyCustomizations.func);
+        @@override(MyService.func, MyCustomizations.func);
         `;
       await runner.compileWithCustomization(mainCode, customizationCode);
       // runner has python scope, so shouldn't be overridden
@@ -4464,7 +4464,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         op func(params: MyCustomizations.ParamsCustomized): void;
 
-        @@methodSignature(MyService.func, MyCustomizations.func);
+        @@override(MyService.func, MyCustomizations.func);
         `;
       const diagnostics = (
         await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
@@ -4491,7 +4491,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         op func(input: MyService.Params): void;
 
-        @@methodSignature(MyService.func, MyCustomizations.func);
+        @@override(MyService.func, MyCustomizations.func);
         `
       );
       const sdkPackage = runner.context.sdkPackage;
