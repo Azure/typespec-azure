@@ -44,6 +44,7 @@ import {
   SdkServiceOperation,
   SdkServiceParameter,
   SdkType,
+  SdkUnionType,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -419,35 +420,35 @@ function getSdkEndpointParameter(
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const servers = getServers(context.program, client.service);
-  let type: SdkEndpointType;
+  let type: SdkEndpointType | SdkUnionType;
   let optional: boolean = false;
+  const defaultOverridableEndpointType: SdkEndpointType = {
+    kind: "endpoint",
+    serverUrl: "{endpoint}",
+    templateArguments: [
+      {
+        name: "endpoint",
+        isGeneratedName: true,
+        description: "Service host",
+        kind: "path",
+        onClient: true,
+        urlEncode: false,
+        optional: false,
+        serializedName: "endpoint",
+        correspondingMethodParams: [],
+        type: getTypeSpecBuiltInType(context, "string"),
+        isApiVersionParam: false,
+        apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
+        decorators: [],
+      }
+    ],
+    decorators: [],
+  };
   if (servers === undefined || servers.length > 1) {
     // if there is no defined server url, or if there are more than one
     // we will return a mandatory endpoint parameter in initialization
-    const name = "endpoint";
-    type = {
-      kind: "endpoint",
-      serverUrl: "{endpoint}",
-      templateArguments: [
-        {
-          name,
-          isGeneratedName: true,
-          description: "Service host",
-          kind: "path",
-          onClient: true,
-          urlEncode: false,
-          optional: false,
-          serializedName: "endpoint",
-          correspondingMethodParams: [],
-          type: getTypeSpecBuiltInType(context, "string"),
-          isApiVersionParam: false,
-          apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
-          decorators: [],
-        },
-      ],
-      decorators: [],
-    };
+    type = defaultOverridableEndpointType;
   } else {
     // this means we have one server
     const templateArguments: SdkPathParameter[] = [];
@@ -484,28 +485,21 @@ function getSdkEndpointParameter(
         );
       }
     }
+    const isOverridable = templateArguments.length === 1 && type.serverUrl.startsWith("{") && type.serverUrl.endsWith("}");
     if (templateArguments.length === 0) {
-      templateArguments.push({
-        kind: "path",
-        name: "baseUrl",
+      type = defaultOverridableEndpointType;
+      type.templateArguments[0].clientDefaultValue = servers[0].url;
+    } else if (!isOverridable) {
+      // if the entire endpoint is already overridable, we don't need to add
+      // the defaultOverridableEndpointType as a union
+      type = {
+        kind: "union",
+        values: [defaultOverridableEndpointType, type],
+        name: createGeneratedName(context, client.service, "Endpoint"),
         isGeneratedName: true,
-        description: "Service host",
-        onClient: true,
-        urlEncode: false,
-        optional: false,
-        serializedName: "baseUrl",
-        correspondingMethodParams: [],
-        type: {
-          kind: "string",
-          encode: "string",
-          decorators: [],
-        },
-        clientDefaultValue: servers[0].url,
-        isApiVersionParam: false,
-        apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.baseUrl`,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
         decorators: [],
-      });
+      }
     }
     optional = Boolean(
       servers[0].url.length &&
