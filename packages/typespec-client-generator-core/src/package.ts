@@ -441,7 +441,7 @@ function getSdkEndpointParameter(
         apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
         decorators: [],
-      }
+      },
     ],
     decorators: [],
   };
@@ -485,7 +485,10 @@ function getSdkEndpointParameter(
         );
       }
     }
-    const isOverridable = templateArguments.length === 1 && type.serverUrl.startsWith("{") && type.serverUrl.endsWith("}");
+    const isOverridable =
+      templateArguments.length === 1 &&
+      type.serverUrl.startsWith("{") &&
+      type.serverUrl.endsWith("}");
     if (templateArguments.length === 0) {
       type = defaultOverridableEndpointType;
       type.templateArguments[0].clientDefaultValue = servers[0].url;
@@ -499,7 +502,7 @@ function getSdkEndpointParameter(
         isGeneratedName: true,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
         decorators: [],
-      }
+      };
     }
     optional = Boolean(
       servers[0].url.length &&

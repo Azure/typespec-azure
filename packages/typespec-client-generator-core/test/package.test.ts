@@ -401,7 +401,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParamType.values.length, 2);
 
       const overridableEndpoint = endpointParamType.values.find(
-        x => x.kind === "endpoint" && x.serverUrl === "{endpoint}"
+        (x) => x.kind === "endpoint" && x.serverUrl === "{endpoint}"
       ) as SdkEndpointType;
       ok(overridableEndpoint);
       strictEqual(overridableEndpoint.templateArguments.length, 1);
@@ -409,7 +409,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(overridableEndpoint.templateArguments[0].clientDefaultValue, undefined);
 
       const templatedEndpoint = endpointParamType.values.find(
-        x => x.kind === "endpoint" && x.serverUrl === "{endpoint}/server/path/multiple/{apiVersion}"
+        (x) =>
+          x.kind === "endpoint" && x.serverUrl === "{endpoint}/server/path/multiple/{apiVersion}"
       ) as SdkEndpointType;
       ok(templatedEndpoint);
       strictEqual(templatedEndpoint.templateArguments.length, 2);
