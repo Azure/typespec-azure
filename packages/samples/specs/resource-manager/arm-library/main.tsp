@@ -22,12 +22,12 @@ using Azure.ResourceManager;
 @versioned(Versions)
 namespace Microsoft.LibraryTest;
 
-/** Contoso API versions */
+/** ARM Library API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
+  /** 2021-09-21-preview version */
   @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2021-10-01-preview`,
+  `2021-09-21-preview`,
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
