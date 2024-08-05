@@ -2,13 +2,14 @@ import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core
 import {
   Diagnostic,
   Operation,
+  Server,
   Type,
   createDiagnosticCollector,
   getNamespaceFullName,
   getService,
   ignoreDiagnostics,
 } from "@typespec/compiler";
-import { getServers } from "@typespec/http";
+import { getServers, HttpServer } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import {
@@ -414,15 +415,14 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   return diagnostics.wrap(retval);
 }
 
-function getSdkEndpointParameter(
+function getEndpointTypeFromSingleServer(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup
-): [SdkEndpointParameter, readonly Diagnostic[]] {
+  client: SdkClient | SdkOperationGroup,
+  server: HttpServer | undefined,
+): [SdkEndpointType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const servers = getServers(context.program, client.service);
-  let type: SdkEndpointType | SdkUnionType;
-  let optional: boolean = false;
-  const defaultOverridableEndpointType: SdkEndpointType = {
+  const templateArguments: SdkPathParameter[] = [];
+  const types: SdkEndpointType[] = [{
     kind: "endpoint",
     serverUrl: "{endpoint}",
     templateArguments: [
@@ -444,70 +444,83 @@ function getSdkEndpointParameter(
       },
     ],
     decorators: [],
-  };
-  if (servers === undefined || servers.length > 1) {
-    // if there is no defined server url, or if there are more than one
-    // we will return a mandatory endpoint parameter in initialization
-    type = defaultOverridableEndpointType;
-  } else {
-    // this means we have one server
-    const templateArguments: SdkPathParameter[] = [];
-    type = {
+  }];
+  if (!server) return diagnostics.wrap(types);
+  for (const param of server.parameters.values()) {
+    const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
+    if (sdkParam.kind === "path") {
+      templateArguments.push(sdkParam);
+      sdkParam.onClient = true;
+      if (param.defaultValue && "value" in param.defaultValue) {
+        sdkParam.clientDefaultValue = param.defaultValue.value;
+      }
+      const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
+      sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+      if (sdkParam.isApiVersionParam) {
+        sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+      }
+      sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
+    } else {
+      diagnostics.add(
+        createDiagnostic({
+          code: "server-param-not-path",
+          target: param,
+          format: {
+            templateArgumentName: sdkParam.name,
+            templateArgumentType: sdkParam.kind,
+          },
+        })
+      );
+    }
+  }
+  const isOverridable =
+    templateArguments.length === 1 &&
+    server.url.startsWith("{") &&
+    server.url.endsWith("}");
+  
+  if (templateArguments.length === 0) {
+    types[0].templateArguments[0].clientDefaultValue = server.url;
+  } else if (!isOverridable) {
+    // if the entire endpoint is already overridable, we don't need to add
+    // the defaultOverridableEndpointType as a union
+    types.push({
       kind: "endpoint",
-      serverUrl: servers[0].url,
+      serverUrl: server.url,
       templateArguments,
       decorators: [],
+    })
+  }
+  return diagnostics.wrap(types);
+}
+
+function getSdkEndpointParameter(
+  context: TCGCContext,
+  client: SdkClient | SdkOperationGroup
+): [SdkEndpointParameter, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const servers = getServers(context.program, client.service);
+  const types: SdkEndpointType[] = [];
+  
+  if (servers === undefined) {
+    // if there is no defined server url, we will return an overridable endpoint
+    types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, undefined)));
+  } else {
+    for (const server of servers) {
+      types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, server)));
+    }
+  }
+  let type: SdkEndpointType | SdkUnionType;
+  if (types.length > 1) {
+    type = {
+      kind: "union",
+      values: types,
+      name: createGeneratedName(context, client.service, "Endpoint"),
+      isGeneratedName: true,
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
+      decorators: [],
     };
-    for (const param of servers[0].parameters.values()) {
-      const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
-      if (sdkParam.kind === "path") {
-        templateArguments.push(sdkParam);
-        sdkParam.onClient = true;
-        if (param.defaultValue && "value" in param.defaultValue) {
-          sdkParam.clientDefaultValue = param.defaultValue.value;
-        }
-        const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
-        sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-        if (sdkParam.isApiVersionParam) {
-          sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
-        }
-        sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
-      } else {
-        diagnostics.add(
-          createDiagnostic({
-            code: "server-param-not-path",
-            target: param,
-            format: {
-              templateArgumentName: sdkParam.name,
-              templateArgumentType: sdkParam.kind,
-            },
-          })
-        );
-      }
-    }
-    const isOverridable =
-      templateArguments.length === 1 &&
-      type.serverUrl.startsWith("{") &&
-      type.serverUrl.endsWith("}");
-    if (templateArguments.length === 0) {
-      type = defaultOverridableEndpointType;
-      type.templateArguments[0].clientDefaultValue = servers[0].url;
-    } else if (!isOverridable) {
-      // if the entire endpoint is already overridable, we don't need to add
-      // the defaultOverridableEndpointType as a union
-      type = {
-        kind: "union",
-        values: [defaultOverridableEndpointType, type],
-        name: createGeneratedName(context, client.service, "Endpoint"),
-        isGeneratedName: true,
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
-        decorators: [],
-      };
-    }
-    optional = Boolean(
-      servers[0].url.length &&
-        templateArguments.every((param) => param.clientDefaultValue !== undefined)
-    );
+  } else {
+    type = types[0];
   }
   return diagnostics.wrap({
     kind: "endpoint",
@@ -518,7 +531,7 @@ function getSdkEndpointParameter(
     onClient: true,
     urlEncode: false,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    optional,
+    optional: false,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.endpoint`,
     decorators: [],

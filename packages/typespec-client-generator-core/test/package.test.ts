@@ -526,7 +526,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(endpointParam);
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.kind, "endpoint");
-      strictEqual(endpointParam.optional, true);
+      strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.type.kind, "endpoint");
       strictEqual(endpointParam.type.serverUrl, "{endpoint}");
