@@ -31,7 +31,6 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
-  HttpOperation,
   HttpOperationPart,
   Visibility,
   getAuthentication,
@@ -1260,7 +1259,7 @@ function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
   base: SdkBodyModelPropertyType,
-  operation: Operation,
+  operation: Operation
 ): [void, readonly Diagnostic[]] {
   const httpOperationPart = getHttpOperationPart(context, type, operation);
   const diagnostics = createDiagnosticCollector();
