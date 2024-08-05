@@ -14,9 +14,6 @@ using Azure.ResourceManager;
 @service({
   title: "Microsoft.EnvelopeTest",
 })
-@OpenAPI.info({
-  version: "2021-09-21-preview",
-})
 @useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
 @armProviderNamespace
 @versioned(Versions)
