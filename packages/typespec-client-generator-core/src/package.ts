@@ -1,13 +1,12 @@
 import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
-  Diagnostic,
-  Operation,
-  Server,
-  Type,
   createDiagnosticCollector,
+  Diagnostic,
   getNamespaceFullName,
   getService,
   ignoreDiagnostics,
+  Operation,
+  Type,
 } from "@typespec/compiler";
 import { getServers, HttpServer } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
@@ -418,11 +417,11 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
 function getEndpointTypeFromSingleServer(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
-  server: HttpServer | undefined,
+  server: HttpServer | undefined
 ): [SdkEndpointType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const templateArguments: SdkPathParameter[] = [];
-  const types: SdkEndpointType[] = [{
+  const defaultOverridableEndpointType: SdkEndpointType = {
     kind: "endpoint",
     serverUrl: "{endpoint}",
     templateArguments: [
@@ -444,8 +443,9 @@ function getEndpointTypeFromSingleServer(
       },
     ],
     decorators: [],
-  }];
-  if (!server) return diagnostics.wrap(types);
+  };
+  const types: SdkEndpointType[] = [];
+  if (!server) return diagnostics.wrap([defaultOverridableEndpointType]);
   for (const param of server.parameters.values()) {
     const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
     if (sdkParam.kind === "path") {
@@ -474,21 +474,21 @@ function getEndpointTypeFromSingleServer(
     }
   }
   const isOverridable =
-    templateArguments.length === 1 &&
-    server.url.startsWith("{") &&
-    server.url.endsWith("}");
-  
+    templateArguments.length === 1 && server.url.startsWith("{") && server.url.endsWith("}");
+
   if (templateArguments.length === 0) {
+    types.push(defaultOverridableEndpointType);
     types[0].templateArguments[0].clientDefaultValue = server.url;
-  } else if (!isOverridable) {
-    // if the entire endpoint is already overridable, we don't need to add
-    // the defaultOverridableEndpointType as a union
+  } else {
     types.push({
       kind: "endpoint",
       serverUrl: server.url,
       templateArguments,
       decorators: [],
-    })
+    });
+    if (!isOverridable) {
+      types.push(defaultOverridableEndpointType);
+    }
   }
   return diagnostics.wrap(types);
 }
@@ -500,7 +500,7 @@ function getSdkEndpointParameter(
   const diagnostics = createDiagnosticCollector();
   const servers = getServers(context.program, client.service);
   const types: SdkEndpointType[] = [];
-  
+
   if (servers === undefined) {
     // if there is no defined server url, we will return an overridable endpoint
     types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, undefined)));
