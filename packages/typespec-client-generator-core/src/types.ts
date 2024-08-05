@@ -1261,7 +1261,6 @@ function updateMultiPartInfo(
   type: ModelProperty,
   base: SdkBodyModelPropertyType,
   operation: Operation,
-  httpOperation: HttpOperation
 ): [void, readonly Diagnostic[]] {
   const httpOperationPart = getHttpOperationPart(context, type, operation);
   const diagnostics = createDiagnosticCollector();
@@ -1287,6 +1286,7 @@ function updateMultiPartInfo(
     }
   } else {
     // common body
+    const httpOperation = getHttpOperationWithCache(context, operation);
     const operationIsMultipart = Boolean(
       httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data")
     );
@@ -1344,7 +1344,7 @@ export function getSdkModelPropertyType(
       httpOperation.parameters.body.type === type.model
     ) {
       // only add multipartOptions for property of multipart body
-      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation, httpOperation));
+      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
     }
   }
   return diagnostics.wrap(result);
