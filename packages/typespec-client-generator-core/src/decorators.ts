@@ -335,7 +335,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
       service: service.type,
       type: service.type,
       arm: isArm(service.type),
-      crossLanguageDefinitionId: `${getNamespaceFullName(service.type)}.${clientName}`,
+      crossLanguageDefinitionId: getNamespaceFullName(service.type),
     } as SdkClient;
   });
 
