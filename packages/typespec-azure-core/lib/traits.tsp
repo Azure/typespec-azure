@@ -247,7 +247,7 @@ extern dec traitLocation(target: ModelProperty, contexts: EnumMember);
  */
 extern dec traitAdded(target: Model | ModelProperty, addedVersion: EnumMember | null);
 
-namespace Azure.Core.Traits.Private {
+namespace Private {
   @added(Azure.Core.Versions.v1_0_Preview_2)
   @Private.addTraitProperties(Traits, Location, Contexts)
   model TraitProperties<
