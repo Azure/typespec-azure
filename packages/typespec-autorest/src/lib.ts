@@ -223,7 +223,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
   required: [],
 };
 
-const libDef = {
+export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-autorest",
   diagnostics: {
     "duplicate-body-types": {
@@ -343,7 +343,11 @@ const libDef = {
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<AutorestEmitterOptions>,
   },
-} as const;
 
-export const $lib = createTypeSpecLibrary(libDef);
-export const { reportDiagnostic, createDiagnostic, createStateSymbol, getTracer } = $lib;
+  state: {
+    example: { description: "State for the @example decorator" },
+    useRef: { description: "State for the @useRef decorator" },
+  },
+} as const);
+
+export const { reportDiagnostic, createDiagnostic, stateKeys: AutorestStateKeys, getTracer } = $lib;

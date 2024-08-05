@@ -355,11 +355,11 @@ describe("typespec-autorest: parameters", () => {
           });
 
           it("array of enum is kept inline", async () => {
-            deepStrictEqual(await testParameter(`@${kind}({format: "multi"})`, "Foo[]"), {
+            deepStrictEqual(await testParameter(`@${kind}({format: "csv"})`, "Foo[]"), {
               in: kind,
               name: "arg1",
               required: true,
-              collectionFormat: "multi",
+              collectionFormat: "csv",
               type: "array",
               items: {
                 type: "string",

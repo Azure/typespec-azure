@@ -1,0 +1,14 @@
+{
+  "operationId": "getModelDiagnostic",
+  "title": "getModelDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "a": "a",
+        "b": 2,
+        "c": true
+      }
+    }
+  }
+}
