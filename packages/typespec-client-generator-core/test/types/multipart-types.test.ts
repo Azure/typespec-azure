@@ -306,7 +306,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     for (const p of multiPartRequest.properties.values()) {
       strictEqual(p.kind, "property");
       ok(p.multipartOptions);
-      ok(p.type.kind === "bytes" || p.type.kind === "model");
+      ok(p.type.kind === "array");
       strictEqual(p.multipartOptions.isMulti, true);
     }
   });
@@ -372,6 +372,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(fileArrayOnePart);
     ok(fileArrayOnePart.multipartOptions);
     strictEqual(fileArrayOnePart.type.kind, "array");
+    strictEqual(fileArrayOnePart.type.valueType.kind, "model");
     strictEqual(fileArrayOnePart.multipartOptions.isMulti, false);
     strictEqual(fileArrayOnePart.multipartOptions.filename, undefined);
     strictEqual(fileArrayOnePart.multipartOptions.contentType, undefined);
@@ -383,7 +384,8 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(fileArrayMultiParts);
     ok(fileArrayMultiParts.multipartOptions);
-    strictEqual(fileArrayMultiParts.type.kind, "model");
+    strictEqual(fileArrayMultiParts.type.kind, "array");
+    strictEqual(fileArrayMultiParts.type.valueType.kind, "model");
     strictEqual(fileArrayMultiParts.multipartOptions.isMulti, true);
     ok(fileArrayMultiParts.multipartOptions.filename);
     strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
@@ -508,13 +510,15 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringsOnePart);
     strictEqual(stringsOnePart.type.kind, "array");
+    strictEqual(stringsOnePart.type.valueType.kind, "string");
     ok(stringsOnePart.multipartOptions);
     strictEqual(stringsOnePart.multipartOptions.isMulti, false);
     const stringsMultiParts = MultiPartRequest.properties.find(
       (x) => x.name === "stringsMultiParts"
     ) as SdkBodyModelPropertyType;
     ok(stringsMultiParts);
-    strictEqual(stringsMultiParts.type.kind, "string");
+    strictEqual(stringsMultiParts.type.kind, "array");
+    strictEqual(stringsMultiParts.type.valueType.kind, "string");
     ok(stringsMultiParts.multipartOptions);
     strictEqual(stringsMultiParts.multipartOptions.isMulti, true);
   });

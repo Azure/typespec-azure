@@ -461,11 +461,15 @@ function getSdkEndpointParameter(
       const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
       if (sdkParam.kind === "path") {
         templateArguments.push(sdkParam);
-        sdkParam.description = sdkParam.description ?? servers[0].description;
         sdkParam.onClient = true;
+        if (param.defaultValue && "value" in param.defaultValue) {
+          sdkParam.clientDefaultValue = param.defaultValue.value;
+        }
         const apiVersionInfo = updateWithApiVersionInformation(context, param, client.type);
-        sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
         sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+        if (sdkParam.isApiVersionParam) {
+          sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+        }
         sdkParam.apiVersions = getAvailableApiVersions(context, param, client.type);
       } else {
         diagnostics.add(
@@ -525,6 +529,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
+    // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type),
   };
   return diagnostics.wrap(sdkClientType);
 }

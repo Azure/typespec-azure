@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.44.3
+
+### Bug Fixes
+
+- [#1244](https://github.com/Azure/typespec-azure/pull/1244) The baseType will be undefined if the `SdkBuiltInType`, `SdkDateTimeType`, `SdkDurationType` is a std type
+- [#1251](https://github.com/Azure/typespec-azure/pull/1251) Change output for `HttpPart<T>[]`
+
+
 ## 0.44.2
 
 ### Bug Fixes
