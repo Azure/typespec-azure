@@ -1336,7 +1336,15 @@ export function getSdkModelPropertyType(
     flatten: shouldFlattenProperty(context, type),
   };
   if (operation) {
-    diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    if (
+      type.model &&
+      httpOperation.parameters.body &&
+      httpOperation.parameters.body.type === type.model
+    ) {
+      // only add multipartOptions for property of multipart body
+      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    }
   }
   return diagnostics.wrap(result);
 }
