@@ -1111,7 +1111,11 @@ export function $override(
     reportDiagnostic(context.program, {
       code: "override-method-parameters-mismatch",
       target: context.decoratorTarget,
-      format: { methodName: original.name },
+      format: {
+        methodName: original.name,
+        originalParameters: originalParams.map((x) => x.name).join(`", "`),
+        overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
+      },
     });
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope); // eslint-disable-line deprecation/deprecation

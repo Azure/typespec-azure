@@ -440,10 +440,30 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * // client.tsp
  * namespace MyCustomizations;
  *
- * op myOperationCustomization(@bodyRoot params: Params): void;
+ * @override(MyService.operation)
+ * op myOperationCustomization(params: Params): void;
  *
- * @@override(MyService.myOperation, MyCustomizations.myOperationCustomization);
  * // method signature is now `op myOperation(params: Params)`
+ * ```
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * model Params {
+ *  foo: string;
+ *  bar: string;
+ * }
+ * op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ *
+ * @override(MyService.operation, "csharp")
+ * op myOperationCustomization(params: Params): void;
+ *
+ * // method signature is now `op myOperation(params: Params)` just for csharp
  * ```
  */
 extern dec override(original: Operation, override: Operation, scope?: valueof string);
