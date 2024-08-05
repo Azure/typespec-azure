@@ -991,8 +991,11 @@ These are parameters to client initialization and method son the client. These w
 
 An `SdkEndpointParameter` represents a parameter to a client's endpoint.
 
-TCGC will always give it to you as overridable: If the server URL is a constant, we will return a templated endpoint with a default value of the constant server URL.
+TCGC will always give it to you as overridable: 
+
+If the server URL is a constant, we will return a templated endpoint with a default value of the constant server URL.
 In the case where the endpoint has extra template arguments, the type is a union of a completely-overridable endpoint, and an endpoint that accepts template arguments.
+If there are multiple servers, we will return the union of all of the possibilities.
 
 ```tsp
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
