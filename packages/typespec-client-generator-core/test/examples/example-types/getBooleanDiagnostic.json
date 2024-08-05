@@ -1,0 +1,10 @@
+{
+  "operationId": "getBooleanDiagnostic",
+  "title": "getBooleanDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": 123
+    }
+  }
+}

@@ -689,7 +689,7 @@ op checkLocalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace & LocationParameter,
+  SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
   Request,
   Response,
   AdditionalParams
