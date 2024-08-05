@@ -38,6 +38,7 @@ export default {
     "@azure-tools/typespec-azure-core/use-standard-operations": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
     "@azure-tools/typespec-azure-core/require-versioned": true,
+    "@azure-tools/typespec-azure-core/no-private-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
 
     // Azure core rules enabled via an optional rulesets

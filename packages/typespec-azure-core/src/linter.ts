@@ -15,6 +15,7 @@ import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
+import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
@@ -73,6 +74,7 @@ const rules = [
   noStringDiscriminatorRule,
   requireVersionedRule,
   friendlyNameRule,
+  noPrivateUsage,
 ];
 
 export const $linter = defineLinter({
