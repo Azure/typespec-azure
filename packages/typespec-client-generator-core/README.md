@@ -493,10 +493,29 @@ op myOperation(...Params): void; // by default, we generate the method signature
 // client.tsp
 namespace MyCustomizations;
 
-op myOperationCustomization(@bodyRoot params: Params): void;
+@override(MyService.operation)
+op myOperationCustomization(params: Params): void;
 
-@@override(MyService.myOperation, MyCustomizations.myOperationCustomization);
 // method signature is now `op myOperation(params: Params)`
+```
+
+```typespec
+// main.tsp
+namespace MyService;
+
+model Params {
+ foo: string;
+ bar: string;
+}
+op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+
+// client.tsp
+namespace MyCustomizations;
+
+@override(MyService.operation, "csharp")
+op myOperationCustomization(params: Params): void;
+
+// method signature is now `op myOperation(params: Params)` just for csharp
 ```
 
 #### `@protocolAPI`
