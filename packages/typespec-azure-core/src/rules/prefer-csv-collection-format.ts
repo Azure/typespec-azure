@@ -1,5 +1,5 @@
 import { ModelProperty, createRule } from "@typespec/compiler";
-import { getHeaderFieldOptions, getQueryParamOptions } from "@typespec/http";
+import { getHeaderFieldOptions } from "@typespec/http";
 import { isExcludedCoreType } from "./utils.js";
 
 export const preferCsvCollectionFormatRule = createRule({
@@ -15,11 +15,7 @@ export const preferCsvCollectionFormatRule = createRule({
         if (isExcludedCoreType(context.program, property)) return;
 
         const headerOptions = getHeaderFieldOptions(context.program, property);
-        const queryOptions = getQueryParamOptions(context.program, property);
-        if (
-          (headerOptions?.format !== undefined && headerOptions?.format !== "csv") ||
-          (queryOptions?.format !== undefined && queryOptions?.format !== "csv")
-        ) {
+        if (headerOptions?.format !== undefined && headerOptions?.format !== "csv") {
           context.reportDiagnostic({
             target: property,
           });
