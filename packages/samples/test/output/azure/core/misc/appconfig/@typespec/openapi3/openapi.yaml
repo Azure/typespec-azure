@@ -101,7 +101,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
       responses:
         '200':
@@ -147,7 +146,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
       responses:
         '200':
@@ -182,7 +180,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
       responses:
         '200':
@@ -464,7 +461,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/LabelField'
-          style: form
           explode: true
       responses:
         '200':
@@ -570,7 +566,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
         - name: label
           in: query

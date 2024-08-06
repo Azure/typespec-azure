@@ -375,7 +375,6 @@ components:
         type: array
         items:
           type: string
-      style: form
       explode: true
     Azure.Core.SkipQueryParameter:
       name: skip
