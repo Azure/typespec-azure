@@ -51,6 +51,7 @@ function getPackagesPath() {
     "@typespec/openapi": resolveLocalPackage("core/packages/openapi"),
     "@typespec/http": resolveLocalPackage("core/packages/http"),
     "@typespec/rest": resolveLocalPackage("core/packages/rest"),
+    "@typespec/xml": resolveLocalPackage("core/packages/xml"),
     "@typespec/versioning": resolveLocalPackage("core/packages/versioning"),
     "@azure-tools/typespec-azure-core": resolveLocalPackage("packages/typespec-azure-core"),
     "@azure-tools/typespec-azure-resource-manager": resolveLocalPackage(
