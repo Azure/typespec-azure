@@ -30,6 +30,7 @@ import { recordTypeRule } from "./rules/record-types.js";
 import { bodyArrayRule } from "./rules/request-body-array.js";
 import { requireDocumentation } from "./rules/require-docs.js";
 import { requireKeyVisibility } from "./rules/require-key-visibility.js";
+import { requireVersionedRule } from "./rules/require-versioned.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
@@ -71,6 +72,7 @@ const rules = [
   useStandardNames,
   useStandardOperations,
   noStringDiscriminatorRule,
+  requireVersionedRule,
   friendlyNameRule,
   noPrivateUsage,
 ];
