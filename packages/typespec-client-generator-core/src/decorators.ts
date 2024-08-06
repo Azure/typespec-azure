@@ -882,7 +882,7 @@ const usageKey = createStateSymbol("usage");
 
 export const $usage: UsageDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Union,
+  entity: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
   scope?: LanguageScopes
 ) => {
@@ -923,6 +923,13 @@ export function getUsageOverride(
   entity: Model | Enum | Union
 ): UsageFlags | undefined {
   return getScopedDecoratorData(context, usageKey, entity);
+}
+
+export function getDefaultUsage(context: TCGCContext, namespace?: Namespace): UsageFlags {
+  if (!namespace) {
+    return UsageFlags.None;
+  }
+  return getScopedDecoratorData(context, usageKey, namespace) ?? UsageFlags.None;
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {

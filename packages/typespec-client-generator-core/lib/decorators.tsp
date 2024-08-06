@@ -241,7 +241,11 @@ enum Usage {
  * op getModel(): Fish;
  * ```
  */
-extern dec usage(target: Model | Enum | Union, value: EnumMember | Union, scope?: valueof string);
+extern dec usage(
+  target: Model | Enum | Union | Namespace,
+  value: EnumMember | Union,
+  scope?: valueof string
+);
 
 /**
  * Access value.
