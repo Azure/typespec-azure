@@ -1181,6 +1181,11 @@ paths:
         '202':
           description: The request has been accepted for processing, but processing has not yet completed.
           headers:
+            x-ms-request-id:
+              required: false
+              description: An opaque, globally-unique, server-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
             Operation-Location:
               required: true
               description: The location for monitoring the operation state.
@@ -1195,11 +1200,6 @@ paths:
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
-              schema:
-                $ref: '#/components/schemas/Azure.Core.uuid'
-            x-ms-request-id:
-              required: false
-              description: An opaque, globally-unique, server-generated string identifier for the request.
               schema:
                 $ref: '#/components/schemas/Azure.Core.uuid'
           content:
