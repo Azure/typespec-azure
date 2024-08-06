@@ -560,9 +560,6 @@ describe("typespec-autorest: metadata", () => {
           operationId: "Create",
           parameters: [
             {
-              $ref: "#/parameters/Pet.id",
-            },
-            {
               name: "h1",
               in: "header",
               required: true,
@@ -579,6 +576,9 @@ describe("typespec-autorest: metadata", () => {
               in: "body",
               schema: { $ref: "#/definitions/PetCreate" },
               required: true,
+            },
+            {
+              $ref: "#/parameters/Pet.id",
             },
           ],
           responses: {
