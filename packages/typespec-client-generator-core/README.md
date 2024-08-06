@@ -565,7 +565,7 @@ you need to take care of all related models/enums.
 
 ##### Target
 
-`Model | Enum | Union`
+`Model | Enum | Union | Namespace`
 
 ##### Parameters
 

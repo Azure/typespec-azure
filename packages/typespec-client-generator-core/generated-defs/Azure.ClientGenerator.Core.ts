@@ -261,7 +261,7 @@ export type InternalDecorator = (
  */
 export type UsageDecorator = (
   context: DecoratorContext,
-  target: Model | Enum | Union,
+  target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
   scope?: string
 ) => void;
