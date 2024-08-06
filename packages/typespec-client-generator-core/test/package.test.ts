@@ -1185,7 +1185,8 @@ describe("typespec-client-generator-core: package", () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service({})
       namespace My.Service;
-
+      
+      #suppress "deprecated" "Legacy test"
       op myOp(@query({format: "multi"}) query: string): void;
       `);
       const sdkPackage = runner.context.sdkPackage;
