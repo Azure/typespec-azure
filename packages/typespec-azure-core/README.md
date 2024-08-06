@@ -65,7 +65,9 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-core/use-standard-names`                                                                                                        | Use recommended names for operations.                                                                                                                |
 | `@azure-tools/typespec-azure-core/use-standard-operations`                                                                                                   | Operations should be defined using a signature from the Azure.Core namespace.                                                                        |
 | [`@azure-tools/typespec-azure-core/no-string-discriminator`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-string-discriminator) | Azure services discriminated models should define the discriminated property as an extensible union.                                                 |
+| [`@azure-tools/typespec-azure-core/require-versioned`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/require-versioned)             | Azure services should use the versioning library.                                                                                                    |
 | `@azure-tools/typespec-azure-core/friendly-name`                                                                                                             | Ensures that @friendlyName is used as intended.                                                                                                      |
+| [`@azure-tools/typespec-azure-core/no-private-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-private-usage)               | Verify that elements inside Private namespace are not referenced.                                                                                    |
 
 ## Decorators
 

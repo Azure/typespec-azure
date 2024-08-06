@@ -1,5 +1,5 @@
 ---
-title: x-ms-examples
+title: x-ms-examples example files
 ---
 
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
