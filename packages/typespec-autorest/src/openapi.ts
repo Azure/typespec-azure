@@ -1282,12 +1282,22 @@ export async function getOpenAPIForService(
     name?: string
   ): OpenAPI2FormDataParameter {
     const base = getOpenAPI2ParameterBase(param, name);
-    return {
+    const result = {
       in: "formData",
       ...base,
       ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
       default: param.defaultValue && getDefaultValue(param.defaultValue),
     };
+
+    Object.assign(
+      result,
+      applyIntrinsicDecorators(param, {
+        type: (result as any).type,
+        format: (result as any).format,
+      })
+    );
+
+    return result;
   }
 
   function getSimpleParameterSchema(

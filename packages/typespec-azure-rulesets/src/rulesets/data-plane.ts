@@ -40,6 +40,7 @@ export default {
     "@azure-tools/typespec-azure-core/require-versioned": true,
     "@azure-tools/typespec-azure-core/no-private-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
+    "@azure-tools/typespec-azure-core/no-query-explode": true,
 
     // Azure core rules enabled via an optional rulesets
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
