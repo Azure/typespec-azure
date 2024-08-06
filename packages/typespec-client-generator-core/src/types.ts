@@ -42,6 +42,7 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
+  getOverriddenClientMethod,
   getUsageOverride,
   isExclude,
   isInclude,
@@ -136,7 +137,15 @@ function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding || kind;
+    const encode = getEncode(context.program, type);
+    if (encode?.encoding) {
+      return encode.encoding;
+    }
+    if (encode?.type) {
+      // if we specify the encoding type in the decorator, we set the `.encode` string
+      // to the kind of the encoding type
+      return getSdkBuiltInType(context, encode.type).kind;
+    }
   }
   return kind;
 }
@@ -1328,7 +1337,15 @@ export function getSdkModelPropertyType(
     flatten: shouldFlattenProperty(context, type),
   };
   if (operation) {
-    diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    if (
+      type.model &&
+      httpOperation.parameters.body &&
+      httpOperation.parameters.body.type === type.model
+    ) {
+      // only add multipartOptions for property of multipart body
+      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    }
   }
   return diagnostics.wrap(result);
 }
@@ -1519,7 +1536,8 @@ function updateTypesFromOperation(
   const program = context.program;
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
-  for (const param of operation.parameters.properties.values()) {
+  const overriddenClientMethod = getOverriddenClientMethod(context, operation);
+  for (const param of (overriddenClientMethod ?? operation).parameters.properties.values()) {
     if (isNeverOrVoidType(param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {

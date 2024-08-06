@@ -37,9 +37,8 @@ export default {
     "@azure-tools/typespec-azure-core/use-standard-names": true,
     "@azure-tools/typespec-azure-core/use-standard-operations": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
-
-    // Rules to enable later https://github.com/Azure/typespec-azure/issues/1171
-    "@azure-tools/typespec-azure-core/friendly-name": false,
+    "@azure-tools/typespec-azure-core/no-private-usage": true,
+    "@azure-tools/typespec-azure-core/friendly-name": true,
 
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,

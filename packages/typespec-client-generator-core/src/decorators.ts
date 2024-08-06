@@ -13,6 +13,7 @@ import {
   Node,
   Operation,
   Program,
+  RekeyableMap,
   SyntaxKind,
   Type,
   Union,
@@ -336,7 +337,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
       service: service.type,
       type: service.type,
       arm: isArm(service.type),
-      crossLanguageDefinitionId: `${getNamespaceFullName(service.type)}.${clientName}`,
+      crossLanguageDefinitionId: getNamespaceFullName(service.type),
     } as SdkClient;
   });
 
@@ -587,7 +588,7 @@ export function listOperationsInOperationGroup(
     for (const op of current.operations.values()) {
       // Skip templated operations
       if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(op);
+        operations.push(getOverriddenClientMethod(context, op) ?? op);
       }
     }
 
@@ -1056,6 +1057,84 @@ export function getClientNameOverride(
   languageScope?: string | typeof AllScopes
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
+}
+
+const overrideKey = createStateSymbol("override");
+
+// Recursive function to collect parameter names
+function collectParams(
+  properties: RekeyableMap<string, ModelProperty>,
+  params: ModelProperty[] = []
+): ModelProperty[] {
+  properties.forEach((value, key) => {
+    // If the property is of type 'model', recurse into its properties
+    if (params.filter((x) => compareModelProperties(x, value)).length === 0) {
+      if (value.type.kind === "Model") {
+        collectParams(value.type.properties, params);
+      } else {
+        params.push(value);
+      }
+    }
+  });
+
+  return params;
+}
+
+function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProperty): boolean {
+  // can't rely fully on equals because the `.model` property may be different
+  return (
+    modelPropA.name === modelPropB.name &&
+    modelPropA.type === modelPropB.type &&
+    modelPropA.node === modelPropB.node
+  );
+}
+
+export function $override(
+  context: DecoratorContext,
+  original: Operation,
+  override: Operation,
+  scope?: LanguageScopes
+) {
+  // Extract and sort parameter names
+  const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+  const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  // Check if the sorted parameter names arrays are equal
+  const parametersMatch =
+    originalParams.length === overrideParams.length &&
+    originalParams.every((value, index) => compareModelProperties(value, overrideParams[index]));
+
+  if (!parametersMatch) {
+    reportDiagnostic(context.program, {
+      code: "override-method-parameters-mismatch",
+      target: context.decoratorTarget,
+      format: {
+        methodName: original.name,
+        originalParameters: originalParams.map((x) => x.name).join(`", "`),
+        overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
+      },
+    });
+  }
+  setScopedDecoratorData(context, $override, overrideKey, original, override, scope); // eslint-disable-line deprecation/deprecation
+}
+
+/**
+ * Gets additional information on how to serialize / deserialize TYPESPEC standard types depending
+ * on whether additional serialization information is provided or needed
+ *
+ * @param context the Sdk Context
+ * @param entity the entity whose client format we are going to get
+ * @returns the format in which to serialize the typespec type or undefined
+ */
+export function getOverriddenClientMethod(
+  context: TCGCContext,
+  entity: Operation
+): Operation | undefined {
+  return getScopedDecoratorData(context, overrideKey, entity);
 }
 
 export const $hasJsonConverter: DecoratorFunction = (
