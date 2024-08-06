@@ -34,26 +34,7 @@ linter:
 
 ❌ **DON'T** suppress documentation warnings
 
-✅ **DO** use the [standard Typespec Azure operation templates and data-types][standard-templates] wherever possible. Standard operation templates should be used as much as possible
-
-✅ **DO** review model definitions and add the `@resource` decorator over models that represent resources in your service and the `@key` decorator for the resource identifier property on the model. Example:
-
-```
-/** A widget. */
-@resource("widgets")
-model Widget {
-  /** The widget name. */
-  @key("widgetName")
-  @visibility("read")
-  name: string;
-
-  /** The widget color. */
-  color: WidgetColor;
-
-  /** The ID of the widget's manufacturer. */
-  manufacturerId: string;
-}
-```
+✅ **DO** use the [standard Typespec Azure.ResourceManager and Azure.Core operation templates and data-types][standard-templates] wherever possible. Standard operation templates should be used as much as possible
 
 ✅ **DO** use `union` instead of `enum` to define Azure extensible enums. See: [Defining enums for Azure services][no-enum]. Example:
 

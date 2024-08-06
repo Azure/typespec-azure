@@ -16,7 +16,7 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 
 ### Update existing swagger files
 
-- Run the tool to sort existing swagger so you can easily compare with TypeSpec generated swagger.
+- Run the tool to sort existing swagger so you can easily compare with TypeSpec generated swagger. Please note this functionality has been added in version 0.10.0. Please update to latest if you don't see this command option.
 
   ```shell
   tsp-client sort-swagger [path to existing swagger]
