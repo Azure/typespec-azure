@@ -14,6 +14,7 @@ import { camelCase } from "change-case";
 import {
   getAccess,
   getClientNameOverride,
+  getOverriddenClientMethod,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -232,7 +233,10 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     getLocationOfOperation(operation)
   );
 
-  for (const param of operation.parameters.properties.values()) {
+  const override = getOverriddenClientMethod(context, operation);
+  const params = (override ?? operation).parameters.properties.values();
+
+  for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
     methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
   }

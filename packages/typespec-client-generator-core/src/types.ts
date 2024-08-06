@@ -42,6 +42,7 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
+  getOverriddenClientMethod,
   getUsageOverride,
   isExclude,
   isInclude,
@@ -1336,7 +1337,15 @@ export function getSdkModelPropertyType(
     flatten: shouldFlattenProperty(context, type),
   };
   if (operation) {
-    diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    const httpOperation = getHttpOperationWithCache(context, operation);
+    if (
+      type.model &&
+      httpOperation.parameters.body &&
+      httpOperation.parameters.body.type === type.model
+    ) {
+      // only add multipartOptions for property of multipart body
+      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    }
   }
   return diagnostics.wrap(result);
 }
@@ -1527,7 +1536,8 @@ function updateTypesFromOperation(
   const program = context.program;
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
-  for (const param of operation.parameters.properties.values()) {
+  const overriddenClientMethod = getOverriddenClientMethod(context, operation);
+  for (const param of (overriddenClientMethod ?? operation).parameters.properties.values()) {
     if (isNeverOrVoidType(param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {
