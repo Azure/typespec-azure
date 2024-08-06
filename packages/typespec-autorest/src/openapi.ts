@@ -868,6 +868,13 @@ export async function getOpenAPIForService(
       visibility: Visibility.Read,
       ignoreMetadataAnnotations: false,
     });
+    Object.assign(
+      header,
+      applyIntrinsicDecorators(prop, {
+        type: (header as any).type,
+        format: (header as any).format,
+      })
+    );
     delete header.in;
     delete header.name;
     delete header.required;
@@ -1117,9 +1124,8 @@ export async function getOpenAPIForService(
         }
       }
     } else if (body.property) {
-      currentEndpoint.parameters.push(
-        getOpenAPI2BodyParameter(body.property, getJsonName(body.property), schema)
-      );
+      const prop = body.property;
+      emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
     } else {
       currentEndpoint.parameters.push({
         name: "body",
