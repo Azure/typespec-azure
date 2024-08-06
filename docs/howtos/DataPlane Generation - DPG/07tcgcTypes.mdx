@@ -68,13 +68,29 @@ const sdkContext = {
             {
               kind: "endpoint",
               type: {
-                kind: "endpoint",
-                serverUrl: "{endpoint}/widget",
-                templateArguments: [
+                kind: "union",
+                values: [
                   {
-                    name: "endpoint",
-                    kind: "path",
-                    ...
+                    kind: "endpoint",
+                    serverUrl: "{endpoint}",
+                    templateArguments: [
+                      {
+                        name: "endpoint",
+                        kind: "path",
+                        ...
+                      }
+                    ]
+                  },
+                  {
+                    kind: "endpoint",
+                    serverUrl: "{endpoint}/widget",
+                    templateArguments: [
+                      {
+                        name: "endpoint",
+                        kind: "path",
+                        ...
+                      }
+                    ]
                   }
                 ]
               }
@@ -973,15 +989,21 @@ These are parameters to client initialization and method son the client. These w
 
 #### SdkEndpointParameter
 
-An `SdkEndpointParameter` represents a parameter to a client's endpoint. If the client is not parameterized, the endpoint parameter represents the entire endpoint input for the client. For parameterized clients, there will be as many `SdkEndpointParameter`s as needed to parameterize the client endpoint.
+An `SdkEndpointParameter` represents a parameter to a client's endpoint.
 
-```ts
+TCGC will always give it to you as overridable:
+
+If the server URL is a constant, we will return a templated endpoint with a default value of the constant server URL.
+In the case where the endpoint has extra template arguments, the type is a union of a completely-overridable endpoint, and an endpoint that accepts template arguments.
+If there are multiple servers, we will return the union of all of the possibilities.
+
+```tsp
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   kind: "endpoint";
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType;
+  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 ```
 
@@ -1407,7 +1429,7 @@ export type AccessFlags = "internal" | "public";
 ```ts
 export interface SdkEndpointType {
   kind: "endpoint";
-  serverUrl?: string;
+  serverUrl: string;
   templateArguments: SdkPathParameter[];
 }
 ```
