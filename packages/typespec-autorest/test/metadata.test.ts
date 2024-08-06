@@ -572,13 +572,13 @@ describe("typespec-autorest: metadata", () => {
               type: "string",
             },
             {
+              $ref: "#/parameters/Pet.id",
+            },
+            {
               name: "body",
               in: "body",
               schema: { $ref: "#/definitions/PetCreate" },
               required: true,
-            },
-            {
-              $ref: "#/parameters/Pet.id",
             },
           ],
           responses: {

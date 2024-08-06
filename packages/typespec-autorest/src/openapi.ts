@@ -1341,13 +1341,18 @@ export async function getOpenAPIForService(
   ): OpenAPI2PathParameter {
     const base = getOpenAPI2ParameterBase(param.param, param.name);
 
-    return {
+    const result: OpenAPI2PathParameter = {
       in: "path",
-      "x-ms-skip-url-encoding": param.allowReserved ?? undefined,
       default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
       ...base,
       ...getSimpleParameterSchema(param.param, schemaContext, base.name),
     };
+
+    if (param.allowReserved) {
+      result["x-ms-skip-url-encoding"] = true;
+    }
+
+    return result;
   }
 
   function getOpenAPI2HeaderParameter(
