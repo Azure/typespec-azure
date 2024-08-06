@@ -268,6 +268,9 @@ export type UsageDecorator = (
 
 /**
  * Set explicit access for operations, models and enums.
+ * When setting access for namespaces,
+ * the access the access info will be propagated to the model children of the namespace
+ * if the model has an access override, the model override takes precedence.
  * When setting access for models,
  * the access info wll not be propagated to models' properties, base models or sub models.
  * When setting access for an operation,
@@ -407,7 +410,7 @@ export type UsageDecorator = (
  */
 export type AccessDecorator = (
   context: DecoratorContext,
-  target: Model | Operation | Enum | Union,
+  target: Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
   scope?: string
 ) => void;
