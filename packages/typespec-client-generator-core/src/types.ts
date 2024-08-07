@@ -42,7 +42,6 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
-  getDefaultUsage,
   getOverriddenClientMethod,
   getUsageOverride,
   isExclude,

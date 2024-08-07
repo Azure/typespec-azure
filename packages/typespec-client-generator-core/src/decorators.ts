@@ -922,14 +922,10 @@ export function getUsageOverride(
   context: TCGCContext,
   entity: Model | Enum | Union
 ): UsageFlags | undefined {
-  return getScopedDecoratorData(context, usageKey, entity);
-}
+  const usageFlags = getScopedDecoratorData(context, usageKey, entity);
+  if (usageFlags || entity.namespace === undefined) return usageFlags;
+  return getScopedDecoratorData(context, usageKey, entity.namespace);
 
-export function getDefaultUsage(context: TCGCContext, namespace?: Namespace): UsageFlags {
-  if (!namespace) {
-    return UsageFlags.None;
-  }
-  return getScopedDecoratorData(context, usageKey, namespace) ?? UsageFlags.None;
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
