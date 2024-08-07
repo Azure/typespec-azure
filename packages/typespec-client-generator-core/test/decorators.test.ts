@@ -2499,7 +2499,8 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { OrphanModel: Model; InputModel: Model; OutputModel: Model; RoundtripModel: Model };
       strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, InputModel), UsageFlags.Input | UsageFlags.Json);
+      // this is set to input and ouput because of the namespace override
+      strictEqual(getUsage(runner.context, InputModel), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
       strictEqual(getUsage(runner.context, OutputModel), UsageFlags.Output | UsageFlags.Json);
       strictEqual(
         getUsage(runner.context, RoundtripModel),
