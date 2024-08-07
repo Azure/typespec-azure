@@ -905,7 +905,7 @@ export function getSdkUnionEnum(context: TCGCContext, type: UnionEnum, operation
   return ignoreDiagnostics(getSdkUnionEnumWithDiagnostics(context, type, operation));
 }
 
-function getSdkUnionEnumWithDiagnostics(
+export function getSdkUnionEnumWithDiagnostics(
   context: TCGCContext,
   type: UnionEnum,
   operation?: Operation

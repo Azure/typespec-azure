@@ -1,3 +1,4 @@
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
@@ -68,7 +69,7 @@ import {
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -925,13 +926,22 @@ export function getUsageOverride(
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
   return getScopedDecoratorData(context, usageKey, entity.namespace);
-
 }
 
-export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
-  return entity.kind === "Model"
-    ? getSdkModel(context, entity).usage
-    : getSdkEnum(context, entity).usage;
+export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
+  const diagnostics = createDiagnosticCollector();
+  switch (entity.kind) {
+    case "Union":
+      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
+      if (unionAsEnum) {
+        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      }
+      return UsageFlags.None;
+    case "Model":
+      return getSdkModel(context, entity).usage;
+    case "Enum":
+      return getSdkEnum(context, entity).usage;
+  }
 }
 
 const accessKey = createStateSymbol("access");
