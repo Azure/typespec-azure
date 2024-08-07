@@ -90,9 +90,7 @@ model FilterParameter {
 @doc("Provides the standard 'orderby' query parameter for list operations.")
 model OrderByQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"
-  @query({
-    format: "multi",
-  })
+  @query(#{ explode: true })
   @doc("Expressions that specify the order of returned results.")
   orderby?: string[];
 }
@@ -107,9 +105,7 @@ model FilterQueryParameter {
 @doc("Provides the standard 'select' query parameter for list operations.")
 model SelectQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"
-  @query({
-    format: "multi",
-  })
+  @query(#{ explode: true })
   @doc("Select the specified fields to be included in the response.")
   select?: string[];
 }
@@ -117,9 +113,7 @@ model SelectQueryParameter {
 @doc("Provides the standard 'expand' query parameter for list operations.")
 model ExpandQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"
-  @query({
-    format: "multi",
-  })
+  @query(#{ explode: true })
   @doc("Expand the indicated resources into the response.")
   expand?: string[];
 }

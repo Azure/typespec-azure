@@ -15,6 +15,8 @@ import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
+import { noPrivateUsage } from "./rules/no-private-usage.js";
+import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
@@ -29,6 +31,7 @@ import { recordTypeRule } from "./rules/record-types.js";
 import { bodyArrayRule } from "./rules/request-body-array.js";
 import { requireDocumentation } from "./rules/require-docs.js";
 import { requireKeyVisibility } from "./rules/require-key-visibility.js";
+import { requireVersionedRule } from "./rules/require-versioned.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
@@ -70,7 +73,10 @@ const rules = [
   useStandardNames,
   useStandardOperations,
   noStringDiscriminatorRule,
+  requireVersionedRule,
   friendlyNameRule,
+  noPrivateUsage,
+  noQueryExplodeRule,
 ];
 
 export const $linter = defineLinter({
