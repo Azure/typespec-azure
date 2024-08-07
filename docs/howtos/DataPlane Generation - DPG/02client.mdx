@@ -583,7 +583,16 @@ NOT_SUPPORTED;
 <TabItem value="java" label="Java" >
 
 ```java
-NOT_SUPPORTED
+import com.petstorenamespace.FoodClient;
+import com.petstorenamespace.FoodClientBuilder;
+import com.petstorenamespace.subnamespace.PetActionClient;
+import com.petstorenamespace.subnamespace.PetActionClientBuilder;
+
+FoodClient foodClient = new FoodClientBuilder().buildClient();
+PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
+
+foodClient.feed();
+petActionClient.pet();
 ```
 
 </TabItem>
