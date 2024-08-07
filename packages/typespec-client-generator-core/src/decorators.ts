@@ -968,7 +968,7 @@ export function getAccess(
 ) {
   const override = getAccessOverride(context, entity);
   if (override) {
-    return override || "public";
+    return override;
   }
 
   switch (entity.kind) {
