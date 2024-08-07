@@ -1706,8 +1706,7 @@ function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Unio
     updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType);
   }
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-  if ((sdkType.kind === "model" || sdkType.kind === "enum") && sdkType.usage === UsageFlags.None) {
-    updateUsageOfModel(context, getDefaultUsage(context, type.namespace), sdkType);
+  updateUsageOfModel(context, UsageFlags.None, sdkType);
   }
 }
 
