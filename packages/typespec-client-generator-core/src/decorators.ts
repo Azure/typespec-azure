@@ -966,7 +966,7 @@ export function getAccess(
   context: TCGCContext,
   entity: Model | Enum | Operation | Union | Namespace
 ) {
-  const override = getScopedDecoratorData(context, accessKey, entity);
+  const override = getAccessOverride(context, entity);
   if (override) {
     return override || "public";
   }
