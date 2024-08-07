@@ -596,7 +596,11 @@ function getCollectionFormat(
         ? getHeaderFieldOptions(program, type)
         : undefined
   )?.format;
-  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
+  if (
+    tspCollectionFormat === "form" ||
+    tspCollectionFormat === "simple" ||
+    tspCollectionFormat === "csv"
+  ) {
     return undefined;
   }
   return tspCollectionFormat;

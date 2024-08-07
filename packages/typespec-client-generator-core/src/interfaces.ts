@@ -420,7 +420,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType;
+  type: SdkEndpointType | SdkUnionType;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
