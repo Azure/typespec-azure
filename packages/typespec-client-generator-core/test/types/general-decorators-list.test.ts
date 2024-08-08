@@ -336,7 +336,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
       );
 
       await runner.compileWithBuiltInService(`
-        @hasJsonConverter
+        @hasJsonConverter("csharp")
         model A {
           id: string;
         }

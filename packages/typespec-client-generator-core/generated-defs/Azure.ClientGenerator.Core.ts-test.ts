@@ -7,6 +7,7 @@ import {
   $convenientAPI,
   $exclude,
   $flattenProperty,
+  $hasJsonConverter,
   $include,
   $internal,
   $operationGroup,
@@ -22,6 +23,7 @@ import type {
   ConvenientAPIDecorator,
   ExcludeDecorator,
   FlattenPropertyDecorator,
+  HasJsonConverterDecorator,
   IncludeDecorator,
   InternalDecorator,
   OperationGroupDecorator,
@@ -44,6 +46,7 @@ type Decorators = {
   $access: AccessDecorator;
   $flattenProperty: FlattenPropertyDecorator;
   $override: OverrideDecorator;
+  $hasJsonConverter: HasJsonConverterDecorator;
 };
 
 /** An error here would mean that the exported decorator is not using the same signature. Make sure to have export const $decName: DecNameDecorator = (...) => ... */
@@ -61,4 +64,5 @@ const _: Decorators = {
   $access,
   $flattenProperty,
   $override,
+  $hasJsonConverter,
 };

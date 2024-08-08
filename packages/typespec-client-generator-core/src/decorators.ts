@@ -27,7 +27,6 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
-  setTypeSpecNamespace,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { isHeader } from "@typespec/http";
@@ -1141,5 +1140,3 @@ export const $hasJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model
 ) => {};
-
-setTypeSpecNamespace("CSharp", $hasJsonConverter);
