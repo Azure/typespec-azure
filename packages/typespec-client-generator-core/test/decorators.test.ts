@@ -1772,7 +1772,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(actual, "internal");
       });
 
-      it("mark an operation as internal", async () => {
+      it("mark an operation as public", async () => {
         const { test } = (await runner.compile(`
           @access(Access.public)
           @service({title: "Test Service"}) namespace TestService;
