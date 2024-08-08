@@ -1759,7 +1759,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(actual, "internal");
       });
 
-      it("mark an operation as internal", async () => {
+      it("locally mark an operation as internal", async () => {
         const { test } = (await runner.compile(`
           @access(Access.public)
           @service({title: "Test Service"}) namespace TestService;
@@ -1772,7 +1772,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(actual, "internal");
       });
 
-      it("mark an operation as public", async () => {
+      it("locally mark an operation as public", async () => {
         const { test } = (await runner.compile(`
           @access(Access.public)
           @service({title: "Test Service"}) namespace TestService;
@@ -1784,7 +1784,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(actual, "public");
       });
 
-      it("mark an operation as internal", async () => {
+      it("mark an operation as internal through the namespace", async () => {
         const { test } = (await runner.compile(`
           @access(Access.internal)
           @service({title: "Test Service"}) namespace TestService;
@@ -1795,17 +1795,6 @@ describe("typespec-client-generator-core: decorators", () => {
         const actual = getAccess(runner.context, test);
         strictEqual(actual, "internal");
       });
-    });
-    it("mark an operation as internal", async () => {
-      const { test } = (await runner.compile(`
-        @service({title: "Test Service"}) namespace TestService;
-        @test
-        @access(Access.internal)
-        op test(): void;
-      `)) as { test: Operation };
-
-      const actual = getAccess(runner.context, test);
-      strictEqual(actual, "internal");
     });
 
     it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
