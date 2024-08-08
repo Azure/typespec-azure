@@ -150,7 +150,18 @@ const sdkContext = {
                   kind: "http",
                   ...
                 }
-              }
+              },
+              examples: [
+                {
+                  kind: "http",
+                  name: "example1",
+                  description: "Example 1",
+                  filePath: "example1.json",
+                  rawExample: {...},
+                  parameters: [...],
+                  responses: {...}
+                }
+              ]
             },
             response: {
               kind: "method",
@@ -1433,6 +1444,10 @@ export interface SdkEndpointType {
   templateArguments: SdkPathParameter[];
 }
 ```
+
+# SdkExample
+
+This is a type that represents the example for `Sdk
 
 ## Complete Usage Code
 
