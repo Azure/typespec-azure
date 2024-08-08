@@ -77,7 +77,6 @@ export async function createSdkTestRunner(
   const host = await createSdkTestHost(options);
   let autoUsings = [
     "Azure.ClientGenerator.Core",
-    "Azure.ClientGenerator.Core.CSharp",
     "TypeSpec.Rest",
     "TypeSpec.Http",
     "TypeSpec.Versioning",
