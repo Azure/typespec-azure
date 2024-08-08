@@ -8,6 +8,7 @@ import {
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
+  SdkEndpointType,
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkPackage,
@@ -133,11 +134,20 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.kind, "endpoint");
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.onClient, true);
-      strictEqual(endpointParam.optional, true);
+      strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.type.kind, "endpoint");
-      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
       strictEqual(endpointParam.urlEncode, false);
-      strictEqual(endpointParam.type.templateArguments.length, 0);
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.name, "endpoint");
+      strictEqual(templateArg.serializedName, "endpoint");
+      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.type.kind, "string");
+      strictEqual(templateArg.optional, false);
+      strictEqual(templateArg.onClient, true);
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
     });
 
     it("initialization default endpoint with apikey auth", async () => {
@@ -157,8 +167,12 @@ describe("typespec-client-generator-core: package", () => {
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
       strictEqual(endpointParam.type.kind, "endpoint");
-      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
-      strictEqual(endpointParam.type.templateArguments.length, 0);
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.type.kind, "string");
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -196,8 +210,14 @@ describe("typespec-client-generator-core: package", () => {
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
       strictEqual(endpointParam.type.kind, "endpoint");
-      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
-      strictEqual(endpointParam.type.templateArguments.length, 0);
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.type.kind, "string");
+      strictEqual(templateArg.optional, false);
+      strictEqual(templateArg.onClient, true);
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -241,7 +261,12 @@ describe("typespec-client-generator-core: package", () => {
         (p): p is SdkEndpointParameter => p.kind === "endpoint"
       )[0];
       strictEqual(endpointParam.type.kind, "endpoint");
-      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.name, "endpoint");
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -314,7 +339,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
-      strictEqual(templateArg.description, "Testserver endpoint");
+      strictEqual(templateArg.description, undefined);
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -373,17 +398,30 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(endpointParam.kind, "endpoint");
 
       const endpointParamType = endpointParam.type;
-      strictEqual(endpointParamType.kind, "endpoint");
-      strictEqual(endpointParamType.serverUrl, "{endpoint}/server/path/multiple/{apiVersion}");
+      strictEqual(endpointParamType.kind, "union");
+      strictEqual(endpointParamType.values.length, 2);
 
-      strictEqual(endpointParamType.templateArguments.length, 2);
-      const endpointTemplateArg = endpointParamType.templateArguments[0];
+      const overridableEndpoint = endpointParamType.values.find(
+        (x) => x.kind === "endpoint" && x.serverUrl === "{endpoint}"
+      ) as SdkEndpointType;
+      ok(overridableEndpoint);
+      strictEqual(overridableEndpoint.templateArguments.length, 1);
+      strictEqual(overridableEndpoint.templateArguments[0].name, "endpoint");
+      strictEqual(overridableEndpoint.templateArguments[0].clientDefaultValue, undefined);
+
+      const templatedEndpoint = endpointParamType.values.find(
+        (x) =>
+          x.kind === "endpoint" && x.serverUrl === "{endpoint}/server/path/multiple/{apiVersion}"
+      ) as SdkEndpointType;
+      ok(templatedEndpoint);
+      strictEqual(templatedEndpoint.templateArguments.length, 2);
+      const endpointTemplateArg = templatedEndpoint.templateArguments[0];
       strictEqual(endpointTemplateArg.name, "endpoint");
       strictEqual(endpointTemplateArg.onClient, true);
       strictEqual(endpointTemplateArg.optional, false);
       strictEqual(endpointTemplateArg.kind, "path");
 
-      const apiVersionParam = endpointParamType.templateArguments[1];
+      const apiVersionParam = templatedEndpoint.templateArguments[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
       strictEqual(apiVersionParam.urlEncode, true);
       strictEqual(apiVersionParam.name, "apiVersion");
@@ -404,6 +442,38 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(scheme.type, "apiKey");
       strictEqual(scheme.in, "header");
       strictEqual(scheme.name, "x-ms-api-key");
+    });
+
+    it("endpoint with path param default value", async () => {
+      await runner.compile(`
+        @server(
+          "{endpoint}",
+          "Test server endpoint",
+          {
+            endpoint: string = "http://localhost:3000",
+          }
+        )
+        @service({})
+        namespace MyService;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 1);
+
+      const endpointParam = client.initialization.properties.filter(
+        (p): p is SdkEndpointParameter => p.kind === "endpoint"
+      )[0];
+      strictEqual(endpointParam.type.kind, "endpoint");
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const endpointTemplateArg = endpointParam.type.templateArguments[0];
+      strictEqual(endpointTemplateArg.name, "endpoint");
+      strictEqual(endpointTemplateArg.onClient, true);
+      strictEqual(endpointTemplateArg.optional, false);
+      strictEqual(endpointTemplateArg.kind, "path");
+      strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
     });
 
     it("single with core", async () => {
@@ -448,6 +518,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
+      strictEqual(client.crossLanguageDefinitionId, "My.Service");
       strictEqual(client.initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 1);
       strictEqual(client.apiVersions[0], "2022-12-01-preview");
@@ -456,10 +527,18 @@ describe("typespec-client-generator-core: package", () => {
       ok(endpointParam);
       strictEqual(endpointParam.name, "endpoint");
       strictEqual(endpointParam.kind, "endpoint");
-      strictEqual(endpointParam.optional, true);
+      strictEqual(endpointParam.optional, false);
       strictEqual(endpointParam.onClient, true);
       strictEqual(endpointParam.type.kind, "endpoint");
-      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const endpointTemplateArg = endpointParam.type.templateArguments[0];
+      strictEqual(endpointTemplateArg.name, "endpoint");
+      strictEqual(endpointTemplateArg.onClient, true);
+      strictEqual(endpointTemplateArg.optional, false);
+      strictEqual(endpointTemplateArg.kind, "path");
+      strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
 
       const apiVersionParam = client.initialization.properties.filter(
         (p) => p.isApiVersionParam
@@ -517,6 +596,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "ServiceClient");
+      strictEqual(client.crossLanguageDefinitionId, "My.Service");
       strictEqual(client.initialization.properties.length, 3);
       strictEqual(client.apiVersions.length, 2);
       deepStrictEqual(client.apiVersions, ["2022-12-01-preview", "2022-12-01"]);
@@ -524,7 +604,13 @@ describe("typespec-client-generator-core: package", () => {
       const endpointParam = client.initialization.properties.find((x) => x.kind === "endpoint");
       ok(endpointParam);
       strictEqual(endpointParam.type.kind, "endpoint");
-      strictEqual(endpointParam.type.serverUrl, "http://localhost:3000");
+      strictEqual(endpointParam.type.serverUrl, "{endpoint}");
+      strictEqual(endpointParam.type.templateArguments.length, 1);
+      const templateArg = endpointParam.type.templateArguments[0];
+      strictEqual(templateArg.kind, "path");
+      strictEqual(templateArg.name, "endpoint");
+      strictEqual(templateArg.onClient, true);
+      strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
       const apiVersionParam = client.initialization.properties.filter(
         (p) => p.isApiVersionParam
@@ -581,6 +667,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(mainClient.methods.length, 1);
       strictEqual(mainClient.initialization.properties.length, 1);
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
+      strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
       const clientAccessor = mainClient.methods[0];
       strictEqual(clientAccessor.kind, "clientaccessor");
@@ -598,6 +685,7 @@ describe("typespec-client-generator-core: package", () => {
         operationGroup.methods[0].crossLanguageDefintionId,
         "TestService.MyOperationGroup.func"
       );
+      strictEqual(operationGroup.crossLanguageDefinitionId, "TestService.MyOperationGroup");
     });
 
     it("operationGroup2", async () => {
@@ -634,6 +722,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(mainClient.initialization);
       strictEqual(mainClient.initialization.properties.length, 1);
       strictEqual(mainClient.initialization.properties[0].name, "endpoint");
+      strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
       const fooAccessor = mainClient.methods[0];
       strictEqual(fooAccessor.kind, "clientaccessor");
@@ -654,6 +743,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(fooClient.initialization.properties.length, 1);
       strictEqual(fooClient.initialization.access, "internal");
       strictEqual(fooClient.methods.length, 1);
+      strictEqual(fooClient.crossLanguageDefinitionId, "TestService.Foo");
 
       const fooBarAccessor = fooClient.methods[0];
       strictEqual(fooBarAccessor.kind, "clientaccessor");
@@ -665,6 +755,7 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(fooBarClient.initialization.properties.length, 1);
       strictEqual(fooBarClient.initialization.access, "internal");
+      strictEqual(fooBarClient.crossLanguageDefinitionId, "TestService.Foo.Bar");
       strictEqual(fooBarClient.methods.length, 1);
       strictEqual(fooBarClient.methods[0].kind, "basic");
       strictEqual(fooBarClient.methods[0].name, "one");
@@ -672,6 +763,7 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(barClient.initialization.properties.length, 1);
       strictEqual(barClient.initialization.access, "internal");
+      strictEqual(barClient.crossLanguageDefinitionId, "TestService.Bar");
       strictEqual(barClient.methods.length, 1);
       strictEqual(barClient.methods[0].kind, "basic");
       strictEqual(barClient.methods[0].name, "two");
@@ -1150,7 +1242,8 @@ describe("typespec-client-generator-core: package", () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service({})
       namespace My.Service;
-
+      
+      #suppress "deprecated" "Legacy test"
       op myOp(@query({format: "multi"}) query: string): void;
       `);
       const sdkPackage = runner.context.sdkPackage;
@@ -3076,6 +3169,14 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(op.bodyParam.kind, "body");
       strictEqual(op.bodyParam.name, "testRequest");
       deepStrictEqual(op.bodyParam.correspondingMethodParams, [documentMethodParam]);
+
+      const anonymousModel = runner.context.sdkPackage.models[0];
+      strictEqual(anonymousModel.properties.length, 1);
+      strictEqual(anonymousModel.properties[0].kind, "property");
+      strictEqual(anonymousModel.properties[0].isMultipartFileInput, true);
+      ok(anonymousModel.properties[0].multipartOptions);
+      strictEqual(anonymousModel.properties[0].multipartOptions.isFilePart, true);
+      strictEqual(anonymousModel.properties[0].multipartOptions.isMulti, false);
     });
 
     it("anonymous model with @body should not be spread", async () => {

@@ -113,12 +113,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
       requestBody:
-        description: The resource instance.
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Manufacturer'
+        description: The resource instance.
     get:
       operationId: Manufacturers_getManufacturer
       description: Get a Manufacturer
@@ -450,12 +450,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
       requestBody:
-        description: The resource instance.
         required: true
         content:
           application/merge-patch+json:
             schema:
               $ref: '#/components/schemas/WidgetCreateOrUpdate'
+        description: The resource instance.
     get:
       operationId: Widgets_getWidget
       description: Get a Widget
@@ -575,7 +575,6 @@ paths:
   /api/{api-version}/widgets/{widgetName}/operations/{operationId}:
     get:
       operationId: Widgets_getWidgetOperationStatus_Widgets_getWidgetDeleteOperationStatus
-      description: Gets status of a Widget operation. Resource operation status operation template.
       parameters:
         - $ref: '#/components/parameters/ApiVersionPathParameter'
         - name: widgetName
@@ -590,6 +589,7 @@ paths:
           description: The unique ID of the operation.
           schema:
             type: string
+      description: Gets status of a Widget operation. Resource operation status operation template.
       responses:
         '200':
           description: The request has succeeded.
@@ -725,7 +725,6 @@ components:
         type: array
         items:
           type: string
-      style: form
       explode: true
     Azure.Core.SkipQueryParameter:
       name: skip

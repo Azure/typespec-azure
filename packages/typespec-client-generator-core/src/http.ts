@@ -127,7 +127,7 @@ function getSdkHttpParameters(
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
-  if (tspBody && tspBody?.bodyKind !== "multipart") {
+  if (tspBody) {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const getParamResponse = diagnostics.pipe(
@@ -596,7 +596,11 @@ function getCollectionFormat(
         ? getHeaderFieldOptions(program, type)
         : undefined
   )?.format;
-  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
+  if (
+    tspCollectionFormat === "form" ||
+    tspCollectionFormat === "simple" ||
+    tspCollectionFormat === "csv"
+  ) {
     return undefined;
   }
   return tspCollectionFormat;

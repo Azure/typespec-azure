@@ -105,6 +105,9 @@ importers:
       '@pnpm/find-workspace-packages':
         specifier: ^6.0.9
         version: 6.0.9(@pnpm/logger@5.0.0)
+      '@types/micromatch':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
@@ -141,6 +144,9 @@ importers:
       eslint-plugin-vitest:
         specifier: ^0.5.4
         version: 0.5.4(eslint@8.57.0)(typescript@5.5.4)(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+      micromatch:
+        specifier: ^4.0.7
+        version: 4.0.7
       picocolors:
         specifier: ~1.0.1
         version: 1.0.1
@@ -542,6 +548,55 @@ importers:
       '@typespec/library-linter':
         specifier: workspace:~
         version: link:../library-linter
+      '@typespec/tspd':
+        specifier: workspace:~
+        version: link:../tspd
+      '@vitest/coverage-v8':
+        specifier: ^2.0.4
+        version: 2.0.4(vitest@2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4)(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3))
+      '@vitest/ui':
+        specifier: ^2.0.4
+        version: 2.0.4(vitest@2.0.4)
+      c8:
+        specifier: ^10.1.2
+        version: 10.1.2
+      rimraf:
+        specifier: ~6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: ~5.5.4
+        version: 5.5.4
+      vitest:
+        specifier: ^2.0.4
+        version: 2.0.4(@types/node@18.11.19)(@vitest/ui@2.0.4(vitest@2.0.4))(happy-dom@14.12.3)(jsdom@24.1.1)(terser@5.31.3)
+
+  core/packages/http-server-csharp:
+    dependencies:
+      '@typespec/versioning':
+        specifier: workspace:~
+        version: link:../versioning
+      change-case:
+        specifier: ~5.4.4
+        version: 5.4.4
+    devDependencies:
+      '@types/node':
+        specifier: ~18.11.19
+        version: 18.11.19
+      '@typespec/compiler':
+        specifier: workspace:~
+        version: link:../compiler
+      '@typespec/http':
+        specifier: workspace:~
+        version: link:../http
+      '@typespec/library-linter':
+        specifier: workspace:~
+        version: link:../library-linter
+      '@typespec/openapi':
+        specifier: workspace:~
+        version: link:../openapi
+      '@typespec/rest':
+        specifier: workspace:~
+        version: link:../rest
       '@typespec/tspd':
         specifier: workspace:~
         version: link:../tspd

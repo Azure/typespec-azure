@@ -100,6 +100,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
+  crossLanguageDefinitionId: string;
   /**
    * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
    */
@@ -420,7 +421,7 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType;
+  type: SdkEndpointType | SdkUnionType;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
