@@ -18,7 +18,7 @@ function $finalOperation(
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

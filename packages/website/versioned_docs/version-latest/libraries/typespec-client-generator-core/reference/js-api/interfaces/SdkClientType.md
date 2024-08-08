@@ -19,6 +19,7 @@ title: "[I] SdkClientType"
 | ------ | ------ | ------ | ------ |
 | `apiVersions` | `string`[] | - | - |
 | ~~`arm`~~ | `boolean` | **Deprecated** This property is deprecated. Look at `.arm` on `SdkContext` instead. | - |
+| `crossLanguageDefinitionId` | `string` | - | - |
 | `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `DecoratedType.decorators` |
 | `description?` | `string` | - | - |
 | `details?` | `string` | - | - |

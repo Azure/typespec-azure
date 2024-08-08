@@ -83,6 +83,10 @@ Example:
 azure-rest-api-specs/specification/contosowidgetmanager> tsp-client convert --swagger-readme ./data-plane/readme.md -o ./Contoso.WidgetManager
 ```
 
+### sort-swagger
+
+Sort an existing swagger specification to be the same content order with TypeSpec generated swagger. This will allow you to easily compare and identify differences between the existing swagger and TypeSpec generated one. You should run this command on existing swagger files and check them in prior to creating converted TypeSpec PRs.
+
 ## Options
 
 ```
@@ -150,8 +154,8 @@ Using the tspconfig.yaml linked above, by default, the client libraries will be 
 
 Please note that these requirements apply on the repository where the client library is going to be generated. Repo owners should make sure to follow these requirements. Users working within a repository that already accepts this tool can refer to the [Usage](#usage) section.
 
-- Add an emitter-package.json to the repo following this [configuration](#emitter-packagejson).
-- Add the [TempTypeSpecFiles](#TempTypeSpecFiles) directory to the .gitignore file for your repository.
+- Add an emitter-package.json to the repo following this [configuration](#emitter-packagejson-required).
+- Add the [TempTypeSpecFiles](#temptypespecfiles) directory to the .gitignore file for your repository.
 
 ### TempTypeSpecFiles
 

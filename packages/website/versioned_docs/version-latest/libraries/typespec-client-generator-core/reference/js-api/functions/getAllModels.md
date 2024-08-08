@@ -11,7 +11,7 @@ function getAllModels(context, options): (SdkModelType | SdkEnumType)[]
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `options` | `GetAllModelsOptions` |
 
 ## Returns
