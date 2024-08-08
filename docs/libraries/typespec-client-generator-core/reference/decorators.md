@@ -359,6 +359,33 @@ model Foo {
 model Bar {}
 ```
 
+### `@hasJsonConverter` {#@Azure.ClientGenerator.Core.hasJsonConverter}
+
+Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
+
+```typespec
+@Azure.ClientGenerator.Core.hasJsonConverter(scope?: valueof string)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+@hasJsonConverter
+model MyModel {
+  prop: string;
+}
+```
+
 ### `@include` {#@Azure.ClientGenerator.Core.include}
 
 :::warning
@@ -616,31 +643,4 @@ model Origin {
 
 @get
 op getModel(): Fish;
-```
-
-## Azure.ClientGenerator.Core.CSharp
-
-### `@hasJsonConverter` {#@Azure.ClientGenerator.Core.CSharp.hasJsonConverter}
-
-Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
-
-```typespec
-@Azure.ClientGenerator.Core.CSharp.hasJsonConverter
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-None
-
-#### Examples
-
-```typespec
-@hasJsonConverter
-model MyModel {
-  prop: string;
-}
 ```
