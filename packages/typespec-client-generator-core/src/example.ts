@@ -2,7 +2,6 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
-  SourceFile,
   createDiagnosticCollector,
   resolvePath,
 } from "@typespec/compiler";
