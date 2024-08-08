@@ -11,7 +11,7 @@ function isExclude(context, entity): boolean
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Model` |
 
 ## Returns

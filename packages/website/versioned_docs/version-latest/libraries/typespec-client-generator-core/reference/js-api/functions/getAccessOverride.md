@@ -11,7 +11,7 @@ function getAccessOverride(context, entity): AccessFlags | undefined
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Enum` \| `Model` \| `Operation` \| `Union` |
 
 ## Returns

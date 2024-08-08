@@ -18,7 +18,7 @@ function $nextPageOperation(
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

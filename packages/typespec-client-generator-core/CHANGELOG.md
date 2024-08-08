@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1238](https://github.com/Azure/typespec-azure/pull/1238) TCGC, add `crossLanguageDefinitionId` to `SdkClientType`
+- [#1266](https://github.com/Azure/typespec-azure/pull/1266) expose default values for endpoint template arguments through `.clientDefaultValue`
+- [#1281](https://github.com/Azure/typespec-azure/pull/1281) Support @multipartBody for `bodyParam` of `SdkHttpOperation`
+- [#1233](https://github.com/Azure/typespec-azure/pull/1233) don't move server description onto endpoints parameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1258](https://github.com/Azure/typespec-azure/pull/1258) add support for encoding an int as a string
+- [#1155](https://github.com/Azure/typespec-azure/pull/1155) Make literal endpoints overridable
+- [#1148](https://github.com/Azure/typespec-azure/pull/1148) add `@override` decorator that allows authors to explicitly describe their desired client method
+
+
 ## 0.44.3
 
 ### Bug Fixes

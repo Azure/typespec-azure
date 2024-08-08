@@ -20,7 +20,7 @@ Returns name in the following order of priority
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `context` | `TCGCContext` |  |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 | `type` | `Type` & `object` |  |
 
 ## Returns
