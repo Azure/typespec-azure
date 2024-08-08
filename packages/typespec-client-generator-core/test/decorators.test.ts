@@ -2,6 +2,7 @@ import {
   Enum,
   Interface,
   Model,
+  ModelProperty,
   Namespace,
   Operation,
   ignoreDiagnostics,
@@ -1690,16 +1691,110 @@ describe("typespec-client-generator-core: decorators", () => {
   });
 
   describe("@access", () => {
-    it("mark an operation as internal", async () => {
-      const { test } = (await runner.compile(`
-        @service({title: "Test Service"}) namespace TestService;
-        @test
-        @access(Access.internal)
-        op test(): void;
-      `)) as { test: Operation };
+    describe("namespace access override", () => {
+      it("should inherit access from parent namespace", async () => {
+        const { Test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          model Test {
+            prop: string;
+          }
+        `)) as { Test: Operation };
 
-      const actual = getAccess(runner.context, test);
-      strictEqual(actual, "internal");
+        const actual = getAccess(runner.context, Test);
+        strictEqual(actual, "public");
+      });
+
+      it("should tag anonymous models with default access", async () => {
+        const { Test, prop } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          model Test {
+            @test
+            prop: {
+               foo: string;
+            }
+          }
+        `)) as { Test: Operation; prop: ModelProperty };
+
+        const actual = getAccess(runner.context, Test);
+        const actualAnonymous = getAccess(runner.context, prop.type as Model);
+        strictEqual(actual, "public");
+        strictEqual(actualAnonymous, "public");
+      });
+
+      it("should tag as internal anonymous models with default access", async () => {
+        const { Test, prop } = (await runner.compile(`
+          @access(Access.internal)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          model Test {
+            @test
+            prop: {
+               foo: string;
+            }
+          }
+        `)) as { Test: Operation; prop: ModelProperty };
+
+        const actual = getAccess(runner.context, Test);
+        const actualAnonymous = getAccess(runner.context, prop.type as Model);
+        strictEqual(actual, "internal");
+        strictEqual(actualAnonymous, "internal");
+      });
+
+      it("should honor the granular override over the namespace one", async () => {
+        const { Test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @access(Access.internal)
+          @test
+          model Test {
+            prop: string;
+          }
+        `)) as { Test: Operation };
+
+        const actual = getAccess(runner.context, Test);
+        strictEqual(actual, "internal");
+      });
+
+      it("locally mark an operation as internal", async () => {
+        const { test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          @access(Access.internal)
+          op test(): void;
+        `)) as { test: Operation };
+
+        const actual = getAccess(runner.context, test);
+        strictEqual(actual, "internal");
+      });
+
+      it("locally mark an operation as public", async () => {
+        const { test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          op test(): void;
+        `)) as { test: Operation };
+
+        const actual = getAccess(runner.context, test);
+        strictEqual(actual, "public");
+      });
+
+      it("mark an operation as internal through the namespace", async () => {
+        const { test } = (await runner.compile(`
+          @access(Access.internal)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          op test(): void;
+        `)) as { test: Operation };
+
+        const actual = getAccess(runner.context, test);
+        strictEqual(actual, "internal");
+      });
     });
 
     it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
