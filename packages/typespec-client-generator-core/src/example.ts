@@ -40,7 +40,6 @@ import { createDiagnostic } from "./lib.js";
 
 interface LoadedExample {
   readonly relativePath: string;
-  readonly file: SourceFile;
   readonly data: any;
 }
 
@@ -117,8 +116,7 @@ async function loadExamples(
       }
 
       examples[example.title] = {
-        relativePath: fileName,
-        file: exampleFile,
+        relativePath: apiVersion ? resolvePath(apiVersion, fileName) : fileName,
         data: example,
       };
     } catch (err) {
@@ -197,7 +195,7 @@ function handleHttpOperationExamples(
       kind: "http",
       name: title,
       description: title,
-      filePath: example.file.path,
+      filePath: example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
           operation.bodyParam

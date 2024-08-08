@@ -41,6 +41,7 @@ describe("typespec-client-generator-core: load examples", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples![0].filePath, "get.json");
   });
 
   it("load example with version", async () => {
@@ -64,6 +65,7 @@ describe("typespec-client-generator-core: load examples", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples![0].filePath, "v3/get.json");
   });
 
   it("load multiple example for one operation", async () => {
@@ -84,6 +86,8 @@ describe("typespec-client-generator-core: load examples", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 2);
+    strictEqual(operation.examples![0].filePath, "get.json");
+    strictEqual(operation.examples![1].filePath, "getAnother.json");
   });
 
   it("load example with client customization", async () => {
