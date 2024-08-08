@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.1
+
+### Bug Fixes
+
+- [#1330](https://github.com/Azure/typespec-azure/pull/1330) Fix collectionFormat for "csv"
+
+
 ## 0.45.0
 
 ### Bug Fixes
