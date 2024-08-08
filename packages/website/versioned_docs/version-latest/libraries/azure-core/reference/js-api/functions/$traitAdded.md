@@ -16,7 +16,7 @@ function $traitAdded(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` \| `ModelProperty` |
-| `addedVersion` | `EnumMember` \| `NullType` |
+| `addedVersion` | `Type` |
 
 ## Returns
 

@@ -14,7 +14,7 @@ function getSdkModelPropertyType(
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `ModelProperty` |
 | `operation`? | `Operation` |
 

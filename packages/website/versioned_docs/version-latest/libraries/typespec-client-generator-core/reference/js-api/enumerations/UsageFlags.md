@@ -18,3 +18,4 @@ This enum represents the different ways a model can be used in a method.
 | `None` | `0` |
 | `Output` | `4` |
 | `Spread` | `64` |
+| `Xml` | `512` |

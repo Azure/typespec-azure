@@ -92,7 +92,7 @@ property to the type of the Azure Resource Manager resource.
 
 #### Target
 
-`Operation | Model`
+`Operation`
 
 #### Parameters
 

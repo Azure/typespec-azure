@@ -4,7 +4,7 @@ title: "[F] $tenantResource"
 
 ---
 ```ts
-function $tenantResource(context, entity): void
+function $tenantResource(context, target): void
 ```
 
 ## Parameters
@@ -12,7 +12,7 @@ function $tenantResource(context, entity): void
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 
 ## Returns
 
