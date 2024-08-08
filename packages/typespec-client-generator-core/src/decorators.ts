@@ -1138,5 +1138,6 @@ export function getOverriddenClientMethod(
 
 export const $hasJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
+  scope?: LanguageScopes
 ) => {};
