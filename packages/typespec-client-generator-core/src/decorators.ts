@@ -955,20 +955,17 @@ export function getAccessOverride(
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if(!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(
-  context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace
-) {
+export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
   const override = getAccessOverride(context, entity);
-  if (override) {
-    return override;
+  if (override || entity.kind === "Operation") {
+    return override || "public";
   }
 
   switch (entity.kind) {
@@ -983,12 +980,8 @@ export function getAccess(
       }
       return "public";
     }
-    case "Operation":
-    case "Namespace":
-      return "public";
   }
 }
-
 
 const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
 /**

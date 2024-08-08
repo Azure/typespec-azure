@@ -1700,12 +1700,12 @@ describe("typespec-client-generator-core: decorators", () => {
             prop: string;
           }
         `)) as { Test: Operation };
-  
+
         const actual = getAccess(runner.context, Test);
         strictEqual(actual, "public");
-      })
+      });
 
-      it("should honor the local override over the namespace one", async () => {
+      it("should honor the granular override over the namespace one", async () => {
         const { Test } = (await runner.compile(`
           @access(Access.public)
           @service({title: "Test Service"}) namespace TestService;
@@ -1715,11 +1715,11 @@ describe("typespec-client-generator-core: decorators", () => {
             prop: string;
           }
         `)) as { Test: Operation };
-  
+
         const actual = getAccess(runner.context, Test);
         strictEqual(actual, "internal");
-      })
-    })
+      });
+    });
     it("mark an operation as internal", async () => {
       const { test } = (await runner.compile(`
         @service({title: "Test Service"}) namespace TestService;
