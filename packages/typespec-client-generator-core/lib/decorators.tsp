@@ -474,10 +474,10 @@ extern dec override(original: Operation, override: Operation, scope?: valueof st
  *
  * @example
  * ```typespec
- * @hasJsonConverter
+ * @useSystemTextJsonConverter
  * model MyModel {
  *   prop: string;
  * }
  * ```
  */
-extern dec hasJsonConverter(target: Model, scope?: valueof string);
+extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);

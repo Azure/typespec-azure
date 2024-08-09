@@ -19,13 +19,13 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@convenientAPI`](#@convenientapi)
 - [`@exclude`](#@exclude)
 - [`@flattenProperty`](#@flattenproperty)
-- [`@hasJsonConverter`](#@hasjsonconverter)
 - [`@include`](#@include)
 - [`@internal`](#@internal)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@protocolAPI`](#@protocolapi)
 - [`@usage`](#@usage)
+- [`@useSystemTextJsonConverter`](#@usesystemtextjsonconverter)
 
 #### `@access`
 
@@ -372,33 +372,6 @@ model Foo {
 model Bar {}
 ```
 
-#### `@hasJsonConverter`
-
-Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
-
-```typespec
-@Azure.ClientGenerator.Core.hasJsonConverter(scope?: valueof string)
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-##### Examples
-
-```typespec
-@hasJsonConverter
-model MyModel {
-  prop: string;
-}
-```
-
 #### `@include`
 
 _Deprecated: @include decorator is deprecated. Use `@usage` and `@access` decorator instead._
@@ -652,4 +625,31 @@ model Origin {
 
 @get
 op getModel(): Fish;
+```
+
+#### `@useSystemTextJsonConverter`
+
+Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
+
+```typespec
+@Azure.ClientGenerator.Core.useSystemTextJsonConverter(scope?: valueof string)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+##### Examples
+
+```typespec
+@useSystemTextJsonConverter
+model MyModel {
+  prop: string;
+}
 ```

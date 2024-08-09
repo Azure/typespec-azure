@@ -7,13 +7,13 @@ import {
   $convenientAPI,
   $exclude,
   $flattenProperty,
-  $hasJsonConverter,
   $include,
   $internal,
   $operationGroup,
   $override,
   $protocolAPI,
   $usage,
+  $useSystemTextJsonConverter,
 } from "@azure-tools/typespec-client-generator-core";
 import type {
   AccessDecorator,
@@ -23,13 +23,13 @@ import type {
   ConvenientAPIDecorator,
   ExcludeDecorator,
   FlattenPropertyDecorator,
-  HasJsonConverterDecorator,
   IncludeDecorator,
   InternalDecorator,
   OperationGroupDecorator,
   OverrideDecorator,
   ProtocolAPIDecorator,
   UsageDecorator,
+  UseSystemTextJsonConverterDecorator,
 } from "./Azure.ClientGenerator.Core.js";
 
 type Decorators = {
@@ -46,7 +46,7 @@ type Decorators = {
   $access: AccessDecorator;
   $flattenProperty: FlattenPropertyDecorator;
   $override: OverrideDecorator;
-  $hasJsonConverter: HasJsonConverterDecorator;
+  $useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
 };
 
 /** An error here would mean that the exported decorator is not using the same signature. Make sure to have export const $decName: DecNameDecorator = (...) => ... */
@@ -64,5 +64,5 @@ const _: Decorators = {
   $access,
   $flattenProperty,
   $override,
-  $hasJsonConverter,
+  $useSystemTextJsonConverter,
 };

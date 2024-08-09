@@ -1136,7 +1136,7 @@ export function getOverriddenClientMethod(
   return getScopedDecoratorData(context, overrideKey, entity);
 }
 
-export const $hasJsonConverter: DecoratorFunction = (
+export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
   scope?: LanguageScopes

@@ -490,13 +490,13 @@ export type OverrideDecorator = (
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
- * @hasJsonConverter
+ * @useSystemTextJsonConverter
  * model MyModel {
  *   prop: string;
  * }
  * ```
  */
-export type HasJsonConverterDecorator = (
+export type UseSystemTextJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
   scope?: string
