@@ -34,7 +34,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples[0].kind, "http");
     strictEqual(operation.examples[0].name, "simple description");
     strictEqual(operation.examples[0].description, "simple description");
-    strictEqual(operation.examples[0].filePath, resolveVirtualPath("./examples/simple.json"));
+    strictEqual(operation.examples[0].filePath, "simple.json");
     deepStrictEqual(operation.examples[0].rawExample, {
       operationId: "simple",
       title: "simple description",
