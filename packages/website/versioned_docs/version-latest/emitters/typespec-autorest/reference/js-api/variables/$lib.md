@@ -4,7 +4,7 @@ title: "[V] $lib"
 
 ---
 ```ts
-const $lib: TypeSpecLibrary<object, AutorestEmitterOptions, never>;
+const $lib: TypeSpecLibrary<object, AutorestEmitterOptions, "example" | "useRef">;
 ```
 
 ## Type declaration

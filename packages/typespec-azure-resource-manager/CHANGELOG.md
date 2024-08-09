@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1187](https://github.com/Azure/typespec-azure/pull/1187) Replace deprecated LocationParameter with LocationResourceParameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+
 ## 0.44.0
 
 ### Bug Fixes

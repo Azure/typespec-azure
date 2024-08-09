@@ -21,6 +21,16 @@ emit:
   - "@azure-tools/typespec-autorest-canonical"
 ```
 
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-autorest-canonical"
+options:
+  "@azure-tools/typespec-autorest-canonical":
+    option: value
+```
+
 ## Emitter options
 
 ### `output-file`

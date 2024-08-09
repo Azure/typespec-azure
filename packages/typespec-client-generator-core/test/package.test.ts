@@ -1251,6 +1251,24 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(queryParm.collectionFormat, "multi");
     });
 
+    it("query collection format for csv", async () => {
+      await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service({})
+      namespace My.Service;
+      
+      #suppress "deprecated" "Legacy test"
+      op myOp(@query({format: "csv"}) query: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.kind, "basic");
+
+      strictEqual(method.operation.parameters.length, 1);
+      const queryParm = method.operation.parameters[0];
+      strictEqual(queryParm.kind, "query");
+      strictEqual(queryParm.collectionFormat, "csv");
+    });
+
     it("body basic", async () => {
       await runner.compile(`@server("http://localhost:3000", "endpoint")
         @service({})
