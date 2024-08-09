@@ -221,6 +221,8 @@ interface MyInterface {}
 
 #### `@clientFormat`
 
+_Deprecated: @clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead._
+
 DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
 
 Can be used to explain the client type that the current TYPESPEC
@@ -311,6 +313,8 @@ op test: void;
 
 #### `@exclude`
 
+_Deprecated: @exclude decorator is deprecated. Use `@usage` and `@access` decorator instead._
+
 DEPRECATED: Use `@usage` and `@access` decorator instead.
 
 Whether to exclude a model from generation for specific languages. By default we generate
@@ -341,6 +345,8 @@ model ModelToExclude {
 
 #### `@flattenProperty`
 
+_Deprecated: @flattenProperty decorator is not recommended to use._
+
 Set whether a model property should be flattened or not.
 
 ```typespec
@@ -368,6 +374,8 @@ model Bar {}
 ```
 
 #### `@include`
+
+_Deprecated: @include decorator is deprecated. Use `@usage` and `@access` decorator instead._
 
 DEPRECATED: Use `@usage` and `@access` decorator instead.
 
@@ -398,6 +406,8 @@ model ModelToInclude {
 ```
 
 #### `@internal`
+
+_Deprecated: @internal decorator is deprecated. Use `@access` decorator instead._
 
 DEPRECATED: Use `@access` decorator instead.
 
