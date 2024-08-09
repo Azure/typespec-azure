@@ -181,6 +181,9 @@ enum Usage {
  * Expand usage for models/enums.
  * A model/enum's default usage info is always calculated by the operations that use it.
  * You could use this decorator to expand the default usage info.
+ * When setting usage for namespaces,
+ * the usage info will be propagated to the models defined in the namespace.
+ * If the model has an usage override, the model override takes precedence.
  * For example, with operation definition `op test(): OutputModel`,
  * the model `OutputModel` has default usage `Usage.output`.
  * After adding decorator `@@usage(OutputModel, Usage.input)`,
@@ -275,8 +278,7 @@ enum Access {
  * Models/enums that are only used in operations with `@access(Access.internal)` will be implicitly set to access "internal".
  * This influence will be propagated to models' properties, parent models, discriminated sub models.
  * But this influence will be override by `@usage` decorator on models/enums directly.
- * If an operation/model/enum has no `@access` decorator and is not influenced by any operation with `@access` decorator,
- * the access result is undefined.
+ * The default access is public.
  * @param value The access info you want to set for this model or operation.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
@@ -341,11 +343,11 @@ enum Access {
  *   @body body: Test1
  * ): void;
  *
- * // undefined
+ * // Access.public
  * model Test2 {
  * }
  *
- * // undefined
+ * // Access.public
  * @route("/func2")
  * op func2(
  *   @body body: Test2
@@ -362,7 +364,7 @@ enum Access {
  *   @body body: Test3
  * ): void;
  *
- * // undefined
+ * // Access.public
  * model Test4 {
  * }
  *
@@ -373,7 +375,7 @@ enum Access {
  *   @body body: Test4
  * ): void;
  *
- * // undefined
+ * // Access.public
  * @route("/func5")
  * op func5(
  *   @body body: Test4
@@ -390,7 +392,7 @@ enum Access {
  *   @body body: Test5
  * ): void;
  *
- * // undefined
+ * // Access.public
  * @route("/func7")
  * op func7(
  *   @body body: Test5
