@@ -2559,6 +2559,80 @@ describe("typespec-client-generator-core: decorators", () => {
         UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json
       );
     });
+
+    it("@usage Input and Output on Namespace", async () => {
+      const { OrphanModel, InputModel, OutputModel, RoundtripModel } = (await runner.compile(`
+        @service({})
+        @test
+        @usage(Usage.input | Usage.output)
+        namespace MyService {
+          @test
+          model OrphanModel {
+            prop: string;
+          }
+
+          @test
+          model InputModel {
+            prop: string
+          }
+
+          @test
+          model OutputModel {
+            prop: string
+          }
+
+          @test
+          model RoundtripModel {
+            prop: string
+          }
+
+          @route("/one")
+          op one(@body body: InputModel): OutputModel;
+
+          @route("/two")
+          op two(@body body: RoundtripModel): RoundtripModel;
+        }
+      `)) as { OrphanModel: Model; InputModel: Model; OutputModel: Model; RoundtripModel: Model };
+      strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
+      // this is set to input and output because of the namespace override
+      strictEqual(
+        getUsage(runner.context, InputModel),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(
+        getUsage(runner.context, OutputModel),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(
+        getUsage(runner.context, RoundtripModel),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+    });
+
+    it("@usage namespace override", async () => {
+      const { OrphanModel, OrphanModelWithOverride } = (await runner.compile(`
+        @service({})
+        @test
+        @usage(Usage.input)
+        namespace MyService {
+          @test
+          model OrphanModel {
+            prop: string;
+          }
+
+          @test
+          @usage(Usage.input | Usage.output)
+          model OrphanModelWithOverride {
+            prop: string;
+          }
+        }
+      `)) as { OrphanModel: Model; OrphanModelWithOverride: Model };
+      strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input);
+      strictEqual(
+        getUsage(runner.context, OrphanModelWithOverride),
+        UsageFlags.Input | UsageFlags.Output
+      );
+    });
   });
 
   describe("@flattenProperty", () => {
