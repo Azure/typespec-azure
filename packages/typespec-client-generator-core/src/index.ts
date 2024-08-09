@@ -4,3 +4,6 @@ export * from "./lib.js";
 export * from "./public-utils.js";
 export * from "./types.js";
 export { $onValidate } from "./validate.js";
+
+/** @internal */
+export { $decorators } from "./tsp-index.js";

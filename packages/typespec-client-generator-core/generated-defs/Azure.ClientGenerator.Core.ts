@@ -488,3 +488,19 @@ export type OverrideDecorator = (
   override: Operation,
   scope?: string
 ) => void;
+
+export type AzureClientGeneratorCoreDecorators = {
+  clientName: ClientNameDecorator;
+  convenientAPI: ConvenientAPIDecorator;
+  protocolAPI: ProtocolAPIDecorator;
+  client: ClientDecorator;
+  operationGroup: OperationGroupDecorator;
+  exclude: ExcludeDecorator;
+  include: IncludeDecorator;
+  clientFormat: ClientFormatDecorator;
+  internal: InternalDecorator;
+  usage: UsageDecorator;
+  access: AccessDecorator;
+  flattenProperty: FlattenPropertyDecorator;
+  override: OverrideDecorator;
+};
