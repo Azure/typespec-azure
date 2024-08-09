@@ -11,6 +11,9 @@ toc_max_heading_level: 3
 ### `@access` {#@Azure.ClientGenerator.Core.access}
 
 Set explicit access for operations, models and enums.
+When setting access for namespaces,
+the access info will be propagated to the models defined in the namespace.
+If the model has an access override, the model override takes precedence.
 When setting access for models,
 the access info wll not be propagated to models' properties, base models or sub models.
 When setting access for an operation,
@@ -28,7 +31,7 @@ the access result is undefined.
 
 #### Target
 
-`Model | Operation | Enum | Union`
+`Model | Operation | Enum | Union | Namespace`
 
 #### Parameters
 

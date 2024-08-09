@@ -6,8 +6,8 @@ title: "[F] $clientName"
 ```ts
 function $clientName(
    context, 
-   entity, 
-   value, 
+   target, 
+   rename, 
    scope?): void
 ```
 
@@ -16,8 +16,8 @@ function $clientName(
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Type` |
-| `value` | `string` |
+| `target` | `Type` |
+| `rename` | `string` |
 | `scope`? | `string` |
 
 ## Returns

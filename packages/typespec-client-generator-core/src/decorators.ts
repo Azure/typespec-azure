@@ -948,7 +948,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union,
+  entity: Model | Enum | Operation | Union | Namespace,
   value: EnumMember,
   scope?: LanguageScopes
 ) => {
@@ -964,16 +964,19 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union
+  entity: Model | Enum | Operation | Union | Namespace
 ): AccessFlags | undefined {
-  return getScopedDecoratorData(context, accessKey, entity);
+  const accessOverride = getScopedDecoratorData(context, accessKey, entity);
+
+  if (!accessOverride && entity.namespace) {
+    return getAccessOverride(context, entity.namespace);
+  }
+
+  return accessOverride;
 }
 
-export function getAccess(
-  context: TCGCContext,
-  entity: Model | Enum | Operation | Union
-): AccessFlags {
-  const override = getScopedDecoratorData(context, accessKey, entity);
+export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+  const override = getAccessOverride(context, entity);
   if (override || entity.kind === "Operation") {
     return override || "public";
   }
@@ -983,12 +986,13 @@ export function getAccess(
       return getSdkModel(context, entity).access;
     case "Enum":
       return getSdkEnum(context, entity).access;
-    case "Union":
+    case "Union": {
       const type = getSdkUnion(context, entity);
       if (type.kind === "enum" || type.kind === "model") {
         return type.access;
       }
       return "public";
+    }
   }
 }
 

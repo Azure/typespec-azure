@@ -25,5 +25,5 @@ title: "[I] SdkEndpointParameter"
 | `onClient` | `true` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`onClient` | - |
 | `optional` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`optional` |
 | `serializedName?` | `string` | - | - |
-| `type` | [`SdkEndpointType`](SdkEndpointType.md) | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`type` | - |
+| `type` | [`SdkUnionType`](SdkUnionType.md) \| [`SdkEndpointType`](SdkEndpointType.md) | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`type` | - |
 | `urlEncode` | `boolean` | - | - |

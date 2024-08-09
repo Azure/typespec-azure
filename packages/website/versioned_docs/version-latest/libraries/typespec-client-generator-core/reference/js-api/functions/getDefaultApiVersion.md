@@ -13,7 +13,7 @@ Return the default api version for a versioned service. Will return undefined if
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `context` | `TCGCContext` | - |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | - |
 | `serviceNamespace` | `Namespace` |  |
 
 ## Returns

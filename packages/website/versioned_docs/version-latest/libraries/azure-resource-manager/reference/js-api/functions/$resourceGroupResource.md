@@ -4,7 +4,7 @@ title: "[F] $resourceGroupResource"
 
 ---
 ```ts
-function $resourceGroupResource(context, entity): void
+function $resourceGroupResource(context, target): void
 ```
 
 ## Parameters
@@ -12,7 +12,7 @@ function $resourceGroupResource(context, entity): void
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 
 ## Returns
 
