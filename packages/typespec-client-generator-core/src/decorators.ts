@@ -165,7 +165,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : (findClientService(context.program, target) ?? (target as any));
+      : (findClientService(context.program, target, scope) ?? (target as any));
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
@@ -195,7 +195,8 @@ export const $client: ClientDecorator = (
 
 function findClientService(
   program: Program,
-  client: Namespace | Interface
+  client: Namespace | Interface,
+  scope?: LanguageScopes
 ): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
@@ -204,8 +205,8 @@ function findClientService(
       return current;
     }
     const client = program.stateMap(clientKey).get(current);
-    if (client && client[AllScopes]) {
-      return client[AllScopes].service;
+    if (client && client[scope ?? AllScopes]) {
+      return client[scope ?? AllScopes].service;
     }
     current = current.namespace;
   }
@@ -358,7 +359,7 @@ export const $operationGroup: OperationGroupDecorator = (
     });
     return;
   }
-  const service = findClientService(context.program, target) ?? (target as any);
+  const service = findClientService(context.program, target, scope) ?? (target as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
       code: "client-service",
@@ -457,7 +458,7 @@ export function getOperationGroup(
   type: Namespace | Interface
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-  const service = findClientService(context.program, type) ?? (type as any);
+  const service = findClientService(context.program, type, context.emitterName) ?? (type as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
       code: "client-service",
