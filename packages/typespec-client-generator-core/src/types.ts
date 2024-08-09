@@ -1106,7 +1106,7 @@ function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   authentication: Authentication
-): SdkCredentialType | SdkUnionType {
+): SdkCredentialType | SdkUnionType<SdkCredentialType> {
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
