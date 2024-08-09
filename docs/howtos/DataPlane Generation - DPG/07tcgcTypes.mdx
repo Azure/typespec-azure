@@ -154,7 +154,7 @@ const sdkContext = {
               examples: [
                 {
                   kind: "http",
-                  name: "example1",
+                  name: "Example 1",
                   description: "Example 1",
                   filePath: "example1.json",
                   rawExample: {...},
@@ -910,6 +910,7 @@ export interface SdkHttpOperation {
   // HttpStatusCodeRange can represent either a single status code or a range.
   responses: Map<HttpStatusCodeRange, SdkHttpResponse>;
   exceptions: Map<HttpStatusCodeRange, SdkHttpResponse>;
+  examples?: SdkHttpOperationExample[];
 }
 ```
 
@@ -942,7 +943,18 @@ const sdkHttpOperation = {
       kind: "http",
       ...
     }
-  }
+  },
+  examples: [
+    {
+      kind: "http",
+      name: "Example 1",
+      description: "Example 1",
+      filePath: "example1.json",
+      rawExample: {...},
+      parameters: [...],
+      responses: {...}
+    }
+  ]
 }
 ```
 
@@ -1445,9 +1457,317 @@ export interface SdkEndpointType {
 }
 ```
 
-# SdkExample
+## Example Types
 
-This is a type that represents the example for `Sdk
+The example types help to model the examples that TypeSpec author defined to help user understand how to use the API.
+
+We currently only have examples based on the payload, so the examples model will be binded to the SdkServiceOperation.
+
+### Operation Related Interface
+
+These types are used to represent an example of a service operation.
+
+We currently only support HTTP calls to the service.
+
+So, we have `SdkHttpoperationExample` bind to `SdkHttpOperation`, `SdkHttpParameterExample` bind to `SdkHttpParameter`, `SdkHttpResponseExample` bind to `SdkHttpResponse`, and `SdkHttpResponseHeaderExample` bind to `SdkHttpResponseHeader`.
+
+Each type will have the example value type and its cooresponding definition type.
+
+```ts
+interface SdkExampleBase {
+  kind: string;
+  name: string;
+  description: string;
+  filePath: string;
+  rawExample: any;
+}
+
+export interface SdkHttpOperationExample extends SdkExampleBase {
+  kind: "http";
+  parameters: SdkHttpParameterExample[];
+  responses: Map<number, SdkHttpResponseExample>;
+}
+
+export interface SdkHttpParameterExample {
+  parameter: SdkHttpParameter;
+  value: SdkTypeExample;
+}
+
+export interface SdkHttpResponseExample {
+  response: SdkHttpResponse;
+  headers: SdkHttpResponseHeaderExample[];
+  bodyValue?: SdkTypeExample;
+}
+
+export interface SdkHttpResponseHeaderExample {
+  header: SdkServiceResponseHeader;
+  value: SdkTypeExample;
+}
+
+```
+
+### SdkExampleType
+
+These types are used to represent the example value of a type. One definition types will have different example value types.
+For `SdkUnionExample`, since it is hard to determine whether the example value should belong to which union varient, we will keep the raw value and leave the work for the emitter.
+For `SdkModelExample`, we will help to map the example type to the right subtype for the discriminated type, and we will separate the additional properties value from the property value.
+But for the model with inheritance, we will not break down the type graph, just put all the example value in the child model.
+
+```ts
+export type SdkTypeExample =
+  | SdkStringExample
+  | SdkNumberExample
+  | SdkBooleanExample
+  | SdkNullExample
+  | SdkAnyExample
+  | SdkArrayExample
+  | SdkDictionaryExample
+  | SdkUnionExample
+  | SdkModelExample;
+
+export interface SdkExampleTypeBase {
+  kind: string;
+  type: SdkType;
+  value: unknown;
+}
+
+export interface SdkStringExample extends SdkExampleTypeBase {
+  kind: "string";
+  type:
+    | SdkBuiltInType
+    | SdkDateTimeType
+    | SdkDurationType
+    | SdkEnumType
+    | SdkEnumValueType
+    | SdkConstantType;
+  value: string;
+}
+
+export interface SdkNumberExample extends SdkExampleTypeBase {
+  kind: "number";
+  type:
+    | SdkBuiltInType
+    | SdkDateTimeType
+    | SdkDurationType
+    | SdkEnumType
+    | SdkEnumValueType
+    | SdkConstantType;
+  value: number;
+}
+
+export interface SdkBooleanExample extends SdkExampleTypeBase {
+  kind: "boolean";
+  type: SdkBuiltInType | SdkConstantType;
+  value: boolean;
+}
+
+export interface SdkNullExample extends SdkExampleTypeBase {
+  kind: "null";
+  type: SdkNullableType;
+  value: null;
+}
+
+export interface SdkAnyExample extends SdkExampleTypeBase {
+  kind: "any";
+  type: SdkBuiltInType;
+  value: unknown;
+}
+
+export interface SdkArrayExample extends SdkExampleTypeBase {
+  kind: "array";
+  type: SdkArrayType;
+  value: SdkTypeExample[];
+}
+
+export interface SdkDictionaryExample extends SdkExampleTypeBase {
+  kind: "dict";
+  type: SdkDictionaryType;
+  value: Record<string, SdkTypeExample>;
+}
+
+export interface SdkUnionExample extends SdkExampleTypeBase {
+  kind: "union";
+  type: SdkUnionType;
+  value: unknown;
+}
+
+export interface SdkModelExample extends SdkExampleTypeBase {
+  kind: "model";
+  type: SdkModelType;
+  value: Record<string, SdkTypeExample>;
+  additionalPropertiesValue?: Record<string, SdkTypeExample>;
+}
+```
+
+### Example
+
+```ts
+const sdkHttpOperationExample = {
+  kind: "http",
+  name: "Example 1",
+  description: "Example 1",
+  filePath: "example1.json",
+  rawExample: {
+    operationId: "Widgets_Read",
+    title: "Example 1",
+    parameters: {
+      "id": "test"
+    },
+    responses: {
+      200: {
+        body: {
+          id: "test",
+          color: "red",
+          weight: 100
+        }
+      }
+    }
+  },
+  parameters: [
+    {
+      parameter: {}, // ref to the SdkHttpParameter
+      value: {
+        kind: "string",
+        type: {}, // ref to the SdkType
+        value: "test",
+      }
+    }
+  ],
+  responses: {
+    200: {
+      response: {}, // ref to the SdkHttpResponse
+      bodyValue: {
+        kind: "model",
+        type: {}, // ref to the SdkType
+        value: {
+          id: {
+            kind: "string",
+            type: {}, // ref to the SdkType
+            value: "test",
+          },
+          color: {
+            kind: "string",
+            type: {}, // ref to the SdkType
+            value: "red",
+          },
+          weight: {
+            kind: "number",
+            type: {}, // ref to the SdkType
+            value: 100,
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Usage
+
+```ts
+function serializeServiceOperationExample(
+  context: PythonSdkContext<SdkHttpOperation>,
+  operation: SdkHttpOperation
+): PythonSdkHttpOperationExample {
+  for (const example of operation.examples) {
+    return {
+      name: example.name,
+      filePath: example.filePath,
+      parameters: example.parameters.map((x) => ({
+        parameter: getSdkModelPropertyType(x.parameter),
+        value: serializeTypeExample(context, x.value),
+      })),
+      responses: new Map(
+        [...example.responses].map(([key, value]) => [
+          key,
+          {
+            response: serializeHttpResponse(value.response),
+            headers: value.headers.map((x) => ({
+              header: getSdkModelPropertyType(x.header),
+              value: serializeTypeExample(context, x.value),
+            })),
+            bodyValue: serializeTypeExample(context, value.bodyValue),
+          },
+        ])
+      ),
+    };
+  }
+}
+
+function serializeTypeExample(
+  context: PythonSdkContext<SdkHttpOperation>,
+  example: SdkTypeExample
+): PythonSdkTypeExample {
+  switch (example.kind) {
+    case "string":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+      };
+    case "number":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+      };
+    case "boolean":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+      };
+    case "null":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+      };
+    case "any":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+      };
+    case "array":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+        value: example.value.map((x) => serializeTypeExample(context, x)),
+      };
+    case "dict":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+        value: Object.fromEntries(
+          Object.entries(example.value).map(([key, value]) => [
+            key,
+            serializeTypeExample(context, value),
+          ])
+        ),
+      };
+    case "union":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+      };
+    case "model":
+      return {
+        ...example,
+        type: getPythonSdkType(context, example.type),
+        value: Object.fromEntries(
+          Object.entries(example.value).map(([key, value]) => [
+            key,
+            serializeTypeExample(context, value),
+          ])
+        ),
+        additionalPropertiesValue: example.additionalPropertiesValue
+          ? Object.fromEntries(
+              Object.entries(example.additionalPropertiesValue).map(([key, value]) => [
+                key,
+                serializeTypeExample(context, value),
+              ])
+            )
+          : undefined,
+      };
+  }
+}
+```
 
 ## Complete Usage Code
 
