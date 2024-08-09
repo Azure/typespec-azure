@@ -522,7 +522,7 @@ function getSdkEndpointParameter(
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
       decorators: [],
-    };
+    } as SdkUnionType<SdkEndpointType>;
   } else {
     type = types[0];
   }
