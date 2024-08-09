@@ -28,7 +28,12 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkHttpOperationExample, TCGCContext } from "./interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperationExample,
+  SdkServiceOperation,
+  TCGCContext,
+} from "./interfaces.js";
 import {
   TspLiteralType,
   getClientNamespaceStringHelper,
@@ -623,4 +628,26 @@ export function getHttpOperationExamples(
   operation: HttpOperation
 ): SdkHttpOperationExample[] {
   return context.__httpOperationExamples?.get(operation) ?? [];
+}
+
+/**
+ * Get all the sub clients from current client.
+ *
+ * @param client
+ * @param listNestedClients determine if nested clients should be listed
+ * @returns
+ */
+export function listSubClients<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+  listNestedClients: boolean = false
+): SdkClientType<TServiceOperation>[] {
+  const subClients: SdkClientType<TServiceOperation>[] = client.methods
+    .filter((c) => c.kind === "clientaccessor")
+    .map((c) => c.response as SdkClientType<TServiceOperation>);
+  if (listNestedClients) {
+    for (const subClient of [...subClients]) {
+      subClients.push(...listSubClients(subClient, listNestedClients));
+    }
+  }
+  return subClients;
 }
