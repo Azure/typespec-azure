@@ -7,7 +7,7 @@ title: "[F] $traitContext"
 function $traitContext(
    context, 
    target, 
-   traitContext): void
+   contexts): void
 ```
 
 ## Parameters
@@ -16,7 +16,7 @@ function $traitContext(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
-| `traitContext` | `EnumMember` \| `Union` \| `UnknownType` |
+| `contexts` | `Type` |
 
 ## Returns
 

@@ -17,7 +17,7 @@ Helper function to return cross language definition id for a type
 
 | Parameter | Type | Default value | Description |
 | ------ | ------ | ------ | ------ |
-| `context` | `TCGCContext` | `undefined` | - |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | `undefined` | - |
 | `type` | \| `Namespace` \| `Enum` \| `Interface` \| `Model` \| `ModelProperty` \| `Operation` \| `Scalar` \| `Union` | `undefined` |  |
 | `operation`? | `Operation` | `undefined` | - |
 | `appendNamespace`? | `boolean` | `true` | - |

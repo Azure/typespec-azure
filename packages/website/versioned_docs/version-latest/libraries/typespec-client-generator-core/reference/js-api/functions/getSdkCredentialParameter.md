@@ -11,7 +11,7 @@ function getSdkCredentialParameter(context, client): SdkCredentialParameter | un
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `client` | [`SdkClient`](../interfaces/SdkClient.md) \| [`SdkOperationGroup`](../interfaces/SdkOperationGroup.md) |
 
 ## Returns

@@ -6,7 +6,7 @@ title: "[F] $access"
 ```ts
 function $access(
    context, 
-   entity, 
+   target, 
    value, 
    scope?): void
 ```
@@ -16,7 +16,7 @@ function $access(
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Enum` \| `Model` \| `Operation` \| `Union` |
+| `target` | `Enum` \| `Model` \| `Operation` \| `Union` |
 | `value` | `EnumMember` |
 | `scope`? | `string` |
 

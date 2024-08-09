@@ -12,10 +12,10 @@ const $lib: TypeSpecLibrary<object, CSharpServiceEmitterOptions, never>;
 | Name | Type |
 | ------ | ------ |
 | `invalid-identifier` | `object` |
-| `invalid-identifier.default` | `CallableMessage`<[`string`, `string`]\> |
+| `invalid-identifier.default` | `CallableMessage`<[`"identifier"`, `"location"`]\> |
 | `missing-type-parent` | `object` |
-| `missing-type-parent.default` | `CallableMessage`<[`string`, `string`]\> |
+| `missing-type-parent.default` | `CallableMessage`<[`"type"`, `"name"`]\> |
 | `no-numeric` | `object` |
-| `no-numeric.default` | `CallableMessage`<[`string`, `string`]\> |
+| `no-numeric.default` | `CallableMessage`<[`"sourceType"`, `"targetType"`]\> |
 | `unrecognized-scalar` | `object` |
-| `unrecognized-scalar.default` | `CallableMessage`<[`string`]\> |
+| `unrecognized-scalar.default` | `CallableMessage`<[`"typeName"`]\> |

@@ -7,7 +7,7 @@ title: "[F] createSdkContext"
 function createSdkContext<TOptions, TServiceOperation>(
    context, 
    emitterName?, 
-options?): SdkContext<TOptions, TServiceOperation>
+options?): Promise<SdkContext<TOptions, TServiceOperation>>
 ```
 
 ## Type Parameters
@@ -27,4 +27,4 @@ options?): SdkContext<TOptions, TServiceOperation>
 
 ## Returns
 
-[`SdkContext`](../interfaces/SdkContext.md)<`TOptions`, `TServiceOperation`\>
+`Promise`<[`SdkContext`](../interfaces/SdkContext.md)<`TOptions`, `TServiceOperation`\>\>

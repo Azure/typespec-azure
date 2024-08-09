@@ -7,7 +7,7 @@ title: "[F] $pollingOperationParameter"
 function $pollingOperationParameter(
    context, 
    entity, 
-   target?): void
+   targetParameter?): void
 ```
 
 ## Parameters
@@ -16,7 +16,7 @@ function $pollingOperationParameter(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
-| `target`? | `ModelProperty` \| `StringLiteral` |
+| `targetParameter`? | `Type` |
 
 ## Returns
 
