@@ -14,7 +14,7 @@ import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource
 import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
-import { operationIdRule } from "./rules/no-operation-id.js";
+import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -57,7 +57,7 @@ const rules = [
   noOffsetDateTimeRule,
   noResponseBodyRule,
   noRpcPathParamsRule,
-  operationIdRule,
+  noOpenAPIRule,
   preferCsvCollectionFormatRule,
   preventFormatUse,
   preventMultipleDiscriminator,
