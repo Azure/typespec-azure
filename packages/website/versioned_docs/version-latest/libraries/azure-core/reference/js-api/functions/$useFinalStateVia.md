@@ -18,7 +18,7 @@ overrides the final state for an lro
 | ------ | ------ | ------ |
 | `context` | `DecoratorContext` | The execution context for the decorator |
 | `entity` | `Operation` | The decorated operation |
-| `finalState` | `string` | The desired value for final-state-via |
+| `finalState` | `"location"` \| `"operation-location"` \| `"azure-async-operation"` \| `"original-uri"` | The desired value for final-state-via |
 
 ## Returns
 

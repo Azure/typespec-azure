@@ -14,7 +14,7 @@ function getSdkUnionEnum(
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `UnionEnum` |
 | `operation`? | `Operation` |
 

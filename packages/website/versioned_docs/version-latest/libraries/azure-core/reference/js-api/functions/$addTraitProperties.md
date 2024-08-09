@@ -20,7 +20,7 @@ function $addTraitProperties(
 | `target` | `Model` |
 | `traitModel` | `Model` |
 | `traitLocation` | `EnumMember` |
-| `traitContexts` | `EnumMember` \| `Union` \| `UnknownType` |
+| `traitContexts` | `Type` |
 
 ## Returns
 

@@ -11,7 +11,7 @@ function getAccess(context, entity): AccessFlags
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Enum` \| `Model` \| `Operation` \| `Union` |
 
 ## Returns

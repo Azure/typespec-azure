@@ -7,7 +7,7 @@ title: "[F] $client"
 function $client(
    context, 
    target, 
-   options?, 
+   value?, 
    scope?): void
 ```
 
@@ -17,7 +17,7 @@ function $client(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Namespace` \| `Interface` |
-| `options`? | `Model` |
+| `value`? | `Model` |
 | `scope`? | `string` |
 
 ## Returns

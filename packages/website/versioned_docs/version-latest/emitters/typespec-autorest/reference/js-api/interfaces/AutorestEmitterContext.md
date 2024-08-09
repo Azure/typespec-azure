@@ -10,5 +10,5 @@ title: "[I] AutorestEmitterContext"
 | `outputFile` | `readonly` | `string` |
 | `program` | `readonly` | `Program` |
 | `service` | `readonly` | `Service` |
-| `tcgcSdkContext` | `readonly` | `SdkContext`<`Record`<`string`, `any`\>, `SdkHttpOperation`\> |
+| `tcgcSdkContext` | `readonly` | `TCGCContext` |
 | `version?` | `readonly` | `string` |
