@@ -1461,7 +1461,7 @@ export interface SdkEndpointType {
 
 The example types help to model the examples that TypeSpec author defined to help user understand how to use the API.
 
-We currently only have examples based on the payload, so the examples model will be binded to the SdkServiceOperation.
+We currently only have examples based on the payload, so the examples model will bind to the SdkServiceOperation.
 
 ### Operation Related Interface
 
@@ -1503,13 +1503,12 @@ export interface SdkHttpResponseHeaderExample {
   header: SdkServiceResponseHeader;
   value: SdkTypeExample;
 }
-
 ```
 
 ### SdkExampleType
 
 These types are used to represent the example value of a type. One definition types will have different example value types.
-For `SdkUnionExample`, since it is hard to determine whether the example value should belong to which union varient, we will keep the raw value and leave the work for the emitter.
+For `SdkUnionExample`, since it is hard to determine whether the example value should belong to which union variant, we will keep the raw value and leave the work for the emitter.
 For `SdkModelExample`, we will help to map the example type to the right subtype for the discriminated type, and we will separate the additional properties value from the property value.
 But for the model with inheritance, we will not break down the type graph, just put all the example value in the child model.
 
@@ -1611,17 +1610,17 @@ const sdkHttpOperationExample = {
     operationId: "Widgets_Read",
     title: "Example 1",
     parameters: {
-      "id": "test"
+      id: "test",
     },
     responses: {
       200: {
         body: {
           id: "test",
           color: "red",
-          weight: 100
-        }
-      }
-    }
+          weight: 100,
+        },
+      },
+    },
   },
   parameters: [
     {
@@ -1630,8 +1629,8 @@ const sdkHttpOperationExample = {
         kind: "string",
         type: {}, // ref to the SdkType
         value: "test",
-      }
-    }
+      },
+    },
   ],
   responses: {
     200: {
@@ -1654,12 +1653,12 @@ const sdkHttpOperationExample = {
             kind: "number",
             type: {}, // ref to the SdkType
             value: 100,
-          }
-        }
-      }
-    }
-  }
-}
+          },
+        },
+      },
+    },
+  },
+};
 ```
 
 ### Usage
