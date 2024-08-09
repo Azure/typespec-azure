@@ -19,7 +19,7 @@ model Resource {
 
   /** The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts" */
   @visibility("read")
-  type?: string;
+  type?: resourceType;
 
   /** Azure Resource Manager metadata containing createdBy and modifiedBy information. */
   @visibility("read")

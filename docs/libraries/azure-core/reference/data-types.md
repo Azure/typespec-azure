@@ -65,10 +65,10 @@ model Azure.Core.ArmResourceIdentifierAllowedResource
 
 #### Properties
 
-| Name    | Type                                | Description                                                                                                                                                                          |
-| ------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| type    | `string`                            | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
-| scopes? | `Core.ArmResourceDeploymentScope[]` | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
+| Name    | Type                                       | Description                                                                                                                                                                          |
+| ------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| type    | [`resourceType`](#Azure.Core.resourceType) | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
+| scopes? | `Core.ArmResourceDeploymentScope[]`        | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
 
 ### `AzureApiKeyAuthentication` {#Azure.Core.AzureApiKeyAuthentication}
 
@@ -602,6 +602,20 @@ scalar Azure.Core.ipV6Address
 
 ```
 2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF
+```
+
+### `resourceType` {#Azure.Core.resourceType}
+
+Represents an Azure Resource Type.
+
+```typespec
+scalar Azure.Core.resourceType
+```
+
+#### Examples
+
+```
+Microsoft.Network/virtualNetworks/subnets
 ```
 
 ### `uuid` {#Azure.Core.uuid}
