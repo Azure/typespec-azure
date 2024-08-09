@@ -458,12 +458,14 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("@operationGroup with diagnostics", async () => {
-      const testCode = [`
+      const testCode = [
+        `
         @service({
           title: "DeviceUpdateClient",
         })
         namespace Azure.IoT.DeviceUpdate;
-      `, `
+      `,
+        `
         @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
         namespace Customizations;
 
@@ -474,12 +476,16 @@ describe("typespec-client-generator-core: decorators", () => {
         @operationGroup("python")
         interface SubClientOnlyForPython {
         }
-      `];
+      `,
+      ];
 
       // java should report disgnostics
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(testCode[0], testCode[1]);
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
         expectDiagnostics(diagnostics, {
           code: "@azure-tools/typespec-client-generator-core/client-service",
         });
@@ -488,7 +494,10 @@ describe("typespec-client-generator-core: decorators", () => {
       // python should have one sub client
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(testCode[0], testCode[1]);
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
         expectDiagnostics(diagnostics, {});
         const client = listClients(runner.context)[0];
         strictEqual(listOperationGroups(runner.context, client).length, 1);
@@ -497,7 +506,10 @@ describe("typespec-client-generator-core: decorators", () => {
       // csharp should only have one root client
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(testCode[0], testCode[1]);
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
         expectDiagnostics(diagnostics, {});
         const client = listClients(runner.context)[0];
         strictEqual(listOperationGroups(runner.context, client).length, 0);
