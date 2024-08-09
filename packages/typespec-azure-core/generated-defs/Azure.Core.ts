@@ -188,3 +188,24 @@ export type NextPageOperationDecorator = (
   linkedOperation: Operation,
   parameters?: Type
 ) => void;
+
+export type AzureCoreDecorators = {
+  lroStatus: LroStatusDecorator;
+  finalLocation: FinalLocationDecorator;
+  pollingLocation: PollingLocationDecorator;
+  pagedResult: PagedResultDecorator;
+  items: ItemsDecorator;
+  nextLink: NextLinkDecorator;
+  fixed: FixedDecorator;
+  lroSucceeded: LroSucceededDecorator;
+  lroCanceled: LroCanceledDecorator;
+  lroFailed: LroFailedDecorator;
+  lroResult: LroResultDecorator;
+  lroErrorResult: LroErrorResultDecorator;
+  operationLink: OperationLinkDecorator;
+  pollingOperationParameter: PollingOperationParameterDecorator;
+  pollingOperation: PollingOperationDecorator;
+  finalOperation: FinalOperationDecorator;
+  useFinalStateVia: UseFinalStateViaDecorator;
+  nextPageOperation: NextPageOperationDecorator;
+};
