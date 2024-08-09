@@ -347,7 +347,10 @@ describe("typespec-client-generator-core: general decorators list", () => {
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].decorators, [
-        { name: "Azure.ClientGenerator.Core.@useSystemTextJsonConverter", arguments: { scope: "csharp" } },
+        {
+          name: "Azure.ClientGenerator.Core.@useSystemTextJsonConverter",
+          arguments: { scope: "csharp" },
+        },
       ]);
       expectDiagnostics(runner.context.diagnostics, []);
     });
