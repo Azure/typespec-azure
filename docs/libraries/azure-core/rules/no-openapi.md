@@ -11,6 +11,27 @@ Using those decorators is usually a sign that the spec is either not following t
 
 Those decorators are only meant to be read by the openapi emitters which means this might achieve the correct OpenAPI output but other emitters(client SDK, service, etc.) will not be able to understand them and will see a broken representation of the spec.
 
+## Decorators and their alternatives
+
+| OpenAPI Decorator                    | Alternative                                                                                                                                                     |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@example`                           | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.md)                                                                                               |
+| `@extension("x-ms-examples", `       | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.md)                                                                                               |
+| `@extension("x-ms-client-flatten", ` | TCGC [`@flattenProperty`](../../typespec-client-generator-core/reference/decorators#@Azure.ClientGenerator.Core.flattenProperty)                                |
+| `@extension("x-ms-mutability", `     | Use [`@visibility` decorator](https://typespec.io/docs/next/standard-library/built-in-decorators#@visibility)                                                   |
+| `@extension("x-ms-enum", `           | [Enum extensibility doc](https://azure.github.io/typespec-azure/docs/next/troubleshoot/enum-not-extensible)                                                     |
+| `@operationId`                       | Name your interface and operation accordingly                                                                                                                   |
+| `@useRef`                            | This should not be used, define the types correctly in TypeSpec. For ARM common types read the [Arm docs](../../../getstarted/azure-resource-manager/step00.md) |
+| `@info`                              | Use versioning library for `version` and `@service` for title                                                                                                   |
+
+## Exceptions
+
+- `@extension("x-ms-identifiers"` is allowed as this right now has no alternative and is an ARM requirement that is not used by any other emitter.
+
+## Examples
+
+### `@extension("x-ms-enum"`
+
 #### ❌ Incorrect
 
 ```tsp
@@ -37,19 +58,39 @@ union PetKind {
 }
 ```
 
-### Decorators and their alternatives
+### `@extension("x-ms-mutability"`
 
-| OpenAPI Decorator                    | Alternative                                                                                                                                                     |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@example`                           | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.md)                                                                                               |
-| `@extension("x-ms-examples", `       | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.md)                                                                                               |
-| `@extension("x-ms-client-flatten", ` | TCGC [`@flattenProperty`](../../typespec-client-generator-core/reference/decorators#@Azure.ClientGenerator.Core.flattenProperty)                                |
-| `@extension("x-ms-mutability", `     | Use [`@visibility` decorator](https://typespec.io/docs/next/standard-library/built-in-decorators#@visibility)                                                   |
-| `@extension("x-ms-enum", `           | [Enum extensibility doc](https://azure.github.io/typespec-azure/docs/next/troubleshoot/enum-not-extensible)                                                     |
-| `@operationId`                       | Name your interface and operation accordingly                                                                                                                   |
-| `@useRef`                            | This should not be used, define the types correctly in TypeSpec. For ARM common types read the [Arm docs](../../../getstarted/azure-resource-manager/step00.md) |
-| `@info`                              | This should not be used, define the types correctly in TypeSpec. For ARM common types read the [Arm docs](../../../getstarted/azure-resource-manager/step00.md) |
+#### ❌ Incorrect
 
-### Exceptions
+```tsp
+model Pet {
+  @extension("x-ms-mutability", ["read", "create"])
+  name: string;
+}
+```
 
-- `@extension("x-ms-identifiers"` is allowed as this right now has no alternative and is an ARM requirement that is not used by any other emitter.
+#### ✅ Correct
+
+```tsp
+model Pet {
+  @visibility("read", "create")
+  name: string;
+}
+```
+
+### `@operationId`
+
+#### ❌ Incorrect
+
+```tsp
+@operationId("Pet_Get")
+op getPet(): Pet;
+```
+
+#### ✅ Correct
+
+```tsp
+interface Pet {
+  get(): Pet;
+}
+```
