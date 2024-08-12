@@ -19,18 +19,11 @@ export const armNoRecordRule = createRule({
     is: "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
   },
   create(context): SemanticNodeListener {
-    function checkModel(model: Model, target: DiagnosticTarget, kind?: "extends" | "is") {
+    function checkModel(model: Model) {
       if (model.baseModel !== undefined) {
         checkNoRecord(model.baseModel, model, "extends");
       } else if (model.sourceModel !== undefined) {
         checkNoRecord(model.sourceModel, model, "is");
-      }
-      if (model?.properties !== undefined) {
-        for (const prop of model.properties.values()) {
-          if (prop.type.kind === "Model") {
-            checkNoRecord(prop.type, prop);
-          }
-        }
       }
     }
 
@@ -45,7 +38,8 @@ export const armNoRecordRule = createRule({
     }
 
     return {
-      model: (type) => checkModel(type, type),
+      operation: (op) => checkNoRecord(op.returnType, op),
+      model: (type) => checkModel(type),
       modelProperty: (prop) => checkNoRecord(prop.type, prop),
       unionVariant: (variant) => checkNoRecord(variant.type, variant),
     };
