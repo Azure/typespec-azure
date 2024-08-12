@@ -186,7 +186,7 @@ export type ClientFormatDecorator = (
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
- * @internal("python")
+ * @_internal("python")
  * op test: void;
  * ```
  */
@@ -488,3 +488,19 @@ export type OverrideDecorator = (
   override: Operation,
   scope?: string
 ) => void;
+
+export type AzureClientGeneratorCoreDecorators = {
+  clientName: ClientNameDecorator;
+  convenientAPI: ConvenientAPIDecorator;
+  protocolAPI: ProtocolAPIDecorator;
+  client: ClientDecorator;
+  operationGroup: OperationGroupDecorator;
+  exclude: ExcludeDecorator;
+  include: IncludeDecorator;
+  clientFormat: ClientFormatDecorator;
+  internal: InternalDecorator;
+  usage: UsageDecorator;
+  access: AccessDecorator;
+  flattenProperty: FlattenPropertyDecorator;
+  override: OverrideDecorator;
+};
