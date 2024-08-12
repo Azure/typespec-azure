@@ -36,7 +36,7 @@ import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
 import { useStandardNames } from "./rules/use-standard-names.js";
-import { useStandardOperations } from "./rules/use-standard-ops.js";
+import { useStandardOperations } from "./rules/use-standard-operations.js";
 
 const rules = [
   apiVersionRule,
