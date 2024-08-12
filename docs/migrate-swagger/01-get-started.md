@@ -77,10 +77,12 @@ This is the probably most critical step of the conversion. As you have pre-sorte
 
 ### Error "does not have a GetAll method"
 
-If converter fails withe error 
+If converter fails withe error
+
 ```
 fatal   | The ResourceCollection RestorePointCollection (RequestPath: {Certain request path}) does not have a GetAll method
 ```
+
 you could bypass it by the configuration in this [page](https://github.com/Azure/autorest.csharp/blob/feature/v3/docs/mgmt/readme.md#list-exception).
 
 ## How to Get Help
