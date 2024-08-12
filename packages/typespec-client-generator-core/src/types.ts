@@ -78,6 +78,7 @@ import {
   UsageFlags,
   getKnownScalars,
   isSdkBuiltInKind,
+  isSdkIntKind,
 } from "./interfaces.js";
 import {
   createGeneratedName,
@@ -213,6 +214,11 @@ export function addEncodeInfo(
       innerType.encode = "base64";
     } else {
       innerType.encode = "bytes";
+    }
+  }
+  if (isSdkIntKind(innerType.kind)) {
+    if (encodeData && "encode" in innerType) {
+      innerType.encode = getEncodeHelper(context, type, innerType.kind);
     }
   }
   return diagnostics.wrap(undefined);
