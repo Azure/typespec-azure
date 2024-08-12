@@ -13,10 +13,10 @@ function $traitAdded(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` \| `ModelProperty` |
-| `addedVersion` | `EnumMember` \| `NullType` |
+| `addedVersion` | `Type` |
 
 ## Returns
 

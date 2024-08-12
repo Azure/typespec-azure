@@ -4,15 +4,15 @@ title: "[F] $extensionResource"
 
 ---
 ```ts
-function $extensionResource(context, entity): void
+function $extensionResource(context, target): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 
 ## Returns
 

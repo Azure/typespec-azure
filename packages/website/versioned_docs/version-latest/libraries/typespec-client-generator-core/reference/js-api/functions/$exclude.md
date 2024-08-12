@@ -6,16 +6,16 @@ title: "[F] $exclude"
 ```ts
 function $exclude(
    context, 
-   entity, 
+   target, 
    scope?): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 | `scope`? | `string` |
 
 ## Returns

@@ -36,9 +36,9 @@ import {
   SdkQueryParameter,
   SdkServiceResponseHeader,
   SdkType,
+  TCGCContext,
 } from "./interfaces.js";
 import {
-  TCGCContext,
   getAvailableApiVersions,
   getDocHelper,
   getHttpOperationResponseHeaders,
@@ -56,6 +56,7 @@ import {
   addFormatInfo,
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
+  getTypeSpecBuiltInType,
 } from "./types.js";
 
 export function getSdkHttpOperation(
@@ -126,7 +127,7 @@ function getSdkHttpParameters(
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
-  if (tspBody && tspBody?.bodyKind !== "multipart") {
+  if (tspBody) {
     // if there's a param on the body, we can just rely on getSdkHttpParameter
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const getParamResponse = diagnostics.pipe(
@@ -233,11 +234,7 @@ function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
-  let type: SdkType = {
-    kind: "string",
-    encode: "string",
-    decorators: [],
-  };
+  let type: SdkType = getTypeSpecBuiltInType(context, "string");
   // for contentType, we treat it as a constant IFF there's one value and it's application/json.
   // this is to prevent a breaking change when a service adds more content types in the future.
   // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
@@ -599,7 +596,11 @@ function getCollectionFormat(
         ? getHeaderFieldOptions(program, type)
         : undefined
   )?.format;
-  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
+  if (
+    tspCollectionFormat === "form" ||
+    tspCollectionFormat === "simple" ||
+    tspCollectionFormat === "csv"
+  ) {
     return undefined;
   }
   return tspCollectionFormat;

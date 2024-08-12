@@ -29,11 +29,17 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  SdkClientType,
+  SdkHttpOperationExample,
+  SdkServiceOperation,
   TCGCContext,
+} from "./interfaces.js";
+import {
   TspLiteralType,
   getClientNamespaceStringHelper,
   getHttpOperationResponseHeaders,
   parseEmitterName,
+  removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
@@ -48,18 +54,8 @@ export function getDefaultApiVersion(
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
-    let versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    // filter with specific api version
-    if (
-      context.apiVersion !== undefined &&
-      context.apiVersion !== "latest" &&
-      context.apiVersion !== "all"
-    ) {
-      const index = versions.findIndex((version) => version.value === context.apiVersion);
-      if (index >= 0) {
-        versions = versions.slice(0, index + 1);
-      }
-    }
+    const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {
@@ -622,4 +618,36 @@ export function getHttpOperationWithCache(
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
   context.httpOperationCache.set(operation, httpOperation);
   return httpOperation;
+}
+
+/**
+ * Get the examples for a given http operation.
+ */
+export function getHttpOperationExamples(
+  context: TCGCContext,
+  operation: HttpOperation
+): SdkHttpOperationExample[] {
+  return context.__httpOperationExamples?.get(operation) ?? [];
+}
+
+/**
+ * Get all the sub clients from current client.
+ *
+ * @param client
+ * @param listNestedClients determine if nested clients should be listed
+ * @returns
+ */
+export function listSubClients<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+  listNestedClients: boolean = false
+): SdkClientType<TServiceOperation>[] {
+  const subClients: SdkClientType<TServiceOperation>[] = client.methods
+    .filter((c) => c.kind === "clientaccessor")
+    .map((c) => c.response as SdkClientType<TServiceOperation>);
+  if (listNestedClients) {
+    for (const subClient of [...subClients]) {
+      subClients.push(...listSubClients(subClient, listNestedClients));
+    }
+  }
+  return subClients;
 }

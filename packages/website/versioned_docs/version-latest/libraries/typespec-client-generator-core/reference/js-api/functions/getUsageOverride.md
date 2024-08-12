@@ -10,8 +10,8 @@ function getUsageOverride(context, entity): UsageFlags | undefined
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Enum` \| `Model` \| `Union` |
 
 ## Returns

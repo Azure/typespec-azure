@@ -1,5 +1,32 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1198](https://github.com/Azure/typespec-azure/pull/1198) Use some more precise types for certain decorators that would have crashed otherwise
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1154](https://github.com/Azure/typespec-azure/pull/1154) Add new `@azure-tools/typespec-azure-core/require-versioned` linting rule to require Azure service to use versioning library.
+- [#1193](https://github.com/Azure/typespec-azure/pull/1193) Add new linter rule to prevent using items from Private namespace from an external library.
+
+
+## 0.44.0
+
+### Bug Fixes
+
+- [#927](https://github.com/Azure/typespec-azure/pull/927) Remove explicit `all` rulesets
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+
 ## 0.43.0
 
 ### Bug Fixes

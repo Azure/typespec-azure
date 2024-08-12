@@ -25,6 +25,16 @@ emit:
   - "@azure-tools/typespec-autorest"
 ```
 
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-autorest"
+options:
+  "@azure-tools/typespec-autorest":
+    option: value
+```
+
 ### Emitter options
 
 #### `output-dir`
@@ -135,6 +145,12 @@ Determine whether and how to emit x-ms-long-running-operation-options for lro re
 **Type:** `boolean`
 
 Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.
+
+#### `emit-common-types-schema`
+
+**Type:** `"never" | "for-visibility-changes"`
+
+Determine whether and how to emit schemas for common-types rather than referencing them
 
 ## Decorators
 

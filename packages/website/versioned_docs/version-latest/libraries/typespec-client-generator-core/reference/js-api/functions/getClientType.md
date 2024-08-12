@@ -13,8 +13,8 @@ function getClientType(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Type` |
 | `operation`? | `Operation` |
 

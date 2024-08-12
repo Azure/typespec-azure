@@ -13,7 +13,7 @@ function resolveAutorestOptions(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `emitterOutputDir` | `string` |
 | `options` | [`AutorestEmitterOptions`](../interfaces/AutorestEmitterOptions.md) |

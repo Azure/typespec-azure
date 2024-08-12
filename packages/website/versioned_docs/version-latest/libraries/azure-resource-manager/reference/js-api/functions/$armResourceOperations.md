@@ -4,7 +4,10 @@ title: "[F] $armResourceOperations"
 
 ---
 ```ts
-function $armResourceOperations(context, interfaceType): void
+function $armResourceOperations(
+   context, 
+   target, 
+   _?): void
 ```
 
 This decorator is used to identify interfaces containing resource operations.
@@ -19,9 +22,10 @@ clients.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `interfaceType` | `Interface` |
+| `target` | `Interface` |
+| `_`? | `Type` |
 
 ## Returns
 

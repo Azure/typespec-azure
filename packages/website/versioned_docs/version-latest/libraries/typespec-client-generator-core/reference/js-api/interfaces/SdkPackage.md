@@ -3,20 +3,19 @@ jsApi: true
 title: "[I] SdkPackage"
 
 ---
-## Type parameters
+## Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `TServiceOperation` *extends* [`SdkServiceOperation`](../type-aliases/SdkServiceOperation.md) |
 
 ## Properties
 
-| Property | Type | Description |
-| :------ | :------ | :------ |
-| `clients` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\>[] | - |
-| `crossLanguagePackageId` | `string` | - |
-| ~~`diagnostics`~~ | readonly `Diagnostic`[] | <p>**Deprecated**</p><p>This property is deprecated. Look at `.diagnostics` on SdkContext instead.</p> |
-| `enums` | [`SdkEnumType`](SdkEnumType.md)[] | - |
-| `models` | [`SdkModelType`](SdkModelType.md)[] | - |
-| `name` | `string` | - |
-| `rootNamespace` | `string` | - |
+| Property | Type |
+| ------ | ------ |
+| `clients` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\>[] |
+| `crossLanguagePackageId` | `string` |
+| `enums` | [`SdkEnumType`](SdkEnumType.md)[] |
+| `models` | [`SdkModelType`](SdkModelType.md)[] |
+| `name` | `string` |
+| `rootNamespace` | `string` |

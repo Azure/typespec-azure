@@ -13,10 +13,10 @@ function $defaultFinalStateVia(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
-| `states` | `LroHeader`[] |
+| `states` | readonly (`"location"` \| `"operation-location"` \| `"azure-async-operation"`)[] |
 
 ## Returns
 

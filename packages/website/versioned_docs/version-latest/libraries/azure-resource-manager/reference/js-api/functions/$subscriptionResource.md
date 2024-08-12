@@ -4,15 +4,15 @@ title: "[F] $subscriptionResource"
 
 ---
 ```ts
-function $subscriptionResource(context, entity): void
+function $subscriptionResource(context, target): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 
 ## Returns
 

@@ -6,7 +6,7 @@ title: "[F] $example"
 ```ts
 function $example(
    context, 
-   entity, 
+   target, 
    pathOrUri, 
    title): void
 ```
@@ -16,9 +16,9 @@ function $example(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Type` |
+| `target` | `Operation` |
 | `pathOrUri` | `string` |
 | `title` | `string` |
 

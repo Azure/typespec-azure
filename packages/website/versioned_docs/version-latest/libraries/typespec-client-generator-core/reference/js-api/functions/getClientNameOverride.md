@@ -4,15 +4,19 @@ title: "[F] getClientNameOverride"
 
 ---
 ```ts
-function getClientNameOverride(context, entity): string | undefined
+function getClientNameOverride(
+   context, 
+   entity, 
+   languageScope?): string | undefined
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Type` |
+| `languageScope`? | `string` \| *typeof* `AllScopes` |
 
 ## Returns
 

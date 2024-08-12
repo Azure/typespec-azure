@@ -10,7 +10,7 @@ function isArmCollectionAction(program, target): boolean
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Operation` |
 

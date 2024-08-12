@@ -15,8 +15,8 @@ Create a name for anonymous model
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` |  |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 | `type` | `Model` \| `Union` \| `TspLiteralType` |  |
 | `operation`? | `Operation` | - |
 

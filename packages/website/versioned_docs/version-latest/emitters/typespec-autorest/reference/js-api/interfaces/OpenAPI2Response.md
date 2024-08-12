@@ -12,7 +12,7 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#respons
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `description` | `string` | A short description of the response. Commonmark syntax can be used for rich text representation |
 | `examples?` | `Record`<`string`, [`OpenAPI2Example`](OpenAPI2Example.md)\> | An example of the response message. |
 | `headers?` | `Record`<`string`, [`OpenAPI2HeaderDefinition`](OpenAPI2HeaderDefinition.md)\> | A list of headers that are sent with the response. |

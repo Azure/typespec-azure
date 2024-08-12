@@ -12,7 +12,7 @@ Get the overridden final state value for this operation, if any
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program to process |
 | `operation` | `Operation` | The operation to check for an override value |
 

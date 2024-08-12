@@ -13,8 +13,8 @@ that value as our namespace. Otherwise, we default to the TypeSpec service names
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` |  |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 
 ## Returns
 

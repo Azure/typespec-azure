@@ -13,8 +13,8 @@ function getSdkEnumValue(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `enumType` | [`SdkEnumType`](../interfaces/SdkEnumType.md) |
 | `type` | `EnumMember` |
 

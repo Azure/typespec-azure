@@ -19,8 +19,8 @@ Returns name in the following order of priority
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` |  |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 | `type` | `Type` & `object` |  |
 
 ## Returns

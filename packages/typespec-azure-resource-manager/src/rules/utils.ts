@@ -105,7 +105,7 @@ export function getNamespaceName(
 }
 
 export function isValidKey(key: string): boolean {
-  const match = key.match(/^[a-z][A-z0-9-]+$/);
+  const match = key.match(/^[a-z][a-zA-Z0-9-]+$/);
   return match !== undefined && match !== null && match.length === 1;
 }
 

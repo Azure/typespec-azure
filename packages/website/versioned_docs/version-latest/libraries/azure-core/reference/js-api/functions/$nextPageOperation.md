@@ -14,11 +14,11 @@ function $nextPageOperation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

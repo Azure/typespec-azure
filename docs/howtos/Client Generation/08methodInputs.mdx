@@ -81,6 +81,13 @@ public User get();
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientGetOptions struct {
+}
+
+type ClientGetResponse struct {
+}
+
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
 ```
 
@@ -171,7 +178,13 @@ public void post(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientPostOptions struct {
+}
 
+type ClientPostResponse struct {
+}
+
+func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
 </TabItem>
@@ -181,9 +194,9 @@ public void post(User user);
 
 Please use the _spread_ feature with caution.
 
-- The anonymous model to be spread into operation should have less than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
-- The anonymous model should be stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
-- The anonymous model should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
+- The model to be spread should have less than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
+- The model to be spread should be stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
+- The model to be spread should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
 
 ### Alias
 
@@ -269,13 +282,20 @@ public void upload(String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
 </TabItem>
 </Tabs>
 
-### Alias with HTTP Parameters
+### Alias with @header/@query/@path properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -294,8 +314,10 @@ op upload(...User): void;
 
 <TabItem value="python" label="Python">
 
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
 ```python
-def upload(id: str, first_name: str, last_name: str) -> None:
+def upload(self, id: str, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -366,7 +388,13 @@ public void upload(String id, String firstName, String lastName);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientUploadOptions struct {
+}
 
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </TabItem>
@@ -392,7 +420,7 @@ op upload(...User): void;
 For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
-def upload(self, user: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
+def upload(self, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -402,7 +430,7 @@ def upload(self, user: [User, JSON, IO[bytes]], *, content_type: str = "applicat
 ```csharp
 public partial class User
 {
-  public User(string firstName, string lastName){}
+  public User(string firstName, string lastName) { }
   public string FirstName { get; }
   public string LastName { get; }
 }
@@ -411,7 +439,7 @@ public virtual async Task<Response> UploadAsync(RequestContent content, RequestC
 public virtual Response Upload(RequestContent content, RequestContext context = null)
 //convenience method
 public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
-public virtual Response Upload(User user, CancellationToken cancellationToken = default)
+public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
 
 </TabItem>
@@ -426,7 +454,10 @@ export type DemoServiceContext = Client & {
     (path: "/users"): {
       post(
         options: {
-          body: User;
+          body: {
+            firstName: string;
+            lastName: string;
+          };
         } & RequestParameters
       ): StreamableMethod<PostUserDefaultResponse>;
     };
@@ -434,11 +465,15 @@ export type DemoServiceContext = Client & {
 };
 
 // Modular Api Layer
-export async function upload(body: User, options: UploadOptionalParams): Promise<void>;
+export async function upload(
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams
+): Promise<void>;
 
 // Modular classical client layer
 export class DemoServiceClient {
-  upload(body: User, options: UploadOptionalParams): Promise<void>;
+  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
 ```
 
@@ -446,29 +481,26 @@ export class DemoServiceClient {
 <TabItem value="java" label="Java" >
 
 ```java
-// Model class
-@Immutable
-public final class User implements JsonSerializable<User> {
-    public User(String firstName, String lastName);
-    public String getFirstName();
-    public String getLastName();
-}
-
-// Client API
-public void upload(User user);
+public void upload(String firstName, String lastName);
 ```
 
 </TabItem>
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientUploadOptions struct {
+}
 
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </TabItem>
 </Tabs>
 
-### Model with `@body` Property
+### Model with `@body` property
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -493,7 +525,7 @@ op upload(...UserRequest): void;
 For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
 
 ```python
-def upload(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
+def upload(self, body: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -564,13 +596,24 @@ public void upload(User user);
 <TabItem value="go" label="Go" >
 
 ```go
+type User struct {
+	firstName *string
+  lastName *string
+}
 
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </TabItem>
 </Tabs>
 
-### Model with Decorated Properties
+### Model with @header/@query/@path properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -594,7 +637,7 @@ For Python, we will also generate the overloads described in the Http Post secti
 
 ```python
 
-def get_blob_properties(name: str, *, test_header: string, **kwargs: Any) -> None:
+def get_blob_properties(self, name: str, *, test_header: string, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -657,13 +700,19 @@ public void getBlobProperties(String name, String testHeader);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientGetBlobPropertiesOptions struct {
+}
 
+type ClientGetBlobPropertiesResponse struct {
+}
+
+func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
 ```
 
 </TabItem>
 </Tabs>
 
-### Model with Decorated and non-Decorated Properties
+### Model mixed with normal and @header/@query/@path properties
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -687,7 +736,7 @@ For Python, we will also generate the overloads described in the Http Post secti
 class Schema:
   schema: bytes
 
-def register(body: [Schema, JSON, IO[bytes]], **kwargs: Any) -> None:
+def register(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
 
@@ -724,7 +773,7 @@ export type DemoServiceContext = Client & {
             "content-type": "application/json";
           } & RawHttpHeaders;
           body: {
-            schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+            schema: string;
           };
         } & RequestParameters
       ): StreamableMethod<PostUserDefaultResponse>;
@@ -734,7 +783,7 @@ export type DemoServiceContext = Client & {
 
 // Modular model
 export interface Schema {
-  schema: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+  schema: string;
 }
 
 // Modular api layer
@@ -768,7 +817,340 @@ public void register(Schema schema);
 <TabItem value="go" label="Go" >
 
 ```go
+type ClientRegisterOptions struct {
+}
 
+type ClientRegisterResponse struct {
+}
+
+func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+```
+
+</TabItem>
+</Tabs>
+
+### Using Azure.Core.ResourceOperations template
+
+Resource create and update operations are not impacted by spread since they all have explicit defined body parameter.
+Only resource action operations are impacted by spread.
+
+If the action parameter is a model, then the model will be spread.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@resource("widgets")
+model Widget {
+  @key("widgetName")
+  name: string;
+}
+
+model RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+model RepairResult {
+  reason: string;
+  info: string;
+}
+
+alias Operations = Azure.Core.ResourceOperations<{}>;
+
+op scheduleRepairs is Operations.ResourceAction<Widget, RepairInfo, RepairResult>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+class RepairInfo:
+  problem: str
+  contact: str
+
+class RepairResult:
+  reason: str
+  info: str
+
+def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, content_type: str = "application/json") -> RepairResult:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export interface RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+export type WidgetServiceContext = Client & {
+  path: {
+    (
+      path: "/widgets/{widgetName}:scheduleRepairs",
+      widgetName: string
+    ): {
+      post(
+        options: {
+          body: RepairInfo;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular api layer
+export async function scheduleRepairs(
+  context: Client,
+  widgetName: string,
+  problem: string,
+  contact: string,
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+): Promise<RepairResult>;
+
+// Modular classical client layer
+export class WidgetServiceClient {
+  scheduleRepairs(
+    widgetName: string,
+    problem: string,
+    contact: string,
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  ): Promise<RepairResult>;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+public RepairResult scheduleRepairs(String widgetName, String problem, String contact);
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+type ClientScheduleRepairsOptions struct {
+}
+
+type RepairResult struct {
+	reason *string
+  info *string
+}
+
+type ClientScheduleRepairsResponse struct {
+  RepairResult
+}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+```
+
+</TabItem>
+</Tabs>
+
+If you want to keep the model, you have two options to prevent spreading:
+
+1. `@override`
+2. If you don't want to do client customizations, you could use a wrapper to explicitly set the body to prevent spread.
+
+<Tabs>
+
+<TabItem value="Service Definition" label="TypeSpec">
+
+```typespec
+namespace Widget.Service;
+
+@resource("widgets")
+model Widget {
+  @key("widgetName")
+  name: string;
+}
+
+model RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+model RepairResult {
+  reason: string;
+  info: string;
+}
+
+alias Operations = Azure.Core.ResourceOperations<{}>;
+
+op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo>, RepairResult>;
+```
+
+</TabItem>
+
+<TabItem value="Client Customizations" label="TypeSpec">
+
+With the `@override` decorator, you have the ability to override the default client method generated by TCGC from your service definition.
+
+In the case of spread, if the service definition spreads a model onto the method signature, but you would like either all or some of the generated client SDKs to still generate with the model grouped together, this is where the `@override` decorator comes in.
+
+With `@override`, you can also specify language `scope` to scope the changes to a specific language emitter.
+
+```tsp
+// client.tsp
+namespace Widget.Client;
+
+op scheduleRepairs(
+  body: RepairInfo,
+  `api-version`: Azure.Core.Foundations.ApiVersionParameter,
+): RepairResult;
+
+@@override(Widget.Service.scheduleRepairs, Widget.Client.scheduleRepairs);
+```
+
+</TabItem>
+
+<TabItem value="`@bodyRoot`" label="TypeSpec">
+
+If you do not want to use customizations in `client.tsp`, you can also add `@bodyRoot` onto the input in the `main.tsp` before you pass the model to the template.
+
+```typespec
+// main.tsp
+alias BodyParameter<
+  T,
+  TName extends valueof string = "body",
+  TDoc extends valueof string = "Body parameter."
+> = {
+  @doc(TDoc)
+  @friendlyName(TName)
+  @bodyRoot
+  body: T;
+};
+
+op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo>, RepairResult>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+
+```python
+class RepairInfo:
+  problem: str
+  contact: str
+
+class RepairResult:
+  reason: str
+  info: str
+
+def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> RepairResult:
+  ...
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export interface RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+export type WidgetServiceContext = Client & {
+  path: {
+    (
+      path: "/widgets/{widgetName}:scheduleRepairs",
+      widgetName: string
+    ): {
+      post(
+        options: {
+          body: RepairInfo;
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular api layer
+export async function scheduleRepairs(
+  context: Client,
+  widgetName: string,
+  body: RepairInfo,
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+): Promise<RepairResult>;
+
+// Modular classical client layer
+export class WidgetServiceClient {
+  scheduleRepairs(
+    widgetName: string,
+    body: RepairInfo,
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  ): Promise<RepairResult>;
+}
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+// Model class
+@Immutable
+public final class RepairInfo implements JsonSerializable<RepairInfo> {
+    public RepairInfo(String problem, String contact);
+    public String getProblem();
+    public String getContact();
+}
+
+@Immutable
+public final class RepairResult implements JsonSerializable<RepairResult> {
+    public String getReason();
+    public String getInfo();
+}
+
+// Client API
+public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
+```
+
+</TabItem>
+<TabItem value="go" label="Go" >
+
+```go
+type RepairInfo struct {
+	problem *string
+  contact *string
+}
+
+type ClientScheduleRepairsOptions struct {
+}
+
+type RepairResult struct {
+	reason *string
+  info *string
+}
+
+type ClientScheduleRepairsResponse struct {
+  RepairResult
+}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </TabItem>

@@ -7,16 +7,16 @@ title: "[F] $traitLocation"
 function $traitLocation(
    context, 
    target, 
-   traitLocation): void
+   contexts): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
-| `traitLocation` | `EnumMember` |
+| `contexts` | `EnumMember` |
 
 ## Returns
 

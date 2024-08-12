@@ -13,7 +13,7 @@ how to end polling
 ## Properties
 
 | Property | Type | Description | Overrides |
-| :------ | :------ | :------ | :------ |
+| ------ | ------ | ------ | ------ |
 | `errorProperty?` | `ModelProperty` | Property of the status monitor that contains operation errors in case of failure (if any) | - |
 | `kind` | `"pollingOperationStep"` | - | - |
 | `responseModel` | `Model` | The TypeSpec type that is returned by following a link or calling a lined operation | [`LogicalOperationStep`](LogicalOperationStep.md).`responseModel` |

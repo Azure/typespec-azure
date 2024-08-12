@@ -2,6 +2,7 @@ import {
   Enum,
   Interface,
   Model,
+  ModelProperty,
   Namespace,
   Operation,
   ignoreDiagnostics,
@@ -177,7 +178,7 @@ describe("typespec-client-generator-core: decorators", () => {
           service: MyService,
           type: MyService,
           arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
     });
@@ -431,9 +432,30 @@ describe("typespec-client-generator-core: decorators", () => {
           service: MyService,
           type: MyService,
           arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
+    });
+
+    it("with @clientName", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @operationGroup
+        @clientName("ClientModel")
+        interface Model {
+          op foo(): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const mainClient = sdkPackage.clients[0];
+      strictEqual(mainClient.methods.length, 1);
+
+      const clientAccessor = mainClient.methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      strictEqual(clientAccessor.response.kind, "client");
+      strictEqual(clientAccessor.response.name, "ClientModel");
     });
   });
 
@@ -1314,7 +1336,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
@@ -1355,7 +1377,7 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
@@ -1391,7 +1413,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
@@ -1669,16 +1691,110 @@ describe("typespec-client-generator-core: decorators", () => {
   });
 
   describe("@access", () => {
-    it("mark an operation as internal", async () => {
-      const { test } = (await runner.compile(`
-        @service({title: "Test Service"}) namespace TestService;
-        @test
-        @access(Access.internal)
-        op test(): void;
-      `)) as { test: Operation };
+    describe("namespace access override", () => {
+      it("should inherit access from parent namespace", async () => {
+        const { Test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          model Test {
+            prop: string;
+          }
+        `)) as { Test: Operation };
 
-      const actual = getAccess(runner.context, test);
-      strictEqual(actual, "internal");
+        const actual = getAccess(runner.context, Test);
+        strictEqual(actual, "public");
+      });
+
+      it("should tag anonymous models with default access", async () => {
+        const { Test, prop } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          model Test {
+            @test
+            prop: {
+               foo: string;
+            }
+          }
+        `)) as { Test: Operation; prop: ModelProperty };
+
+        const actual = getAccess(runner.context, Test);
+        const actualAnonymous = getAccess(runner.context, prop.type as Model);
+        strictEqual(actual, "public");
+        strictEqual(actualAnonymous, "public");
+      });
+
+      it("should tag as internal anonymous models with default access", async () => {
+        const { Test, prop } = (await runner.compile(`
+          @access(Access.internal)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          model Test {
+            @test
+            prop: {
+               foo: string;
+            }
+          }
+        `)) as { Test: Operation; prop: ModelProperty };
+
+        const actual = getAccess(runner.context, Test);
+        const actualAnonymous = getAccess(runner.context, prop.type as Model);
+        strictEqual(actual, "internal");
+        strictEqual(actualAnonymous, "internal");
+      });
+
+      it("should honor the granular override over the namespace one", async () => {
+        const { Test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @access(Access.internal)
+          @test
+          model Test {
+            prop: string;
+          }
+        `)) as { Test: Operation };
+
+        const actual = getAccess(runner.context, Test);
+        strictEqual(actual, "internal");
+      });
+
+      it("locally mark an operation as internal", async () => {
+        const { test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          @access(Access.internal)
+          op test(): void;
+        `)) as { test: Operation };
+
+        const actual = getAccess(runner.context, test);
+        strictEqual(actual, "internal");
+      });
+
+      it("locally mark an operation as public", async () => {
+        const { test } = (await runner.compile(`
+          @access(Access.public)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          op test(): void;
+        `)) as { test: Operation };
+
+        const actual = getAccess(runner.context, test);
+        strictEqual(actual, "public");
+      });
+
+      it("mark an operation as internal through the namespace", async () => {
+        const { test } = (await runner.compile(`
+          @access(Access.internal)
+          @service({title: "Test Service"}) namespace TestService;
+          @test
+          op test(): void;
+        `)) as { test: Operation };
+
+        const actual = getAccess(runner.context, test);
+        strictEqual(actual, "internal");
+      });
     });
 
     it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
@@ -2443,6 +2559,80 @@ describe("typespec-client-generator-core: decorators", () => {
         UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json
       );
     });
+
+    it("@usage Input and Output on Namespace", async () => {
+      const { OrphanModel, InputModel, OutputModel, RoundtripModel } = (await runner.compile(`
+        @service({})
+        @test
+        @usage(Usage.input | Usage.output)
+        namespace MyService {
+          @test
+          model OrphanModel {
+            prop: string;
+          }
+
+          @test
+          model InputModel {
+            prop: string
+          }
+
+          @test
+          model OutputModel {
+            prop: string
+          }
+
+          @test
+          model RoundtripModel {
+            prop: string
+          }
+
+          @route("/one")
+          op one(@body body: InputModel): OutputModel;
+
+          @route("/two")
+          op two(@body body: RoundtripModel): RoundtripModel;
+        }
+      `)) as { OrphanModel: Model; InputModel: Model; OutputModel: Model; RoundtripModel: Model };
+      strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
+      // this is set to input and output because of the namespace override
+      strictEqual(
+        getUsage(runner.context, InputModel),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(
+        getUsage(runner.context, OutputModel),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+      strictEqual(
+        getUsage(runner.context, RoundtripModel),
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      );
+    });
+
+    it("@usage namespace override", async () => {
+      const { OrphanModel, OrphanModelWithOverride } = (await runner.compile(`
+        @service({})
+        @test
+        @usage(Usage.input)
+        namespace MyService {
+          @test
+          model OrphanModel {
+            prop: string;
+          }
+
+          @test
+          @usage(Usage.input | Usage.output)
+          model OrphanModelWithOverride {
+            prop: string;
+          }
+        }
+      `)) as { OrphanModel: Model; OrphanModelWithOverride: Model };
+      strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input);
+      strictEqual(
+        getUsage(runner.context, OrphanModelWithOverride),
+        UsageFlags.Input | UsageFlags.Output
+      );
+    });
   });
 
   describe("@flattenProperty", () => {
@@ -2543,6 +2733,30 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, {
         code: "decorator-wrong-target",
+      });
+    });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
       });
     });
   });
@@ -2724,6 +2938,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
     });
+
     it("empty client name", async () => {
       const diagnostics = await runner.diagnose(`
         @service({})
@@ -2739,6 +2954,389 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/empty-client-name",
       });
+    });
+
+    it("duplicate model client name with a random language scope", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      @clientName("Test", "random")
+      model Widget {
+        @key
+        id: int32;
+      }
+
+      model Test {
+        prop1: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "random"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "random"',
+        },
+      ]);
+    });
+
+    it("duplicate model, enum, union client name with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("B")
+      enum A {
+        one
+      }
+
+      model B {}
+
+      @clientName("B")
+      union C {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation in interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      interface C {
+        @clientName("b")
+        @route("/a")
+        op a(): void;
+
+        @route("/b")
+        op b(): void;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate scalar with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      scalar a extends string;
+
+      scalar b extends string;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      @clientName("B")
+      @route("/a")
+      interface A {
+      }
+
+      @route("/b")
+      interface B {
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model property with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      model A {
+        @clientName("prop2")
+        prop1: string;
+        prop2: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "prop2" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "prop2" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum member with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      enum A {
+        @clientName("two")
+        one,
+        two
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "two" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "two" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate union variant with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace Contoso.WidgetManager;
+
+        union Foo { 
+          @clientName("b")
+          a: {}, 
+          b: {} 
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate namespace with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {}
+          @clientName("B")
+          namespace C {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum and model within nested namespace for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {
+            @clientName("B")
+            enum A {
+              one
+            }
+
+            model B {}
+          }
+
+          @clientName("B")
+          model A {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model with model only generation for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        model Foo {}
+
+        @clientName("Foo")
+        model Bar {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Foo" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Foo" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model client name with multiple language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      @clientName("Test", "csharp,python,java")
+      model Widget {
+        @key
+        id: int32;
+      }
+
+      @clientName("Widget", "java")
+      model Test {
+        prop1: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "python"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
+        },
+      ]);
     });
   });
 
@@ -3472,6 +4070,115 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(test2Method.name, "test2");
       deepStrictEqual(test2Method.apiVersions, ["v2"]);
     });
+    it("default latest GA version with preview", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2022_10_01_preview: "2022-10-01-preview",
+          v2024_10_01: "2024-10-01",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 1);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+    });
+    it("default latest preview version with GA", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-11-01-preview");
+    });
+
+    it("specify api version with preview filter", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "2024-10-01",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2023_10_01: "2023-10-01",
+          v2023_11_01_preview: "2023-11-01-preview",
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2023-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
+    });
   });
 
   describe("versioning impact for apis", () => {
@@ -3712,10 +4419,271 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);
+    });
+  });
+
+  describe("@override", () => {
+    it("basic", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsModel, paramsParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
+    });
+
+    it("basic with scope", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func, "csharp");
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const fooParam = method.parameters.find((x) => x.name === "foo");
+      ok(fooParam);
+
+      const barParam = method.parameters.find((x) => x.name === "bar");
+      ok(barParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCsharp.compileWithCustomization(mainCode, customizationCode);
+      ok(runnerWithCsharp.context.sdkPackage.models.find((x) => x.name === "Params"));
+
+      const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
+      strictEqual(sdkPackageWithCsharp.clients.length, 1);
+
+      strictEqual(sdkPackageWithCsharp.clients[0].methods.length, 1);
+      const methodWithCsharp = sdkPackageWithCsharp.clients[0].methods[0];
+      strictEqual(methodWithCsharp.kind, "basic");
+      strictEqual(methodWithCsharp.name, "func");
+      strictEqual(methodWithCsharp.parameters.length, 2);
+      const contentTypeParamWithCsharp = methodWithCsharp.parameters.find(
+        (x) => x.name === "contentType"
+      );
+      ok(contentTypeParamWithCsharp);
+
+      const paramsParamWithCsharp = methodWithCsharp.parameters.find((x) => x.name === "params");
+      ok(paramsParamWithCsharp);
+      strictEqual(
+        sdkPackageWithCsharp.models.find((x) => x.name === "Params"),
+        paramsParamWithCsharp.type
+      );
+
+      const httpOpWithCsharp = methodWithCsharp.operation;
+      strictEqual(httpOpWithCsharp.parameters.length, 1);
+      strictEqual(
+        httpOpWithCsharp.parameters[0].correspondingMethodParams[0],
+        contentTypeParamWithCsharp
+      );
+      ok(httpOpWithCsharp.bodyParam);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
+    });
+
+    it("regrouping", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+          fooBar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        model ParamsCustomized {
+          ...PickProperties<MyService.Params, "foo" | "bar">;
+        }
+
+        op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+
+      const fooBarParam = method.parameters.find((x) => x.name === "fooBar");
+      ok(fooBarParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], fooBarParam);
+    });
+
+    it("params mismatch", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        model ParamsCustomized {
+          foo: string;
+          bar: string;
+        }
+
+        op func(params: MyCustomizations.ParamsCustomized): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `;
+      const diagnostics = (
+        await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+      )[1];
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
+      });
+    });
+
+    it("recursive params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(input: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const inputParam = method.parameters.find((x) => x.name === "input");
+      ok(inputParam);
+      strictEqual(paramsModel, inputParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
     });
   });
 });

@@ -14,9 +14,7 @@ namespace RevisionsResource {
     ...AcceptDatetimeHeader,
 
     @doc("Used to select what fields are present in the returned resource(s).")
-    @query({
-      format: "multi",
-    })
+    @query(#{ explode: true })
     $Select?: KeyField[],
 
     @doc("A filter used to match labels")

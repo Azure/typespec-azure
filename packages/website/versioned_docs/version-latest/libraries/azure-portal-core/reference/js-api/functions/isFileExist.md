@@ -10,7 +10,7 @@ function isFileExist(host, filePath): Promise<boolean>
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `host` | `CompilerHost` |
 | `filePath` | `string` |
 

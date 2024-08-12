@@ -1,5 +1,57 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1248](https://github.com/Azure/typespec-azure/pull/1248) Fix issue what allowed `multi` format on a header
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1275](https://github.com/Azure/typespec-azure/pull/1275) Add support for encoding numeric types as string
+- [#1247](https://github.com/Azure/typespec-azure/pull/1247) Add support for URI templates in routes
+
+
+## 0.44.1
+
+### Features
+
+- [#1237](https://github.com/Azure/typespec-azure/pull/1237) Use new `createTcgcContext` from tcgc lib, which is the minimal context object that handles scope
+
+
+## 0.44.0
+
+### Bug Fixes
+
+- [#1081](https://github.com/Azure/typespec-azure/pull/1081) Fix patch models for common-types
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1116](https://github.com/Azure/typespec-azure/pull/1116) Resolve Arm Common Definitions for enums and unions as well
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Use emit-lro--options emitter option to control emission of x-ms-long-running-operation-options
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Add support for displaying lro options in typespec-autorest based on lro metadata
+- [#1123](https://github.com/Azure/typespec-azure/pull/1123) Removed direct reference to OpenAPI extension `x-ms-azure-resource` in ARM library and replaced with `@Azure.ResourceManager.Private.azureResourceBase` decorator. It is only used internally on base resource types. `autorest` emitter has been updated to check the decorator and still emit `x-ms-azure-resource` extension in swagger.
+
+### Breaking Changes
+
+- [#1105](https://github.com/Azure/typespec-azure/pull/1105) `x-ms-client-flatten` extension on some of resource properties property is now configurable to be emitted by autorest emitter(`arm-resource-flattening` option). Default is false which will skip emission of that extension.
+  To revert to previous behavior update your `tspconfig.yaml` with the following
+
+  ```diff
+  options:
+    "@azure-tools/typespec-autorest":
+      # ...other options
+  +   arm-resource-flattening: true
+  ```
+
 ## 0.43.0
 
 ### Bug Fixes

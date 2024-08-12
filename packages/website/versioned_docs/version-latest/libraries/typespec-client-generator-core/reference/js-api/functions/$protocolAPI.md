@@ -6,18 +6,18 @@ title: "[F] $protocolAPI"
 ```ts
 function $protocolAPI(
    context, 
-   entity, 
-   value, 
+   target, 
+   value?, 
    scope?): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Operation` |
-| `value` | `boolean` |
+| `target` | `Operation` |
+| `value`? | `boolean` |
 | `scope`? | `string` |
 
 ## Returns

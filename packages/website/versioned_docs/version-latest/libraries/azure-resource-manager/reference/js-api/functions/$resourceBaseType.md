@@ -6,16 +6,16 @@ title: "[F] $resourceBaseType"
 ```ts
 function $resourceBaseType(
    context, 
-   entity, 
+   target, 
    baseType): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 | `baseType` | `Type` |
 
 ## Returns

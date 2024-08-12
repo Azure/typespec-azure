@@ -3,3 +3,6 @@ export * from "./interfaces.js";
 export * from "./lib.js";
 export * from "./public-utils.js";
 export * from "./types.js";
+
+/** @internal */
+export { $decorators } from "./tsp-index.js";

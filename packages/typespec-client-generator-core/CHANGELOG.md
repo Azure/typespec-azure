@@ -1,5 +1,89 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1238](https://github.com/Azure/typespec-azure/pull/1238) TCGC, add `crossLanguageDefinitionId` to `SdkClientType`
+- [#1266](https://github.com/Azure/typespec-azure/pull/1266) expose default values for endpoint template arguments through `.clientDefaultValue`
+- [#1281](https://github.com/Azure/typespec-azure/pull/1281) Support @multipartBody for `bodyParam` of `SdkHttpOperation`
+- [#1233](https://github.com/Azure/typespec-azure/pull/1233) don't move server description onto endpoints parameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1258](https://github.com/Azure/typespec-azure/pull/1258) add support for encoding an int as a string
+- [#1155](https://github.com/Azure/typespec-azure/pull/1155) Make literal endpoints overridable
+- [#1148](https://github.com/Azure/typespec-azure/pull/1148) add `@override` decorator that allows authors to explicitly describe their desired client method
+
+
+## 0.44.3
+
+### Bug Fixes
+
+- [#1244](https://github.com/Azure/typespec-azure/pull/1244) The baseType will be undefined if the `SdkBuiltInType`, `SdkDateTimeType`, `SdkDurationType` is a std type
+- [#1251](https://github.com/Azure/typespec-azure/pull/1251) Change output for `HttpPart<T>[]`
+
+
+## 0.44.2
+
+### Bug Fixes
+
+- [#1231](https://github.com/Azure/typespec-azure/pull/1231) Fix the duplicate usageflags values for json and xml
+- [#1203](https://github.com/Azure/typespec-azure/pull/1203) Have `@clientName` work for operation groups as well
+- [#1222](https://github.com/Azure/typespec-azure/pull/1222) Validate `@clientName` conflict for operations inside interface
+
+### Features
+
+- [#1090](https://github.com/Azure/typespec-azure/pull/1090) Support model format of `@multipartBody`
+- [#1237](https://github.com/Azure/typespec-azure/pull/1237) Expose createTcgcContext, which is the minimal context object that handles scope
+- [#1223](https://github.com/Azure/typespec-azure/pull/1223) Report error diagnostic when trying to flattening a model with polymorphism
+- [#1076](https://github.com/Azure/typespec-azure/pull/1076) Add example types support
+- [#1204](https://github.com/Azure/typespec-azure/pull/1204) Add xml usage and change enumvalue arg representation in generic decorators
+
+### Breaking Changes
+
+- [#1015](https://github.com/Azure/typespec-azure/pull/1015) Refactor tcgc build-in types, please refer pr's description for details and migration guides
+
+
+## 0.44.1
+
+### Bug Fixes
+
+- [#1186](https://github.com/Azure/typespec-azure/pull/1186) fix access and usage calculation for nested model/enum in spread model
+- [#1185](https://github.com/Azure/typespec-azure/pull/1185) fix idempotent issue for spread
+
+### Features
+
+- [#1119](https://github.com/Azure/typespec-azure/pull/1119) Report diagnostics on `@clientName` conflicts
+
+
+## 0.44.0
+
+### Bug Fixes
+
+- [#1142](https://github.com/Azure/typespec-azure/pull/1142) TCGC, Add description to `SdkHttpResponse`
+- [#1102](https://github.com/Azure/typespec-azure/pull/1102) Fixing typo
+- [#1157](https://github.com/Azure/typespec-azure/pull/1157) findContextPath need to handle nested operation group, also refine the logic for naming and composing cross language definition id
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1152](https://github.com/Azure/typespec-azure/pull/1152) add `.generateConvenient` and `.generateProtocol` for service methods. These booleans tell emitters whether to generate convenient and protocol versions for the method
+- [#1129](https://github.com/Azure/typespec-azure/pull/1129) add `UsageFlags.Json`. Will be set if a model is used with a JSON content type
+- [#1045](https://github.com/Azure/typespec-azure/pull/1045) filter api versions enum to only include GA versions if default value is GA
+
+### Breaking Changes
+
+- [#1078](https://github.com/Azure/typespec-azure/pull/1078) remove `experimental_` prefix from `sdkPackage`. Now it's just called `sdkPackage`.
+
+
 ## 0.43.2
 
 ### Bug Fixes

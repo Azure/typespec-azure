@@ -14,8 +14,8 @@ Otherwise the given type is returned unchanged.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` |  |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 | `type` | `Model` |  |
 
 ## Returns

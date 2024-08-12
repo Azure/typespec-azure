@@ -6,8 +6,8 @@ title: "[F] $armProviderNamespace"
 ```ts
 function $armProviderNamespace(
    context, 
-   entity, 
-   armProviderNamespace?): void
+   target, 
+   providerNamespace?): void
 ```
 
 `@armProviderNamespace` sets the ARM provider namespace.
@@ -15,10 +15,10 @@ function $armProviderNamespace(
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | DecoratorContext object |
-| `entity` | `Namespace` | Target of the decorator. Must be `namespace` type |
-| `armProviderNamespace`? | `string` | Provider namespace |
+| `target` | `Namespace` | - |
+| `providerNamespace`? | `string` | - |
 
 ## Returns
 

@@ -6,7 +6,7 @@ title: "[F] $pollingOperation"
 ```ts
 function $pollingOperation(
    context, 
-   target, 
+   entity, 
    linkedOperation, 
    parameters?): void
 ```
@@ -14,11 +14,11 @@ function $pollingOperation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Operation` |
+| `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

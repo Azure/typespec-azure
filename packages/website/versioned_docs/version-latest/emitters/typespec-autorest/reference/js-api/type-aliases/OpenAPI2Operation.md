@@ -9,8 +9,8 @@ type OpenAPI2Operation: Extensions & object;
 
 ## Type declaration
 
-| Member | Type | Description |
-| :------ | :------ | :------ |
+| Name | Type | Description |
+| ------ | ------ | ------ |
 | `consumes` | `string`[] | A list of MIME types the operation can consume. This overrides the consumes definition at the Swagger Object. An empty value MAY be used to clear the global definition. Value MUST be as described under Mime Types. |
 | `deprecated` | `boolean` | Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false. |
 | `description` | `string` | A verbose explanation of the operation behavior. Commonmark syntax can be used for rich text representation. |

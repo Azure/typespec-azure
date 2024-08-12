@@ -187,9 +187,9 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ArmLroLocationHeader` {#Azure.ResourceManager.ArmLroLocationHeader}
 
@@ -465,14 +465,15 @@ Concrete extension resource types can be created by aliasing this type using a s
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.ExtensionResource<Properties>
+model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 ```
 
 #### Template Parameters
 
-| Name       | Description                                                           |
-| ---------- | --------------------------------------------------------------------- |
-| Properties | A model containing the provider-specific properties for this resource |
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
 #### Properties
 
@@ -631,14 +632,15 @@ Concrete proxy resource types can be created by aliasing this type using a speci
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.ProxyResource<Properties>
+model Azure.ResourceManager.ProxyResource<Properties, PropertiesOptional>
 ```
 
 #### Template Parameters
 
-| Name       | Description                                                           |
-| ---------- | --------------------------------------------------------------------- |
-| Properties | A model containing the provider-specific properties for this resource |
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
 #### Properties
 
@@ -657,9 +659,9 @@ model Azure.ResourceManager.ResourceGroupLocationResource
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ResourceInstanceParameters` {#Azure.ResourceManager.ResourceInstanceParameters}
 
@@ -851,9 +853,9 @@ model Azure.ResourceManager.SubscriptionLocationResource
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 
@@ -866,9 +868,9 @@ model Azure.ResourceManager.TenantLocationResource
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TrackedResource` {#Azure.ResourceManager.TrackedResource}
 
@@ -877,14 +879,15 @@ Concrete tracked resource types can be created by aliasing this type using a spe
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
 ```typespec
-model Azure.ResourceManager.TrackedResource<Properties>
+model Azure.ResourceManager.TrackedResource<Properties, PropertiesOptional>
 ```
 
 #### Template Parameters
 
-| Name       | Description                                                           |
-| ---------- | --------------------------------------------------------------------- |
-| Properties | A model containing the provider-specific properties for this resource |
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
 #### Properties
 
@@ -899,6 +902,10 @@ Supported versions of Azure.ResourceManager building blocks.
 ```typespec
 enum Azure.ResourceManager.Versions
 ```
+
+| Name           | Value             | Description           |
+| -------------- | ----------------- | --------------------- |
+| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
 
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
@@ -1216,9 +1223,9 @@ model Azure.ResourceManager.CommonTypes.LocationResourceParameter
 
 #### Properties
 
-| Name     | Type     | Description                   |
-| -------- | -------- | ----------------------------- |
-| location | `string` | The name of the Azure region. |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity}
 
@@ -1235,7 +1242,7 @@ model Azure.ResourceManager.CommonTypes.ManagedServiceIdentity
 | principalId?            | `Core.uuid`                                                                                                  | The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. |
 | tenantId?               | `Core.uuid`                                                                                                  | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
 | type                    | [`ManagedServiceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
-| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity> \| null`                                           | The identities assigned to this resource by the user.                                                                         |
+| userAssignedIdentities? | `Record<ResourceManager.CommonTypes.UserAssignedIdentity \| null>`                                           | The identities assigned to this resource by the user.                                                                         |
 
 ### `ManagementGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter}
 
@@ -1687,6 +1694,10 @@ model Azure.ResourceManager.CommonTypes.TrackedResource
 
 ### `UserAssignedIdentities` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentities}
 
+:::warning
+**Deprecated**: Do not use this model. Instead, use Record<UserAssignedIdentity | null> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger.
+:::
+
 The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.
 
 ```typespec
@@ -1695,9 +1706,9 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentities
 
 #### Properties
 
-| Name | Type                                                                                             | Description           |
-| ---- | ------------------------------------------------------------------------------------------------ | --------------------- |
-|      | [`UserAssignedIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.UserAssignedIdentity) | Additional properties |
+| Name | Type                                                       | Description           |
+| ---- | ---------------------------------------------------------- | --------------------- |
+|      | `ResourceManager.CommonTypes.UserAssignedIdentity \| null` | Additional properties |
 
 ### `UserAssignedIdentity` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentity}
 
@@ -1722,6 +1733,14 @@ An internal enum to indicate the resource support for various path types
 enum Azure.ResourceManager.CommonTypes.ResourceHome
 ```
 
+| Name          | Value | Description                               |
+| ------------- | ----- | ----------------------------------------- |
+| Tenant        |       | The resource is bound to a tenant         |
+| Subscription  |       | The resource is bound to a subscription   |
+| Location      |       | The resource is bound to a location       |
+| ResourceGroup |       | The resource is bound to a resource group |
+| Extension     |       | The resource is bound to an extension     |
+
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 
 The Azure Resource Manager common-types versions.
@@ -1729,6 +1748,12 @@ The Azure Resource Manager common-types versions.
 ```typespec
 enum Azure.ResourceManager.CommonTypes.Versions
 ```
+
+| Name | Value | Description                                 |
+| ---- | ----- | ------------------------------------------- |
+| v3   |       | The Azure Resource Manager v3 common types. |
+| v4   |       | The Azure Resource Manager v4 common types. |
+| v5   |       | The Azure Resource Manager v5 common types. |
 
 ### `ActionType` {#Azure.ResourceManager.CommonTypes.ActionType}
 
@@ -2039,9 +2064,9 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties
 
 #### Properties
 
-| Name        | Type                                                                              | Description |
-| ----------- | --------------------------------------------------------------------------------- | ----------- |
-| properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
+| Name        | Type                                                                              | Description                                         |
+| ----------- | --------------------------------------------------------------------------------- | --------------------------------------------------- |
+| properties? | `ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` | The resource-specific properties for this resource. |
 
 ### `ResourceUpdateModelProperties` {#Azure.ResourceManager.Foundations.ResourceUpdateModelProperties}
 

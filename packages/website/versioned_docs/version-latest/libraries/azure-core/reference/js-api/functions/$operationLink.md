@@ -15,12 +15,12 @@ function $operationLink(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
 | `linkType` | `string` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

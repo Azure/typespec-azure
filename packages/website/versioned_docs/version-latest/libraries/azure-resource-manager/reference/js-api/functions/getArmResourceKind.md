@@ -10,7 +10,7 @@ function getArmResourceKind(resourceType): ArmResourceKind | undefined
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `resourceType` | `Model` |
 
 ## Returns

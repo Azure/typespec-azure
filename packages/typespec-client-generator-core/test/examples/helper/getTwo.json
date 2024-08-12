@@ -1,0 +1,10 @@
+{
+  "operationId": "get",
+  "title": "get one",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "one"
+    }
+  }
+}

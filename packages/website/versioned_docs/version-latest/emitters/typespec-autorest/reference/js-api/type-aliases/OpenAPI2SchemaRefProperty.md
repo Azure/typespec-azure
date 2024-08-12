@@ -16,6 +16,6 @@ Autorest allows a few properties to be next to $ref of a property.
 
 ## Type declaration
 
-| Member | Type | Description |
-| :------ | :------ | :------ |
+| Name | Type | Description |
+| ------ | ------ | ------ |
 | `x-ms-client-name` | `string` | Provide a different name to be used in the client. |

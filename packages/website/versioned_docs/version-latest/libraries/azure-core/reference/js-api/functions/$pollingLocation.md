@@ -13,10 +13,10 @@ function $pollingLocation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
-| `options`? | `Model` |
+| `options`? | `Type` |
 
 ## Returns
 

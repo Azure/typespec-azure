@@ -15,12 +15,12 @@ function $addTraitProperties(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `traitModel` | `Model` |
 | `traitLocation` | `EnumMember` |
-| `traitContexts` | `EnumMember` \| `Union` \| `UnknownType` |
+| `traitContexts` | `Type` |
 
 ## Returns
 

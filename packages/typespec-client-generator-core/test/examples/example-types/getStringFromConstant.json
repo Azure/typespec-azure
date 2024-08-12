@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringFromConstant",
+  "title": "getStringFromConstant",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}

@@ -1,16 +1,19 @@
-import { SdkContext, getClientNameOverride } from "@azure-tools/typespec-client-generator-core";
 import {
-  ModelProperty,
-  Operation,
-  Program,
-  Service,
-  Type,
+  getClientNameOverride,
+  type TCGCContext,
+} from "@azure-tools/typespec-client-generator-core";
+import {
   getFriendlyName,
   getProjectedName,
   getVisibility,
   isGlobalNamespace,
   isService,
   isTemplateInstance,
+  ModelProperty,
+  Operation,
+  Program,
+  Service,
+  Type,
 } from "@typespec/compiler";
 import { getOperationId } from "@typespec/openapi";
 import { pascalCase } from "change-case";
@@ -19,7 +22,7 @@ export interface AutorestEmitterContext {
   readonly program: Program;
   readonly service: Service;
   readonly outputFile: string;
-  readonly tcgcSdkContext: SdkContext;
+  readonly tcgcSdkContext: TCGCContext;
   readonly version?: string;
 }
 

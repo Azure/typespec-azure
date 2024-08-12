@@ -113,7 +113,7 @@ extern dec extensionResource(target: Model);
  * property to the type of the Azure Resource Manager resource.
  * @param resource The resource to get the type of
  */
-extern dec armProviderNameValue(target: Operation | Model);
+extern dec armProviderNameValue(target: Operation);
 
 /**
  * Marks the operation as being a collection action

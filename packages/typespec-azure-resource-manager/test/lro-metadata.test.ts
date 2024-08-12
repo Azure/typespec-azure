@@ -310,6 +310,71 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     deepStrictEqual(metadata.finalResultPath, undefined);
     deepStrictEqual(metadata.finalStateVia, "location");
   });
+  it("Returns correct metadata for Async action with void return type", async () => {
+    const [metadata, _diag, _runner] = await getLroMetadataFor(
+      `
+  @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The state of the resource")
+      enum ResourceState {
+       Succeeded,
+       Canceled,
+       Failed
+     }
+
+      @doc("The widget properties")
+      model WidgetProperties {
+        @doc("I am a simple Resource Identifier")
+        simpleArmId: ResourceIdentifier;
+
+        @doc("The provisioning State")
+        provisioningState: ResourceState;
+      }
+
+      @doc("The result of the post request")
+      model ResultModel {
+        @doc("The result message")
+        message: string;
+      }
+
+      @doc("The request of the post request")
+      model RequestModel {
+        @doc("The request message")
+        message: string;
+      }
+
+      @doc("Foo resource")
+      model Widget is TrackedResource<WidgetProperties> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+
+      @armResourceOperations(Widget)
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+        doStuff is ArmResourceActionAsync<Widget, RequestModel, void, LroHeaders=ArmAsyncOperationHeader<FinalResult = void>>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+        listBySubscription is ArmListBySubscription<Widget>;
+      }
+      `,
+      "doStuff"
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+  });
 
   it("Returns correct metadata for Async CreateOrUpdate with union type ProvisioningState", async () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
