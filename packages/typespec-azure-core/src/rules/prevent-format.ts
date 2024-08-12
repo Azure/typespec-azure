@@ -1,9 +1,10 @@
 import { ModelProperty, Scalar, createRule } from "@typespec/compiler";
 
-export const preventFormatUse = createRule({
+export const preventFormatRule = createRule({
   name: "no-format",
   description: "Azure services should not use the `@format` decorator.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/prevent-format",
   messages: {
     default: "Azure services should not use the `@format` decorator.",
   },

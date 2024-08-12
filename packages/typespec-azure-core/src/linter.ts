@@ -22,7 +22,7 @@ import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
-import { preventFormatUse } from "./rules/prevent-format.js";
+import { preventFormatRule } from "./rules/prevent-format.js";
 import { preventMultipleDiscriminator } from "./rules/prevent-multiple-discriminator.js";
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";
 import { preventUnknownType } from "./rules/prevent-unknown.js";
@@ -59,7 +59,7 @@ const rules = [
   noRpcPathParamsRule,
   operationIdRule,
   preferCsvCollectionFormatRule,
-  preventFormatUse,
+  preventFormatRule,
   preventMultipleDiscriminator,
   preventRestLibraryInterfaces,
   preventUnknownType,
