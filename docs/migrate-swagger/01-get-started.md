@@ -73,6 +73,16 @@ This is the probably most critical step of the conversion. As you have pre-sorte
 
 - Review CI checks such as breaking changes and other failures.
 
+## Troubleshooting
+
+### Error "does not have a GetAll method"
+
+If converter fails withe error 
+```
+fatal   | The ResourceCollection RestorePointCollection (RequestPath: {Certain request path}) does not have a GetAll method
+```
+you could bypass it by the configuration in this [page](https://github.com/Azure/autorest.csharp/blob/feature/v3/docs/mgmt/readme.md#list-exception).
+
 ## How to Get Help
 
 - Ask questions in the [TypeSpec Discussions Channel](https://teams.microsoft.com/l/channel/19%3a906c1efbbec54dc8949ac736633e6bdf%40thread.skype/TypeSpec%2520Discussion%2520%25F0%259F%2590%25AE?groupId=3e17dcb0-4257-4a30-b843-77f47f1d4121&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47)
