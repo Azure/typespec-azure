@@ -49,3 +49,9 @@ export type ArmCommonDefinitionDecorator = (
     | string,
   referenceFile?: string
 ) => void;
+
+export type AzureResourceManagerCommonTypesPrivateDecorators = {
+  armCommonTypesVersions: ArmCommonTypesVersionsDecorator;
+  armCommonParameter: ArmCommonParameterDecorator;
+  armCommonDefinition: ArmCommonDefinitionDecorator;
+};
