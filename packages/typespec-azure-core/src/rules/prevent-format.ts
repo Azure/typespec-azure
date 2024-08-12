@@ -1,5 +1,4 @@
 import { ModelProperty, Scalar, createRule } from "@typespec/compiler";
-import { isExcludedCoreType } from "./utils.js";
 
 export const preventFormatUse = createRule({
   name: "no-format",
@@ -11,9 +10,6 @@ export const preventFormatUse = createRule({
   create(context) {
     return {
       scalar: (scalar: Scalar) => {
-        if (isExcludedCoreType(context.program, scalar)) {
-          return;
-        }
         for (const dec of scalar.decorators) {
           if (dec.decorator.name === "$format") {
             context.reportDiagnostic({
@@ -23,9 +19,6 @@ export const preventFormatUse = createRule({
         }
       },
       modelProperty: (model: ModelProperty) => {
-        if (isExcludedCoreType(context.program, model)) {
-          return;
-        }
         for (const dec of model.decorators) {
           if (dec.decorator.name === "$format") {
             context.reportDiagnostic({
