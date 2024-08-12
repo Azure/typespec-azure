@@ -31,6 +31,7 @@ export const useStandardOperations = createRule({
   name: "use-standard-operations",
   description: "Operations should be defined using a signature from the Azure.Core namespace.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-operations",
   messages: {
     default: paramMessage`Operation '${"name"}' should be defined using a signature from the Azure.Core namespace.`,
   },
