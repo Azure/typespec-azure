@@ -214,7 +214,7 @@ export function getCrossLanguageDefinitionId(
   operation?: Operation,
   appendNamespace: boolean = true
 ): string {
-  let retval = type.name || "anonymous";
+  let [retval, args] = getTypeName(context, type, operation, appendNamespace);
   const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
   switch (type.kind) {
     case "Union":
@@ -252,7 +252,33 @@ export function getCrossLanguageDefinitionId(
   if (appendNamespace && namespace && getNamespaceFullName(namespace)) {
     retval = `${getNamespaceFullName(namespace)}.${retval}`;
   }
+
+  if (args) {
+    retval = `${retval}<${args}>`;
+  }
   return retval;
+}
+
+function getTypeName(
+  context: TCGCContext,
+  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  operation?: Operation,
+  appendNamespace: boolean = true
+): [string, string | undefined] {
+  const typeName = type.name || "anonymous";
+
+  if (
+    type.kind === "Model" ||
+    type.kind === "Union" ||
+    type.kind === "Scalar" ||
+    type.kind === "Interface" ||
+    type.kind === "Operation"
+  ) {
+    if (type.templateMapper?.args) {
+    }
+  }
+
+  return [typeName, undefined];
 }
 
 /**

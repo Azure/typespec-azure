@@ -665,6 +665,38 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(discriminatorProperty.serializedName, "@data.kind");
   });
 
+  it("crossLanguageDefinitionId should be unique for templated models", async () => {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      @access(Access.public)
+      @usage(Usage.input | Usage.output)
+      model User {};
+
+      @access(Access.public)
+      @usage(Usage.input | Usage.output)
+      model AnotherUser {};
+
+      @access(Access.public)
+      @usage(Usage.input | Usage.output)
+      model Test {
+        prop1: Page<User>;
+        prop2: Page<AnotherUser>;
+      }
+      `);
+
+    const models = runnerWithCore.context.sdkPackage.models;
+    const pagedUser = models.find((x) => x.name === "PagedUser");
+    const pagedAnotherUser = models.find((x) => x.name === "PagedAnotherUser");
+    ok(pagedUser);
+    ok(pagedAnotherUser);
+    strictEqual(pagedUser.crossLanguageDefinitionId, "My.Service.PagedUser");
+    strictEqual(pagedAnotherUser.crossLanguageDefinitionId, "My.Service.PagedAnotherUser");
+  });
+
   it("filterOutCoreModels true", async () => {
     const runnerWithCore = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
