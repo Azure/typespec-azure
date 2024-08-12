@@ -186,7 +186,7 @@ export type ClientFormatDecorator = (
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
- * &#2063;@internal("python")
+ * @_internal("python")
  * op test: void;
  * ```
  */
