@@ -138,15 +138,7 @@ function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    const encode = getEncode(context.program, type);
-    if (encode?.encoding) {
-      return encode.encoding;
-    }
-    if (encode?.type) {
-      // if we specify the encoding type in the decorator, we set the `.encode` string
-      // to the kind of the encoding type
-      return getSdkBuiltInType(context, encode.type).kind;
-    }
+    return getEncode(context.program, type)?.encoding || kind;
   }
   return kind;
 }
@@ -217,8 +209,17 @@ export function addEncodeInfo(
     }
   }
   if (isSdkIntKind(innerType.kind)) {
+    // only integer type is allowed to be encoded as string
     if (encodeData && "encode" in innerType) {
-      innerType.encode = getEncodeHelper(context, type, innerType.kind);
+      const encode = getEncode(context.program, type);
+      if (encode?.encoding) {
+        innerType.encode = encode.encoding;
+      }
+      if (encode?.type) {
+        // if we specify the encoding type in the decorator, we set the `.encode` string
+        // to the kind of the encoding type
+        innerType.encode = getSdkBuiltInType(context, encode.type).kind;
+      }
     }
   }
   return diagnostics.wrap(undefined);
