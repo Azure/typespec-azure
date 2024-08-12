@@ -9,13 +9,6 @@ import {
 } from "@typespec/compiler";
 import { isExcludedCoreType } from "./utils.js";
 
-// HACK HACK HACK: This should be removed once Azure.Core-compatible
-// Azure.ResourceManager operations are added
-let checkStandardOperationsEnabled = true;
-export function __unsupported_enable_checkStandardOperations(enabled: boolean): void {
-  checkStandardOperationsEnabled = enabled;
-}
-
 function derivesFromAzureCoreOperation(program: Program, operation: Operation): boolean {
   // Check every link in the signature chain
   while (operation.node.signature.kind === SyntaxKind.OperationSignatureReference) {
@@ -44,10 +37,6 @@ export const useStandardOperations = createRule({
   create(context) {
     return {
       operation: (operationContext: Operation) => {
-        // HACK HACK HACK: This should be removed once Azure.Core-compatible
-        // Azure.ResourceManager operations are added
-        if (!checkStandardOperationsEnabled) return;
-
         // Can we skip this operation?  Either it or the interface it's defined in
         // has to be defined in an approved namespace, or the operation itself must
         // be templated.
