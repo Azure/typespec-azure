@@ -1,27 +1,23 @@
 import {
   Operation,
-  Program,
-  SyntaxKind,
   createRule,
   getNamespaceFullName,
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
-import { isExcludedCoreType } from "./utils.js";
 
-function derivesFromAzureCoreOperation(program: Program, operation: Operation): boolean {
+function derivesFromAzureCoreOperation(operation: Operation): boolean {
   // Check every link in the signature chain
-  while (operation.node.signature.kind === SyntaxKind.OperationSignatureReference) {
-    const baseOp = program.checker.getTypeForNode(
-      operation.node.signature.baseOperation
-    ) as Operation;
-
-    if (baseOp.namespace && getNamespaceFullName(baseOp.namespace) === "Azure.Core") {
+  while (operation.sourceOperation) {
+    if (
+      operation.sourceOperation.namespace &&
+      getNamespaceFullName(operation.sourceOperation.namespace) === "Azure.Core"
+    ) {
       return true;
     }
 
     // See if the base operation ultimately derives from an Azure.Core operation
-    operation = baseOp;
+    operation = operation.sourceOperation;
   }
 
   return false;
@@ -41,12 +37,7 @@ export const useStandardOperations = createRule({
         // Can we skip this operation?  Either it or the interface it's defined in
         // has to be defined in an approved namespace, or the operation itself must
         // be templated.
-        if (
-          (operationContext.interface &&
-            isExcludedCoreType(context.program, operationContext.interface)) ||
-          (!operationContext.interface && isExcludedCoreType(context.program, operationContext)) ||
-          isTemplateDeclarationOrInstance(operationContext)
-        ) {
+        if (isTemplateDeclarationOrInstance(operationContext)) {
           return;
         }
 
@@ -62,10 +53,7 @@ export const useStandardOperations = createRule({
 
         // Otherwise, if the operation signature is a raw declaration or does not
         // derive from an operation in Azure.Core, it violates this linting rule.
-        if (
-          operationContext.node.signature.kind === SyntaxKind.OperationSignatureDeclaration ||
-          !derivesFromAzureCoreOperation(context.program, operationContext)
-        ) {
+        if (!derivesFromAzureCoreOperation(operationContext)) {
           context.reportDiagnostic({
             // If the namespace where the operation's interface is defined is
             // different than the namespace we're in, mark the operation's
