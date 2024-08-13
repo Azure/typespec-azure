@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.2
+
+### Bug Fixes
+
+- [#1336](https://github.com/Azure/typespec-azure/pull/1336) Add `@hasJsonConverter` for csharp only to indicate if JSON converter is needed
+- [#1350](https://github.com/Azure/typespec-azure/pull/1350) Bug fix for encode as string on ModelProperty.
+- [#1343](https://github.com/Azure/typespec-azure/pull/1343) Add generic parameter inputs to `SdkUnionType` to clearly define the union types of `endpoint` and `credential` params
+
+
 ## 0.45.1
 
 ### Bug Fixes
