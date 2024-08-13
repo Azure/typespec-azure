@@ -465,7 +465,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   flatten: boolean;
 }
 
-export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
 export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
@@ -479,11 +479,19 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
+  explode?: boolean;
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
+  /**
+   * @deprecated This property is deprecated. Use `allowReserved` instead.
+   * @param serviceParam
+   */
   urlEncode: boolean;
+  explode?: boolean;
+  style?: "simple" | "label" | "matrix" | "fragment" | "path";
+  allowReserved?: boolean;
   serializedName: string;
   optional: false;
   correspondingMethodParams: SdkModelPropertyType[];
@@ -543,6 +551,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
   kind: "http";
   path: string;
+  uriTemplate: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;

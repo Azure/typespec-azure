@@ -1274,8 +1274,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1325,7 +1325,7 @@ export function getSdkModelPropertyType(
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
-  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!) as [SdkModelPropertyType, readonly Diagnostic[]];
   const result: SdkBodyModelPropertyType = {
     ...base,
     kind: "property",
@@ -1573,7 +1573,7 @@ function updateTypesFromOperation(
             (operation.parameters.properties.get(k) ===
               (httpBody.type as Model).properties.get(k) ||
               operation.parameters.properties.get(k) ===
-                (httpBody.type as Model).properties.get(k)?.sourceProperty)
+              (httpBody.type as Model).properties.get(k)?.sourceProperty)
         )
       ) {
         if (!context.spreadModels?.has(httpBody.type)) {
