@@ -11,7 +11,7 @@ pass check-in validations.
 For operations with non-empty request bodies (PUT, POST, PATCH), the TypeSpec operation templates provide a default name for the
 request parameter corresponding to the request payload. You can use augment decorators to make changes to this parameter, and other parts of the operation signature.
 
-The following sections show how to do this for each operation template. 
+The following sections show how to do this for each operation template.
 
 In order to be able to use the decorators you have to add the client generator definition:
 ```tsp
