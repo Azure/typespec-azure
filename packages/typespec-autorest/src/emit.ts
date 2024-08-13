@@ -2,6 +2,7 @@ import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
+  NoTarget,
   Program,
   Service,
   emitFile,
@@ -11,6 +12,7 @@ import {
   interpolatePath,
   listServices,
   projectProgram,
+  reportDeprecated,
   resolvePath,
 } from "@typespec/compiler";
 import { resolveInfo } from "@typespec/openapi";
@@ -70,7 +72,10 @@ export function resolveAutorestOptions(
   emitterOutputDir: string,
   options: AutorestEmitterOptions
 ): ResolvedAutorestEmitterOptions {
-  const resolvedOptions = { ...defaultOptions, ...options };
+  const resolvedOptions = {
+    ...defaultOptions,
+    ...options,
+  };
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {
@@ -78,11 +83,20 @@ export function resolveAutorestOptions(
       "emitter-output-dir": emitterOutputDir,
     }
   );
+
+  if (resolvedOptions["examples-directory"]) {
+    reportDeprecated(
+      program,
+      `examples-directory option is deprecated use examples-dir instead or remove it if examples are located in {project-root}/examples`,
+      NoTarget
+    );
+  }
+
   return {
     outputFile: resolvedOptions["output-file"],
     outputDir: emitterOutputDir,
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
-    examplesDirectory: resolvedOptions["examples-directory"],
+    examplesDirectory: resolvedOptions["examples-dir"] ?? resolvedOptions["examples-directory"],
     version: resolvedOptions["version"],
     newLine: resolvedOptions["new-line"],
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],

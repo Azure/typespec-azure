@@ -287,7 +287,7 @@ describe("typespec-autorest: decorators", () => {
     it("duplicate example file", async () => {
       const host = await createAutorestTestHost();
       const runner = await createAutorestTestRunner(host, {
-        "examples-directory": resolveVirtualPath("./examples"),
+        "examples-dir": resolveVirtualPath("./examples"),
       });
 
       host.addTypeSpecFile(
