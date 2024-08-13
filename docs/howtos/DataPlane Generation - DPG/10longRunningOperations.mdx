@@ -1,0 +1,188 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Long-Running Operations
+
+This doc details what emitters will generate for long-running operations.
+
+## Resource create or replace
+
+Long-running operation to create or replace a resource.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
+  NoRepeatableRequests &
+  NoClientRequestId>;
+
+@resource("users")
+@doc("Details about a user.")
+model User {
+  @key
+  @visibility("read")
+  @doc("The name of user.")
+  name: string;
+
+  @doc("The role of user")
+  role: string;
+}
+
+op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+
+```
+
+</TabItem>
+</Tabs>
+
+## Resource delete
+
+Long-running operation to delete a resource.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+op delete is ResourceOperations.LongRunningResourceDelete<User>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+
+```
+
+</TabItem>
+</Tabs>
+
+## Resource action
+
+Long-running operation to invoke an action on a resource.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@resource("users")
+@doc("Details about a user.")
+model User {
+  @key
+  @visibility("read")
+  @doc("The name of user.")
+  name: string;
+
+  @doc("The role of user")
+  role: string;
+}
+
+@doc("The parameters for exporting a user.")
+model UserExportParams {
+  @query
+  @doc("The format of the data.")
+  format: string;
+}
+
+@doc("The exported user data.")
+model ExportedUser {
+  @doc("The name of user.")
+  name: string;
+
+  @doc("The exported URI.")
+  resourceUri: string;
+}
+
+op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+
+```
+
+</TabItem>
+</Tabs>
