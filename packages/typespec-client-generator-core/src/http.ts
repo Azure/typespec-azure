@@ -9,8 +9,6 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
@@ -119,8 +117,9 @@ function getSdkHttpParameters(
   };
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
-    .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))!
+    .map(
+      (x) =>
+        diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))!
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
@@ -300,12 +299,12 @@ function addContentTypeInfoToBodyParam(
 
 /**
  * Generate TCGC Http parameter type, `httpParam` or `location` should be provided at least one
- * @param context 
+ * @param context
  * @param param TypeSpec param for the http parameter
- * @param operation 
+ * @param operation
  * @param httpParam TypeSpec Http parameter type
  * @param location Location of the http parameter
- * @returns 
+ * @returns
  */
 export function getSdkHttpParameter(
   context: TCGCContext,
@@ -388,12 +387,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-    {
-      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-    },
-    readonly Diagnostic[],
-  ] {
+  {
+    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  },
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();

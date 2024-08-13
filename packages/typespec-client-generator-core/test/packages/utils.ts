@@ -1,5 +1,10 @@
 import { strictEqual } from "assert";
-import { SdkClientType, SdkHttpOperation, SdkPackage, SdkServiceMethod } from "../../src/interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperation,
+  SdkPackage,
+  SdkServiceMethod,
+} from "../../src/interfaces.js";
 
 export function getServiceWithDefaultApiVersion(op: string) {
   return `

@@ -451,7 +451,9 @@ function getEndpointTypeFromSingleServer(
   const types: SdkEndpointType[] = [];
   if (!server) return diagnostics.wrap([defaultOverridableEndpointType]);
   for (const param of server.parameters.values()) {
-    const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, undefined, "path"))!;
+    const sdkParam = diagnostics.pipe(
+      getSdkHttpParameter(context, param, undefined, undefined, "path")
+    )!;
     if (sdkParam.kind === "path") {
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
