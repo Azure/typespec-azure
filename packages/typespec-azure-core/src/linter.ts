@@ -1,6 +1,7 @@
 import { defineLinter } from "@typespec/compiler";
 import { apiVersionRule } from "./rules/api-version-parameter.js";
 import { authRequiredRule } from "./rules/auth-required.js";
+import { badRecordTypeRule } from "./rules/bad-record-type.js";
 import { byosRule } from "./rules/byos.js";
 import { casingRule } from "./rules/casing.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
@@ -27,7 +28,6 @@ import { preventMultipleDiscriminator } from "./rules/prevent-multiple-discrimin
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";
 import { preventUnknownType } from "./rules/prevent-unknown.js";
 import { propertyNameRule } from "./rules/property-naming.js";
-import { recordTypeRule } from "./rules/record-types.js";
 import { bodyArrayRule } from "./rules/request-body-array.js";
 import { requireDocumentation } from "./rules/require-docs.js";
 import { requireKeyVisibility } from "./rules/require-key-visibility.js";
@@ -64,7 +64,7 @@ const rules = [
   preventRestLibraryInterfaces,
   preventUnknownType,
   propertyNameRule,
-  recordTypeRule,
+  badRecordTypeRule,
   requireDocumentation,
   requireKeyVisibility,
   responseSchemaMultiStatusCodeRule,

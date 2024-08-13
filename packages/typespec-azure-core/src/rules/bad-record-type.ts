@@ -74,10 +74,11 @@ function validatePropertyRecordType(
   }
 }
 
-export const recordTypeRule = createRule({
+export const badRecordTypeRule = createRule({
   name: "bad-record-type",
   description: "Identify bad record definitions.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/bad-record-type",
   messages: {
     extendUnknown: paramMessage`${"name"} should not use '${"keyword"} Record<${"typeName"}>'. Use '${"keyword"} Record<string>' instead.`,
     recordWithProperties: paramMessage`${"name"} that uses '${"keyword"} Record<${"typeName"}>' should not have properties.`,

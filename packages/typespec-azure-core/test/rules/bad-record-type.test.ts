@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { recordTypeRule } from "../../src/rules/record-types.js";
+import { badRecordTypeRule } from "../../src/rules/bad-record-type.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: Record type rules", () => {
@@ -13,7 +13,7 @@ describe("typespec-azure-core: Record type rules", () => {
 
   beforeEach(async () => {
     runner = await createAzureCoreTestRunner();
-    tester = createLinterRuleTester(runner, recordTypeRule, "@azure-tools/typespec-azure-core");
+    tester = createLinterRuleTester(runner, badRecordTypeRule, "@azure-tools/typespec-azure-core");
   });
 
   describe("model is Record<T>", () => {
