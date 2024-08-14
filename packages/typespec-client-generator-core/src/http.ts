@@ -9,6 +9,9 @@ import {
 } from "@typespec/compiler";
 import {
   HttpOperation,
+  HttpOperationParameter,
+  HttpOperationPathParameter,
+  HttpOperationQueryParameter,
   HttpStatusCodeRange,
   getHeaderFieldName,
   getHeaderFieldOptions,
@@ -78,6 +81,7 @@ export function getSdkHttpOperation(
     __raw: httpOperation,
     kind: "http",
     path: httpOperation.path,
+    uriTemplate: httpOperation.uriTemplate,
     verb: httpOperation.verb,
     ...parameters,
     responses,
@@ -114,7 +118,7 @@ function getSdkHttpParameters(
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x.type))
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
@@ -128,12 +132,12 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody) {
-    // if there's a param on the body, we can just rely on getSdkHttpParameter
+    // explicit @body and @bodyRoot
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
-      const getParamResponse = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.property, httpOperation.operation, "body")
+      const bodyParam = diagnostics.pipe(
+        getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body")
       );
-      if (getParamResponse.kind !== "body") {
+      if (bodyParam.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
             code: "unexpected-http-param-type",
@@ -141,13 +145,13 @@ function getSdkHttpParameters(
             format: {
               paramName: tspBody.property.name,
               expectedType: "body",
-              actualType: getParamResponse.kind,
+              actualType: bodyParam.kind,
             },
           })
         );
         return diagnostics.wrap(retval);
       }
-      retval.bodyParam = getParamResponse;
+      retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
       const type = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
@@ -292,66 +296,80 @@ function addContentTypeInfoToBodyParam(
   return diagnostics.diagnostics;
 }
 
+/**
+ * Generate TCGC Http parameter type, `httpParam` or `location` should be provided at least one
+ * @param context
+ * @param param TypeSpec param for the http parameter
+ * @param operation
+ * @param httpParam TypeSpec Http parameter type
+ * @param location Location of the http parameter
+ * @returns
+ */
 export function getSdkHttpParameter(
   context: TCGCContext,
-  type: ModelProperty,
+  param: ModelProperty,
   operation?: Operation,
+  httpParam?: HttpOperationParameter,
   location?: "path" | "query" | "header" | "body"
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
-  if (isPathParam(context.program, type) || location === "path") {
+  if (isPathParam(context.program, param) || location === "path") {
     // we don't url encode if the type can be assigned to url
     const urlEncode = !ignoreDiagnostics(
       program.checker.isTypeAssignableTo(
-        type.type.projectionBase ?? type.type,
+        param.type.projectionBase ?? param.type,
         program.checker.getStdType("url"),
-        type.type
+        param.type
       )
     );
     return diagnostics.wrap({
       ...base,
       kind: "path",
       urlEncode,
-      serializedName: getPathParamName(program, type) ?? base.name,
+      explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
+      style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
+      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
+      serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
     });
   }
-  if (isBody(context.program, type) || location === "body") {
+  if (isBody(context.program, param) || location === "body") {
     return diagnostics.wrap({
       ...base,
       kind: "body",
       contentTypes: ["application/json"], // will update when we get to the operation level
       defaultContentType: "application/json", // will update when we get to the operation level
-      optional: type.optional,
+      optional: param.optional,
       correspondingMethodParams,
     });
   }
   const headerQueryBase = {
     ...base,
-    optional: type.optional,
-    collectionFormat: getCollectionFormat(context, type),
+    optional: param.optional,
+    collectionFormat: getCollectionFormat(context, param),
     correspondingMethodParams,
   };
-  if (isQueryParam(context.program, type) || location === "query") {
+  if (isQueryParam(context.program, param) || location === "query") {
     return diagnostics.wrap({
       ...headerQueryBase,
       kind: "query",
-      serializedName: getQueryParamName(program, type) ?? base.name,
+      serializedName: getQueryParamName(program, param) ?? base.name,
+      explode: (httpParam as HttpOperationQueryParameter)?.explode,
     });
   }
-  if (!(isHeader(context.program, type) || location === "header")) {
+  if (!(isHeader(context.program, param) || location === "header")) {
     diagnostics.add(
       createDiagnostic({
         code: "unexpected-http-param-type",
-        target: type,
+        target: param,
         format: {
-          paramName: type.name,
+          paramName: param.name,
           expectedType: "path, query, header, or body",
-          actualType: type.kind,
+          actualType: param.kind,
         },
       })
     );
@@ -359,7 +377,7 @@ export function getSdkHttpParameter(
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
-    serializedName: getHeaderFieldName(program, type) ?? base.name,
+    serializedName: getHeaderFieldName(program, param) ?? base.name,
   });
 }
 
@@ -596,8 +614,5 @@ function getCollectionFormat(
         ? getHeaderFieldOptions(program, type)
         : undefined
   )?.format;
-  if (tspCollectionFormat === "form" || tspCollectionFormat === "simple") {
-    return undefined;
-  }
   return tspCollectionFormat;
 }
