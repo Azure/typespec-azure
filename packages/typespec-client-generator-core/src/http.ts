@@ -117,9 +117,8 @@ function getSdkHttpParameters(
   };
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
-    .map(
-      (x) =>
-        diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))
+    .map((x) =>
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
