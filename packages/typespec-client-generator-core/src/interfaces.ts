@@ -479,7 +479,7 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
-  explode?: boolean;
+  explode: boolean;
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
@@ -489,9 +489,9 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
    * @param serviceParam
    */
   urlEncode: boolean;
-  explode?: boolean;
-  style?: "simple" | "label" | "matrix" | "fragment" | "path";
-  allowReserved?: boolean;
+  explode: boolean;
+  style: "simple" | "label" | "matrix" | "fragment" | "path";
+  allowReserved: boolean;
   serializedName: string;
   optional: false;
   correspondingMethodParams: SdkModelPropertyType[];
