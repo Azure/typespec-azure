@@ -1641,7 +1641,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "TestRequestRepeatabilityResult");
+        strictEqual(unionEnum.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
@@ -1675,7 +1675,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.values[1].kind, "enumvalue");
         strictEqual(stringType.values[1].value, "rejected");
         strictEqual(stringType.valueType.kind, "string");
-        strictEqual(stringType.name, "TestRequestRepeatabilityResult");
+        strictEqual(stringType.name, "RequestParameterWithAnonymousUnionRepeatabilityResult");
         strictEqual(stringType.isGeneratedName, true);
         strictEqual(
           stringType.crossLanguageDefinitionId,

@@ -374,7 +374,9 @@ function getContextPath(
     if (httpOperation.parameters.body) {
       visited.clear();
       result = [{ name: root.name }];
-      if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type, "Request")) {
+      if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type.kind === "Model"
+        ? getEffectivePayloadType(context, httpOperation.parameters.body.type)
+        : httpOperation.parameters.body.type, "Request")) {
         return result;
       }
     }

@@ -1274,8 +1274,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1556,7 +1556,9 @@ function updateTypesFromOperation(
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
     const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, httpBody.type, operation)
+      getClientTypeWithDiagnostics(context, httpBody.type.kind === "Model"
+        ? getEffectivePayloadType(context, httpBody.type)
+        : httpBody.type, operation)
     );
     if (generateConvenient) {
       // Special logic for spread body model:
@@ -1573,7 +1575,7 @@ function updateTypesFromOperation(
             (operation.parameters.properties.get(k) ===
               (httpBody.type as Model).properties.get(k) ||
               operation.parameters.properties.get(k) ===
-                (httpBody.type as Model).properties.get(k)?.sourceProperty)
+              (httpBody.type as Model).properties.get(k)?.sourceProperty)
         )
       ) {
         if (!context.spreadModels?.has(httpBody.type)) {
