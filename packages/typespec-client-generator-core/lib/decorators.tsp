@@ -467,3 +467,17 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * ```
  */
 extern dec override(original: Operation, override: Operation, scope?: valueof string);
+
+/**
+ * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * @useSystemTextJsonConverter
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);

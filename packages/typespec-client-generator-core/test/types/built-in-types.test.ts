@@ -417,4 +417,40 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.details, "doc");
     strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
   });
+
+  it("integer model property encoded as string", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        @encode(string)
+        value: safeint;
+      }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "safeint");
+    strictEqual(sdkType.encode, "string");
+    strictEqual(sdkType.baseType, undefined);
+  });
+
+  it("integer scalar encoded as string", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @encode(string)
+      scalar int32EncodedAsString extends int32;
+
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      model Test {
+        value: int32EncodedAsString;
+      }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "int32");
+    strictEqual(sdkType.encode, "string");
+    strictEqual(sdkType.baseType?.kind, "int32");
+  });
 });

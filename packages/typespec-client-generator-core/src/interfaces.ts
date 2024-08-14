@@ -359,11 +359,11 @@ export interface SdkConstantType extends SdkTypeBase {
   isGeneratedName: boolean;
 }
 
-export interface SdkUnionType extends SdkTypeBase {
+export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
   kind: "union";
-  values: SdkType[];
+  values: TValueType[];
   crossLanguageDefinitionId: string;
 }
 
@@ -420,12 +420,12 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType | SdkUnionType;
+  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
   kind: "credential";
-  type: SdkCredentialType | SdkUnionType; // union of credentials
+  type: SdkCredentialType | SdkUnionType<SdkCredentialType>;
   onClient: true;
 }
 
