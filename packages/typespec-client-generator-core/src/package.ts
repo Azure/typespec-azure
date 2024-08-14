@@ -515,7 +515,7 @@ function getSdkEndpointParameter(
       types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, server)));
     }
   }
-  let type: SdkEndpointType | SdkUnionType;
+  let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
     type = {
       kind: "union",
@@ -524,7 +524,7 @@ function getSdkEndpointParameter(
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
       decorators: [],
-    };
+    } as SdkUnionType<SdkEndpointType>;
   } else {
     type = types[0];
   }
