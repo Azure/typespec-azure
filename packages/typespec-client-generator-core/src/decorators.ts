@@ -658,7 +658,7 @@ export async function createSdkContext<
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    examplesDirectory: context.options["examples-directory"],
+    examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
   };
