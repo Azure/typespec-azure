@@ -119,7 +119,7 @@ function getSdkHttpParameters(
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map(
       (x) =>
-        diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))!
+        diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
@@ -137,7 +137,7 @@ function getSdkHttpParameters(
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body")
-      )!;
+      );
       if (bodyParam.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
@@ -312,7 +312,7 @@ export function getSdkHttpParameter(
   operation?: Operation,
   httpParam?: HttpOperationParameter,
   location?: "path" | "query" | "header" | "body"
-): [SdkHttpParameter | void, readonly Diagnostic[]] {
+): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
   const program = context.program;
@@ -362,25 +362,24 @@ export function getSdkHttpParameter(
       explode: (httpParam as HttpOperationQueryParameter)?.explode,
     });
   }
-  if (isHeader(context.program, param) || location === "header") {
-    return diagnostics.wrap({
-      ...headerQueryBase,
-      kind: "header",
-      serializedName: getHeaderFieldName(program, param) ?? base.name,
-    });
+  if (!(isHeader(context.program, param) || location === "header")) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "unexpected-http-param-type",
+        target: param,
+        format: {
+          paramName: param.name,
+          expectedType: "path, query, header, or body",
+          actualType: param.kind,
+        },
+      })
+    );
   }
-  diagnostics.add(
-    createDiagnostic({
-      code: "unexpected-http-param-type",
-      target: param,
-      format: {
-        paramName: param.name,
-        expectedType: "path, query, header, or body",
-        actualType: param.kind,
-      },
-    })
-  );
-  return diagnostics.wrap(undefined);
+  return diagnostics.wrap({
+    ...headerQueryBase,
+    kind: "header",
+    serializedName: getHeaderFieldName(program, param) ?? base.name,
+  });
 }
 
 function getSdkHttpResponseAndExceptions(

@@ -1332,11 +1332,7 @@ export function getSdkModelPropertyType(
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
-  if (isSdkHttpParameter(context, type))
-    return getSdkHttpParameter(context, type, operation!) as [
-      SdkModelPropertyType,
-      readonly Diagnostic[],
-    ];
+  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
   const result: SdkBodyModelPropertyType = {
     ...base,
     kind: "property",
