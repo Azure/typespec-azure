@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  Model,
   ModelProperty,
   Operation,
   Type,
@@ -41,11 +42,13 @@ import {
 import {
   getAvailableApiVersions,
   getDocHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
+  isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
 } from "./internal-utils.js";
@@ -149,9 +152,13 @@ function getSdkHttpParameters(
       }
       retval.bodyParam = getParamResponse;
     } else if (!isNeverOrVoidType(tspBody.type)) {
-      const type = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-      );
+      const spread = isHttpBodySpread(tspBody, httpOperation.operation.parameters);
+      let type: SdkType;
+      if (spread) {
+        type = diagnostics.pipe(getClientTypeWithDiagnostics(context, getHttpBodySpreadModel(tspBody.type as Model), httpOperation.operation));
+      } else {
+        type = diagnostics.pipe(getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation));
+      }
       const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
         kind: "body",
@@ -367,12 +374,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-  {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-  },
-  readonly Diagnostic[],
-] {
+    {
+      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+    },
+    readonly Diagnostic[],
+  ] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
@@ -550,8 +557,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      (methodParam.__raw === serviceParam.__raw ||
-        methodParam.__raw === serviceParam.__raw.sourceProperty)
+      methodParam.__raw.node === serviceParam.__raw.node
     ) {
       return methodParam;
     }

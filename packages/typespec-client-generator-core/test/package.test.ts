@@ -1990,13 +1990,13 @@ describe("typespec-client-generator-core: package", () => {
       const bodyParameter = method.operation.bodyParam;
       ok(bodyParameter);
       strictEqual(bodyParameter.kind, "body");
-      strictEqual(bodyParameter.name, "createRequest");
+      strictEqual(bodyParameter.name, "widget");
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.name, "CreateRequest");
-      strictEqual(bodyParameter.type.properties.length, 2);
-      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
+      strictEqual(bodyParameter.type.name, "Widget");
+      strictEqual(bodyParameter.type.properties.length, 3);
+      strictEqual(bodyParameter.correspondingMethodParams.length, 3);
 
       strictEqual(method.operation.parameters.length, 2);
 
@@ -2167,7 +2167,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationAcceptParam.optional, false);
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams.map((x) => x.name);
-      deepStrictEqual(correspondingMethodParams, ["weight", "color"]);
+      deepStrictEqual(correspondingMethodParams, ["id", "weight", "color"]);
 
       strictEqual(operationContentTypeParam.correspondingMethodParams[0], methodContentTypeParam);
       strictEqual(operationAcceptParam.correspondingMethodParams[0], methodAcceptParam);
@@ -3473,8 +3473,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
-      strictEqual(bodyParameter.correspondingMethodParams.length, 1);
-      deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
+      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], a);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[1], b);
     });
 
     it("explicit multiple spread", async () => {

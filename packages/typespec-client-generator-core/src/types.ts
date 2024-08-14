@@ -84,6 +84,7 @@ import {
   filterApiVersionsInEnum,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getNonNullOptions,
@@ -92,6 +93,7 @@ import {
   getTypeDecorators,
   intOrFloat,
   isAzureCoreModel,
+  isHttpBodySpread,
   isJsonContentType,
   isMultipartFormData,
   isMultipartOperation,
@@ -1341,7 +1343,7 @@ export function getSdkModelPropertyType(
     if (
       type.model &&
       httpOperation.parameters.body &&
-      httpOperation.parameters.body.type === type.model
+      httpOperation.parameters.body.type.node === type.model.node
     ) {
       // only add multipartOptions for property of multipart body
       diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
@@ -1449,6 +1451,7 @@ function updateModelsMap(
 interface ModelUsageOptions {
   seenModelNames?: Set<SdkType>;
   propagation?: boolean;
+  skipFirst?: boolean;
   // this is used to prevent propagation usage from subtype to base type's other subtypes
   ignoreSubTypeStack?: boolean[];
 }
@@ -1489,11 +1492,15 @@ function updateUsageOfModel(
   if (type.kind !== "model" && type.kind !== "enum") return;
   options.seenModelNames.add(type);
 
-  const usageOverride = getUsageOverride(context, type.__raw as any);
-  if (usageOverride) {
-    type.usage |= usageOverride | usage;
+  if (!options.skipFirst) {
+    const usageOverride = getUsageOverride(context, type.__raw as any);
+    if (usageOverride) {
+      type.usage |= usageOverride | usage;
+    } else {
+      type.usage |= usage;
+    }
   } else {
-    type.usage |= usage;
+    options.skipFirst = false;
   }
 
   if (type.kind === "enum") return;
@@ -1555,34 +1562,23 @@ function updateTypesFromOperation(
   }
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
-    const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, httpBody.type.kind === "Model"
-        ? getEffectivePayloadType(context, httpBody.type)
-        : httpBody.type, operation)
-    );
+    const spread = isHttpBodySpread(httpBody, operation.parameters);
+    let sdkType: SdkType;
+    if (spread) {
+      sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, getHttpBodySpreadModel(httpBody.type as Model), operation));
+    } else {
+      sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, httpBody.type, operation));
+    }
     if (generateConvenient) {
-      // Special logic for spread body model:
-      // If body is from spread, then it should be an anonymous model.
-      // Also all model properties should be
-      // either equal to one of operation parameters (for case spread from model without property with metadata decorator)
-      // or its source property equal to one of operation parameters (for case spread from model with property with metadata decorator)
-      if (
-        httpBody.type.kind === "Model" &&
-        httpBody.type.name === "" &&
-        [...httpBody.type.properties.keys()].every(
-          (k) =>
-            operation.parameters.properties.has(k) &&
-            (operation.parameters.properties.get(k) ===
-              (httpBody.type as Model).properties.get(k) ||
-              operation.parameters.properties.get(k) ===
-              (httpBody.type as Model).properties.get(k)?.sourceProperty)
-        )
-      ) {
-        if (!context.spreadModels?.has(httpBody.type)) {
+      if (spread) {
+        if (!context.spreadModels?.has(httpBody.type as Model)) {
           context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
         }
+        updateUsageOfModel(context, UsageFlags.Input, sdkType, {skipFirst: true});
+      } else {
+        updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }
-      updateUsageOfModel(context, UsageFlags.Input, sdkType);
+
       if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
         updateUsageOfModel(context, UsageFlags.Json, sdkType);
       }
@@ -1688,9 +1684,11 @@ function updateAccessOfModel(context: TCGCContext): void {
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   for (const sdkType of context.spreadModels?.values() ?? []) {
-    // if a type has spread usage, then it must be internal
-    sdkType.access = "internal";
-    sdkType.usage = (sdkType.usage & ~UsageFlags.Input) | UsageFlags.Spread;
+    sdkType.usage |= UsageFlags.Spread;
+    if ((sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) === 0) {
+      // if a type has spread usage, but not used in any other operation, then set it to be internal
+      sdkType.access = "internal";
+    }
   }
 }
 
