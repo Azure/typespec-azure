@@ -183,7 +183,7 @@ def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[Ex
 <TabItem value="java" label="Java">
 
 ```java
-public SyncPoller<BinaryData, BinaryData> beginExport(String name, String format, RequestOptions requestOptions);
+public SyncPoller<PollOperationDetails, ExportedUser> beginExport(String name, String format);
 ```
 
 </TabItem>
