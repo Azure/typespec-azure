@@ -1137,7 +1137,7 @@ export const $override = (
     });
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope); // eslint-disable-line deprecation/deprecation
-}
+};
 
 /**
  * Gets additional information on how to serialize / deserialize TYPESPEC standard types depending
