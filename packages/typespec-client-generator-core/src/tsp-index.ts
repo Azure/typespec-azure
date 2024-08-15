@@ -13,6 +13,7 @@ import {
   $override,
   $protocolAPI,
   $usage,
+  $useSystemTextJsonConverter,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -39,5 +40,6 @@ export const $decorators = {
     // eslint-disable-next-line deprecation/deprecation
     flattenProperty: $flattenProperty,
     override: $override,
+    useSystemTextJsonConverter: $useSystemTextJsonConverter,
   } as AzureClientGeneratorCoreDecorators,
 };

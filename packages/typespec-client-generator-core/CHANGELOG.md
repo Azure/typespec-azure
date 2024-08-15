@@ -1,5 +1,34 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.3
+
+### Bug Fixes
+
+- [#1328](https://github.com/Azure/typespec-azure/pull/1328) change example file path to relative file path
+- [#1338](https://github.com/Azure/typespec-azure/pull/1338) consider scope when find service of a client
+- [#1376](https://github.com/Azure/typespec-azure/pull/1376) no need to add access override along with usage override for orphan model
+
+### Features
+
+- [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
+
+
+## 0.45.2
+
+### Bug Fixes
+
+- [#1336](https://github.com/Azure/typespec-azure/pull/1336) Add `@hasJsonConverter` for csharp only to indicate if JSON converter is needed
+- [#1350](https://github.com/Azure/typespec-azure/pull/1350) Bug fix for encode as string on ModelProperty.
+- [#1343](https://github.com/Azure/typespec-azure/pull/1343) Add generic parameter inputs to `SdkUnionType` to clearly define the union types of `endpoint` and `credential` params
+
+
+## 0.45.1
+
+### Bug Fixes
+
+- [#1330](https://github.com/Azure/typespec-azure/pull/1330) Fix collectionFormat for "csv"
+
+
 ## 0.45.0
 
 ### Bug Fixes
