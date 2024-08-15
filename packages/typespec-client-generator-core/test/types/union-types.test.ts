@@ -484,6 +484,7 @@ describe("typespec-client-generator-core: union types", () => {
   it("usage override", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
+      @access(Access.public)
       union UnionAsEnum {
         "A",
         "B",
