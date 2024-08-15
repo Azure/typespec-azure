@@ -2328,7 +2328,6 @@ describe("typespec-client-generator-core: decorators", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           enum Enum1{
             one,
             two,
@@ -2344,7 +2343,6 @@ describe("typespec-client-generator-core: decorators", () => {
 
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Model1{ prop: string }
 
           @test

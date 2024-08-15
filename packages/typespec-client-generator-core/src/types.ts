@@ -1709,10 +1709,8 @@ function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Unio
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
     updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType);
   }
-  if (getAccessOverride(context, type) !== undefined) {
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-    updateUsageOfModel(context, UsageFlags.None, sdkType);
-  }
+  const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
+  updateUsageOfModel(context, UsageFlags.None, sdkType);
 }
 
 function verifyNoConflictingMultipartModelUsage(
