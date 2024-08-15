@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.3
+
+### Bug Fixes
+
+- [#1328](https://github.com/Azure/typespec-azure/pull/1328) change example file path to relative file path
+- [#1338](https://github.com/Azure/typespec-azure/pull/1338) consider scope when find service of a client
+- [#1376](https://github.com/Azure/typespec-azure/pull/1376) no need to add access override along with usage override for orphan model
+
+### Features
+
+- [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
+
+
 ## 0.45.2
 
 ### Bug Fixes
