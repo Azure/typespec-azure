@@ -1,4 +1,4 @@
-import { expectDiagnostics, resolveVirtualPath } from "@typespec/compiler/testing";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
@@ -10,7 +10,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-java",
-      "examples-directory": `./examples`,
+      "examples-dir": `./examples`,
     });
   });
 
@@ -34,7 +34,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples[0].kind, "http");
     strictEqual(operation.examples[0].name, "simple description");
     strictEqual(operation.examples[0].description, "simple description");
-    strictEqual(operation.examples[0].filePath, resolveVirtualPath("./examples/simple.json"));
+    strictEqual(operation.examples[0].filePath, "simple.json");
     deepStrictEqual(operation.examples[0].rawExample, {
       operationId: "simple",
       title: "simple description",

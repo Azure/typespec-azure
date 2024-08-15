@@ -14,7 +14,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           prop: utcDateTime;
         }
@@ -30,7 +29,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DateTimeKnownEncoding.rfc3339)
           prop: utcDateTime;
@@ -47,7 +45,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DateTimeKnownEncoding.rfc7231)
           prop: utcDateTime;
@@ -65,7 +62,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: unixTimestamp32;
       }
@@ -83,7 +79,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DateTimeKnownEncoding.unixTimestamp, int64)
           value: utcDateTime;
@@ -107,7 +102,6 @@ describe("typespec-client-generator-core: date-time types", () => {
         scalar extraLayerDateTime extends unixTimestampDatetime;
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           value: extraLayerDateTime;
         }
@@ -135,7 +129,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DateTimeKnownEncoding.unixTimestamp, int64)
           value: utcDateTime | null;
@@ -160,7 +153,6 @@ describe("typespec-client-generator-core: date-time types", () => {
         scalar unixTimestampDateTime extends utcDateTime;
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           value: unixTimestampDateTime[];
         }

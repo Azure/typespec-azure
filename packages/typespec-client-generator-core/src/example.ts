@@ -2,7 +2,6 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
-  SourceFile,
   createDiagnosticCollector,
   resolvePath,
 } from "@typespec/compiler";
@@ -40,7 +39,6 @@ import { createDiagnostic } from "./lib.js";
 
 interface LoadedExample {
   readonly relativePath: string;
-  readonly file: SourceFile;
   readonly data: any;
 }
 
@@ -57,13 +55,13 @@ async function loadExamples(
   apiVersion: string | undefined
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
-  if (!context.examplesDirectory) {
+  if (!context.examplesDir) {
     return diagnostics.wrap(new Map());
   }
 
   const exampleDir = apiVersion
-    ? resolvePath(context.examplesDirectory, apiVersion)
-    : resolvePath(context.examplesDirectory);
+    ? resolvePath(context.examplesDir, apiVersion)
+    : resolvePath(context.examplesDir);
   try {
     if (!(await context.program.host.stat(exampleDir)).isDirectory())
       return diagnostics.wrap(new Map());
@@ -117,8 +115,7 @@ async function loadExamples(
       }
 
       examples[example.title] = {
-        relativePath: fileName,
-        file: exampleFile,
+        relativePath: apiVersion ? resolvePath(apiVersion, fileName) : fileName,
         data: example,
       };
     } catch (err) {
@@ -197,7 +194,7 @@ function handleHttpOperationExamples(
       kind: "http",
       name: title,
       description: title,
-      filePath: example.file.path,
+      filePath: example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
           operation.bodyParam

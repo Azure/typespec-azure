@@ -51,7 +51,7 @@ export interface TCGCContext {
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
-  examplesDirectory?: string;
+  examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
 }
@@ -71,7 +71,11 @@ export interface SdkEmitterOptions {
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
+  /**
+   * @deprecated Use `examples-dir` instead.
+   */
   "examples-directory"?: string;
+  "examples-dir"?: string;
 }
 
 export interface SdkClient {
