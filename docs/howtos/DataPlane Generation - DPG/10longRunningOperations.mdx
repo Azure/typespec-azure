@@ -61,7 +61,7 @@ op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User
 <TabItem value="java" label="Java">
 
 ```java
-
+public SyncPoller<PollOperationDetails, User> beginCreateOrReplace(String name, User resource);
 ```
 
 </TabItem>
@@ -107,7 +107,7 @@ op delete is ResourceOperations.LongRunningResourceDelete<User>;
 <TabItem value="java" label="Java">
 
 ```java
-
+public SyncPoller<PollOperationDetails, Void> beginDelete(String name);
 ```
 
 </TabItem>
@@ -181,7 +181,7 @@ op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams
 <TabItem value="java" label="Java">
 
 ```java
-
+public SyncPoller<BinaryData, BinaryData> beginExport(String name, String format, RequestOptions requestOptions);
 ```
 
 </TabItem>
