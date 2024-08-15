@@ -320,6 +320,24 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(dog.discriminatorProperty, dogKindProperty);
   });
 
+  it("anonymous model contains template", async () => {
+    await runner.compileWithBuiltInService(`
+
+      model Name {
+        name: string;
+      }
+      model ModelTemplate<T> {
+        prop: T
+      }
+
+      op test(): {prop: ModelTemplate<Name>};
+      `);
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    const modelNames = models.map((model) => model.name).sort();
+    deepStrictEqual(modelNames, ["TestResponse", "Name", "ModelTemplateName"].sort());
+  });
+
   it("union to extensible enum values", async () => {
     await runner.compileWithBuiltInService(`
       union PetKind {
