@@ -1106,12 +1106,12 @@ function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProp
   );
 }
 
-export function $override(
+export const $override = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
   scope?: LanguageScopes
-) {
+) => {
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name)
