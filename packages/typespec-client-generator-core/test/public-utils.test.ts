@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,

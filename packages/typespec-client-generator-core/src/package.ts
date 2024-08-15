@@ -135,12 +135,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters
-          )
+        getSdkServiceOperation<TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters
         )
+      )
       : undefined,
     getResponseMapping(): string | undefined {
       return basic.response.resultPath;
@@ -257,6 +257,8 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
+    doc: getDoc(context.program, operation),
+    summary: getSummary(context.program, operation),
     operation: serviceOperation,
     response,
     apiVersions,
@@ -340,6 +342,7 @@ function getSdkInitializationType(
   return diagnostics.wrap({
     __raw: client.service,
     description: "Initialization class for the client",
+    doc: "Initialization class for the client",
     kind: "model",
     properties,
     name,
@@ -370,6 +373,8 @@ function getSdkMethodParameter(
       kind: "method",
       description: getDocHelper(context, type).description,
       details: getDocHelper(context, type).details,
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
       apiVersions,
       type: propertyType,
       name,
@@ -411,6 +416,8 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       name,
       description: getDocHelper(context, operationGroup.type).description,
       details: getDocHelper(context, operationGroup.type).details,
+      doc: getDoc(context.program, operationGroup.type),
+      summary: getSummary(context.program, operationGroup.type),
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
@@ -436,6 +443,7 @@ function getEndpointTypeFromSingleServer(
         name: "endpoint",
         isGeneratedName: true,
         description: "Service host",
+        doc: "Service host",
         kind: "path",
         onClient: true,
         urlEncode: false,
@@ -535,6 +543,7 @@ function getSdkEndpointParameter(
     name: "endpoint",
     isGeneratedName: true,
     description: "Service host",
+    doc: "Service host",
     onClient: true,
     urlEncode: false,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,

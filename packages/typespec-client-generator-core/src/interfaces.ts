@@ -565,12 +565,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
   description?: string;
-  doc?: string;
-  summary?: string;
 }
 
 interface SdkServiceOperationBase {}

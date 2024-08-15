@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -339,7 +338,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
-      strictEqual(templateArg.description, undefined);
+      strictEqual(templateArg.description, undefined); // eslint-disable-line deprecation/deprecation
+      strictEqual(templateArg.doc, undefined);
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"

@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { isReadOnly } from "../../src/types.js";

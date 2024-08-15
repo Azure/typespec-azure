@@ -172,8 +172,10 @@ describe("typespec-client-generator-core: date-time types", () => {
     strictEqual(sdkType.valueType.name, "unixTimestampDateTime");
     strictEqual(sdkType.valueType.encode, "unixTimestamp");
     strictEqual(sdkType.valueType.wireType?.kind, "int64");
-    strictEqual(sdkType.valueType.description, "title");
-    strictEqual(sdkType.valueType.details, "doc");
+    strictEqual(sdkType.valueType.description, "title"); // eslint-disable-line deprecation/deprecation
+    strictEqual(sdkType.valueType.details, "doc"); // eslint-disable-line deprecation/deprecation
+    strictEqual(sdkType.valueType.doc, "doc");
+    strictEqual(sdkType.valueType.summary, "title");
     strictEqual(sdkType.valueType.crossLanguageDefinitionId, "TestService.unixTimestampDateTime");
     strictEqual(sdkType.valueType.baseType?.kind, "utcDateTime");
     strictEqual(sdkType.valueType.baseType.wireType.kind, "string");
