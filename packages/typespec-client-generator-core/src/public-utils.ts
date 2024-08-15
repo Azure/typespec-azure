@@ -170,7 +170,12 @@ export function getLibraryName(
   if (friendlyName) return friendlyName;
 
   // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
-  if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
+  if (
+    typeof type.name === "string" &&
+    type.name !== "" &&
+    type.kind === "Model" &&
+    type.templateMapper?.args
+  ) {
     return (
       type.name +
       type.templateMapper.args
