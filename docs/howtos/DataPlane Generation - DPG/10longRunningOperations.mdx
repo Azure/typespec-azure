@@ -37,7 +37,9 @@ op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User
 <TabItem value="python" label="Python">
 
 ```python
-
+def begin_create_or_replace(
+    self, name: str, resource: Union[User, JSON, IO[bytes]], **kwargs: Any
+) -> LROPoller[User]
 ```
 
 </TabItem>
@@ -83,7 +85,7 @@ op delete is ResourceOperations.LongRunningResourceDelete<User>;
 <TabItem value="python" label="Python">
 
 ```python
-
+def begin_delete(self, name: str, **kwargs: Any) -> LROPoller[None]
 ```
 
 </TabItem>
@@ -157,7 +159,7 @@ op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams
 <TabItem value="python" label="Python">
 
 ```python
-
+def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[ExportedUser]
 ```
 
 </TabItem>
