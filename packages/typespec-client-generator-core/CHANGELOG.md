@@ -1,13 +1,5 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-## 0.45.3
-
-### Bug Fixes
-
-- [#1338](https://github.com/Azure/typespec-azure/pull/1338) consider scope when find service of a client
-- [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
-
-
 ## 0.45.2
 
 ### Bug Fixes
