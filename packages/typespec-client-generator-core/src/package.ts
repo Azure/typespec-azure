@@ -135,12 +135,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-        getSdkServiceOperation<TServiceOperation>(
-          context,
-          pagedMetadata.nextLinkOperation,
-          basic.parameters
+          getSdkServiceOperation<TServiceOperation>(
+            context,
+            pagedMetadata.nextLinkOperation,
+            basic.parameters
+          )
         )
-      )
       : undefined,
     getResponseMapping(): string | undefined {
       return basic.response.resultPath;
