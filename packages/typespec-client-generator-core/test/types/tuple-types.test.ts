@@ -14,7 +14,6 @@ describe("typespec-client-generator-core: tuple types", () => {
         @service({})
         namespace MyService;
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model MyFlow {
           scopes: ["https://security.microsoft.com/.default"];
           test: [int32, string]

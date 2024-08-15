@@ -13,7 +13,6 @@ describe("typespec-client-generator-core: constant types", () => {
   it("string", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           prop: "json";
         }
@@ -29,7 +28,6 @@ describe("typespec-client-generator-core: constant types", () => {
   it("boolean", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @test prop: true;
         }
@@ -45,7 +43,6 @@ describe("typespec-client-generator-core: constant types", () => {
   it("number", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @test prop: 4;
         }
