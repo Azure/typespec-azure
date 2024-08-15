@@ -77,3 +77,4 @@ packages/samples/common-types/**/*.json
 
 # Client emitters not part of workspace that shouldn't be needed in this repo
 core/packages/http-client-csharp/
+core/packages/http-client-java/
