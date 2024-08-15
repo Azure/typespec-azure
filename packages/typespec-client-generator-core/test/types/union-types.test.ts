@@ -491,6 +491,7 @@ describe("typespec-client-generator-core: union types", () => {
       }
 
       @usage(Usage.input | Usage.output)
+      @access(Access.public)
       model Foo {
         prop: string;
       }
