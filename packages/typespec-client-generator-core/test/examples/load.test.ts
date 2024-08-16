@@ -10,8 +10,51 @@ describe("typespec-client-generator-core: load examples", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-java",
+      "examples-dir": `./examples`,
+    });
+  });
+
+  it("example config", async () => {
+    runner = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-java",
       "examples-directory": `./examples`,
     });
+
+    await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op get(): string;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples![0].filePath, "get.json");
+  });
+
+  it("example default config", async () => {
+    runner = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op get(): string;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples![0].filePath, "get.json");
   });
 
   it("no example folder found", async () => {
@@ -41,6 +84,7 @@ describe("typespec-client-generator-core: load examples", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples![0].filePath, "get.json");
   });
 
   it("load example with version", async () => {
@@ -64,6 +108,7 @@ describe("typespec-client-generator-core: load examples", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples![0].filePath, "v3/get.json");
   });
 
   it("load multiple example for one operation", async () => {
@@ -84,6 +129,8 @@ describe("typespec-client-generator-core: load examples", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 2);
+    strictEqual(operation.examples![0].filePath, "get.json");
+    strictEqual(operation.examples![1].filePath, "getAnother.json");
   });
 
   it("load example with client customization", async () => {

@@ -1,8 +1,8 @@
 import {
+  CompilerHost,
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
-  SourceFile,
   createDiagnosticCollector,
   resolvePath,
 } from "@typespec/compiler";
@@ -40,8 +40,15 @@ import { createDiagnostic } from "./lib.js";
 
 interface LoadedExample {
   readonly relativePath: string;
-  readonly file: SourceFile;
   readonly data: any;
+}
+
+async function checkExamplesDirExists(host: CompilerHost, dir: string) {
+  try {
+    return (await host.stat(dir)).isDirectory();
+  } catch (err) {
+    return false;
+  }
 }
 
 /**
@@ -57,25 +64,23 @@ async function loadExamples(
   apiVersion: string | undefined
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
-  if (!context.examplesDirectory) {
-    return diagnostics.wrap(new Map());
-  }
+  const examplesBaseDir =
+    context.examplesDir ?? resolvePath(context.program.projectRoot, "examples");
 
   const exampleDir = apiVersion
-    ? resolvePath(context.examplesDirectory, apiVersion)
-    : resolvePath(context.examplesDirectory);
-  try {
-    if (!(await context.program.host.stat(exampleDir)).isDirectory())
-      return diagnostics.wrap(new Map());
-  } catch (err) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "example-loading",
-        messageId: "noDirectory",
-        format: { directory: exampleDir },
-        target: NoTarget,
-      })
-    );
+    ? resolvePath(examplesBaseDir, apiVersion)
+    : resolvePath(examplesBaseDir);
+  if (!(await checkExamplesDirExists(context.program.host, exampleDir))) {
+    if (context.examplesDir) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "noDirectory",
+          format: { directory: exampleDir },
+          target: NoTarget,
+        })
+      );
+    }
     return diagnostics.wrap(new Map());
   }
 
@@ -117,8 +122,7 @@ async function loadExamples(
       }
 
       examples[example.title] = {
-        relativePath: fileName,
-        file: exampleFile,
+        relativePath: apiVersion ? resolvePath(apiVersion, fileName) : fileName,
         data: example,
       };
     } catch (err) {
@@ -197,7 +201,7 @@ function handleHttpOperationExamples(
       kind: "http",
       name: title,
       description: title,
-      filePath: example.file.path,
+      filePath: example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
           operation.bodyParam

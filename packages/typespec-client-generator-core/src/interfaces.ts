@@ -51,7 +51,7 @@ export interface TCGCContext {
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
-  examplesDirectory?: string;
+  examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
 }
@@ -71,7 +71,11 @@ export interface SdkEmitterOptions {
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
+  /**
+   * @deprecated Use `examples-dir` instead.
+   */
   "examples-directory"?: string;
+  "examples-dir"?: string;
 }
 
 export interface SdkClient {
@@ -360,11 +364,11 @@ export interface SdkConstantType extends SdkTypeBase {
   isGeneratedName: boolean;
 }
 
-export interface SdkUnionType extends SdkTypeBase {
+export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
   kind: "union";
-  values: SdkType[];
+  values: TValueType[];
   crossLanguageDefinitionId: string;
 }
 
@@ -421,12 +425,12 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType | SdkUnionType;
+  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
   kind: "credential";
-  type: SdkCredentialType | SdkUnionType; // union of credentials
+  type: SdkCredentialType | SdkUnionType<SdkCredentialType>;
   onClient: true;
 }
 
@@ -466,7 +470,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   flatten: boolean;
 }
 
-export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
 export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
@@ -480,11 +484,19 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
+  explode: boolean;
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
+  /**
+   * @deprecated This property is deprecated. Use `allowReserved` instead.
+   * @param serviceParam
+   */
   urlEncode: boolean;
+  explode: boolean;
+  style: "simple" | "label" | "matrix" | "fragment" | "path";
+  allowReserved: boolean;
   serializedName: string;
   optional: false;
   correspondingMethodParams: SdkModelPropertyType[];
@@ -544,6 +556,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
   kind: "http";
   path: string;
+  uriTemplate: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
