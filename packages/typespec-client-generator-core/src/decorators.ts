@@ -41,7 +41,6 @@ import {
   ExcludeDecorator,
   FlattenPropertyDecorator,
   IncludeDecorator,
-  InternalDecorator,
   OperationGroupDecorator,
   ProtocolAPIDecorator,
   UsageDecorator,
@@ -827,57 +826,6 @@ export function getClientFormat(
   }
 
   return retval;
-}
-const internalKey = createStateSymbol("internal");
-
-/**
- * Whether a operation is internal and should not be exposed
- * to end customers
- *
- * @param context DecoratorContext
- * @param target Operation to mark as internal
- * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
- * @deprecated Use `access` decorator instead.
- *
- * @internal
- */
-export const $internal: InternalDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  scope?: LanguageScopes
-) => {
-  setScopedDecoratorData(context, $internal, internalKey, target, true, scope); // eslint-disable-line deprecation/deprecation
-};
-
-/**
- * Whether a model / operation is internal or not. If it's internal, emitters
- * should not expose them to users
- *
- * @param context TCGCContext
- * @param entity model / operation that we want to check is internal or not
- * @returns whether the entity is internal
- * @deprecated This function is unused and will be removed in a future release.
- */
-export function isInternal(
-  context: TCGCContext,
-  entity: Model | Operation | Enum | Union
-): boolean {
-  const found = getScopedDecoratorData(context, internalKey, entity) ?? false;
-  if (entity.kind === "Operation" || found) {
-    return found;
-  }
-  const operationModels = context.operationModelsMap!;
-  let referredByInternal = false;
-  for (const [operation, modelMap] of operationModels) {
-    // eslint-disable-next-line deprecation/deprecation
-    if (isInternal(context, operation) && modelMap.get(entity)) {
-      referredByInternal = true;
-      // eslint-disable-next-line deprecation/deprecation
-    } else if (!isInternal(context, operation) && modelMap.get(entity)) {
-      return false;
-    }
-  }
-  return referredByInternal;
 }
 
 const usageKey = createStateSymbol("usage");

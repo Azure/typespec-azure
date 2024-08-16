@@ -147,22 +147,6 @@ alias ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
 extern dec clientFormat(target: ModelProperty, value: valueof ClientFormat);
 
 /**
- * DEPRECATED: Use `@access` decorator instead.
- *
- * Whether to mark an operation as internal for specific languages,
- * meaning it should not be exposed to end SDK users
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
- * @example
- * ```typespec
- * @internal("python")
- * op test: void;
- * ```
- */
-#deprecated "@internal decorator is deprecated. Use `@access` decorator instead."
-extern dec internal(target: Operation, scope?: valueof string);
-
-/**
  * Usage value.
  */
 enum Usage {

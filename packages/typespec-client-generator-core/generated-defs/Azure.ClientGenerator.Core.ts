@@ -178,25 +178,6 @@ export type ClientFormatDecorator = (
 ) => void;
 
 /**
- * DEPRECATED: Use `@access` decorator instead.
- *
- * Whether to mark an operation as internal for specific languages,
- * meaning it should not be exposed to end SDK users
- *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- * @example
- * ```typespec
- * @_internal("python")
- * op test: void;
- * ```
- */
-export type InternalDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  scope?: string
-) => void;
-
-/**
  * Expand usage for models/enums.
  * A model/enum's default usage info is always calculated by the operations that use it.
  * You could use this decorator to expand the default usage info.
@@ -516,7 +497,6 @@ export type AzureClientGeneratorCoreDecorators = {
   exclude: ExcludeDecorator;
   include: IncludeDecorator;
   clientFormat: ClientFormatDecorator;
-  internal: InternalDecorator;
   usage: UsageDecorator;
   access: AccessDecorator;
   flattenProperty: FlattenPropertyDecorator;

@@ -2217,11 +2217,6 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(getAccess(runner.context, ModelE), "public");
       strictEqual(getAccess(runner.context, ModelF), "public");
       strictEqual(getAccess(runner.context, EnumA), "public");
-
-      strictEqual(runner.context.operationModelsMap?.get(func1)?.size, 3);
-      strictEqual(runner.context.operationModelsMap?.get(func2)?.size, 3);
-      strictEqual(runner.context.operationModelsMap?.get(func3)?.size, 8);
-      strictEqual(runner.context.operationModelsMap?.get(func4)?.size, 8);
     });
 
     it("access propagation with override", async () => {

@@ -32,7 +32,6 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(models.length, 1);
     const model = models[0];
     strictEqual(model.kind, "model");
-    strictEqual(model.isFormDataType, true);
     ok((model.usage & UsageFlags.MultipartFormData) > 0);
     strictEqual(model.name, "MultiPartRequest");
     strictEqual(model.properties.length, 2);
@@ -56,12 +55,11 @@ describe("typespec-client-generator-core: multipart types", () => {
           profileImage: bytes;
         }
   
-        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
         @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
       `
     );
-    const [_, diagnostics] = getAllModelsWithDiagnostics(runner.context);
-    expectDiagnostics(diagnostics, {
+    expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
     });
   });
@@ -85,7 +83,6 @@ describe("typespec-client-generator-core: multipart types", () => {
     const modelA = models.find((x) => x.name === "MultipartOperationRequest");
     ok(modelA);
     strictEqual(modelA.kind, "model");
-    strictEqual(modelA.isFormDataType, true);
     strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Spread);
     strictEqual(modelA.properties.length, 1);
     const modelAProp = modelA.properties[0];
@@ -97,7 +94,6 @@ describe("typespec-client-generator-core: multipart types", () => {
     const modelB = models.find((x) => x.name === "NormalOperationRequest");
     ok(modelB);
     strictEqual(modelB.kind, "model");
-    strictEqual(modelB.isFormDataType, false);
     strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
     strictEqual(modelB.properties.length, 1);
     strictEqual(modelB.properties[0].type.kind, "bytes");
@@ -186,13 +182,11 @@ describe("typespec-client-generator-core: multipart types", () => {
 
     const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
     ok(pictureWrapper);
-    strictEqual(pictureWrapper.isFormDataType, true);
     ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
     const errorResponse = models.find((x) => x.name === "ErrorResponse");
     ok(errorResponse);
     strictEqual(errorResponse.kind, "model");
-    strictEqual(errorResponse.isFormDataType, false);
     ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
   });
 

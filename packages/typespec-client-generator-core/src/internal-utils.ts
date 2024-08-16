@@ -445,14 +445,6 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
   );
 }
 
-export function isMultipartFormData(
-  context: TCGCContext,
-  type: Type,
-  operation?: Operation
-): boolean {
-  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
-}
-
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
   return Boolean(context.arm) && parameter.name === "subscriptionId";
 }

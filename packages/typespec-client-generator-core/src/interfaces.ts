@@ -35,7 +35,6 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
@@ -140,6 +139,7 @@ interface SdkTypeBase extends DecoratedType {
   deprecation?: string;
   description?: string;
   details?: string;
+  __accessSet?: boolean;
 }
 
 export type SdkType =
@@ -378,10 +378,6 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
-  /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
-   */
-  isFormDataType: boolean;
   isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
