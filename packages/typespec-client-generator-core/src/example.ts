@@ -1,4 +1,5 @@
 import {
+  CompilerHost,
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
@@ -42,6 +43,14 @@ interface LoadedExample {
   readonly data: any;
 }
 
+async function checkExamplesDirExists(host: CompilerHost, dir: string) {
+  try {
+    return (await host.stat(dir)).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
 /**
  * Load all examples for a client
  *
@@ -55,25 +64,20 @@ async function loadExamples(
   apiVersion: string | undefined
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
-  if (!context.examplesDir) {
-    return diagnostics.wrap(new Map());
-  }
+  const examplesBaseDir = context.examplesDir ?? resolvePath(context.program.projectRoot, "examples");
 
-  const exampleDir = apiVersion
-    ? resolvePath(context.examplesDir, apiVersion)
-    : resolvePath(context.examplesDir);
-  try {
-    if (!(await context.program.host.stat(exampleDir)).isDirectory())
-      return diagnostics.wrap(new Map());
-  } catch (err) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "example-loading",
-        messageId: "noDirectory",
-        format: { directory: exampleDir },
-        target: NoTarget,
-      })
-    );
+  const exampleDir = apiVersion ? resolvePath(examplesBaseDir, apiVersion) : resolvePath(examplesBaseDir);
+  if (!(await checkExamplesDirExists(context.program.host, exampleDir))) {
+    if (context.examplesDir) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "noDirectory",
+          format: { directory: exampleDir },
+          target: NoTarget,
+        })
+      );
+    }
     return diagnostics.wrap(new Map());
   }
 
