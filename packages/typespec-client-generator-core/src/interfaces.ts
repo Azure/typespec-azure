@@ -90,17 +90,13 @@ export interface SdkClient {
   crossLanguageDefinitionId: string;
 }
 
-export interface SdkInitializationType extends SdkModelType {
-  properties: SdkParameter[];
-}
-
 export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
   kind: "client";
   name: string;
   description?: string;
   details?: string;
-  initialization: SdkInitializationType;
+  initialization: SdkModelType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified

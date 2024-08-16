@@ -13,6 +13,7 @@ import { resolveVersions } from "@typespec/versioning";
 import { camelCase } from "change-case";
 import {
   getAccess,
+  getClientInitialization,
   getClientNameOverride,
   getOverriddenClientMethod,
   listClients,
@@ -28,7 +29,6 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkEnumType,
-  SdkInitializationType,
   SdkLroPagingServiceMethod,
   SdkLroServiceMethod,
   SdkMethod,
@@ -39,7 +39,6 @@ import {
   SdkOperationGroup,
   SdkPackage,
   SdkPagingServiceMethod,
-  SdkParameter,
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
@@ -75,6 +74,7 @@ import {
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
+  getSdkModel,
   getSdkModelPropertyType,
   getTypeSpecBuiltInType,
 } from "./types.js";
@@ -309,14 +309,37 @@ function getClientDefaultApiVersion(
 function getSdkInitializationType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup
-): [SdkInitializationType, readonly Diagnostic[]] {
+): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const credentialParam = getSdkCredentialParameter(context, client);
-  const properties: SdkParameter[] = [
-    diagnostics.pipe(getSdkEndpointParameter(context, client)), // there will always be an endpoint parameter
-  ];
+  let initializationModel: SdkModelType | undefined;
+  const initializationDecorator = getClientInitialization(context, client.type);
+  if (initializationDecorator) {
+    initializationModel = getSdkModel(context, initializationDecorator);
+  } else {
+    const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
+    const name = `${namePrefix.split(".").at(-1)}Options`;
+    initializationModel = {
+      __raw: client.service,
+      description: "Initialization class for the client",
+      kind: "model",
+      properties: [],
+      name,
+      isGeneratedName: true,
+      access: client.kind === "SdkClient" ? "public" : "internal",
+      usage: UsageFlags.Input,
+      crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
+      apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+      isFormDataType: false,
+      decorators: [],
+    }
+  }
+
+  // there will always be an endpoint property
+  initializationModel.properties.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
+
   if (credentialParam) {
-    properties.push(credentialParam);
+    initializationModel.properties.push(credentialParam);
   }
   let apiVersionParam = context.__namespaceToApiVersionParameter.get(client.type);
   if (!apiVersionParam) {
@@ -328,28 +351,12 @@ function getSdkInitializationType(
     }
   }
   if (apiVersionParam) {
-    properties.push(apiVersionParam);
+    initializationModel.properties.push(apiVersionParam);
   }
   if (context.__subscriptionIdParameter) {
-    properties.push(context.__subscriptionIdParameter);
+    initializationModel.properties.push(context.__subscriptionIdParameter);
   }
-  const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
-  const name = `${namePrefix.split(".").at(-1)}Options`;
-  return diagnostics.wrap({
-    __raw: client.service,
-    description: "Initialization class for the client",
-    kind: "model",
-    properties,
-    name,
-    isGeneratedName: true,
-    access: client.kind === "SdkClient" ? "public" : "internal",
-    usage: UsageFlags.Input,
-    crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    isFormDataType: false,
-    isError: false,
-    decorators: [],
-  });
+  return diagnostics.wrap(initializationModel);
 }
 
 function getSdkMethodParameter(

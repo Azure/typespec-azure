@@ -1159,3 +1159,22 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   entity: Model,
   scope?: LanguageScopes
 ) => {};
+
+
+const clientInitializationKey = createStateSymbol("clientInitialization");
+
+export const $clientInitialization: DecoratorFunction = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  options: Model,
+  scope?: LanguageScopes
+) => {
+  setScopedDecoratorData(context, $override, clientInitializationKey, target, options, scope);
+};
+
+export function getClientInitialization(
+  context: TCGCContext,
+  entity: Namespace | Interface
+): Model | undefined {
+  return getScopedDecoratorData(context, clientInitializationKey, entity);
+}
