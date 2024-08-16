@@ -1089,7 +1089,7 @@ describe("typespec-client-generator-core: package", () => {
       );
       const sdkPackage = runner.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 2);
+      strictEqual(sdkPackage.models.length, 3);
       strictEqual(method.name, "create");
       const serviceResponses = method.operation.responses;
       strictEqual(serviceResponses.size, 1);
@@ -1286,13 +1286,13 @@ describe("typespec-client-generator-core: package", () => {
       const bodyParameter = method.operation.bodyParam;
       ok(bodyParameter);
       strictEqual(bodyParameter.kind, "body");
-      strictEqual(bodyParameter.name, "widget");
+      strictEqual(bodyParameter.name, "createRequest");
       strictEqual(bodyParameter.onClient, false);
       strictEqual(bodyParameter.optional, false);
       strictEqual(bodyParameter.type.kind, "model");
-      strictEqual(bodyParameter.type.name, "Widget");
-      strictEqual(bodyParameter.type.properties.length, 3);
-      strictEqual(bodyParameter.correspondingMethodParams.length, 3);
+      strictEqual(bodyParameter.type.name, "CreateRequest");
+      strictEqual(bodyParameter.type.properties.length, 2);
+      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
 
       strictEqual(method.operation.parameters.length, 2);
 
@@ -1444,7 +1444,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.type.kind, "model");
       strictEqual(
         bodyParameter.type,
-        sdkPackage.models.filter((m) => m.name === "Widget")[0]
+        sdkPackage.models.filter((m) => m.name === "UpdateRequest")[0]
       );
 
       const headerParams = serviceOperation.parameters.filter(
@@ -1463,7 +1463,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(operationAcceptParam.optional, false);
 
       const correspondingMethodParams = bodyParameter.correspondingMethodParams.map((x) => x.name);
-      deepStrictEqual(correspondingMethodParams, ["id", "weight", "color"]);
+      deepStrictEqual(correspondingMethodParams, ["weight", "color"]);
 
       strictEqual(operationContentTypeParam.correspondingMethodParams[0], methodContentTypeParam);
       strictEqual(operationAcceptParam.correspondingMethodParams[0], methodAcceptParam);
@@ -2769,9 +2769,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(bodyParameter.type.usage, UsageFlags.Spread | UsageFlags.Json);
       strictEqual(bodyParameter.type.access, "internal");
 
-      strictEqual(bodyParameter.correspondingMethodParams.length, 2);
-      deepStrictEqual(bodyParameter.correspondingMethodParams[0], a);
-      deepStrictEqual(bodyParameter.correspondingMethodParams[1], b);
+      strictEqual(bodyParameter.correspondingMethodParams.length, 1);
+      deepStrictEqual(bodyParameter.correspondingMethodParams[0], b);
     });
 
     it("explicit multiple spread", async () => {

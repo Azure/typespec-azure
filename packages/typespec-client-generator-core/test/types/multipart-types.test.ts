@@ -255,8 +255,8 @@ describe("typespec-client-generator-core: multipart types", () => {
     const formDataBodyParam = formDataOp.bodyParam;
     ok(formDataBodyParam);
     strictEqual(formDataBodyParam.type.kind, "model");
-    strictEqual(formDataBodyParam.type.name, "WidgetForm");
-    strictEqual(formDataBodyParam.correspondingMethodParams.length, 5);
+    strictEqual(formDataBodyParam.type.name, "UploadRequest");
+    strictEqual(formDataBodyParam.correspondingMethodParams.length, 4);
   });
 
   it("usage doesn't apply to properties of a form data", async function () {

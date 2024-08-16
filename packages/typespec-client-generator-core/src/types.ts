@@ -1345,15 +1345,15 @@ export function getSdkModelPropertyType(
     isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
   };
-  if (operation) {
+  if (operation && type.model) {
     const httpOperation = getHttpOperationWithCache(context, operation);
-    if (
-      type.model &&
-      httpOperation.parameters.body &&
-      httpOperation.parameters.body.type.node === type.model.node
-    ) {
-      // only add multipartOptions for property of multipart body
-      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    const httpBody = httpOperation.parameters.body;
+    if (httpBody) {
+      const httpBodyType = isHttpBodySpread(httpBody, operation.parameters) ? getHttpBodySpreadModel(httpBody.type as Model): httpBody.type;
+      if (type.model === httpBodyType){
+        // only try to add multipartOptions for property of body
+        diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+      }
     }
   }
   return diagnostics.wrap(result);

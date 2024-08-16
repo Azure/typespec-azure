@@ -549,25 +549,13 @@ export function isXmlContentType(contentType: string): boolean {
 }
 
 /**
- * If body is from spread, then it should be an anonymous model.
- * Also all model properties should be
- * either equal to one of operation parameters (for case spread from model without property with metadata decorator)
- * or its source property equal to one of operation parameters (for case spread from model with property with metadata decorator)
+ * If body is from spread, then it does not directly from a model property.
  * @param httpBody 
  * @param parameters 
  * @returns 
  */
 export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody, parameters: Model) {
-  return httpBody.type.kind === "Model" &&
-    httpBody.type.name === "" &&
-    [...httpBody.type.properties.keys()].every(
-      (k) =>
-        parameters.properties.has(k) &&
-        (parameters.properties.get(k) ===
-          (httpBody.type as Model).properties.get(k) ||
-          parameters.properties.get(k) ===
-          (httpBody.type as Model).properties.get(k)?.sourceProperty)
-    )
+  return httpBody.property === undefined;
 }
 
 /**
@@ -579,11 +567,11 @@ export function getHttpBodySpreadModel(type: Model): Model {
   if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
     const innerModel = type.sourceModels[0].model;
     // for case: `op test(...Model):void`;
-    if (innerModel.name !== "") {
+    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
       return innerModel;
     }
     // for case: `op test(@header h: string, @query q: string, ...Model): void`;
-    if (innerModel.sourceModels.length === 1 && innerModel.sourceModels[0].usage === "spread" && innerModel.sourceModels[0].model.name !== "") {
+    if (innerModel.sourceModels.length === 1 && innerModel.sourceModels[0].usage === "spread" && innerModel.sourceModels[0].model.name !== "" && innerModel.sourceModels[0].model.properties.size === type.properties.size) {
       return innerModel.sourceModels[0].model;
     }
   }
