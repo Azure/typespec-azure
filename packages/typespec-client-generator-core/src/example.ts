@@ -64,9 +64,12 @@ async function loadExamples(
   apiVersion: string | undefined
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
-  const examplesBaseDir = context.examplesDir ?? resolvePath(context.program.projectRoot, "examples");
+  const examplesBaseDir =
+    context.examplesDir ?? resolvePath(context.program.projectRoot, "examples");
 
-  const exampleDir = apiVersion ? resolvePath(examplesBaseDir, apiVersion) : resolvePath(examplesBaseDir);
+  const exampleDir = apiVersion
+    ? resolvePath(examplesBaseDir, apiVersion)
+    : resolvePath(examplesBaseDir);
   if (!(await checkExamplesDirExists(context.program.host, exampleDir))) {
     if (context.examplesDir) {
       diagnostics.add(

@@ -38,7 +38,7 @@ describe("typespec-client-generator-core: load examples", () => {
 
   it("example default config", async () => {
     runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-java"
+      emitterName: "@azure-tools/typespec-java",
     });
 
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
@@ -56,7 +56,6 @@ describe("typespec-client-generator-core: load examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples![0].filePath, "get.json");
   });
-
 
   it("no example folder found", async () => {
     await runner.compile(`
