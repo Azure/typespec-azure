@@ -1283,8 +1283,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-        )
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1349,8 +1349,10 @@ export function getSdkModelPropertyType(
     const httpOperation = getHttpOperationWithCache(context, operation);
     const httpBody = httpOperation.parameters.body;
     if (httpBody) {
-      const httpBodyType = isHttpBodySpread(httpBody, operation.parameters) ? getHttpBodySpreadModel(httpBody.type as Model): httpBody.type;
-      if (type.model === httpBodyType){
+      const httpBodyType = isHttpBodySpread(httpBody, operation.parameters)
+        ? getHttpBodySpreadModel(httpBody.type as Model)
+        : httpBody.type;
+      if (type.model === httpBodyType) {
         // only try to add multipartOptions for property of body
         diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
       }
@@ -1570,7 +1572,13 @@ function updateTypesFromOperation(
     const spread = isHttpBodySpread(httpBody, operation.parameters);
     let sdkType: SdkType;
     if (spread) {
-      sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, getHttpBodySpreadModel(httpBody.type as Model), operation));
+      sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(
+          context,
+          getHttpBodySpreadModel(httpBody.type as Model),
+          operation
+        )
+      );
     } else {
       sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, httpBody.type, operation));
     }
@@ -1579,7 +1587,7 @@ function updateTypesFromOperation(
         if (!context.spreadModels?.has(httpBody.type as Model)) {
           context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
         }
-        updateUsageOfModel(context, UsageFlags.Input, sdkType, {skipFirst: true});
+        updateUsageOfModel(context, UsageFlags.Input, sdkType, { skipFirst: true });
       } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);
       }

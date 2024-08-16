@@ -22,7 +22,13 @@ import {
   Union,
   Value,
 } from "@typespec/compiler";
-import { HttpOperation, HttpOperationBody, HttpOperationMultipartBody, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
+import {
+  HttpOperation,
+  HttpOperationBody,
+  HttpOperationMultipartBody,
+  HttpOperationResponseContent,
+  HttpStatusCodeRange,
+} from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
@@ -441,8 +447,8 @@ function isOperationBodyType(context: TCGCContext, type: Type, operation?: Opera
     : undefined;
   return Boolean(
     httpBody &&
-    httpBody.type.kind === "Model" &&
-    getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
+      httpBody.type.kind === "Model" &&
+      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
   );
 }
 
@@ -550,18 +556,21 @@ export function isXmlContentType(contentType: string): boolean {
 
 /**
  * If body is from spread, then it does not directly from a model property.
- * @param httpBody 
- * @param parameters 
- * @returns 
+ * @param httpBody
+ * @param parameters
+ * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody, parameters: Model) {
+export function isHttpBodySpread(
+  httpBody: HttpOperationBody | HttpOperationMultipartBody,
+  parameters: Model
+) {
   return httpBody.property === undefined;
 }
 
 /**
  * If body is from simple spread, then we use the original model as body model.
- * @param type 
- * @returns 
+ * @param type
+ * @returns
  */
 export function getHttpBodySpreadModel(type: Model): Model {
   if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
@@ -571,7 +580,12 @@ export function getHttpBodySpreadModel(type: Model): Model {
       return innerModel;
     }
     // for case: `op test(@header h: string, @query q: string, ...Model): void`;
-    if (innerModel.sourceModels.length === 1 && innerModel.sourceModels[0].usage === "spread" && innerModel.sourceModels[0].model.name !== "" && innerModel.sourceModels[0].model.properties.size === type.properties.size) {
+    if (
+      innerModel.sourceModels.length === 1 &&
+      innerModel.sourceModels[0].usage === "spread" &&
+      innerModel.sourceModels[0].model.name !== "" &&
+      innerModel.sourceModels[0].model.properties.size === type.properties.size
+    ) {
       return innerModel.sourceModels[0].model;
     }
   }

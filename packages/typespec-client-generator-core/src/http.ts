@@ -159,9 +159,17 @@ function getSdkHttpParameters(
       const spread = isHttpBodySpread(tspBody, httpOperation.operation.parameters);
       let type: SdkType;
       if (spread) {
-        type = diagnostics.pipe(getClientTypeWithDiagnostics(context, getHttpBodySpreadModel(tspBody.type as Model), httpOperation.operation));
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(
+            context,
+            getHttpBodySpreadModel(tspBody.type as Model),
+            httpOperation.operation
+          )
+        );
       } else {
-        type = diagnostics.pipe(getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation));
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+        );
       }
       const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
@@ -392,12 +400,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation
 ): [
-    {
-      responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-      exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
-    },
-    readonly Diagnostic[],
-  ] {
+  {
+    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
+    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  },
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
   const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
