@@ -490,3 +490,30 @@ extern dec override(original: Operation, override: Operation, scope?: valueof st
  * ```
  */
 extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
+
+/**
+ * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ * 
+ * op upload(blobName: string): void;
+ * op download(blobName: string): void;
+ * 
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blobName: string;
+ * }
+ * 
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blobName` parameter to the client level.
+ * ```
+ */
+extern dec clientInitialization(target: Namespace | Interface,
+  options: Model,
+  scope?: valueof string);

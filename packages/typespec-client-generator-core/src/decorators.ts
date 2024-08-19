@@ -36,6 +36,7 @@ import {
   AccessDecorator,
   ClientDecorator,
   ClientFormatDecorator,
+  ClientInitializationDecorator,
   ClientNameDecorator,
   ConvenientAPIDecorator,
   ExcludeDecorator,
@@ -1162,7 +1163,7 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
-export const $clientInitialization: DecoratorFunction = (
+export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Model,

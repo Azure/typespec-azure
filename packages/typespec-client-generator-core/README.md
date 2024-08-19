@@ -15,6 +15,7 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@access`](#@access)
 - [`@client`](#@client)
 - [`@clientFormat`](#@clientformat)
+- [`@clientInitialization`](#@clientinitialization)
 - [`@clientName`](#@clientname)
 - [`@convenientAPI`](#@convenientapi)
 - [`@exclude`](#@exclude)
@@ -250,6 +251,45 @@ model MyModel {
   @clientFormat("unixtime")
   created_at?: int64;
 }
+```
+
+#### `@clientInitialization`
+
+Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+
+```typespec
+@Azure.ClientGenerator.Core.clientInitialization(options: Model, scope?: valueof string)
+```
+
+##### Target
+
+`Namespace | Interface`
+
+##### Parameters
+
+| Name    | Type             | Description                                                                                                   |
+| ------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| options | `Model`          |                                                                                                               |
+| scope   | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+##### Examples
+
+```typespec
+// main.tsp
+namespace MyService;
+
+op upload(blobName: string): void;
+op download(blobName: string): void;
+
+// client.tsp
+namespace MyCustomizations;
+model MyServiceClientOptions {
+  blobName: string;
+}
+
+@@clientInitialization(MyService, MyServiceClientOptions)
+// The generated client will have `blobName` on it. We will also
+// elevate the existing `blobName` parameter to the client level.
 ```
 
 #### `@clientName`

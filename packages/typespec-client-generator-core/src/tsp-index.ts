@@ -14,6 +14,7 @@ import {
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
+  $clientInitialization,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -41,5 +42,6 @@ export const $decorators = {
     flattenProperty: $flattenProperty,
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
+    clientInitialization: $clientInitialization,
   } as AzureClientGeneratorCoreDecorators,
 };

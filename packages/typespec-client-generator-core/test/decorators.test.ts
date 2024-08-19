@@ -4743,4 +4743,48 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
     });
   });
+  describe("@clientInitialization", () => {
+    it("main client", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(blobName: string): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          blobName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 2);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+      
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 1);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+    });
+  });
 });
