@@ -1440,12 +1440,7 @@ function updateUsageOrAccessOfModel(
 
   if (typeof value === "number") {
     // usage set
-    const usageOverride = getUsageOverride(context, type.__raw as any);
-    if (usageOverride) {
-      type.usage |= usageOverride | value;
-    } else {
-      type.usage |= value;
-    }
+    type.usage |= value;
   } else {
     // access set
     if (!type.__accessSet || type.access !== "public") {
@@ -1659,6 +1654,15 @@ function updateAccessOverrideOfModel(context: TCGCContext): void {
   }
 }
 
+function updateUsageOverrideOfModel(context: TCGCContext): void {
+  for (const sdkType of context.modelsMap?.values() ?? []) {
+    const usageOverride = getUsageOverride(context, sdkType.__raw as any);
+    if (usageOverride) {
+      updateUsageOrAccessOfModel(context, usageOverride, sdkType, { isOverride: true });
+    }
+  }
+}
+
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   for (const sdkType of context.spreadModels?.values() ?? []) {
     // if a type has spread usage, then it must be internal
@@ -1764,6 +1768,8 @@ export function getAllModelsWithDiagnostics(
   }
   // update access
   updateAccessOverrideOfModel(context);
+  // update usage
+  updateUsageOverrideOfModel(context);
   // update spread model
   updateSpreadModelUsageAndAccess(context);
   // filter out models
