@@ -67,6 +67,7 @@ import {
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
+  SdkInitializationType,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
@@ -712,6 +713,18 @@ export function getSdkModel(
   operation?: Operation
 ): SdkModelType {
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
+}
+
+export function getInitializationType(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
+): SdkInitializationType {
+  const model = ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
+  for (const property of model.properties) {
+    property.kind = "method";
+  }
+  return model;
 }
 
 export function getSdkModelWithDiagnostics(

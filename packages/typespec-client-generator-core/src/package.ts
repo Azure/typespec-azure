@@ -30,6 +30,7 @@ import {
   SdkEndpointType,
   SdkEnumType,
   SdkHttpOperation,
+  SdkInitializationType,
   SdkLroPagingServiceMethod,
   SdkLroServiceMethod,
   SdkMethod,
@@ -311,9 +312,9 @@ function getClientDefaultApiVersion(
 function getSdkInitializationType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup
-): [SdkModelType, readonly Diagnostic[]] {
+): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let initializationModel: SdkModelType | undefined;
+  let initializationModel: SdkInitializationType | undefined;
   const initializationDecorator = getClientInitialization(context, client.type);
   let clientParams = context.__clientToParameters.get(client.type);
   if (!clientParams) {
@@ -321,11 +322,19 @@ function getSdkInitializationType(
     context.__clientToParameters.set(client.type, clientParams);
   }
   if (initializationDecorator) {
-    initializationModel = getSdkModel(context, initializationDecorator);
-    for (const property of initializationModel.properties) {
-      property.onClient = true;
-      clientParams.push(property);
-    }
+    const sdkModel = getSdkModel(context, initializationDecorator);
+    const initializationProps = sdkModel.properties.map(
+      (property: SdkModelPropertyType): SdkMethodParameter => {
+        property.onClient = true;
+        clientParams.push(property);
+        property.kind = "method";
+        return property as SdkMethodParameter;
+      }
+    );
+    initializationModel = {
+      ...sdkModel,
+      properties: initializationProps,
+    };
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
@@ -405,7 +414,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
         parameters.push(property);
       }
     } else {
-
     }
     const name = `get${operationGroup.type.name}`;
     retval.push({

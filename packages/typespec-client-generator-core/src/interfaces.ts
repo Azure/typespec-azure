@@ -96,7 +96,7 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   name: string;
   description?: string;
   details?: string;
-  initialization: SdkModelType;
+  initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
@@ -388,6 +388,10 @@ export interface SdkModelType extends SdkTypeBase {
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+}
+
+export interface SdkInitializationType extends SdkModelType {
+  properties: SdkParameter[];
 }
 
 export interface SdkCredentialType extends SdkTypeBase {

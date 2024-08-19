@@ -4793,7 +4793,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameCorresponding.onClient, true);
       strictEqual(blobName.type.kind, "string");
     });
-    it("subclient", async() => {
+    it("subclient", async () => {
       await runner.compileWithCustomization(
         `
         @service
@@ -4824,7 +4824,8 @@ describe("typespec-client-generator-core: decorators", () => {
       const getBlobClient = methods[0];
       strictEqual(getBlobClient.kind, "clientaccessor");
       strictEqual(getBlobClient.name, "getBlobClient");
-      strictEqual(getBlobClient.parameters.length, 2);
-    })
+      strictEqual(getBlobClient.parameters.length, 1);
+      strictEqual(getBlobClient.parameters[0].name, "blobName");
+    });
   });
 });
