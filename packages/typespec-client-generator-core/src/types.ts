@@ -1795,18 +1795,6 @@ export function getAllModelsWithDiagnostics(
         ogs.push(...operationGroup.subOperationGroups);
       }
     }
-    // orphan models
-    for (const model of client.service.models.values()) {
-      handleServiceOrphanType(context, model);
-    }
-    // orphan enums
-    for (const enumType of client.service.enums.values()) {
-      handleServiceOrphanType(context, enumType);
-    }
-    // orphan unions
-    for (const unionType of client.service.unions.values()) {
-      handleServiceOrphanType(context, unionType);
-    }
     // server parameters
     const servers = getServers(context.program, client.service);
     if (servers !== undefined && servers[0].parameters !== undefined) {
@@ -1824,6 +1812,21 @@ export function getAllModelsWithDiagnostics(
       );
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
+    }
+  }
+  // update for orphan models/enums/unions
+  for (const client of listClients(context)) {
+    // orphan models
+    for (const model of client.service.models.values()) {
+      handleServiceOrphanType(context, model);
+    }
+    // orphan enums
+    for (const enumType of client.service.enums.values()) {
+      handleServiceOrphanType(context, enumType);
+    }
+    // orphan unions
+    for (const unionType of client.service.unions.values()) {
+      handleServiceOrphanType(context, unionType);
     }
   }
   // update access
