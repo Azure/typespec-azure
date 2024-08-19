@@ -41,6 +41,7 @@ import {
   SdkOperationGroup,
   SdkPackage,
   SdkPagingServiceMethod,
+  SdkParameter,
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
@@ -314,27 +315,16 @@ function getSdkInitializationType(
   client: SdkClient | SdkOperationGroup
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let initializationModel: SdkInitializationType | undefined;
-  const initializationDecorator = getClientInitialization(context, client.type);
+  let initializationModel = getClientInitialization(context, client.type);
   let clientParams = context.__clientToParameters.get(client.type);
   if (!clientParams) {
     clientParams = [];
     context.__clientToParameters.set(client.type, clientParams);
   }
-  if (initializationDecorator) {
-    const sdkModel = getSdkModel(context, initializationDecorator);
-    const initializationProps = sdkModel.properties.map(
-      (property: SdkModelPropertyType): SdkMethodParameter => {
-        property.onClient = true;
-        clientParams.push(property);
-        property.kind = "method";
-        return property as SdkMethodParameter;
-      }
-    );
-    initializationModel = {
-      ...sdkModel,
-      properties: initializationProps,
-    };
+  if (initializationModel) {
+    for (const prop of initializationModel.properties) {
+      clientParams.push(prop);
+    }
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
@@ -408,9 +398,9 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType)
     );
     const clientInitialization = getClientInitialization(context, operationGroup.type);
-    const parameters: SdkMethodParameter[] = [];
+    const parameters: SdkParameter[] = [];
     if (clientInitialization) {
-      for (const property of getSdkModel(context, clientInitialization).properties) {
+      for (const property of clientInitialization.properties) {
         parameters.push(property);
       }
     } else {

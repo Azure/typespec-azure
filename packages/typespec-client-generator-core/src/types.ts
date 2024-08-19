@@ -724,7 +724,7 @@ export function getInitializationType(
   for (const property of model.properties) {
     property.kind = "method";
   }
-  return model;
+  return model as SdkInitializationType;
 }
 
 export function getSdkModelWithDiagnostics(
