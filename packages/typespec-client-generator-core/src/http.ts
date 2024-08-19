@@ -156,7 +156,7 @@ function getSdkHttpParameters(
       }
       retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
-      const spread = isHttpBodySpread(tspBody, httpOperation.operation.parameters);
+      const spread = isHttpBodySpread(tspBody);
       let type: SdkType;
       if (spread) {
         type = diagnostics.pipe(

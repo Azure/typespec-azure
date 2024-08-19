@@ -561,8 +561,7 @@ export function isXmlContentType(contentType: string): boolean {
  * @returns
  */
 export function isHttpBodySpread(
-  httpBody: HttpOperationBody | HttpOperationMultipartBody,
-  parameters: Model
+  httpBody: HttpOperationBody | HttpOperationMultipartBody
 ) {
   return httpBody.property === undefined;
 }

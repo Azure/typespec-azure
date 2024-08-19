@@ -1349,7 +1349,7 @@ export function getSdkModelPropertyType(
     const httpOperation = getHttpOperationWithCache(context, operation);
     const httpBody = httpOperation.parameters.body;
     if (httpBody) {
-      const httpBodyType = isHttpBodySpread(httpBody, operation.parameters)
+      const httpBodyType = isHttpBodySpread(httpBody)
         ? getHttpBodySpreadModel(httpBody.type as Model)
         : httpBody.type;
       if (type.model === httpBodyType) {
@@ -1569,7 +1569,7 @@ function updateTypesFromOperation(
   }
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
-    const spread = isHttpBodySpread(httpBody, operation.parameters);
+    const spread = isHttpBodySpread(httpBody);
     let sdkType: SdkType;
     if (spread) {
       sdkType = diagnostics.pipe(
