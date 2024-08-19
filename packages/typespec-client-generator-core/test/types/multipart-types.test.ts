@@ -643,10 +643,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     `,
     ];
 
-    await runner.compileWithCustomization(
-      testCode[0],
-      testCode[1]
-    );
+    await runner.compileWithCustomization(testCode[0], testCode[1]);
 
     const models = runner.context.sdkPackage.models;
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
