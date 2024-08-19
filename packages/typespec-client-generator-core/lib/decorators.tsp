@@ -499,21 +499,23 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
  * ```typespec
  * // main.tsp
  * namespace MyService;
- * 
+ *
  * op upload(blobName: string): void;
  * op download(blobName: string): void;
- * 
+ *
  * // client.tsp
  * namespace MyCustomizations;
  * model MyServiceClientOptions {
  *   blobName: string;
  * }
- * 
+ *
  * @@clientInitialization(MyService, MyServiceClientOptions)
  * // The generated client will have `blobName` on it. We will also
  * // elevate the existing `blobName` parameter to the client level.
  * ```
  */
-extern dec clientInitialization(target: Namespace | Interface,
+extern dec clientInitialization(
+  target: Namespace | Interface,
   options: Model,
-  scope?: valueof string);
+  scope?: valueof string
+);

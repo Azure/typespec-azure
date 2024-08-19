@@ -3,6 +3,7 @@ import {
   $access,
   $client,
   $clientFormat,
+  $clientInitialization,
   $clientName,
   $convenientAPI,
   $exclude,
@@ -14,7 +15,6 @@ import {
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
-  $clientInitialization,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";

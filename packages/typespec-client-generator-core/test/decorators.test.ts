@@ -4750,7 +4750,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @service
         namespace MyService;
 
-        op download(blobName: string): void;
+        op download(@path blobName: string): void;
         `,
         `
         namespace MyCustomizations;
@@ -4772,19 +4772,26 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobName.clientDefaultValue, undefined);
       strictEqual(blobName.onClient, true);
       strictEqual(blobName.optional, false);
-      
+
       const methods = client.methods;
       strictEqual(methods.length, 1);
       const download = methods[0];
       strictEqual(download.name, "download");
       strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 0);
+      strictEqual(download.parameters.length, 1);
+      strictEqual(download.parameters[0].name, "blobName");
+      strictEqual(download.parameters[0].onClient, true);
+
       const downloadOp = download.operation;
       strictEqual(downloadOp.parameters.length, 1);
       const blobNameOpParam = downloadOp.parameters[0];
       strictEqual(blobNameOpParam.name, "blobName");
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
-      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+
+      const blobNameCorresponding = blobNameOpParam.correspondingMethodParams[0];
+      strictEqual(blobNameCorresponding.name, "blobName");
+      strictEqual(blobNameCorresponding.onClient, true);
+      strictEqual(blobName.type.kind, "string");
     });
   });
 });

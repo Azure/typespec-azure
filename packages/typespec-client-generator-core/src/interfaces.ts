@@ -40,7 +40,7 @@ export interface TCGCContext {
   spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
+  __clientToParameters: Map<Interface | Namespace, SdkModelPropertyType[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
@@ -91,6 +91,7 @@ export interface SdkClient {
 
 export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
+  __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
   description?: string;
