@@ -1,12 +1,4 @@
-import {
-  Enum,
-  Interface,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  ignoreDiagnostics,
-} from "@typespec/compiler";
+import { Interface, Model, Namespace, Operation, ignoreDiagnostics } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -16,7 +8,6 @@ import {
   getClient,
   getClientNameOverride,
   getOperationGroup,
-  getUsage,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,

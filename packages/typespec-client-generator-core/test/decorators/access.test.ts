@@ -1,14 +1,7 @@
-import {
-  Model,
-  ModelProperty,
-  Operation,
-} from "@typespec/compiler";
+import { Model, ModelProperty, Operation } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import {
-  getAccess,
-
-} from "../../src/decorators.js";
+import { getAccess } from "../../src/decorators.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: @access", () => {
@@ -17,7 +10,6 @@ describe("typespec-client-generator-core: @access", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
-
 
   describe("namespace access override", () => {
     it("should inherit access from parent namespace", async () => {

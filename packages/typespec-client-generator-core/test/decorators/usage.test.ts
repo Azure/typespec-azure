@@ -1,16 +1,9 @@
-import {
-  Enum,
-  Model,
-} from "@typespec/compiler";
+import { Enum, Model } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import {
-  getUsage,
-} from "../../src/decorators.js";
-import {
-  UsageFlags,
-} from "../../src/interfaces.js";
+import { getUsage } from "../../src/decorators.js";
+import { UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: @usage", () => {
@@ -176,14 +169,23 @@ describe("typespec-client-generator-core: @usage", () => {
         }
       `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
 
-    strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    strictEqual(
+      getUsage(runner.context, Fish),
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+    );
     strictEqual(
       getUsage(runner.context, Shark),
       UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
     );
     strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
-    strictEqual(getUsage(runner.context, SawShark), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
-    strictEqual(getUsage(runner.context, Origin), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    strictEqual(
+      getUsage(runner.context, SawShark),
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+    );
+    strictEqual(
+      getUsage(runner.context, Origin),
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+    );
   });
 
   it("usage and convenience", async () => {

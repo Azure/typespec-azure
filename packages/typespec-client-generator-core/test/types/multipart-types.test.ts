@@ -8,7 +8,6 @@ import {
   SdkHttpOperation,
   UsageFlags,
 } from "../../src/interfaces.js";
-import { getAllModelsWithDiagnostics } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: multipart types", () => {
