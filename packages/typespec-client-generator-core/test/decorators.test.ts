@@ -4793,5 +4793,38 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameCorresponding.onClient, true);
       strictEqual(blobName.type.kind, "string");
     });
+    it("subclient", async() => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace StorageClient {
+          interface BlobClient {
+            op download(@path blobName: string): void;
+          }
+        }
+        `,
+        `
+        model BlobClientInitialization {
+          blobName: string
+        };
+
+        @@clientInitialization(StorageClient.BlobClient, BlobClientInitialization);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const clients = sdkPackage.clients;
+      strictEqual(clients.length, 1);
+      const client = clients[0];
+      strictEqual(client.name, "StorageClient");
+      strictEqual(client.initialization.properties.length, 1);
+      strictEqual(client.initialization.properties[0].kind, "endpoint");
+
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const getBlobClient = methods[0];
+      strictEqual(getBlobClient.kind, "clientaccessor");
+      strictEqual(getBlobClient.name, "getBlobClient");
+      strictEqual(getBlobClient.parameters.length, 2);
+    })
   });
 });

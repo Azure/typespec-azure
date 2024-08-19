@@ -398,10 +398,19 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     const operationGroupClient = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType)
     );
+    const clientInitialization = getClientInitialization(context, operationGroup.type);
+    const parameters: SdkMethodParameter[] = [];
+    if (clientInitialization) {
+      for (const property of getSdkModel(context, clientInitialization).properties) {
+        parameters.push(property);
+      }
+    } else {
+
+    }
     const name = `get${operationGroup.type.name}`;
     retval.push({
       kind: "clientaccessor",
-      parameters: [],
+      parameters,
       name,
       description: getDocHelper(context, operationGroup.type).description,
       details: getDocHelper(context, operationGroup.type).details,
