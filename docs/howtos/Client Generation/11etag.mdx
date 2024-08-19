@@ -5,8 +5,8 @@ import TabItem from "@theme/TabItem";
 
 This doc details what emitters will generate for conditional request header
 
+## `If-Match` and `If-None-Match`
 
-##  `If-Match` and `If-None-Match`
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
 
@@ -14,11 +14,11 @@ This doc details what emitters will generate for conditional request header
 op get(
   @header("If-Match")
   @doc("The request should only proceed if an entity matches this string.")
-  ifMatch?: string;
+  ifMatch?: string,
 
   @header("If-None-Match")
   @doc("The request should only proceed if no entity matches this string.")
-  ifNoneMatch?: string;
+  ifNoneMatch?: string,
 ): void;
 ```
 
