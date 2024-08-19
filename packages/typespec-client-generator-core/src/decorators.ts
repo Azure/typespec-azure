@@ -614,9 +614,9 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
     diagnostics: diagnostics.diagnostics,
     originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
+    __clientToParameters: new Map(),
     __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
+    __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
   };
 }
@@ -1159,7 +1159,6 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   entity: Model,
   scope?: LanguageScopes
 ) => {};
-
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 

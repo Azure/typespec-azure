@@ -97,6 +97,7 @@ import {
   isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
+  isSubscriptionId,
   isXmlContentType,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -108,6 +109,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
+  isApiVersion,
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
@@ -1178,6 +1180,13 @@ export function getSdkModelPropertyTypeBase(
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
+  const namespace = type.model?.namespace;
+  const onClient =
+    isSubscriptionId(context, type) ||
+    isApiVersion(context, type) ||
+    Boolean(
+      namespace && context.__clientToParameters.get(namespace)?.find((x) => x.name === type.name)
+    );
   return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,
@@ -1192,6 +1201,7 @@ export function getSdkModelPropertyTypeBase(
       type,
       operation ? getLocationOfOperation(operation) : undefined
     ),
+    onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });

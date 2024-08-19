@@ -59,6 +59,7 @@ import {
   getLocationOfOperation,
   getTypeDecorators,
   isNeverOrVoidType,
+  isSubscriptionId,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -314,8 +315,16 @@ function getSdkInitializationType(
   const credentialParam = getSdkCredentialParameter(context, client);
   let initializationModel: SdkModelType | undefined;
   const initializationDecorator = getClientInitialization(context, client.type);
+  let clientParams = context.__clientToParameters.get(client.type);
+  if (!clientParams) {
+    clientParams = [];
+    context.__clientToParameters.set(client.type, clientParams);
+  }
   if (initializationDecorator) {
     initializationModel = getSdkModel(context, initializationDecorator);
+    for (const property of initializationModel.properties) {
+      property.onClient = true;
+    }
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
@@ -332,7 +341,7 @@ function getSdkInitializationType(
       apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
       isFormDataType: false,
       decorators: [],
-    }
+    };
   }
 
   // there will always be an endpoint property
@@ -341,20 +350,23 @@ function getSdkInitializationType(
   if (credentialParam) {
     initializationModel.properties.push(credentialParam);
   }
-  let apiVersionParam = context.__namespaceToApiVersionParameter.get(client.type);
+  let apiVersionParam = clientParams.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
     for (const operationGroup of listOperationGroups(context, client)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
-      apiVersionParam = context.__namespaceToApiVersionParameter.get(operationGroup.type);
+      apiVersionParam = context.__clientToParameters
+        .get(operationGroup.type)
+        ?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) break;
     }
   }
   if (apiVersionParam) {
     initializationModel.properties.push(apiVersionParam);
   }
-  if (context.__subscriptionIdParameter) {
-    initializationModel.properties.push(context.__subscriptionIdParameter);
+  const subId = clientParams.find((x) => isSubscriptionId(context, x));
+  if (subId) {
+    initializationModel.properties.push(subId);
   }
   return diagnostics.wrap(initializationModel);
 }
@@ -615,7 +627,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
       filterApiVersionsWithDecorators(context, client.type, clientApiVersions)
     );
 
-    context.__namespaceToApiVersionClientDefaultValue.set(
+    context.__clientToApiVersionClientDefaultValue.set(
       client.type,
       getClientDefaultApiVersion(context, client)
     );
@@ -628,7 +640,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
         filterApiVersionsWithDecorators(context, og.type, clientApiVersions)
       );
 
-      context.__namespaceToApiVersionClientDefaultValue.set(
+      context.__clientToApiVersionClientDefaultValue.set(
         og.type,
         getClientDefaultApiVersion(context, og)
       );

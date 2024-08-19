@@ -53,7 +53,11 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
+import {
+  getCrossLanguageDefinitionId,
+  getEffectivePayloadType,
+  isApiVersion,
+} from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -473,8 +477,13 @@ export function getCorrespondingMethodParams(
   const diagnostics = createDiagnosticCollector();
 
   const operationLocation = getLocationOfOperation(operation);
+  let clientParams = context.__clientToParameters.get(operationLocation);
+  if (!clientParams) {
+    clientParams = [];
+    context.__clientToParameters.set(operationLocation, clientParams);
+  }
   if (serviceParam.isApiVersionParam) {
-    const existingApiVersion = context.__namespaceToApiVersionParameter.get(operationLocation);
+    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
       const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
       if (!apiVersionParam) {
@@ -495,15 +504,14 @@ export function getCorrespondingMethodParams(
         name: "apiVersion",
         isGeneratedName: apiVersionParam.name !== "apiVersion",
         optional: false,
-        clientDefaultValue:
-          context.__namespaceToApiVersionClientDefaultValue.get(operationLocation),
+        clientDefaultValue: context.__clientToApiVersionClientDefaultValue.get(operationLocation),
       };
-      context.__namespaceToApiVersionParameter.set(operationLocation, apiVersionParamUpdated);
+      clientParams.push(apiVersionParamUpdated); // TODO:
     }
-    return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(operationLocation)!]);
+    return diagnostics.wrap(clientParams);
   }
   if (isSubscriptionId(context, serviceParam)) {
-    if (!context.__subscriptionIdParameter) {
+    if (!clientParams.find((x) => isSubscriptionId(context, x))) {
       const subscriptionIdParam = methodParameters.find((x) => isSubscriptionId(context, x));
       if (!subscriptionIdParam) {
         diagnostics.add(
@@ -518,9 +526,9 @@ export function getCorrespondingMethodParams(
         );
         return diagnostics.wrap([]);
       }
-      context.__subscriptionIdParameter = subscriptionIdParam;
+      clientParams.push(subscriptionIdParam);
     }
-    return diagnostics.wrap([context.__subscriptionIdParameter]);
+    return diagnostics.wrap(clientParams);
   }
 
   // to see if the service parameter is a method parameter or a property of a method parameter

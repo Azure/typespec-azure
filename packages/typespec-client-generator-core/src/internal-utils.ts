@@ -111,16 +111,14 @@ export function updateWithApiVersionInformation(
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
-  onClient: boolean;
 } {
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
     clientDefaultValue:
       isApiVersionParam && namespace
-        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        ? context.__clientToApiVersionClientDefaultValue.get(namespace)
         : undefined,
-    onClient: onClient(context, type),
   };
 }
 
@@ -455,10 +453,6 @@ export function isMultipartFormData(
 
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
   return Boolean(context.arm) && parameter.name === "subscriptionId";
-}
-
-export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
-  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }
 
 export function getLocationOfOperation(operation: Operation): Namespace | Interface {
