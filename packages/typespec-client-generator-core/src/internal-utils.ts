@@ -560,9 +560,7 @@ export function isXmlContentType(contentType: string): boolean {
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(
-  httpBody: HttpOperationBody | HttpOperationMultipartBody
-) {
+export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
   return httpBody.property === undefined;
 }
 
