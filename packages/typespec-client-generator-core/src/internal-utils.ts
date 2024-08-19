@@ -574,11 +574,11 @@ export function isHttpBodySpread(
 export function getHttpBodySpreadModel(type: Model): Model {
   if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
     const innerModel = type.sourceModels[0].model;
-    // for case: `op test(...Model):void`;
+    // for case: `op test(...Model):void;`
     if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
       return innerModel;
     }
-    // for case: `op test(@header h: string, @query q: string, ...Model): void`;
+    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
     if (
       innerModel.sourceModels.length === 1 &&
       innerModel.sourceModels[0].usage === "spread" &&
