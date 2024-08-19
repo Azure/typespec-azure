@@ -78,7 +78,6 @@ import {
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
-  getSdkModel,
   getSdkModelPropertyType,
   getTypeSpecBuiltInType,
 } from "./types.js";

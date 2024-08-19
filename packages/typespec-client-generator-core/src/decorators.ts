@@ -1192,6 +1192,5 @@ export function getClientInitialization(
   return {
     ...sdkModel,
     properties: initializationProps,
-  }
-
+  };
 }
