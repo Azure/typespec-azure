@@ -432,19 +432,6 @@ export function createGeneratedName(
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
-function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
-  if (type.kind !== "Model") return false;
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return Boolean(
-    httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
-  );
-}
-
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
   return Boolean(context.arm) && parameter.name === "subscriptionId";
 }
