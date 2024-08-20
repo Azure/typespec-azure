@@ -131,7 +131,6 @@ describe("typespec-client-generator-core: model types", () => {
   it("recursive model", async () => {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model RecursiveModel {
         prop: RecursiveModel
       }
@@ -1137,23 +1136,19 @@ describe("typespec-client-generator-core: model types", () => {
   it("additionalProperties of same type", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel extends Record<string> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel2 is Record<unknown> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel3 {
           prop: string;
           ...Record<string>;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model NoAdditionalPropertiesModel {
           prop: string;
         }
@@ -1241,14 +1236,12 @@ describe("typespec-client-generator-core: model types", () => {
   it("additionalProperties of different types", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel {
           prop: string;
           ...Record<float32>;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel2 {
           prop: string;
           ...Record<boolean | float32>;
@@ -1272,11 +1265,9 @@ describe("typespec-client-generator-core: model types", () => {
         @service({})
         namespace MyService {
           @usage(Usage.input)
-          @access(Access.public)
           model InputModel {}
 
           @usage(Usage.output)
-          @access(Access.public)
           model OutputModel {}
         }
       `);
@@ -1293,7 +1284,6 @@ describe("typespec-client-generator-core: model types", () => {
   it("template model", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Catalog is TrackedResource<CatalogProperties> {
           @pattern("^[A-Za-z0-9_-]{1,50}$")
           @key("catalogName")
@@ -1302,7 +1292,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model CatalogProperties {
           test?: string;
         }
@@ -1312,7 +1301,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Deployment is TrackedResource<DeploymentProperties> {
           @key("deploymentName")
           @segment("deployments")
@@ -1320,7 +1308,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model DeploymentProperties {
           deploymentId?: string;
           deploymentDateUtc?: utcDateTime;
@@ -1357,7 +1344,6 @@ describe("typespec-client-generator-core: model types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Model1{}
 
           model Model2{}
@@ -1479,7 +1465,6 @@ describe("typespec-client-generator-core: model types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Test{
             prop1: never;
             prop2: void;

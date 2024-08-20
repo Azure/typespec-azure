@@ -14,7 +14,6 @@ describe("typespec-client-generator-core: duration types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           prop: duration;
         }
@@ -29,7 +28,6 @@ describe("typespec-client-generator-core: duration types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DurationKnownEncoding.ISO8601)
           prop: duration;
@@ -46,7 +44,6 @@ describe("typespec-client-generator-core: duration types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DurationKnownEncoding.seconds, int32)
           prop: duration;
@@ -63,7 +60,6 @@ describe("typespec-client-generator-core: duration types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DurationKnownEncoding.seconds, float)
           prop: duration;
@@ -80,7 +76,6 @@ describe("typespec-client-generator-core: duration types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @encode(DurationKnownEncoding.seconds, float)
           prop: duration | null;
@@ -105,7 +100,6 @@ describe("typespec-client-generator-core: duration types", () => {
         scalar Float32Duration extends duration;
         
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           value: Float32Duration[];
         }

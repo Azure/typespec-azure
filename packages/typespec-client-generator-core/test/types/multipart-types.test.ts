@@ -114,7 +114,6 @@ describe("typespec-client-generator-core: multipart types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AddressSecondAppearance {
           address: Address;
         }
