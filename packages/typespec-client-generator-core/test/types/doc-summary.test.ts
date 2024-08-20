@@ -1,6 +1,6 @@
+import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-import { strictEqual } from "assert";
 
 describe("typespec-client-generator-core: doc and summary", () => {
   let runner: SdkTestRunner;
