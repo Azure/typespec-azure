@@ -861,7 +861,12 @@ function getSdkEnumWithDiagnostics(
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: diagnostics.pipe(getSdkEnumValueType(context, [...type.members.values()].map(v => v.value))),
+      valueType: diagnostics.pipe(
+        getSdkEnumValueType(
+          context,
+          [...type.members.values()].map((v) => v.value)
+        )
+      ),
       values: [],
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
@@ -927,7 +932,12 @@ export function getSdkUnionEnumWithDiagnostics(
       details: docWrapper.details,
       valueType:
         diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
-        diagnostics.pipe(getSdkEnumValueType(context, [...type.flattenedMembers.values()].map(v => v.value))),
+        diagnostics.pipe(
+          getSdkEnumValueType(
+            context,
+            [...type.flattenedMembers.values()].map((v) => v.value)
+          )
+        ),
       values: [],
       isFixed: !type.open,
       isFlags: false,
@@ -966,7 +976,12 @@ function getKnownValuesEnum(
         isGeneratedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
-        valueType: diagnostics.pipe(getSdkEnumValueType(context, [...knownValues.members.values()].map(v => v.value))),
+        valueType: diagnostics.pipe(
+          getSdkEnumValueType(
+            context,
+            [...knownValues.members.values()].map((v) => v.value)
+          )
+        ),
         values: [],
         isFixed: false,
         isFlags: false,
