@@ -111,7 +111,6 @@ import {
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
-import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 
 export function getTypeSpecBuiltInType(
@@ -779,20 +778,17 @@ export function getSdkModelWithDiagnostics(
 
 function getSdkEnumValueType(
   context: TCGCContext,
-  values:
-    | IterableIterator<EnumMember>
-    | IterableIterator<UnionEnumVariant<string>>
-    | IterableIterator<UnionEnumVariant<number>>
+  values: (string | number | undefined)[]
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let kind: "string" | "int32" | "float32" = "string";
   for (const value of values) {
-    if (typeof value.value === "number") {
-      kind = intOrFloat(value.value);
+    if (typeof value === "number") {
+      kind = intOrFloat(value);
       if (kind === "float32") {
         break;
       }
-    } else if (typeof value.value === "string") {
+    } else if (typeof value === "string") {
       kind = "string";
       break;
     }
@@ -865,7 +861,7 @@ function getSdkEnumWithDiagnostics(
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: diagnostics.pipe(getSdkEnumValueType(context, type.members.values())),
+      valueType: diagnostics.pipe(getSdkEnumValueType(context, [...type.members.values()].map(v => v.value))),
       values: [],
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
@@ -931,7 +927,7 @@ export function getSdkUnionEnumWithDiagnostics(
       details: docWrapper.details,
       valueType:
         diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
-        diagnostics.pipe(getSdkEnumValueType(context, type.flattenedMembers.values())),
+        diagnostics.pipe(getSdkEnumValueType(context, [...type.flattenedMembers.values()].map(v => v.value))),
       values: [],
       isFixed: !type.open,
       isFlags: false,
@@ -970,7 +966,7 @@ function getKnownValuesEnum(
         isGeneratedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
-        valueType: diagnostics.pipe(getSdkEnumValueType(context, knownValues.members.values())),
+        valueType: diagnostics.pipe(getSdkEnumValueType(context, [...knownValues.members.values()].map(v => v.value))),
         values: [],
         isFixed: false,
         isFlags: false,
