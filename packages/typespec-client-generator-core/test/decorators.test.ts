@@ -4929,5 +4929,70 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(noClientParamsMethod.parameters[0].name, "query");
       strictEqual(noClientParamsMethod.parameters[0].onClient, false);
     });
+
+    it("multiple client params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blobName: string, @path containerName: string): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          blobName: string;
+          containerName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 3);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const containerName = client.initialization.properties.find(
+        (x) => x.name === "containerName"
+      );
+      ok(containerName);
+      strictEqual(containerName.clientDefaultValue, undefined);
+      strictEqual(containerName.onClient, true);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 2);
+
+      const blobNameParam = download.parameters.find((x) => x.name === "blobName");
+      ok(blobNameParam);
+      strictEqual(blobNameParam.onClient, true);
+
+      const containerNameParam = download.parameters.find((x) => x.name === "containerName");
+      ok(containerNameParam);
+      strictEqual(containerNameParam.onClient, true);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 2);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+
+      const containerNameOpParam = downloadOp.parameters[1];
+      strictEqual(containerNameOpParam.name, "containerName");
+      strictEqual(containerNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
+    });
   });
 });
