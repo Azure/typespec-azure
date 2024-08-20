@@ -540,3 +540,7 @@ export function isXmlContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
   return regex.test(contentType);
 }
+
+export function twoParamsEquivalent(param1: { name: string }, param2: { name: string }): boolean {
+  return param1.name === param2.name;
+}

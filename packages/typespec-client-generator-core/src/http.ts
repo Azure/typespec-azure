@@ -51,6 +51,7 @@ import {
   isContentTypeHeader,
   isNeverOrVoidType,
   isSubscriptionId,
+  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -476,12 +477,18 @@ export function getCorrespondingMethodParams(
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  const operationLocation = getLocationOfOperation(operation);
+  const operationLocation = getLocationOfOperation(operation)!;
   let clientParams = context.__clientToParameters.get(operationLocation);
   if (!clientParams) {
     clientParams = [];
     context.__clientToParameters.set(operationLocation, clientParams);
   }
+
+  const correspondingClientParams = clientParams.filter((x) =>
+    twoParamsEquivalent(x, serviceParam)
+  );
+  if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
+
   if (serviceParam.isApiVersionParam) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
@@ -508,7 +515,7 @@ export function getCorrespondingMethodParams(
       };
       clientParams.push(apiVersionParamUpdated); // TODO:
     }
-    return diagnostics.wrap(clientParams);
+    return diagnostics.wrap(clientParams.filter((x) => isApiVersion(context, x)));
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!clientParams.find((x) => isSubscriptionId(context, x))) {
@@ -528,7 +535,7 @@ export function getCorrespondingMethodParams(
       }
       clientParams.push(subscriptionIdParam);
     }
-    return diagnostics.wrap(clientParams);
+    return diagnostics.wrap(clientParams.filter((x) => isSubscriptionId(context, x)));
   }
 
   // to see if the service parameter is a method parameter or a property of a method parameter

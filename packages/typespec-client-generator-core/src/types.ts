@@ -100,6 +100,7 @@ import {
   isNeverOrVoidType,
   isSubscriptionId,
   isXmlContentType,
+  twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -1353,6 +1354,12 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  const clientParams = operation
+    ? context.__clientToParameters.get(getLocationOfOperation(operation))
+    : undefined;
+  const correspondingClientParams = clientParams?.find((x) => twoParamsEquivalent(x, type));
+  if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);

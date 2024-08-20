@@ -4787,18 +4787,19 @@ describe("typespec-client-generator-core: decorators", () => {
       const blobNameOpParam = downloadOp.parameters[0];
       strictEqual(blobNameOpParam.name, "blobName");
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
-
-      const blobNameCorresponding = blobNameOpParam.correspondingMethodParams[0];
-      strictEqual(blobNameCorresponding.name, "blobName");
-      strictEqual(blobNameCorresponding.onClient, true);
-      strictEqual(blobName.type.kind, "string");
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
     });
     it("subclient", async () => {
       await runner.compileWithCustomization(
         `
         @service
         namespace StorageClient {
+
+          @route("/main")
+          op download(@path blobName: string): void;
+
           interface BlobClient {
+            @route("/blob")
             op download(@path blobName: string): void;
           }
         }
@@ -4820,12 +4821,54 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(client.initialization.properties[0].kind, "endpoint");
 
       const methods = client.methods;
-      strictEqual(methods.length, 1);
-      const getBlobClient = methods[0];
+      strictEqual(methods.length, 2);
+
+      // the main client's function should not have `blobName` as a client method parameter
+      const mainClientDownload = methods.find((x) => x.kind === "basic" && x.name === "download");
+      ok(mainClientDownload);
+      strictEqual(mainClientDownload.parameters.length, 1);
+      strictEqual(mainClientDownload.parameters[0].name, "blobName");
+      strictEqual(mainClientDownload.parameters[0].onClient, false);
+
+      const getBlobClient = methods.find((x) => x.kind === "clientaccessor");
+      ok(getBlobClient);
       strictEqual(getBlobClient.kind, "clientaccessor");
       strictEqual(getBlobClient.name, "getBlobClient");
       strictEqual(getBlobClient.parameters.length, 1);
-      strictEqual(getBlobClient.parameters[0].name, "blobName");
+      const blobNameParam = getBlobClient.parameters.find((x) => x.name === "blobName");
+      ok(blobNameParam);
+      strictEqual(blobNameParam.onClient, true);
+      strictEqual(blobNameParam.optional, false);
+      strictEqual(blobNameParam.kind, "method");
+
+      const blobClient = getBlobClient.response;
+
+      strictEqual(blobClient.kind, "client");
+      strictEqual(blobClient.name, "BlobClient");
+      strictEqual(blobClient.initialization.properties.length, 2);
+
+      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
+      const blobClientBlobInitializationProp = blobClient.initialization.properties.find(
+        (x) => x.name === "blobName"
+      );
+      ok(blobClientBlobInitializationProp);
+      strictEqual(blobClientBlobInitializationProp.kind, "method");
+      strictEqual(blobClientBlobInitializationProp.onClient, true);
+      strictEqual(blobClient.methods.length, 1);
+
+      const download = blobClient.methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 1);
+      strictEqual(download.parameters[0].name, "blobName");
+      strictEqual(download.parameters[0].onClient, true);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 1);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobClientBlobInitializationProp);
     });
   });
 });
