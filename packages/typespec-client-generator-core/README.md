@@ -28,21 +28,19 @@ npm install @azure-tools/typespec-client-generator-core
 
 #### `@access`
 
-Set explicit access for operations, models and enums.
+Override access for operations, models and enums.
 When setting access for namespaces,
-the access info will be propagated to the models defined in the namespace.
+the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
 When setting access for an operation,
 it will influence the access info for models/enums that are used by this operation.
 Models/enums that are used in any operations with `@access(Access.public)` will be set to access "public"
 Models/enums that are only used in operations with `@access(Access.internal)` will be set to access "internal".
-The usage info for models will be propagated to models' properties,
+The access info for models will be propagated to models' properties,
 parent models, discriminated sub models.
-The override usage should not be narrow than the usage calculated by operation,
-and different override usage should not conflict with each other,
+The override access should not be narrow than the access calculated by operation,
+and different override access should not conflict with each other,
 otherwise a warning will be added to diagnostics list.
-But this influence will be override by `@usage` decorator on models/enums directly.
-The default access is public.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -520,7 +518,7 @@ op test: void;
 
 #### `@usage`
 
-Expand usage for models/enums.
+Override usage for models/enums.
 A model/enum's default usage info is always calculated by the operations that use it.
 You could use this decorator to override the default usage info.
 When setting usage for namespaces,
