@@ -20,7 +20,6 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@exclude`](#@exclude)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@include`](#@include)
-- [`@internal`](#@internal)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@protocolAPI`](#@protocolapi)
@@ -33,13 +32,15 @@ Set explicit access for operations, models and enums.
 When setting access for namespaces,
 the access info will be propagated to the models defined in the namespace.
 If the model has an access override, the model override takes precedence.
-When setting access for models,
-the access info wll not be propagated to models' properties, base models or sub models.
 When setting access for an operation,
 it will influence the access info for models/enums that are used by this operation.
-Models/enums that are used in any operations with `@access(Access.public)` will be implicitly set to access "public"
-Models/enums that are only used in operations with `@access(Access.internal)` will be implicitly set to access "internal".
-This influence will be propagated to models' properties, parent models, discriminated sub models.
+Models/enums that are used in any operations with `@access(Access.public)` will be set to access "public"
+Models/enums that are only used in operations with `@access(Access.internal)` will be set to access "internal".
+The usage info for models will be propagated to models' properties,
+parent models, discriminated sub models.
+The override usage should not be narrow than the usage calculated by operation,
+and different override usage should not conflict with each other,
+otherwise a warning will be added to diagnostics list.
 But this influence will be override by `@usage` decorator on models/enums directly.
 The default access is public.
 
@@ -406,36 +407,6 @@ model ModelToInclude {
 }
 ```
 
-#### `@internal`
-
-_Deprecated: @internal decorator is deprecated. Use `@access` decorator instead._
-
-DEPRECATED: Use `@access` decorator instead.
-
-Whether to mark an operation as internal for specific languages,
-meaning it should not be exposed to end SDK users
-
-```typespec
-@Azure.ClientGenerator.Core.internal(scope?: valueof string)
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-##### Examples
-
-```typespec
-@internal("python")
-op test: void;
-```
-
 #### `@operationGroup`
 
 Create a ClientGenerator.Core operation group out of a namespace or interface
@@ -551,19 +522,19 @@ op test: void;
 
 Expand usage for models/enums.
 A model/enum's default usage info is always calculated by the operations that use it.
-You could use this decorator to expand the default usage info.
+You could use this decorator to override the default usage info.
 When setting usage for namespaces,
 the usage info will be propagated to the models defined in the namespace.
 If the model has an usage override, the model override takes precedence.
 For example, with operation definition `op test(): OutputModel`,
 the model `OutputModel` has default usage `Usage.output`.
-After adding decorator `@@usage(OutputModel, Usage.input)`,
+After adding decorator `@@usage(OutputModel, Usage.input | Usage.output)`,
 the final usage result for `OutputModel` is `Usage.input | Usage.output`.
-The calculation of default usage info for models will be propagated to models' properties,
+The usage info for models will be propagated to models' properties,
 parent models, discriminated sub models.
-But the expanded usage from `@usage` decorator will not be propagated.
-If you want to do any customization for the usage of a model,
-you need to take care of all related models/enums.
+The override usage should not be narrow than the usage calculated by operation,
+and different override usage should not conflict with each other,
+otherwise a warning will be added to diagnostics list.
 
 ```typespec
 @Azure.ClientGenerator.Core.usage(value: EnumMember | Union, scope?: valueof string)

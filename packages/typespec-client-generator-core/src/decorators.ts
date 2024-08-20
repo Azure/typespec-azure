@@ -871,7 +871,7 @@ export const $usage: UsageDecorator = (
 export function getUsageOverride(
   context: TCGCContext,
   entity: Model | Enum | Union
-): UsageFlags | undefined {
+): number | undefined {
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
   return getScopedDecoratorData(context, usageKey, entity.namespace);

@@ -1,4 +1,5 @@
 import { Model, ModelProperty, Operation } from "@typespec/compiler";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
@@ -630,5 +631,103 @@ describe("typespec-client-generator-core: @access", () => {
     strictEqual(models.length, 2);
     strictEqual(models[0].access, "public");
     strictEqual(models[1].access, "public");
+  });
+
+  it("access conflict from operation", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        @access(Access.internal)
+        model A {}
+
+        op test(@body body: A): void;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].access, "public");
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
+    });
+  });
+
+  it("access conflict from propagation", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        model A {
+          prop: B;
+        }
+
+        @access(Access.internal)
+        model B {}
+
+        op test(@body body: A): void;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].access, "public");
+    strictEqual(models[1].access, "public");
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
+    });
+  });
+
+  it("access conflict from other override", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        model A {
+          prop: B;
+        }
+
+        model B {}
+
+        @access(Access.internal)
+        @usage(Usage.input)
+        model C {
+          prop: B;
+        }
+
+        op test(@body body: A): void;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    strictEqual(models[0].access, "public");
+    strictEqual(models[1].access, "public");
+    strictEqual(models[2].access, "internal");
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
+    });
+  });
+
+  it("access conflict from multiple override", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        model A {
+          x: X;
+        }
+
+        model B {
+          x: X;
+        }
+
+        @access(Access.internal)
+        model X {
+        }
+
+        @access(Access.internal)
+        op one(...B): B;
+
+        @access(Access.internal)
+        op two(): B;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    strictEqual(models.find((m) => m.name === "B")?.access, "internal");
+    strictEqual(models.find((m) => m.name === "X")?.access, "public");
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
+    });
   });
 });

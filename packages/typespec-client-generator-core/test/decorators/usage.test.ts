@@ -79,11 +79,11 @@ describe("typespec-client-generator-core: @usage", () => {
           model Model4{ prop: string }
 
           @test
-          @usage(Usage.output)
+          @usage(Usage.input | Usage.output)
           model Model2{ prop: string }
 
           @test
-          @usage(Usage.input)
+          @usage(Usage.input | Usage.output)
           model Model3{ prop: string }
 
           @test
@@ -141,7 +141,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
           @discriminator("sharktype")
           @test
-          @usage(Usage.input)
+          @usage(Usage.input | Usage.output)
           model Shark extends Fish {
             kind: "shark";
             origin: Origin;
@@ -333,5 +333,103 @@ describe("typespec-client-generator-core: @usage", () => {
       getUsage(runner.context, OrphanModelWithOverride),
       UsageFlags.Input | UsageFlags.Output
     );
+  });
+
+  it("usage conflict from operation", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        @usage(Usage.output)
+        model A {}
+
+        op test(@body body: A): void;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
+    });
+  });
+
+  it("usage conflict from propagation", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        model A {
+          prop: B;
+        }
+
+        @usage(Usage.output)
+        model B {}
+
+        op test(@body body: A): void;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
+    strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Json);
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
+    });
+  });
+
+  it("usage conflict from other override", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        model A {
+          prop: B;
+        }
+
+        model B {}
+
+        @usage(Usage.output)
+        model C {
+          prop: B;
+        }
+
+        op test(@body body: A): void;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
+    strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Json);
+    strictEqual(models[2].usage, UsageFlags.Output);
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
+    });
+  });
+
+  it("usage conflict from spread", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        model A {
+          x: X;
+        }
+
+        model B {
+          x: X;
+        }
+
+        @usage(Usage.input)
+        model X {
+        }
+
+        op one(...B): B;
+
+        op two(): B;
+        `
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    strictEqual(models.find((m) => m.name === "B")?.usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(
+      models.find((m) => m.name === "X")?.usage,
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+    );
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
+    });
   });
 });
