@@ -23,6 +23,7 @@ import {
   ArmUpdateProviderNamespaceDecorator,
   AssignProviderNameValueDecorator,
   AzureResourceBaseDecorator,
+  AzureResourceManagerPrivateDecorators,
   ConditionalClientFlattenDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
@@ -46,7 +47,7 @@ import { ArmStateKeys } from "./state.js";
 export const namespace = "Azure.ResourceManager.Private";
 
 /** @internal */
-export const $omitIfEmpty: OmitIfEmptyDecorator = (
+const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
   propertyName: string
@@ -62,7 +63,7 @@ export const $omitIfEmpty: OmitIfEmptyDecorator = (
   }
 };
 
-export const $enforceConstraint: EnforceConstraintDecorator = (
+const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
   sourceType: Model,
@@ -88,7 +89,7 @@ export const $enforceConstraint: EnforceConstraintDecorator = (
   }
 };
 
-export const $resourceBaseParametersOf: ResourceBaseParametersOfDecorator = (
+const $resourceBaseParametersOf: ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
   entity: Model,
   resourceType: Model
@@ -108,7 +109,7 @@ export const $resourceBaseParametersOf: ResourceBaseParametersOfDecorator = (
   }
 };
 
-export const $resourceParameterBaseFor: ResourceParameterBaseForDecorator = (
+const $resourceParameterBaseFor: ResourceParameterBaseForDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   values: Type
@@ -124,7 +125,7 @@ export const $resourceParameterBaseFor: ResourceParameterBaseForDecorator = (
   context.program.stateMap(ArmStateKeys.armResourceCollection).set(entity, resolvedValues);
 };
 
-export const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
+const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   resource: Model,
@@ -187,7 +188,7 @@ function isResourceParameterBaseForInternal(
  * @param {Type} target Target of this decorator. Must be a string `ModelProperty`.
  * @param {Type} resourceType Must be a `Model`.
  */
-export const $assignProviderNameValue: AssignProviderNameValueDecorator = (
+const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   resourceType: Model
@@ -206,7 +207,7 @@ export const $assignProviderNameValue: AssignProviderNameValueDecorator = (
  * @param {Type} entity Entity to set namespace. Must be a `Operation`.
  * @returns
  */
-export const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
+const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
   context: DecoratorContext,
   entity: Operation
 ) => {
@@ -262,7 +263,7 @@ export function isArmOperationsListInterface(program: Program, type: Interface):
  * decorator, so it also gets applied to the type which absorbs the `TrackedResource<T>`
  * definition by using the `is` keyword.
  */
-export const $armResourceInternal: ArmResourceInternalDecorator = (
+const $armResourceInternal: ArmResourceInternalDecorator = (
   context: DecoratorContext,
   resourceType: Model,
   propertiesType: Model
@@ -376,7 +377,7 @@ function hasProperty(program: Program, model: Model): boolean {
   return false;
 }
 
-export const $azureResourceBase: AzureResourceBaseDecorator = (
+const $azureResourceBase: AzureResourceBaseDecorator = (
   context: DecoratorContext,
   resourceType: Model
 ) => {
@@ -394,7 +395,7 @@ export function isAzureResource(program: Program, resourceType: Model): boolean 
  * It will programatically enabled/disable client flattening with @flattenProperty with autorest
  * emitter flags to maintain compatibility in swagger.
  */
-export const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
+const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
   context: DecoratorContext,
   entity: ModelProperty
 ) => {
@@ -406,7 +407,7 @@ export function isConditionallyFlattened(program: Program, entity: ModelProperty
   return flatten ?? false;
 }
 
-export const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
+const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   resourceType: Model,
@@ -424,7 +425,7 @@ export const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
   );
 };
 
-export const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator = (
+const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   isOptional: boolean
@@ -432,4 +433,22 @@ export const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionality
   if (target.name === "properties") {
     target.optional = isOptional;
   }
+};
+
+/** @internal */
+export const $decorators = {
+  "Azure.ResourceManager.Private": {
+    resourceBaseParametersOf: $resourceBaseParametersOf,
+    resourceParameterBaseFor: $resourceParameterBaseFor,
+    azureResourceBase: $azureResourceBase,
+    omitIfEmpty: $omitIfEmpty,
+    conditionalClientFlatten: $conditionalClientFlatten,
+    assignProviderNameValue: $assignProviderNameValue,
+    armUpdateProviderNamespace: $armUpdateProviderNamespace,
+    armResourceInternal: $armResourceInternal,
+    defaultResourceKeySegmentName: $defaultResourceKeySegmentName,
+    enforceConstraint: $enforceConstraint,
+    armRenameListByOperation: $armRenameListByOperation,
+    armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
+  } satisfies AzureResourceManagerPrivateDecorators,
 };

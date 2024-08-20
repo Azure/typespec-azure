@@ -115,6 +115,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients.length, 1);
       strictEqual(sdkPackage.clients[0].name, "MyClient");
       strictEqual(sdkPackage.clients[0].kind, "client");
+      strictEqual(sdkPackage.clients[0].parent, undefined);
     });
     it("initialization default endpoint no credential", async () => {
       await runner.compile(`
@@ -660,6 +661,7 @@ describe("typespec-client-generator-core: package", () => {
       const operationGroup = mainClient?.methods.find((c) => c.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       ok(mainClient && operationGroup);
+      strictEqual(operationGroup.parent, mainClient);
 
       strictEqual(mainClient.methods.length, 1);
       strictEqual(mainClient.initialization.properties.length, 1);
@@ -711,6 +713,9 @@ describe("typespec-client-generator-core: package", () => {
         (m) => m.kind === "clientaccessor" && m.name === "getBar"
       )?.response as SdkClientType<SdkHttpOperation>;
       ok(mainClient && fooClient && fooBarClient && barClient);
+      strictEqual(fooClient.parent, mainClient);
+      strictEqual(fooBarClient.parent, fooClient);
+      strictEqual(barClient.parent, mainClient);
 
       strictEqual(mainClient.methods.length, 2);
       ok(mainClient.initialization);
