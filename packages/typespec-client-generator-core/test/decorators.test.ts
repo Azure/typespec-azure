@@ -4870,5 +4870,64 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobClientBlobInitializationProp);
     });
+    it("some methods don't have client initialization params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blobName: string, @header header: int32): void;
+        op noClientParams(@query query: int32): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          blobName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 2);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 2);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 2);
+
+      const blobNameParam = download.parameters.find((x) => x.name === "blobName");
+      ok(blobNameParam);
+      strictEqual(blobNameParam.onClient, true);
+
+      const headerParam = download.parameters.find((x) => x.name === "header");
+      ok(headerParam);
+      strictEqual(headerParam.onClient, false);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 2);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+
+      const noClientParamsMethod = methods[1];
+      strictEqual(noClientParamsMethod.name, "noClientParams");
+      strictEqual(noClientParamsMethod.kind, "basic");
+      strictEqual(noClientParamsMethod.parameters.length, 1);
+      strictEqual(noClientParamsMethod.parameters[0].name, "query");
+      strictEqual(noClientParamsMethod.parameters[0].onClient, false);
+    });
   });
 });
