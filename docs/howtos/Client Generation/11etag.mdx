@@ -11,6 +11,11 @@ This doc details what emitters will generate for conditional request header
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
+model Response {
+    name: string;
+}
+
+@get
 op get(
   @header("If-Match")
   @doc("The request should only proceed if an entity matches this string.")
@@ -19,7 +24,7 @@ op get(
   @header("If-None-Match")
   @doc("The request should only proceed if no entity matches this string.")
   ifNoneMatch?: string,
-): void;
+): Response;
 ```
 
 </TabItem>
@@ -29,7 +34,7 @@ op get(
 ```python
 from azure.core import MatchConditions
 
-def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchConditions] = None)
+def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchConditions] = None) -> Response:
 ```
 
 </TabItem>
