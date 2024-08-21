@@ -21,9 +21,11 @@ import {
   Union,
   createDiagnosticCollector,
   getDiscriminator,
+  getDoc,
   getEncode,
   getFormat,
   getKnownValues,
+  getSummary,
   getVisibility,
   ignoreDiagnostics,
   isErrorModel,
@@ -265,6 +267,8 @@ function getSdkBuiltInTypeWithDiagnostics(
     encode: getEncodeHelper(context, type, kind),
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     baseType:
       type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
         ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
@@ -335,6 +339,8 @@ function getSdkDateTimeType(
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
@@ -434,6 +440,8 @@ function getSdkDurationTypeWithDiagnostics(
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
@@ -681,6 +689,7 @@ function addDiscriminatorToModelType(
     model.properties.splice(0, 0, {
       kind: "property",
       description: `Discriminator property for ${model.name}.`,
+      doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
       serializedName: discriminatorProperty
@@ -732,6 +741,8 @@ export function getSdkModelWithDiagnostics(
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
@@ -841,6 +852,8 @@ function getSdkEnumValueWithDiagnostics(
     value: type.value ?? type.name,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     enumType,
     valueType: enumType.valueType,
   });
@@ -865,6 +878,8 @@ function getSdkEnumWithDiagnostics(
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(getSdkEnumValueType(context, type.members.values())),
       values: [],
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
@@ -900,6 +915,8 @@ function getSdkUnionEnumValues(
       name: name ? name : `${member.value}`,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, member.type),
+      summary: getSummary(context.program, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,
@@ -929,6 +946,8 @@ export function getSdkUnionEnumWithDiagnostics(
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, union),
+      summary: getSummary(context.program, union),
       valueType:
         diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
         diagnostics.pipe(getSdkEnumValueType(context, type.flattenedMembers.values())),
@@ -970,6 +989,8 @@ function getKnownValuesEnum(
         isGeneratedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
+        doc: getDoc(context.program, type),
+        summary: getSummary(context.program, type),
         valueType: diagnostics.pipe(getSdkEnumValueType(context, knownValues.members.values())),
         values: [],
         isFixed: false,
@@ -1152,6 +1173,7 @@ export function getSdkCredentialParameter(
     name,
     isGeneratedName: true,
     description: "Credential used to authenticate requests to the service.",
+    doc: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service, client.type),
     onClient: true,
     optional: false,
@@ -1182,6 +1204,8 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     apiVersions,
     type: propertyType,
     name,
