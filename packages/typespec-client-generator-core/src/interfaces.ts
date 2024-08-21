@@ -98,8 +98,16 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
   kind: "client";
   name: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
   initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
@@ -138,8 +146,16 @@ interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
 }
 
 export type SdkType =
@@ -410,8 +426,16 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   type: SdkType;
   name: string;
   isGeneratedName: boolean;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
   apiVersions: string[];
   onClient: boolean;
   clientDefaultValue?: any;
@@ -524,8 +548,16 @@ export interface SdkServiceResponseHeader {
   __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
 }
 
 export interface SdkMethodResponse {
@@ -578,8 +610,16 @@ interface SdkMethodBase extends DecoratedType {
   access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
   crossLanguageDefintionId: string;
 }
 

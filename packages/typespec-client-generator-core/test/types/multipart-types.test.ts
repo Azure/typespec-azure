@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -32,7 +31,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(models.length, 1);
     const model = models[0];
     strictEqual(model.kind, "model");
-    strictEqual(model.isFormDataType, true);
+    strictEqual(model.isFormDataType, true); // eslint-disable-line deprecation/deprecation
     ok((model.usage & UsageFlags.MultipartFormData) > 0);
     strictEqual(model.name, "MultiPartRequest");
     strictEqual(model.properties.length, 2);
@@ -85,7 +84,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     const modelA = models.find((x) => x.name === "MultipartOperationRequest");
     ok(modelA);
     strictEqual(modelA.kind, "model");
-    strictEqual(modelA.isFormDataType, true);
+    strictEqual(modelA.isFormDataType, true); // eslint-disable-line deprecation/deprecation
     strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Spread);
     strictEqual(modelA.properties.length, 1);
     const modelAProp = modelA.properties[0];
@@ -97,7 +96,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     const modelB = models.find((x) => x.name === "NormalOperationRequest");
     ok(modelB);
     strictEqual(modelB.kind, "model");
-    strictEqual(modelB.isFormDataType, false);
+    strictEqual(modelB.isFormDataType, false); // eslint-disable-line deprecation/deprecation
     strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
     strictEqual(modelB.properties.length, 1);
     strictEqual(modelB.properties[0].type.kind, "bytes");
@@ -186,13 +185,13 @@ describe("typespec-client-generator-core: multipart types", () => {
 
     const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
     ok(pictureWrapper);
-    strictEqual(pictureWrapper.isFormDataType, true);
+    strictEqual(pictureWrapper.isFormDataType, true); // eslint-disable-line deprecation/deprecation
     ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
     const errorResponse = models.find((x) => x.name === "ErrorResponse");
     ok(errorResponse);
     strictEqual(errorResponse.kind, "model");
-    strictEqual(errorResponse.isFormDataType, false);
+    strictEqual(errorResponse.isFormDataType, false); // eslint-disable-line deprecation/deprecation
     ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
   });
 
