@@ -437,6 +437,9 @@ function getEndpointTypeFromSingleServer(
         kind: "path",
         onClient: true,
         urlEncode: false,
+        explode: false,
+        style: "simple",
+        allowReserved: false,
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
@@ -452,7 +455,9 @@ function getEndpointTypeFromSingleServer(
   const types: SdkEndpointType[] = [];
   if (!server) return diagnostics.wrap([defaultOverridableEndpointType]);
   for (const param of server.parameters.values()) {
-    const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
+    const sdkParam = diagnostics.pipe(
+      getSdkHttpParameter(context, param, undefined, undefined, "path")
+    );
     if (sdkParam.kind === "path") {
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
@@ -514,7 +519,7 @@ function getSdkEndpointParameter(
       types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, server)));
     }
   }
-  let type: SdkEndpointType | SdkUnionType;
+  let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
     type = {
       kind: "union",
@@ -523,7 +528,7 @@ function getSdkEndpointParameter(
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
       decorators: [],
-    };
+    } as SdkUnionType<SdkEndpointType>;
   } else {
     type = types[0];
   }

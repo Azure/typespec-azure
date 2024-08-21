@@ -489,6 +489,24 @@ export type OverrideDecorator = (
   scope?: string
 ) => void;
 
+/**
+ * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * @useSystemTextJsonConverter
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+export type UseSystemTextJsonConverterDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  scope?: string
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -503,4 +521,5 @@ export type AzureClientGeneratorCoreDecorators = {
   access: AccessDecorator;
   flattenProperty: FlattenPropertyDecorator;
   override: OverrideDecorator;
+  useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
 };

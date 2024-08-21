@@ -16,7 +16,7 @@ describe("typespec-client-generator-core: example types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-java",
-      "examples-directory": `./examples`,
+      "examples-dir": `./examples`,
     });
   });
 

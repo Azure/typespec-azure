@@ -3,7 +3,7 @@ import TabItem from "@theme/TabItem";
 
 # Convenient method generation
 
-This page documents how to customize method generations in DPG. For an overview of the setup, please visit the setup page.
+This page documents how to customize method generation for the emitters. For an overview of the setup, please visit the setup page.
 
 ## Default behaviors
 
@@ -38,7 +38,6 @@ op GetModel is ResourceRead<OutputModel>;
 class OutputModel:
   name: str = rest_field(readonly=True)
 response: OutputModel = client.get(name="name")
-FIXME
 ```
 
 </TabItem>
@@ -114,7 +113,7 @@ For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can b
 
 ### Shifting the generation of protocol and convenience on and off
 
-This can be achieved with the augment operator and the DPG package
+This can be achieved with the augment operator and the emitter package
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -198,9 +197,8 @@ The two possible value for the `Access` enum are `internal` and `public`.
 <TabItem value="python" label="Python">
 
 ```python
-class _GetModel:
-  ...
-# FIXME
+# can't import form models directly
+from petstorenamespace.models import GetModel # will report error
 ```
 
 </TabItem>

@@ -78,6 +78,7 @@ import {
   UsageFlags,
   getKnownScalars,
   isSdkBuiltInKind,
+  isSdkIntKind,
 } from "./interfaces.js";
 import {
   createGeneratedName,
@@ -137,15 +138,7 @@ function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly
 
 function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    const encode = getEncode(context.program, type);
-    if (encode?.encoding) {
-      return encode.encoding;
-    }
-    if (encode?.type) {
-      // if we specify the encoding type in the decorator, we set the `.encode` string
-      // to the kind of the encoding type
-      return getSdkBuiltInType(context, encode.type).kind;
-    }
+    return getEncode(context.program, type)?.encoding || kind;
   }
   return kind;
 }
@@ -213,6 +206,20 @@ export function addEncodeInfo(
       innerType.encode = "base64";
     } else {
       innerType.encode = "bytes";
+    }
+  }
+  if (isSdkIntKind(innerType.kind)) {
+    // only integer type is allowed to be encoded as string
+    if (encodeData && "encode" in innerType) {
+      const encode = getEncode(context.program, type);
+      if (encode?.encoding) {
+        innerType.encode = encode.encoding;
+      }
+      if (encode?.type) {
+        // if we specify the encoding type in the decorator, we set the `.encode` string
+        // to the kind of the encoding type
+        innerType.encode = getSdkBuiltInType(context, encode.type).kind;
+      }
     }
   }
   return diagnostics.wrap(undefined);
@@ -1106,7 +1113,7 @@ function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   authentication: Authentication
-): SdkCredentialType | SdkUnionType {
+): SdkCredentialType | SdkUnionType<SdkCredentialType> {
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
@@ -1127,7 +1134,7 @@ function getSdkCredentialType(
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
       decorators: [],
-    };
+    } as SdkUnionType<SdkCredentialType>;
   }
   return credentialTypes[0];
 }
@@ -1462,8 +1469,6 @@ function updateUsageOfModel(
   options = options ?? {};
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
-  // if (!type || !["model", "enum", "array", "dict", "union", "enumvalue"].includes(type.kind))
-  //   return;
   if (!type) return;
   if (options?.seenModelNames === undefined) {
     options.seenModelNames = new Set<SdkType>();
@@ -1790,18 +1795,6 @@ export function getAllModelsWithDiagnostics(
         ogs.push(...operationGroup.subOperationGroups);
       }
     }
-    // orphan models
-    for (const model of client.service.models.values()) {
-      handleServiceOrphanType(context, model);
-    }
-    // orphan enums
-    for (const enumType of client.service.enums.values()) {
-      handleServiceOrphanType(context, enumType);
-    }
-    // orphan unions
-    for (const unionType of client.service.unions.values()) {
-      handleServiceOrphanType(context, unionType);
-    }
     // server parameters
     const servers = getServers(context.program, client.service);
     if (servers !== undefined && servers[0].parameters !== undefined) {
@@ -1819,6 +1812,21 @@ export function getAllModelsWithDiagnostics(
       );
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
+    }
+  }
+  // update for orphan models/enums/unions
+  for (const client of listClients(context)) {
+    // orphan models
+    for (const model of client.service.models.values()) {
+      handleServiceOrphanType(context, model);
+    }
+    // orphan enums
+    for (const enumType of client.service.enums.values()) {
+      handleServiceOrphanType(context, enumType);
+    }
+    // orphan unions
+    for (const unionType of client.service.unions.values()) {
+      handleServiceOrphanType(context, unionType);
     }
   }
   // update access
