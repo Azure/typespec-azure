@@ -55,7 +55,9 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 <TabItem value="java" label="Java" >
 
 ```java
+import com.azure.core.http.MatchConditions;
 
+public Response get(MatchConditions matchConditions);
 ```
 
 </TabItem>
