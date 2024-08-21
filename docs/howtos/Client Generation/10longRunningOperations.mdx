@@ -29,6 +29,11 @@ model User {
   role: string;
 }
 
+// Operation for polling the status of the LRO. SDK may exclude this operation from client.
+@sharedRoute
+op getOperationStatus is ResourceOperations.GetResourceOperationStatus<User, never>;
+
+@pollingOperation(getOperationStatus)
 op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
 ```
 
@@ -77,6 +82,7 @@ Long-running operation to delete a resource.
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
+@pollingOperation(getOperationStatus)
 op delete is ResourceOperations.LongRunningResourceDelete<User>;
 ```
 
@@ -151,6 +157,11 @@ model ExportedUser {
   resourceUri: string;
 }
 
+// Operation for polling the status of the LRO. SDK may exclude this operation from client.
+@sharedRoute
+op getExportOperationStatus is ResourceOperations.GetResourceOperationStatus<User, ExportedUser>;
+
+@pollingOperation(getExportOperationStatus)
 op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
 ```
 
