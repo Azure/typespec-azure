@@ -618,4 +618,40 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(nameProperty.name, "name");
     strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
   });
+
+  it("multipart in client customization", async () => {
+    const testCode = [
+      `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          profileImage: bytes;
+        }
+  
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+    `,
+      `
+      namespace Customizations;
+      
+      @client({name: "FirstOrderClient", service: TestService})
+      interface FirstOrder {}
+
+      @client({name: "SecondOrderClient", service: TestService})
+      interface SecondOrder {
+        myOp is TestService.multipartUse
+      }
+    `,
+    ];
+
+    await runner.compileWithCustomization(testCode[0], testCode[1]);
+
+    const models = runner.context.sdkPackage.models;
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const property = MultiPartRequest.properties.find((x) => x.name === "profileImage");
+    ok(property);
+    strictEqual(property.kind, "property");
+    strictEqual(property.isMultipartFileInput, true);
+    ok(property.multipartOptions);
+    strictEqual(property.multipartOptions.isFilePart, true);
+  });
 });

@@ -214,9 +214,7 @@ using Azure.ClientGenerator.Core;
 ```python
 class InputModel:
   input_name: str = rest_field(rest_name="name", readonly=True)
-
-client.get_computed_model(name="name")
-# FIXME
+response: InputModel = client.get_computed_model(name="name")
 ```
 
 </TabItem>
