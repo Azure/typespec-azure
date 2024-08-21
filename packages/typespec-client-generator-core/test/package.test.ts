@@ -141,7 +141,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.kind, "path");
       strictEqual(templateArg.name, "endpoint");
       strictEqual(templateArg.serializedName, "endpoint");
-      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.urlEncode, false); // eslint-disable-line deprecation/deprecation
       strictEqual(templateArg.type.kind, "string");
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
@@ -333,7 +333,7 @@ describe("typespec-client-generator-core: package", () => {
       const templateArg = endpointParam.type.templateArguments[0];
       strictEqual(templateArg.kind, "path");
       strictEqual(templateArg.name, "endpointInput");
-      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.urlEncode, false); // eslint-disable-line deprecation/deprecation
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
@@ -422,7 +422,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const apiVersionParam = templatedEndpoint.templateArguments[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-      strictEqual(apiVersionParam.urlEncode, true);
+      strictEqual(apiVersionParam.urlEncode, true); // eslint-disable-line deprecation/deprecation
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.optional, false);
