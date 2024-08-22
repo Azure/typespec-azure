@@ -723,7 +723,7 @@ describe("typespec-client-generator-core: @access", () => {
         `
     );
     const models = runner.context.sdkPackage.models;
-    strictEqual(models.length, 3);
+    strictEqual(models.length, 2);
     strictEqual(models.find((m) => m.name === "B")?.access, "internal");
     strictEqual(models.find((m) => m.name === "X")?.access, "public");
     expectDiagnostics(runner.context.diagnostics, {
