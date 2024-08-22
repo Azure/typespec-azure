@@ -1318,8 +1318,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-        )
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1730,7 +1730,10 @@ function updateAccessOfModel(context: TCGCContext): void {
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   for (const [_, sdkType] of context.modelsMap?.entries() ?? []) {
-    if ((sdkType.usage & UsageFlags.Spread) > 0 && (sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) === 0) {
+    if (
+      (sdkType.usage & UsageFlags.Spread) > 0 &&
+      (sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) === 0
+    ) {
       // if a type has spread usage, but not used in any other operation, then set it to be internal
       sdkType.access = "internal";
     }

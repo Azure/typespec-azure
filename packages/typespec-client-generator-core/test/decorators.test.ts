@@ -4032,7 +4032,9 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
       strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
       strictEqual(runnerWithVersion.context.sdkPackage.models[1].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].access, "internal");
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -4048,6 +4050,7 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
       strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
       strictEqual(
         runnerWithVersion.context.sdkPackage.models[0].usage,
         UsageFlags.Spread | UsageFlags.Json
